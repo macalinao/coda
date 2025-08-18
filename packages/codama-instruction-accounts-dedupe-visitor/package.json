@@ -5,7 +5,7 @@
   "type": "module",
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
-  "homepage": "https://grill.ianm.com",
+  "homepage": "https://github.com/macalinao/coda",
   "license": "MIT",
   "keywords": [
     "codama",
@@ -32,14 +32,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/macalinao/grill.git",
-    "directory": "packages/codama/codama-instruction-accounts-dedupe-visitor"
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "packages/codama-instruction-accounts-dedupe-visitor"
   },
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
-    "lint": "eslint . --cache",
-    "test": "bun test"
+    "lint": "eslint . --cache"
   },
   "dependencies": {
     "@codama/nodes-from-anchor": "*",

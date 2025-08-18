@@ -1,0 +1,207 @@
+{
+  "address": "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9",
+  "metadata": {
+    "name": "quarry_redeemer",
+    "version": "5.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "create_redeemer",
+      "discriminator": [137, 228, 81, 63, 209, 33, 131, 195],
+      "accounts": [
+        {
+          "name": "redeemer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 82, 101, 100, 101, 101, 109, 101, 114, 34]
+              },
+              {
+                "kind": "account",
+                "path": "iou_mint",
+                "account": "Mint"
+              },
+              {
+                "kind": "account",
+                "path": "redemption_mint",
+                "account": "Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "iou_mint"
+        },
+        {
+          "name": "redemption_mint"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "redeem_tokens",
+      "discriminator": [246, 98, 134, 41, 152, 33, 120, 69],
+      "accounts": [
+        {
+          "name": "redeemer",
+          "writable": true
+        },
+        {
+          "name": "source_authority",
+          "signer": true
+        },
+        {
+          "name": "iou_mint",
+          "writable": true
+        },
+        {
+          "name": "iou_source",
+          "writable": true
+        },
+        {
+          "name": "redemption_vault",
+          "writable": true
+        },
+        {
+          "name": "redemption_destination",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "redeem_all_tokens",
+      "discriminator": [68, 38, 47, 47, 226, 176, 31, 48],
+      "accounts": [
+        {
+          "name": "redeemer",
+          "writable": true
+        },
+        {
+          "name": "source_authority",
+          "signer": true
+        },
+        {
+          "name": "iou_mint",
+          "writable": true
+        },
+        {
+          "name": "iou_source",
+          "writable": true
+        },
+        {
+          "name": "redemption_vault",
+          "writable": true
+        },
+        {
+          "name": "redemption_destination",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Redeemer",
+      "discriminator": [41, 191, 197, 8, 98, 64, 17, 99]
+    }
+  ],
+  "events": [
+    {
+      "name": "RedeemTokensEvent",
+      "discriminator": [36, 211, 53, 194, 23, 5, 75, 90]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized."
+    }
+  ],
+  "types": [
+    {
+      "name": "Redeemer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "iou_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "redemption_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "total_tokens_redeemed",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RedeemTokensEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "iou_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "redemption_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@macalinao/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["bun-types"]
+  },
+  "exclude": ["src/**/*.test.ts", "dist/**"]
+}

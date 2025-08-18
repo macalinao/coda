@@ -1,0 +1,102 @@
+{
+  "address": "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc",
+  "metadata": {
+    "name": "quarry_registry",
+    "version": "5.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "new_registry",
+      "discriminator": [237, 187, 50, 70, 74, 26, 144, 230],
+      "accounts": [
+        {
+          "name": "rewarder"
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 81, 117, 97, 114, 114, 121, 82, 101, 103, 105, 115, 116,
+                  114, 121, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "rewarder",
+                "account": "Rewarder"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "max_quarries",
+          "type": "u16"
+        },
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "sync_quarry",
+      "discriminator": [48, 99, 184, 151, 219, 101, 253, 170],
+      "accounts": [
+        {
+          "name": "quarry"
+        },
+        {
+          "name": "registry",
+          "writable": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Registry",
+      "discriminator": [47, 174, 110, 246, 184, 182, 252, 218]
+    }
+  ],
+  "types": [
+    {
+      "name": "Registry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "rewarder",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokens",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,19 +1,19 @@
 {
-  "name": "@macalinao/clients-token-metadata",
-  "version": "0.1.2",
-  "description": "TypeScript client for the Metaplex Token Metadata program",
+  "name": "@macalinao/codama-rename-visitor",
+  "version": "0.1.0",
+  "description": "Codama visitor for renaming instructions and events within a program",
   "type": "module",
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
-  "homepage": "https://coda.ianm.com",
-  "license": "Apache-2.0",
+  "homepage": "https://github.com/macalinao/coda",
+  "license": "MIT",
   "keywords": [
+    "codama",
     "solana",
-    "metaplex",
-    "token-metadata",
-    "nft",
-    "client",
-    "esm",
+    "anchor",
+    "idl",
+    "rename",
+    "visitor",
     "typescript"
   ],
   "main": "dist/index.js",
@@ -34,24 +34,20 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
-    "directory": "clients/mpl-token-metadata"
+    "directory": "packages/codama-rename-visitor"
   },
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
     "lint": "eslint . --cache",
-    "test": "bun test",
-    "codegen": "coda generate"
+    "test": "bun test"
   },
-  "peerDependencies": {
-    "@solana/kit": "*"
+  "dependencies": {
+    "codama": "*"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",
-    "@macalinao/coda": "workspace:*",
     "@macalinao/tsconfig": "catalog:",
-    "@solana/kit": "*",
-    "codama": "*",
     "eslint": "catalog:",
     "typescript": "catalog:"
   },

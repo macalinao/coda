@@ -1,0 +1,1235 @@
+{
+  "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  "metadata": {
+    "name": "quarry_mine",
+    "version": "5.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "new_rewarder",
+      "discriminator": [1, 115, 16, 244, 109, 74, 67, 209],
+      "accounts": [
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "rewarder",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 82, 101, 119, 97, 114, 100, 101, 114, 34]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "initial_authority"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "unused_account"
+        },
+        {
+          "name": "mint_wrapper"
+        },
+        {
+          "name": "rewards_token_mint"
+        },
+        {
+          "name": "claim_fee_token_account"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "new_rewarder_v2",
+      "discriminator": [173, 189, 26, 25, 79, 177, 60, 173],
+      "accounts": [
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "rewarder",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 82, 101, 119, 97, 114, 100, 101, 114, 34]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "initial_authority"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "mint_wrapper"
+        },
+        {
+          "name": "rewards_token_mint"
+        },
+        {
+          "name": "claim_fee_token_account"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_pause_authority",
+      "discriminator": [127, 70, 214, 12, 172, 8, 89, 114],
+      "accounts": [
+        {
+          "name": "auth",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            }
+          ]
+        },
+        {
+          "name": "new_pause_authority"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "pause",
+      "discriminator": [211, 22, 221, 251, 74, 121, 193, 47],
+      "accounts": [
+        {
+          "name": "pause_authority",
+          "signer": true
+        },
+        {
+          "name": "rewarder",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unpause",
+      "discriminator": [169, 144, 4, 38, 10, 141, 188, 255],
+      "accounts": [
+        {
+          "name": "pause_authority",
+          "signer": true
+        },
+        {
+          "name": "rewarder",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "transfer_authority",
+      "discriminator": [48, 169, 76, 72, 229, 180, 55, 161],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "rewarder",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "accept_authority",
+      "discriminator": [107, 86, 198, 91, 33, 12, 107, 160],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "rewarder",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_annual_rewards",
+      "discriminator": [135, 125, 92, 160, 100, 101, 141, 84],
+      "accounts": [
+        {
+          "name": "auth",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_rate",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "create_quarry",
+      "discriminator": [18, 113, 223, 132, 105, 208, 102, 93],
+      "accounts": [
+        {
+          "name": "quarry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 81, 117, 97, 114, 114, 121, 34]
+              },
+              {
+                "kind": "account",
+                "path": "auth.rewarder",
+                "account": "MutableRewarderWithAuthority"
+              },
+              {
+                "kind": "account",
+                "path": "token_mint",
+                "account": "Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "auth",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            }
+          ]
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "unused_account"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "create_quarry_v2",
+      "discriminator": [46, 84, 33, 67, 174, 252, 67, 148],
+      "accounts": [
+        {
+          "name": "quarry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 81, 117, 97, 114, 114, 121, 34]
+              },
+              {
+                "kind": "account",
+                "path": "auth.rewarder",
+                "account": "MutableRewarderWithAuthority"
+              },
+              {
+                "kind": "account",
+                "path": "token_mint",
+                "account": "Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "auth",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            }
+          ]
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_rewards_share",
+      "discriminator": [186, 168, 34, 15, 178, 135, 189, 129],
+      "accounts": [
+        {
+          "name": "auth",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            }
+          ]
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_share",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_famine",
+      "discriminator": [30, 50, 21, 169, 103, 68, 155, 192],
+      "accounts": [
+        {
+          "name": "auth",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "rewarder"
+            }
+          ]
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "famine_ts",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "update_quarry_rewards",
+      "discriminator": [42, 213, 243, 249, 125, 145, 44, 242],
+      "accounts": [
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "rewarder"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_miner",
+      "discriminator": [126, 23, 157, 1, 147, 94, 245, 69],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "miner",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 77, 105, 110, 101, 114, 34]
+              },
+              {
+                "kind": "account",
+                "path": "quarry",
+                "account": "Quarry"
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "rewarder"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "miner_vault"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "create_miner_v2",
+      "discriminator": [177, 242, 29, 176, 13, 217, 36, 71],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "miner",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 77, 105, 110, 101, 114, 34]
+              },
+              {
+                "kind": "account",
+                "path": "quarry",
+                "account": "Quarry"
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "rewarder"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "miner_vault"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_rewards",
+      "discriminator": [4, 144, 132, 71, 116, 23, 151, 80],
+      "accounts": [
+        {
+          "name": "mint_wrapper",
+          "writable": true
+        },
+        {
+          "name": "mint_wrapper_program",
+          "address": "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV"
+        },
+        {
+          "name": "minter",
+          "writable": true
+        },
+        {
+          "name": "rewards_token_mint",
+          "writable": true
+        },
+        {
+          "name": "rewards_token_account",
+          "writable": true
+        },
+        {
+          "name": "claim_fee_token_account",
+          "writable": true
+        },
+        {
+          "name": "claimV1",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "miner",
+              "writable": true
+            },
+            {
+              "name": "quarry",
+              "writable": true
+            },
+            {
+              "name": "unused_miner_vault"
+            },
+            {
+              "name": "unused_token_account"
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
+              "name": "rewarder"
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_rewards_v2",
+      "discriminator": [69, 49, 158, 229, 212, 133, 136, 227],
+      "accounts": [
+        {
+          "name": "mint_wrapper",
+          "writable": true
+        },
+        {
+          "name": "mint_wrapper_program",
+          "address": "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV"
+        },
+        {
+          "name": "minter",
+          "writable": true
+        },
+        {
+          "name": "rewards_token_mint",
+          "writable": true
+        },
+        {
+          "name": "rewards_token_account",
+          "writable": true
+        },
+        {
+          "name": "claim_fee_token_account",
+          "writable": true
+        },
+        {
+          "name": "claim",
+          "accounts": [
+            {
+              "name": "authority",
+              "signer": true
+            },
+            {
+              "name": "miner",
+              "writable": true
+            },
+            {
+              "name": "quarry",
+              "writable": true
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
+              "name": "rewarder"
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "stake_tokens",
+      "discriminator": [136, 126, 91, 162, 40, 131, 13, 127],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "miner",
+          "writable": true
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "miner_vault",
+          "writable": true
+        },
+        {
+          "name": "token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rewarder"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw_tokens",
+      "discriminator": [2, 4, 225, 61, 19, 182, 106, 170],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "miner",
+          "writable": true
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "miner_vault",
+          "writable": true
+        },
+        {
+          "name": "token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rewarder"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "rescue_tokens",
+      "discriminator": [222, 81, 199, 209, 182, 62, 62, 186],
+      "accounts": [
+        {
+          "name": "miner"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "miner_token_account",
+          "writable": true
+        },
+        {
+          "name": "destination_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "extract_fees",
+      "discriminator": [57, 219, 44, 55, 130, 127, 165, 183],
+      "accounts": [
+        {
+          "name": "rewarder"
+        },
+        {
+          "name": "claim_fee_token_account",
+          "writable": true
+        },
+        {
+          "name": "fee_to_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Rewarder",
+      "discriminator": [83, 3, 203, 174, 244, 30, 172, 198]
+    },
+    {
+      "name": "Quarry",
+      "discriminator": [243, 248, 54, 182, 240, 85, 9, 77]
+    },
+    {
+      "name": "Miner",
+      "discriminator": [223, 113, 15, 54, 123, 122, 140, 100]
+    }
+  ],
+  "events": [
+    {
+      "name": "ClaimEvent",
+      "discriminator": [93, 15, 70, 170, 48, 140, 212, 219]
+    },
+    {
+      "name": "MinerCreateEvent",
+      "discriminator": [200, 195, 241, 212, 154, 115, 62, 84]
+    },
+    {
+      "name": "QuarryCreateEvent",
+      "discriminator": [109, 244, 166, 195, 40, 32, 208, 179]
+    },
+    {
+      "name": "NewRewarderEvent",
+      "discriminator": [104, 219, 29, 190, 162, 244, 148, 236]
+    },
+    {
+      "name": "StakeEvent",
+      "discriminator": [226, 134, 188, 173, 19, 33, 75, 175]
+    },
+    {
+      "name": "WithdrawEvent",
+      "discriminator": [22, 9, 133, 26, 160, 44, 71, 192]
+    },
+    {
+      "name": "RewarderAnnualRewardsUpdateEvent",
+      "discriminator": [198, 66, 187, 153, 134, 34, 199, 21]
+    },
+    {
+      "name": "QuarryRewardsUpdateEvent",
+      "discriminator": [16, 63, 20, 155, 149, 162, 75, 193]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "You are not authorized to perform this action."
+    },
+    {
+      "code": 6001,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient staked balance for withdraw request."
+    },
+    {
+      "code": 6002,
+      "name": "PendingAuthorityNotSet",
+      "msg": "Pending authority not set"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidRewardsShare",
+      "msg": "Invalid quarry rewards share"
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientAllowance",
+      "msg": "Insufficient allowance."
+    },
+    {
+      "code": 6005,
+      "name": "NewVaultNotEmpty",
+      "msg": "New vault not empty."
+    },
+    {
+      "code": 6006,
+      "name": "NotEnoughTokens",
+      "msg": "Not enough tokens."
+    },
+    {
+      "code": 6007,
+      "name": "InvalidTimestamp",
+      "msg": "Invalid timestamp."
+    },
+    {
+      "code": 6008,
+      "name": "InvalidMaxClaimFee",
+      "msg": "Invalid max claim fee."
+    },
+    {
+      "code": 6009,
+      "name": "MaxAnnualRewardsRateExceeded",
+      "msg": "Max annual rewards rate exceeded."
+    },
+    {
+      "code": 6010,
+      "name": "Paused",
+      "msg": "Rewarder is paused."
+    },
+    {
+      "code": 6011,
+      "name": "UpperboundExceeded",
+      "msg": "Rewards earned exceeded quarry's upper bound."
+    }
+  ],
+  "types": [
+    {
+      "name": "StakeAction",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Stake"
+          },
+          {
+            "name": "Withdraw"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rewarder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "base",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "num_quarries",
+            "type": "u16"
+          },
+          {
+            "name": "annual_rewards_rate",
+            "type": "u64"
+          },
+          {
+            "name": "total_rewards_shares",
+            "type": "u64"
+          },
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "rewards_token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "claim_fee_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "max_claim_fee_millibps",
+            "type": "u64"
+          },
+          {
+            "name": "pause_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_paused",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Quarry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rewarder",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_mint_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "index",
+            "type": "u16"
+          },
+          {
+            "name": "token_mint_decimals",
+            "type": "u8"
+          },
+          {
+            "name": "famine_ts",
+            "type": "i64"
+          },
+          {
+            "name": "last_update_ts",
+            "type": "i64"
+          },
+          {
+            "name": "rewards_per_token_stored",
+            "type": "u128"
+          },
+          {
+            "name": "annual_rewards_rate",
+            "type": "u64"
+          },
+          {
+            "name": "rewards_share",
+            "type": "u64"
+          },
+          {
+            "name": "total_tokens_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "num_miners",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Miner",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "quarry",
+            "type": "pubkey"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "token_vault_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "rewards_earned",
+            "type": "u64"
+          },
+          {
+            "name": "rewards_per_token_paid",
+            "type": "u128"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "index",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "staked_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "rewards_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "fees",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MinerCreateEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "quarry",
+            "type": "pubkey"
+          },
+          {
+            "name": "miner",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuarryCreateEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewRewarderEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RewarderAnnualRewardsUpdateEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "previous_rate",
+            "type": "u64"
+          },
+          {
+            "name": "new_rate",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuarryRewardsUpdateEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "annual_rewards_rate",
+            "type": "u64"
+          },
+          {
+            "name": "rewards_share",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

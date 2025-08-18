@@ -1,0 +1,1085 @@
+{
+  "address": "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto",
+  "metadata": {
+    "name": "quarry_merge_mine",
+    "version": "5.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "new_pool",
+      "discriminator": [38, 63, 210, 32, 246, 20, 239, 112],
+      "accounts": [
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 77, 101, 114, 103, 101, 80, 111, 111, 108, 34]
+              },
+              {
+                "kind": "account",
+                "path": "primary_mint",
+                "account": "Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "primary_mint"
+        },
+        {
+          "name": "replica_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 82, 101, 112, 108, 105, 99, 97, 77, 105, 110, 116, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool",
+                "account": "MergePool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "mint_bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "new_pool_v2",
+      "discriminator": [107, 122, 206, 99, 39, 6, 23, 195],
+      "accounts": [
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 77, 101, 114, 103, 101, 80, 111, 111, 108, 34]
+              },
+              {
+                "kind": "account",
+                "path": "primary_mint",
+                "account": "Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "primary_mint"
+        },
+        {
+          "name": "replica_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 82, 101, 112, 108, 105, 99, 97, 77, 105, 110, 116, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool",
+                "account": "MergePool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "init_merge_miner",
+      "discriminator": [23, 22, 142, 134, 78, 63, 147, 161],
+      "accounts": [
+        {
+          "name": "pool"
+        },
+        {
+          "name": "owner"
+        },
+        {
+          "name": "mm",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 77, 101, 114, 103, 101, 77, 105, 110, 101, 114, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool",
+                "account": "MergePool"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "init_merge_miner_v2",
+      "discriminator": [153, 44, 29, 197, 171, 114, 71, 208],
+      "accounts": [
+        {
+          "name": "pool"
+        },
+        {
+          "name": "owner"
+        },
+        {
+          "name": "mm",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 77, 101, 114, 103, 101, 77, 105, 110, 101, 114, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool",
+                "account": "MergePool"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "init_miner",
+      "discriminator": [144, 159, 202, 208, 234, 154, 242, 55],
+      "accounts": [
+        {
+          "name": "pool"
+        },
+        {
+          "name": "mm"
+        },
+        {
+          "name": "miner",
+          "writable": true
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "rewarder"
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "miner_vault"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mine_program",
+          "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "init_miner_v2",
+      "discriminator": [189, 125, 116, 157, 73, 4, 253, 156],
+      "accounts": [
+        {
+          "name": "pool"
+        },
+        {
+          "name": "mm"
+        },
+        {
+          "name": "miner",
+          "writable": true
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "rewarder"
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "miner_vault"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mine_program",
+          "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "stake_primary_miner",
+      "discriminator": [72, 59, 23, 242, 117, 178, 129, 138],
+      "accounts": [
+        {
+          "name": "mm_owner",
+          "signer": true
+        },
+        {
+          "name": "mm_primary_token_account",
+          "writable": true
+        },
+        {
+          "name": "stake_primary_miner_stake",
+          "accounts": [
+            {
+              "name": "pool",
+              "writable": true
+            },
+            {
+              "name": "mm",
+              "writable": true
+            },
+            {
+              "name": "rewarder"
+            },
+            {
+              "name": "quarry",
+              "writable": true
+            },
+            {
+              "name": "miner",
+              "writable": true
+            },
+            {
+              "name": "miner_vault",
+              "writable": true
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
+              "name": "mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "stake_replica_miner",
+      "discriminator": [246, 171, 25, 201, 242, 145, 94, 47],
+      "accounts": [
+        {
+          "name": "mm_owner",
+          "signer": true
+        },
+        {
+          "name": "replica_mint",
+          "writable": true
+        },
+        {
+          "name": "replica_mint_token_account",
+          "writable": true
+        },
+        {
+          "name": "stake_replica_miner_stake",
+          "accounts": [
+            {
+              "name": "pool",
+              "writable": true
+            },
+            {
+              "name": "mm",
+              "writable": true
+            },
+            {
+              "name": "rewarder"
+            },
+            {
+              "name": "quarry",
+              "writable": true
+            },
+            {
+              "name": "miner",
+              "writable": true
+            },
+            {
+              "name": "miner_vault",
+              "writable": true
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
+              "name": "mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unstake_primary_miner",
+      "discriminator": [45, 62, 3, 33, 114, 156, 186, 26],
+      "accounts": [
+        {
+          "name": "mm_owner",
+          "signer": true
+        },
+        {
+          "name": "mm_primary_token_account",
+          "writable": true
+        },
+        {
+          "name": "unstake_primary_miner_stake",
+          "accounts": [
+            {
+              "name": "pool",
+              "writable": true
+            },
+            {
+              "name": "mm",
+              "writable": true
+            },
+            {
+              "name": "rewarder"
+            },
+            {
+              "name": "quarry",
+              "writable": true
+            },
+            {
+              "name": "miner",
+              "writable": true
+            },
+            {
+              "name": "miner_vault",
+              "writable": true
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
+              "name": "mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "unstake_all_replica_miner",
+      "discriminator": [250, 4, 3, 209, 154, 125, 71, 168],
+      "accounts": [
+        {
+          "name": "mm_owner",
+          "signer": true
+        },
+        {
+          "name": "replica_mint",
+          "writable": true
+        },
+        {
+          "name": "replica_mint_token_account",
+          "writable": true
+        },
+        {
+          "name": "unstake_all_replica_miner_stake",
+          "accounts": [
+            {
+              "name": "pool",
+              "writable": true
+            },
+            {
+              "name": "mm",
+              "writable": true
+            },
+            {
+              "name": "rewarder"
+            },
+            {
+              "name": "quarry",
+              "writable": true
+            },
+            {
+              "name": "miner",
+              "writable": true
+            },
+            {
+              "name": "miner_vault",
+              "writable": true
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
+              "name": "mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw_tokens",
+      "discriminator": [2, 4, 225, 61, 19, 182, 106, 170],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true
+        },
+        {
+          "name": "pool"
+        },
+        {
+          "name": "mm",
+          "writable": true
+        },
+        {
+          "name": "withdraw_mint"
+        },
+        {
+          "name": "mm_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_destination",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "rescue_tokens",
+      "discriminator": [222, 81, 199, 209, 182, 62, 62, 186],
+      "accounts": [
+        {
+          "name": "mm_owner",
+          "signer": true
+        },
+        {
+          "name": "merge_pool"
+        },
+        {
+          "name": "mm"
+        },
+        {
+          "name": "miner"
+        },
+        {
+          "name": "miner_token_account",
+          "writable": true
+        },
+        {
+          "name": "destination_token_account",
+          "writable": true
+        },
+        {
+          "name": "quarry_mine_program",
+          "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_rewards",
+      "discriminator": [4, 144, 132, 71, 116, 23, 151, 80],
+      "accounts": [
+        {
+          "name": "mint_wrapper",
+          "writable": true
+        },
+        {
+          "name": "mint_wrapper_program",
+          "address": "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV"
+        },
+        {
+          "name": "minter",
+          "writable": true
+        },
+        {
+          "name": "rewards_token_mint",
+          "writable": true
+        },
+        {
+          "name": "rewards_token_account",
+          "writable": true
+        },
+        {
+          "name": "claim_fee_token_account",
+          "writable": true
+        },
+        {
+          "name": "stake_token_account",
+          "writable": true
+        },
+        {
+          "name": "claim_rewards_stake",
+          "accounts": [
+            {
+              "name": "pool",
+              "writable": true
+            },
+            {
+              "name": "mm",
+              "writable": true
+            },
+            {
+              "name": "rewarder"
+            },
+            {
+              "name": "quarry",
+              "writable": true
+            },
+            {
+              "name": "miner",
+              "writable": true
+            },
+            {
+              "name": "miner_vault",
+              "writable": true
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
+              "name": "mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "MergePool",
+      "discriminator": [15, 189, 242, 87, 188, 75, 64, 244]
+    },
+    {
+      "name": "MergeMiner",
+      "discriminator": [243, 97, 253, 80, 19, 210, 148, 120]
+    }
+  ],
+  "events": [
+    {
+      "name": "NewMergePoolEvent",
+      "discriminator": [41, 211, 23, 103, 75, 166, 182, 3]
+    },
+    {
+      "name": "InitMergeMinerEvent",
+      "discriminator": [47, 235, 92, 237, 118, 122, 156, 209]
+    },
+    {
+      "name": "InitMinerEvent",
+      "discriminator": [206, 45, 1, 33, 129, 52, 176, 143]
+    },
+    {
+      "name": "StakePrimaryEvent",
+      "discriminator": [236, 126, 161, 137, 29, 249, 219, 13]
+    },
+    {
+      "name": "StakeReplicaEvent",
+      "discriminator": [195, 152, 221, 148, 102, 32, 66, 253]
+    },
+    {
+      "name": "UnstakePrimaryEvent",
+      "discriminator": [221, 140, 211, 217, 132, 192, 88, 141]
+    },
+    {
+      "name": "UnstakeReplicaEvent",
+      "discriminator": [229, 239, 203, 5, 170, 24, 216, 196]
+    },
+    {
+      "name": "WithdrawTokensEvent",
+      "discriminator": [237, 236, 226, 254, 59, 92, 22, 107]
+    },
+    {
+      "name": "ClaimEvent",
+      "discriminator": [93, 15, 70, 170, 48, 140, 212, 219]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized."
+    },
+    {
+      "code": 6001,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient balance."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidMiner",
+      "msg": "Invalid miner for the given quarry."
+    },
+    {
+      "code": 6003,
+      "name": "CannotWithdrawReplicaMint",
+      "msg": "Cannot withdraw a replica mint."
+    },
+    {
+      "code": 6004,
+      "name": "OutstandingReplicaTokens",
+      "msg": "User must first withdraw from all replica quarries."
+    },
+    {
+      "code": 6005,
+      "name": "ReplicaDecimalsMismatch",
+      "msg": "The replica mint must have the same number of decimals as the primary mint."
+    },
+    {
+      "code": 6006,
+      "name": "ReplicaNonZeroSupply",
+      "msg": "The replica mint must have zero supply."
+    }
+  ],
+  "types": [
+    {
+      "name": "MergePool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "primary_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "replica_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm_count",
+            "type": "u64"
+          },
+          {
+            "name": "total_primary_balance",
+            "type": "u64"
+          },
+          {
+            "name": "total_replica_balance",
+            "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u64", 16]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MergeMiner",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "index",
+            "type": "u64"
+          },
+          {
+            "name": "primary_balance",
+            "type": "u64"
+          },
+          {
+            "name": "replica_balance",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewMergePoolEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "primary_mint",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitMergeMinerEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "primary_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitMinerEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "miner",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakePrimaryEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "miner",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeReplicaEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "miner",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnstakePrimaryEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "miner",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnstakeReplicaEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "miner",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawTokensEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "mm",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "initial_balance",
+            "type": "u64"
+          },
+          {
+            "name": "end_balance",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

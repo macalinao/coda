@@ -1,0 +1,453 @@
+{
+  "address": "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz",
+  "metadata": {
+    "name": "quarry_operator",
+    "version": "5.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "create_operator",
+      "discriminator": [145, 40, 238, 75, 181, 252, 59, 11],
+      "accounts": [
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "operator",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 79, 112, 101, 114, 97, 116, 111, 114, 34]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "rewarder",
+          "writable": true
+        },
+        {
+          "name": "admin"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "quarry_mine_program",
+          "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "create_operator_v2",
+      "discriminator": [179, 106, 174, 35, 45, 26, 10, 67],
+      "accounts": [
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "operator",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [34, 79, 112, 101, 114, 97, 116, 111, 114, 34]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "rewarder",
+          "writable": true
+        },
+        {
+          "name": "admin"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "quarry_mine_program",
+          "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_admin",
+      "discriminator": [251, 163, 0, 52, 91, 194, 187, 92],
+      "accounts": [
+        {
+          "name": "operator",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "delegate"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_rate_setter",
+      "discriminator": [59, 193, 107, 111, 94, 23, 64, 107],
+      "accounts": [
+        {
+          "name": "operator",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "delegate"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_quarry_creator",
+      "discriminator": [59, 91, 208, 54, 209, 64, 234, 68],
+      "accounts": [
+        {
+          "name": "operator",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "delegate"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_share_allocator",
+      "discriminator": [96, 77, 203, 216, 167, 175, 61, 189],
+      "accounts": [
+        {
+          "name": "operator",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "delegate"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "delegate_set_annual_rewards",
+      "discriminator": [121, 174, 85, 150, 174, 18, 13, 31],
+      "accounts": [
+        {
+          "name": "set_annual_rewards_with_delegate",
+          "accounts": [
+            {
+              "name": "operator",
+              "writable": true
+            },
+            {
+              "name": "delegate",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            },
+            {
+              "name": "quarry_mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_rate",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "delegate_create_quarry",
+      "discriminator": [245, 238, 31, 14, 175, 233, 75, 237],
+      "accounts": [
+        {
+          "name": "create_quarry_with_delegate",
+          "accounts": [
+            {
+              "name": "operator",
+              "writable": true
+            },
+            {
+              "name": "delegate",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            },
+            {
+              "name": "quarry_mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "unused_account"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "delegate_create_quarry_v2",
+      "discriminator": [69, 180, 9, 212, 75, 142, 202, 62],
+      "accounts": [
+        {
+          "name": "create_quarry_v2_with_delegate",
+          "accounts": [
+            {
+              "name": "operator",
+              "writable": true
+            },
+            {
+              "name": "delegate",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            },
+            {
+              "name": "quarry_mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "delegate_set_rewards_share",
+      "discriminator": [111, 198, 20, 112, 172, 82, 102, 66],
+      "accounts": [
+        {
+          "name": "set_rewards_share_with_delegate",
+          "accounts": [
+            {
+              "name": "operator",
+              "writable": true
+            },
+            {
+              "name": "delegate",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            },
+            {
+              "name": "quarry_mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_share",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "delegate_set_famine",
+      "discriminator": [1, 196, 52, 171, 199, 237, 240, 134],
+      "accounts": [
+        {
+          "name": "set_famine_with_delegate",
+          "accounts": [
+            {
+              "name": "operator",
+              "writable": true
+            },
+            {
+              "name": "delegate",
+              "signer": true
+            },
+            {
+              "name": "rewarder",
+              "writable": true
+            },
+            {
+              "name": "quarry_mine_program",
+              "address": "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+            }
+          ]
+        },
+        {
+          "name": "quarry",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "famine_ts",
+          "type": "i64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Operator",
+      "discriminator": [219, 31, 188, 145, 69, 139, 204, 117]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Signer is not authorized to perform this action."
+    },
+    {
+      "code": 6001,
+      "name": "PendingAuthorityNotSet",
+      "msg": "Pending authority must be set to the created operator."
+    },
+    {
+      "code": 6002,
+      "name": "OperatorNotRewarderAuthority",
+      "msg": "Operator is not the Rewarder authority."
+    }
+  ],
+  "types": [
+    {
+      "name": "Operator",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "base",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "rewarder",
+            "type": "pubkey"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "rate_setter",
+            "type": "pubkey"
+          },
+          {
+            "name": "quarry_creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_allocator",
+            "type": "pubkey"
+          },
+          {
+            "name": "last_modified_ts",
+            "type": "i64"
+          },
+          {
+            "name": "generation",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

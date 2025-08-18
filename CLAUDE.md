@@ -4,19 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Grill is a modern Solana development kit monorepo that provides React components and utilities for building Solana applications with automatic account batching and caching. It's built on top of gill-react and integrates with @solana/kit.
+Coda is an automated client generation tool for Solana programs. Built on top of [Codama](https://github.com/codama-idl/codama), Coda provides a zero-config CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
+
+The monorepo contains:
+- **Coda CLI** - The main tool for generating TypeScript clients from Anchor IDLs
+- **Codama utilities** - Custom visitors and renderers for enhanced code generation
+- **Generated clients** - Pre-built clients for popular Solana programs
 
 ## Technology Stack
 
-- **Package Manager**: Bun (v1.2.19)
+- **Package Manager**: Bun (v1.2.20)
 - **Build System**: Turbo for monorepo orchestration
-- **Framework**: React 19 with TypeScript
-- **Solana**: @solana/kit, gill, gill-react
-- **State Management**: @tanstack/react-query for caching
-- **Routing**: @tanstack/react-router (in example-dapp)
-- **Styling**: Tailwind CSS v4 with shadcn/ui components
+- **Language**: TypeScript with ES modules
+- **Code Generation**: Codama for AST transformations
 - **Code Quality**: Biome for formatting, ESLint for linting
-- **Testing**: Vitest
+- **Testing**: Bun test runner
 
 ## Essential Commands
 
@@ -26,6 +28,11 @@ bun install                  # Install all dependencies
 bun run build                # Build all packages
 bun run build:watch          # Watch mode for all packages
 bun run build:watch:packages # Watch mode for packages only
+
+# Code Generation
+bun run codegen             # Run code generation for all clients
+bunx coda generate          # Generate client with Coda CLI
+bunx coda init             # Initialize coda.config.mjs
 
 # Code Quality
 bun run lint                 # Run biome check + eslint
@@ -40,65 +47,76 @@ bun test                    # Run tests directly
 bun run changeset           # Create changeset for version bumps
 bun run ci:publish          # Publish packages to npm
 
-# Example App Development
-cd apps/example-dapp
-bun run dev                 # Start Vite dev server
-bun run build              # Build the app
-
 # IMPORTANT: After making code changes
 bun run build                # Build to check for TypeScript errors
 bun run lint:fix            # Fix linting and formatting issues
 ```
 
-## Architecture
+## Repository Structure
 
-### Monorepo Structure
-
-The project uses Bun workspaces with packages in two directories:
-- `packages/*` - Core library packages
-- `apps/*` - Example applications
-
-### Core Packages
-
-1. **@macalinao/grill** - Main package providing React context and hooks
-   - `GrillProvider`: Creates DataLoader for batching account requests with sonner toast notifications
-   - `GrillHeadlessProvider`: Headless version without UI features (for custom implementations)
-   - `WalletProvider`: Kit wallet integration context
-   - `useAccount`: Hook for fetching account data with batching
-   - `useKitWallet`: Access wallet signer and RPC
-   - Note: sonner is a required peer dependency for transaction toast notifications
-
-2. **@macalinao/solana-batch-accounts-loader** - DataLoader implementation for batching Solana account fetches
-
-3. **@macalinao/wallet-adapter-compat** - Compatibility layer between @solana/wallet-adapter and @solana/kit
-
-4. **dataloader-es** - ES module compatible DataLoader implementation
-
-### Provider Hierarchy
-
-When using Grill, providers must be set up in this order:
-```tsx
-QueryClientProvider
-  → SolanaProvider (gill-react)
-    → ConnectionProvider (@solana/wallet-adapter-react)
-      → WalletProvider (@solana/wallet-adapter-react)
-        → WalletModalProvider
-          → GrillProvider
+```
+coda/
+├── packages/                # Core packages
+│   ├── coda/               # Main CLI tool (@macalinao/coda)
+│   ├── codama-instruction-accounts-dedupe-visitor/  # Flattens nested accounts
+│   └── codama-renderers-js-esm/                    # ESM-native renderer
+├── clients/                # Generated client libraries
+│   └── token-metadata/     # Metaplex Token Metadata client
+├── docs/                   # Documentation
+└── scripts/               # Build and CI scripts
 ```
 
-### Account Batching Architecture
+## Core Packages
 
-The core innovation is automatic batching of concurrent account requests:
-- Multiple `useAccount` calls in different components are automatically batched
-- Uses DataLoader pattern to coalesce requests within a tick
-- Single RPC call instead of multiple, improving performance
-- Integrated with React Query for caching
+### 1. **@macalinao/coda** - CLI for client generation
+   - Zero-config by default (looks for `./target/idl/program.json`)
+   - Configurable via `coda.config.mjs`
+   - Generates TypeScript clients with full type safety
+   - Built on Codama for extensibility
 
-### Kit Wallet Integration
+### 2. **@macalinao/codama-instruction-accounts-dedupe-visitor**
+   - Flattens nested account structures from Anchor IDL
+   - Preserves relationships through naming conventions
+   - Updates PDA seeds when accounts are flattened
 
-Provides two contexts:
-1. Account batching context (GrillProvider)
-2. Wallet context for TransactionSendingSigner (WalletProvider from grill)
+### 3. **@macalinao/codama-renderers-js-esm**
+   - ESM-native TypeScript renderer for Codama
+   - Adds `.js` extensions to all imports
+   - Removes Node.js-specific environment checks
+   - Ensures compatibility with `"type": "module"`
+
+### 4. **@macalinao/clients-token-metadata**
+   - Pre-generated client for Metaplex Token Metadata program
+   - Includes custom PDAs and type definitions
+   - Ready-to-use with `@solana/web3.js`
+
+## How Coda Works
+
+1. **Parse IDL**: Reads Anchor IDL file (JSON format)
+2. **Create AST**: Converts to Codama's node structure
+3. **Apply Visitors**: Transforms the AST (custom PDAs, flattening, etc.)
+4. **Generate Code**: Renders TypeScript with ESM support
+5. **Output Files**: Creates organized file structure with types, instructions, accounts, etc.
+
+## Configuration (coda.config.mjs)
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { addPdasVisitor } from "codama";
+
+export default defineConfig({
+  // Optional: Custom paths
+  idlPath: "./idls/my_program.json",
+  outputDir: "./src/generated",
+  
+  // Optional: Codama visitors for customization
+  visitors: [
+    addPdasVisitor({
+      // Add custom PDAs
+    })
+  ]
+});
+```
 
 ## Code Style Guidelines
 
@@ -108,18 +126,12 @@ Provides two contexts:
 - Use `import type` for type-only imports (enforced by Biome)
 - Arrays use shorthand syntax: `string[]` not `Array<string>`
 - **Use double quotes for strings** (not single quotes)
-- Follow default Prettier settings
+- ES modules with `.js` extensions for imports
 
 ### After Making Code Changes
 **Always run these commands to ensure code quality:**
 1. `bun run build` - Check for TypeScript errors
 2. `bun run lint:fix` - Fix linting and formatting issues
-
-### React Components
-- Small, focused components
-- Use function components with hooks
-- Props interfaces should be explicitly defined
-- File structure: `components/category/component-name/index.tsx`
 
 ### Biome/ESLint Configuration
 - No floating promises (must be handled)
@@ -129,42 +141,34 @@ Provides two contexts:
 - No double equals (use === instead)
 - Imports are auto-organized on save
 
-## Example App (example-dapp)
-
-The example-dapp demonstrates:
-- TanStack Router for routing
-- shadcn/ui component integration
-- Wallet connection with Solana wallet adapter
-- Layout system with navigation and sidebar
-- Dark mode support
-
-Routes:
-- `/` - Home page
-- `/dashboard` - Simple dashboard
-- `/examples/*` - Examples section with sidebar navigation
-
 ## Turborepo Configuration
 
 Tasks are defined in turbo.json:
 - `build`: Depends on upstream builds, outputs to `./dist/**`
 - `lint`: Depends on upstream builds
 - `test`: Depends on build, no caching
+- `codegen`: Outputs to `./src/generated/**`, no caching
 - Tasks run in topological order respecting dependencies
 
-## Working with Providers
+## Adding a New Client
 
-When creating new features that need account data:
-1. Ensure component is wrapped in GrillProvider
-2. Use `useAccount` hook for fetching account data
-3. Account requests are automatically batched
-4. React Query handles caching and refetching
+1. **Add IDL file**: Place in `clients/[program-name]/idls/`
+2. **Create config**: Add `coda.config.mjs` with any custom visitors
+3. **Add package.json**: Include build and codegen scripts
+4. **Generate client**: Run `bun run codegen`
+5. **Build**: Run `bun run build`
 
-## Vendor Documentation
-
-The repository includes vendor documentation at `/docs/vendor/`:
-- `gill.md` - Complete documentation for the gill library (Solana client library)
-  - Includes transaction builders, token operations, and program clients
-  - Used as the foundation for Solana operations in Grill
+Example package.json for a client:
+```json
+{
+  "name": "@macalinao/clients-[program-name]",
+  "scripts": {
+    "build": "tsc",
+    "codegen": "coda generate",
+    "clean": "rm -fr dist/"
+  }
+}
+```
 
 ## CI/CD
 
@@ -187,6 +191,51 @@ GitHub Actions workflow runs on push/PR to main:
 When creating new packages:
 - Use TypeScript directly with `tsc` for building (no tsup/rollup/etc)
 - Follow the same structure as existing packages
-- Scripts should be: `build`, `build:watch`, `clean`, `typecheck`
+- Scripts should be: `build`, `clean`, `lint`, `test`, `codegen` (if applicable)
 - All packages use ES modules (`"type": "module"` in package.json)
 - Keep package.json scripts simple and consistent
+
+## Working with Generated Code
+
+Generated clients provide:
+- **Instructions**: Typed builders for all program instructions
+- **Accounts**: Decoders and fetchers for all account types
+- **Types**: All TypeScript types from the IDL
+- **PDAs**: Helper functions for program-derived addresses
+- **Errors**: Typed error enums and handlers
+
+Example usage:
+```typescript
+import { createTransferInstruction } from "./generated";
+import { createSolanaRpc } from "@solana/web3.js";
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const instruction = createTransferInstruction({
+  source: sourceAddress,
+  destination: destAddress,
+  authority: authorityAddress,
+  amount: 1000n
+});
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **IDL not found**: Ensure Anchor program is built (`anchor build`)
+2. **Config not loading**: Check file is named `coda.config.mjs` with `.mjs` extension
+3. **Import errors**: Ensure all imports use `.js` extensions for local files
+4. **Type errors**: Run `bun run build` to check TypeScript compilation
+
+### Debug Commands
+
+```bash
+# Check generated files
+ls -la ./src/generated/
+
+# Verify config is valid
+node -e "import('./coda.config.mjs').then(c => console.log(c.default))"
+
+# Clean and rebuild
+bun run clean && bun run codegen && bun run build
+```
