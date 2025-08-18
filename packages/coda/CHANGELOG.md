@@ -1,5 +1,16 @@
 # @macalinao/grill-cli
 
+## 0.2.0
+
+### Minor Changes
+
+- b06099b: Rename to Coda
+
+### Patch Changes
+
+- Updated dependencies [b06099b]
+  - @macalinao/codama-renderers-js-esm@0.2.0
+
 ## 0.1.2
 
 ### Patch Changes

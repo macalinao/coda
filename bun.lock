@@ -37,7 +37,7 @@
     },
     "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
-      "version": "0.1.2",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:*",
         "@macalinao/eslint-config": "catalog:",
@@ -53,7 +53,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.1.2",
+      "version": "0.2.0",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -74,7 +74,7 @@
     },
     "packages/codama-instruction-accounts-dedupe-visitor": {
       "name": "@macalinao/codama-instruction-accounts-dedupe-visitor",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "dependencies": {
         "@codama/nodes-from-anchor": "*",
         "codama": "*",
@@ -101,7 +101,7 @@
     },
     "packages/codama-renderers-js-esm": {
       "name": "@macalinao/codama-renderers-js-esm",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "dependencies": {
         "@codama/renderers-core": "*",
         "@codama/renderers-js": "*",
