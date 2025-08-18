@@ -120,8 +120,8 @@
     "react-dom": "^19.1.1",
   },
   "catalog": {
-    "@macalinao/eslint-config": "^4.2.2",
-    "@macalinao/tsconfig": "^3.2.2",
+    "@macalinao/eslint-config": "^5",
+    "@macalinao/tsconfig": "^3.2.3",
     "@solana/kit": "^2.3.0",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
@@ -262,9 +262,9 @@
 
     "@macalinao/codama-renderers-js-esm": ["@macalinao/codama-renderers-js-esm@workspace:packages/codama-renderers-js-esm"],
 
-    "@macalinao/eslint-config": ["@macalinao/eslint-config@4.2.2", "", { "dependencies": { "@eslint/js": "^9.30.0", "@typescript-eslint/eslint-plugin": "^8.35.1", "@typescript-eslint/parser": "^8.35.1", "@typescript-eslint/utils": "^8.35.1", "eslint": "^9.30.0", "eslint-config-prettier": "^10.1.5", "eslint-config-turbo": "^2.5.4", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-prettier": "^5.5.1", "eslint-plugin-simple-import-sort": "^12.1.1", "eslint-plugin-turbo": "^2.5.4", "eslint-plugin-unused-imports": "^4.1.4", "globals": "^16.2.0", "prettier": "^3.6.2", "tslib": "^2.8.1", "typescript-eslint": "^8.35.1" } }, "sha512-/oPhUUYQr8Kpbv4AJW+w7eF5VF/dtxwiteq3lSBr+poWZGmtwDklbvYKew2m01TVKWUmFQRhd3d8BSSzGC5pkA=="],
+    "@macalinao/eslint-config": ["@macalinao/eslint-config@5.0.0", "", { "dependencies": { "@eslint/js": "^9.33.0", "@typescript-eslint/parser": "^8.39.1", "@typescript-eslint/utils": "^8.39.1", "eslint-config-prettier": "^10.1.8", "eslint-config-turbo": "^2.5.6", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-prettier": "^5.5.4", "eslint-plugin-simple-import-sort": "^12.1.1", "eslint-plugin-unused-imports": "^4.1.4", "globals": "^16.3.0", "typescript-eslint": "^8.39.1" }, "peerDependencies": { "eslint": "^9.33.0" } }, "sha512-DBjSU9r6V2xqzZ2UaWgfnFO0YpszoZdoqVLtsmHgHZrDm+c7i2RujSxA/reCaAmxQGg7zboqZeQRhCzQ7JDqEg=="],
 
-    "@macalinao/tsconfig": ["@macalinao/tsconfig@3.2.2", "", {}, "sha512-pw+l4EiyGQXwffxMQxqvJghLEm5fKGXZ3BAUYyitmkrtyD0D517RwwooSBrjCXP+sl3oefpHzUnZjowYTQd8wg=="],
+    "@macalinao/tsconfig": ["@macalinao/tsconfig@3.2.3", "", {}, "sha512-PH6UvudxPrxYg+2BZyPUx2/U2jCOlJYz+2cGLvIX3Ybtz3GNGxjounb4sceZmR9QmquZlxuP0o5Zz3Y8VATbdA=="],
 
     "@manypkg/find-root": ["@manypkg/find-root@1.1.0", "", { "dependencies": { "@babel/runtime": "^7.5.5", "@types/node": "^12.7.1", "find-up": "^4.1.0", "fs-extra": "^8.1.0" } }, "sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA=="],
 

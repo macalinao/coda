@@ -105,6 +105,12 @@
       "includes": ["clients/*/src/generated/**"],
       "linter": {
         "rules": {
+          "suspicious": {
+            "noEmptyInterface": "off"
+          },
+          "complexity": {
+            "noBannedTypes": "off"
+          },
           "correctness": {
             "noConstantCondition": "off"
           }
