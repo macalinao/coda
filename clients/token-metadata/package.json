@@ -47,8 +47,8 @@
     "@solana/kit": "*"
   },
   "devDependencies": {
-    "@macalinao/eslint-config": "catalog:",
     "@macalinao/coda": "workspace:*",
+    "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "*",
     "codama": "*",
