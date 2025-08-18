@@ -6,14 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getAddressEncoder,
@@ -24,25 +35,11 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_OPERATOR_DISCRIMINATOR = new Uint8Array([
   145, 40, 238, 75, 181, 252, 59, 11,
@@ -103,7 +100,9 @@ export interface CreateOperatorInstructionData {
   bump: number;
 }
 
-export interface CreateOperatorInstructionDataArgs { bump: number }
+export interface CreateOperatorInstructionDataArgs {
+  bump: number;
+}
 
 export function getCreateOperatorInstructionDataEncoder(): FixedSizeEncoder<CreateOperatorInstructionDataArgs> {
   return transformEncoder(

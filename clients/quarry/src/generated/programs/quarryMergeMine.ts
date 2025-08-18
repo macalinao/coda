@@ -6,15 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  
-  containsBytes,
-  fixEncoderSize,
-  getBytesEncoder
-  
-} from "@solana/kit";
-import type {Address, ReadonlyUint8Array} from "@solana/kit";
-import type {ParsedClaimRewardsMMInstruction, ParsedInitMergeMinerInstruction, ParsedInitMergeMinerV2Instruction, ParsedInitMinerMMInstruction, ParsedInitMinerMMV2Instruction, ParsedNewPoolInstruction, ParsedNewPoolV2Instruction, ParsedRescueTokensMMInstruction, ParsedStakePrimaryMinerInstruction, ParsedStakeReplicaMinerInstruction, ParsedUnstakeAllReplicaMinerInstruction, ParsedUnstakePrimaryMinerInstruction, ParsedWithdrawTokensMMInstruction} from "../instructions/index.js";
+import type { Address, ReadonlyUint8Array } from "@solana/kit";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import type {
+  ParsedClaimRewardsMMInstruction,
+  ParsedInitMergeMinerInstruction,
+  ParsedInitMergeMinerV2Instruction,
+  ParsedInitMinerMMInstruction,
+  ParsedInitMinerMMV2Instruction,
+  ParsedNewPoolInstruction,
+  ParsedNewPoolV2Instruction,
+  ParsedRescueTokensMMInstruction,
+  ParsedStakePrimaryMinerInstruction,
+  ParsedStakeReplicaMinerInstruction,
+  ParsedUnstakeAllReplicaMinerInstruction,
+  ParsedUnstakePrimaryMinerInstruction,
+  ParsedWithdrawTokensMMInstruction,
+} from "../instructions/index.js";
 
 export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;

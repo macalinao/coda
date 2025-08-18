@@ -6,13 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  
-  isProgramError
-  
-  
+import type {
+  Address,
+  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  SolanaError,
 } from "@solana/kit";
-import type {Address, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM, SolanaError} from "@solana/kit";
+import { isProgramError } from "@solana/kit";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: Unauthorized. */
@@ -58,9 +57,7 @@ export function getQuarryMergeMineErrorMessage(
   code: QuarryMergeMineError,
 ): string {
   if (true) {
-    return (
-      quarryMergeMineErrorMessages!
-    )[code];
+    return quarryMergeMineErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

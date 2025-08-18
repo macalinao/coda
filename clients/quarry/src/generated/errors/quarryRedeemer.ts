@@ -6,13 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  
-  isProgramError
-  
-  
+import type {
+  Address,
+  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  SolanaError,
 } from "@solana/kit";
-import type {Address, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM, SolanaError} from "@solana/kit";
+import { isProgramError } from "@solana/kit";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: Unauthorized. */
@@ -33,9 +32,7 @@ export function getQuarryRedeemerErrorMessage(
   code: QuarryRedeemerError,
 ): string {
   if (true) {
-    return (quarryRedeemerErrorMessages!)[
-      code
-    ];
+    return quarryRedeemerErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

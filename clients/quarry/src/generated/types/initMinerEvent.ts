@@ -6,20 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
-  
   combineCodec,
-  
-  
-  
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
-  getStructEncoder
+  getStructEncoder,
 } from "@solana/kit";
-import type {Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder} from "@solana/kit";
 
-export interface InitMinerEvent { pool: Address; mm: Address; miner: Address }
+export interface InitMinerEvent {
+  pool: Address;
+  mm: Address;
+  miner: Address;
+}
 
 export type InitMinerEventArgs = InitMinerEvent;
 

@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,23 +32,11 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REDEEM_TOKENS_DISCRIMINATOR = new Uint8Array([
   246, 98, 134, 41, 152, 33, 120, 69,
@@ -97,7 +95,9 @@ export interface RedeemTokensInstructionData {
   amount: bigint;
 }
 
-export interface RedeemTokensInstructionDataArgs { amount: number | bigint }
+export interface RedeemTokensInstructionDataArgs {
+  amount: number | bigint;
+}
 
 export function getRedeemTokensInstructionDataEncoder(): FixedSizeEncoder<RedeemTokensInstructionDataArgs> {
   return transformEncoder(

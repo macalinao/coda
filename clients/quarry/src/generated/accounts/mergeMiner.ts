@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  
-  
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  
-  
-  
-  
-  
-  
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -33,12 +38,8 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
-  
-  
-  
-  transformEncoder
+  transformEncoder,
 } from "@solana/kit";
-import type {Account, Address, EncodedAccount, FetchAccountConfig, FetchAccountsConfig, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, MaybeAccount, MaybeEncodedAccount, ReadonlyUint8Array} from "@solana/kit";
 
 export const MERGE_MINER_DISCRIMINATOR = new Uint8Array([
   243, 97, 253, 80, 19, 210, 148, 120,

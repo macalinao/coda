@@ -6,15 +6,21 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  
-  containsBytes,
-  fixEncoderSize,
-  getBytesEncoder
-  
-} from "@solana/kit";
-import type {Address, ReadonlyUint8Array} from "@solana/kit";
-import type {ParsedCreateOperatorInstruction, ParsedCreateOperatorV2Instruction, ParsedDelegateCreateQuarryInstruction, ParsedDelegateCreateQuarryV2Instruction, ParsedDelegateSetAnnualRewardsInstruction, ParsedDelegateSetFamineInstruction, ParsedDelegateSetRewardsShareInstruction, ParsedSetAdminInstruction, ParsedSetQuarryCreatorInstruction, ParsedSetRateSetterInstruction, ParsedSetShareAllocatorInstruction} from "../instructions/index.js";
+import type { Address, ReadonlyUint8Array } from "@solana/kit";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import type {
+  ParsedCreateOperatorInstruction,
+  ParsedCreateOperatorV2Instruction,
+  ParsedDelegateCreateQuarryInstruction,
+  ParsedDelegateCreateQuarryV2Instruction,
+  ParsedDelegateSetAnnualRewardsInstruction,
+  ParsedDelegateSetFamineInstruction,
+  ParsedDelegateSetRewardsShareInstruction,
+  ParsedSetAdminInstruction,
+  ParsedSetQuarryCreatorInstruction,
+  ParsedSetRateSetterInstruction,
+  ParsedSetShareAllocatorInstruction,
+} from "../instructions/index.js";
 
 export const QUARRY_OPERATOR_PROGRAM_ADDRESS =
   "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz" as Address<"QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz">;

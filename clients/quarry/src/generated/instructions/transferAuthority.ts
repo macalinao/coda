@@ -6,14 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getAddressDecoder,
@@ -22,22 +31,11 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
 export const TRANSFER_AUTHORITY_DISCRIMINATOR = new Uint8Array([
   48, 169, 76, 72, 229, 180, 55, 161,
@@ -74,7 +72,9 @@ export interface TransferAuthorityInstructionData {
   newAuthority: Address;
 }
 
-export interface TransferAuthorityInstructionDataArgs { newAuthority: Address }
+export interface TransferAuthorityInstructionDataArgs {
+  newAuthority: Address;
+}
 
 export function getTransferAuthorityInstructionDataEncoder(): FixedSizeEncoder<TransferAuthorityInstructionDataArgs> {
   return transformEncoder(

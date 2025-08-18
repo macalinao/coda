@@ -6,14 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getAddressEncoder,
@@ -24,25 +35,11 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const NEW_WRAPPER_V2_DISCRIMINATOR = new Uint8Array([
   140, 106, 205, 202, 15, 176, 85, 19,
@@ -103,7 +100,9 @@ export interface NewWrapperV2InstructionData {
   hardCap: bigint;
 }
 
-export interface NewWrapperV2InstructionDataArgs { hardCap: number | bigint }
+export interface NewWrapperV2InstructionDataArgs {
+  hardCap: number | bigint;
+}
 
 export function getNewWrapperV2InstructionDataEncoder(): FixedSizeEncoder<NewWrapperV2InstructionDataArgs> {
   return transformEncoder(

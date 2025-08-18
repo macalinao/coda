@@ -6,13 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  
-  isProgramError
-  
-  
+import type {
+  Address,
+  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  SolanaError,
 } from "@solana/kit";
-import type {Address, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM, SolanaError} from "@solana/kit";
+import { isProgramError } from "@solana/kit";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: You are not authorized to perform this action. */
@@ -42,9 +41,7 @@ export function getQuarryMintWrapperErrorMessage(
   code: QuarryMintWrapperError,
 ): string {
   if (true) {
-    return (
-      quarryMintWrapperErrorMessages!
-    )[code];
+    return quarryMintWrapperErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";
