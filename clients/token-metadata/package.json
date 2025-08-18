@@ -34,7 +34,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
-    "directory": "clients/mpl-token-metadata"
+    "directory": "clients/token-metadata"
   },
   "scripts": {
     "build": "tsc",

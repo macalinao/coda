@@ -1,18 +1,18 @@
-# @macalinao/token-metadata-client
+# @macalinao/clients-token-metadata
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/token-metadata-client.svg)](https://www.npmjs.com/package/@macalinao/token-metadata-client)
+[![npm version](https://img.shields.io/npm/v/@macalinao/clients-token-metadata.svg)](https://www.npmjs.com/package/@macalinao/clients-token-metadata)
 
 TypeScript client for the Metaplex Token Metadata program, generated using Codama with full ESM support.
 
 ## Installation
 
 ```bash
-bun add @macalinao/token-metadata-client
+bun add @macalinao/clients-token-metadata
 ```
 
 ## Development
 
-This client is generated from the Token Metadata IDL using Codama CLI:
+This client is generated from the Token Metadata IDL using Coda CLI:
 
 ```bash
 # Generate the client from idls/token_metadata.json
@@ -24,12 +24,12 @@ bun run build
 
 ### Configuration
 
-The `codama.config.mjs` file adds custom PDAs to the generated client, including the standard metadata PDA derivation.
+The `coda.config.mjs` file adds custom PDAs to the generated client, including the standard metadata PDA derivation.
 
 ## Usage
 
 ```typescript
-import { /* generated exports */ } from "@macalinao/token-metadata-client";
+import { /* generated exports */ } from "@macalinao/clients-token-metadata";
 
 // Use the generated client functions
 ```
