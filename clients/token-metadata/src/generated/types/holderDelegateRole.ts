@@ -14,7 +14,7 @@ import type {
 import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum HolderDelegateRole {
-  PrintDelegate,
+  PrintDelegate = 0,
 }
 
 export type HolderDelegateRoleArgs = HolderDelegateRole;

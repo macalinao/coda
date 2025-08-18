@@ -425,7 +425,9 @@ export function parseMintNewEditionFromMasterEditionViaTokenInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 13;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) return undefined;
+    if (optionalAccountsRemaining === 0) {
+      return undefined;
+    }
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

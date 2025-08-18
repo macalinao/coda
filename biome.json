@@ -73,8 +73,7 @@
     "includes": [
       "**",
       "!**/bun.lock",
-      "!apps/example-dapp/src/routeTree.gen.ts",
-      "!clients/*/src/generated/**"
+      "!apps/example-dapp/src/routeTree.gen.ts"
     ]
   },
   "assist": {
@@ -100,5 +99,17 @@
       "bracketSameLine": false,
       "bracketSpacing": true
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["clients/*/src/generated/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noConstantCondition": "off"
+          }
+        }
+      }
+    }
+  ]
 }

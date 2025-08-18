@@ -17,7 +17,7 @@ export const QUARRY_REGISTRY_PROGRAM_ADDRESS =
   "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc" as Address<"QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc">;
 
 export enum QuarryRegistryAccount {
-  Registry,
+  Registry = 0,
 }
 
 export function identifyQuarryRegistryAccount(
@@ -41,8 +41,8 @@ export function identifyQuarryRegistryAccount(
 }
 
 export enum QuarryRegistryInstruction {
-  NewRegistry,
-  SyncQuarry,
+  NewRegistry = 0,
+  SyncQuarry = 1,
 }
 
 export function identifyQuarryRegistryInstruction(

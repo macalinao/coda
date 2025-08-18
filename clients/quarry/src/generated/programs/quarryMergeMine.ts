@@ -28,8 +28,8 @@ export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;
 
 export enum QuarryMergeMineAccount {
-  MergePool,
-  MergeMiner,
+  MergePool = 0,
+  MergeMiner = 1,
 }
 
 export function identifyQuarryMergeMineAccount(
@@ -64,19 +64,19 @@ export function identifyQuarryMergeMineAccount(
 }
 
 export enum QuarryMergeMineInstruction {
-  NewPool,
-  NewPoolV2,
-  InitMergeMiner,
-  InitMergeMinerV2,
-  InitMinerMM,
-  InitMinerMMV2,
-  StakePrimaryMiner,
-  StakeReplicaMiner,
-  UnstakePrimaryMiner,
-  UnstakeAllReplicaMiner,
-  WithdrawTokensMM,
-  RescueTokensMM,
-  ClaimRewardsMM,
+  NewPool = 0,
+  NewPoolV2 = 1,
+  InitMergeMiner = 2,
+  InitMergeMinerV2 = 3,
+  InitMinerMM = 4,
+  InitMinerMMV2 = 5,
+  StakePrimaryMiner = 6,
+  StakeReplicaMiner = 7,
+  UnstakePrimaryMiner = 8,
+  UnstakeAllReplicaMiner = 9,
+  WithdrawTokensMM = 10,
+  RescueTokensMM = 11,
+  ClaimRewardsMM = 12,
 }
 
 export function identifyQuarryMergeMineInstruction(

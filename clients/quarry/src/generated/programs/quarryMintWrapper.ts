@@ -23,8 +23,8 @@ export const QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS =
   "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV" as Address<"QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV">;
 
 export enum QuarryMintWrapperAccount {
-  MintWrapper,
-  Minter,
+  MintWrapper = 0,
+  Minter = 1,
 }
 
 export function identifyQuarryMintWrapperAccount(
@@ -59,14 +59,14 @@ export function identifyQuarryMintWrapperAccount(
 }
 
 export enum QuarryMintWrapperInstruction {
-  NewWrapper,
-  NewWrapperV2,
-  TransferAdmin,
-  AcceptAdmin,
-  NewMinter,
-  NewMinterV2,
-  MinterUpdate,
-  PerformMint,
+  NewWrapper = 0,
+  NewWrapperV2 = 1,
+  TransferAdmin = 2,
+  AcceptAdmin = 3,
+  NewMinter = 4,
+  NewMinterV2 = 5,
+  MinterUpdate = 6,
+  PerformMint = 7,
 }
 
 export function identifyQuarryMintWrapperInstruction(

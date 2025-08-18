@@ -36,9 +36,9 @@ export const QUARRY_MINE_PROGRAM_ADDRESS =
   "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
 
 export enum QuarryMineAccount {
-  Rewarder,
-  Quarry,
-  Miner,
+  Rewarder = 0,
+  Quarry = 1,
+  Miner = 2,
 }
 
 export function identifyQuarryMineAccount(
@@ -84,27 +84,27 @@ export function identifyQuarryMineAccount(
 }
 
 export enum QuarryMineInstruction {
-  NewRewarder,
-  NewRewarderV2,
-  SetPauseAuthority,
-  Pause,
-  Unpause,
-  TransferAuthority,
-  AcceptAuthority,
-  SetAnnualRewards,
-  CreateQuarry,
-  CreateQuarryV2,
-  SetRewardsShare,
-  SetFamine,
-  UpdateQuarryRewards,
-  CreateMiner,
-  CreateMinerV2,
-  ClaimRewards,
-  ClaimRewardsV2,
-  StakeTokens,
-  WithdrawTokens,
-  RescueTokens,
-  ExtractFees,
+  NewRewarder = 0,
+  NewRewarderV2 = 1,
+  SetPauseAuthority = 2,
+  Pause = 3,
+  Unpause = 4,
+  TransferAuthority = 5,
+  AcceptAuthority = 6,
+  SetAnnualRewards = 7,
+  CreateQuarry = 8,
+  CreateQuarryV2 = 9,
+  SetRewardsShare = 10,
+  SetFamine = 11,
+  UpdateQuarryRewards = 12,
+  CreateMiner = 13,
+  CreateMinerV2 = 14,
+  ClaimRewards = 15,
+  ClaimRewardsV2 = 16,
+  StakeTokens = 17,
+  WithdrawTokens = 18,
+  RescueTokens = 19,
+  ExtractFees = 20,
 }
 
 export function identifyQuarryMineInstruction(

@@ -31,9 +31,12 @@ let quarryOperatorErrorMessages:
   | undefined;
 if (true) {
   quarryOperatorErrorMessages = {
-    [QUARRY_OPERATOR_ERROR__OPERATOR_NOT_REWARDER_AUTHORITY]: `Operator is not the Rewarder authority.`,
-    [QUARRY_OPERATOR_ERROR__PENDING_AUTHORITY_NOT_SET]: `Pending authority must be set to the created operator.`,
-    [QUARRY_OPERATOR_ERROR__UNAUTHORIZED]: `Signer is not authorized to perform this action.`,
+    [QUARRY_OPERATOR_ERROR__OPERATOR_NOT_REWARDER_AUTHORITY]:
+      "Operator is not the Rewarder authority.",
+    [QUARRY_OPERATOR_ERROR__PENDING_AUTHORITY_NOT_SET]:
+      "Pending authority must be set to the created operator.",
+    [QUARRY_OPERATOR_ERROR__UNAUTHORIZED]:
+      "Signer is not authorized to perform this action.",
   };
 }
 

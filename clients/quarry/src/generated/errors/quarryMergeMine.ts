@@ -43,13 +43,18 @@ let quarryMergeMineErrorMessages:
   | undefined;
 if (true) {
   quarryMergeMineErrorMessages = {
-    [QUARRY_MERGE_MINE_ERROR__CANNOT_WITHDRAW_REPLICA_MINT]: `Cannot withdraw a replica mint.`,
-    [QUARRY_MERGE_MINE_ERROR__INSUFFICIENT_BALANCE]: `Insufficient balance.`,
-    [QUARRY_MERGE_MINE_ERROR__INVALID_MINER]: `Invalid miner for the given quarry.`,
-    [QUARRY_MERGE_MINE_ERROR__OUTSTANDING_REPLICA_TOKENS]: `User must first withdraw from all replica quarries.`,
-    [QUARRY_MERGE_MINE_ERROR__REPLICA_DECIMALS_MISMATCH]: `The replica mint must have the same number of decimals as the primary mint.`,
-    [QUARRY_MERGE_MINE_ERROR__REPLICA_NON_ZERO_SUPPLY]: `The replica mint must have zero supply.`,
-    [QUARRY_MERGE_MINE_ERROR__UNAUTHORIZED]: `Unauthorized.`,
+    [QUARRY_MERGE_MINE_ERROR__CANNOT_WITHDRAW_REPLICA_MINT]:
+      "Cannot withdraw a replica mint.",
+    [QUARRY_MERGE_MINE_ERROR__INSUFFICIENT_BALANCE]: "Insufficient balance.",
+    [QUARRY_MERGE_MINE_ERROR__INVALID_MINER]:
+      "Invalid miner for the given quarry.",
+    [QUARRY_MERGE_MINE_ERROR__OUTSTANDING_REPLICA_TOKENS]:
+      "User must first withdraw from all replica quarries.",
+    [QUARRY_MERGE_MINE_ERROR__REPLICA_DECIMALS_MISMATCH]:
+      "The replica mint must have the same number of decimals as the primary mint.",
+    [QUARRY_MERGE_MINE_ERROR__REPLICA_NON_ZERO_SUPPLY]:
+      "The replica mint must have zero supply.",
+    [QUARRY_MERGE_MINE_ERROR__UNAUTHORIZED]: "Unauthorized.",
   };
 }
 

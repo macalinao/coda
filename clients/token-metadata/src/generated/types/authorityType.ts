@@ -14,11 +14,11 @@ import type {
 import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum AuthorityType {
-  None,
-  Metadata,
-  Holder,
-  MetadataDelegate,
-  TokenDelegate,
+  None = 0,
+  Metadata = 1,
+  Holder = 2,
+  MetadataDelegate = 3,
+  TokenDelegate = 4,
 }
 
 export type AuthorityTypeArgs = AuthorityType;

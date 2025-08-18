@@ -14,8 +14,8 @@ import type {
 import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum StakeAction {
-  Stake,
-  Withdraw,
+  Stake = 0,
+  Withdraw = 1,
 }
 
 export type StakeActionArgs = StakeAction;

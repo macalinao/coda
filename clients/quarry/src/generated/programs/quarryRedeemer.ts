@@ -18,7 +18,7 @@ export const QUARRY_REDEEMER_PROGRAM_ADDRESS =
   "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9" as Address<"QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9">;
 
 export enum QuarryRedeemerAccount {
-  Redeemer,
+  Redeemer = 0,
 }
 
 export function identifyQuarryRedeemerAccount(
@@ -42,9 +42,9 @@ export function identifyQuarryRedeemerAccount(
 }
 
 export enum QuarryRedeemerInstruction {
-  CreateRedeemer,
-  RedeemTokens,
-  RedeemAllTokens,
+  CreateRedeemer = 0,
+  RedeemTokens = 1,
+  RedeemAllTokens = 2,
 }
 
 export function identifyQuarryRedeemerInstruction(

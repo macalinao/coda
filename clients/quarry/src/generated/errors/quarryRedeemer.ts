@@ -24,7 +24,7 @@ let quarryRedeemerErrorMessages:
   | undefined;
 if (true) {
   quarryRedeemerErrorMessages = {
-    [QUARRY_REDEEMER_ERROR__UNAUTHORIZED]: `Unauthorized.`,
+    [QUARRY_REDEEMER_ERROR__UNAUTHORIZED]: "Unauthorized.",
   };
 }
 

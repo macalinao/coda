@@ -56,17 +56,20 @@ export type QuarryMineError =
 let quarryMineErrorMessages: Record<QuarryMineError, string> | undefined;
 if (true) {
   quarryMineErrorMessages = {
-    [QUARRY_MINE_ERROR__INSUFFICIENT_ALLOWANCE]: `Insufficient allowance.`,
-    [QUARRY_MINE_ERROR__INSUFFICIENT_BALANCE]: `Insufficient staked balance for withdraw request.`,
-    [QUARRY_MINE_ERROR__INVALID_MAX_CLAIM_FEE]: `Invalid max claim fee.`,
-    [QUARRY_MINE_ERROR__INVALID_REWARDS_SHARE]: `Invalid quarry rewards share`,
-    [QUARRY_MINE_ERROR__INVALID_TIMESTAMP]: `Invalid timestamp.`,
-    [QUARRY_MINE_ERROR__MAX_ANNUAL_REWARDS_RATE_EXCEEDED]: `Max annual rewards rate exceeded.`,
-    [QUARRY_MINE_ERROR__NEW_VAULT_NOT_EMPTY]: `New vault not empty.`,
-    [QUARRY_MINE_ERROR__NOT_ENOUGH_TOKENS]: `Not enough tokens.`,
-    [QUARRY_MINE_ERROR__PAUSED]: `Rewarder is paused.`,
-    [QUARRY_MINE_ERROR__PENDING_AUTHORITY_NOT_SET]: `Pending authority not set`,
-    [QUARRY_MINE_ERROR__UNAUTHORIZED]: `You are not authorized to perform this action.`,
+    [QUARRY_MINE_ERROR__INSUFFICIENT_ALLOWANCE]: "Insufficient allowance.",
+    [QUARRY_MINE_ERROR__INSUFFICIENT_BALANCE]:
+      "Insufficient staked balance for withdraw request.",
+    [QUARRY_MINE_ERROR__INVALID_MAX_CLAIM_FEE]: "Invalid max claim fee.",
+    [QUARRY_MINE_ERROR__INVALID_REWARDS_SHARE]: "Invalid quarry rewards share",
+    [QUARRY_MINE_ERROR__INVALID_TIMESTAMP]: "Invalid timestamp.",
+    [QUARRY_MINE_ERROR__MAX_ANNUAL_REWARDS_RATE_EXCEEDED]:
+      "Max annual rewards rate exceeded.",
+    [QUARRY_MINE_ERROR__NEW_VAULT_NOT_EMPTY]: "New vault not empty.",
+    [QUARRY_MINE_ERROR__NOT_ENOUGH_TOKENS]: "Not enough tokens.",
+    [QUARRY_MINE_ERROR__PAUSED]: "Rewarder is paused.",
+    [QUARRY_MINE_ERROR__PENDING_AUTHORITY_NOT_SET]: "Pending authority not set",
+    [QUARRY_MINE_ERROR__UNAUTHORIZED]:
+      "You are not authorized to perform this action.",
     [QUARRY_MINE_ERROR__UPPERBOUND_EXCEEDED]: `Rewards earned exceeded quarry's upper bound.`,
   };
 }

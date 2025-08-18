@@ -14,13 +14,13 @@ import type {
 import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum TokenDelegateRole {
-  Sale,
-  Transfer,
-  Utility,
-  Staking,
-  Standard,
-  LockedTransfer,
-  Migration,
+  Sale = 0,
+  Transfer = 1,
+  Utility = 2,
+  Staking = 3,
+  Standard = 4,
+  LockedTransfer = 5,
+  Migration = 6,
 }
 
 export type TokenDelegateRoleArgs = TokenDelegateRole;

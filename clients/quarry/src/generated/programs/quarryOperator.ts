@@ -26,7 +26,7 @@ export const QUARRY_OPERATOR_PROGRAM_ADDRESS =
   "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz" as Address<"QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz">;
 
 export enum QuarryOperatorAccount {
-  Operator,
+  Operator = 0,
 }
 
 export function identifyQuarryOperatorAccount(
@@ -50,17 +50,17 @@ export function identifyQuarryOperatorAccount(
 }
 
 export enum QuarryOperatorInstruction {
-  CreateOperator,
-  CreateOperatorV2,
-  SetAdmin,
-  SetRateSetter,
-  SetQuarryCreator,
-  SetShareAllocator,
-  DelegateSetAnnualRewards,
-  DelegateCreateQuarry,
-  DelegateCreateQuarryV2,
-  DelegateSetRewardsShare,
-  DelegateSetFamine,
+  CreateOperator = 0,
+  CreateOperatorV2 = 1,
+  SetAdmin = 2,
+  SetRateSetter = 3,
+  SetQuarryCreator = 4,
+  SetShareAllocator = 5,
+  DelegateSetAnnualRewards = 6,
+  DelegateCreateQuarry = 7,
+  DelegateCreateQuarryV2 = 8,
+  DelegateSetRewardsShare = 9,
+  DelegateSetFamine = 10,
 }
 
 export function identifyQuarryOperatorInstruction(

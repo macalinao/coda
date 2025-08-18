@@ -31,9 +31,11 @@ let quarryMintWrapperErrorMessages:
   | undefined;
 if (true) {
   quarryMintWrapperErrorMessages = {
-    [QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED]: `Cannot mint over hard cap.`,
-    [QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED]: `Minter allowance exceeded.`,
-    [QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED]: `You are not authorized to perform this action.`,
+    [QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED]: "Cannot mint over hard cap.",
+    [QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED]:
+      "Minter allowance exceeded.",
+    [QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED]:
+      "You are not authorized to perform this action.",
   };
 }
 
