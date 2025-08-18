@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { AnchorIdl } from "@codama/nodes-from-anchor";
-import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
+import type { AnchorIdl, IdlV01 } from "@codama/nodes-from-anchor";
+import { rootNodeFromAnchorV01 } from "@codama/nodes-from-anchor";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
 import { createFromRoot } from "codama";
 import { Command } from "commander";
@@ -61,24 +61,48 @@ program
       }
 
       // Use config values if provided, otherwise fall back to command line options
-      const idlPath = resolve(config.idlPath ?? options.idl);
+      const idlPaths = Array.isArray(config.idlPath)
+        ? config.idlPath.map((p) => resolve(p))
+        : [resolve(config.idlPath ?? options.idl)];
       const outputPath = resolve(config.outputDir ?? options.output);
 
-      // Check if IDL file exists
-      if (!(await fileExists(idlPath))) {
-        console.error(`Error: IDL file not found at ${idlPath}`);
+      // Load all IDLs
+      const idls: AnchorIdl[] = [];
+      for (const idlPath of idlPaths) {
+        // Check if IDL file exists
+        if (!(await fileExists(idlPath))) {
+          console.error(`Error: IDL file not found at ${idlPath}`);
+          process.exit(1);
+        }
+
+        // Load the IDL
+        console.log(`Loading IDL from ${idlPath}...`);
+        const idlContent = await readFile(idlPath, "utf-8");
+        const idl = JSON.parse(idlContent) as AnchorIdl;
+        idls.push(idl);
+      }
+
+      // Ensure we have at least one IDL
+      if (idls.length === 0) {
+        console.error("Error: No IDL files were loaded");
         process.exit(1);
       }
 
-      // Load the IDL
-      console.log(`Loading IDL from ${idlPath}...`);
-      const idlContent = await readFile(idlPath, "utf-8");
-      const idl = JSON.parse(idlContent) as AnchorIdl;
+      // Create root node from Anchor IDL(s)
+      console.log(
+        `Creating Codama nodes from ${idls.length.toString()} Anchor IDL(s)...`,
+      );
 
-      // Create root node from Anchor IDL
-      console.log("Creating Codama nodes from Anchor IDL...");
-
-      const root = rootNodeFromAnchor(idl);
+      // Create root nodes from IDL(s)
+      // Note: rootNodeFromAnchor can accept additional IDLs as external programs
+      const [firstIdl, ...restIdls] = idls;
+      if (!firstIdl) {
+        throw new Error("Unexpected: No IDL files loaded");
+      }
+      const root = rootNodeFromAnchorV01(
+        firstIdl as unknown as IdlV01,
+        restIdls as unknown as IdlV01[],
+      );
       const codama = createFromRoot(root);
 
       // Apply additional visitors from config
@@ -86,7 +110,7 @@ program
         // Resolve visitors - either array or function
         const visitors =
           typeof config.visitors === "function"
-            ? config.visitors({ idl })
+            ? config.visitors({ idl: firstIdl, idls })
             : config.visitors;
 
         if (visitors.length > 0) {
@@ -133,8 +157,10 @@ program
  * @type {import('@macalinao/coda').CodaConfig}
  */
 export default {
-  // Optional: Path to the Anchor IDL file (overrides --idl option)
+  // Optional: Path to the Anchor IDL file(s) (overrides --idl option)
+  // Can be a single path or an array for multiple IDLs
   // idlPath: "./target/idl/program.json",
+  // idlPath: ["./idls/program1.json", "./idls/program2.json"],
   
   // Optional: Output directory for generated client (overrides --output option)
   // outputDir: "./src/generated",

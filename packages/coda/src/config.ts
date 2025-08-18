@@ -5,8 +5,10 @@ import type { Node, Visitor } from "codama";
  * Context provided to visitor functions
  */
 export interface VisitorContext {
-  /** The parsed Anchor IDL */
+  /** The parsed Anchor IDL(s) */
   idl: AnchorIdl;
+  /** All parsed IDLs when using multiple IDLs */
+  idls?: AnchorIdl[];
 }
 
 /**
@@ -14,11 +16,12 @@ export interface VisitorContext {
  */
 export interface CodaConfig {
   /**
-   * Path to the Anchor IDL file.
+   * Path to the Anchor IDL file(s).
+   * Can be a single path or an array of paths for multiple IDLs.
    * Overrides the --idl command line option.
    * @default "./target/idl/program.json"
    */
-  idlPath?: string;
+  idlPath?: string | string[];
 
   /**
    * Output directory for the generated client.
@@ -60,6 +63,14 @@ export interface CodaConfig {
  * export default defineConfig({
  *   visitors: ({ idl }) => [
  *     someCustomVisitor(idl),
+ *   ],
+ * });
+ *
+ * // Using multiple IDLs
+ * export default defineConfig({
+ *   idlPath: ["./idls/program1.json", "./idls/program2.json"],
+ *   visitors: ({ idls }) => [
+ *     someCustomVisitor(idls),
  *   ],
  * });
  * ```

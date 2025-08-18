@@ -1,0 +1,65 @@
+{
+  "name": "@macalinao/clients-quarry",
+  "version": "0.1.0",
+  "description": "TypeScript client for Quarry protocol programs",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://github.com/macalinao/coda",
+  "license": "Apache-2.0",
+  "keywords": [
+    "solana",
+    "quarry",
+    "mining",
+    "staking",
+    "client",
+    "esm",
+    "typescript"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/quarry"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -fr dist/",
+    "lint": "eslint . --cache",
+    "test": "bun test",
+    "codegen": "coda generate"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*"
+  },
+  "devDependencies": {
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/coda": "workspace:*",
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "*",
+    "codama": "*",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts}": [
+      "biome check --write --no-errors-on-unmatched",
+      "eslint --fix --cache"
+    ],
+    "*.{json,jsonc,html}": "biome format --write --no-errors-on-unmatched"
+  }
+}

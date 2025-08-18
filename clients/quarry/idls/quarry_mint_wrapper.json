@@ -1,0 +1,602 @@
+{
+  "address": "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
+  "metadata": {
+    "name": "quarry_mint_wrapper",
+    "version": "5.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "new_wrapper",
+      "discriminator": [106, 226, 139, 13, 35, 121, 62, 171],
+      "accounts": [
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "mint_wrapper",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 77, 105, 110, 116, 87, 114, 97, 112, 112, 101, 114, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin"
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "hard_cap",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "new_wrapper_v2",
+      "discriminator": [140, 106, 205, 202, 15, 176, 85, 19],
+      "accounts": [
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "mint_wrapper",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 77, 105, 110, 116, 87, 114, 97, 112, 112, 101, 114, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin"
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "hard_cap",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transfer_admin",
+      "discriminator": [42, 242, 66, 106, 228, 10, 111, 156],
+      "accounts": [
+        {
+          "name": "mint_wrapper",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "next_admin"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "accept_admin",
+      "discriminator": [112, 42, 45, 90, 116, 181, 13, 170],
+      "accounts": [
+        {
+          "name": "mint_wrapper",
+          "writable": true
+        },
+        {
+          "name": "pending_admin",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "new_minter",
+      "discriminator": [14, 95, 216, 55, 122, 115, 37, 250],
+      "accounts": [
+        {
+          "name": "new_minter_auth",
+          "accounts": [
+            {
+              "name": "mint_wrapper",
+              "writable": true
+            },
+            {
+              "name": "admin",
+              "signer": true
+            }
+          ]
+        },
+        {
+          "name": "new_minter_authority"
+        },
+        {
+          "name": "minter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 77, 105, 110, 116, 87, 114, 97, 112, 112, 101, 114, 77,
+                  105, 110, 116, 101, 114, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "auth.mint_wrapper",
+                "account": "OnlyAdmin"
+              },
+              {
+                "kind": "account",
+                "path": "new_minter_authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "new_minter_v2",
+      "discriminator": [7, 93, 245, 202, 126, 212, 61, 195],
+      "accounts": [
+        {
+          "name": "new_minter_v2_auth",
+          "accounts": [
+            {
+              "name": "mint_wrapper",
+              "writable": true
+            },
+            {
+              "name": "admin",
+              "signer": true
+            }
+          ]
+        },
+        {
+          "name": "new_minter_authority"
+        },
+        {
+          "name": "minter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  34, 77, 105, 110, 116, 87, 114, 97, 112, 112, 101, 114, 77,
+                  105, 110, 116, 101, 114, 34
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "auth.mint_wrapper",
+                "account": "OnlyAdmin"
+              },
+              {
+                "kind": "account",
+                "path": "new_minter_authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "minter_update",
+      "discriminator": [11, 219, 68, 245, 38, 222, 221, 184],
+      "accounts": [
+        {
+          "name": "minter_update_auth",
+          "accounts": [
+            {
+              "name": "mint_wrapper",
+              "writable": true
+            },
+            {
+              "name": "admin",
+              "signer": true
+            }
+          ]
+        },
+        {
+          "name": "minter",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "allowance",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "perform_mint",
+      "discriminator": [8, 41, 142, 248, 38, 22, 106, 23],
+      "accounts": [
+        {
+          "name": "mint_wrapper",
+          "writable": true
+        },
+        {
+          "name": "minter_authority",
+          "signer": true
+        },
+        {
+          "name": "token_mint",
+          "writable": true
+        },
+        {
+          "name": "destination",
+          "writable": true
+        },
+        {
+          "name": "minter",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "MintWrapper",
+      "discriminator": [154, 166, 64, 239, 170, 99, 74, 158]
+    },
+    {
+      "name": "Minter",
+      "discriminator": [28, 69, 107, 166, 41, 139, 205, 247]
+    }
+  ],
+  "events": [
+    {
+      "name": "NewMintWrapperEvent",
+      "discriminator": [95, 64, 223, 210, 29, 244, 156, 130]
+    },
+    {
+      "name": "MintWrapperAdminProposeEvent",
+      "discriminator": [218, 29, 158, 95, 175, 148, 195, 16]
+    },
+    {
+      "name": "MintWrapperAdminUpdateEvent",
+      "discriminator": [137, 226, 70, 89, 9, 156, 196, 201]
+    },
+    {
+      "name": "NewMinterEvent",
+      "discriminator": [168, 215, 118, 190, 202, 218, 211, 29]
+    },
+    {
+      "name": "MinterAllowanceUpdateEvent",
+      "discriminator": [10, 208, 220, 247, 144, 234, 214, 103]
+    },
+    {
+      "name": "MinterMintEvent",
+      "discriminator": [209, 15, 227, 3, 172, 143, 85, 32]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "You are not authorized to perform this action."
+    },
+    {
+      "code": 6001,
+      "name": "HardcapExceeded",
+      "msg": "Cannot mint over hard cap."
+    },
+    {
+      "code": 6002,
+      "name": "MinterAllowanceExceeded",
+      "msg": "Minter allowance exceeded."
+    }
+  ],
+  "types": [
+    {
+      "name": "MintWrapper",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "base",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "hard_cap",
+            "type": "u64"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "num_minters",
+            "type": "u64"
+          },
+          {
+            "name": "total_allowance",
+            "type": "u64"
+          },
+          {
+            "name": "total_minted",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Minter",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "minter_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "index",
+            "type": "u64"
+          },
+          {
+            "name": "allowance",
+            "type": "u64"
+          },
+          {
+            "name": "total_minted",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewMintWrapperEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "hard_cap",
+            "type": "u64"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintWrapperAdminProposeEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "current_admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_admin",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintWrapperAdminUpdateEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewMinterEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "minter",
+            "type": "pubkey"
+          },
+          {
+            "name": "index",
+            "type": "u64"
+          },
+          {
+            "name": "minter_authority",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MinterAllowanceUpdateEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "minter",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_allowance",
+            "type": "u64"
+          },
+          {
+            "name": "allowance",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MinterMintEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_wrapper",
+            "type": "pubkey"
+          },
+          {
+            "name": "minter",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "destination",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}
