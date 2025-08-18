@@ -12,7 +12,6 @@ Building on Solana requires interacting with on-chain programs through their IDL
 4. **Maintain type safety** across their application
 
 This leads to:
-
 - **Boilerplate code** that's error-prone and time-consuming to write
 - **Version mismatches** between your client and the on-chain program
 - **Type errors** that only surface at runtime
@@ -37,7 +36,6 @@ bun add -D @macalinao/coda
 ```
 
 Or with npm:
-
 ```bash
 npm install -D @macalinao/coda
 ```
@@ -55,7 +53,6 @@ bunx coda generate --idl ./target/idl/my_program.json --output ./src/generated
 ```
 
 By default, Coda looks for:
-
 - IDL at `./target/idl/program.json`
 - Outputs to `./src/generated`
 
@@ -76,8 +73,8 @@ const instruction = createTransferInstruction({
 // Use with your Solana client
 const transaction = pipe(
   createTransaction({ version: "legacy" }),
-  (tx) => addInstruction(instruction, tx),
-  (tx) => setTransactionFeePayer(payerAddress, tx)
+  tx => addInstruction(instruction, tx),
+  tx => setTransactionFeePayer(payerAddress, tx)
 );
 ```
 
@@ -90,7 +87,6 @@ bunx coda init
 ```
 
 This creates a configuration file where you can:
-
 - Set custom IDL and output paths
 - Add Codama visitors to transform generated code
 - Configure program-specific settings
@@ -106,7 +102,7 @@ export default defineConfig({
   // Custom paths (optional)
   idlPath: "./idls/my_program.json",
   outputDir: "./src/clients/my_program",
-
+  
   // Add visitors to customize generation
   visitors: [
     // Add custom PDAs
@@ -116,12 +112,12 @@ export default defineConfig({
           name: "authority",
           seeds: [
             { kind: "constant", value: "authority" },
-            { kind: "variable", name: "user", type: publicKeyTypeNode() },
-          ],
-        },
-      ],
-    }),
-  ],
+            { kind: "variable", name: "user", type: publicKeyTypeNode() }
+          ]
+        }
+      ]
+    })
+  ]
 });
 ```
 
@@ -133,14 +129,14 @@ You can also use a function to access the IDL and conditionally apply visitors:
 export default defineConfig({
   visitors: ({ idl }) => {
     const visitors = [];
-
+    
     // Conditionally add visitors based on IDL content
     if (idl.name === "my_program") {
       visitors.push(myCustomVisitor());
     }
-
+    
     return visitors;
-  },
+  }
 });
 ```
 
@@ -149,7 +145,6 @@ export default defineConfig({
 Coda generates a complete TypeScript client with:
 
 ### Instructions
-
 ```typescript
 // Fully typed instruction builders
 export function createTransferInstruction(
@@ -161,7 +156,6 @@ export function getTransferInstructionDataEncoder(): Encoder<TransferArgs>;
 ```
 
 ### Accounts
-
 ```typescript
 // Account decoders with type safety
 export function decodeTokenAccount(
@@ -176,7 +170,6 @@ export async function fetchTokenAccount(
 ```
 
 ### Types
-
 ```typescript
 // All types from your IDL
 export type TokenAccount = {
@@ -188,16 +181,16 @@ export type TokenAccount = {
 ```
 
 ### PDAs
-
 ```typescript
 // PDA helpers with proper seed derivation
-export async function findAuthorityPda(seeds: {
-  user: Address;
-}): Promise<[Address, number]>;
+export async function findAuthorityPda(
+  seeds: {
+    user: Address;
+  }
+): Promise<[Address, number]>;
 ```
 
 ### Errors
-
 ```typescript
 // Typed error codes
 export enum MyProgramError {
@@ -280,13 +273,13 @@ const customVisitor = updateInstructionsVisitor({
   transfer: {
     // Add custom defaults
     defaults: {
-      amount: 0n,
-    },
-  },
+      amount: 0n
+    }
+  }
 });
 
 export default defineConfig({
-  visitors: [customVisitor],
+  visitors: [customVisitor]
 });
 ```
 
@@ -298,7 +291,7 @@ Generate clients for multiple programs:
 # Main program
 bunx coda generate --idl ./idls/main.json --output ./src/clients/main
 
-# Auxiliary program
+# Auxiliary program  
 bunx coda generate --idl ./idls/aux.json --output ./src/clients/aux
 ```
 
@@ -329,7 +322,10 @@ bunx coda generate --config ./coda.aux.mjs
 
 ```typescript
 import { createSolanaRpc } from "@solana/web3.js";
-import { fetchTokenAccount, createTransferInstruction } from "./generated";
+import { 
+  fetchTokenAccount,
+  createTransferInstruction 
+} from "./generated";
 
 const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
 
@@ -342,7 +338,7 @@ const ix = createTransferInstruction({
   source: account.address,
   destination: destAddress,
   authority: wallet.address,
-  amount: 100n,
+  amount: 100n
 });
 ```
 
@@ -350,9 +346,9 @@ const ix = createTransferInstruction({
 
 ```typescript
 import { pipe } from "@solana/web3.js";
-import {
+import { 
   createInitializeInstruction,
-  createTransferInstruction
+  createTransferInstruction 
 } from "./generated";
 
 const transaction = pipe(
@@ -396,13 +392,11 @@ Coda follows these principles:
 ### IDL Not Found
 
 Ensure your Anchor program is built:
-
 ```bash
 anchor build
 ```
 
 Or specify the path explicitly:
-
 ```bash
 bunx coda generate --idl ./path/to/idl.json
 ```
@@ -416,7 +410,6 @@ bunx coda generate --idl ./path/to/idl.json
 ### Types Not Resolving
 
 Make sure TypeScript can find the generated files:
-
 ```json
 // tsconfig.json
 {

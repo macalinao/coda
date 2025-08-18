@@ -17,6 +17,10 @@
     "test:run": {
       "dependsOn": ["build"],
       "cache": false
+    },
+    "codegen": {
+      "outputs": ["./src/generated/**"],
+      "cache": false
     }
   }
 }
