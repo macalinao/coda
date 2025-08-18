@@ -17,7 +17,7 @@
         "typescript": "^5.9.2",
       },
     },
-    "clients/mpl-token-metadata": {
+    "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
       "version": "0.1.2",
       "devDependencies": {
@@ -217,7 +217,7 @@
 
     "@isaacs/brace-expansion": ["@isaacs/brace-expansion@5.0.0", "", { "dependencies": { "@isaacs/balanced-match": "^4.0.1" } }, "sha512-ZT55BDLV0yv0RBm2czMiZ+SqCGO7AvmOM3G/w2xhVPH+te0aKgFjmBvGlL1dH+ql2tgGO3MVrbb3jCKyvpgnxA=="],
 
-    "@macalinao/clients-token-metadata": ["@macalinao/clients-token-metadata@workspace:clients/mpl-token-metadata"],
+    "@macalinao/clients-token-metadata": ["@macalinao/clients-token-metadata@workspace:clients/token-metadata"],
 
     "@macalinao/coda": ["@macalinao/coda@workspace:packages/coda"],
 

@@ -1,6 +1,15 @@
-# Coda
+<h1 align="center">
+Coda
+</h1>
 
+<p align="center">
 Automated client generation for Solana programs.
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@macalinao/coda"><img src="https://img.shields.io/npm/v/@macalinao/coda?logo=npm&color=377CC0" /></a>
+  <a href="https://www.npmjs.com/package/@macalinao/coda"><img src="https://img.shields.io/npm/dm/@macalinao/coda?color=377CC0" /></a>
+</p>
 
 ## Why Coda?
 
@@ -48,10 +57,7 @@ npm install -D @macalinao/coda
 
 ```bash
 # Using default paths
-bunx coda generate
-
-# With custom paths
-bunx coda generate --idl ./target/idl/my_program.json --output ./src/generated
+coda generate
 ```
 
 By default, Coda looks for:
