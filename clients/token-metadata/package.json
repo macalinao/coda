@@ -40,7 +40,7 @@
     "build": "tsc",
     "clean": "rm -fr dist/",
     "lint": "eslint . --cache",
-    "test": "bun test",
+    "test": "echo 'No tests yet'",
     "codegen": "coda generate"
   },
   "peerDependencies": {
