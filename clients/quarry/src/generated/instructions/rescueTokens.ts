@@ -6,35 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const RESCUE_TOKENS_DISCRIMINATOR = new Uint8Array([
   222, 81, 199, 209, 182, 62, 62, 186,
@@ -47,16 +49,11 @@ export function getRescueTokensDiscriminatorBytes(): ReadonlyUint8Array {
 }
 
 export type RescueTokensInstruction<
-  TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountMmOwner extends string | AccountMeta = string,
-  TAccountMergePool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
+  TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMiner extends string | AccountMeta = string,
+  TAccountAuthority extends string | AccountMeta = string,
   TAccountMinerTokenAccount extends string | AccountMeta = string,
   TAccountDestinationTokenAccount extends string | AccountMeta = string,
-  TAccountQuarryMineProgram extends
-    | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
@@ -65,26 +62,19 @@ export type RescueTokensInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMmOwner extends string
-        ? ReadonlySignerAccount<TAccountMmOwner> &
-            AccountSignerMeta<TAccountMmOwner>
-        : TAccountMmOwner,
-      TAccountMergePool extends string
-        ? ReadonlyAccount<TAccountMergePool>
-        : TAccountMergePool,
-      TAccountMm extends string ? ReadonlyAccount<TAccountMm> : TAccountMm,
       TAccountMiner extends string
         ? ReadonlyAccount<TAccountMiner>
         : TAccountMiner,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
       TAccountMinerTokenAccount extends string
         ? WritableAccount<TAccountMinerTokenAccount>
         : TAccountMinerTokenAccount,
       TAccountDestinationTokenAccount extends string
         ? WritableAccount<TAccountDestinationTokenAccount>
         : TAccountDestinationTokenAccount,
-      TAccountQuarryMineProgram extends string
-        ? ReadonlyAccount<TAccountQuarryMineProgram>
-        : TAccountQuarryMineProgram,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
@@ -92,9 +82,7 @@ export type RescueTokensInstruction<
     ]
   >;
 
-export interface RescueTokensInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export interface RescueTokensInstructionData { discriminator: ReadonlyUint8Array }
 
 export interface RescueTokensInstructionDataArgs {}
 
@@ -122,68 +110,50 @@ export function getRescueTokensInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface RescueTokensInput<
-  TAccountMmOwner extends string = string,
-  TAccountMergePool extends string = string,
-  TAccountMm extends string = string,
   TAccountMiner extends string = string,
+  TAccountAuthority extends string = string,
   TAccountMinerTokenAccount extends string = string,
   TAccountDestinationTokenAccount extends string = string,
-  TAccountQuarryMineProgram extends string = string,
   TAccountTokenProgram extends string = string,
 > {
-  mmOwner: TransactionSigner<TAccountMmOwner>;
-  mergePool: Address<TAccountMergePool>;
-  mm: Address<TAccountMm>;
   miner: Address<TAccountMiner>;
+  authority: TransactionSigner<TAccountAuthority>;
   minerTokenAccount: Address<TAccountMinerTokenAccount>;
   destinationTokenAccount: Address<TAccountDestinationTokenAccount>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
 }
 
 export function getRescueTokensInstruction<
-  TAccountMmOwner extends string,
-  TAccountMergePool extends string,
-  TAccountMm extends string,
   TAccountMiner extends string,
+  TAccountAuthority extends string,
   TAccountMinerTokenAccount extends string,
   TAccountDestinationTokenAccount extends string,
-  TAccountQuarryMineProgram extends string,
   TAccountTokenProgram extends string,
-  TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: RescueTokensInput<
-    TAccountMmOwner,
-    TAccountMergePool,
-    TAccountMm,
     TAccountMiner,
+    TAccountAuthority,
     TAccountMinerTokenAccount,
     TAccountDestinationTokenAccount,
-    TAccountQuarryMineProgram,
     TAccountTokenProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): RescueTokensInstruction<
   TProgramAddress,
-  TAccountMmOwner,
-  TAccountMergePool,
-  TAccountMm,
   TAccountMiner,
+  TAccountAuthority,
   TAccountMinerTokenAccount,
   TAccountDestinationTokenAccount,
-  TAccountQuarryMineProgram,
   TAccountTokenProgram
 > {
   // Program address.
-  const programAddress =
-    config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    mmOwner: { value: input.mmOwner ?? null, isWritable: false },
-    mergePool: { value: input.mergePool ?? null, isWritable: false },
-    mm: { value: input.mm ?? null, isWritable: false },
     miner: { value: input.miner ?? null, isWritable: false },
+    authority: { value: input.authority ?? null, isWritable: false },
     minerTokenAccount: {
       value: input.minerTokenAccount ?? null,
       isWritable: true,
@@ -191,10 +161,6 @@ export function getRescueTokensInstruction<
     destinationTokenAccount: {
       value: input.destinationTokenAccount ?? null,
       isWritable: true,
-    },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
-      isWritable: false,
     },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
@@ -204,10 +170,6 @@ export function getRescueTokensInstruction<
   >;
 
   // Resolve default values.
-  if (!accounts.quarryMineProgram.value) {
-    accounts.quarryMineProgram.value =
-      "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
-  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
@@ -216,26 +178,20 @@ export function getRescueTokensInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.mmOwner),
-      getAccountMeta(accounts.mergePool),
-      getAccountMeta(accounts.mm),
       getAccountMeta(accounts.miner),
+      getAccountMeta(accounts.authority),
       getAccountMeta(accounts.minerTokenAccount),
       getAccountMeta(accounts.destinationTokenAccount),
-      getAccountMeta(accounts.quarryMineProgram),
       getAccountMeta(accounts.tokenProgram),
     ],
     programAddress,
     data: getRescueTokensInstructionDataEncoder().encode({}),
   } as RescueTokensInstruction<
     TProgramAddress,
-    TAccountMmOwner,
-    TAccountMergePool,
-    TAccountMm,
     TAccountMiner,
+    TAccountAuthority,
     TAccountMinerTokenAccount,
     TAccountDestinationTokenAccount,
-    TAccountQuarryMineProgram,
     TAccountTokenProgram
   >;
 
@@ -243,19 +199,16 @@ export function getRescueTokensInstruction<
 }
 
 export interface ParsedRescueTokensInstruction<
-  TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+  TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    mmOwner: TAccountMetas[0];
-    mergePool: TAccountMetas[1];
-    mm: TAccountMetas[2];
-    miner: TAccountMetas[3];
-    minerTokenAccount: TAccountMetas[4];
-    destinationTokenAccount: TAccountMetas[5];
-    quarryMineProgram: TAccountMetas[6];
-    tokenProgram: TAccountMetas[7];
+    miner: TAccountMetas[0];
+    authority: TAccountMetas[1];
+    minerTokenAccount: TAccountMetas[2];
+    destinationTokenAccount: TAccountMetas[3];
+    tokenProgram: TAccountMetas[4];
   };
   data: RescueTokensInstructionData;
 }
@@ -268,7 +221,7 @@ export function parseRescueTokensInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRescueTokensInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 8) {
+  if (instruction.accounts.length < 5) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -281,13 +234,10 @@ export function parseRescueTokensInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      mmOwner: getNextAccount(),
-      mergePool: getNextAccount(),
-      mm: getNextAccount(),
       miner: getNextAccount(),
+      authority: getNextAccount(),
       minerTokenAccount: getNextAccount(),
       destinationTokenAccount: getNextAccount(),
-      quarryMineProgram: getNextAccount(),
       tokenProgram: getNextAccount(),
     },
     data: getRescueTokensInstructionDataDecoder().decode(instruction.data),

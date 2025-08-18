@@ -23,6 +23,7 @@
       "version": "0.1.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:*",
+        "@macalinao/codama-rename-visitor": "workspace:*",
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@solana/kit": "*",
@@ -76,6 +77,19 @@
       "version": "0.1.1",
       "dependencies": {
         "@codama/nodes-from-anchor": "*",
+        "codama": "*",
+      },
+      "devDependencies": {
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/codama-rename-visitor": {
+      "name": "@macalinao/codama-rename-visitor",
+      "version": "0.1.0",
+      "dependencies": {
         "codama": "*",
       },
       "devDependencies": {
@@ -243,6 +257,8 @@
     "@macalinao/coda": ["@macalinao/coda@workspace:packages/coda"],
 
     "@macalinao/codama-instruction-accounts-dedupe-visitor": ["@macalinao/codama-instruction-accounts-dedupe-visitor@workspace:packages/codama-instruction-accounts-dedupe-visitor"],
+
+    "@macalinao/codama-rename-visitor": ["@macalinao/codama-rename-visitor@workspace:packages/codama-rename-visitor"],
 
     "@macalinao/codama-renderers-js-esm": ["@macalinao/codama-renderers-js-esm@workspace:packages/codama-renderers-js-esm"],
 

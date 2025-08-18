@@ -6,36 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const NEW_MINTER_V2_DISCRIMINATOR = new Uint8Array([
   7, 93, 245, 202, 126, 212, 61, 195,
@@ -86,9 +88,7 @@ export type NewMinterV2Instruction<
     ]
   >;
 
-export interface NewMinterV2InstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export interface NewMinterV2InstructionData { discriminator: ReadonlyUint8Array }
 
 export interface NewMinterV2InstructionDataArgs {}
 

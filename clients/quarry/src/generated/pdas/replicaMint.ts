@@ -6,12 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
+  
   getAddressEncoder,
   getProgramDerivedAddress,
-  getUtf8Encoder,
+  getUtf8Encoder
+  
 } from "@solana/kit";
+import type {Address, ProgramDerivedAddress} from "@solana/kit";
 
 export interface ReplicaMintSeeds {
   pool: Address;

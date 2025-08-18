@@ -6,12 +6,15 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
-import type {
-  ParsedNewRegistryInstruction,
-  ParsedSyncQuarryInstruction,
-} from "../instructions/index.js";
+import {
+  
+  containsBytes,
+  fixEncoderSize,
+  getBytesEncoder
+  
+} from "@solana/kit";
+import type {Address, ReadonlyUint8Array} from "@solana/kit";
+import type {ParsedNewRegistryInstruction, ParsedSyncQuarryInstruction} from "../instructions/index.js";
 
 export const QUARRY_REGISTRY_PROGRAM_ADDRESS =
   "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc" as Address<"QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc">;

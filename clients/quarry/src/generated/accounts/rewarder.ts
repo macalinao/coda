@@ -6,24 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
+  
+  
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
+  
+  
+  
+  
+  
+  
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -42,8 +37,12 @@ import {
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
-  transformEncoder,
+  
+  
+  
+  transformEncoder
 } from "@solana/kit";
+import type {Account, Address, EncodedAccount, FetchAccountConfig, FetchAccountsConfig, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, MaybeAccount, MaybeEncodedAccount, ReadonlyUint8Array} from "@solana/kit";
 
 export const REWARDER_DISCRIMINATOR = new Uint8Array([
   83, 3, 203, 174, 244, 30, 172, 198,

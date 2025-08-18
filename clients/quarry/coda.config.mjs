@@ -5,6 +5,7 @@ import {
   publicKeyTypeNode,
   variablePdaSeedNode,
 } from "@macalinao/coda";
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
 
 export default defineConfig({
   // Load all Quarry IDLs
@@ -114,6 +115,21 @@ export default defineConfig({
           ],
         },
       ],
+    }),
+    // Rename instructions to avoid conflicts between programs
+    renameVisitor({
+      quarryMergeMine: {
+        instructions: {
+          claimRewards: "claimRewardsMM",
+          initMiner: "initMinerMM",
+          initMinerV2: "initMinerMMV2",
+          withdrawTokens: "withdrawTokensMM",
+          rescueTokens: "rescueTokensMM",
+        },
+        definedTypes: {
+          claimEvent: "claimEventMM",
+        },
+      },
     }),
   ],
 });

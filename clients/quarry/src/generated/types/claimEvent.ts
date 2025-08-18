@@ -6,59 +6,60 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
+  
   combineCodec,
+  
+  
+  
   getAddressDecoder,
   getAddressEncoder,
+  getI64Decoder,
+  getI64Encoder,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
-  getU64Encoder,
+  getU64Encoder
 } from "@solana/kit";
+import type {Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder} from "@solana/kit";
 
 export interface ClaimEvent {
-  pool: Address;
-  mm: Address;
-  mint: Address;
+  authority: Address;
+  stakedToken: Address;
+  rewardsToken: Address;
   amount: bigint;
-  initialBalance: bigint;
-  endBalance: bigint;
+  fees: bigint;
+  timestamp: bigint;
 }
 
 export interface ClaimEventArgs {
-  pool: Address;
-  mm: Address;
-  mint: Address;
+  authority: Address;
+  stakedToken: Address;
+  rewardsToken: Address;
   amount: number | bigint;
-  initialBalance: number | bigint;
-  endBalance: number | bigint;
+  fees: number | bigint;
+  timestamp: number | bigint;
 }
 
 export function getClaimEventEncoder(): FixedSizeEncoder<ClaimEventArgs> {
   return getStructEncoder([
-    ["pool", getAddressEncoder()],
-    ["mm", getAddressEncoder()],
-    ["mint", getAddressEncoder()],
+    ["authority", getAddressEncoder()],
+    ["stakedToken", getAddressEncoder()],
+    ["rewardsToken", getAddressEncoder()],
     ["amount", getU64Encoder()],
-    ["initialBalance", getU64Encoder()],
-    ["endBalance", getU64Encoder()],
+    ["fees", getU64Encoder()],
+    ["timestamp", getI64Encoder()],
   ]);
 }
 
 export function getClaimEventDecoder(): FixedSizeDecoder<ClaimEvent> {
   return getStructDecoder([
-    ["pool", getAddressDecoder()],
-    ["mm", getAddressDecoder()],
-    ["mint", getAddressDecoder()],
+    ["authority", getAddressDecoder()],
+    ["stakedToken", getAddressDecoder()],
+    ["rewardsToken", getAddressDecoder()],
     ["amount", getU64Decoder()],
-    ["initialBalance", getU64Decoder()],
-    ["endBalance", getU64Decoder()],
+    ["fees", getU64Decoder()],
+    ["timestamp", getI64Decoder()],
   ]);
 }
 

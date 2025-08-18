@@ -6,24 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -32,11 +22,23 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const PERFORM_MINT_DISCRIMINATOR = new Uint8Array([
   8, 41, 142, 248, 38, 22, 106, 23,
@@ -91,9 +93,7 @@ export interface PerformMintInstructionData {
   amount: bigint;
 }
 
-export interface PerformMintInstructionDataArgs {
-  amount: number | bigint;
-}
+export interface PerformMintInstructionDataArgs { amount: number | bigint }
 
 export function getPerformMintInstructionDataEncoder(): FixedSizeEncoder<PerformMintInstructionDataArgs> {
   return transformEncoder(

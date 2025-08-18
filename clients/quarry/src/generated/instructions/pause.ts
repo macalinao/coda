@@ -6,34 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const PAUSE_DISCRIMINATOR = new Uint8Array([
   211, 22, 221, 251, 74, 121, 193, 47,
@@ -63,9 +65,7 @@ export type PauseInstruction<
     ]
   >;
 
-export interface PauseInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export interface PauseInstructionData { discriminator: ReadonlyUint8Array }
 
 export interface PauseInstructionDataArgs {}
 

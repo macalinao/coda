@@ -6,24 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getAddressEncoder,
@@ -34,11 +24,24 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const NEW_POOL_DISCRIMINATOR = new Uint8Array([
   38, 63, 210, 32, 246, 20, 239, 112,
@@ -100,10 +103,7 @@ export interface NewPoolInstructionData {
   mintBump: number;
 }
 
-export interface NewPoolInstructionDataArgs {
-  bump: number;
-  mintBump: number;
-}
+export interface NewPoolInstructionDataArgs { bump: number; mintBump: number }
 
 export function getNewPoolInstructionDataEncoder(): FixedSizeEncoder<NewPoolInstructionDataArgs> {
   return transformEncoder(

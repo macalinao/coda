@@ -6,12 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  
+  isProgramError
+  
+  
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
+import type {Address, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM, SolanaError} from "@solana/kit";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: Signer is not authorized to perform this action. */
@@ -41,7 +42,9 @@ export function getQuarryOperatorErrorMessage(
   code: QuarryOperatorError,
 ): string {
   if (true) {
-    return quarryOperatorErrorMessages![code];
+    return (quarryOperatorErrorMessages!)[
+      code
+    ];
   }
 
   return "Error message not available in production bundles.";

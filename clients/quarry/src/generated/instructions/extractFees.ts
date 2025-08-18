@@ -6,32 +6,34 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
+import type {AccountMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlyUint8Array, WritableAccount} from "@solana/kit";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const EXTRACT_FEES_DISCRIMINATOR = new Uint8Array([
   57, 219, 44, 55, 130, 127, 165, 183,
@@ -72,9 +74,7 @@ export type ExtractFeesInstruction<
     ]
   >;
 
-export interface ExtractFeesInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export interface ExtractFeesInstructionData { discriminator: ReadonlyUint8Array }
 
 export interface ExtractFeesInstructionDataArgs {}
 

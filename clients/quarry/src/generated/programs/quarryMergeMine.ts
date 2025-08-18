@@ -6,23 +6,15 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
-import type {
-  ParsedClaimRewardsInstruction,
-  ParsedInitMergeMinerInstruction,
-  ParsedInitMergeMinerV2Instruction,
-  ParsedInitMinerInstruction,
-  ParsedInitMinerV2Instruction,
-  ParsedNewPoolInstruction,
-  ParsedNewPoolV2Instruction,
-  ParsedRescueTokensInstruction,
-  ParsedStakePrimaryMinerInstruction,
-  ParsedStakeReplicaMinerInstruction,
-  ParsedUnstakeAllReplicaMinerInstruction,
-  ParsedUnstakePrimaryMinerInstruction,
-  ParsedWithdrawTokensInstruction,
-} from "../instructions/index.js";
+import {
+  
+  containsBytes,
+  fixEncoderSize,
+  getBytesEncoder
+  
+} from "@solana/kit";
+import type {Address, ReadonlyUint8Array} from "@solana/kit";
+import type {ParsedClaimRewardsMMInstruction, ParsedInitMergeMinerInstruction, ParsedInitMergeMinerV2Instruction, ParsedInitMinerMMInstruction, ParsedInitMinerMMV2Instruction, ParsedNewPoolInstruction, ParsedNewPoolV2Instruction, ParsedRescueTokensMMInstruction, ParsedStakePrimaryMinerInstruction, ParsedStakeReplicaMinerInstruction, ParsedUnstakeAllReplicaMinerInstruction, ParsedUnstakePrimaryMinerInstruction, ParsedWithdrawTokensMMInstruction} from "../instructions/index.js";
 
 export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;
@@ -68,15 +60,15 @@ export enum QuarryMergeMineInstruction {
   NewPoolV2,
   InitMergeMiner,
   InitMergeMinerV2,
-  InitMiner,
-  InitMinerV2,
+  InitMinerMM,
+  InitMinerMMV2,
   StakePrimaryMiner,
   StakeReplicaMiner,
   UnstakePrimaryMiner,
   UnstakeAllReplicaMiner,
-  WithdrawTokens,
-  RescueTokens,
-  ClaimRewards,
+  WithdrawTokensMM,
+  RescueTokensMM,
+  ClaimRewardsMM,
 }
 
 export function identifyQuarryMergeMineInstruction(
@@ -136,7 +128,7 @@ export function identifyQuarryMergeMineInstruction(
       0,
     )
   ) {
-    return QuarryMergeMineInstruction.InitMiner;
+    return QuarryMergeMineInstruction.InitMinerMM;
   }
   if (
     containsBytes(
@@ -147,7 +139,7 @@ export function identifyQuarryMergeMineInstruction(
       0,
     )
   ) {
-    return QuarryMergeMineInstruction.InitMinerV2;
+    return QuarryMergeMineInstruction.InitMinerMMV2;
   }
   if (
     containsBytes(
@@ -202,7 +194,7 @@ export function identifyQuarryMergeMineInstruction(
       0,
     )
   ) {
-    return QuarryMergeMineInstruction.WithdrawTokens;
+    return QuarryMergeMineInstruction.WithdrawTokensMM;
   }
   if (
     containsBytes(
@@ -213,7 +205,7 @@ export function identifyQuarryMergeMineInstruction(
       0,
     )
   ) {
-    return QuarryMergeMineInstruction.RescueTokens;
+    return QuarryMergeMineInstruction.RescueTokensMM;
   }
   if (
     containsBytes(
@@ -224,7 +216,7 @@ export function identifyQuarryMergeMineInstruction(
       0,
     )
   ) {
-    return QuarryMergeMineInstruction.ClaimRewards;
+    return QuarryMergeMineInstruction.ClaimRewardsMM;
   }
   throw new Error(
     "The provided instruction could not be identified as a quarryMergeMine instruction.",
@@ -247,11 +239,11 @@ export type ParsedQuarryMergeMineInstruction<
       instructionType: QuarryMergeMineInstruction.InitMergeMinerV2;
     } & ParsedInitMergeMinerV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.InitMiner;
-    } & ParsedInitMinerInstruction<TProgram>)
+      instructionType: QuarryMergeMineInstruction.InitMinerMM;
+    } & ParsedInitMinerMMInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.InitMinerV2;
-    } & ParsedInitMinerV2Instruction<TProgram>)
+      instructionType: QuarryMergeMineInstruction.InitMinerMMV2;
+    } & ParsedInitMinerMMV2Instruction<TProgram>)
   | ({
       instructionType: QuarryMergeMineInstruction.StakePrimaryMiner;
     } & ParsedStakePrimaryMinerInstruction<TProgram>)
@@ -265,11 +257,11 @@ export type ParsedQuarryMergeMineInstruction<
       instructionType: QuarryMergeMineInstruction.UnstakeAllReplicaMiner;
     } & ParsedUnstakeAllReplicaMinerInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.WithdrawTokens;
-    } & ParsedWithdrawTokensInstruction<TProgram>)
+      instructionType: QuarryMergeMineInstruction.WithdrawTokensMM;
+    } & ParsedWithdrawTokensMMInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.RescueTokens;
-    } & ParsedRescueTokensInstruction<TProgram>)
+      instructionType: QuarryMergeMineInstruction.RescueTokensMM;
+    } & ParsedRescueTokensMMInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.ClaimRewards;
-    } & ParsedClaimRewardsInstruction<TProgram>);
+      instructionType: QuarryMergeMineInstruction.ClaimRewardsMM;
+    } & ParsedClaimRewardsMMInstruction<TProgram>);

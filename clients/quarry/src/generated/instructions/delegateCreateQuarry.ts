@@ -6,25 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -33,11 +22,24 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const DELEGATE_CREATE_QUARRY_DISCRIMINATOR = new Uint8Array([
   245, 238, 31, 14, 175, 233, 75, 237,
@@ -107,9 +109,7 @@ export interface DelegateCreateQuarryInstructionData {
   bump: number;
 }
 
-export interface DelegateCreateQuarryInstructionDataArgs {
-  bump: number;
-}
+export interface DelegateCreateQuarryInstructionDataArgs { bump: number }
 
 export function getDelegateCreateQuarryInstructionDataEncoder(): FixedSizeEncoder<DelegateCreateQuarryInstructionDataArgs> {
   return transformEncoder(

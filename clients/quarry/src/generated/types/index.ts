@@ -7,6 +7,7 @@
  */
 
 export * from "./claimEvent.js";
+export * from "./claimEventMM.js";
 export * from "./initMergeMinerEvent.js";
 export * from "./initMinerEvent.js";
 export * from "./minerCreateEvent.js";

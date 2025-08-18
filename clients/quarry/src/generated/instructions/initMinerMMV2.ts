@@ -6,47 +6,49 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
-export const INIT_MINER_DISCRIMINATOR = new Uint8Array([
-  144, 159, 202, 208, 234, 154, 242, 55,
+export const INIT_MINER_M_M_V2_DISCRIMINATOR = new Uint8Array([
+  189, 125, 116, 157, 73, 4, 253, 156,
 ]);
 
-export function getInitMinerDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(INIT_MINER_DISCRIMINATOR);
+export function getInitMinerMMV2DiscriminatorBytes(): ReadonlyUint8Array {
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    INIT_MINER_M_M_V2_DISCRIMINATOR,
+  );
 }
 
-export type InitMinerInstruction<
+export type InitMinerMMV2Instruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountPool extends string | AccountMeta = string,
   TAccountMm extends string | AccountMeta = string,
@@ -106,43 +108,36 @@ export type InitMinerInstruction<
     ]
   >;
 
-export interface InitMinerInstructionData {
+export interface InitMinerMMV2InstructionData {
   discriminator: ReadonlyUint8Array;
-  bump: number;
 }
 
-export interface InitMinerInstructionDataArgs {
-  bump: number;
-}
+export interface InitMinerMMV2InstructionDataArgs {}
 
-export function getInitMinerInstructionDataEncoder(): FixedSizeEncoder<InitMinerInstructionDataArgs> {
+export function getInitMinerMMV2InstructionDataEncoder(): FixedSizeEncoder<InitMinerMMV2InstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["bump", getU8Encoder()],
-    ]),
-    (value) => ({ ...value, discriminator: INIT_MINER_DISCRIMINATOR }),
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: INIT_MINER_M_M_V2_DISCRIMINATOR }),
   );
 }
 
-export function getInitMinerInstructionDataDecoder(): FixedSizeDecoder<InitMinerInstructionData> {
+export function getInitMinerMMV2InstructionDataDecoder(): FixedSizeDecoder<InitMinerMMV2InstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["bump", getU8Decoder()],
   ]);
 }
 
-export function getInitMinerInstructionDataCodec(): FixedSizeCodec<
-  InitMinerInstructionDataArgs,
-  InitMinerInstructionData
+export function getInitMinerMMV2InstructionDataCodec(): FixedSizeCodec<
+  InitMinerMMV2InstructionDataArgs,
+  InitMinerMMV2InstructionData
 > {
   return combineCodec(
-    getInitMinerInstructionDataEncoder(),
-    getInitMinerInstructionDataDecoder(),
+    getInitMinerMMV2InstructionDataEncoder(),
+    getInitMinerMMV2InstructionDataDecoder(),
   );
 }
 
-export interface InitMinerInput<
+export interface InitMinerMMV2Input<
   TAccountPool extends string = string,
   TAccountMm extends string = string,
   TAccountMiner extends string = string,
@@ -166,10 +161,9 @@ export interface InitMinerInput<
   mineProgram?: Address<TAccountMineProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  bump: InitMinerInstructionDataArgs["bump"];
 }
 
-export function getInitMinerInstruction<
+export function getInitMinerMMV2Instruction<
   TAccountPool extends string,
   TAccountMm extends string,
   TAccountMiner extends string,
@@ -183,7 +177,7 @@ export function getInitMinerInstruction<
   TAccountTokenProgram extends string,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
-  input: InitMinerInput<
+  input: InitMinerMMV2Input<
     TAccountPool,
     TAccountMm,
     TAccountMiner,
@@ -197,7 +191,7 @@ export function getInitMinerInstruction<
     TAccountTokenProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): InitMinerInstruction<
+): InitMinerMMV2Instruction<
   TProgramAddress,
   TAccountPool,
   TAccountMm,
@@ -234,9 +228,6 @@ export function getInitMinerInstruction<
     ResolvedAccount
   >;
 
-  // Original args.
-  const args = { ...input };
-
   // Resolve default values.
   if (!accounts.mineProgram.value) {
     accounts.mineProgram.value =
@@ -267,10 +258,8 @@ export function getInitMinerInstruction<
       getAccountMeta(accounts.tokenProgram),
     ],
     programAddress,
-    data: getInitMinerInstructionDataEncoder().encode(
-      args as InitMinerInstructionDataArgs,
-    ),
-  } as InitMinerInstruction<
+    data: getInitMinerMMV2InstructionDataEncoder().encode({}),
+  } as InitMinerMMV2Instruction<
     TProgramAddress,
     TAccountPool,
     TAccountMm,
@@ -288,7 +277,7 @@ export function getInitMinerInstruction<
   return instruction;
 }
 
-export interface ParsedInitMinerInstruction<
+export interface ParsedInitMinerMMV2Instruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
@@ -306,17 +295,17 @@ export interface ParsedInitMinerInstruction<
     systemProgram: TAccountMetas[9];
     tokenProgram: TAccountMetas[10];
   };
-  data: InitMinerInstructionData;
+  data: InitMinerMMV2InstructionData;
 }
 
-export function parseInitMinerInstruction<
+export function parseInitMinerMMV2Instruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedInitMinerInstruction<TProgram, TAccountMetas> {
+): ParsedInitMinerMMV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -342,6 +331,6 @@ export function parseInitMinerInstruction<
       systemProgram: getNextAccount(),
       tokenProgram: getNextAccount(),
     },
-    data: getInitMinerInstructionDataDecoder().decode(instruction.data),
+    data: getInitMinerMMV2InstructionDataDecoder().decode(instruction.data),
   };
 }

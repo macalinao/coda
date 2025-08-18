@@ -6,32 +6,34 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
+import type {AccountMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlyUint8Array, WritableAccount} from "@solana/kit";
 import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const SYNC_QUARRY_DISCRIMINATOR = new Uint8Array([
   48, 99, 184, 151, 219, 101, 253, 170,
@@ -60,9 +62,7 @@ export type SyncQuarryInstruction<
     ]
   >;
 
-export interface SyncQuarryInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export interface SyncQuarryInstructionData { discriminator: ReadonlyUint8Array }
 
 export interface SyncQuarryInstructionDataArgs {}
 

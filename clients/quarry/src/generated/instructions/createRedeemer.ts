@@ -6,24 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getAddressEncoder,
@@ -34,11 +24,24 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const CREATE_REDEEMER_DISCRIMINATOR = new Uint8Array([
   137, 228, 81, 63, 209, 33, 131, 195,
@@ -89,9 +92,7 @@ export interface CreateRedeemerInstructionData {
   bump: number;
 }
 
-export interface CreateRedeemerInstructionDataArgs {
-  bump: number;
-}
+export interface CreateRedeemerInstructionDataArgs { bump: number }
 
 export function getCreateRedeemerInstructionDataEncoder(): FixedSizeEncoder<CreateRedeemerInstructionDataArgs> {
   return transformEncoder(

@@ -6,35 +6,39 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
+  getU64Decoder,
+  getU64Encoder,
+  
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const WITHDRAW_TOKENS_DISCRIMINATOR = new Uint8Array([
   2, 4, 225, 61, 19, 182, 106, 170,
@@ -47,54 +51,60 @@ export function getWithdrawTokensDiscriminatorBytes(): ReadonlyUint8Array {
 }
 
 export type WithdrawTokensInstruction<
-  TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountWithdrawMint extends string | AccountMeta = string,
-  TAccountMmTokenAccount extends string | AccountMeta = string,
-  TAccountTokenDestination extends string | AccountMeta = string,
+  TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
+  TAccountAuthority extends string | AccountMeta = string,
+  TAccountMiner extends string | AccountMeta = string,
+  TAccountQuarry extends string | AccountMeta = string,
+  TAccountMinerVault extends string | AccountMeta = string,
+  TAccountTokenAccount extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRewarder extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountOwner extends string
-        ? ReadonlySignerAccount<TAccountOwner> &
-            AccountSignerMeta<TAccountOwner>
-        : TAccountOwner,
-      TAccountPool extends string
-        ? ReadonlyAccount<TAccountPool>
-        : TAccountPool,
-      TAccountMm extends string ? WritableAccount<TAccountMm> : TAccountMm,
-      TAccountWithdrawMint extends string
-        ? ReadonlyAccount<TAccountWithdrawMint>
-        : TAccountWithdrawMint,
-      TAccountMmTokenAccount extends string
-        ? WritableAccount<TAccountMmTokenAccount>
-        : TAccountMmTokenAccount,
-      TAccountTokenDestination extends string
-        ? WritableAccount<TAccountTokenDestination>
-        : TAccountTokenDestination,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
+      TAccountMiner extends string
+        ? WritableAccount<TAccountMiner>
+        : TAccountMiner,
+      TAccountQuarry extends string
+        ? WritableAccount<TAccountQuarry>
+        : TAccountQuarry,
+      TAccountMinerVault extends string
+        ? WritableAccount<TAccountMinerVault>
+        : TAccountMinerVault,
+      TAccountTokenAccount extends string
+        ? WritableAccount<TAccountTokenAccount>
+        : TAccountTokenAccount,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
+      TAccountRewarder extends string
+        ? ReadonlyAccount<TAccountRewarder>
+        : TAccountRewarder,
       ...TRemainingAccounts,
     ]
   >;
 
 export interface WithdrawTokensInstructionData {
   discriminator: ReadonlyUint8Array;
+  amount: bigint;
 }
 
-export interface WithdrawTokensInstructionDataArgs {}
+export interface WithdrawTokensInstructionDataArgs { amount: number | bigint }
 
 export function getWithdrawTokensInstructionDataEncoder(): FixedSizeEncoder<WithdrawTokensInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["amount", getU64Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: WITHDRAW_TOKENS_DISCRIMINATOR }),
   );
 }
@@ -102,6 +112,7 @@ export function getWithdrawTokensInstructionDataEncoder(): FixedSizeEncoder<With
 export function getWithdrawTokensInstructionDataDecoder(): FixedSizeDecoder<WithdrawTokensInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["amount", getU64Decoder()],
   ]);
 }
 
@@ -116,74 +127,74 @@ export function getWithdrawTokensInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface WithdrawTokensInput<
-  TAccountOwner extends string = string,
-  TAccountPool extends string = string,
-  TAccountMm extends string = string,
-  TAccountWithdrawMint extends string = string,
-  TAccountMmTokenAccount extends string = string,
-  TAccountTokenDestination extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountMiner extends string = string,
+  TAccountQuarry extends string = string,
+  TAccountMinerVault extends string = string,
+  TAccountTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
+  TAccountRewarder extends string = string,
 > {
-  owner: TransactionSigner<TAccountOwner>;
-  pool: Address<TAccountPool>;
-  mm: Address<TAccountMm>;
-  withdrawMint: Address<TAccountWithdrawMint>;
-  mmTokenAccount: Address<TAccountMmTokenAccount>;
-  tokenDestination: Address<TAccountTokenDestination>;
+  authority: TransactionSigner<TAccountAuthority>;
+  miner: Address<TAccountMiner>;
+  quarry: Address<TAccountQuarry>;
+  minerVault: Address<TAccountMinerVault>;
+  tokenAccount: Address<TAccountTokenAccount>;
   tokenProgram?: Address<TAccountTokenProgram>;
+  rewarder: Address<TAccountRewarder>;
+  amount: WithdrawTokensInstructionDataArgs["amount"];
 }
 
 export function getWithdrawTokensInstruction<
-  TAccountOwner extends string,
-  TAccountPool extends string,
-  TAccountMm extends string,
-  TAccountWithdrawMint extends string,
-  TAccountMmTokenAccount extends string,
-  TAccountTokenDestination extends string,
+  TAccountAuthority extends string,
+  TAccountMiner extends string,
+  TAccountQuarry extends string,
+  TAccountMinerVault extends string,
+  TAccountTokenAccount extends string,
   TAccountTokenProgram extends string,
-  TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+  TAccountRewarder extends string,
+  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: WithdrawTokensInput<
-    TAccountOwner,
-    TAccountPool,
-    TAccountMm,
-    TAccountWithdrawMint,
-    TAccountMmTokenAccount,
-    TAccountTokenDestination,
-    TAccountTokenProgram
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountMinerVault,
+    TAccountTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
   >,
   config?: { programAddress?: TProgramAddress },
 ): WithdrawTokensInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountPool,
-  TAccountMm,
-  TAccountWithdrawMint,
-  TAccountMmTokenAccount,
-  TAccountTokenDestination,
-  TAccountTokenProgram
+  TAccountAuthority,
+  TAccountMiner,
+  TAccountQuarry,
+  TAccountMinerVault,
+  TAccountTokenAccount,
+  TAccountTokenProgram,
+  TAccountRewarder
 > {
   // Program address.
-  const programAddress =
-    config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    pool: { value: input.pool ?? null, isWritable: false },
-    mm: { value: input.mm ?? null, isWritable: true },
-    withdrawMint: { value: input.withdrawMint ?? null, isWritable: false },
-    mmTokenAccount: { value: input.mmTokenAccount ?? null, isWritable: true },
-    tokenDestination: {
-      value: input.tokenDestination ?? null,
-      isWritable: true,
-    },
+    authority: { value: input.authority ?? null, isWritable: false },
+    miner: { value: input.miner ?? null, isWritable: true },
+    quarry: { value: input.quarry ?? null, isWritable: true },
+    minerVault: { value: input.minerVault ?? null, isWritable: true },
+    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    rewarder: { value: input.rewarder ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Original args.
+  const args = { ...input };
 
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
@@ -194,43 +205,45 @@ export function getWithdrawTokensInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.withdrawMint),
-      getAccountMeta(accounts.mmTokenAccount),
-      getAccountMeta(accounts.tokenDestination),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.miner),
+      getAccountMeta(accounts.quarry),
+      getAccountMeta(accounts.minerVault),
+      getAccountMeta(accounts.tokenAccount),
       getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.rewarder),
     ],
     programAddress,
-    data: getWithdrawTokensInstructionDataEncoder().encode({}),
+    data: getWithdrawTokensInstructionDataEncoder().encode(
+      args as WithdrawTokensInstructionDataArgs,
+    ),
   } as WithdrawTokensInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountPool,
-    TAccountMm,
-    TAccountWithdrawMint,
-    TAccountMmTokenAccount,
-    TAccountTokenDestination,
-    TAccountTokenProgram
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountMinerVault,
+    TAccountTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
   >;
 
   return instruction;
 }
 
 export interface ParsedWithdrawTokensInstruction<
-  TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+  TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    owner: TAccountMetas[0];
-    pool: TAccountMetas[1];
-    mm: TAccountMetas[2];
-    withdrawMint: TAccountMetas[3];
-    mmTokenAccount: TAccountMetas[4];
-    tokenDestination: TAccountMetas[5];
-    tokenProgram: TAccountMetas[6];
+    authority: TAccountMetas[0];
+    miner: TAccountMetas[1];
+    quarry: TAccountMetas[2];
+    minerVault: TAccountMetas[3];
+    tokenAccount: TAccountMetas[4];
+    tokenProgram: TAccountMetas[5];
+    rewarder: TAccountMetas[6];
   };
   data: WithdrawTokensInstructionData;
 }
@@ -256,13 +269,13 @@ export function parseWithdrawTokensInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      owner: getNextAccount(),
-      pool: getNextAccount(),
-      mm: getNextAccount(),
-      withdrawMint: getNextAccount(),
-      mmTokenAccount: getNextAccount(),
-      tokenDestination: getNextAccount(),
+      authority: getNextAccount(),
+      miner: getNextAccount(),
+      quarry: getNextAccount(),
+      minerVault: getNextAccount(),
+      tokenAccount: getNextAccount(),
       tokenProgram: getNextAccount(),
+      rewarder: getNextAccount(),
     },
     data: getWithdrawTokensInstructionDataDecoder().decode(instruction.data),
   };

@@ -6,23 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -31,11 +22,22 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const SET_ANNUAL_REWARDS_DISCRIMINATOR = new Uint8Array([
   135, 125, 92, 160, 100, 101, 141, 84,
@@ -72,9 +74,7 @@ export interface SetAnnualRewardsInstructionData {
   newRate: bigint;
 }
 
-export interface SetAnnualRewardsInstructionDataArgs {
-  newRate: number | bigint;
-}
+export interface SetAnnualRewardsInstructionDataArgs { newRate: number | bigint }
 
 export function getSetAnnualRewardsInstructionDataEncoder(): FixedSizeEncoder<SetAnnualRewardsInstructionDataArgs> {
   return transformEncoder(

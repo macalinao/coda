@@ -41,7 +41,7 @@
     "clean": "rm -fr dist/",
     "lint": "eslint . --cache",
     "test": "bun test",
-    "codegen": "coda generate"
+    "codegen": "rm -fr src/generated/ && coda generate"
   },
   "peerDependencies": {
     "@solana/kit": "*"
@@ -49,6 +49,7 @@
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/coda": "workspace:*",
+    "@macalinao/codama-rename-visitor": "workspace:*",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "*",
     "codama": "*",

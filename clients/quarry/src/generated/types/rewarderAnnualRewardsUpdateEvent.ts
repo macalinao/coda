@@ -6,20 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
+  
+  
+  
   getI64Decoder,
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
-  getU64Encoder,
+  getU64Encoder
 } from "@solana/kit";
+import type {FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder} from "@solana/kit";
 
 export interface RewarderAnnualRewardsUpdateEvent {
   previousRate: bigint;

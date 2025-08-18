@@ -6,32 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
 import {
+  
+  
+  
   combineCodec,
+  
+  
+  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
+  
+  
+  
+  
+  
+  
+  
+  transformEncoder
+  
 } from "@solana/kit";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  getAccountMetaFactory
+  
+} from "../shared/index.js";
+import type {ResolvedAccount} from "../shared/index.js";
 
 export const CLAIM_REWARDS_DISCRIMINATOR = new Uint8Array([
   4, 144, 132, 71, 116, 23, 151, 80,
@@ -44,7 +49,7 @@ export function getClaimRewardsDiscriminatorBytes(): ReadonlyUint8Array {
 }
 
 export type ClaimRewardsInstruction<
-  TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+  TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMintWrapper extends string | AccountMeta = string,
   TAccountMintWrapperProgram extends
     | string
@@ -53,19 +58,15 @@ export type ClaimRewardsInstruction<
   TAccountRewardsTokenMint extends string | AccountMeta = string,
   TAccountRewardsTokenAccount extends string | AccountMeta = string,
   TAccountClaimFeeTokenAccount extends string | AccountMeta = string,
-  TAccountStakeTokenAccount extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
+  TAccountAuthority extends string | AccountMeta = string,
   TAccountMiner extends string | AccountMeta = string,
-  TAccountMinerVault extends string | AccountMeta = string,
+  TAccountQuarry extends string | AccountMeta = string,
+  TAccountUnusedMinerVault extends string | AccountMeta = string,
+  TAccountUnusedTokenAccount extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountMineProgram extends
-    | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TAccountRewarder extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -89,38 +90,33 @@ export type ClaimRewardsInstruction<
       TAccountClaimFeeTokenAccount extends string
         ? WritableAccount<TAccountClaimFeeTokenAccount>
         : TAccountClaimFeeTokenAccount,
-      TAccountStakeTokenAccount extends string
-        ? WritableAccount<TAccountStakeTokenAccount>
-        : TAccountStakeTokenAccount,
-      TAccountPool extends string
-        ? WritableAccount<TAccountPool>
-        : TAccountPool,
-      TAccountMm extends string ? WritableAccount<TAccountMm> : TAccountMm,
-      TAccountRewarder extends string
-        ? ReadonlyAccount<TAccountRewarder>
-        : TAccountRewarder,
-      TAccountQuarry extends string
-        ? WritableAccount<TAccountQuarry>
-        : TAccountQuarry,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
       TAccountMiner extends string
         ? WritableAccount<TAccountMiner>
         : TAccountMiner,
-      TAccountMinerVault extends string
-        ? WritableAccount<TAccountMinerVault>
-        : TAccountMinerVault,
+      TAccountQuarry extends string
+        ? WritableAccount<TAccountQuarry>
+        : TAccountQuarry,
+      TAccountUnusedMinerVault extends string
+        ? ReadonlyAccount<TAccountUnusedMinerVault>
+        : TAccountUnusedMinerVault,
+      TAccountUnusedTokenAccount extends string
+        ? ReadonlyAccount<TAccountUnusedTokenAccount>
+        : TAccountUnusedTokenAccount,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
-      TAccountMineProgram extends string
-        ? ReadonlyAccount<TAccountMineProgram>
-        : TAccountMineProgram,
+      TAccountRewarder extends string
+        ? ReadonlyAccount<TAccountRewarder>
+        : TAccountRewarder,
       ...TRemainingAccounts,
     ]
   >;
 
-export interface ClaimRewardsInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export interface ClaimRewardsInstructionData { discriminator: ReadonlyUint8Array }
 
 export interface ClaimRewardsInstructionDataArgs {}
 
@@ -154,15 +150,13 @@ export interface ClaimRewardsInput<
   TAccountRewardsTokenMint extends string = string,
   TAccountRewardsTokenAccount extends string = string,
   TAccountClaimFeeTokenAccount extends string = string,
-  TAccountStakeTokenAccount extends string = string,
-  TAccountPool extends string = string,
-  TAccountMm extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarry extends string = string,
+  TAccountAuthority extends string = string,
   TAccountMiner extends string = string,
-  TAccountMinerVault extends string = string,
+  TAccountQuarry extends string = string,
+  TAccountUnusedMinerVault extends string = string,
+  TAccountUnusedTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
-  TAccountMineProgram extends string = string,
+  TAccountRewarder extends string = string,
 > {
   mintWrapper: Address<TAccountMintWrapper>;
   mintWrapperProgram?: Address<TAccountMintWrapperProgram>;
@@ -170,15 +164,13 @@ export interface ClaimRewardsInput<
   rewardsTokenMint: Address<TAccountRewardsTokenMint>;
   rewardsTokenAccount: Address<TAccountRewardsTokenAccount>;
   claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
-  stakeTokenAccount: Address<TAccountStakeTokenAccount>;
-  pool: Address<TAccountPool>;
-  mm: Address<TAccountMm>;
-  rewarder: Address<TAccountRewarder>;
-  quarry: Address<TAccountQuarry>;
+  authority: TransactionSigner<TAccountAuthority>;
   miner: Address<TAccountMiner>;
-  minerVault: Address<TAccountMinerVault>;
+  quarry: Address<TAccountQuarry>;
+  unusedMinerVault: Address<TAccountUnusedMinerVault>;
+  unusedTokenAccount: Address<TAccountUnusedTokenAccount>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  mineProgram?: Address<TAccountMineProgram>;
+  rewarder: Address<TAccountRewarder>;
 }
 
 export function getClaimRewardsInstruction<
@@ -188,16 +180,14 @@ export function getClaimRewardsInstruction<
   TAccountRewardsTokenMint extends string,
   TAccountRewardsTokenAccount extends string,
   TAccountClaimFeeTokenAccount extends string,
-  TAccountStakeTokenAccount extends string,
-  TAccountPool extends string,
-  TAccountMm extends string,
-  TAccountRewarder extends string,
-  TAccountQuarry extends string,
+  TAccountAuthority extends string,
   TAccountMiner extends string,
-  TAccountMinerVault extends string,
+  TAccountQuarry extends string,
+  TAccountUnusedMinerVault extends string,
+  TAccountUnusedTokenAccount extends string,
   TAccountTokenProgram extends string,
-  TAccountMineProgram extends string,
-  TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+  TAccountRewarder extends string,
+  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: ClaimRewardsInput<
     TAccountMintWrapper,
@@ -206,15 +196,13 @@ export function getClaimRewardsInstruction<
     TAccountRewardsTokenMint,
     TAccountRewardsTokenAccount,
     TAccountClaimFeeTokenAccount,
-    TAccountStakeTokenAccount,
-    TAccountPool,
-    TAccountMm,
-    TAccountRewarder,
-    TAccountQuarry,
+    TAccountAuthority,
     TAccountMiner,
-    TAccountMinerVault,
+    TAccountQuarry,
+    TAccountUnusedMinerVault,
+    TAccountUnusedTokenAccount,
     TAccountTokenProgram,
-    TAccountMineProgram
+    TAccountRewarder
   >,
   config?: { programAddress?: TProgramAddress },
 ): ClaimRewardsInstruction<
@@ -225,19 +213,16 @@ export function getClaimRewardsInstruction<
   TAccountRewardsTokenMint,
   TAccountRewardsTokenAccount,
   TAccountClaimFeeTokenAccount,
-  TAccountStakeTokenAccount,
-  TAccountPool,
-  TAccountMm,
-  TAccountRewarder,
-  TAccountQuarry,
+  TAccountAuthority,
   TAccountMiner,
-  TAccountMinerVault,
+  TAccountQuarry,
+  TAccountUnusedMinerVault,
+  TAccountUnusedTokenAccount,
   TAccountTokenProgram,
-  TAccountMineProgram
+  TAccountRewarder
 > {
   // Program address.
-  const programAddress =
-    config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -259,18 +244,19 @@ export function getClaimRewardsInstruction<
       value: input.claimFeeTokenAccount ?? null,
       isWritable: true,
     },
-    stakeTokenAccount: {
-      value: input.stakeTokenAccount ?? null,
-      isWritable: true,
-    },
-    pool: { value: input.pool ?? null, isWritable: true },
-    mm: { value: input.mm ?? null, isWritable: true },
-    rewarder: { value: input.rewarder ?? null, isWritable: false },
-    quarry: { value: input.quarry ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
     miner: { value: input.miner ?? null, isWritable: true },
-    minerVault: { value: input.minerVault ?? null, isWritable: true },
+    quarry: { value: input.quarry ?? null, isWritable: true },
+    unusedMinerVault: {
+      value: input.unusedMinerVault ?? null,
+      isWritable: false,
+    },
+    unusedTokenAccount: {
+      value: input.unusedTokenAccount ?? null,
+      isWritable: false,
+    },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    mineProgram: { value: input.mineProgram ?? null, isWritable: false },
+    rewarder: { value: input.rewarder ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -286,10 +272,6 @@ export function getClaimRewardsInstruction<
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
-  if (!accounts.mineProgram.value) {
-    accounts.mineProgram.value =
-      "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
@@ -300,15 +282,13 @@ export function getClaimRewardsInstruction<
       getAccountMeta(accounts.rewardsTokenMint),
       getAccountMeta(accounts.rewardsTokenAccount),
       getAccountMeta(accounts.claimFeeTokenAccount),
-      getAccountMeta(accounts.stakeTokenAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarry),
+      getAccountMeta(accounts.authority),
       getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.minerVault),
+      getAccountMeta(accounts.quarry),
+      getAccountMeta(accounts.unusedMinerVault),
+      getAccountMeta(accounts.unusedTokenAccount),
       getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.mineProgram),
+      getAccountMeta(accounts.rewarder),
     ],
     programAddress,
     data: getClaimRewardsInstructionDataEncoder().encode({}),
@@ -320,22 +300,20 @@ export function getClaimRewardsInstruction<
     TAccountRewardsTokenMint,
     TAccountRewardsTokenAccount,
     TAccountClaimFeeTokenAccount,
-    TAccountStakeTokenAccount,
-    TAccountPool,
-    TAccountMm,
-    TAccountRewarder,
-    TAccountQuarry,
+    TAccountAuthority,
     TAccountMiner,
-    TAccountMinerVault,
+    TAccountQuarry,
+    TAccountUnusedMinerVault,
+    TAccountUnusedTokenAccount,
     TAccountTokenProgram,
-    TAccountMineProgram
+    TAccountRewarder
   >;
 
   return instruction;
 }
 
 export interface ParsedClaimRewardsInstruction<
-  TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+  TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
   programAddress: Address<TProgram>;
@@ -346,15 +324,13 @@ export interface ParsedClaimRewardsInstruction<
     rewardsTokenMint: TAccountMetas[3];
     rewardsTokenAccount: TAccountMetas[4];
     claimFeeTokenAccount: TAccountMetas[5];
-    stakeTokenAccount: TAccountMetas[6];
-    pool: TAccountMetas[7];
-    mm: TAccountMetas[8];
-    rewarder: TAccountMetas[9];
-    quarry: TAccountMetas[10];
-    miner: TAccountMetas[11];
-    minerVault: TAccountMetas[12];
-    tokenProgram: TAccountMetas[13];
-    mineProgram: TAccountMetas[14];
+    authority: TAccountMetas[6];
+    miner: TAccountMetas[7];
+    quarry: TAccountMetas[8];
+    unusedMinerVault: TAccountMetas[9];
+    unusedTokenAccount: TAccountMetas[10];
+    tokenProgram: TAccountMetas[11];
+    rewarder: TAccountMetas[12];
   };
   data: ClaimRewardsInstructionData;
 }
@@ -367,7 +343,7 @@ export function parseClaimRewardsInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClaimRewardsInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 15) {
+  if (instruction.accounts.length < 13) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -386,15 +362,13 @@ export function parseClaimRewardsInstruction<
       rewardsTokenMint: getNextAccount(),
       rewardsTokenAccount: getNextAccount(),
       claimFeeTokenAccount: getNextAccount(),
-      stakeTokenAccount: getNextAccount(),
-      pool: getNextAccount(),
-      mm: getNextAccount(),
-      rewarder: getNextAccount(),
-      quarry: getNextAccount(),
+      authority: getNextAccount(),
       miner: getNextAccount(),
-      minerVault: getNextAccount(),
+      quarry: getNextAccount(),
+      unusedMinerVault: getNextAccount(),
+      unusedTokenAccount: getNextAccount(),
       tokenProgram: getNextAccount(),
-      mineProgram: getNextAccount(),
+      rewarder: getNextAccount(),
     },
     data: getClaimRewardsInstructionDataDecoder().decode(instruction.data),
   };
