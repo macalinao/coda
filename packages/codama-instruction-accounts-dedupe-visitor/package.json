@@ -38,8 +38,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
-    "lint": "eslint . --cache",
-    "test": "bun test"
+    "lint": "eslint . --cache"
   },
   "dependencies": {
     "@codama/nodes-from-anchor": "*",

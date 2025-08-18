@@ -62,8 +62,8 @@ describe("renameInstructionsVisitor", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const instructions = updatedRoot.program.instructions;
 
-    expect(instructions[0].name).toBe("transferTokens");
-    expect(instructions[1].name).toBe("mintNft");
+    expect(instructions[0].name.toString()).toBe("transferTokens");
+    expect(instructions[1].name.toString()).toBe("mintNft");
   });
 
   it("should leave unmapped instructions unchanged", () => {
@@ -86,7 +86,7 @@ describe("renameInstructionsVisitor", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const instructions = updatedRoot.program.instructions;
 
-    expect(instructions[0].name).toBe("burn");
+    expect(instructions[0].name.toString()).toBe("burn");
   });
 });
 
@@ -116,8 +116,8 @@ describe("renameDefinedTypesVisitor", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const types = updatedRoot.program.definedTypes;
 
-    expect(types[0].name).toBe("counterAccount");
-    expect(types[1].name).toBe("programConfig");
+    expect(types[0].name.toString()).toBe("counterAccount");
+    expect(types[1].name.toString()).toBe("programConfig");
   });
 });
 
@@ -151,9 +151,9 @@ describe("renameEventsVisitor", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const types = updatedRoot.program.definedTypes;
 
-    expect(types[0].name).toBe("nftMintedEvent");
-    expect(types[1].name).toBe("transferFinishedEvent");
-    expect(types[2].name).toBe("regularType"); // Should remain unchanged
+    expect(types[0].name.toString()).toBe("nftMintedEvent");
+    expect(types[1].name.toString()).toBe("transferFinishedEvent");
+    expect(types[2].name.toString()).toBe("regularType"); // Should remain unchanged
   });
 
   it("should rename events without suffix if explicitly in mapping", () => {
@@ -176,7 +176,7 @@ describe("renameEventsVisitor", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const types = updatedRoot.program.definedTypes;
 
-    expect(types[0].name).toBe("nftMinted");
+    expect(types[0].name.toString()).toBe("nftMinted");
   });
 });
 
@@ -213,8 +213,8 @@ describe("renameVisitor (legacy format)", () => {
     const instructions = updatedRoot.program.instructions;
     const types = updatedRoot.program.definedTypes;
 
-    expect(instructions[0].name).toBe("transferTokens");
-    expect(types[0].name).toBe("nftMintedEvent");
+    expect(instructions[0].name.toString()).toBe("transferTokens");
+    expect(types[0].name.toString()).toBe("nftMintedEvent");
   });
 
   it("should handle empty options gracefully", () => {
@@ -235,7 +235,7 @@ describe("renameVisitor (legacy format)", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const instructions = updatedRoot.program.instructions;
 
-    expect(instructions[0].name).toBe("transfer");
+    expect(instructions[0].name.toString()).toBe("transfer");
   });
 });
 
@@ -293,10 +293,10 @@ describe("renameVisitor (program-specific format)", () => {
     const tokenInstructions =
       updatedRoot.additionalPrograms?.[0]?.instructions ?? [];
 
-    expect(quarryInstructions[0].name).toBe("claimRewardsMine");
-    expect(quarryInstructions[1].name).toBe("stake"); // Unchanged
-    expect(tokenInstructions[0].name).toBe("transferTokens");
-    expect(tokenInstructions[1].name).toBe("mintNft");
+    expect(quarryInstructions[0].name.toString()).toBe("claimRewardsMine");
+    expect(quarryInstructions[1].name.toString()).toBe("stake"); // Unchanged
+    expect(tokenInstructions[0].name.toString()).toBe("transferTokens");
+    expect(tokenInstructions[1].name.toString()).toBe("mintNft");
   });
 
   it("should rename events and defined types in specific programs", () => {
@@ -331,8 +331,8 @@ describe("renameVisitor (program-specific format)", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const types = updatedRoot.program.definedTypes;
 
-    expect(types[0].name).toBe("nftMintedEvent");
-    expect(types[1].name).toBe("counterAccount");
+    expect(types[0].name.toString()).toBe("nftMintedEvent");
+    expect(types[1].name.toString()).toBe("counterAccount");
   });
 
   it("should work with Quarry-style program names (camelCase)", () => {
@@ -364,8 +364,8 @@ describe("renameVisitor (program-specific format)", () => {
     const updatedRoot = visit(root, visitor) as RootNode;
     const instructions = updatedRoot.program.instructions;
 
-    expect(instructions[0].name).toBe("claimRewardsMergeMine");
-    expect(instructions[1].name).toBe("stake"); // Unchanged
+    expect(instructions[0].name.toString()).toBe("claimRewardsMergeMine");
+    expect(instructions[1].name.toString()).toBe("stake"); // Unchanged
   });
 
   it("should handle mixed program configurations", () => {
@@ -403,7 +403,7 @@ describe("renameVisitor (program-specific format)", () => {
     const instructions = updatedRoot.program.instructions;
     const types = updatedRoot.program.definedTypes;
 
-    expect(instructions[0].name).toBe("sendTokens");
-    expect(types[0].name).toBe("tokenSentEvent");
+    expect(instructions[0].name.toString()).toBe("sendTokens");
+    expect(types[0].name.toString()).toBe("tokenSentEvent");
   });
 });
