@@ -1,5 +1,11 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
+## 0.2.0
+
+### Minor Changes
+
+- b06099b: Rename to Coda
+
 ## 0.1.1
 
 ### Patch Changes
