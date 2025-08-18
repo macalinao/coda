@@ -29,7 +29,7 @@ The `coda.config.mjs` file adds custom PDAs to the generated client, including t
 ## Usage
 
 ```typescript
-import { /* generated exports */ } from "@macalinao/clients-token-metadata";
+import {} from /* generated exports */ "@macalinao/clients-token-metadata";
 
 // Use the generated client functions
 ```

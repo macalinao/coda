@@ -1,0 +1,130 @@
+---
+title: Configuration
+description: Customize Coda generation with coda.config.mjs
+---
+
+# Configuration
+
+Coda works zero-config out of the box, but you can customize its behavior with a `coda.config.mjs` file.
+
+## Basic Configuration
+
+Create `coda.config.mjs` in your project root:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  idlPath: "./target/idl/my_program.json",
+  outputDir: "./src/generated",
+});
+```
+
+## Configuration Options
+
+### `idlPath`
+- **Type**: `string`
+- **Default**: `"./target/idl/program.json"`
+- **Description**: Path to your Anchor IDL JSON file
+
+### `outputDir`
+- **Type**: `string`
+- **Default**: `"./src/generated"`
+- **Description**: Directory where generated TypeScript files will be placed
+
+### `visitors`
+- **Type**: `Visitor[]`
+- **Default**: `[]`
+- **Description**: Array of Codama visitors for advanced customization
+
+## Advanced Configuration
+
+### Custom PDAs
+
+Add custom program-derived addresses:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { addPdasVisitor } from "codama";
+
+export default defineConfig({
+  visitors: [
+    addPdasVisitor({
+      metadata: {
+        seeds: [
+          {
+            kind: "constant",
+            type: "string",
+            value: "metadata",
+          },
+          {
+            kind: "variable",
+            type: "publicKey",
+            name: "mint",
+          },
+        ],
+      },
+    }),
+  ],
+});
+```
+
+### Custom Visitors
+
+Transform the generated code with custom visitors:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { flattenInstructionAccountsVisitor } from "@macalinao/codama-instruction-accounts-dedupe-visitor";
+
+export default defineConfig({
+  visitors: [
+    flattenInstructionAccountsVisitor(),
+  ],
+});
+```
+
+## Environment Variables
+
+Override configuration with environment variables:
+
+- `CODA_IDL_PATH` - Override IDL path
+- `CODA_OUTPUT_DIR` - Override output directory
+
+```bash
+CODA_IDL_PATH=./custom/path.json bunx @macalinao/coda generate
+```
+
+## Examples
+
+### Multiple Programs
+
+Generate clients for multiple programs:
+
+```javascript
+// Use multiple config files or run Coda multiple times
+// coda.token.config.mjs
+export default defineConfig({
+  idlPath: "./idls/token.json",
+  outputDir: "./src/generated/token",
+});
+
+// coda.nft.config.mjs
+export default defineConfig({
+  idlPath: "./idls/nft.json",
+  outputDir: "./src/generated/nft",
+});
+```
+
+### Integration with Build Tools
+
+Add to package.json scripts:
+
+```json
+{
+  "scripts": {
+    "codegen": "coda generate",
+    "prebuild": "bun run codegen",
+    "dev": "bun run codegen && next dev"
+  }
+}

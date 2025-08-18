@@ -1,0 +1,50 @@
+---
+title: Introduction
+description: Welcome to Coda - automated TypeScript client generation for Solana programs
+---
+
+# Welcome to Coda
+
+Coda is an automated client generation tool for Solana programs. Built on top of [Codama](https://github.com/codama-idl/codama), Coda provides a zero-config CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
+
+## Features
+
+- **Zero Configuration**: Works out of the box with Anchor projects
+- **Full Type Safety**: Generated clients include comprehensive TypeScript types
+- **ES Modules**: Modern import/export syntax with `.js` extensions
+- **Custom PDAs**: Support for program-derived addresses with custom seeds
+- **Extensible**: Built on Codama for advanced customization
+
+## Quick Start
+
+Install and generate your first client:
+
+```bash
+bunx @macalinao/coda generate
+```
+
+This will look for `./target/idl/program.json` and generate a TypeScript client in `./src/generated/`.
+
+## Next Steps
+
+- [Installation](/docs/installation) - Different ways to install Coda
+- [Configuration](/docs/configuration) - Customize generation with `coda.config.mjs`
+- [API Reference](/docs/api) - Complete CLI and programmatic API docs
+
+## Example
+
+Here's what a generated client looks like:
+
+```typescript
+import { createTransferInstruction } from "./generated/index.js";
+import { createSolanaRpc } from "@solana/web3.js";
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+
+const instruction = createTransferInstruction({
+  source: sourceAddress,
+  destination: destAddress,
+  authority: authorityAddress,
+  amount: 1000n
+});
+```

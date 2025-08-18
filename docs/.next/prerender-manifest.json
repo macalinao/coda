@@ -1,0 +1,18 @@
+{
+  "version": 4,
+  "routes": {
+    "/docs/api": {},
+    "/docs/configuration": {},
+    "/docs": {},
+    "/docs/installation": {},
+    "/docs/quick-start": {},
+    "/docs/api/index": {}
+  },
+  "dynamicRoutes": { "/docs/[[...slug]]": { "fallback": null } },
+  "notFoundRoutes": [],
+  "preview": {
+    "previewModeId": "9fba574ef323350223f34fc756c9b028",
+    "previewModeSigningKey": "3b53e804eb8bcba7fc57a92e220841faa09c0afcf6558f580b8b1a2934a8e877",
+    "previewModeEncryptionKey": "1b782b3a53885d63e9d50a32d1d2707f36b5c7627a7e0b2f22c812a705e23b66"
+  }
+}

@@ -1,0 +1,131 @@
+---
+title: Quick Start
+description: Generate your first TypeScript client with Coda
+---
+
+# Quick Start
+
+This guide will walk you through generating your first TypeScript client from an Anchor IDL.
+
+## Step 1: Ensure Your IDL Exists
+
+Coda looks for your IDL file at `./target/idl/[program_name].json` by default. Make sure your Anchor program is built:
+
+```bash
+anchor build
+```
+
+This should create a file like `./target/idl/my_program.json`.
+
+## Step 2: Generate the Client
+
+Run Coda to generate your TypeScript client:
+
+```bash
+bunx @macalinao/coda generate
+```
+
+By default, this will:
+- Read your IDL from `./target/idl/`
+- Generate TypeScript code in `./src/generated/`
+- Include all instructions, accounts, types, and PDAs
+
+## Step 3: Use the Generated Client
+
+Import and use the generated functions:
+
+```typescript
+import { 
+  createMyInstructionInstruction,
+  fetchMyAccount,
+  findMyPda 
+} from "./src/generated/index.js";
+import { createSolanaRpc, pipe, createTransaction } from "@solana/web3.js";
+
+// Create an RPC client
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+
+// Fetch an account
+const myAccount = await fetchMyAccount(rpc, address);
+
+// Create an instruction
+const instruction = createMyInstructionInstruction({
+  account: accountAddress,
+  authority: authorityAddress,
+  amount: 1000n
+});
+
+// Find a PDA
+const [pdaAddress] = await findMyPda({
+  seeds: [Buffer.from("my-seed")],
+  programAddress
+});
+```
+
+## What Gets Generated?
+
+Coda generates a complete TypeScript client with:
+
+### Instructions
+- Typed instruction builders for every program instruction
+- Automatic account resolution and validation
+- Full TypeScript IntelliSense support
+
+### Accounts
+- Account fetchers with automatic deserialization
+- Type-safe account data structures
+- Error handling for missing accounts
+
+### Types
+- All custom types from your IDL
+- Enums, structs, and unions
+- Full type safety throughout
+
+### PDAs (Program Derived Addresses)
+- Helper functions for common PDA patterns
+- Seed-based address derivation
+- Integration with account fetchers
+
+### Programs
+- Program address constants
+- Error type definitions
+- Instruction discriminators
+
+## Directory Structure
+
+After generation, you'll see:
+
+```
+src/generated/
+├── index.ts              # Main export file
+├── instructions/         # Instruction builders
+│   ├── myInstruction.ts
+│   └── index.ts
+├── accounts/            # Account fetchers and types
+│   ├── myAccount.ts
+│   └── index.ts
+├── types/              # Custom type definitions
+│   ├── myType.ts
+│   └── index.ts
+├── pdas/              # PDA helpers
+│   ├── myPda.ts
+│   └── index.ts
+├── programs/          # Program metadata
+│   └── myProgram.ts
+└── errors/            # Error definitions
+    └── myProgram.ts
+```
+
+## Next Steps
+
+- Learn about [configuration options](/docs/configuration) to customize generation
+- Explore advanced features like custom visitors
+- Check out the [API reference](/docs/api) for detailed documentation
+
+## Troubleshooting
+
+**IDL not found**: Ensure your Anchor program is built with `anchor build`
+
+**Import errors**: Make sure you're using `.js` extensions in your imports
+
+**Type errors**: Run `tsc --noEmit` to check for TypeScript compilation issues

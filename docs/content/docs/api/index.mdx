@@ -1,0 +1,234 @@
+---
+title: API Reference
+description: Complete API reference for Coda
+---
+
+# API Reference
+
+This section provides detailed documentation for all Coda APIs, CLI commands, and configuration options.
+
+## CLI Commands
+
+### `coda generate`
+
+Generate TypeScript clients from Anchor IDL files.
+
+```bash
+coda generate [options]
+```
+
+**Options:**
+- `-c, --config <path>` - Path to configuration file (default: `coda.config.mjs`)
+- `-i, --idl <path>` - Path to IDL file (overrides config)
+- `-o, --output <path>` - Output directory (overrides config)
+- `--dry-run` - Preview changes without writing files
+- `-v, --verbose` - Enable verbose logging
+
+**Examples:**
+```bash
+# Generate with default settings
+coda generate
+
+# Use custom config file
+coda generate -c ./custom.config.mjs
+
+# Override IDL path
+coda generate -i ./idls/my_program.json
+
+# Dry run to preview changes
+coda generate --dry-run
+```
+
+### `coda init`
+
+Initialize a new Coda configuration file.
+
+```bash
+coda init [options]
+```
+
+**Options:**
+- `-f, --force` - Overwrite existing config file
+- `--template <name>` - Use configuration template
+
+**Examples:**
+```bash
+# Create basic config
+coda init
+
+# Force overwrite existing config
+coda init --force
+
+# Use template
+coda init --template advanced
+```
+
+## Configuration API
+
+### `defineConfig(options)`
+
+Define a Coda configuration with type safety.
+
+```typescript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  // Configuration options
+});
+```
+
+**Parameters:**
+- `options` - Configuration object
+
+**Configuration Options:**
+- `idlPath?: string` - Path to IDL file
+- `outputDir?: string` - Output directory
+- `programName?: string` - Override program name
+- `programAddress?: string` - Override program address
+- `visitors?: Visitor[]` - Codama visitors to apply
+- `dedupeAccounts?: boolean` - Enable account deduplication (default: true)
+
+## Generated Client API
+
+### Instructions
+
+```typescript
+// Generated instruction builder
+function createMyInstructionInstruction(input: {
+  account: Address;
+  authority: Address;
+  amount: bigint;
+}): TransactionInstruction;
+```
+
+### Accounts
+
+```typescript
+// Generated account fetcher
+function fetchMyAccount(
+  rpc: Rpc,
+  address: Address,
+  options?: RpcGetAccountOptions
+): Promise<MyAccount>;
+
+// Generated account decoder
+function getMyAccountDecoder(): Decoder<MyAccount>;
+```
+
+### PDAs
+
+```typescript
+// Generated PDA helper
+async function findMyPda(config: {
+  seeds: Array<Uint8Array>;
+  programAddress?: Address;
+}): Promise<[Address, number]>;
+```
+
+### Types
+
+All IDL types are generated as TypeScript types with full type safety:
+
+```typescript
+// Generated from IDL
+export type MyCustomType = {
+  field1: string;
+  field2: bigint;
+  field3: boolean;
+};
+```
+
+## Error Handling
+
+```typescript
+import { MyProgramError } from "./generated/errors/index.js";
+
+// Generated error types with codes and messages
+export enum MyProgramError {
+  InvalidAmount = 0x1770, // 6000
+  InsufficientFunds = 0x1771, // 6001
+  // ...
+}
+
+// Error messages
+export const MY_PROGRAM_ERROR_MESSAGES = {
+  [MyProgramError.InvalidAmount]: "The provided amount is invalid",
+  [MyProgramError.InsufficientFunds]: "Insufficient funds for operation",
+  // ...
+};
+```
+
+## Integration APIs
+
+### TypeScript Integration
+
+Ensure your `tsconfig.json` allows the generated client:
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "paths": {
+      "@/generated/*": ["./src/generated/*"]
+    }
+  }
+}
+```
+
+### Build Tool Integration
+
+#### Vite
+
+```javascript
+// vite.config.js
+export default {
+  // Vite automatically handles .js imports
+};
+```
+
+#### Webpack
+
+```javascript
+// webpack.config.js
+module.exports = {
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  },
+};
+```
+
+## Best Practices
+
+### Import Patterns
+
+```typescript
+// ✅ Good: Import specific functions
+import { createTransferInstruction, fetchTokenAccount } from "./generated/index.js";
+
+// ❌ Avoid: Barrel imports can be large
+import * as Generated from "./generated/index.js";
+```
+
+### Error Handling
+
+```typescript
+// ✅ Good: Handle specific errors
+try {
+  await rpc.sendTransaction(transaction);
+} catch (error) {
+  if (error.code === MyProgramError.InsufficientFunds) {
+    // Handle insufficient funds
+  }
+}
+```
+
+### Type Safety
+
+```typescript
+// ✅ Good: Use generated types
+const account: TokenAccount = await fetchTokenAccount(rpc, address);
+
+// ❌ Avoid: Casting or any types
+const account = await fetchTokenAccount(rpc, address) as any;
+```

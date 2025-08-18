@@ -1,0 +1,86 @@
+---
+title: Installation
+description: Different ways to install and use Coda
+---
+
+# Installation
+
+Coda can be used in multiple ways depending on your workflow preferences.
+
+## Quick Start (Recommended)
+
+Use Coda directly without installation using bunx:
+
+```bash
+bunx @macalinao/coda generate
+```
+
+This will:
+1. Look for `./target/idl/program.json` (default Anchor IDL location)
+2. Generate TypeScript client in `./src/generated/`
+3. Include all necessary types, instructions, and accounts
+
+## Global Installation
+
+Install Coda globally for repeated use:
+
+```bash
+bun add -g @macalinao/coda
+coda generate
+```
+
+## Project Installation
+
+Add Coda as a development dependency:
+
+```bash
+bun add -D @macalinao/coda
+```
+
+Then use via package.json scripts:
+
+```json
+{
+  "scripts": {
+    "codegen": "coda generate"
+  }
+}
+```
+
+## Alternative Package Managers
+
+### npm
+```bash
+npx @macalinao/coda generate
+# or
+npm install -g @macalinao/coda
+```
+
+### pnpm
+```bash
+pnpm dlx @macalinao/coda generate
+# or
+pnpm add -g @macalinao/coda
+```
+
+### yarn
+```bash
+yarn dlx @macalinao/coda generate
+# or
+yarn global add @macalinao/coda
+```
+
+## Requirements
+
+- Node.js 18+ (recommended: latest LTS)
+- Anchor framework (for IDL generation)
+- TypeScript project with ES modules support
+
+## Verification
+
+Verify your installation:
+
+```bash
+coda --version
+coda --help
+```

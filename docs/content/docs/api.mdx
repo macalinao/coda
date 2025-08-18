@@ -1,0 +1,171 @@
+---
+title: API Reference
+description: Complete CLI and programmatic API documentation
+---
+
+# API Reference
+
+## CLI Commands
+
+### `generate`
+
+Generate TypeScript client from Anchor IDL.
+
+```bash
+coda generate [options]
+```
+
+**Options:**
+- `--idl <path>` - Path to IDL file (default: `./target/idl/program.json`)
+- `--output <dir>` - Output directory (default: `./src/generated`)
+- `--config <path>` - Configuration file (default: `./coda.config.mjs`)
+
+**Examples:**
+```bash
+coda generate
+coda generate --idl ./custom.json --output ./lib/generated
+```
+
+### `init`
+
+Initialize a new `coda.config.mjs` file.
+
+```bash
+coda init
+```
+
+Creates a basic configuration file in the current directory.
+
+### Global Options
+
+- `--help, -h` - Show help
+- `--version, -v` - Show version
+
+## Programmatic API
+
+### `defineConfig`
+
+Define configuration for Coda generation.
+
+```typescript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  idlPath: string,
+  outputDir: string,
+  visitors?: Visitor[],
+});
+```
+
+**Parameters:**
+- `idlPath` - Path to Anchor IDL JSON file
+- `outputDir` - Directory for generated files
+- `visitors` - Array of Codama visitors for customization
+
+### `generateClient`
+
+Programmatically generate a TypeScript client.
+
+```typescript
+import { generateClient } from "@macalinao/coda";
+
+await generateClient({
+  idlPath: "./target/idl/program.json",
+  outputDir: "./src/generated",
+  visitors: [],
+});
+```
+
+## Generated Client API
+
+The generated TypeScript client includes:
+
+### Instructions
+
+For each instruction in your program:
+
+```typescript
+export function create{InstructionName}Instruction(
+  context: Context,
+  input: {InstructionName}InstructionInput
+): {InstructionName}Instruction;
+```
+
+### Accounts
+
+For each account type:
+
+```typescript
+export function decode{AccountName}(
+  data: Uint8Array
+): {AccountName};
+
+export async function fetch{AccountName}(
+  context: Context,
+  address: Address
+): Promise<{AccountName}>;
+```
+
+### PDAs
+
+For program-derived addresses:
+
+```typescript
+export function find{PdaName}Pda(
+  context: Context,
+  seeds: {PdaName}Seeds
+): Promise<[Address, number]>;
+```
+
+### Types
+
+All custom types from your IDL:
+
+```typescript
+export type {TypeName} = {
+  // Generated TypeScript interface
+};
+```
+
+### Errors
+
+Program error handling:
+
+```typescript
+export enum {ProgramName}Error {
+  // Error variants
+}
+
+export function get{ProgramName}ErrorMessage(
+  code: number
+): string | undefined;
+```
+
+## Configuration Schema
+
+```typescript
+interface CodaConfig {
+  /** Path to Anchor IDL file */
+  idlPath?: string;
+  
+  /** Output directory for generated files */
+  outputDir?: string;
+  
+  /** Codama visitors for customization */
+  visitors?: Visitor[];
+}
+```
+
+## File Structure
+
+Generated files are organized as:
+
+```
+src/generated/
+├── index.ts          # Main exports
+├── instructions/     # Instruction builders
+├── accounts/         # Account decoders and fetchers
+├── pdas/            # PDA helper functions
+├── types/           # Type definitions
+└── errors.ts        # Error handling
+```

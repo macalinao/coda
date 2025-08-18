@@ -13,6 +13,7 @@ bun add @macalinao/clients-quarry
 ## Programs Included
 
 This client includes all Quarry protocol programs:
+
 - **Quarry Mine** - Core mining/staking program
 - **Quarry Mint Wrapper** - Mint wrapper for rewards
 - **Quarry Operator** - Operator delegation system
@@ -39,7 +40,7 @@ The `coda.config.mjs` file is configured to load all Quarry protocol IDLs and ge
 ## Usage
 
 ```typescript
-import { /* generated exports */ } from "@macalinao/clients-quarry";
+import {} from /* generated exports */ "@macalinao/clients-quarry";
 
 // Use the generated client functions for any Quarry program
 ```

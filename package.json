@@ -7,7 +7,8 @@
   "workspaces": {
     "packages": [
       "packages/*",
-      "clients/*"
+      "clients/*",
+      "docs"
     ],
     "catalog": {
       "eslint": "^9.33.0",
@@ -44,7 +45,9 @@
     "ci:version": "changeset version && bun update",
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
-    "codegen": "turbo run codegen"
+    "codegen": "turbo run codegen",
+    "docs:dev": "turbo dev --filter=@macalinao/coda-docs",
+    "docs:build": "turbo build --filter=@macalinao/coda-docs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
