@@ -8,6 +8,7 @@ dist/
 build/
 .turbo
 docs/.next/
+# docs/content/docs/api/clients/
 
 # TypeScript
 *.tsbuildinfo

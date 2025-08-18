@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "bun run generate:api && next build",
     "dev": "next dev",
     "start": "next start",
     "postinstall": "fumadocs-mdx",
-    "clean": "rm -rf .next dist",
-    "lint": "next lint"
+    "clean": "rm -rf .next dist content/docs/api/clients",
+    "lint": "next lint",
+    "generate:api": "node scripts/generate-api-docs.mjs"
   },
   "dependencies": {
     "fumadocs-core": "^15.6.12",

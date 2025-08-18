@@ -1,0 +1,12 @@
+{
+  "title": "clients-quarry",
+  "pages": [
+    "index",
+    "instructions",
+    "accounts",
+    "types",
+    "pdas",
+    "errors",
+    "programs"
+  ]
+}
