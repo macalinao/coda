@@ -1,171 +1,268 @@
 ---
-title: API Reference
-description: Complete CLI and programmatic API documentation
+title: API Reference  
+description: Pre-built TypeScript client libraries for popular Solana programs
 ---
 
 # API Reference
 
-## CLI Commands
+Coda provides pre-built TypeScript client libraries for popular Solana programs. These clients are generated using Coda and are ready to use in your projects.
 
-### `generate`
+## Available Clients
 
-Generate TypeScript client from Anchor IDL.
+### @macalinao/clients-token-metadata
 
+Pre-generated client for the Metaplex Token Metadata program.
+
+**Installation:**
 ```bash
-coda generate [options]
+bun add @macalinao/clients-token-metadata
 ```
 
-**Options:**
-- `--idl <path>` - Path to IDL file (default: `./target/idl/program.json`)
-- `--output <dir>` - Output directory (default: `./src/generated`)
-- `--config <path>` - Configuration file (default: `./coda.config.mjs`)
-
-**Examples:**
-```bash
-coda generate
-coda generate --idl ./custom.json --output ./lib/generated
-```
-
-### `init`
-
-Initialize a new `coda.config.mjs` file.
-
-```bash
-coda init
-```
-
-Creates a basic configuration file in the current directory.
-
-### Global Options
-
-- `--help, -h` - Show help
-- `--version, -v` - Show version
-
-## Programmatic API
-
-### `defineConfig`
-
-Define configuration for Coda generation.
-
+**Usage:**
 ```typescript
-import { defineConfig } from "@macalinao/coda";
+import { 
+  createMetadataInstruction,
+  findMetadataPda 
+} from "@macalinao/clients-token-metadata";
 
-export default defineConfig({
-  idlPath: string,
-  outputDir: string,
-  visitors?: Visitor[],
+// Find the metadata PDA for a mint
+const [metadataAddress] = await findMetadataPda({
+  mint: mintAddress,
+  programId: TOKEN_METADATA_PROGRAM_ID,
+});
+
+// Create metadata for an NFT
+const instruction = createMetadataInstruction({
+  metadata: metadataAddress,
+  mint: mintAddress,
+  mintAuthority: authorityAddress,
+  payer: payerAddress,
+  updateAuthority: authorityAddress,
+  data: {
+    name: "My NFT",
+    symbol: "NFT",
+    uri: "https://example.com/metadata.json",
+    sellerFeeBasisPoints: 500,
+    creators: null,
+  },
+  isMutable: true,
 });
 ```
 
-**Parameters:**
-- `idlPath` - Path to Anchor IDL JSON file
-- `outputDir` - Directory for generated files
-- `visitors` - Array of Codama visitors for customization
+## Client API Structure
 
-### `generateClient`
-
-Programmatically generate a TypeScript client.
-
-```typescript
-import { generateClient } from "@macalinao/coda";
-
-await generateClient({
-  idlPath: "./target/idl/program.json",
-  outputDir: "./src/generated",
-  visitors: [],
-});
-```
-
-## Generated Client API
-
-The generated TypeScript client includes:
+Each generated client provides a consistent API structure:
 
 ### Instructions
 
-For each instruction in your program:
+Every instruction from the program IDL is available as a typed function:
 
 ```typescript
-export function create{InstructionName}Instruction(
-  context: Context,
-  input: {InstructionName}InstructionInput
-): {InstructionName}Instruction;
+// Pattern: create{InstructionName}Instruction
+export function createTransferInstruction(
+  input: TransferInstructionInput
+): TransactionInstruction;
 ```
 
 ### Accounts
 
-For each account type:
+Account types include decoders and fetchers:
 
 ```typescript
-export function decode{AccountName}(
+// Decode account data
+export function decodeMetadata(
   data: Uint8Array
-): {AccountName};
+): Metadata;
 
-export async function fetch{AccountName}(
-  context: Context,
+// Fetch and decode account
+export async function fetchMetadata(
+  rpc: Rpc,
   address: Address
-): Promise<{AccountName}>;
+): Promise<Metadata>;
+
+// Fetch multiple accounts
+export async function fetchAllMetadata(
+  rpc: Rpc,
+  addresses: Address[]
+): Promise<Metadata[]>;
 ```
 
-### PDAs
+### Program Derived Addresses (PDAs)
 
-For program-derived addresses:
+Helper functions for finding PDAs:
 
 ```typescript
-export function find{PdaName}Pda(
-  context: Context,
-  seeds: {PdaName}Seeds
-): Promise<[Address, number]>;
+// Pattern: find{PdaName}Pda
+export function findMetadataPda(
+  seeds: {
+    mint: Address;
+    programId?: Address;
+  }
+): [Address, number]; // Returns [address, bump]
 ```
 
 ### Types
 
-All custom types from your IDL:
+All custom types from the IDL are exported:
 
 ```typescript
-export type {TypeName} = {
-  // Generated TypeScript interface
+export type Metadata = {
+  key: MetadataKey;
+  updateAuthority: Address;
+  mint: Address;
+  data: Data;
+  primarySaleHappened: boolean;
+  isMutable: boolean;
+  editionNonce: number | null;
+  tokenStandard: TokenStandard | null;
+  collection: Collection | null;
+  uses: Uses | null;
+};
+
+export type Data = {
+  name: string;
+  symbol: string;
+  uri: string;
+  sellerFeeBasisPoints: number;
+  creators: Creator[] | null;
 };
 ```
 
 ### Errors
 
-Program error handling:
+Typed error handling:
 
 ```typescript
-export enum {ProgramName}Error {
-  // Error variants
+export enum TokenMetadataError {
+  InstructionUnpackError = 0,
+  InstructionPackError = 1,
+  NotRentExempt = 2,
+  // ... more error codes
 }
 
-export function get{ProgramName}ErrorMessage(
+export function getTokenMetadataErrorMessage(
   code: number
 ): string | undefined;
 ```
 
-## Configuration Schema
+## Working with Generated Clients
+
+### Creating Instructions
 
 ```typescript
-interface CodaConfig {
-  /** Path to Anchor IDL file */
-  idlPath?: string;
+import { createTransferInstruction } from "./generated";
+
+const instruction = createTransferInstruction({
+  source: sourceAccount,
+  destination: destAccount,
+  owner: ownerKeypair.publicKey,
+  amount: 1000000n, // Uses bigint for u64 values
+});
+
+// Add to transaction
+const transaction = new Transaction().add(instruction);
+```
+
+### Fetching Accounts
+
+```typescript
+import { fetchTokenAccount } from "./generated";
+import { createSolanaRpc } from "@solana/web3.js";
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+
+// Fetch single account
+const account = await fetchTokenAccount(rpc, accountAddress);
+console.log("Balance:", account.amount);
+
+// Fetch multiple accounts
+const accounts = await fetchAllTokenAccount(rpc, [addr1, addr2, addr3]);
+```
+
+### Using PDAs
+
+```typescript
+import { findAssociatedTokenAddressPda } from "./generated";
+
+const [ataAddress, bump] = findAssociatedTokenAddressPda({
+  owner: ownerAddress,
+  mint: mintAddress,
+  tokenProgram: TOKEN_PROGRAM_ID,
+});
+
+console.log("ATA Address:", ataAddress);
+console.log("Bump seed:", bump);
+```
+
+### Error Handling
+
+```typescript
+import { TokenProgramError, getTokenProgramErrorMessage } from "./generated";
+
+try {
+  // ... transaction code
+} catch (error) {
+  if (error.code === TokenProgramError.InsufficientFunds) {
+    console.error("Insufficient funds for transfer");
+  }
   
-  /** Output directory for generated files */
-  outputDir?: string;
-  
-  /** Codama visitors for customization */
-  visitors?: Visitor[];
+  const message = getTokenProgramErrorMessage(error.code);
+  console.error("Error:", message);
 }
 ```
 
-## File Structure
+## Type Safety
 
-Generated files are organized as:
+All generated clients provide full TypeScript type safety:
 
+```typescript
+// TypeScript will enforce correct field types
+const instruction = createMintToInstruction({
+  mint: mintAddress,           // Must be Address type
+  destination: tokenAccount,   // Must be Address type  
+  authority: authorityKeypair,  // Must be Keypair or Address
+  amount: "not a number",      // ❌ TypeScript error: must be bigint
+});
+
+// Accounts are fully typed
+const metadata = await fetchMetadata(rpc, metadataAddress);
+console.log(metadata.data.name); // ✅ TypeScript knows this is a string
+console.log(metadata.foo);       // ❌ TypeScript error: property doesn't exist
 ```
-src/generated/
-├── index.ts          # Main exports
-├── instructions/     # Instruction builders
-├── accounts/         # Account decoders and fetchers
-├── pdas/            # PDA helper functions
-├── types/           # Type definitions
-└── errors.ts        # Error handling
+
+## Integration with Solana Web3.js
+
+Generated clients work seamlessly with `@solana/web3.js`:
+
+```typescript
+import { Connection, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import { createTransferInstruction } from "./generated";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+
+const instruction = createTransferInstruction({
+  // ... instruction args
+});
+
+const transaction = new Transaction().add(instruction);
+
+const signature = await sendAndConfirmTransaction(
+  connection,
+  transaction,
+  [payer]
+);
 ```
+
+## Custom Clients
+
+To generate your own client from an Anchor IDL:
+
+```bash
+# Generate client
+bunx @macalinao/coda generate --idl ./target/idl/my_program.json
+
+# Use in your code
+import { createMyInstruction } from "./src/generated";
+```
+
+See the [Configuration](/docs/configuration) guide for customization options.

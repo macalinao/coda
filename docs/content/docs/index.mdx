@@ -9,31 +9,48 @@ Coda is an automated client generation tool for Solana programs. Built on top of
 
 ## Features
 
-- **Zero Configuration**: Works out of the box with Anchor projects
+- **Zero Configuration**: Works out of the box with Anchor projects - just run `coda generate`
+- **Multiple IDL Support**: Generate clients from multiple programs in one project
 - **Full Type Safety**: Generated clients include comprehensive TypeScript types
-- **ES Modules**: Modern import/export syntax with `.js` extensions
-- **Custom PDAs**: Support for program-derived addresses with custom seeds
-- **Extensible**: Built on Codama for advanced customization
+- **ES Modules**: Modern import/export syntax with `.js` extensions for browser compatibility
+- **Account Flattening**: Automatically deduplicates nested account structures from Anchor IDL
+- **Custom PDAs**: Define program-derived addresses with custom seeds
+- **Codama Visitors**: Apply custom transformations to the AST before generation
+- **Rename Support**: Avoid naming conflicts when using multiple IDLs
 
 ## Quick Start
 
-Install and generate your first client:
+Generate your first client:
 
 ```bash
+# From default Anchor build location (./target/idl/program.json)
 bunx @macalinao/coda generate
+
+# From custom IDL location
+bunx @macalinao/coda generate --idl ./idls/my_program.json
+
+# Initialize a configuration file
+bunx @macalinao/coda init
 ```
 
-This will look for `./target/idl/program.json` and generate a TypeScript client in `./src/generated/`.
+## How It Works
 
-## Next Steps
+1. **Parse IDL**: Reads your Anchor IDL file (JSON format)
+2. **Create AST**: Converts to Codama's node structure
+3. **Apply Visitors**: Transforms the AST (custom PDAs, flattening, renaming, etc.)
+4. **Generate Code**: Renders TypeScript with ESM support
+5. **Output Files**: Creates organized file structure with types, instructions, accounts, etc.
 
-- [Installation](/docs/installation) - Different ways to install Coda
-- [Configuration](/docs/configuration) - Customize generation with `coda.config.mjs`
-- [API Reference](/docs/api) - Complete CLI and programmatic API docs
+## Generated Client Structure
 
-## Example
+The generated client provides:
+- **Instructions**: Typed builders for all program instructions
+- **Accounts**: Decoders and fetchers for all account types
+- **Types**: All TypeScript types from the IDL
+- **PDAs**: Helper functions for program-derived addresses
+- **Errors**: Typed error enums and handlers
 
-Here's what a generated client looks like:
+## Example Usage
 
 ```typescript
 import { createTransferInstruction } from "./generated/index.js";
@@ -48,3 +65,9 @@ const instruction = createTransferInstruction({
   amount: 1000n
 });
 ```
+
+## Next Steps
+
+- [Installation](/docs/installation) - Different ways to install Coda
+- [Configuration](/docs/configuration) - Customize generation with `coda.config.mjs`
+- [API Reference](/docs/api) - Explore pre-built client libraries

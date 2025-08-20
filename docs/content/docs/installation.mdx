@@ -12,13 +12,17 @@ Coda can be used in multiple ways depending on your workflow preferences.
 Use Coda directly without installation using bunx:
 
 ```bash
+# Generate from default location
 bunx @macalinao/coda generate
+
+# Initialize a configuration file
+bunx @macalinao/coda init
 ```
 
 This will:
 1. Look for `./target/idl/program.json` (default Anchor IDL location)
 2. Generate TypeScript client in `./src/generated/`
-3. Include all necessary types, instructions, and accounts
+3. Include all necessary types, instructions, accounts, PDAs, and errors
 
 ## Global Installation
 
@@ -45,6 +49,41 @@ Then use via package.json scripts:
     "codegen": "coda generate"
   }
 }
+```
+
+## CLI Commands
+
+Coda provides two main commands:
+
+### `generate` (alias: `gen`)
+Generate a TypeScript client from an Anchor IDL.
+
+**Options:**
+- `-i, --idl <path>` - Path to the Anchor IDL file (default: `./target/idl/program.json`)
+- `-o, --output <path>` - Output directory for generated client (default: `./src/generated`)
+- `-c, --config <path>` - Path to coda.config.mjs file (default: `./coda.config.mjs`)
+
+**Examples:**
+```bash
+# Use defaults
+coda generate
+
+# Custom IDL and output
+coda generate --idl ./idls/my_program.json --output ./src/client
+
+# Use configuration file
+coda generate --config ./custom.config.mjs
+```
+
+### `init`
+Initialize a new `coda.config.mjs` configuration file.
+
+**Options:**
+- `-c, --config <path>` - Path for the config file (default: `./coda.config.mjs`)
+
+**Example:**
+```bash
+coda init
 ```
 
 ## Alternative Package Managers
@@ -74,13 +113,27 @@ yarn global add @macalinao/coda
 
 - Node.js 18+ (recommended: latest LTS)
 - Anchor framework (for IDL generation)
-- TypeScript project with ES modules support
+- TypeScript project with ES modules support (`"type": "module"` in package.json)
 
 ## Verification
 
 Verify your installation:
 
 ```bash
+# Check version
 coda --version
+
+# Show help
 coda --help
+
+# Show command-specific help
+coda generate --help
+coda init --help
 ```
+
+## Next Steps
+
+After installation:
+1. Run `coda init` to create a configuration file
+2. Customize your `coda.config.mjs` with visitors and options
+3. Run `coda generate` to create your TypeScript client
