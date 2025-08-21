@@ -1,0 +1,221 @@
+---
+title: Why Coda?
+description: Understanding the benefits of automated client generation for Solana development
+---
+
+# Why Coda?
+
+Building Solana applications traditionally requires writing extensive boilerplate code for interacting with on-chain programs. Coda fundamentally changes this by automatically generating type-safe TypeScript clients from your Anchor IDL, eliminating manual serialization work and reducing potential for errors.
+
+## The Problem with Manual Client Development
+
+### Traditional Approach
+
+When building Solana applications without code generation, developers must:
+
+1. **Manually define serialization layouts** using libraries like Borsh or Buffer Layout
+2. **Write encoding/decoding logic** for every instruction and account type
+3. **Maintain type definitions** separately from the actual implementation
+4. **Update multiple files** whenever the on-chain program changes
+5. **Debug runtime serialization errors** that could have been caught at compile time
+
+This approach leads to:
+
+- Hundreds of lines of error-prone boilerplate code
+- Type mismatches between client and program
+- Increased development time on repetitive tasks
+- Higher maintenance burden as programs evolve
+- Runtime failures from serialization errors
+
+### Example: Manual Implementation
+
+Consider a simple transfer instruction. Without Coda, you would write:
+
+```typescript
+// Manual layout definition
+const transferLayout = BufferLayout.struct([
+  BufferLayout.u8("instruction"),
+  BufferLayout.u64("amount"),
+]);
+
+// Manual encoding
+function createTransferInstruction(
+  source: PublicKey,
+  destination: PublicKey,
+  authority: PublicKey,
+  amount: bigint
+): TransactionInstruction {
+  const data = Buffer.alloc(transferLayout.span);
+  transferLayout.encode(
+    {
+      instruction: 0, // Manual discriminator
+      amount: Number(amount), // Type conversion
+    },
+    data
+  );
+
+  return new TransactionInstruction({
+    keys: [
+      { pubkey: source, isSigner: false, isWritable: true },
+      { pubkey: destination, isSigner: false, isWritable: true },
+      { pubkey: authority, isSigner: true, isWritable: false },
+    ],
+    programId: PROGRAM_ID,
+    data,
+  });
+}
+
+// Manual decoding for accounts
+function decodeTokenAccount(data: Buffer): TokenAccount {
+  // Manual offset calculations and type conversions
+  const mint = new PublicKey(data.slice(0, 32));
+  const owner = new PublicKey(data.slice(32, 64));
+  const amount = data.readBigUInt64LE(64);
+  // ... more manual parsing
+
+  return { mint, owner, amount };
+}
+```
+
+## The Coda Solution
+
+### Automated Generation
+
+With Coda, the same functionality is generated automatically:
+
+```typescript
+import { createTransferInstruction } from "./generated";
+
+// Type-safe, auto-completed, zero boilerplate
+const instruction = createTransferInstruction({
+  source,
+  destination,
+  authority,
+  amount: 1000n,
+});
+```
+
+### Key Benefits
+
+#### 1. **Elimination of Boilerplate**
+
+Coda generates all serialization, deserialization, and encoding logic automatically. What would typically be hundreds of lines of manual code becomes a single command: `coda generate`.
+
+#### 2. **Type Safety Throughout**
+
+Every aspect of your program interface is fully typed:
+
+- Instruction arguments with proper TypeScript types
+- Account structures with all fields typed
+- Error enums with discriminated unions
+- PDA seeds with type checking
+
+Your IDE provides intelligent autocomplete and catches type errors before runtime.
+
+#### 3. **Automatic Synchronization**
+
+When your Anchor program changes, simply regenerate the client. All updates propagate automatically:
+
+- New instructions appear immediately
+- Modified account structures update throughout
+- Removed features cause compile-time errors in dependent code
+- No manual tracking of changes needed
+
+#### 4. **Reduced Error Surface**
+
+By eliminating manual serialization code, Coda removes entire categories of bugs:
+
+- No more incorrect discriminator values
+- No buffer overflow or underflow errors
+- No type conversion mistakes
+- No missing or incorrectly ordered account keys
+
+#### 5. **Development Velocity**
+
+Teams using Coda report significant improvements in development speed:
+
+- Initial client setup takes seconds instead of hours
+- Adding new features requires no client-side boilerplate
+- Refactoring is safer with compile-time type checking
+- New team members onboard faster with less code to understand
+
+## How the Magic Happens
+
+### Under the Hood
+
+Curious how it works? Here's the simple version:
+
+1. **Read your IDL** — We grab that JSON file Anchor spits out
+2. **Parse it** — Turn it into something we can work with
+3. **Transform it** — Apply some clever tricks (flatten nested stuff, add PDAs, etc.)
+4. **Generate code** — Create beautiful, typed TypeScript
+5. **Organize it** — Put everything in nice, tidy folders
+
+### Built on Proven Technology
+
+Coda leverages Codama, the same AST framework used by:
+
+- Metaplex for Token Metadata clients
+- Major DeFi protocols on Solana
+- Enterprise Solana applications
+
+This foundation ensures reliability, performance, and compatibility with the broader Solana ecosystem.
+
+## When to Use Coda
+
+Coda is ideal for:
+
+### **New Projects**
+
+Start with generated clients from day one. Avoid technical debt from manual serialization code.
+
+### **Existing Projects**
+
+Migrate incrementally by generating clients for new features while maintaining existing code.
+
+### **Team Environments**
+
+Ensure consistency across team members with generated, standardized client code.
+
+### **Rapid Prototyping**
+
+Iterate quickly on program designs without client-side overhead.
+
+### **Production Applications**
+
+Reduce bugs and maintenance burden in production systems.
+
+## Comparison with Alternatives
+
+### Manual Implementation
+
+- **Pros**: Full control, no dependencies
+- **Cons**: Time-consuming, error-prone, high maintenance
+
+### Other Code Generators
+
+- **Pros**: Some automation
+- **Cons**: Often require extensive configuration, limited customization, poor type safety
+
+### Coda
+
+- **Pros**: Zero config, full type safety, extensible via Codama visitors, production-proven
+- **Cons**: Requires Anchor IDL (standard in Solana ecosystem)
+
+## Getting Started
+
+The path from IDL to working client is straightforward:
+
+1. Build your Anchor program: `anchor build`
+2. Generate the client: `coda generate`
+3. Import and use: `import { ... } from "./generated"`
+
+No configuration files. No setup process. Just immediate productivity.
+
+## Conclusion
+
+Coda represents a fundamental shift in how developers interact with Solana programs. By automating the tedious and error-prone aspects of client development, it allows teams to focus on building features rather than maintaining boilerplate.
+
+The question isn't whether to use code generation—it's why you would continue writing serialization code manually when a proven, zero-configuration solution exists.
+
+Ready to eliminate boilerplate from your Solana development? [Get started with Coda](/docs/quick-start).

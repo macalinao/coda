@@ -5,17 +5,17 @@ description: Generate your first TypeScript client with Coda
 
 # Quick Start
 
-This guide will walk you through generating your first TypeScript client from an Anchor IDL.
+This guide walks you through generating your first TypeScript client from an Anchor IDL.
 
-## Step 1: Ensure Your IDL Exists
+## Step 1: Build Your Program
 
-Coda looks for your IDL file at `./target/idl/[program_name].json` by default. Make sure your Anchor program is built:
+First, ensure you have an Anchor IDL by building your program:
 
 ```bash
 anchor build
 ```
 
-This should create a file like `./target/idl/my_program.json`.
+This creates your IDL file at `./target/idl/your_program.json`.
 
 ## Step 2: Generate the Client
 
@@ -25,107 +25,89 @@ Run Coda to generate your TypeScript client:
 bunx @macalinao/coda generate
 ```
 
-By default, this will:
-- Read your IDL from `./target/idl/`
-- Generate TypeScript code in `./src/generated/`
-- Include all instructions, accounts, types, and PDAs
+Coda will:
+- Locate your IDL (defaults to `./target/idl/`)
+- Generate a complete TypeScript client
+- Output files to `./src/generated/`
+
+No configuration required for standard Anchor projects.
 
 ## Step 3: Use the Generated Client
 
-Import and use the generated functions:
+Import and use the generated functions in your application:
 
 ```typescript
 import { 
-  createMyInstructionInstruction,
-  fetchMyAccount,
-  findMyPda 
-} from "./src/generated/index.js";
-import { createSolanaRpc, pipe, createTransaction } from "@solana/web3.js";
+  createTransferInstruction,
+  fetchTokenAccount,
+  findVaultPda 
+} from "./src/generated";
 
-// Create an RPC client
-const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
-
-// Fetch an account
-const myAccount = await fetchMyAccount(rpc, address);
-
-// Create an instruction
-const instruction = createMyInstructionInstruction({
-  account: accountAddress,
-  authority: authorityAddress,
+// Create instructions with full type safety
+const instruction = createTransferInstruction({
+  source: sourceAccount,
+  destination: destAccount,
+  authority: signer,
   amount: 1000n
 });
 
-// Find a PDA
-const [pdaAddress] = await findMyPda({
-  seeds: [Buffer.from("my-seed")],
-  programAddress
+// Fetch and decode accounts
+const account = await fetchTokenAccount(rpc, address);
+console.log(account.balance); // Fully typed
+
+// Find program-derived addresses
+const [vault] = await findVaultPda({
+  user: userPubkey,
+  seed: "vault"
 });
 ```
 
-## What Gets Generated?
+## Generated Client Components
 
-Coda generates a complete TypeScript client with:
+Coda generates a comprehensive TypeScript client including:
 
-### Instructions
-- Typed instruction builders for every program instruction
-- Automatic account resolution and validation
-- Full TypeScript IntelliSense support
+### **Instructions**
+Typed builders for every program instruction with full IntelliSense support.
 
-### Accounts
-- Account fetchers with automatic deserialization
-- Type-safe account data structures
-- Error handling for missing accounts
+### **Accounts**
+Fetchers and decoders for all account types with automatic deserialization.
 
-### Types
-- All custom types from your IDL
-- Enums, structs, and unions
-- Full type safety throughout
+### **Types**
+All custom types from your IDL including enums, structs, and unions.
 
-### PDAs (Program Derived Addresses)
-- Helper functions for common PDA patterns
-- Seed-based address derivation
-- Integration with account fetchers
+### **PDAs**
+Helper functions for program-derived address calculation.
 
-### Programs
-- Program address constants
-- Error type definitions
-- Instruction discriminators
+### **Errors**
+Typed error definitions for proper error handling.
 
-## Directory Structure
+## File Structure
 
-After generation, you'll see:
+The generated client is organized as follows:
 
 ```
 src/generated/
 ├── index.ts              # Main export file
 ├── instructions/         # Instruction builders
-│   ├── myInstruction.ts
-│   └── index.ts
-├── accounts/            # Account fetchers and types
-│   ├── myAccount.ts
-│   └── index.ts
+├── accounts/            # Account types and fetchers
 ├── types/              # Custom type definitions
-│   ├── myType.ts
-│   └── index.ts
-├── pdas/              # PDA helpers
-│   ├── myPda.ts
-│   └── index.ts
+├── pdas/              # PDA helper functions
 ├── programs/          # Program metadata
-│   └── myProgram.ts
 └── errors/            # Error definitions
-    └── myProgram.ts
 ```
 
 ## Next Steps
 
-- Learn about [configuration options](/docs/configuration) to customize generation
-- Explore advanced features like custom visitors
-- Check out the [API reference](/docs/api) for detailed documentation
+- **Start building**: Use the generated client in your application
+- **Customize generation**: See [configuration](/docs/configuration) for advanced options
+- **View examples**: Check out [example projects](/docs/examples) for reference
 
 ## Troubleshooting
 
 **IDL not found**: Ensure your Anchor program is built with `anchor build`
 
-**Import errors**: Make sure you're using `.js` extensions in your imports
+**Import errors**: Use `.js` extensions in imports (required for ES modules)
 
-**Type errors**: Run `tsc --noEmit` to check for TypeScript compilation issues
+**Type errors**: Run `tsc --noEmit` to check TypeScript compilation
+
+For additional help, please [open an issue](https://github.com/macalinao/coda/issues) on GitHub.
