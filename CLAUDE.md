@@ -31,8 +31,8 @@ bun run build:watch:packages # Watch mode for packages only
 
 # Code Generation
 bun run codegen             # Run code generation for all clients
-bunx coda generate          # Generate client with Coda CLI
-bunx coda init             # Initialize coda.config.mjs
+coda generate               # Generate client with Coda CLI
+coda init                  # Initialize coda.config.mjs
 
 # Code Quality
 bun run lint                 # Run biome check + eslint
@@ -88,7 +88,7 @@ coda/
 ### 4. **@macalinao/clients-token-metadata**
    - Pre-generated client for Metaplex Token Metadata program
    - Includes custom PDAs and type definitions
-   - Ready-to-use with `@solana/web3.js`
+   - Ready-to-use TypeScript client
 
 ## How Coda Works
 
@@ -100,12 +100,15 @@ coda/
 
 ## Configuration (coda.config.mjs)
 
+### Single IDL Configuration
+For projects with a single program (like [token-metadata](https://github.com/macalinao/coda/tree/master/clients/token-metadata)):
+
 ```javascript
 import { defineConfig } from "@macalinao/coda";
 import { addPdasVisitor } from "codama";
 
 export default defineConfig({
-  // Optional: Custom paths
+  // Optional: Custom path for single IDL
   idlPath: "./idls/my_program.json",
   outputDir: "./src/generated",
   
@@ -114,6 +117,31 @@ export default defineConfig({
     addPdasVisitor({
       // Add custom PDAs
     })
+  ]
+});
+```
+
+### Multiple IDL Configuration
+For projects with multiple programs (like [quarry](https://github.com/macalinao/coda/tree/master/clients/quarry)):
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  // Array of IDL paths for multiple programs
+  idlPath: [
+    "./idls/quarry_mine.json",
+    "./idls/quarry_mint_wrapper.json",
+    "./idls/quarry_operator.json",
+    "./idls/quarry_merge_mine.json",
+    "./idls/quarry_redeemer.json",
+    "./idls/quarry_registry.json",
+  ],
+  outputDir: "./src/generated",
+  
+  // Optional: Add PDAs and other visitors for each program
+  visitors: [
+    // Custom visitors for each program
   ]
 });
 ```
@@ -207,9 +235,7 @@ Generated clients provide:
 Example usage:
 ```typescript
 import { createTransferInstruction } from "./generated";
-import { createSolanaRpc } from "@solana/web3.js";
 
-const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
 const instruction = createTransferInstruction({
   source: sourceAddress,
   destination: destAddress,
@@ -217,6 +243,40 @@ const instruction = createTransferInstruction({
   amount: 1000n
 });
 ```
+
+## Documentation Guidelines
+
+### Writing Good Documentation
+
+When writing documentation for Coda or generated clients:
+
+1. **Command Examples**: 
+   - Always show direct command usage: `coda generate`, not `bunx coda generate` or `npx coda`
+   - Assume users have installed the package globally or are using it directly
+   - Show the simplest path to success
+
+2. **Code Examples**:
+   - Provide complete, runnable examples
+   - Show imports clearly at the top
+   - Use TypeScript for all examples
+   - Include types where helpful for clarity
+
+3. **Structure**:
+   - Start with the most common use case
+   - Progress from simple to complex
+   - Link to relevant examples in the repository
+   - Use clear headings and subheadings
+
+4. **Best Practices**:
+   - Explain the "why" not just the "how"
+   - Include error messages users might see
+   - Provide solutions to common problems
+   - Keep examples concise but complete
+
+5. **Links and References**:
+   - Link to example repositories (e.g., token-metadata for single IDL, quarry for multiple IDLs)
+   - Reference the official Codama documentation where appropriate
+   - Include links to Anchor documentation for IDL-related topics
 
 ## Troubleshooting
 
