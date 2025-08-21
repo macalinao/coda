@@ -29,13 +29,19 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  TransferOutOfEscrowArgs,
+  TransferOutOfEscrowArgsArgs,
+} from "../types/index.js";
+import {
+  getTransferOutOfEscrowArgsDecoder,
+  getTransferOutOfEscrowArgsEncoder,
+} from "../types/index.js";
 
 export const TRANSFER_OUT_OF_ESCROW_DISCRIMINATOR = 40;
 
@@ -53,18 +59,10 @@ export type TransferOutOfEscrowInstruction<
   TAccountAttributeDst extends string | AccountMeta = string,
   TAccountEscrowMint extends string | AccountMeta = string,
   TAccountEscrowAccount extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountAtaProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountAtaProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountSysvarInstructions extends string | AccountMeta = string,
   TAccountAuthority extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -122,18 +120,18 @@ export type TransferOutOfEscrowInstruction<
 
 export interface TransferOutOfEscrowInstructionData {
   discriminator: number;
-  amount: bigint;
+  transferOutOfEscrowArgs: TransferOutOfEscrowArgs;
 }
 
 export interface TransferOutOfEscrowInstructionDataArgs {
-  amount: number | bigint;
+  transferOutOfEscrowArgs: TransferOutOfEscrowArgsArgs;
 }
 
 export function getTransferOutOfEscrowInstructionDataEncoder(): FixedSizeEncoder<TransferOutOfEscrowInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", getU8Encoder()],
-      ["amount", getU64Encoder()],
+      ["transferOutOfEscrowArgs", getTransferOutOfEscrowArgsEncoder()],
     ]),
     (value) => ({
       ...value,
@@ -145,7 +143,7 @@ export function getTransferOutOfEscrowInstructionDataEncoder(): FixedSizeEncoder
 export function getTransferOutOfEscrowInstructionDataDecoder(): FixedSizeDecoder<TransferOutOfEscrowInstructionData> {
   return getStructDecoder([
     ["discriminator", getU8Decoder()],
-    ["amount", getU64Decoder()],
+    ["transferOutOfEscrowArgs", getTransferOutOfEscrowArgsDecoder()],
   ]);
 }
 
@@ -191,16 +189,16 @@ export interface TransferOutOfEscrowInput<
   /** Token account that holds the token the escrow is attached to */
   escrowAccount: Address<TAccountEscrowAccount>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Associated Token program */
-  ataProgram?: Address<TAccountAtaProgram>;
+  ataProgram: Address<TAccountAtaProgram>;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram: Address<TAccountTokenProgram>;
   /** Instructions sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions: Address<TAccountSysvarInstructions>;
   /** Authority/creator of the escrow account */
   authority?: TransactionSigner<TAccountAuthority>;
-  amount: TransferOutOfEscrowInstructionDataArgs["amount"];
+  transferOutOfEscrowArgs: TransferOutOfEscrowInstructionDataArgs["transferOutOfEscrowArgs"];
 }
 
 export function getTransferOutOfEscrowInstruction<
@@ -281,24 +279,6 @@ export function getTransferOutOfEscrowInstruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.ataProgram.value) {
-    accounts.ataProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.sysvarInstructions.value) {
-    accounts.sysvarInstructions.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   const instruction = {

@@ -52,12 +52,8 @@ export type UpdateInstruction<
   TAccountMetadata extends string | AccountMeta = string,
   TAccountEdition extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSysvarInstructions extends string | AccountMeta = string,
   TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
   TAccountAuthorizationRules extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -168,9 +164,9 @@ export interface UpdateInput<
   /** Payer */
   payer: TransactionSigner<TAccountPayer>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Instructions sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions: Address<TAccountSysvarInstructions>;
   /** Token Authorization Rules Program */
   authorizationRulesProgram?: Address<TAccountAuthorizationRulesProgram>;
   /** Token Authorization Rules account */
@@ -254,16 +250,6 @@ export function getUpdateInstruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.sysvarInstructions.value) {
-    accounts.sysvarInstructions.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {

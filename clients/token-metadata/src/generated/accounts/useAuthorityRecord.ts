@@ -135,7 +135,3 @@ export async function fetchAllMaybeUseAuthorityRecord(
     decodeUseAuthorityRecord(maybeAccount),
   );
 }
-
-export function getUseAuthorityRecordSize(): number {
-  return 10;
-}

@@ -47,12 +47,8 @@ export type DeprecatedMintPrintingTokensInstruction<
   TAccountUpdateAuthority extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
   TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountRent extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -134,9 +130,9 @@ export interface DeprecatedMintPrintingTokensInput<
   /** Master Edition V1 key (pda of ['metadata', program id, mint id, 'edition']) */
   masterEdition: Address<TAccountMasterEdition>;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram: Address<TAccountTokenProgram>;
   /** Rent */
-  rent?: Address<TAccountRent>;
+  rent: Address<TAccountRent>;
 }
 
 export function getDeprecatedMintPrintingTokensInstruction<
@@ -190,16 +186,6 @@ export function getDeprecatedMintPrintingTokensInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
-
-  // Resolve default values.
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.rent.value) {
-    accounts.rent.value =
-      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {

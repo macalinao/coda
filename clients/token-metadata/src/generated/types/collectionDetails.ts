@@ -12,36 +12,37 @@ import type {
   FixedSizeEncoder,
   GetDiscriminatedUnionVariant,
   GetDiscriminatedUnionVariantContent,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
+  getArrayDecoder,
+  getArrayEncoder,
   getDiscriminatedUnionDecoder,
   getDiscriminatedUnionEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
 
 export type CollectionDetails =
   | { __kind: "V1"; size: bigint }
-  | { __kind: "V2"; padding: ReadonlyUint8Array };
+  | { __kind: "V2"; padding: number[] };
 
 export type CollectionDetailsArgs =
   | { __kind: "V1"; size: number | bigint }
-  | { __kind: "V2"; padding: ReadonlyUint8Array };
+  | { __kind: "V2"; padding: number[] };
 
 export function getCollectionDetailsEncoder(): FixedSizeEncoder<CollectionDetailsArgs> {
   return getDiscriminatedUnionEncoder([
     ["V1", getStructEncoder([["size", getU64Encoder()]])],
     [
       "V2",
-      getStructEncoder([["padding", fixEncoderSize(getBytesEncoder(), 8)]]),
+      getStructEncoder([
+        ["padding", getArrayEncoder(getU8Encoder(), { size: 8 })],
+      ]),
     ],
   ]) as FixedSizeEncoder<CollectionDetailsArgs>;
 }
@@ -51,7 +52,9 @@ export function getCollectionDetailsDecoder(): FixedSizeDecoder<CollectionDetail
     ["V1", getStructDecoder([["size", getU64Decoder()]])],
     [
       "V2",
-      getStructDecoder([["padding", fixDecoderSize(getBytesDecoder(), 8)]]),
+      getStructDecoder([
+        ["padding", getArrayDecoder(getU8Decoder(), { size: 8 })],
+      ]),
     ],
   ]) as FixedSizeDecoder<CollectionDetails>;
 }

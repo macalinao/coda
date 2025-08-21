@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["./dist/**"],
+      "outputs": ["./dist/**", "./.next/**"],
       "env": ["NODE_ENV"]
     },
     "lint": {
@@ -21,6 +21,10 @@
     },
     "codegen": {
       "outputs": ["./src/generated/**"],
+      "cache": false
+    },
+    "dev": {
+      "persistent": true,
       "cache": false
     }
   }

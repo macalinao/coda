@@ -8,15 +8,6 @@ import {
 import { renameVisitor } from "@macalinao/codama-rename-visitor";
 
 export default defineConfig({
-  // Load all Quarry IDLs
-  idlPath: [
-    "./idls/quarry_mine.json",
-    "./idls/quarry_mint_wrapper.json",
-    "./idls/quarry_operator.json",
-    "./idls/quarry_merge_mine.json",
-    "./idls/quarry_redeemer.json",
-    "./idls/quarry_registry.json",
-  ],
   outputDir: "./src/generated",
 
   visitors: [

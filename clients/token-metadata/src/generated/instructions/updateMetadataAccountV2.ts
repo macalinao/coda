@@ -16,8 +16,6 @@ import type {
   Instruction,
   InstructionWithAccounts,
   InstructionWithData,
-  Option,
-  OptionOrNullable,
   ReadonlySignerAccount,
   ReadonlyUint8Array,
   TransactionSigner,
@@ -25,12 +23,6 @@ import type {
 } from "@solana/kit";
 import {
   combineCodec,
-  getAddressDecoder,
-  getAddressEncoder,
-  getBooleanDecoder,
-  getBooleanEncoder,
-  getOptionDecoder,
-  getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -40,8 +32,14 @@ import {
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
-import type { DataV2, DataV2Args } from "../types/index.js";
-import { getDataV2Decoder, getDataV2Encoder } from "../types/index.js";
+import type {
+  UpdateMetadataAccountArgsV2,
+  UpdateMetadataAccountArgsV2Args,
+} from "../types/index.js";
+import {
+  getUpdateMetadataAccountArgsV2Decoder,
+  getUpdateMetadataAccountArgsV2Encoder,
+} from "../types/index.js";
 
 export const UPDATE_METADATA_ACCOUNT_V2_DISCRIMINATOR = 15;
 
@@ -71,27 +69,18 @@ export type UpdateMetadataAccountV2Instruction<
 
 export interface UpdateMetadataAccountV2InstructionData {
   discriminator: number;
-  data: Option<DataV2>;
-  updateAuthority: Option<Address>;
-  primarySaleHappened: Option<boolean>;
-  isMutable: Option<boolean>;
+  updateMetadataAccountArgsV2: UpdateMetadataAccountArgsV2;
 }
 
 export interface UpdateMetadataAccountV2InstructionDataArgs {
-  data: OptionOrNullable<DataV2Args>;
-  updateAuthority: OptionOrNullable<Address>;
-  primarySaleHappened: OptionOrNullable<boolean>;
-  isMutable: OptionOrNullable<boolean>;
+  updateMetadataAccountArgsV2: UpdateMetadataAccountArgsV2Args;
 }
 
 export function getUpdateMetadataAccountV2InstructionDataEncoder(): Encoder<UpdateMetadataAccountV2InstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", getU8Encoder()],
-      ["data", getOptionEncoder(getDataV2Encoder())],
-      ["updateAuthority", getOptionEncoder(getAddressEncoder())],
-      ["primarySaleHappened", getOptionEncoder(getBooleanEncoder())],
-      ["isMutable", getOptionEncoder(getBooleanEncoder())],
+      ["updateMetadataAccountArgsV2", getUpdateMetadataAccountArgsV2Encoder()],
     ]),
     (value) => ({
       ...value,
@@ -103,10 +92,7 @@ export function getUpdateMetadataAccountV2InstructionDataEncoder(): Encoder<Upda
 export function getUpdateMetadataAccountV2InstructionDataDecoder(): Decoder<UpdateMetadataAccountV2InstructionData> {
   return getStructDecoder([
     ["discriminator", getU8Decoder()],
-    ["data", getOptionDecoder(getDataV2Decoder())],
-    ["updateAuthority", getOptionDecoder(getAddressDecoder())],
-    ["primarySaleHappened", getOptionDecoder(getBooleanDecoder())],
-    ["isMutable", getOptionDecoder(getBooleanDecoder())],
+    ["updateMetadataAccountArgsV2", getUpdateMetadataAccountArgsV2Decoder()],
   ]);
 }
 
@@ -128,10 +114,7 @@ export interface UpdateMetadataAccountV2Input<
   metadata: Address<TAccountMetadata>;
   /** Update authority key */
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
-  data: UpdateMetadataAccountV2InstructionDataArgs["data"];
-  updateAuthorityArg: UpdateMetadataAccountV2InstructionDataArgs["updateAuthority"];
-  primarySaleHappened: UpdateMetadataAccountV2InstructionDataArgs["primarySaleHappened"];
-  isMutable: UpdateMetadataAccountV2InstructionDataArgs["isMutable"];
+  updateMetadataAccountArgsV2: UpdateMetadataAccountV2InstructionDataArgs["updateMetadataAccountArgsV2"];
 }
 
 export function getUpdateMetadataAccountV2Instruction<
@@ -167,7 +150,7 @@ export function getUpdateMetadataAccountV2Instruction<
   >;
 
   // Original args.
-  const args = { ...input, updateAuthority: input.updateAuthorityArg };
+  const args = { ...input };
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {

@@ -1,0 +1,263 @@
+---
+title: Configuration
+description: Customize Coda generation with coda.config.mjs
+---
+
+# Configuration
+
+Coda works zero-config out of the box, but you can customize its behavior with a `coda.config.mjs` file.
+
+## Initialize Configuration
+
+Create a configuration file using the `init` command:
+
+```bash
+coda init
+```
+
+This creates a `coda.config.mjs` file with helpful comments and examples.
+
+## Configuration Options
+
+### `idlPath`
+- **Type**: `string | string[]`
+- **Default**: `"./target/idl/program.json"`
+- **Description**: Path to your Anchor IDL file(s). Can be a single path or array for multiple IDLs.
+
+### `outputDir`
+- **Type**: `string`
+- **Default**: `"./src/generated"`
+- **Description**: Directory where generated TypeScript files will be placed
+
+### `visitors`
+- **Type**: `Visitor[] | (context) => Visitor[]`
+- **Default**: `[]`
+- **Description**: Codama visitors to transform the AST. Can be an array or function that receives the IDL context.
+
+## Basic Configuration
+
+Simple configuration with custom paths:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  idlPath: "./idls/my_program.json",
+  outputDir: "./src/client",
+});
+```
+
+## Multiple IDLs
+
+Generate clients from multiple programs in one project:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  idlPath: [
+    "./idls/program_a.json",
+    "./idls/program_b.json",
+    "./idls/program_c.json",
+  ],
+  outputDir: "./src/generated",
+});
+```
+
+## Custom PDAs
+
+Define program-derived addresses with custom seeds:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import {
+  addPdasVisitor,
+  constantPdaSeedNodeFromString,
+  publicKeyTypeNode,
+  variablePdaSeedNode,
+} from "codama";
+
+const addCustomPDAsVisitor = addPdasVisitor({
+  tokenMetadata: [
+    {
+      name: "metadata",
+      seeds: [
+        constantPdaSeedNodeFromString("utf8", "metadata"),
+        variablePdaSeedNode(
+          "programId",
+          publicKeyTypeNode(),
+          "The address of the program",
+        ),
+        variablePdaSeedNode(
+          "mint",
+          publicKeyTypeNode(),
+          "The address of the mint account",
+        ),
+      ],
+    },
+  ],
+});
+
+export default defineConfig({
+  idlPath: "./idls/token_metadata.json",
+  outputDir: "./src/generated",
+  visitors: [addCustomPDAsVisitor],
+});
+```
+
+## Advanced Example: Quarry Configuration
+
+Real-world example with multiple IDLs, PDAs, and rename visitors:
+
+```javascript
+import {
+  addPdasVisitor,
+  constantPdaSeedNodeFromString,
+  defineConfig,
+  publicKeyTypeNode,
+  variablePdaSeedNode,
+} from "@macalinao/coda";
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
+
+export default defineConfig({
+  // Multiple IDLs from the same project
+  idlPath: [
+    "./idls/quarry_mine.json",
+    "./idls/quarry_mint_wrapper.json",
+    "./idls/quarry_operator.json",
+    "./idls/quarry_merge_mine.json",
+    "./idls/quarry_redeemer.json",
+    "./idls/quarry_registry.json",
+  ],
+  outputDir: "./src/generated",
+
+  visitors: [
+    // Add PDAs for each program
+    addPdasVisitor({
+      quarryMine: [
+        {
+          name: "rewarder",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "Rewarder"),
+            variablePdaSeedNode("base", publicKeyTypeNode()),
+          ],
+        },
+        {
+          name: "quarry",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "Quarry"),
+            variablePdaSeedNode("rewarder", publicKeyTypeNode()),
+            variablePdaSeedNode("tokenMint", publicKeyTypeNode()),
+          ],
+        },
+        {
+          name: "miner",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "Miner"),
+            variablePdaSeedNode("quarry", publicKeyTypeNode()),
+            variablePdaSeedNode("authority", publicKeyTypeNode()),
+          ],
+        },
+      ],
+      quarryMergeMine: [
+        {
+          name: "mergePool",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "MergePool"),
+            variablePdaSeedNode("primaryMint", publicKeyTypeNode()),
+          ],
+        },
+      ],
+    }),
+    
+    // Rename instructions to avoid conflicts between programs
+    renameVisitor({
+      quarryMergeMine: {
+        instructions: {
+          claimRewards: "claimRewardsMM",
+          initMiner: "initMinerMM",
+          withdrawTokens: "withdrawTokensMM",
+        },
+        definedTypes: {
+          claimEvent: "claimEventMM",
+        },
+      },
+    }),
+  ],
+});
+```
+
+## Using Visitor Functions
+
+Access the IDL context in your visitors:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { someCustomVisitor } from "./visitors/custom.js";
+
+export default defineConfig({
+  visitors: ({ idl, idls }) => {
+    // Access parsed IDL(s) to customize visitors
+    console.log(`Generating for ${idl.name}`);
+    
+    return [
+      someCustomVisitor(idl),
+      // Add more visitors based on IDL content
+    ];
+  },
+});
+```
+
+## Command Line Override
+
+Configuration file settings can be overridden via command line:
+
+```bash
+# Override IDL path
+coda generate --idl ./other/idl.json
+
+# Override output directory
+coda generate --output ./other/output
+
+# Use different config file
+coda generate --config ./custom.config.mjs
+```
+
+## Priority Order
+
+Settings are applied in this priority order (highest to lowest):
+1. Command line arguments
+2. Configuration file (`coda.config.mjs`)
+3. Default values
+
+## Integration with Build Tools
+
+Add to your package.json scripts:
+
+```json
+{
+  "scripts": {
+    "codegen": "coda generate",
+    "prebuild": "bun run codegen",
+    "dev": "bun run codegen && next dev",
+    "clean": "rm -rf ./src/generated"
+  }
+}
+```
+
+## Troubleshooting
+
+### Config not loading
+- Ensure file is named `coda.config.mjs` with `.mjs` extension
+- Check that you're using ES module syntax (`export default`)
+- Verify the config file is in your project root or specified via `--config`
+
+### Multiple IDL conflicts
+- Use `renameVisitor` to rename conflicting instructions/types
+- Generate to separate output directories
+- Consider splitting into multiple config files
+
+### Visitor errors
+- Ensure visitors are compatible with your Codama version
+- Check that visitor functions return valid visitor objects
+- Use the context parameter to access IDL information

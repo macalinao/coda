@@ -59,18 +59,10 @@ export type PrintInstruction<
   TAccountMasterTokenAccount extends string | AccountMeta = string,
   TAccountMasterMetadata extends string | AccountMeta = string,
   TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountSplTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSplAtaProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSplTokenProgram extends string | AccountMeta = string,
+  TAccountSplAtaProgram extends string | AccountMeta = string,
+  TAccountSysvarInstructions extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -223,13 +215,13 @@ export interface PrintInput<
   /** The update authority of the master edition. */
   updateAuthority: Address<TAccountUpdateAuthority>;
   /** Token program */
-  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  splTokenProgram: Address<TAccountSplTokenProgram>;
   /** SPL Associated Token Account program */
-  splAtaProgram?: Address<TAccountSplAtaProgram>;
+  splAtaProgram: Address<TAccountSplAtaProgram>;
   /** Instructions sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions: Address<TAccountSysvarInstructions>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   printArgs: PrintInstructionDataArgs["printArgs"];
 }
 
@@ -361,24 +353,6 @@ export function getPrintInstruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.splTokenProgram.value) {
-    accounts.splTokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.splAtaProgram.value) {
-    accounts.splAtaProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
-  if (!accounts.sysvarInstructions.value) {
-    accounts.sysvarInstructions.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {

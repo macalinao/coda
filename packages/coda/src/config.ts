@@ -5,10 +5,8 @@ import type { Node, Visitor } from "codama";
  * Context provided to visitor functions
  */
 export interface VisitorContext {
-  /** The parsed Anchor IDL(s) */
-  idl: AnchorIdl;
   /** All parsed IDLs when using multiple IDLs */
-  idls?: AnchorIdl[];
+  idls: AnchorIdl[];
 }
 
 /**
@@ -17,9 +15,15 @@ export interface VisitorContext {
 export interface CodaConfig {
   /**
    * Path to the Anchor IDL file(s).
-   * Can be a single path or an array of paths for multiple IDLs.
+   * Can be:
+   * - A single file path: "./target/idl/program.json"
+   * - A glob pattern: "./idls/*.json"
+   * - An array of paths and/or patterns: ["./idls/*.json", "./extra/program.json"]
+   *
+   * Glob patterns are supported for matching multiple files.
    * Overrides the --idl command line option.
-   * @default "./target/idl/program.json"
+   *
+   * @default "./idls/*.json"
    */
   idlPath?: string | string[];
 

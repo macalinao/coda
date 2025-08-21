@@ -1,0 +1,12 @@
+{
+  "title": "clients-token-metadata",
+  "pages": [
+    "index",
+    "instructions",
+    "accounts",
+    "types",
+    "pdas",
+    "errors",
+    "programs"
+  ]
+}

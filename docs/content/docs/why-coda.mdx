@@ -1,0 +1,312 @@
+---
+title: Why Coda?
+description: Understanding the advantages of Coda over Anchor's built-in TypeScript client
+---
+
+# Why Coda?
+
+While Anchor provides a built-in TypeScript client via [@coral-xyz/anchor](https://www.anchor-lang.com/docs/clients/typescript), Coda offers a modern alternative that addresses several limitations and provides additional features critical for production Solana applications.
+
+## The Limitations of Anchor's TypeScript Client
+
+### Current Challenges
+
+The Anchor TypeScript client has served the Solana ecosystem well, but developers face several challenges:
+
+1. **Legacy Web3.js dependency**: Still tied to the older @solana/web3.js library
+2. **No @solana/kit support**: Incompatible with Anza's modern [@solana/kit](https://github.com/anza-xyz/kit), the successor to Web3.js
+3. **Limited PDA support**: Requires manual PDA derivation without helper functions
+4. **Minimal documentation**: Generated code lacks inline documentation
+5. **No JSDoc comments**: Makes it harder for developers and AI assistants to understand the API
+
+These limitations become more apparent as projects scale:
+
+- Migration to modern Solana tooling is blocked
+- Developers must manually derive PDAs repeatedly
+- New team members struggle without inline documentation
+- AI coding assistants can't effectively help without context
+- Integration with modern Solana infrastructure is complicated
+
+### Example: Anchor's Built-in Client
+
+Here's what using Anchor's built-in TypeScript client looks like:
+
+```typescript
+import { Program, AnchorProvider } from "@coral-xyz/anchor";
+import { PublicKey } from "@solana/web3.js"; // Old Web3.js
+
+const program = new Program(idl, programId, provider);
+
+// No built-in PDA helpers - manual derivation
+const [vaultPda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("vault"), user.toBuffer()],
+  program.programId
+);
+
+// Basic instruction without documentation
+await program.methods
+  .transfer(new BN(1000))
+  .accounts({
+    source: sourceAccount,
+    destination: destAccount,
+    authority: signer,
+  })
+  .rpc();
+
+// No JSDoc, no hints about what this does or what accounts are required
+// No compatibility with @solana/kit
+// Manual PDA derivation every time
+// Needs the entire IDL to be loaded into memory, which can be huge
+```
+
+## The Coda Solution
+
+### Modern, Compatible, and Documented
+
+Coda generates clients that work with modern Solana infrastructure:
+
+```typescript
+import { createTransferInstruction, findVaultPda } from "./generated";
+import {
+  createTransaction,
+  signTransactionMessageWithSigners,
+  setTransactionMessageLifetimeUsingBlockhash,
+  sendAndConfirmTransaction,
+  createSolanaRpc,
+} from "gill"; // Clean, modern API!
+
+/**
+ * Creates a transfer instruction
+ * @param source - Source token account
+ * @param destination - Destination token account
+ * @param authority - Account authorized to transfer
+ * @param amount - Amount to transfer (in base units)
+ */
+const instruction = createTransferInstruction({
+  source,
+  destination,
+  authority,
+  amount: 1000n,
+});
+
+// Built-in PDA helpers with JSDoc
+const [vaultPda] = await findVaultPda({
+  user: userPubkey,
+});
+
+// Simple, clean transaction creation
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
+
+const transaction = createTransaction({
+  version: "legacy",
+  feePayer: signer,
+  instructions: [instruction],
+});
+
+const signedTransaction = await signTransactionMessageWithSigners(
+  setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, transaction)
+);
+
+await sendAndConfirmTransaction(signedTransaction);
+```
+
+## Key Advantages Over Anchor's Client
+
+### 1. **Modern Solana Tooling Compatibility**
+
+Coda generates clients fully compatible with modern Solana libraries like [Gill](https://github.com/solana-foundation/gill) and [@solana/web3.js v2.0](https://github.com/solana-foundation/solana-web3.js). This means:
+
+- Use the latest Solana tooling and best practices
+- Clean, TypeScript-first APIs with excellent DX
+- Tree-shakeable imports and smaller bundle sizes
+- Full TypeScript support with proper types
+- Better performance with optimized patterns
+
+### 2. **PDA Helper Functions**
+
+Unlike Anchor's client, Coda automatically generates PDA finder functions powered by Codama:
+
+```typescript
+// Anchor client - manual PDA derivation every time
+const [pda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("seed"), user.toBuffer()],
+  programId
+);
+
+// Coda - clean, reusable PDA helpers
+const [pda] = await findMyPda({ user });
+```
+
+These helpers:
+
+- Encapsulate seed derivation logic
+- Provide type-safe parameters
+- Include documentation about the PDA's purpose
+- Reduce errors from incorrect seed ordering
+
+### 3. **Rich JSDoc Documentation**
+
+Many generated functions include the docs that are available in your Anchor IDL.
+
+This documentation:
+
+- Helps developers understand the API instantly
+- Enables AI assistants (GitHub Copilot, Cursor, Claude, etc.) to provide better suggestions
+- Appears in IDE tooltips and autocomplete
+- Documents account requirements and mutations
+- Clarifies parameter purposes and types
+
+### 4. **Complete Type Safety**
+
+Beyond what Anchor's client provides, Coda generates:
+
+- Fully typed instruction builders
+- Type-safe account decoders
+- Discriminated unions for errors
+- Typed PDA seed parameters
+- Account mutation markers (mut, signer)
+
+Your IDE knows exactly what's required and catches errors before runtime.
+
+### 5. **Modern JavaScript/TypeScript**
+
+Coda generates code using modern patterns:
+
+- ES modules with proper `.js` extensions
+- Tree-shakeable exports
+- Async/await patterns
+- BigInt support for u64/i64 values. In Anchor, you'd use `BN`, which requires more code to work with.
+- No global state or singletons
+
+This ensures compatibility with:
+
+- Vite, Next.js, and modern bundlers
+- Server-side rendering
+- Edge runtimes
+- Browser environments
+
+## Migration from Anchor's Client
+
+### Smooth Transition
+
+Moving from Anchor's built-in client to Coda is straightforward:
+
+1. **Keep your existing code**: No need to rewrite everything at once
+2. **Generate Coda client**: Run `coda generate` alongside your current setup
+3. **Migrate gradually**: Update one instruction at a time
+4. **Leverage new features**: Add PDA helpers and modern web3.js patterns as you go
+
+### Side-by-Side Comparison
+
+```typescript
+// Anchor client - legacy patterns
+import { Program } from "@coral-xyz/anchor";
+import { PublicKey } from "@solana/web3.js"; // v1
+
+const program = new Program(idl, programId, provider);
+await program.methods.transfer(amount).accounts({...}).rpc();
+
+// Coda client - modern patterns
+import { createTransferInstruction } from "./generated";
+import { createTransaction } from "gill"; // Clean modern API
+
+const instruction = createTransferInstruction({...});
+const transaction = createTransaction({
+  version: 0,
+  feePayer: signer,
+  instructions: [instruction]
+});
+```
+
+## Technical Foundation
+
+### Built on Codama
+
+Coda leverages [Codama](https://github.com/codama-idl/codama), the proven AST framework that powers:
+
+- Metaplex Token Metadata clients
+- Major DeFi protocols on Solana
+- Enterprise Solana applications
+
+This means:
+
+- Battle-tested code generation
+- Extensible visitor pattern for customization
+- Consistent with ecosystem standards
+- Regular updates and improvements
+
+### How Coda Works
+
+1. **Parse IDL**: Read your Anchor IDL file (JSON format)
+2. **Build AST**: Create an abstract syntax tree using Codama
+3. **Apply Visitors**: Transform the AST (adding PDAs, flattening nested accounts, etc.)
+4. **Generate Code**: Render optimized TypeScript with full type information and documentation
+5. **Organize Output**: Create a clean, modular file structure
+
+## When to Choose Coda
+
+### **Modern Solana Development**
+
+If you're using or planning to use Gill, web3.js v2, or other modern Solana tooling.
+
+### **Complex Programs with PDAs**
+
+When your program has multiple PDAs that need consistent derivation.
+
+### **Team Collaboration**
+
+When multiple developers need to understand and use your program's API.
+
+### **AI-Assisted Development**
+
+When using GitHub Copilot, Cursor, or other AI tools that benefit from documentation.
+
+### **Production Applications**
+
+When you need reliability, maintainability, and clear documentation.
+
+## Comparison
+
+### Anchor's Built-in Client
+
+- **Pros**: No additional tools needed, familiar API
+- **Cons**: Legacy Web3.js, no PDA helpers, no documentation, limited compatibility
+
+### Manual Implementation
+
+- **Pros**: Full control
+- **Cons**: Time-consuming, error-prone, high maintenance
+
+### Coda
+
+- **Pros**: Modern tooling compatible (Gill, web3.js v2), PDA helpers, JSDoc, zero config
+- **Cons**: Requires running generation step (but integrates into build process)
+
+## Getting Started
+
+Transition from Anchor's client to Coda in minutes:
+
+```bash
+# You already have your IDL from Anchor
+anchor build
+
+# Generate modern, documented client
+coda generate
+```
+
+Start using immediately:
+
+```typescript
+import { createTransferInstruction, findVaultPda } from "./generated";
+
+// Modern, documented, compatible with Gill and web3.js v2
+```
+
+## Conclusion
+
+While Anchor's built-in TypeScript client served its purpose, modern Solana development demands more: compatibility with libraries like Gill, built-in PDA helpers, comprehensive documentation, and forward-looking architecture.
+
+Coda delivers all of this while maintaining the simplicity of zero configuration. It's not about replacing Anchor — it's about enhancing your development experience with better client-side tooling that works seamlessly with modern Solana libraries.
+
+**Ready to modernize your Solana development?** [Get started with Coda →](/docs/quick-start)

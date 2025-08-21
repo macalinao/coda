@@ -149,7 +149,3 @@ export async function fetchAllMaybeHolderDelegateRecord(
     decodeHolderDelegateRecord(maybeAccount),
   );
 }
-
-export function getHolderDelegateRecordSize(): number {
-  return 98;
-}

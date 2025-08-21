@@ -28,13 +28,19 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  ApproveUseAuthorityArgs,
+  ApproveUseAuthorityArgsArgs,
+} from "../types/index.js";
+import {
+  getApproveUseAuthorityArgsDecoder,
+  getApproveUseAuthorityArgsEncoder,
+} from "../types/index.js";
 
 export const APPROVE_USE_AUTHORITY_DISCRIMINATOR = 20;
 
@@ -52,12 +58,8 @@ export type ApproveUseAuthorityInstruction<
   TAccountMetadata extends string | AccountMeta = string,
   TAccountMint extends string | AccountMeta = string,
   TAccountBurner extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
   TAccountRent extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -109,18 +111,18 @@ export type ApproveUseAuthorityInstruction<
 
 export interface ApproveUseAuthorityInstructionData {
   discriminator: number;
-  numberOfUses: bigint;
+  approveUseAuthorityArgs: ApproveUseAuthorityArgs;
 }
 
 export interface ApproveUseAuthorityInstructionDataArgs {
-  numberOfUses: number | bigint;
+  approveUseAuthorityArgs: ApproveUseAuthorityArgsArgs;
 }
 
 export function getApproveUseAuthorityInstructionDataEncoder(): FixedSizeEncoder<ApproveUseAuthorityInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", getU8Encoder()],
-      ["numberOfUses", getU64Encoder()],
+      ["approveUseAuthorityArgs", getApproveUseAuthorityArgsEncoder()],
     ]),
     (value) => ({
       ...value,
@@ -132,7 +134,7 @@ export function getApproveUseAuthorityInstructionDataEncoder(): FixedSizeEncoder
 export function getApproveUseAuthorityInstructionDataDecoder(): FixedSizeDecoder<ApproveUseAuthorityInstructionData> {
   return getStructDecoder([
     ["discriminator", getU8Decoder()],
-    ["numberOfUses", getU64Decoder()],
+    ["approveUseAuthorityArgs", getApproveUseAuthorityArgsDecoder()],
   ]);
 }
 
@@ -176,12 +178,12 @@ export interface ApproveUseAuthorityInput<
   /** Program As Signer (Burner) */
   burner: Address<TAccountBurner>;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram: Address<TAccountTokenProgram>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-  numberOfUses: ApproveUseAuthorityInstructionDataArgs["numberOfUses"];
+  approveUseAuthorityArgs: ApproveUseAuthorityInstructionDataArgs["approveUseAuthorityArgs"];
 }
 
 export function getApproveUseAuthorityInstruction<
@@ -257,16 +259,6 @@ export function getApproveUseAuthorityInstruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   const instruction = {

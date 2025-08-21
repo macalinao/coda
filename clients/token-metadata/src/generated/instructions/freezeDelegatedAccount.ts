@@ -46,9 +46,7 @@ export type FreezeDelegatedAccountInstruction<
   TAccountTokenAccount extends string | AccountMeta = string,
   TAccountEdition extends string | AccountMeta = string,
   TAccountMint extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -120,7 +118,7 @@ export interface FreezeDelegatedAccountInput<
   /** Token mint */
   mint: Address<TAccountMint>;
   /** Token Program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram: Address<TAccountTokenProgram>;
 }
 
 export function getFreezeDelegatedAccountInstruction<
@@ -163,12 +161,6 @@ export function getFreezeDelegatedAccountInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
-
-  // Resolve default values.
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {

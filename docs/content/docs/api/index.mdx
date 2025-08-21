@@ -1,0 +1,40 @@
+---
+title: API Reference
+description: Complete API documentation for Coda-generated clients
+---
+
+# API Reference
+
+This section contains the complete API documentation for all Coda-generated client libraries.
+
+## Client Libraries
+
+The following client libraries are available:
+
+- **@macalinao/clients-quarry** - Quarry mining protocol clients
+- **@macalinao/clients-token-metadata** - Metaplex Token Metadata clients
+
+Each client library provides:
+
+- **Instructions** - Typed builders for all program instructions
+- **Accounts** - Decoders and fetchers for all account types
+- **Types** - All TypeScript types from the IDL
+- **PDAs** - Helper functions for program-derived addresses
+- **Errors** - Typed error enums and handlers
+
+## Navigation
+
+Browse the API documentation using the sidebar. Each module contains detailed documentation for all exported functions, types, and interfaces.
+
+## Usage Example
+
+```typescript
+import { createTransferInstruction } from "@macalinao/clients-token-metadata";
+import { createSolanaRpc } from "@solana/web3.js";
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+
+const instruction = createTransferInstruction({
+  // ... instruction parameters
+});
+```

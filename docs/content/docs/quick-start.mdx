@@ -1,0 +1,113 @@
+---
+title: Quick Start
+description: Generate your first TypeScript client with Coda
+---
+
+# Quick Start
+
+This guide walks you through generating your first TypeScript client from an Anchor IDL.
+
+## Step 1: Build Your Program
+
+First, ensure you have an Anchor IDL by building your program:
+
+```bash
+anchor build
+```
+
+This creates your IDL file at `./target/idl/your_program.json`.
+
+## Step 2: Generate the Client
+
+Run Coda to generate your TypeScript client:
+
+```bash
+bunx @macalinao/coda generate
+```
+
+Coda will:
+- Locate your IDL (defaults to `./target/idl/`)
+- Generate a complete TypeScript client
+- Output files to `./src/generated/`
+
+No configuration required for standard Anchor projects.
+
+## Step 3: Use the Generated Client
+
+Import and use the generated functions in your application:
+
+```typescript
+import { 
+  createTransferInstruction,
+  fetchTokenAccount,
+  findVaultPda 
+} from "./src/generated";
+
+// Create instructions with full type safety
+const instruction = createTransferInstruction({
+  source: sourceAccount,
+  destination: destAccount,
+  authority: signer,
+  amount: 1000n
+});
+
+// Fetch and decode accounts
+const account = await fetchTokenAccount(rpc, address);
+console.log(account.balance); // Fully typed
+
+// Find program-derived addresses
+const [vault] = await findVaultPda({
+  user: userPubkey,
+  seed: "vault"
+});
+```
+
+## Generated Client Components
+
+Coda generates a comprehensive TypeScript client including:
+
+### **Instructions**
+Typed builders for every program instruction with full IntelliSense support.
+
+### **Accounts**
+Fetchers and decoders for all account types with automatic deserialization.
+
+### **Types**
+All custom types from your IDL including enums, structs, and unions.
+
+### **PDAs**
+Helper functions for program-derived address calculation.
+
+### **Errors**
+Typed error definitions for proper error handling.
+
+## File Structure
+
+The generated client is organized as follows:
+
+```
+src/generated/
+├── index.ts              # Main export file
+├── instructions/         # Instruction builders
+├── accounts/            # Account types and fetchers
+├── types/              # Custom type definitions
+├── pdas/              # PDA helper functions
+├── programs/          # Program metadata
+└── errors/            # Error definitions
+```
+
+## Next Steps
+
+- **Start building**: Use the generated client in your application
+- **Customize generation**: See [configuration](/docs/configuration) for advanced options
+- **View examples**: Check out [example projects](/docs/examples) for reference
+
+## Troubleshooting
+
+**IDL not found**: Ensure your Anchor program is built with `anchor build`
+
+**Import errors**: Use `.js` extensions in imports (required for ES modules)
+
+**Type errors**: Run `tsc --noEmit` to check TypeScript compilation
+
+For additional help, please [open an issue](https://github.com/macalinao/coda/issues) on GitHub.

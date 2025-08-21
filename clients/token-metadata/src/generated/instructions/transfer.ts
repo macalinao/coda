@@ -59,18 +59,10 @@ export type TransferInstruction<
   TAccountDestinationTokenRecord extends string | AccountMeta = string,
   TAccountAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSplAtaProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSysvarInstructions extends string | AccountMeta = string,
+  TAccountSplTokenProgram extends string | AccountMeta = string,
+  TAccountSplAtaProgram extends string | AccountMeta = string,
   TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
   TAccountAuthorizationRules extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -213,13 +205,13 @@ export interface TransferInput<
   /** Payer */
   payer: TransactionSigner<TAccountPayer>;
   /** System Program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Instructions sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions: Address<TAccountSysvarInstructions>;
   /** SPL Token Program */
-  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  splTokenProgram: Address<TAccountSplTokenProgram>;
   /** SPL Associated Token Account program */
-  splAtaProgram?: Address<TAccountSplAtaProgram>;
+  splAtaProgram: Address<TAccountSplAtaProgram>;
   /** Token Authorization Rules Program */
   authorizationRulesProgram?: Address<TAccountAuthorizationRulesProgram>;
   /** Token Authorization Rules account */
@@ -339,24 +331,6 @@ export function getTransferInstruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.sysvarInstructions.value) {
-    accounts.sysvarInstructions.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
-  if (!accounts.splTokenProgram.value) {
-    accounts.splTokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.splAtaProgram.value) {
-    accounts.splAtaProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {

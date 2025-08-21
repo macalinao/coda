@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { AnchorIdl, IdlV01 } from "@codama/nodes-from-anchor";
-import { rootNodeFromAnchorV01 } from "@codama/nodes-from-anchor";
+import type { AnchorIdl, IdlV00, IdlV01 } from "@codama/nodes-from-anchor";
+import {
+  programNodeFromAnchorV00,
+  programNodeFromAnchorV01,
+} from "@codama/nodes-from-anchor";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
-import { createFromRoot } from "codama";
+import { createFromRoot, rootNode } from "codama";
 import { Command } from "commander";
+import { glob } from "glob";
 import type { CodaConfig } from "../config.js";
 
 async function fileExists(path: string): Promise<boolean> {
@@ -30,8 +34,8 @@ program
   .description("Generate a client from an Anchor IDL")
   .option(
     "-i, --idl <path>",
-    "Path to the Anchor IDL file",
-    "./target/idl/program.json",
+    "Path to the Anchor IDL file(s) or glob pattern",
+    "./idls/*.json",
   )
   .option(
     "-o, --output <path>",
@@ -60,15 +64,50 @@ program
         config = configModule.default;
       }
 
-      // Use config values if provided, otherwise fall back to command line options
-      const idlPaths = Array.isArray(config.idlPath)
-        ? config.idlPath.map((p) => resolve(p))
-        : [resolve(config.idlPath ?? options.idl)];
+      // Determine IDL paths - use config if provided, otherwise use command line option
+      const idlPathInput = config.idlPath ?? options.idl;
+
+      // Process idlPath - can be string, array, or glob pattern
+      let resolvedPaths: string[] = [];
+
+      if (Array.isArray(idlPathInput)) {
+        // Handle array of paths (each could be a glob)
+        for (const path of idlPathInput) {
+          if (path.includes("*")) {
+            // It's a glob pattern
+            const matches = await glob(path);
+            resolvedPaths.push(...matches.map((p) => resolve(p)));
+          } else {
+            // Regular path
+            resolvedPaths.push(resolve(path));
+          }
+        }
+      }
+      // Single path (could be glob)
+      else if (idlPathInput.includes("*")) {
+        // It's a glob pattern
+        const matches = await glob(idlPathInput);
+        resolvedPaths = matches.map((p) => resolve(p));
+      } else {
+        // Regular path
+        resolvedPaths = [resolve(idlPathInput)];
+      }
+
+      // Remove duplicates and sort for consistent ordering
+      resolvedPaths = [...new Set(resolvedPaths)].sort();
+
+      if (resolvedPaths.length === 0) {
+        console.error(
+          "Error: No IDL files found matching the specified pattern(s)",
+        );
+        process.exit(1);
+      }
+
       const outputPath = resolve(config.outputDir ?? options.output);
 
       // Load all IDLs
       const idls: AnchorIdl[] = [];
-      for (const idlPath of idlPaths) {
+      for (const idlPath of resolvedPaths) {
         // Check if IDL file exists
         if (!(await fileExists(idlPath))) {
           console.error(`Error: IDL file not found at ${idlPath}`);
@@ -95,14 +134,21 @@ program
 
       // Create root nodes from IDL(s)
       // Note: rootNodeFromAnchor can accept additional IDLs as external programs
-      const [firstIdl, ...restIdls] = idls;
-      if (!firstIdl) {
-        throw new Error("Unexpected: No IDL files loaded");
+      const programNodes = idls.map((idl) => {
+        if (
+          idl.metadata &&
+          "spec" in idl.metadata &&
+          idl.metadata.spec === "0.1.0"
+        ) {
+          return programNodeFromAnchorV01(idl as unknown as IdlV01);
+        }
+        return programNodeFromAnchorV00(idl as unknown as IdlV00);
+      });
+      const [firstProgramNode, ...restProgramNodes] = programNodes;
+      if (!firstProgramNode) {
+        throw new Error("Unexpected: No program nodes loaded");
       }
-      const root = rootNodeFromAnchorV01(
-        firstIdl as unknown as IdlV01,
-        restIdls as unknown as IdlV01[],
-      );
+      const root = rootNode(firstProgramNode, restProgramNodes);
       const codama = createFromRoot(root);
 
       // Apply additional visitors from config
@@ -110,7 +156,7 @@ program
         // Resolve visitors - either array or function
         const visitors =
           typeof config.visitors === "function"
-            ? config.visitors({ idl: firstIdl, idls })
+            ? config.visitors({ idls })
             : config.visitors;
 
         if (visitors.length > 0) {
@@ -158,9 +204,13 @@ program
  */
 export default {
   // Optional: Path to the Anchor IDL file(s) (overrides --idl option)
-  // Can be a single path or an array for multiple IDLs
-  // idlPath: "./target/idl/program.json",
-  // idlPath: ["./idls/program1.json", "./idls/program2.json"],
+  // Can be a single path, glob pattern, or an array of paths/patterns
+  // Default: Looks for "./idls/*.json" if available, otherwise "./target/idl/program.json"
+  // idlPath: "./target/idl/program.json",        // Single file
+  // idlPath: "./idls/*.json",                     // Glob pattern (all JSON files in idls/)
+  // idlPath: "./idls/program_*.json",             // Glob pattern (matching files)
+  // idlPath: ["./idls/program1.json", "./idls/program2.json"],  // Array of files
+  // idlPath: ["./idls/*.json", "./extra/*.json"], // Array with glob patterns
   
   // Optional: Output directory for generated client (overrides --output option)
   // outputDir: "./src/generated",

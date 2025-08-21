@@ -16,8 +16,6 @@ import type {
   Instruction,
   InstructionWithAccounts,
   InstructionWithData,
-  Option,
-  OptionOrNullable,
   ReadonlyAccount,
   ReadonlySignerAccount,
   ReadonlyUint8Array,
@@ -27,19 +25,23 @@ import type {
 } from "@solana/kit";
 import {
   combineCodec,
-  getOptionDecoder,
-  getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  CreateMasterEditionArgs,
+  CreateMasterEditionArgsArgs,
+} from "../types/index.js";
+import {
+  getCreateMasterEditionArgsDecoder,
+  getCreateMasterEditionArgsEncoder,
+} from "../types/index.js";
 
 export const CREATE_MASTER_EDITION_V3_DISCRIMINATOR = 17;
 
@@ -55,12 +57,8 @@ export type CreateMasterEditionV3Instruction<
   TAccountMintAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
   TAccountRent extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -107,18 +105,18 @@ export type CreateMasterEditionV3Instruction<
 
 export interface CreateMasterEditionV3InstructionData {
   discriminator: number;
-  maxSupply: Option<bigint>;
+  createMasterEditionArgs: CreateMasterEditionArgs;
 }
 
 export interface CreateMasterEditionV3InstructionDataArgs {
-  maxSupply: OptionOrNullable<number | bigint>;
+  createMasterEditionArgs: CreateMasterEditionArgsArgs;
 }
 
 export function getCreateMasterEditionV3InstructionDataEncoder(): Encoder<CreateMasterEditionV3InstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", getU8Encoder()],
-      ["maxSupply", getOptionEncoder(getU64Encoder())],
+      ["createMasterEditionArgs", getCreateMasterEditionArgsEncoder()],
     ]),
     (value) => ({
       ...value,
@@ -130,7 +128,7 @@ export function getCreateMasterEditionV3InstructionDataEncoder(): Encoder<Create
 export function getCreateMasterEditionV3InstructionDataDecoder(): Decoder<CreateMasterEditionV3InstructionData> {
   return getStructDecoder([
     ["discriminator", getU8Decoder()],
-    ["maxSupply", getOptionDecoder(getU64Decoder())],
+    ["createMasterEditionArgs", getCreateMasterEditionArgsDecoder()],
   ]);
 }
 
@@ -168,12 +166,12 @@ export interface CreateMasterEditionV3Input<
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram: Address<TAccountTokenProgram>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-  maxSupply: CreateMasterEditionV3InstructionDataArgs["maxSupply"];
+  createMasterEditionArgs: CreateMasterEditionV3InstructionDataArgs["createMasterEditionArgs"];
 }
 
 export function getCreateMasterEditionV3Instruction<
@@ -238,16 +236,6 @@ export function getCreateMasterEditionV3Instruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   const instruction = {
