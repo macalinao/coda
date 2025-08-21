@@ -69,10 +69,11 @@ coda/
 ## Core Packages
 
 ### 1. **@macalinao/coda** - CLI for client generation
-   - Zero-config by default (looks for `./target/idl/program.json`)
+   - Zero-config by default (looks for `./idls/*.json`)
    - Configurable via `coda.config.mjs`
    - Generates TypeScript clients with full type safety
    - Built on Codama for extensibility
+   - Supports glob patterns for IDL discovery
 
 ### 2. **@macalinao/codama-instruction-accounts-dedupe-visitor**
    - Flattens nested account structures from Anchor IDL
@@ -100,6 +101,12 @@ coda/
 
 ## Configuration (coda.config.mjs)
 
+### Default Configuration
+Coda automatically discovers IDLs without any configuration:
+- Looks for `./idls/*.json` by default
+- Place your IDL files in the `idls/` directory
+- No config file needed for basic usage!
+
 ### Single IDL Configuration
 For projects with a single program (like [token-metadata](https://github.com/macalinao/coda/tree/master/clients/token-metadata)):
 
@@ -121,28 +128,53 @@ export default defineConfig({
 });
 ```
 
-### Multiple IDL Configuration
+### Multiple IDL Configuration with Glob Pattern
 For projects with multiple programs (like [quarry](https://github.com/macalinao/coda/tree/master/clients/quarry)):
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
 
 export default defineConfig({
-  // Array of IDL paths for multiple programs
-  idlPath: [
-    "./idls/quarry_mine.json",
-    "./idls/quarry_mint_wrapper.json",
-    "./idls/quarry_operator.json",
-    "./idls/quarry_merge_mine.json",
-    "./idls/quarry_redeemer.json",
-    "./idls/quarry_registry.json",
-  ],
+  // Use glob pattern to match all IDLs
+  idlPath: "./idls/*.json",
   outputDir: "./src/generated",
   
   // Optional: Add PDAs and other visitors for each program
   visitors: [
     // Custom visitors for each program
   ]
+});
+```
+
+### Multiple IDL Configuration with Array
+You can also explicitly list IDL files:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  // Array of specific IDL paths
+  idlPath: [
+    "./idls/program1.json",
+    "./idls/program2.json",
+    "./custom/path/program3.json",
+  ],
+  outputDir: "./src/generated",
+});
+```
+
+### Advanced Glob Patterns
+Use specific patterns to match only certain IDLs:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  // Match only IDLs starting with "quarry_"
+  idlPath: "./idls/quarry_*.json",
+  // Or combine multiple patterns
+  // idlPath: ["./idls/quarry_*.json", "./extra/*.json"],
+  outputDir: "./src/generated",
 });
 ```
 

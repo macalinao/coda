@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
-import fs from "fs/promises";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import yaml from "yaml";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,7 +20,7 @@ interface PackageInfo {
 async function ensureDir(dir: string): Promise<void> {
   try {
     await fs.mkdir(dir, { recursive: true });
-  } catch (e) {
+  } catch (_e) {
     // Directory exists
   }
 }
@@ -40,7 +40,7 @@ async function getClientPackages(): Promise<PackageInfo[]> {
         description: pkg.description || "",
         version: pkg.version,
       });
-    } catch (e) {
+    } catch (_e) {
       // Not a package directory
     }
   }
@@ -48,7 +48,7 @@ async function getClientPackages(): Promise<PackageInfo[]> {
   return packages;
 }
 
-function createFrontmatter(data: Record<string, any>): string {
+function createFrontmatter(data: Record<string, unknown>): string {
   return `---\n${yaml.stringify(data).trim()}\n---`;
 }
 
@@ -74,7 +74,7 @@ ${pkg.description}
 
 - Version: ${pkg.version}
 - [View Documentation](./${pkg.dir})
-`
+`,
   )
   .join("\n")}
 
@@ -145,14 +145,14 @@ import { /* exports */ } from "${pkg.name}";
     "programs",
   ];
 
-  for (const module of modules) {
-    const moduleDir = path.join(srcDir, module);
-    const moduleOutDir = path.join(outDir, module);
+  for (const m of modules) {
+    const moduleDir = path.join(srcDir, m);
+    const moduleOutDir = path.join(outDir, m);
 
     try {
       const files = await fs.readdir(moduleDir);
       const tsFiles = files.filter(
-        (f) => f.endsWith(".ts") && f !== "index.ts"
+        (f) => f.endsWith(".ts") && f !== "index.ts",
       );
 
       if (tsFiles.length > 0) {
@@ -160,15 +160,15 @@ import { /* exports */ } from "${pkg.name}";
 
         // Generate module index
         const moduleFrontmatter = createFrontmatter({
-          title: module.charAt(0).toUpperCase() + module.slice(1),
-          description: `${module} for ${pkg.name}`,
+          title: m.charAt(0).toUpperCase() + m.slice(1),
+          description: `${m} for ${pkg.name}`,
         });
 
         const moduleContent = `${moduleFrontmatter}
 
-# ${module.charAt(0).toUpperCase() + module.slice(1)}
+# ${m.charAt(0).toUpperCase() + m.slice(1)}
 
-## Available ${module.charAt(0).toUpperCase() + module.slice(1)}
+## Available ${m.charAt(0).toUpperCase() + m.slice(1)}
 
 ${tsFiles
   .map((file) => {
@@ -205,21 +205,21 @@ For detailed type information, please refer to the source code or use your IDE's
 
           await fs.writeFile(
             path.join(moduleOutDir, `${name}.mdx`),
-            fileContent
+            fileContent,
           );
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // Module doesn't exist
     }
   }
 
   // Generate meta.json
   const availableModules: string[] = [];
-  for (const module of modules) {
+  for (const mod of modules) {
     try {
-      await fs.access(path.join(outDir, module));
-      availableModules.push(module);
+      await fs.access(path.join(outDir, mod));
+      availableModules.push(mod);
     } catch {
       // Module doesn't exist
     }
@@ -232,7 +232,7 @@ For detailed type information, please refer to the source code or use your IDE's
 
   await fs.writeFile(
     path.join(outDir, "meta.json"),
-    JSON.stringify(metaContent, null, 2)
+    JSON.stringify(metaContent, null, 2),
   );
 }
 

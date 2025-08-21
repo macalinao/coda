@@ -7,7 +7,14 @@
     "defaultBranch": "master"
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!docs/.next",
+      "!out",
+      "!**/bun.lock",
+      "!apps/example-dapp/src/routeTree.gen.ts"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -18,23 +25,19 @@
     "lineEnding": "lf",
     "lineWidth": 80,
     "attributePosition": "auto",
-    "bracketSpacing": true,
-    "includes": [
-      "**",
-      "!**/bun.lock",
-      "!apps/example-dapp/src/routeTree.gen.ts"
-    ]
+    "bracketSpacing": true
   },
   "linter": {
     "enabled": true,
-    "domains": {
-      "project": "recommended"
-    },
+    // "domains": {
+    //   "project": "recommended"
+    // },
     "rules": {
       "recommended": true,
-      "nursery": {
-        "noFloatingPromises": "error"
-      },
+      // this thing lags super hard
+      // "nursery": {
+      //   "noFloatingPromises": "error"
+      // },
       "complexity": {
         "useSimplifiedLogicExpression": "error"
       },
@@ -69,24 +72,14 @@
         "noUnusedVariables": "warn",
         "noUnusedImports": "error"
       }
-    },
-    "includes": [
-      "**",
-      "!**/bun.lock",
-      "!apps/example-dapp/src/routeTree.gen.ts"
-    ]
+    }
   },
   "assist": {
     "actions": {
       "source": {
         "organizeImports": "on"
       }
-    },
-    "includes": [
-      "**",
-      "!**/bun.lock",
-      "!apps/example-dapp/src/routeTree.gen.ts"
-    ]
+    }
   },
   "javascript": {
     "formatter": {

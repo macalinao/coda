@@ -50,7 +50,8 @@
     "@codama/nodes-from-anchor": "*",
     "@macalinao/codama-renderers-js-esm": "workspace:*",
     "codama": "*",
-    "commander": "^14.0.0"
+    "commander": "^14.0.0",
+    "glob": "^11.0.3"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",

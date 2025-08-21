@@ -24,13 +24,13 @@ Generate your first client:
 
 ```bash
 # From default Anchor build location (./target/idl/program.json)
-bunx @macalinao/coda generate
+coda generate
 
 # From custom IDL location
-bunx @macalinao/coda generate --idl ./idls/my_program.json
+coda generate --idl ./idls/my_program.json
 
 # Initialize a configuration file
-bunx @macalinao/coda init
+coda init
 ```
 
 ## How It Works
@@ -44,6 +44,7 @@ bunx @macalinao/coda init
 ## Generated Client Structure
 
 The generated client provides:
+
 - **Instructions**: Typed builders for all program instructions
 - **Accounts**: Decoders and fetchers for all account types
 - **Types**: All TypeScript types from the IDL
@@ -62,7 +63,7 @@ const instruction = createTransferInstruction({
   source: sourceAddress,
   destination: destAddress,
   authority: authorityAddress,
-  amount: 1000n
+  amount: 1000n,
 });
 ```
 
