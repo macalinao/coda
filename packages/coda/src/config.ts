@@ -5,10 +5,8 @@ import type { Node, Visitor } from "codama";
  * Context provided to visitor functions
  */
 export interface VisitorContext {
-  /** The parsed Anchor IDL(s) */
-  idl: AnchorIdl;
   /** All parsed IDLs when using multiple IDLs */
-  idls?: AnchorIdl[];
+  idls: AnchorIdl[];
 }
 
 /**

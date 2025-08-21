@@ -28,13 +28,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
+import type { UtilizeArgs, UtilizeArgsArgs } from "../types/index.js";
+import {
+  getUtilizeArgsDecoder,
+  getUtilizeArgsEncoder,
+} from "../types/index.js";
 
 export const UTILIZE_DISCRIMINATOR = 19;
 
@@ -49,18 +52,10 @@ export type UtilizeInstruction<
   TAccountMint extends string | AccountMeta = string,
   TAccountUseAuthority extends string | AccountMeta = string,
   TAccountOwner extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAtaProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountAtaProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountRent extends string | AccountMeta = string,
   TAccountUseAuthorityRecord extends
     | string
     | AccountMeta
@@ -119,18 +114,18 @@ export type UtilizeInstruction<
 
 export interface UtilizeInstructionData {
   discriminator: number;
-  numberOfUses: bigint;
+  utilizeArgs: UtilizeArgs;
 }
 
 export interface UtilizeInstructionDataArgs {
-  numberOfUses: number | bigint;
+  utilizeArgs: UtilizeArgsArgs;
 }
 
 export function getUtilizeInstructionDataEncoder(): FixedSizeEncoder<UtilizeInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", getU8Encoder()],
-      ["numberOfUses", getU64Encoder()],
+      ["utilizeArgs", getUtilizeArgsEncoder()],
     ]),
     (value) => ({ ...value, discriminator: UTILIZE_DISCRIMINATOR }),
   );
@@ -139,7 +134,7 @@ export function getUtilizeInstructionDataEncoder(): FixedSizeEncoder<UtilizeInst
 export function getUtilizeInstructionDataDecoder(): FixedSizeDecoder<UtilizeInstructionData> {
   return getStructDecoder([
     ["discriminator", getU8Decoder()],
-    ["numberOfUses", getU64Decoder()],
+    ["utilizeArgs", getUtilizeArgsDecoder()],
   ]);
 }
 
@@ -177,18 +172,18 @@ export interface UtilizeInput<
   /** Owner */
   owner: Address<TAccountOwner>;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram: Address<TAccountTokenProgram>;
   /** Associated Token program */
-  ataProgram?: Address<TAccountAtaProgram>;
+  ataProgram: Address<TAccountAtaProgram>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Rent info */
-  rent?: Address<TAccountRent>;
+  rent: Address<TAccountRent>;
   /** Use Authority Record PDA If present the program Assumes a delegated use authority */
   useAuthorityRecord?: Address<TAccountUseAuthorityRecord>;
   /** Program As Signer (Burner) */
   burner?: Address<TAccountBurner>;
-  numberOfUses: UtilizeInstructionDataArgs["numberOfUses"];
+  utilizeArgs: UtilizeInstructionDataArgs["utilizeArgs"];
 }
 
 export function getUtilizeInstruction<
@@ -261,24 +256,6 @@ export function getUtilizeInstruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.ataProgram.value) {
-    accounts.ataProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.rent.value) {
-    accounts.rent.value =
-      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   const instruction = {

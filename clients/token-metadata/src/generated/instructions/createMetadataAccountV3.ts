@@ -16,8 +16,6 @@ import type {
   Instruction,
   InstructionWithAccounts,
   InstructionWithData,
-  Option,
-  OptionOrNullable,
   ReadonlyAccount,
   ReadonlySignerAccount,
   ReadonlyUint8Array,
@@ -27,10 +25,6 @@ import type {
 } from "@solana/kit";
 import {
   combineCodec,
-  getBooleanDecoder,
-  getBooleanEncoder,
-  getOptionDecoder,
-  getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -41,16 +35,12 @@ import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 import type {
-  CollectionDetails,
-  CollectionDetailsArgs,
-  DataV2,
-  DataV2Args,
+  CreateMetadataAccountArgsV3,
+  CreateMetadataAccountArgsV3Args,
 } from "../types/index.js";
 import {
-  getCollectionDetailsDecoder,
-  getCollectionDetailsEncoder,
-  getDataV2Decoder,
-  getDataV2Encoder,
+  getCreateMetadataAccountArgsV3Decoder,
+  getCreateMetadataAccountArgsV3Encoder,
 } from "../types/index.js";
 
 export const CREATE_METADATA_ACCOUNT_V3_DISCRIMINATOR = 33;
@@ -66,9 +56,7 @@ export type CreateMetadataAccountV3Instruction<
   TAccountMintAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta = string,
   TAccountRent extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -108,24 +96,18 @@ export type CreateMetadataAccountV3Instruction<
 
 export interface CreateMetadataAccountV3InstructionData {
   discriminator: number;
-  data: DataV2;
-  isMutable: boolean;
-  collectionDetails: Option<CollectionDetails>;
+  createMetadataAccountArgsV3: CreateMetadataAccountArgsV3;
 }
 
 export interface CreateMetadataAccountV3InstructionDataArgs {
-  data: DataV2Args;
-  isMutable: boolean;
-  collectionDetails: OptionOrNullable<CollectionDetailsArgs>;
+  createMetadataAccountArgsV3: CreateMetadataAccountArgsV3Args;
 }
 
 export function getCreateMetadataAccountV3InstructionDataEncoder(): Encoder<CreateMetadataAccountV3InstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", getU8Encoder()],
-      ["data", getDataV2Encoder()],
-      ["isMutable", getBooleanEncoder()],
-      ["collectionDetails", getOptionEncoder(getCollectionDetailsEncoder())],
+      ["createMetadataAccountArgsV3", getCreateMetadataAccountArgsV3Encoder()],
     ]),
     (value) => ({
       ...value,
@@ -137,9 +119,7 @@ export function getCreateMetadataAccountV3InstructionDataEncoder(): Encoder<Crea
 export function getCreateMetadataAccountV3InstructionDataDecoder(): Decoder<CreateMetadataAccountV3InstructionData> {
   return getStructDecoder([
     ["discriminator", getU8Decoder()],
-    ["data", getDataV2Decoder()],
-    ["isMutable", getBooleanDecoder()],
-    ["collectionDetails", getOptionDecoder(getCollectionDetailsDecoder())],
+    ["createMetadataAccountArgsV3", getCreateMetadataAccountArgsV3Decoder()],
   ]);
 }
 
@@ -175,12 +155,10 @@ export interface CreateMetadataAccountV3Input<
     | Address<TAccountUpdateAuthority>
     | TransactionSigner<TAccountUpdateAuthority>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-  data: CreateMetadataAccountV3InstructionDataArgs["data"];
-  isMutable: CreateMetadataAccountV3InstructionDataArgs["isMutable"];
-  collectionDetails: CreateMetadataAccountV3InstructionDataArgs["collectionDetails"];
+  createMetadataAccountArgsV3: CreateMetadataAccountV3InstructionDataArgs["createMetadataAccountArgsV3"];
 }
 
 export function getCreateMetadataAccountV3Instruction<
@@ -240,12 +218,6 @@ export function getCreateMetadataAccountV3Instruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   const instruction = {

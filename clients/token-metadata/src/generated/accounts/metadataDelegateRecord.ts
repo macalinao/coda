@@ -149,7 +149,3 @@ export async function fetchAllMaybeMetadataDelegateRecord(
     decodeMetadataDelegateRecord(maybeAccount),
   );
 }
-
-export function getMetadataDelegateRecordSize(): number {
-  return 98;
-}

@@ -6,6 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
+export * from "./approveUseAuthorityArgs.js";
 export * from "./assetData.js";
 export * from "./authorityType.js";
 export * from "./authorizationData.js";
@@ -15,6 +16,8 @@ export * from "./collectionDetails.js";
 export * from "./collectionDetailsToggle.js";
 export * from "./collectionToggle.js";
 export * from "./createArgs.js";
+export * from "./createMasterEditionArgs.js";
+export * from "./createMetadataAccountArgsV3.js";
 export * from "./creator.js";
 export * from "./data.js";
 export * from "./dataV2.js";
@@ -44,10 +47,13 @@ export * from "./tokenDelegateRole.js";
 export * from "./tokenStandard.js";
 export * from "./tokenState.js";
 export * from "./transferArgs.js";
+export * from "./transferOutOfEscrowArgs.js";
 export * from "./unlockArgs.js";
 export * from "./updateArgs.js";
+export * from "./updateMetadataAccountArgsV2.js";
 export * from "./useArgs.js";
 export * from "./useMethod.js";
 export * from "./uses.js";
 export * from "./usesToggle.js";
+export * from "./utilizeArgs.js";
 export * from "./verificationArgs.js";

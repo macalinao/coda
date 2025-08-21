@@ -119,7 +119,3 @@ export async function fetchAllMaybeEdition(
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeEdition(maybeAccount));
 }
-
-export function getEditionSize(): number {
-  return 41;
-}

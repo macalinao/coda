@@ -17,7 +17,6 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   assertAccountExists,
@@ -26,37 +25,37 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
+  getArrayDecoder,
+  getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
 } from "@solana/kit";
 import type { Key, KeyArgs } from "../types/index.js";
 import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
 
 export interface EditionMarker {
   key: Key;
-  ledger: ReadonlyUint8Array;
+  ledger: number[];
 }
 
 export interface EditionMarkerArgs {
   key: KeyArgs;
-  ledger: ReadonlyUint8Array;
+  ledger: number[];
 }
 
 export function getEditionMarkerEncoder(): FixedSizeEncoder<EditionMarkerArgs> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
-    ["ledger", fixEncoderSize(getBytesEncoder(), 31)],
+    ["ledger", getArrayEncoder(getU8Encoder(), { size: 31 })],
   ]);
 }
 
 export function getEditionMarkerDecoder(): FixedSizeDecoder<EditionMarker> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
-    ["ledger", fixDecoderSize(getBytesDecoder(), 31)],
+    ["ledger", getArrayDecoder(getU8Decoder(), { size: 31 })],
   ]);
 }
 
@@ -122,8 +121,4 @@ export async function fetchAllMaybeEditionMarker(
 ): Promise<MaybeAccount<EditionMarker>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeEditionMarker(maybeAccount));
-}
-
-export function getEditionMarkerSize(): number {
-  return 32;
 }

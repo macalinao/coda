@@ -48,12 +48,8 @@ export type CloseEscrowAccountInstruction<
   TAccountTokenAccount extends string | AccountMeta = string,
   TAccountEdition extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSysvarInstructions extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -141,9 +137,9 @@ export interface CloseEscrowAccountInput<
   /** Wallet paying for the transaction and new account */
   payer: TransactionSigner<TAccountPayer>;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram: Address<TAccountSystemProgram>;
   /** Instructions sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions: Address<TAccountSysvarInstructions>;
 }
 
 export function getCloseEscrowAccountInstruction<
@@ -201,16 +197,6 @@ export function getCloseEscrowAccountInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
-
-  // Resolve default values.
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.sysvarInstructions.value) {
-    accounts.sysvarInstructions.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {

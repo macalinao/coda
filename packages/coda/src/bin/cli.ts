@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { AnchorIdl, IdlV01 } from "@codama/nodes-from-anchor";
-import { rootNodeFromAnchorV01 } from "@codama/nodes-from-anchor";
+import type { AnchorIdl, IdlV00, IdlV01 } from "@codama/nodes-from-anchor";
+import {
+  programNodeFromAnchorV00,
+  programNodeFromAnchorV01,
+} from "@codama/nodes-from-anchor";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
-import { createFromRoot } from "codama";
+import { createFromRoot, rootNode } from "codama";
 import { Command } from "commander";
 import { glob } from "glob";
 import type { CodaConfig } from "../config.js";
@@ -131,14 +134,21 @@ program
 
       // Create root nodes from IDL(s)
       // Note: rootNodeFromAnchor can accept additional IDLs as external programs
-      const [firstIdl, ...restIdls] = idls;
-      if (!firstIdl) {
-        throw new Error("Unexpected: No IDL files loaded");
+      const programNodes = idls.map((idl) => {
+        if (
+          idl.metadata &&
+          "spec" in idl.metadata &&
+          idl.metadata.spec === "0.1.0"
+        ) {
+          return programNodeFromAnchorV01(idl as unknown as IdlV01);
+        }
+        return programNodeFromAnchorV00(idl as unknown as IdlV00);
+      });
+      const [firstProgramNode, ...restProgramNodes] = programNodes;
+      if (!firstProgramNode) {
+        throw new Error("Unexpected: No program nodes loaded");
       }
-      const root = rootNodeFromAnchorV01(
-        firstIdl as unknown as IdlV01,
-        restIdls as unknown as IdlV01[],
-      );
+      const root = rootNode(firstProgramNode, restProgramNodes);
       const codama = createFromRoot(root);
 
       // Apply additional visitors from config
@@ -146,7 +156,7 @@ program
         // Resolve visitors - either array or function
         const visitors =
           typeof config.visitors === "function"
-            ? config.visitors({ idl: firstIdl, idls })
+            ? config.visitors({ idls })
             : config.visitors;
 
         if (visitors.length > 0) {
