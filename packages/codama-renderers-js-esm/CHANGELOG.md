@@ -1,5 +1,11 @@
 # @macalinao/codama-renderers-js-esm
 
+## 0.2.1
+
+### Patch Changes
+
+- 80235e4: Update README for copyright notices
+
 ## 0.2.0
 
 ### Minor Changes
