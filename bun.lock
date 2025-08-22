@@ -20,7 +20,7 @@
     },
     "apps/docs": {
       "name": "coda-docs",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "fumadocs-core": "15.7.0",
         "fumadocs-mdx": "11.8.0",
@@ -44,7 +44,7 @@
     },
     "clients/quarry": {
       "name": "@macalinao/clients-quarry",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "devDependencies": {
         "@macalinao/coda": "workspace:*",
         "@macalinao/codama-rename-visitor": "workspace:*",
@@ -61,7 +61,7 @@
     },
     "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "devDependencies": {
         "@macalinao/coda": "workspace:*",
         "@macalinao/eslint-config": "catalog:",
@@ -77,7 +77,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -99,7 +99,7 @@
     },
     "packages/codama-instruction-accounts-dedupe-visitor": {
       "name": "@macalinao/codama-instruction-accounts-dedupe-visitor",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@codama/nodes-from-anchor": "*",
         "codama": "*",
@@ -113,7 +113,7 @@
     },
     "packages/codama-rename-visitor": {
       "name": "@macalinao/codama-rename-visitor",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "codama": "*",
       },
@@ -126,7 +126,7 @@
     },
     "packages/codama-renderers-js-esm": {
       "name": "@macalinao/codama-renderers-js-esm",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@codama/renderers-core": "*",
         "@codama/renderers-js": "*",
