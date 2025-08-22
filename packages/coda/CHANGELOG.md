@@ -1,5 +1,13 @@
 # @macalinao/grill-cli
 
+## 0.2.2
+
+### Patch Changes
+
+- f7a50ca: Add codama-renderers-markdown
+- Updated dependencies [f7a50ca]
+  - @macalinao/codama-renderers-markdown@0.1.1
+
 ## 0.2.1
 
 ### Patch Changes
