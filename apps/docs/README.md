@@ -73,3 +73,9 @@ For better documentation layout, use the `<Cards>` component for link grids:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
 - [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
 - [Coda Repository](https://github.com/macalinao/coda) - main Coda repository
+
+## License
+
+Copyright © 2025 Ian Macalinao
+
+Licensed under the Apache License, Version 2.0

@@ -36,4 +36,6 @@ import {} from /* generated exports */ "@macalinao/clients-token-metadata";
 
 ## License
 
-Apache-2.0
+Copyright © 2025 Ian Macalinao
+
+Licensed under the Apache License, Version 2.0

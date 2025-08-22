@@ -73,4 +73,6 @@ The visitor transforms nested account structures by:
 
 ## License
 
-MIT
+Copyright © 2025 Ian Macalinao
+
+Licensed under the Apache License, Version 2.0

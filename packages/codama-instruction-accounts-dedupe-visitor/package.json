@@ -6,7 +6,7 @@
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
   "homepage": "https://github.com/macalinao/coda",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "codama",
     "solana",

@@ -441,4 +441,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-Apache-2.0
+Copyright © 2025 Ian Macalinao
+
+Licensed under the Apache License, Version 2.0
