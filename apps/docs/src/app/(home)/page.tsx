@@ -14,53 +14,90 @@ export default function HomePage() {
           </p>
 
           {/* Terminal Mockup */}
-          <div className="mx-auto mb-12 max-w-2xl">
+          <div className="mx-auto mb-12 max-w-3xl">
             <div className="overflow-hidden rounded-lg border border-fd-border bg-fd-card shadow-xl">
               {/* Terminal Header */}
-              <div className="flex items-center gap-2 border-b border-fd-border bg-fd-muted/30 px-4 py-3">
+              <div className="flex items-center gap-2 border-b border-fd-border bg-fd-muted/30 px-4 py-2">
                 <div className="flex gap-1.5">
                   <div className="h-3 w-3 rounded-full bg-red-500" />
                   <div className="h-3 w-3 rounded-full bg-yellow-500" />
                   <div className="h-3 w-3 rounded-full bg-green-500" />
                 </div>
                 <span className="ml-2 text-xs text-fd-muted-foreground">
-                  Terminal
+                  ~/my-solana-project
                 </span>
               </div>
 
               {/* Terminal Content */}
-              <div className="bg-black p-6 font-mono text-sm">
-                <div className="space-y-2">
-                  <div className="flex items-start">
-                    <span className="mr-2 text-green-400">$</span>
-                    <span className="text-white">coda generate</span>
-                  </div>
-                  <div className="text-fd-muted-foreground">
-                    <div className="ml-4">
-                      <div>✓ Found IDL at ./idls/my_program.json</div>
-                      <div>✓ Parsing Anchor IDL...</div>
-                      <div>✓ Building AST from 12 instructions</div>
-                      <div>✓ Applying visitor transformations</div>
-                      <div>✓ Generating TypeScript client...</div>
-                      <div className="mt-2 text-green-400">
-                        ✓ Client generated successfully at ./src/generated
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 border-t border-gray-800 pt-4">
-                    <div className="flex items-start">
-                      <span className="mr-2 text-green-400">$</span>
-                      <span className="text-white">ls ./src/generated</span>
-                    </div>
-                    <div className="ml-4 mt-1 grid grid-cols-2 gap-x-4 text-blue-400">
-                      <div>accounts/</div>
-                      <div>instructions/</div>
-                      <div>errors/</div>
-                      <div>pdas/</div>
-                      <div>types/</div>
-                      <div>index.ts</div>
-                    </div>
-                  </div>
+              <div className="bg-[#0c0c0c] p-4 font-mono text-xs text-left leading-relaxed">
+                <div className="text-gray-300">
+                  <span className="text-cyan-400">~/my-solana-project</span>
+                  <span className="text-gray-500"> main</span>
+                  <br />
+                  <span className="text-green-400">❯</span>
+                  <span className="ml-2 text-white">coda generate</span>
+                  <br />
+                  <br />
+                  <span className="text-gray-400">⠋ Searching for IDL files...</span>
+                  <br />
+                  <span className="text-green-400">✓</span>
+                  <span className="ml-2 text-gray-300">Found IDL at ./idls/my_program.json</span>
+                  <br />
+                  <span className="text-green-400">✓</span>
+                  <span className="ml-2 text-gray-300">Parsing Anchor IDL...</span>
+                  <br />
+                  <span className="text-green-400">✓</span>
+                  <span className="ml-2 text-gray-300">Building AST from 12 instructions</span>
+                  <br />
+                  <span className="text-green-400">✓</span>
+                  <span className="ml-2 text-gray-300">Applying visitor transformations</span>
+                  <br />
+                  <span className="text-green-400">✓</span>
+                  <span className="ml-2 text-gray-300">Generating TypeScript client...</span>
+                  <br />
+                  <br />
+                  <span className="text-green-400 font-bold">✓ Client generated successfully</span>
+                  <span className="ml-2 text-gray-500">at ./src/generated</span>
+                  <br />
+                  <br />
+                  <span className="text-cyan-400">~/my-solana-project</span>
+                  <span className="text-gray-500"> main</span>
+                  <br />
+                  <span className="text-green-400">❯</span>
+                  <span className="ml-2 text-white">ls -la ./src/generated</span>
+                  <br />
+                  <span className="text-gray-500">total 24</span>
+                  <br />
+                  <span className="text-gray-300">drwxr-xr-x  8 user  staff   256 Aug 22 10:02 </span>
+                  <span className="text-cyan-400">.</span>
+                  <br />
+                  <span className="text-gray-300">drwxr-xr-x  5 user  staff   160 Aug 22 10:02 </span>
+                  <span className="text-cyan-400">..</span>
+                  <br />
+                  <span className="text-gray-300">drwxr-xr-x  4 user  staff   128 Aug 22 10:02 </span>
+                  <span className="text-blue-400">accounts</span>
+                  <br />
+                  <span className="text-gray-300">drwxr-xr-x  3 user  staff    96 Aug 22 10:02 </span>
+                  <span className="text-blue-400">errors</span>
+                  <br />
+                  <span className="text-gray-300">-rw-r--r--  1 user  staff  1024 Aug 22 10:02 </span>
+                  <span className="text-white">index.ts</span>
+                  <br />
+                  <span className="text-gray-300">drwxr-xr-x  6 user  staff   192 Aug 22 10:02 </span>
+                  <span className="text-blue-400">instructions</span>
+                  <br />
+                  <span className="text-gray-300">drwxr-xr-x  3 user  staff    96 Aug 22 10:02 </span>
+                  <span className="text-blue-400">pdas</span>
+                  <br />
+                  <span className="text-gray-300">drwxr-xr-x  5 user  staff   160 Aug 22 10:02 </span>
+                  <span className="text-blue-400">types</span>
+                  <br />
+                  <br />
+                  <span className="text-cyan-400">~/my-solana-project</span>
+                  <span className="text-gray-500"> main</span>
+                  <br />
+                  <span className="text-green-400">❯</span>
+                  <span className="ml-2 text-gray-500 animate-pulse">_</span>
                 </div>
               </div>
             </div>
