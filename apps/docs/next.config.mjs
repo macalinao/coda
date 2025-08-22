@@ -4,11 +4,8 @@ const withMDX = createMDX();
 
 /** @type {import('next').NextConfig} */
 const config = {
-  output: "export",
   reactStrictMode: true,
-  experimental: {
-    webpackMemoryOptimizations: true,
-  },
+  output: "export",
 };
 
 export default withMDX(config);

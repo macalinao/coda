@@ -1,0 +1,11 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "index",
+    "installation",
+    "quick-start",
+    "why-coda",
+    "configuration",
+    "api"
+  ]
+}

@@ -6,9 +6,9 @@
   "author": "Ian Macalinao <me@ianm.com>",
   "workspaces": {
     "packages": [
+      "apps/*",
       "packages/*",
-      "clients/*",
-      "docs"
+      "clients/*"
     ],
     "catalog": {
       "eslint": "^9.33.0",
