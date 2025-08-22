@@ -62,8 +62,10 @@ coda/
 │   └── codama-renderers-js-esm/                    # ESM-native renderer
 ├── clients/                # Generated client libraries
 │   └── token-metadata/     # Metaplex Token Metadata client
-├── docs/                   # Documentation
-└── scripts/               # Build and CI scripts
+├── docs/                   # Documentation site (Fumadocs + Next.js)
+├── scripts/               # Build and CI scripts
+└── vendor/                 # Vendored dependencies for reference
+    └── fumadocs/          # Fumadocs source for configuration reference
 ```
 
 ## Core Packages
@@ -309,6 +311,37 @@ When writing documentation for Coda or generated clients:
    - Link to example repositories (e.g., token-metadata for single IDL, quarry for multiple IDLs)
    - Reference the official Codama documentation where appropriate
    - Include links to Anchor documentation for IDL-related topics
+
+## Documentation Site
+
+The `docs/` folder contains the documentation site built with Fumadocs and Next.js 15. The structure follows the Fumadocs reference implementation in `vendor/fumadocs/apps/docs/`.
+
+### Tech Stack
+- **Framework**: Next.js 15 with App Router
+- **Documentation**: Fumadocs UI
+- **Styling**: Tailwind CSS v4 (no config file needed, uses @source directives)
+- **MDX**: Fumadocs MDX with Shiki syntax highlighting
+- **Themes**: Catppuccin Latte (light) / Catppuccin Mocha (dark) for code blocks
+- **Linting**: Modern ESLint flat config (eslint.config.mjs)
+
+### Development
+```bash
+cd docs
+bun run dev     # Start dev server on localhost:3000
+bun run build   # Build for production
+```
+
+### Adding Documentation
+1. Create MDX files in `docs/content/docs/`
+2. Update navigation in `meta.json` files if needed
+3. Code blocks automatically get syntax highlighting
+4. Use frontmatter for page metadata (title, description)
+
+### Key Files
+- `src/app/layout.config.tsx` - Site branding and navigation
+- `source.config.ts` - MDX and syntax highlighting config
+- `src/app/global.css` - Tailwind v4 imports with @source directives
+- `content/docs/` - Documentation content in MDX
 
 ## Troubleshooting
 

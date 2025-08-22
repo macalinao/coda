@@ -6,6 +6,7 @@
   "author": "Ian Macalinao <me@ianm.com>",
   "workspaces": {
     "packages": [
+      "apps/*",
       "packages/*",
       "clients/*",
       "docs"
