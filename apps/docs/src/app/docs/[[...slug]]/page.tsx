@@ -20,7 +20,16 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const MDXContent = page.data.body;
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage
+      toc={page.data.toc}
+      full={page.data.full}
+      editOnGithub={{
+        owner: "macalinao",
+        repo: "coda",
+        sha: "master",
+        path: `apps/docs/content/docs/${params.slug?.join("/") || "index"}.mdx`,
+      }}
+    >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
