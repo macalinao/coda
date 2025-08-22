@@ -8,13 +8,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": [
-      "**",
-      "!docs/.next",
-      "!out",
-      "!**/bun.lock",
-      "!apps/example-dapp/src/routeTree.gen.ts"
-    ]
+    "includes": ["**", "!docs/.next", "!out", "!**/bun.lock", "!vendor"]
   },
   "formatter": {
     "enabled": true,

@@ -38,25 +38,39 @@ export default function HomePage() {
                   <span className="ml-2 text-white">coda generate</span>
                   <br />
                   <br />
-                  <span className="text-gray-400">⠋ Searching for IDL files...</span>
+                  <span className="text-gray-400">
+                    ⠋ Searching for IDL files...
+                  </span>
                   <br />
                   <span className="text-green-400">✓</span>
-                  <span className="ml-2 text-gray-300">Found IDL at ./idls/my_program.json</span>
+                  <span className="ml-2 text-gray-300">
+                    Found IDL at ./idls/my_program.json
+                  </span>
                   <br />
                   <span className="text-green-400">✓</span>
-                  <span className="ml-2 text-gray-300">Parsing Anchor IDL...</span>
+                  <span className="ml-2 text-gray-300">
+                    Parsing Anchor IDL...
+                  </span>
                   <br />
                   <span className="text-green-400">✓</span>
-                  <span className="ml-2 text-gray-300">Building AST from 12 instructions</span>
+                  <span className="ml-2 text-gray-300">
+                    Building AST from 12 instructions
+                  </span>
                   <br />
                   <span className="text-green-400">✓</span>
-                  <span className="ml-2 text-gray-300">Applying visitor transformations</span>
+                  <span className="ml-2 text-gray-300">
+                    Applying visitor transformations
+                  </span>
                   <br />
                   <span className="text-green-400">✓</span>
-                  <span className="ml-2 text-gray-300">Generating TypeScript client...</span>
+                  <span className="ml-2 text-gray-300">
+                    Generating TypeScript client...
+                  </span>
                   <br />
                   <br />
-                  <span className="text-green-400 font-bold">✓ Client generated successfully</span>
+                  <span className="text-green-400 font-bold">
+                    ✓ Client generated successfully
+                  </span>
                   <span className="ml-2 text-gray-500">at ./src/generated</span>
                   <br />
                   <br />
@@ -64,32 +78,50 @@ export default function HomePage() {
                   <span className="text-gray-500"> main</span>
                   <br />
                   <span className="text-green-400">❯</span>
-                  <span className="ml-2 text-white">ls -la ./src/generated</span>
+                  <span className="ml-2 text-white">
+                    ls -la ./src/generated
+                  </span>
                   <br />
                   <span className="text-gray-500">total 24</span>
                   <br />
-                  <span className="text-gray-300">drwxr-xr-x  8 user  staff   256 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    drwxr-xr-x 8 user staff 256 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-cyan-400">.</span>
                   <br />
-                  <span className="text-gray-300">drwxr-xr-x  5 user  staff   160 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    drwxr-xr-x 5 user staff 160 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-cyan-400">..</span>
                   <br />
-                  <span className="text-gray-300">drwxr-xr-x  4 user  staff   128 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    drwxr-xr-x 4 user staff 128 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-blue-400">accounts</span>
                   <br />
-                  <span className="text-gray-300">drwxr-xr-x  3 user  staff    96 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    drwxr-xr-x 3 user staff 96 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-blue-400">errors</span>
                   <br />
-                  <span className="text-gray-300">-rw-r--r--  1 user  staff  1024 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    -rw-r--r-- 1 user staff 1024 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-white">index.ts</span>
                   <br />
-                  <span className="text-gray-300">drwxr-xr-x  6 user  staff   192 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    drwxr-xr-x 6 user staff 192 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-blue-400">instructions</span>
                   <br />
-                  <span className="text-gray-300">drwxr-xr-x  3 user  staff    96 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    drwxr-xr-x 3 user staff 96 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-blue-400">pdas</span>
                   <br />
-                  <span className="text-gray-300">drwxr-xr-x  5 user  staff   160 Aug 22 10:02 </span>
+                  <span className="text-gray-300">
+                    drwxr-xr-x 5 user staff 160 Aug 22 10:02{" "}
+                  </span>
                   <span className="text-blue-400">types</span>
                   <br />
                   <br />
