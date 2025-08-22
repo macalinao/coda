@@ -1,0 +1,213 @@
+---
+title: Generating TypeScript Clients
+description: Generate type-safe TypeScript clients for your Solana programs
+---
+
+Coda's primary feature is generating fully type-safe TypeScript clients from your Anchor IDLs. These clients provide a modern, ergonomic API for interacting with your Solana programs.
+
+## Basic Usage
+
+To generate a TypeScript client for your program:
+
+```bash
+coda generate
+```
+
+This command will:
+1. Look for IDL files in `./idls/*.json` (or use your configured path)
+2. Generate TypeScript code to `./src/generated/` directory
+3. Create a complete client with types, instructions, accounts, and more
+
+## What Gets Generated
+
+Coda generates a comprehensive TypeScript client that includes:
+
+### 1. **Programs**
+Program constants and metadata:
+```typescript
+export const MY_PROGRAM_PROGRAM_ADDRESS = 
+  "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+```
+
+### 2. **Instructions**
+Type-safe instruction builders:
+```typescript
+import { createTransferInstruction } from "./generated";
+
+const instruction = createTransferInstruction({
+  source: sourceAddress,
+  destination: destAddress,
+  authority: authorityAddress,
+  amount: 1000n,
+});
+```
+
+### 3. **Accounts**
+Account decoders and fetchers:
+```typescript
+import { fetchMintAccount, decodeMintAccount } from "./generated";
+
+// Fetch and decode in one call
+const mint = await fetchMintAccount(rpc, mintAddress);
+
+// Or decode manually
+const accountInfo = await rpc.getAccountInfo(mintAddress);
+const mint = decodeMintAccount(accountInfo.data);
+```
+
+### 4. **Types**
+All TypeScript types from your IDL:
+```typescript
+import type { TokenMetadata, Creator } from "./generated";
+
+const metadata: TokenMetadata = {
+  name: "My NFT",
+  symbol: "NFT",
+  uri: "https://example.com/metadata.json",
+  creators: [],
+};
+```
+
+### 5. **PDAs (Program Derived Addresses)**
+Helper functions for deriving PDAs:
+```typescript
+import { findMetadataPda } from "./generated";
+
+const [metadataAddress, bump] = await findMetadataPda({
+  mint: mintAddress,
+});
+```
+
+### 6. **Errors**
+Typed error enums and handlers:
+```typescript
+import { MyProgramError, isMyProgramError } from "./generated";
+
+try {
+  // ... program interaction
+} catch (error) {
+  if (isMyProgramError(error, MyProgramError.InsufficientFunds)) {
+    console.log("Not enough funds!");
+  }
+}
+```
+
+## Configuration
+
+Client generation can be customized through `coda.config.mjs`. See the [Configuration](/docs/configuration) page for detailed options including:
+- Custom IDL paths and output directories
+- Working with multiple programs
+- Adding custom PDAs with visitors
+- Handling naming conflicts between programs
+
+For a real-world example with multiple programs, see the [Quarry configuration](https://github.com/macalinao/coda/blob/master/clients/quarry/coda.config.mjs).
+
+## ES Modules Support
+
+All generated code uses proper ES modules with `.js` extensions:
+
+```typescript
+// All imports use .js extensions
+import { something } from "./types/index.js";
+```
+
+This ensures compatibility with modern TypeScript and Node.js configurations using `"type": "module"`.
+
+## Command Options
+
+The `coda generate` command accepts several options. See the [Configuration](/docs/configuration#generate-command) page for all available command-line arguments.
+
+## Integration Example
+
+Here's a complete example of using a generated client:
+
+```typescript
+import { 
+  createMintInstruction,
+  createTransferInstruction,
+  fetchTokenAccount,
+  findAssociatedTokenAddress,
+} from "./generated";
+import { generateKeyPair, createSolanaRpc } from "@solana/web3.js";
+
+// Setup
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const authority = await generateKeyPair();
+
+// Find PDA
+const [ataAddress] = await findAssociatedTokenAddress({
+  owner: authority.address,
+  mint: mintAddress,
+});
+
+// Create instruction
+const mintIx = createMintInstruction({
+  mint: mintAddress,
+  destination: ataAddress,
+  authority: authority.address,
+  amount: 1000n,
+});
+
+// Send transaction
+const signature = await rpc.sendTransaction({
+  instructions: [mintIx],
+  signers: [authority],
+});
+
+// Fetch account
+const tokenAccount = await fetchTokenAccount(rpc, ataAddress);
+console.log("Balance:", tokenAccount.amount);
+```
+
+## Advanced Features
+
+### Custom Visitors
+
+Coda uses the Codama visitor pattern for AST transformations. You can:
+- Rename types and instructions
+- Add custom PDAs
+- Modify account structures
+- Transform field types
+- And much more
+
+### Discriminator Handling
+
+Coda automatically handles Anchor's 8-byte discriminators for accounts and instructions, so you don't need to worry about them in your client code.
+
+### BigInt Support
+
+All `u64` and `i64` values are automatically converted to JavaScript `bigint` for proper handling of large numbers:
+
+```typescript
+const amount = 1_000_000_000n; // 1 billion lamports
+```
+
+## Best Practices
+
+1. **Version Control**: Commit your `coda.config.mjs` but consider gitignoring generated files
+2. **CI/CD**: Regenerate clients in CI to ensure they're always up-to-date
+3. **Type Checking**: Use TypeScript strict mode for maximum type safety
+4. **Custom Types**: Define custom types in separate files that import from generated code
+5. **Testing**: Write tests against the generated client interfaces
+
+## Troubleshooting
+
+### Common Issues
+
+**IDL not found**
+```bash
+Error: IDL file not found at ./idls/*.json
+```
+Solution: Ensure your Anchor program is built (`anchor build`)
+
+**TypeScript errors**
+```bash
+Cannot find module './types/index.js'
+```
+Solution: Make sure your `tsconfig.json` has proper module resolution settings
+
+**Import errors**
+```bash
+ERR_MODULE_NOT_FOUND
+```
+Solution: Ensure your `package.json` has `"type": "module"` set

@@ -1,0 +1,53 @@
+import { getAllPrograms } from "@codama/nodes";
+import { RenderMap } from "@codama/renderers-core";
+import {
+  getRecordLinkablesVisitor,
+  LinkableDictionary,
+  rootNodeVisitor,
+  visit,
+} from "@codama/visitors-core";
+import * as prettier from "prettier";
+import { renderProgram } from "./renderers/renderProgram.js";
+import type { RenderMarkdownOptions } from "./types.js";
+
+export function renderMarkdownVisitor(
+  outputDir: string,
+  options: RenderMarkdownOptions = {},
+): ReturnType<typeof rootNodeVisitor> {
+  const linkables = new LinkableDictionary();
+
+  return rootNodeVisitor(async (root) => {
+    // Record linkables using getRecordLinkablesVisitor
+    visit(root, getRecordLinkablesVisitor(linkables));
+
+    const map = new RenderMap();
+    const programs = getAllPrograms(root);
+
+    // Generate markdown for each program
+    for (const program of programs) {
+      let markdown = renderProgram(program, { linkables, options });
+
+      // Format with prettier if requested
+      if (options.formatWithPrettier !== false) {
+        // Debug: log the markdown before prettier
+        // console.log("BEFORE PRETTIER:", markdown.substring(0, 2000));
+        markdown = await prettier.format(markdown, {
+          parser: "markdown",
+          printWidth: options.prettierOptions?.printWidth ?? 120,
+          tabWidth: options.prettierOptions?.tabWidth ?? 2,
+          proseWrap: options.prettierOptions?.proseWrap ?? "preserve",
+        });
+      }
+
+      // Convert camelCase to kebab-case for filename
+      const kebabCase = program.name
+        .replace(/([A-Z])/g, "-$1") // Add dash before capitals
+        .toLowerCase()
+        .replace(/^-/, ""); // Remove leading dash if present
+      const filename = `${kebabCase}.md`;
+      map.add(filename, markdown);
+    }
+
+    map.write(outputDir);
+  });
+}

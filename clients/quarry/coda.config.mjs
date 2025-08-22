@@ -9,6 +9,9 @@ import { renameVisitor } from "@macalinao/codama-rename-visitor";
 
 export default defineConfig({
   outputDir: "./src/generated",
+  docs: {
+    npmPackageName: "@macalinao/clients-quarry",
+  },
 
   visitors: [
     addPdasVisitor({

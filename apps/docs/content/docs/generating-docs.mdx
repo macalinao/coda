@@ -1,0 +1,212 @@
+---
+title: Generating Documentation
+description: Generate beautiful markdown documentation for your Solana programs
+---
+
+Coda can automatically generate comprehensive markdown documentation for your Solana programs directly from your Anchor IDLs. This documentation includes all accounts, instructions, PDAs, types, and errors in a well-organized, readable format.
+
+## Basic Usage
+
+To generate documentation for your program:
+
+```bash
+coda docs
+```
+
+This command will:
+1. Look for IDL files in `./idls/*.json` (or use your configured path)
+2. Generate markdown documentation to `./docs/` directory
+3. Create one markdown file per program with kebab-case naming
+
+## Configuration
+
+Documentation generation can be customized through `coda.config.mjs`. See the [Configuration](/docs/configuration) page for base configuration options.
+
+### Documentation-Specific Options
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+
+export default defineConfig({
+  // Documentation options
+  docs: {
+    // Custom output directory for docs (default: "./docs")
+    path: "./documentation",
+    // Add NPM package badge and link
+    npmPackageName: "@my-org/my-solana-client",
+  },
+});
+```
+
+### Custom Output Directory
+
+To generate documentation to a different directory:
+
+```javascript
+export default defineConfig({
+  docs: {
+    path: "./my-custom-docs",
+  },
+});
+```
+
+## NPM Package Integration
+
+If you've published a TypeScript client for your program, you can include NPM package information in your documentation:
+
+```javascript
+export default defineConfig({
+  docs: {
+    npmPackageName: "@my-org/my-solana-client",
+  },
+});
+```
+
+This will add:
+- An NPM version badge at the top of the document
+- A link to your TypeScript client package on NPM
+
+Example output:
+
+```markdown
+# My Program
+
+[![npm version](https://badge.fury.io/js/%40my-org%2Fmy-solana-client.svg)](https://www.npmjs.com/package/@my-org/my-solana-client)
+
+- Program ID: `11111111111111111111111111111111`
+- TypeScript Client: [`@my-org/my-solana-client`](https://www.npmjs.com/package/@my-org/my-solana-client)
+```
+
+## Generated Documentation Structure
+
+The generated markdown documentation includes:
+
+### Program Information
+- Program name (converted to Title Case)
+- Program description (from IDL docs)
+- Program ID
+- TypeScript client link (if configured)
+
+### Table of Contents
+Automatically generated with links to all sections:
+- Accounts
+- Instructions
+- PDAs (Program Derived Addresses)
+- Types
+- Errors
+
+### Accounts Section
+For each account:
+- Account name and description
+- Data structure with field types
+- TypeScript interface representation
+- Discriminator information (if applicable)
+
+### Instructions Section
+For each instruction:
+- Instruction name and description
+- Account requirements (signer, writable status)
+- Argument types and descriptions
+- TypeScript function signature
+
+### PDAs Section
+For each PDA:
+- PDA name and description
+- Seed structure and types
+- How to derive the address
+
+### Types Section
+For each custom type:
+- Type name and description
+- Field definitions for structs
+- Variants for enums
+- TypeScript type representation
+
+### Errors Section
+All program errors in a bullet list format:
+- Error name with code in decimal, padded, and hex formats
+- Error message
+
+Example: `- **InvalidAccount** (Code: 100 / \`100\` / \`0x64\`) -- The account is invalid`
+
+## Multiple Programs
+
+When working with multiple programs, Coda generates separate documentation files for each. Each program gets its own markdown file with kebab-case naming:
+- `docs/program-one.md`
+- `docs/program-two.md`
+- etc.
+
+See the [Configuration](/docs/configuration#multiple-idls) page for details on configuring multiple IDLs.
+
+## Command Options
+
+The `coda docs` command accepts several options. See the [Configuration](/docs/configuration#docs-command) page for all available command-line arguments.
+
+## Example Output
+
+Here's what the generated documentation looks like for a simple program:
+
+```markdown
+# Token Program
+
+[![npm version](https://badge.fury.io/js/%40my-org%2Ftoken-client.svg)](https://www.npmjs.com/package/@my-org/token-client)
+
+## Description
+
+A simple SPL Token program for minting and transferring tokens.
+
+- Program ID: `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
+- TypeScript Client: [`@my-org/token-client`](https://www.npmjs.com/package/@my-org/token-client)
+
+## Table of Contents
+
+- [Accounts](#accounts)
+  - [mint](#mint)
+  - [tokenAccount](#tokenAccount)
+- [Instructions](#instructions)
+  - [initializeMint](#initializeMint)
+  - [transfer](#transfer)
+- [Errors](#errors)
+
+## Accounts
+
+### mint
+
+The mint account stores token supply and decimals.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| supply | `u64` | Total supply of tokens |
+| decimals | `u8` | Number of decimals |
+
+...
+```
+
+## Integration with Documentation Sites
+
+The generated markdown files can be easily integrated into documentation sites like:
+- GitHub Pages
+- GitBook
+- Docusaurus
+- MkDocs
+- Fumadocs
+- Or any static site generator that supports markdown
+
+## Best Practices
+
+1. **Keep IDL Documentation Updated**: Add comprehensive docs to your Anchor program using `/// Doc comments` - these will be included in the generated documentation.
+
+2. **Use Semantic Versioning**: If publishing an NPM package, keep your documentation in sync with your package version.
+
+3. **Commit Generated Docs**: Consider committing the generated documentation to your repository so it's available on GitHub.
+
+4. **Automate Generation**: Add a script to your `package.json` to regenerate docs:
+   ```json
+   {
+     "scripts": {
+       "docs": "coda docs"
+     }
+   }
+   ```
+
+5. **Custom Styling**: The generated markdown is clean and semantic, making it easy to style with your documentation site's CSS.

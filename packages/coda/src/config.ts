@@ -35,6 +35,24 @@ export interface CodaConfig {
   outputDir?: string;
 
   /**
+   * Documentation generation options.
+   */
+  docs?: {
+    /**
+     * Output directory for the generated documentation.
+     * @default "./docs"
+     */
+    path?: string;
+
+    /**
+     * NPM package name for the TypeScript client.
+     * If provided, will add an NPM badge and link to the package in the generated documentation.
+     * @example "@my-org/my-solana-client"
+     */
+    npmPackageName?: string;
+  };
+
+  /**
    * Additional root node visitors to apply to the Codama nodes before generating code.
    * These visitors are applied in order after the initial Anchor IDL parsing.
    * Can be either an array of visitors or a function that returns an array of visitors.
