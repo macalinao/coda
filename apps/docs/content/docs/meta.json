@@ -1,4 +1,11 @@
 {
   "title": "Documentation",
-  "pages": ["index", "installation", "configuration", "api", "...api/clients"]
+  "pages": [
+    "index",
+    "installation",
+    "quick-start",
+    "why-coda",
+    "configuration",
+    "api"
+  ]
 }

@@ -1,45 +1,75 @@
-# coda-docs
+# Coda Documentation
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+This is the documentation site for Coda, built with [Fumadocs](https://fumadocs.vercel.app) and Next.js.
 
-Run development server:
+## Development
 
 ```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
+# Install dependencies
+bun install
+
+# Start development server
+bun run dev
+
+# Build for production
+bun run build
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+## Structure
 
-## Explore
+```
+apps/docs/
+├── content/          # Documentation content (MDX files)
+│   └── docs/        # Main documentation pages
+├── src/
+│   ├── app/         # Next.js app directory
+│   │   ├── (home)/  # Home page layout
+│   │   └── docs/    # Documentation layout
+│   └── lib/         # Library code
+└── scripts/         # Build scripts
+```
 
-In the project, you can see:
+## Adding Documentation
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+1. Create MDX files in `content/docs/`
+2. Update navigation in `content/docs/meta.json` if needed
+3. Run `bun run dev` to preview changes
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+## Configuration
 
-### Fumadocs MDX
+- **Layout**: Site configuration in `src/lib/layout.shared.tsx`
+- **MDX**: MDX processing in `source.config.ts`
+- **Styling**: Global styles in `src/app/global.css` (Tailwind v4)
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+## Technologies
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+- **Framework**: Next.js 15 with App Router
+- **Documentation**: Fumadocs UI
+- **Styling**: Tailwind CSS v4
+- **MDX**: Fumadocs MDX with Shiki syntax highlighting
+- **Package Manager**: Bun
+
+## Using the Cards Component
+
+For better documentation layout, use the `<Cards>` component for link grids:
+
+```mdx
+<Cards>
+  <Card 
+    title="Installation" 
+    description="Step-by-step guide to install Coda"
+    href="/docs/installation"
+  />
+  <Card 
+    title="Quick Start" 
+    description="Generate your first TypeScript client"
+    href="/docs/quick-start"
+  />
+</Cards>
+```
 
 ## Learn More
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
 - [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
+- [Coda Repository](https://github.com/macalinao/coda) - main Coda repository

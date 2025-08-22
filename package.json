@@ -8,8 +8,7 @@
     "packages": [
       "apps/*",
       "packages/*",
-      "clients/*",
-      "docs"
+      "clients/*"
     ],
     "catalog": {
       "eslint": "^9.33.0",
