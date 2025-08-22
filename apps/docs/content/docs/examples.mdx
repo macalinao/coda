@@ -1,0 +1,90 @@
+---
+title: Examples
+description: Real-world implementations of Coda for Solana client generation
+---
+
+Learn from real-world implementations of Coda in production projects. These examples demonstrate different configuration approaches and use cases for generating TypeScript clients from Anchor IDLs.
+
+## Official Examples
+
+### Token Metadata Client
+
+[![npm version](https://img.shields.io/npm/v/@macalinao/clients-token-metadata.svg?style=flat-square)](https://www.npmjs.com/package/@macalinao/clients-token-metadata)
+[![npm downloads](https://img.shields.io/npm/dm/@macalinao/clients-token-metadata.svg?style=flat-square)](https://www.npmjs.com/package/@macalinao/clients-token-metadata)
+
+[View on GitHub →](https://github.com/macalinao/coda/tree/master/clients/token-metadata)
+
+The Token Metadata client showcases Coda's capabilities for a **single program** setup:
+
+- **Single IDL configuration** - Simple `coda.config.mjs` for one program
+- **Custom PDAs** - Adds program-derived addresses using Codama visitors
+- **Production-ready** - Pre-generated client for Metaplex Token Metadata
+- **Type-safe operations** - Full TypeScript support with proper typing
+
+Perfect for projects that need to interact with a single Solana program or want to see how to configure custom PDAs and transformations.
+
+### Quarry Client
+
+[![npm version](https://img.shields.io/npm/v/@macalinao/clients-quarry.svg?style=flat-square)](https://www.npmjs.com/package/@macalinao/clients-quarry)
+[![npm downloads](https://img.shields.io/npm/dm/@macalinao/clients-quarry.svg?style=flat-square)](https://www.npmjs.com/package/@macalinao/clients-quarry)
+
+[View on GitHub →](https://github.com/macalinao/coda/tree/master/clients/quarry)
+
+The Quarry client demonstrates Coda's **multi-program** capabilities:
+
+- **Multiple IDL handling** - Uses glob patterns to process multiple IDLs
+- **Workspace management** - Generates clients for an entire protocol suite
+- **Shared types** - Manages dependencies between related programs
+- **Modular structure** - Organized output for complex protocol interactions
+
+Ideal for protocol developers managing multiple interconnected programs or anyone building comprehensive DeFi integrations.
+
+## What Makes These Examples Unique
+
+### Token Metadata
+- Shows how to extend generated code with custom PDAs
+- Demonstrates integration with existing Metaplex ecosystem
+- Includes practical patterns for NFT and metadata operations
+
+### Quarry
+- Illustrates handling of protocol-wide client generation
+- Shows glob pattern configuration for discovering IDLs
+- Demonstrates organizing multiple programs in a single package
+
+## Add Your Example
+
+Using Coda in your project? We'd love to showcase it!
+
+**[Submit a Pull Request →](https://github.com/macalinao/coda/pulls)** to add your project to this documentation.
+
+### How to Add Your Example
+
+1. Fork the [Coda repository](https://github.com/macalinao/coda)
+2. Edit this file at `docs/content/docs/examples.mdx`
+3. Add your project following this format:
+
+```mdx
+### Your Project Name
+
+[View on GitHub →](https://github.com/yourname/yourproject)
+
+Brief description of what makes your implementation unique:
+
+- **Key feature 1** - Description
+- **Key feature 2** - Description
+- **Key feature 3** - Description
+
+What developers can learn from your example.
+```
+
+4. Submit your PR with a clear description
+
+We welcome examples that demonstrate:
+- Novel configuration approaches
+- Integration patterns
+- Complex visitor usage
+- Multi-program setups
+- Custom code generation workflows
+- Production deployment strategies
+
+Help the Solana developer community by sharing your Coda implementation!

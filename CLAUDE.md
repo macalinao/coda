@@ -314,7 +314,7 @@ When writing documentation for Coda or generated clients:
 
 ## Documentation Site
 
-The `docs/` folder contains the documentation site built with Fumadocs and Next.js 15. The structure follows the Fumadocs reference implementation in `vendor/fumadocs/apps/docs/`.
+The `apps/docs/` folder contains the documentation site built with Fumadocs and Next.js 15. The structure follows the Fumadocs reference implementation in `vendor/fumadocs/apps/docs/`.
 
 ### Tech Stack
 - **Framework**: Next.js 15 with App Router
@@ -326,22 +326,28 @@ The `docs/` folder contains the documentation site built with Fumadocs and Next.
 
 ### Development
 ```bash
-cd docs
+cd apps/docs
 bun run dev     # Start dev server on localhost:3000
 bun run build   # Build for production
 ```
 
 ### Adding Documentation
-1. Create MDX files in `docs/content/docs/`
+1. Create MDX files in `apps/docs/content/docs/`
 2. Update navigation in `meta.json` files if needed
 3. Code blocks automatically get syntax highlighting
 4. Use frontmatter for page metadata (title, description)
+5. **Important**: Do NOT include `# Title` headers in MDX files - the title is already specified in the YAML frontmatter and will be rendered automatically
 
 ### Key Files
 - `src/app/layout.config.tsx` - Site branding and navigation
 - `source.config.ts` - MDX and syntax highlighting config
 - `src/app/global.css` - Tailwind v4 imports with @source directives
 - `content/docs/` - Documentation content in MDX
+
+### MDX Writing Guidelines
+- **No redundant headers**: Since the title is specified in YAML frontmatter, do NOT add `# Title` as the first line of content
+- Start documentation content directly with the introduction paragraph or first section (`##`)
+- The title from frontmatter will be automatically rendered by Fumadocs
 
 ## Troubleshooting
 

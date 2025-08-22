@@ -3,8 +3,6 @@ title: Configuration
 description: Customize Coda generation with coda.config.mjs
 ---
 
-# Configuration
-
 Coda works zero-config out of the box, but you can customize its behavior with a `coda.config.mjs` file.
 
 ## Initialize Configuration
@@ -63,6 +61,39 @@ export default defineConfig({
   outputDir: "./src/generated",
 });
 ```
+
+### Important: Handling Naming Conflicts
+
+When generating clients from multiple IDLs, be aware of potential naming conflicts:
+
+- **Naming conflicts will NOT throw errors** during code generation
+- Conflicting names will be silently overwritten by the last processed IDL
+- This can lead to unexpected behavior and missing types/instructions
+
+To avoid conflicts, use the `renameVisitor` from `@macalinao/codama-rename-visitor`:
+
+```javascript
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
+
+export default defineConfig({
+  visitors: [
+    renameVisitor({
+      // Rename conflicting instructions in specific programs
+      programA: {
+        instructions: {
+          transfer: "transferA",  // Rename transfer to transferA
+          deposit: "depositA",    // Rename deposit to depositA
+        },
+        definedTypes: {
+          account: "accountA",    // Rename account type to accountA
+        },
+      },
+    }),
+  ],
+});
+```
+
+See the [Quarry configuration](https://github.com/macalinao/coda/blob/master/clients/quarry/coda.config.mjs) for a real-world example where instructions like `claimRewards`, `initMiner`, and `withdrawTokens` were renamed to avoid conflicts between the `quarryMine` and `quarryMergeMine` programs.
 
 ## Custom PDAs
 
