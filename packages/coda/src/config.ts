@@ -35,6 +35,12 @@ export interface CodaConfig {
   outputDir?: string;
 
   /**
+   * Output directory for the generated documentation.
+   * @default "./docs"
+   */
+  docsPath?: string;
+
+  /**
    * Additional root node visitors to apply to the Codama nodes before generating code.
    * These visitors are applied in order after the initial Anchor IDL parsing.
    * Can be either an array of visitors or a function that returns an array of visitors.

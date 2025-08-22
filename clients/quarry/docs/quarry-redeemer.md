@@ -1,0 +1,125 @@
+# Quarry Redeemer Program
+
+- Program ID: `QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9`
+
+## Table of Contents
+
+- [Accounts](#accounts)
+  - [redeemer](#redeemer)
+- [Instructions](#instructions)
+  - [createRedeemer](#createRedeemer-1)
+  - [redeemTokens](#redeemTokens-1)
+  - [redeemAllTokens](#redeemAllTokens-1)
+- [PDAs](#pdas)
+  - [redeemer](#redeemer-2)
+- [Types](#types)
+  - [redeemTokensEvent](#redeemTokensEvent-3)
+- [Errors](#errors)
+
+## Accounts
+
+### redeemer
+
+**Fields:**
+
+| Field                 | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `discriminator`       | `unknown`   |             |
+| `iouMint`             | `PublicKey` |             |
+| `redemptionMint`      | `PublicKey` |             |
+| `bump`                | `u8`        |             |
+| `totalTokensRedeemed` | `u64`       |             |
+
+## Instructions
+
+### createRedeemer
+
+**Accounts:**
+
+| Account          | Type             | Description |
+| ---------------- | ---------------- | ----------- |
+| `redeemer`       | writable         |             |
+| `iouMint`        | readonly         |             |
+| `redemptionMint` | readonly         |             |
+| `payer`          | signer, writable |             |
+| `systemProgram`  | readonly         |             |
+
+**Arguments:**
+
+| Argument        | Type      | Description |
+| --------------- | --------- | ----------- |
+| `discriminator` | `unknown` |             |
+| `bump`          | `u8`      |             |
+
+### redeemTokens
+
+**Accounts:**
+
+| Account                 | Type     | Description |
+| ----------------------- | -------- | ----------- |
+| `redeemer`              | writable |             |
+| `sourceAuthority`       | signer   |             |
+| `iouMint`               | writable |             |
+| `iouSource`             | writable |             |
+| `redemptionVault`       | writable |             |
+| `redemptionDestination` | writable |             |
+| `tokenProgram`          | readonly |             |
+
+**Arguments:**
+
+| Argument        | Type      | Description |
+| --------------- | --------- | ----------- |
+| `discriminator` | `unknown` |             |
+| `amount`        | `u64`     |             |
+
+### redeemAllTokens
+
+**Accounts:**
+
+| Account                 | Type     | Description |
+| ----------------------- | -------- | ----------- |
+| `redeemer`              | writable |             |
+| `sourceAuthority`       | signer   |             |
+| `iouMint`               | writable |             |
+| `iouSource`             | writable |             |
+| `redemptionVault`       | writable |             |
+| `redemptionDestination` | writable |             |
+| `tokenProgram`          | readonly |             |
+
+**Arguments:**
+
+| Argument        | Type      | Description |
+| --------------- | --------- | ----------- |
+| `discriminator` | `unknown` |             |
+
+## PDAs
+
+### redeemer
+
+**Seeds:**
+
+| Seed             | Type             | Description |
+| ---------------- | ---------------- | ----------- |
+| `constant`       | bytes (constant) | -           |
+| `iouMint`        | `PublicKey`      |             |
+| `redemptionMint` | `PublicKey`      |             |
+
+## Types
+
+### redeemTokensEvent
+
+**Definition:**
+
+```typescript
+{
+  user: PublicKey;
+  iouMint: PublicKey;
+  redemptionMint: PublicKey;
+  amount: bigint;
+  timestamp: bigint;
+}
+```
+
+## Errors
+
+- **unauthorized** (Code: 6000 / `6000` / `0x1770`) -- Unauthorized.

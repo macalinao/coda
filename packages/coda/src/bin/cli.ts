@@ -7,6 +7,7 @@ import {
   programNodeFromAnchorV01,
 } from "@codama/nodes-from-anchor";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
+import { renderMarkdownVisitor } from "@macalinao/codama-renderers-markdown";
 import { createFromRoot, rootNode } from "codama";
 import { Command } from "commander";
 import { glob } from "glob";
@@ -241,6 +242,151 @@ export default {
       console.log("2. Run 'coda generate' to generate your Solana client");
     } catch (error) {
       console.error("Error creating config file:", error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command("docs")
+  .description("Generate markdown documentation from an Anchor IDL")
+  .option(
+    "-i, --idl <path>",
+    "Path to the Anchor IDL file(s) or glob pattern",
+    "./idls/*.json",
+  )
+  .option(
+    "-c, --config <path>",
+    "Path to coda.config.mjs file",
+    "./coda.config.mjs",
+  )
+  .action(async (options: { idl: string; config: string }) => {
+    try {
+      const configPath = resolve(options.config);
+
+      // Load config first if it exists
+      let config: CodaConfig = {};
+      if (await fileExists(configPath)) {
+        console.log(`Loading config from ${configPath}...`);
+
+        // Dynamic import of the config file
+        const configUrl = new URL(`file://${configPath}`);
+        const configModule = (await import(configUrl.href)) as {
+          default: CodaConfig;
+        };
+        config = configModule.default;
+      }
+
+      // Determine IDL paths - use config if provided, otherwise use command line option
+      const idlPathInput = config.idlPath ?? options.idl;
+
+      // Process idlPath - can be string, array, or glob pattern
+      let resolvedPaths: string[] = [];
+
+      if (Array.isArray(idlPathInput)) {
+        // Handle array of paths (each could be a glob)
+        for (const path of idlPathInput) {
+          if (path.includes("*")) {
+            // It's a glob pattern
+            const matches = await glob(path);
+            resolvedPaths.push(...matches.map((p) => resolve(p)));
+          } else {
+            // Regular path
+            resolvedPaths.push(resolve(path));
+          }
+        }
+      }
+      // Single path (could be glob)
+      else if (idlPathInput.includes("*")) {
+        // It's a glob pattern
+        const matches = await glob(idlPathInput);
+        resolvedPaths = matches.map((p) => resolve(p));
+      } else {
+        // Regular path
+        resolvedPaths = [resolve(idlPathInput)];
+      }
+
+      // Remove duplicates and sort for consistent ordering
+      resolvedPaths = [...new Set(resolvedPaths)].sort();
+
+      if (resolvedPaths.length === 0) {
+        console.error(
+          "Error: No IDL files found matching the specified pattern(s)",
+        );
+        process.exit(1);
+      }
+
+      const outputPath = resolve(config.docsPath ?? "./docs");
+
+      // Load all IDLs
+      const idls: AnchorIdl[] = [];
+      for (const idlPath of resolvedPaths) {
+        // Check if IDL file exists
+        if (!(await fileExists(idlPath))) {
+          console.error(`Error: IDL file not found at ${idlPath}`);
+          process.exit(1);
+        }
+
+        // Load the IDL
+        console.log(`Loading IDL from ${idlPath}...`);
+        const idlContent = await readFile(idlPath, "utf-8");
+        const idl = JSON.parse(idlContent) as AnchorIdl;
+        idls.push(idl);
+      }
+
+      // Ensure we have at least one IDL
+      if (idls.length === 0) {
+        console.error("Error: No IDL files were loaded");
+        process.exit(1);
+      }
+
+      // Create root node from Anchor IDL(s)
+      console.log(
+        `Creating Codama nodes from ${idls.length.toString()} Anchor IDL(s)...`,
+      );
+
+      // Create root nodes from IDL(s)
+      const programNodes = idls.map((idl) => {
+        if (
+          idl.metadata &&
+          "spec" in idl.metadata &&
+          idl.metadata.spec === "0.1.0"
+        ) {
+          return programNodeFromAnchorV01(idl as unknown as IdlV01);
+        }
+        return programNodeFromAnchorV00(idl as unknown as IdlV00);
+      });
+      const [firstProgramNode, ...restProgramNodes] = programNodes;
+      if (!firstProgramNode) {
+        throw new Error("Unexpected: No program nodes loaded");
+      }
+      const root = rootNode(firstProgramNode, restProgramNodes);
+      const codama = createFromRoot(root);
+
+      // Apply additional visitors from config
+      if (config.visitors) {
+        // Resolve visitors - either array or function
+        const visitors =
+          typeof config.visitors === "function"
+            ? config.visitors({ idls })
+            : config.visitors;
+
+        if (visitors.length > 0) {
+          console.log(
+            `Applying ${visitors.length.toLocaleString()} custom visitor(s)...`,
+          );
+          for (const visitor of visitors) {
+            codama.update(visitor);
+          }
+        }
+      }
+
+      // Apply the markdown visitor
+      console.log(`Generating documentation to ${outputPath}...`);
+      codama.accept(renderMarkdownVisitor(outputPath));
+
+      console.log("✅ Documentation generated successfully!");
+    } catch (error) {
+      console.error("Error generating documentation:", error);
       process.exit(1);
     }
   });

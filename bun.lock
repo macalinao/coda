@@ -84,6 +84,7 @@
       "dependencies": {
         "@codama/nodes-from-anchor": "*",
         "@macalinao/codama-renderers-js-esm": "workspace:*",
+        "@macalinao/codama-renderers-markdown": "workspace:*",
         "codama": "*",
         "commander": "^14.0.0",
         "glob": "^11.0.3",
@@ -137,6 +138,24 @@
         "@macalinao/tsconfig": "catalog:",
         "eslint": "catalog:",
         "typescript": "catalog:",
+      },
+    },
+    "packages/codama-renderers-markdown": {
+      "name": "@macalinao/codama-renderers-markdown",
+      "version": "0.1.0",
+      "dependencies": {
+        "@codama/errors": "^1.0.2",
+        "@codama/nodes": "^1.0.2",
+        "@codama/renderers-core": "^1.0.2",
+        "@codama/visitors-core": "^1.0.2",
+        "codama": "^1.0.2",
+        "prettier": "^3.0.0",
+      },
+      "devDependencies": {
+        "@macalinao/eslint-config": "^5.0.1",
+        "@macalinao/tsconfig": "^3.2.3",
+        "@types/bun": "^1.1.0",
+        "typescript": "^5.5.4",
       },
     },
   },
@@ -410,6 +429,8 @@
     "@macalinao/codama-rename-visitor": ["@macalinao/codama-rename-visitor@workspace:packages/codama-rename-visitor"],
 
     "@macalinao/codama-renderers-js-esm": ["@macalinao/codama-renderers-js-esm@workspace:packages/codama-renderers-js-esm"],
+
+    "@macalinao/codama-renderers-markdown": ["@macalinao/codama-renderers-markdown@workspace:packages/codama-renderers-markdown"],
 
     "@macalinao/eslint-config": ["@macalinao/eslint-config@5.0.0", "", { "dependencies": { "@eslint/js": "^9.33.0", "@typescript-eslint/parser": "^8.39.1", "@typescript-eslint/utils": "^8.39.1", "eslint-config-prettier": "^10.1.8", "eslint-config-turbo": "^2.5.6", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-prettier": "^5.5.4", "eslint-plugin-simple-import-sort": "^12.1.1", "eslint-plugin-unused-imports": "^4.1.4", "globals": "^16.3.0", "typescript-eslint": "^8.39.1" }, "peerDependencies": { "eslint": "^9.33.0" } }, "sha512-DBjSU9r6V2xqzZ2UaWgfnFO0YpszoZdoqVLtsmHgHZrDm+c7i2RujSxA/reCaAmxQGg7zboqZeQRhCzQ7JDqEg=="],
 
@@ -1892,6 +1913,8 @@
     "@isaacs/cliui/strip-ansi": ["strip-ansi@7.1.0", "", { "dependencies": { "ansi-regex": "^6.0.1" } }, "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ=="],
 
     "@isaacs/cliui/wrap-ansi": ["wrap-ansi@8.1.0", "", { "dependencies": { "ansi-styles": "^6.1.0", "string-width": "^5.0.1", "strip-ansi": "^7.0.1" } }, "sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ=="],
+
+    "@macalinao/codama-renderers-markdown/@macalinao/eslint-config": ["@macalinao/eslint-config@5.0.1", "", { "dependencies": { "@eslint/js": "^9.33.0", "@typescript-eslint/parser": "^8.39.1", "@typescript-eslint/utils": "^8.39.1", "eslint-config-prettier": "^10.1.8", "eslint-config-turbo": "^2.5.6", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-prettier": "^5.5.4", "eslint-plugin-simple-import-sort": "^12.1.1", "eslint-plugin-unused-imports": "^4.1.4", "globals": "^16.3.0", "typescript-eslint": "^8.39.1" }, "peerDependencies": { "eslint": "^9.33.0" } }, "sha512-y2irsItbTh2+qk5ICCGiNozKEcDJzZZjZ6ohRBbwNPWnl/X5hzS/pmeFvQzcw/USM4/eWbynsayobZMCIOWjAg=="],
 
     "@manypkg/find-root/@types/node": ["@types/node@12.20.55", "", {}, "sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ=="],
 
