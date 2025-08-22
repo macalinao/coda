@@ -83,6 +83,13 @@ export default {
   // Optional: Output directory for generated client (overrides --output option)
   // outputDir: "./src/generated",
   
+  // Optional: Documentation generation options
+  // docs: {
+  //   // NPM package name for the TypeScript client
+  //   // If provided, will add an NPM badge and link to the package
+  //   npmPackageName: "@my-org/my-solana-client",
+  // },
+  
   // Optional: Add custom visitors to transform the Codama tree
   // Can be an array of visitors or a function that returns visitors
   // visitors: [
@@ -130,9 +137,12 @@ program
       const { codama, config } = await processIdls(options);
       const outputPath = resolve(config.docsPath ?? "./docs");
 
-      // Apply the markdown visitor
+      // Apply the markdown visitor with options from config
       console.log(`Generating documentation to ${outputPath}...`);
-      codama.accept(renderMarkdownVisitor(outputPath));
+      const markdownOptions = {
+        npmPackageName: config.docs?.npmPackageName,
+      };
+      codama.accept(renderMarkdownVisitor(outputPath, markdownOptions));
 
       console.log("✅ Documentation generated successfully!");
     } catch (error) {

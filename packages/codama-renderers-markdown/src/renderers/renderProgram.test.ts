@@ -122,4 +122,54 @@ describe("renderProgram", () => {
     const markdown = renderProgram(program, contextNoToc);
     expect(markdown).not.toContain("## Table of Contents");
   });
+
+  test("renders NPM package badge and link when provided", async () => {
+    const program = programNode({
+      name: "myProgram",
+      publicKey: "11111111111111111111111111111111",
+      accounts: [],
+    });
+
+    const contextWithNpm: RenderContext = {
+      linkables: new LinkableDictionary(),
+      options: {
+        formatWithPrettier: true,
+        npmPackageName: "@my-org/my-solana-client",
+      },
+    };
+
+    const markdown = renderProgram(program, contextWithNpm);
+    const formatted = await prettier.format(markdown, { parser: "markdown" });
+
+    // Check for NPM badge
+    expect(formatted).toContain(
+      "[![npm version](https://badge.fury.io/js/%40my-org%2Fmy-solana-client.svg)](https://www.npmjs.com/package/%40my-org%2Fmy-solana-client)",
+    );
+
+    // Check for TypeScript client link
+    expect(formatted).toContain(
+      "- TypeScript Client: [`@my-org/my-solana-client`](https://www.npmjs.com/package/@my-org/my-solana-client)",
+    );
+  });
+
+  test("does not render NPM badge when not provided", () => {
+    const program = programNode({
+      name: "myProgram",
+      publicKey: "11111111111111111111111111111111",
+      accounts: [],
+    });
+
+    const contextWithoutNpm: RenderContext = {
+      linkables: new LinkableDictionary(),
+      options: {
+        formatWithPrettier: false,
+      },
+    };
+
+    const markdown = renderProgram(program, contextWithoutNpm);
+
+    // Should not contain NPM badge or client link
+    expect(markdown).not.toContain("npm version");
+    expect(markdown).not.toContain("TypeScript Client:");
+  });
 });

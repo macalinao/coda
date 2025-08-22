@@ -29,5 +29,8 @@ const addCustomPDAsVisitor = addPdasVisitor({
 
 export default defineConfig({
   outputDir: "./src/generated",
+  docs: {
+    npmPackageName: "@macalinao/clients-token-metadata",
+  },
   visitors: [addCustomPDAsVisitor],
 });

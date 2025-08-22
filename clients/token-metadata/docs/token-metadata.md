@@ -1,6 +1,9 @@
 # Token Metadata Program
 
+[![npm version](https://badge.fury.io/js/%40macalinao%2Fclients-token-metadata.svg)](https://www.npmjs.com/package/%40macalinao%2Fclients-token-metadata)
+
 - Program ID: `metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s`
+- TypeScript Client: [`@macalinao/clients-token-metadata`](https://www.npmjs.com/package/@macalinao/clients-token-metadata)
 
 ## Table of Contents
 

@@ -27,6 +27,16 @@ export function renderProgram(
   lines.push(`# ${titleCase} Program`);
   lines.push("");
 
+  // NPM Package Badge (if provided)
+  if (context.options.npmPackageName) {
+    const packageName = context.options.npmPackageName;
+    const encodedPackageName = encodeURIComponent(packageName);
+    lines.push(
+      `[![npm version](https://badge.fury.io/js/${encodedPackageName}.svg)](https://www.npmjs.com/package/${encodedPackageName})`,
+    );
+    lines.push("");
+  }
+
   // Description
   if (program.docs?.length) {
     lines.push("## Description");
@@ -42,6 +52,14 @@ export function renderProgram(
     const address =
       context.options.formatAddress?.(program.publicKey) ?? program.publicKey;
     lines.push(`- Program ID: \`${address}\``);
+  }
+
+  // TypeScript Client Link (if NPM package provided)
+  if (context.options.npmPackageName) {
+    const packageName = context.options.npmPackageName;
+    lines.push(
+      `- TypeScript Client: [\`${packageName}\`](https://www.npmjs.com/package/${packageName})`,
+    );
   }
 
   // Table of Contents

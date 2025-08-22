@@ -13,6 +13,9 @@ export interface RenderMarkdownOptions {
   /** Whether to hide discriminators from the documentation (default: true) */
   hideDiscriminators?: boolean;
 
+  /** NPM package name for the TypeScript client */
+  npmPackageName?: string;
+
   /** Prettier configuration options */
   prettierOptions?: {
     printWidth?: number;

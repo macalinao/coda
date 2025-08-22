@@ -1,6 +1,9 @@
 # Quarry Mine Program
 
+[![npm version](https://badge.fury.io/js/%40macalinao%2Fclients-quarry.svg)](https://www.npmjs.com/package/%40macalinao%2Fclients-quarry)
+
 - Program ID: `QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB`
+- TypeScript Client: [`@macalinao/clients-quarry`](https://www.npmjs.com/package/@macalinao/clients-quarry)
 
 ## Table of Contents
 
