@@ -28,13 +28,24 @@ Documentation generation can be customized through `coda.config.mjs`. See the [C
 import { defineConfig } from "@macalinao/coda";
 
 export default defineConfig({
-  // Custom output directory for docs
-  docsPath: "./documentation",
-  
   // Documentation options
   docs: {
+    // Custom output directory for docs (default: "./docs")
+    path: "./documentation",
     // Add NPM package badge and link
     npmPackageName: "@my-org/my-solana-client",
+  },
+});
+```
+
+### Custom Output Directory
+
+To generate documentation to a different directory:
+
+```javascript
+export default defineConfig({
+  docs: {
+    path: "./my-custom-docs",
   },
 });
 ```

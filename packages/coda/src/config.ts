@@ -35,15 +35,15 @@ export interface CodaConfig {
   outputDir?: string;
 
   /**
-   * Output directory for the generated documentation.
-   * @default "./docs"
-   */
-  docsPath?: string;
-
-  /**
    * Documentation generation options.
    */
   docs?: {
+    /**
+     * Output directory for the generated documentation.
+     * @default "./docs"
+     */
+    path?: string;
+
     /**
      * NPM package name for the TypeScript client.
      * If provided, will add an NPM badge and link to the package in the generated documentation.

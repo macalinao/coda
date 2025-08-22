@@ -27,15 +27,11 @@ This creates a `coda.config.mjs` file with helpful comments and examples.
 - **Default**: `"./src/generated"`
 - **Description**: Directory where generated TypeScript files will be placed
 
-### `docsPath`
-- **Type**: `string`
-- **Default**: `"./docs"`
-- **Description**: Directory where generated markdown documentation will be placed
-
 ### `docs`
-- **Type**: `{ npmPackageName?: string }`
+- **Type**: `{ path?: string, npmPackageName?: string }`
 - **Default**: `{}`
 - **Description**: Documentation-specific options
+  - `path`: Directory where generated markdown documentation will be placed (default: `"./docs"`)
   - `npmPackageName`: NPM package name to display badge and link in documentation
 
 ### `visitors`

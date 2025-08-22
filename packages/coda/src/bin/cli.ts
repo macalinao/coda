@@ -135,7 +135,7 @@ program
   .action(async (options: { idl: string; config: string }) => {
     try {
       const { codama, config } = await processIdls(options);
-      const outputPath = resolve(config.docsPath ?? "./docs");
+      const outputPath = resolve(config.docs?.path ?? "./docs");
 
       // Apply the markdown visitor with options from config
       console.log(`Generating documentation to ${outputPath}...`);
