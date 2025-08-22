@@ -20,15 +20,14 @@ This command will:
 
 ## Configuration
 
-You can customize the documentation generation through your `coda.config.mjs` file:
+Documentation generation can be customized through `coda.config.mjs`. See the [Configuration](/docs/configuration) page for base configuration options.
+
+### Documentation-Specific Options
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
 
 export default defineConfig({
-  // Custom IDL path
-  idlPath: "./target/idl/my_program.json",
-  
   // Custom output directory for docs
   docsPath: "./documentation",
   
@@ -121,36 +120,16 @@ Example: `- **InvalidAccount** (Code: 100 / \`100\` / \`0x64\`) -- The account i
 
 ## Multiple Programs
 
-When working with multiple programs, Coda generates separate documentation files for each:
-
-```javascript
-export default defineConfig({
-  // Glob pattern for multiple IDLs
-  idlPath: "./idls/*.json",
-  
-  docs: {
-    // Same NPM package for all programs
-    npmPackageName: "@my-org/my-programs",
-  },
-});
-```
-
-This will generate:
+When working with multiple programs, Coda generates separate documentation files for each. Each program gets its own markdown file with kebab-case naming:
 - `docs/program-one.md`
 - `docs/program-two.md`
 - etc.
 
+See the [Configuration](/docs/configuration#multiple-idls) page for details on configuring multiple IDLs.
+
 ## Command Options
 
-The `coda docs` command accepts the following options:
-
-```bash
-# Specify custom IDL path
-coda docs -i ./path/to/idl.json
-
-# Use a different config file
-coda docs -c ./custom.config.mjs
-```
+The `coda docs` command accepts several options. See the [Configuration](/docs/configuration#docs-command) page for all available command-line arguments.
 
 ## Example Output
 

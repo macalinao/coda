@@ -27,6 +27,17 @@ This creates a `coda.config.mjs` file with helpful comments and examples.
 - **Default**: `"./src/generated"`
 - **Description**: Directory where generated TypeScript files will be placed
 
+### `docsPath`
+- **Type**: `string`
+- **Default**: `"./docs"`
+- **Description**: Directory where generated markdown documentation will be placed
+
+### `docs`
+- **Type**: `{ npmPackageName?: string }`
+- **Default**: `{}`
+- **Description**: Documentation-specific options
+  - `npmPackageName`: NPM package name to display badge and link in documentation
+
 ### `visitors`
 - **Type**: `Visitor[] | (context) => Visitor[]`
 - **Default**: `[]`
@@ -239,19 +250,36 @@ export default defineConfig({
 });
 ```
 
-## Command Line Override
+## Command Line Arguments
 
 Configuration file settings can be overridden via command line:
+
+### Generate Command
 
 ```bash
 # Override IDL path
 coda generate --idl ./other/idl.json
+coda generate -i ./other/idl.json
 
 # Override output directory
 coda generate --output ./other/output
+coda generate -o ./other/output
 
 # Use different config file
 coda generate --config ./custom.config.mjs
+coda generate -c ./custom.config.mjs
+```
+
+### Docs Command
+
+```bash
+# Override IDL path
+coda docs --idl ./other/idl.json
+coda docs -i ./other/idl.json
+
+# Use different config file
+coda docs --config ./custom.config.mjs
+coda docs -c ./custom.config.mjs
 ```
 
 ## Priority Order

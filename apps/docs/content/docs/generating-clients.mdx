@@ -94,68 +94,13 @@ try {
 
 ## Configuration
 
-Configure client generation through `coda.config.mjs`:
+Client generation can be customized through `coda.config.mjs`. See the [Configuration](/docs/configuration) page for detailed options including:
+- Custom IDL paths and output directories
+- Working with multiple programs
+- Adding custom PDAs with visitors
+- Handling naming conflicts between programs
 
-```javascript
-import { defineConfig } from "@macalinao/coda";
-
-export default defineConfig({
-  // Custom IDL path
-  idlPath: "./target/idl/my_program.json",
-  
-  // Custom output directory
-  outputDir: "./src/generated",
-  
-  // Add custom visitors for advanced transformations
-  visitors: [
-    // Add custom PDAs, rename types, etc.
-  ],
-});
-```
-
-## Working with Multiple Programs
-
-Coda seamlessly handles multiple programs:
-
-```javascript
-export default defineConfig({
-  // Use glob pattern for multiple IDLs
-  idlPath: "./idls/*.json",
-  outputDir: "./src/generated",
-});
-```
-
-This generates a unified client with all programs properly namespaced.
-
-## Adding Custom PDAs
-
-Programs often have PDAs that aren't explicitly defined in the IDL. You can add them using visitors:
-
-```javascript
-import { defineConfig } from "@macalinao/coda";
-import { 
-  addPdasVisitor,
-  constantPdaSeedNodeFromString,
-  publicKeyTypeNode,
-  variablePdaSeedNode,
-} from "codama";
-
-export default defineConfig({
-  visitors: [
-    addPdasVisitor({
-      myProgram: [
-        {
-          name: "userAccount",
-          seeds: [
-            constantPdaSeedNodeFromString("utf8", "user"),
-            variablePdaSeedNode("owner", publicKeyTypeNode()),
-          ],
-        },
-      ],
-    }),
-  ],
-});
-```
+For a real-world example with multiple programs, see the [Quarry configuration](https://github.com/macalinao/coda/blob/master/clients/quarry/coda.config.mjs).
 
 ## ES Modules Support
 
@@ -170,18 +115,7 @@ This ensures compatibility with modern TypeScript and Node.js configurations usi
 
 ## Command Options
 
-The `coda generate` command accepts several options:
-
-```bash
-# Specify custom IDL path
-coda generate -i ./path/to/idl.json
-
-# Specify custom output directory
-coda generate -o ./src/my-client
-
-# Use a different config file
-coda generate -c ./custom.config.mjs
-```
+The `coda generate` command accepts several options. See the [Configuration](/docs/configuration#generate-command) page for all available command-line arguments.
 
 ## Integration Example
 
