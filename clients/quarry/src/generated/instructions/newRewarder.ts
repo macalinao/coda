@@ -27,10 +27,8 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -39,9 +37,9 @@ import {
 } from "@solana/kit";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const NEW_REWARDER_DISCRIMINATOR = new Uint8Array([
+export const NEW_REWARDER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   1, 115, 16, 244, 109, 74, 67, 209,
 ]);
 
@@ -135,149 +133,6 @@ export function getNewRewarderInstructionDataCodec(): FixedSizeCodec<
     getNewRewarderInstructionDataEncoder(),
     getNewRewarderInstructionDataDecoder(),
   );
-}
-
-export interface NewRewarderAsyncInput<
-  TAccountBase extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountInitialAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountUnusedAccount extends string = string,
-  TAccountMintWrapper extends string = string,
-  TAccountRewardsTokenMint extends string = string,
-  TAccountClaimFeeTokenAccount extends string = string,
-> {
-  base: TransactionSigner<TAccountBase>;
-  rewarder?: Address<TAccountRewarder>;
-  initialAuthority: Address<TAccountInitialAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  unusedAccount: Address<TAccountUnusedAccount>;
-  mintWrapper: Address<TAccountMintWrapper>;
-  rewardsTokenMint: Address<TAccountRewardsTokenMint>;
-  claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
-  bump: NewRewarderInstructionDataArgs["bump"];
-}
-
-export async function getNewRewarderInstructionAsync<
-  TAccountBase extends string,
-  TAccountRewarder extends string,
-  TAccountInitialAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountUnusedAccount extends string,
-  TAccountMintWrapper extends string,
-  TAccountRewardsTokenMint extends string,
-  TAccountClaimFeeTokenAccount extends string,
-  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
->(
-  input: NewRewarderAsyncInput<
-    TAccountBase,
-    TAccountRewarder,
-    TAccountInitialAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountUnusedAccount,
-    TAccountMintWrapper,
-    TAccountRewardsTokenMint,
-    TAccountClaimFeeTokenAccount
-  >,
-  config?: { programAddress?: TProgramAddress },
-): Promise<
-  NewRewarderInstruction<
-    TProgramAddress,
-    TAccountBase,
-    TAccountRewarder,
-    TAccountInitialAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountUnusedAccount,
-    TAccountMintWrapper,
-    TAccountRewardsTokenMint,
-    TAccountClaimFeeTokenAccount
-  >
-> {
-  // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
-
-  // Original accounts.
-  const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    initialAuthority: {
-      value: input.initialAuthority ?? null,
-      isWritable: false,
-    },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    unusedAccount: { value: input.unusedAccount ?? null, isWritable: false },
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: false },
-    rewardsTokenMint: {
-      value: input.rewardsTokenMint ?? null,
-      isWritable: false,
-    },
-    claimFeeTokenAccount: {
-      value: input.claimFeeTokenAccount ?? null,
-      isWritable: false,
-    },
-  };
-  const accounts = originalAccounts as Record<
-    keyof typeof originalAccounts,
-    ResolvedAccount
-  >;
-
-  // Original args.
-  const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.rewarder.value) {
-    accounts.rewarder.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([34, 82, 101, 119, 97, 114, 100, 101, 114, 34]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.base.value)),
-      ],
-    });
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
-  const instruction = {
-    accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.initialAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.unusedAccount),
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.rewardsTokenMint),
-      getAccountMeta(accounts.claimFeeTokenAccount),
-    ],
-    programAddress,
-    data: getNewRewarderInstructionDataEncoder().encode(
-      args as NewRewarderInstructionDataArgs,
-    ),
-  } as NewRewarderInstruction<
-    TProgramAddress,
-    TAccountBase,
-    TAccountRewarder,
-    TAccountInitialAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountUnusedAccount,
-    TAccountMintWrapper,
-    TAccountRewardsTokenMint,
-    TAccountClaimFeeTokenAccount
-  >;
-
-  return instruction;
 }
 
 export interface NewRewarderInput<

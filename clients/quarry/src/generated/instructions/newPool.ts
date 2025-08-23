@@ -26,10 +26,8 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -38,9 +36,9 @@ import {
 } from "@solana/kit";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const NEW_POOL_DISCRIMINATOR = new Uint8Array([
+export const NEW_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   38, 63, 210, 32, 246, 20, 239, 112,
 ]);
 
@@ -132,147 +130,6 @@ export function getNewPoolInstructionDataCodec(): FixedSizeCodec<
     getNewPoolInstructionDataEncoder(),
     getNewPoolInstructionDataDecoder(),
   );
-}
-
-export interface NewPoolAsyncInput<
-  TAccountPool extends string = string,
-  TAccountPrimaryMint extends string = string,
-  TAccountReplicaMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
-> {
-  pool?: Address<TAccountPool>;
-  primaryMint: Address<TAccountPrimaryMint>;
-  replicaMint?: Address<TAccountReplicaMint>;
-  payer: TransactionSigner<TAccountPayer>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
-  bump: NewPoolInstructionDataArgs["bump"];
-  mintBump: NewPoolInstructionDataArgs["mintBump"];
-}
-
-export async function getNewPoolInstructionAsync<
-  TAccountPool extends string,
-  TAccountPrimaryMint extends string,
-  TAccountReplicaMint extends string,
-  TAccountPayer extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
-  TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
->(
-  input: NewPoolAsyncInput<
-    TAccountPool,
-    TAccountPrimaryMint,
-    TAccountReplicaMint,
-    TAccountPayer,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
-  >,
-  config?: { programAddress?: TProgramAddress },
-): Promise<
-  NewPoolInstruction<
-    TProgramAddress,
-    TAccountPool,
-    TAccountPrimaryMint,
-    TAccountReplicaMint,
-    TAccountPayer,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
-  >
-> {
-  // Program address.
-  const programAddress =
-    config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
-
-  // Original accounts.
-  const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: true },
-    primaryMint: { value: input.primaryMint ?? null, isWritable: false },
-    replicaMint: { value: input.replicaMint ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
-  };
-  const accounts = originalAccounts as Record<
-    keyof typeof originalAccounts,
-    ResolvedAccount
-  >;
-
-  // Original args.
-  const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.pool.value) {
-    accounts.pool.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([34, 77, 101, 114, 103, 101, 80, 111, 111, 108, 34]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.primaryMint.value)),
-      ],
-    });
-  }
-  if (!accounts.replicaMint.value) {
-    accounts.replicaMint.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            34, 82, 101, 112, 108, 105, 99, 97, 77, 105, 110, 116, 34,
-          ]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.pool.value)),
-      ],
-    });
-  }
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.rent.value) {
-    accounts.rent.value =
-      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
-  }
-
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
-  const instruction = {
-    accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.primaryMint),
-      getAccountMeta(accounts.replicaMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
-    ],
-    programAddress,
-    data: getNewPoolInstructionDataEncoder().encode(
-      args as NewPoolInstructionDataArgs,
-    ),
-  } as NewPoolInstruction<
-    TProgramAddress,
-    TAccountPool,
-    TAccountPrimaryMint,
-    TAccountReplicaMint,
-    TAccountPayer,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
-  >;
-
-  return instruction;
 }
 
 export interface NewPoolInput<

@@ -38,9 +38,8 @@ import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DELEGATE_SET_REWARDS_SHARE_DISCRIMINATOR = new Uint8Array([
-  111, 198, 20, 112, 172, 82, 102, 66,
-]);
+export const DELEGATE_SET_REWARDS_SHARE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([111, 198, 20, 112, 172, 82, 102, 66]);
 
 export function getDelegateSetRewardsShareDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,10 +49,16 @@ export function getDelegateSetRewardsShareDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type DelegateSetRewardsShareInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarryMineProgram extends
+  TAccountSetRewardsShareWithDelegateOperator extends
+    | string
+    | AccountMeta = string,
+  TAccountSetRewardsShareWithDelegateDelegate extends
+    | string
+    | AccountMeta = string,
+  TAccountSetRewardsShareWithDelegateRewarder extends
+    | string
+    | AccountMeta = string,
+  TAccountSetRewardsShareWithDelegateQuarryMineProgram extends
     | string
     | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountQuarry extends string | AccountMeta = string,
@@ -62,19 +67,19 @@ export type DelegateSetRewardsShareInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountOperator extends string
-        ? WritableAccount<TAccountOperator>
-        : TAccountOperator,
-      TAccountDelegate extends string
-        ? ReadonlySignerAccount<TAccountDelegate> &
-            AccountSignerMeta<TAccountDelegate>
-        : TAccountDelegate,
-      TAccountRewarder extends string
-        ? WritableAccount<TAccountRewarder>
-        : TAccountRewarder,
-      TAccountQuarryMineProgram extends string
-        ? ReadonlyAccount<TAccountQuarryMineProgram>
-        : TAccountQuarryMineProgram,
+      TAccountSetRewardsShareWithDelegateOperator extends string
+        ? WritableAccount<TAccountSetRewardsShareWithDelegateOperator>
+        : TAccountSetRewardsShareWithDelegateOperator,
+      TAccountSetRewardsShareWithDelegateDelegate extends string
+        ? ReadonlySignerAccount<TAccountSetRewardsShareWithDelegateDelegate> &
+            AccountSignerMeta<TAccountSetRewardsShareWithDelegateDelegate>
+        : TAccountSetRewardsShareWithDelegateDelegate,
+      TAccountSetRewardsShareWithDelegateRewarder extends string
+        ? WritableAccount<TAccountSetRewardsShareWithDelegateRewarder>
+        : TAccountSetRewardsShareWithDelegateRewarder,
+      TAccountSetRewardsShareWithDelegateQuarryMineProgram extends string
+        ? ReadonlyAccount<TAccountSetRewardsShareWithDelegateQuarryMineProgram>
+        : TAccountSetRewardsShareWithDelegateQuarryMineProgram,
       TAccountQuarry extends string
         ? WritableAccount<TAccountQuarry>
         : TAccountQuarry,
@@ -122,42 +127,42 @@ export function getDelegateSetRewardsShareInstructionDataCodec(): FixedSizeCodec
 }
 
 export interface DelegateSetRewardsShareInput<
-  TAccountOperator extends string = string,
-  TAccountDelegate extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarryMineProgram extends string = string,
+  TAccountSetRewardsShareWithDelegateOperator extends string = string,
+  TAccountSetRewardsShareWithDelegateDelegate extends string = string,
+  TAccountSetRewardsShareWithDelegateRewarder extends string = string,
+  TAccountSetRewardsShareWithDelegateQuarryMineProgram extends string = string,
   TAccountQuarry extends string = string,
 > {
-  operator: Address<TAccountOperator>;
-  delegate: TransactionSigner<TAccountDelegate>;
-  rewarder: Address<TAccountRewarder>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
+  setRewardsShareWithDelegateOperator: Address<TAccountSetRewardsShareWithDelegateOperator>;
+  setRewardsShareWithDelegateDelegate: TransactionSigner<TAccountSetRewardsShareWithDelegateDelegate>;
+  setRewardsShareWithDelegateRewarder: Address<TAccountSetRewardsShareWithDelegateRewarder>;
+  setRewardsShareWithDelegateQuarryMineProgram?: Address<TAccountSetRewardsShareWithDelegateQuarryMineProgram>;
   quarry: Address<TAccountQuarry>;
   newShare: DelegateSetRewardsShareInstructionDataArgs["newShare"];
 }
 
 export function getDelegateSetRewardsShareInstruction<
-  TAccountOperator extends string,
-  TAccountDelegate extends string,
-  TAccountRewarder extends string,
-  TAccountQuarryMineProgram extends string,
+  TAccountSetRewardsShareWithDelegateOperator extends string,
+  TAccountSetRewardsShareWithDelegateDelegate extends string,
+  TAccountSetRewardsShareWithDelegateRewarder extends string,
+  TAccountSetRewardsShareWithDelegateQuarryMineProgram extends string,
   TAccountQuarry extends string,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: DelegateSetRewardsShareInput<
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
+    TAccountSetRewardsShareWithDelegateOperator,
+    TAccountSetRewardsShareWithDelegateDelegate,
+    TAccountSetRewardsShareWithDelegateRewarder,
+    TAccountSetRewardsShareWithDelegateQuarryMineProgram,
     TAccountQuarry
   >,
   config?: { programAddress?: TProgramAddress },
 ): DelegateSetRewardsShareInstruction<
   TProgramAddress,
-  TAccountOperator,
-  TAccountDelegate,
-  TAccountRewarder,
-  TAccountQuarryMineProgram,
+  TAccountSetRewardsShareWithDelegateOperator,
+  TAccountSetRewardsShareWithDelegateDelegate,
+  TAccountSetRewardsShareWithDelegateRewarder,
+  TAccountSetRewardsShareWithDelegateQuarryMineProgram,
   TAccountQuarry
 > {
   // Program address.
@@ -166,11 +171,20 @@ export function getDelegateSetRewardsShareInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    operator: { value: input.operator ?? null, isWritable: true },
-    delegate: { value: input.delegate ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
+    setRewardsShareWithDelegateOperator: {
+      value: input.setRewardsShareWithDelegateOperator ?? null,
+      isWritable: true,
+    },
+    setRewardsShareWithDelegateDelegate: {
+      value: input.setRewardsShareWithDelegateDelegate ?? null,
+      isWritable: false,
+    },
+    setRewardsShareWithDelegateRewarder: {
+      value: input.setRewardsShareWithDelegateRewarder ?? null,
+      isWritable: true,
+    },
+    setRewardsShareWithDelegateQuarryMineProgram: {
+      value: input.setRewardsShareWithDelegateQuarryMineProgram ?? null,
       isWritable: false,
     },
     quarry: { value: input.quarry ?? null, isWritable: true },
@@ -184,18 +198,18 @@ export function getDelegateSetRewardsShareInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.quarryMineProgram.value) {
-    accounts.quarryMineProgram.value =
+  if (!accounts.setRewardsShareWithDelegateQuarryMineProgram.value) {
+    accounts.setRewardsShareWithDelegateQuarryMineProgram.value =
       "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
+      getAccountMeta(accounts.setRewardsShareWithDelegateOperator),
+      getAccountMeta(accounts.setRewardsShareWithDelegateDelegate),
+      getAccountMeta(accounts.setRewardsShareWithDelegateRewarder),
+      getAccountMeta(accounts.setRewardsShareWithDelegateQuarryMineProgram),
       getAccountMeta(accounts.quarry),
     ],
     programAddress,
@@ -204,10 +218,10 @@ export function getDelegateSetRewardsShareInstruction<
     ),
   } as DelegateSetRewardsShareInstruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
+    TAccountSetRewardsShareWithDelegateOperator,
+    TAccountSetRewardsShareWithDelegateDelegate,
+    TAccountSetRewardsShareWithDelegateRewarder,
+    TAccountSetRewardsShareWithDelegateQuarryMineProgram,
     TAccountQuarry
   >;
 
@@ -220,10 +234,10 @@ export interface ParsedDelegateSetRewardsShareInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    operator: TAccountMetas[0];
-    delegate: TAccountMetas[1];
-    rewarder: TAccountMetas[2];
-    quarryMineProgram: TAccountMetas[3];
+    setRewardsShareWithDelegateOperator: TAccountMetas[0];
+    setRewardsShareWithDelegateDelegate: TAccountMetas[1];
+    setRewardsShareWithDelegateRewarder: TAccountMetas[2];
+    setRewardsShareWithDelegateQuarryMineProgram: TAccountMetas[3];
     quarry: TAccountMetas[4];
   };
   data: DelegateSetRewardsShareInstructionData;
@@ -250,10 +264,10 @@ export function parseDelegateSetRewardsShareInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      operator: getNextAccount(),
-      delegate: getNextAccount(),
-      rewarder: getNextAccount(),
-      quarryMineProgram: getNextAccount(),
+      setRewardsShareWithDelegateOperator: getNextAccount(),
+      setRewardsShareWithDelegateDelegate: getNextAccount(),
+      setRewardsShareWithDelegateRewarder: getNextAccount(),
+      setRewardsShareWithDelegateQuarryMineProgram: getNextAccount(),
       quarry: getNextAccount(),
     },
     data: getDelegateSetRewardsShareInstructionDataDecoder().decode(

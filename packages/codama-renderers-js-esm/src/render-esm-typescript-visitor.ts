@@ -1,16 +1,6 @@
-import type { RenderMap } from "@codama/renderers-core";
 import { getRenderMapVisitor } from "@codama/renderers-js";
 import { rootNodeVisitor, visit } from "codama";
 import { ESM_DEPENDENCY_MAP } from "./constants.js";
-
-function modifyFile(
-  renderMap: RenderMap,
-  relativePath: string,
-  fn: (code: string) => string,
-): void {
-  const code = renderMap.get(relativePath);
-  renderMap.add(relativePath, fn(code));
-}
 
 /**
  * Codama visitor for rendering the code to be TypeScript compatible.
@@ -34,36 +24,28 @@ export function renderESMTypeScriptVisitor(
       "index.ts",
       index.replace(
         /(export\s+\*\s+from\s+['"])(\.\/[^'"]+)(['"])/g,
-        (_, prefix, path, quote) =>
-          `${prefix as string}${path as string}/index.js${quote as string}`,
+        (_: string, prefix: string, path: string, quote: string) =>
+          `${prefix}${path}/index.js${quote}`,
       ),
     );
 
-    modifyFile(renderMap, "shared/index.ts", (code) => {
-      return code
-        .replaceAll(
-          "if (value == null) {",
-          "if (value === null || value === undefined) {",
-        )
-        .replaceAll("return value[0]", "return value[0] as Address<T>");
-    });
-
     renderMap.mapContent((code) => {
       const updated = code
-        .replace(/= 0x([\da-f]+), \/\//g, "= 0x$1; //")
+        // .replace(/= 0x([\da-f]+), \/\//g, "= 0x$1; //")
         .replaceAll("process.env.NODE_ENV !== 'production'", "true")
-        .replaceAll(
-          "const accountMeta = instruction.accounts![accountIndex]!;",
-          "const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;",
-        )
+        .replaceAll(";;", ";")
         // Add return type annotations for functions that return simple types
+        .replace(
+          /export const (\w+DISCRIMINATOR)\s*=\s*new Uint8Array\(/g,
+          "export const $1: ReadonlyUint8Array = new Uint8Array(",
+        )
         .replace(
           /export function (get\w+DiscriminatorBytes)\(\)\s*{/g,
           "export function $1(): ReadonlyUint8Array {",
         )
         .replace(
           /(export\s+\*\s+from\s+['"])(\.\/[^'"]+?)(?<!\.(js|ts|mjs|cjs|json))(['"])/g,
-          (_, prefix, path) => `${prefix as string}${path as string}.js'`,
+          (_: string, prefix: string, path: string) => `${prefix}${path}.js'`,
         )
         .replace(/from\s+['"]\.['"]/g, 'from "./index.js"');
 

@@ -1,0 +1,60 @@
+---
+title: Packages
+description: Core packages that power Coda's client generation capabilities
+---
+
+Coda is built as a modular system of packages that work together to generate high-quality TypeScript clients from Solana IDLs. Each package serves a specific purpose in the generation pipeline.
+
+## Core Packages
+
+### [@macalinao/coda](/docs/packages/coda)
+The main CLI tool for generating TypeScript clients from Anchor IDLs. Provides zero-config defaults and extensible configuration.
+
+### [@macalinao/codama-instruction-accounts-dedupe-visitor](/docs/packages/codama-instruction-accounts-dedupe-visitor)
+Flattens nested account structures from Anchor IDLs while preserving relationships through naming conventions.
+
+### [@macalinao/codama-rename-visitor](/docs/packages/codama-rename-visitor)
+Provides utilities for renaming nodes in the Codama AST, useful for customizing generated code naming.
+
+### [@macalinao/codama-renderers-js-esm](/docs/packages/codama-renderers-js-esm)
+ESM-native TypeScript renderer that generates modern JavaScript modules with proper `.js` extensions.
+
+### [@macalinao/codama-renderers-markdown](/docs/packages/codama-renderers-markdown)
+Generates comprehensive Markdown documentation from Codama AST nodes, perfect for API documentation.
+
+## Package Architecture
+
+Each package in the Coda ecosystem follows a consistent structure:
+
+- **TypeScript-first**: All packages are written in TypeScript with full type safety
+- **ES Modules**: Uses modern JavaScript modules with `"type": "module"`
+- **Simple builds**: Direct `tsc` compilation without complex bundling
+- **Consistent scripts**: Standardized `build`, `test`, `lint` commands
+
+## Installation
+
+Each package can be installed individually based on your needs:
+
+```bash
+# Install the main CLI
+bun add -D @macalinao/coda
+
+# Install specific visitors
+bun add -D @macalinao/codama-instruction-accounts-dedupe-visitor
+bun add -D @macalinao/codama-renderers-js-esm
+```
+
+## Contributing
+
+All packages follow the same development workflow:
+
+```bash
+# Build the package
+bun run build
+
+# Run tests
+bun test
+
+# Fix linting issues
+bun run lint:fix
+```

@@ -43,7 +43,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 
-export const MERGE_POOL_DISCRIMINATOR = new Uint8Array([
+export const MERGE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   15, 189, 242, 87, 188, 75, 64, 244,
 ]);
 

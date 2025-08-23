@@ -1,8 +1,29 @@
 # @macalinao/codama-rename-visitor
 
+[![npm version](https://img.shields.io/npm/v/@macalinao/codama-rename-visitor.svg)](https://www.npmjs.com/package/@macalinao/codama-rename-visitor)
+[![npm downloads](https://img.shields.io/npm/dm/@macalinao/codama-rename-visitor.svg)](https://www.npmjs.com/package/@macalinao/codama-rename-visitor)
+
 A Codama visitor for renaming instructions and events within a Solana program.
 
+## Quick Start with Coda CLI
+
+This visitor works seamlessly with the [Coda CLI](https://coda.ianm.com) for automated client generation:
+
+```bash
+# Install Coda CLI
+bun add -D @macalinao/coda
+
+# Initialize configuration 
+coda init
+
+# Add this visitor to your coda.config.mjs
+```
+
+Coda provides zero-config client generation with powerful customization through visitors like this one. Learn more at [coda.ianm.com](https://coda.ianm.com).
+
 ## Installation
+
+For direct usage:
 
 ```bash
 npm install @macalinao/codama-rename-visitor

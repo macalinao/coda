@@ -39,7 +39,7 @@ import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const NEW_MINTER_DISCRIMINATOR = new Uint8Array([
+export const NEW_MINTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   14, 95, 216, 55, 122, 115, 37, 250,
 ]);
 
@@ -49,8 +49,8 @@ export function getNewMinterDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewMinterInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
+  TAccountNewMinterAuthMintWrapper extends string | AccountMeta = string,
+  TAccountNewMinterAuthAdmin extends string | AccountMeta = string,
   TAccountNewMinterAuthority extends string | AccountMeta = string,
   TAccountMinter extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
@@ -62,13 +62,13 @@ export type NewMinterInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMintWrapper extends string
-        ? WritableAccount<TAccountMintWrapper>
-        : TAccountMintWrapper,
-      TAccountAdmin extends string
-        ? ReadonlySignerAccount<TAccountAdmin> &
-            AccountSignerMeta<TAccountAdmin>
-        : TAccountAdmin,
+      TAccountNewMinterAuthMintWrapper extends string
+        ? WritableAccount<TAccountNewMinterAuthMintWrapper>
+        : TAccountNewMinterAuthMintWrapper,
+      TAccountNewMinterAuthAdmin extends string
+        ? ReadonlySignerAccount<TAccountNewMinterAuthAdmin> &
+            AccountSignerMeta<TAccountNewMinterAuthAdmin>
+        : TAccountNewMinterAuthAdmin,
       TAccountNewMinterAuthority extends string
         ? ReadonlyAccount<TAccountNewMinterAuthority>
         : TAccountNewMinterAuthority,
@@ -123,15 +123,15 @@ export function getNewMinterInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface NewMinterInput<
-  TAccountMintWrapper extends string = string,
-  TAccountAdmin extends string = string,
+  TAccountNewMinterAuthMintWrapper extends string = string,
+  TAccountNewMinterAuthAdmin extends string = string,
   TAccountNewMinterAuthority extends string = string,
   TAccountMinter extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
 > {
-  mintWrapper: Address<TAccountMintWrapper>;
-  admin: TransactionSigner<TAccountAdmin>;
+  newMinterAuthMintWrapper: Address<TAccountNewMinterAuthMintWrapper>;
+  newMinterAuthAdmin: TransactionSigner<TAccountNewMinterAuthAdmin>;
   newMinterAuthority: Address<TAccountNewMinterAuthority>;
   minter: Address<TAccountMinter>;
   payer: TransactionSigner<TAccountPayer>;
@@ -140,8 +140,8 @@ export interface NewMinterInput<
 }
 
 export function getNewMinterInstruction<
-  TAccountMintWrapper extends string,
-  TAccountAdmin extends string,
+  TAccountNewMinterAuthMintWrapper extends string,
+  TAccountNewMinterAuthAdmin extends string,
   TAccountNewMinterAuthority extends string,
   TAccountMinter extends string,
   TAccountPayer extends string,
@@ -149,8 +149,8 @@ export function getNewMinterInstruction<
   TProgramAddress extends Address = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
 >(
   input: NewMinterInput<
-    TAccountMintWrapper,
-    TAccountAdmin,
+    TAccountNewMinterAuthMintWrapper,
+    TAccountNewMinterAuthAdmin,
     TAccountNewMinterAuthority,
     TAccountMinter,
     TAccountPayer,
@@ -159,8 +159,8 @@ export function getNewMinterInstruction<
   config?: { programAddress?: TProgramAddress },
 ): NewMinterInstruction<
   TProgramAddress,
-  TAccountMintWrapper,
-  TAccountAdmin,
+  TAccountNewMinterAuthMintWrapper,
+  TAccountNewMinterAuthAdmin,
   TAccountNewMinterAuthority,
   TAccountMinter,
   TAccountPayer,
@@ -172,8 +172,14 @@ export function getNewMinterInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
+    newMinterAuthMintWrapper: {
+      value: input.newMinterAuthMintWrapper ?? null,
+      isWritable: true,
+    },
+    newMinterAuthAdmin: {
+      value: input.newMinterAuthAdmin ?? null,
+      isWritable: false,
+    },
     newMinterAuthority: {
       value: input.newMinterAuthority ?? null,
       isWritable: false,
@@ -199,8 +205,8 @@ export function getNewMinterInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
+      getAccountMeta(accounts.newMinterAuthMintWrapper),
+      getAccountMeta(accounts.newMinterAuthAdmin),
       getAccountMeta(accounts.newMinterAuthority),
       getAccountMeta(accounts.minter),
       getAccountMeta(accounts.payer),
@@ -212,8 +218,8 @@ export function getNewMinterInstruction<
     ),
   } as NewMinterInstruction<
     TProgramAddress,
-    TAccountMintWrapper,
-    TAccountAdmin,
+    TAccountNewMinterAuthMintWrapper,
+    TAccountNewMinterAuthAdmin,
     TAccountNewMinterAuthority,
     TAccountMinter,
     TAccountPayer,
@@ -229,8 +235,8 @@ export interface ParsedNewMinterInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    mintWrapper: TAccountMetas[0];
-    admin: TAccountMetas[1];
+    newMinterAuthMintWrapper: TAccountMetas[0];
+    newMinterAuthAdmin: TAccountMetas[1];
     newMinterAuthority: TAccountMetas[2];
     minter: TAccountMetas[3];
     payer: TAccountMetas[4];
@@ -260,8 +266,8 @@ export function parseNewMinterInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      mintWrapper: getNextAccount(),
-      admin: getNextAccount(),
+      newMinterAuthMintWrapper: getNextAccount(),
+      newMinterAuthAdmin: getNextAccount(),
       newMinterAuthority: getNextAccount(),
       minter: getNextAccount(),
       payer: getNextAccount(),

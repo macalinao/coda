@@ -15,7 +15,8 @@
     "client",
     "code-generation",
     "esm",
-    "typescript"
+    "typescript",
+    "ian-macalinao"
   ],
   "bin": {
     "coda": "./dist/bin/cli.js"
@@ -47,10 +48,12 @@
     "test": "echo 'No tests yet'"
   },
   "dependencies": {
-    "@codama/nodes-from-anchor": "*",
+    "@codama/nodes-from-anchor": "catalog:",
+    "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
     "@macalinao/codama-renderers-js-esm": "workspace:*",
     "@macalinao/codama-renderers-markdown": "workspace:*",
-    "codama": "*",
+    "@macalinao/codama-rename-visitor": "workspace:*",
+    "codama": "catalog:",
     "commander": "^14.0.0",
     "glob": "^11.0.3"
   },

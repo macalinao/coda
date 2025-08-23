@@ -27,10 +27,8 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -39,11 +37,11 @@ import {
 } from "@solana/kit";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const CREATE_OPERATOR_DISCRIMINATOR = new Uint8Array([
-  145, 40, 238, 75, 181, 252, 59, 11,
-]);
+export const CREATE_OPERATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
+  [145, 40, 238, 75, 181, 252, 59, 11],
+);
 
 export function getCreateOperatorDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -129,132 +127,6 @@ export function getCreateOperatorInstructionDataCodec(): FixedSizeCodec<
     getCreateOperatorInstructionDataEncoder(),
     getCreateOperatorInstructionDataDecoder(),
   );
-}
-
-export interface CreateOperatorAsyncInput<
-  TAccountBase extends string = string,
-  TAccountOperator extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountQuarryMineProgram extends string = string,
-> {
-  base: TransactionSigner<TAccountBase>;
-  operator?: Address<TAccountOperator>;
-  rewarder: Address<TAccountRewarder>;
-  admin: Address<TAccountAdmin>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
-  bump: CreateOperatorInstructionDataArgs["bump"];
-}
-
-export async function getCreateOperatorInstructionAsync<
-  TAccountBase extends string,
-  TAccountOperator extends string,
-  TAccountRewarder extends string,
-  TAccountAdmin extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountQuarryMineProgram extends string,
-  TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
->(
-  input: CreateOperatorAsyncInput<
-    TAccountBase,
-    TAccountOperator,
-    TAccountRewarder,
-    TAccountAdmin,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountQuarryMineProgram
-  >,
-  config?: { programAddress?: TProgramAddress },
-): Promise<
-  CreateOperatorInstruction<
-    TProgramAddress,
-    TAccountBase,
-    TAccountOperator,
-    TAccountRewarder,
-    TAccountAdmin,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountQuarryMineProgram
-  >
-> {
-  // Program address.
-  const programAddress =
-    config?.programAddress ?? QUARRY_OPERATOR_PROGRAM_ADDRESS;
-
-  // Original accounts.
-  const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    operator: { value: input.operator ?? null, isWritable: true },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
-      isWritable: false,
-    },
-  };
-  const accounts = originalAccounts as Record<
-    keyof typeof originalAccounts,
-    ResolvedAccount
-  >;
-
-  // Original args.
-  const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.operator.value) {
-    accounts.operator.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([34, 79, 112, 101, 114, 97, 116, 111, 114, 34]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.base.value)),
-      ],
-    });
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.quarryMineProgram.value) {
-    accounts.quarryMineProgram.value =
-      "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
-  }
-
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
-  const instruction = {
-    accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.quarryMineProgram),
-    ],
-    programAddress,
-    data: getCreateOperatorInstructionDataEncoder().encode(
-      args as CreateOperatorInstructionDataArgs,
-    ),
-  } as CreateOperatorInstruction<
-    TProgramAddress,
-    TAccountBase,
-    TAccountOperator,
-    TAccountRewarder,
-    TAccountAdmin,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountQuarryMineProgram
-  >;
-
-  return instruction;
 }
 
 export interface CreateOperatorInput<

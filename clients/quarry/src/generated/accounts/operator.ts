@@ -43,7 +43,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 
-export const OPERATOR_DISCRIMINATOR = new Uint8Array([
+export const OPERATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   219, 31, 188, 145, 69, 139, 204, 117,
 ]);
 

@@ -10,13 +10,13 @@
 - [Accounts](#accounts)
   - [redeemer](#redeemer)
 - [Instructions](#instructions)
-  - [createRedeemer](#createRedeemer-1)
-  - [redeemTokens](#redeemTokens-1)
-  - [redeemAllTokens](#redeemAllTokens-1)
+  - [createRedeemer](#createRedeemer)
+  - [redeemTokens](#redeemTokens)
+  - [redeemAllTokens](#redeemAllTokens)
 - [PDAs](#pdas)
-  - [redeemer](#redeemer-2)
+  - [redeemer](#redeemer)
 - [Types](#types)
-  - [redeemTokensEvent](#redeemTokensEvent-3)
+  - [redeemTokensEvent](#redeemTokensEvent)
 - [Errors](#errors)
 
 ## Accounts
@@ -125,4 +125,4 @@
 
 ## Errors
 
-- **unauthorized** (Code: 6000 / `6000` / `0x1770`) -- Unauthorized.
+- **6000 - Unauthorized**: Unauthorized. _(Hex: `0x1770`)_

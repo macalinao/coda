@@ -11,24 +11,24 @@
   - [mintWrapper](#mintWrapper)
   - [minter](#minter)
 - [Instructions](#instructions)
-  - [newWrapper](#newWrapper-1)
-  - [newWrapperV2](#newWrapperV2-1)
-  - [transferAdmin](#transferAdmin-1)
-  - [acceptAdmin](#acceptAdmin-1)
-  - [newMinter](#newMinter-1)
-  - [newMinterV2](#newMinterV2-1)
-  - [minterUpdate](#minterUpdate-1)
-  - [performMint](#performMint-1)
+  - [newWrapper](#newWrapper)
+  - [newWrapperV2](#newWrapperV2)
+  - [transferAdmin](#transferAdmin)
+  - [acceptAdmin](#acceptAdmin)
+  - [newMinter](#newMinter)
+  - [newMinterV2](#newMinterV2)
+  - [minterUpdate](#minterUpdate)
+  - [performMint](#performMint)
 - [PDAs](#pdas)
-  - [mintWrapper](#mintWrapper-2)
-  - [minter](#minter-2)
+  - [mintWrapper](#mintWrapper)
+  - [minter](#minter)
 - [Types](#types)
-  - [newMintWrapperEvent](#newMintWrapperEvent-3)
-  - [mintWrapperAdminProposeEvent](#mintWrapperAdminProposeEvent-3)
-  - [mintWrapperAdminUpdateEvent](#mintWrapperAdminUpdateEvent-3)
-  - [newMinterEvent](#newMinterEvent-3)
-  - [minterAllowanceUpdateEvent](#minterAllowanceUpdateEvent-3)
-  - [minterMintEvent](#minterMintEvent-3)
+  - [newMintWrapperEvent](#newMintWrapperEvent)
+  - [mintWrapperAdminProposeEvent](#mintWrapperAdminProposeEvent)
+  - [mintWrapperAdminUpdateEvent](#mintWrapperAdminUpdateEvent)
+  - [newMinterEvent](#newMinterEvent)
+  - [minterAllowanceUpdateEvent](#minterAllowanceUpdateEvent)
+  - [minterMintEvent](#minterMintEvent)
 - [Errors](#errors)
 
 ## Accounts
@@ -144,14 +144,14 @@
 
 **Accounts:**
 
-| Account              | Type             | Description |
-| -------------------- | ---------------- | ----------- |
-| `mintWrapper`        | writable         |             |
-| `admin`              | signer           |             |
-| `newMinterAuthority` | readonly         |             |
-| `minter`             | writable         |             |
-| `payer`              | signer, writable |             |
-| `systemProgram`      | readonly         |             |
+| Account                    | Type             | Description |
+| -------------------------- | ---------------- | ----------- |
+| `newMinterAuthMintWrapper` | writable         |             |
+| `newMinterAuthAdmin`       | signer           |             |
+| `newMinterAuthority`       | readonly         |             |
+| `minter`                   | writable         |             |
+| `payer`                    | signer, writable |             |
+| `systemProgram`            | readonly         |             |
 
 **Arguments:**
 
@@ -164,14 +164,14 @@
 
 **Accounts:**
 
-| Account              | Type             | Description |
-| -------------------- | ---------------- | ----------- |
-| `mintWrapper`        | writable         |             |
-| `admin`              | signer           |             |
-| `newMinterAuthority` | readonly         |             |
-| `minter`             | writable         |             |
-| `payer`              | signer, writable |             |
-| `systemProgram`      | readonly         |             |
+| Account                      | Type             | Description |
+| ---------------------------- | ---------------- | ----------- |
+| `newMinterV2AuthMintWrapper` | writable         |             |
+| `newMinterV2AuthAdmin`       | signer           |             |
+| `newMinterAuthority`         | readonly         |             |
+| `minter`                     | writable         |             |
+| `payer`                      | signer, writable |             |
+| `systemProgram`              | readonly         |             |
 
 **Arguments:**
 
@@ -183,11 +183,11 @@
 
 **Accounts:**
 
-| Account       | Type     | Description |
-| ------------- | -------- | ----------- |
-| `mintWrapper` | writable |             |
-| `admin`       | signer   |             |
-| `minter`      | writable |             |
+| Account                       | Type     | Description |
+| ----------------------------- | -------- | ----------- |
+| `minterUpdateAuthMintWrapper` | writable |             |
+| `minterUpdateAuthAdmin`       | signer   |             |
+| `minter`                      | writable |             |
 
 **Arguments:**
 
@@ -317,6 +317,6 @@
 
 ## Errors
 
-- **unauthorized** (Code: 6000 / `6000` / `0x1770`) -- You are not authorized to perform this action.
-- **hardcapExceeded** (Code: 6001 / `6001` / `0x1771`) -- Cannot mint over hard cap.
-- **minterAllowanceExceeded** (Code: 6002 / `6002` / `0x1772`) -- Minter allowance exceeded.
+- **6000 - Unauthorized**: You are not authorized to perform this action. _(Hex: `0x1770`)_
+- **6001 - HardcapExceeded**: Cannot mint over hard cap. _(Hex: `0x1771`)_
+- **6002 - MinterAllowanceExceeded**: Minter allowance exceeded. _(Hex: `0x1772`)_

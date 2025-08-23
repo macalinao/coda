@@ -33,9 +33,8 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const UPDATE_QUARRY_REWARDS_DISCRIMINATOR = new Uint8Array([
-  42, 213, 243, 249, 125, 145, 44, 242,
-]);
+export const UPDATE_QUARRY_REWARDS_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([42, 213, 243, 249, 125, 145, 44, 242]);
 
 export function getUpdateQuarryRewardsDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

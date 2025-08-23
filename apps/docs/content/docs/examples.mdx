@@ -39,6 +39,29 @@ The Quarry client demonstrates Coda's **multi-program** capabilities:
 
 Ideal for protocol developers managing multiple interconnected programs or anyone building comprehensive DeFi integrations.
 
+### Kamino Lending Client
+
+[![npm version](https://img.shields.io/npm/v/@macalinao/clients-kamino-lending.svg?style=flat-square)](https://www.npmjs.com/package/@macalinao/clients-kamino-lending)
+[![npm downloads](https://img.shields.io/npm/dm/@macalinao/clients-kamino-lending.svg?style=flat-square)](https://www.npmjs.com/package/@macalinao/clients-kamino-lending)
+
+[View on GitHub →](https://github.com/macalinao/coda/tree/master/clients/kamino-lending)
+
+The Kamino Lending client demonstrates Coda's ability to handle **complex IDLs with overlapping account names**:
+
+- **Overlapping account names** - Handles instructions with duplicate account names across nested structures
+- **Automatic flattening** - Intelligently flattens nested account groups to avoid naming conflicts
+- **Complex DeFi protocol** - Full lending protocol with deposit, withdraw, and liquidation operations
+- **Production-scale IDL** - Processes large IDL with numerous instructions and account types
+
+This example is particularly useful for developers working with:
+
+- Complex DeFi protocols with nested account structures
+- IDLs that have evolved over time with naming inconsistencies
+- Programs requiring sophisticated account management patterns
+- Large-scale production protocols with intricate instruction sets
+
+The Kamino Lending client showcases how Coda's automatic account flattening feature (via `codama-instruction-accounts-dedupe-visitor`) resolves naming conflicts that would otherwise cause compilation errors in generated TypeScript code.
+
 ## Add Your Example
 
 Using Coda in your project? We'd love to showcase it!
@@ -49,30 +72,6 @@ Using Coda in your project? We'd love to showcase it!
 
 1. Fork the [Coda repository](https://github.com/macalinao/coda)
 2. Edit this file at `apps/docs/content/docs/examples.mdx`
-3. Add your project following this format:
-
-```mdx
-### Your Project Name
-
-[View on GitHub →](https://github.com/yourname/yourproject)
-
-Brief description of what makes your implementation unique:
-
-- **Key feature 1** - Description
-- **Key feature 2** - Description
-- **Key feature 3** - Description
-
-What developers can learn from your example.
-```
-
-4. Submit your PR with a clear description
-
-We welcome examples that demonstrate:
-- Novel configuration approaches
-- Integration patterns
-- Complex visitor usage
-- Multi-program setups
-- Custom code generation workflows
-- Production deployment strategies
+3. Submit your PR with a clear description
 
 Help the Solana developer community by sharing your Coda implementation!

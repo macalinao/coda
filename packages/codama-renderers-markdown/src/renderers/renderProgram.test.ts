@@ -76,7 +76,7 @@ describe("renderProgram", () => {
     expect(formatted).toContain("### initializeMint");
     expect(formatted).toContain("## Errors");
     expect(formatted).toContain(
-      "- **invalidMint** (Code: 0 / `000` / `0x0`) -- Invalid mint",
+      "- **0 - InvalidMint**: Invalid mint _(Hex: `0x0`)_",
     );
   });
 

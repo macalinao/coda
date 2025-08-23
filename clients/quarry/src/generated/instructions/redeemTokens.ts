@@ -38,7 +38,7 @@ import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REDEEM_TOKENS_DISCRIMINATOR = new Uint8Array([
+export const REDEEM_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   246, 98, 134, 41, 152, 33, 120, 69,
 ]);
 

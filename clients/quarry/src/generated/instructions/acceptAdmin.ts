@@ -35,7 +35,7 @@ import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const ACCEPT_ADMIN_DISCRIMINATOR = new Uint8Array([
+export const ACCEPT_ADMIN_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   112, 42, 45, 90, 116, 181, 13, 170,
 ]);
 

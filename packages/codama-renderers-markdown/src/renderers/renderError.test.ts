@@ -15,7 +15,7 @@ describe("renderError", () => {
     const markdown = renderError(error);
 
     expect(markdown).toBe(
-      "- **insufficientFunds** (Code: 1001 / `1001` / `0x3e9`) -- Insufficient funds for operation",
+      "- **1001 - InsufficientFunds**: Insufficient funds for operation *(Hex: `0x3e9`)*",
     );
   });
 });

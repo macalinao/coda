@@ -8,13 +8,15 @@
   "homepage": "https://coda.ianm.com",
   "license": "Apache-2.0",
   "keywords": [
+    "coda",
     "solana",
     "metaplex",
     "token-metadata",
     "nft",
     "client",
     "esm",
-    "typescript"
+    "typescript",
+    "ian-macalinao"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -51,7 +53,6 @@
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "*",
-    "codama": "*",
     "eslint": "catalog:",
     "typescript": "catalog:"
   },

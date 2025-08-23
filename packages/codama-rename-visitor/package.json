@@ -9,12 +9,14 @@
   "license": "Apache-2.0",
   "keywords": [
     "codama",
+    "coda",
     "solana",
     "anchor",
     "idl",
     "rename",
     "visitor",
-    "typescript"
+    "typescript",
+    "ian-macalinao"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -40,10 +42,10 @@
     "build": "tsc",
     "clean": "rm -fr dist/",
     "lint": "eslint . --cache",
-    "test": "bun test"
+    "test": "bun test src/"
   },
   "dependencies": {
-    "codama": "*"
+    "codama": "catalog:"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",

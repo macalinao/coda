@@ -12,41 +12,41 @@
   - [quarry](#quarry)
   - [miner](#miner)
 - [Instructions](#instructions)
-  - [newRewarder](#newRewarder-1)
-  - [newRewarderV2](#newRewarderV2-1)
-  - [setPauseAuthority](#setPauseAuthority-1)
-  - [pause](#pause-1)
-  - [unpause](#unpause-1)
-  - [transferAuthority](#transferAuthority-1)
-  - [acceptAuthority](#acceptAuthority-1)
-  - [setAnnualRewards](#setAnnualRewards-1)
-  - [createQuarry](#createQuarry-1)
-  - [createQuarryV2](#createQuarryV2-1)
-  - [setRewardsShare](#setRewardsShare-1)
-  - [setFamine](#setFamine-1)
-  - [updateQuarryRewards](#updateQuarryRewards-1)
-  - [createMiner](#createMiner-1)
-  - [createMinerV2](#createMinerV2-1)
-  - [claimRewards](#claimRewards-1)
-  - [claimRewardsV2](#claimRewardsV2-1)
-  - [stakeTokens](#stakeTokens-1)
-  - [withdrawTokens](#withdrawTokens-1)
-  - [rescueTokens](#rescueTokens-1)
-  - [extractFees](#extractFees-1)
+  - [newRewarder](#newRewarder)
+  - [newRewarderV2](#newRewarderV2)
+  - [setPauseAuthority](#setPauseAuthority)
+  - [pause](#pause)
+  - [unpause](#unpause)
+  - [transferAuthority](#transferAuthority)
+  - [acceptAuthority](#acceptAuthority)
+  - [setAnnualRewards](#setAnnualRewards)
+  - [createQuarry](#createQuarry)
+  - [createQuarryV2](#createQuarryV2)
+  - [setRewardsShare](#setRewardsShare)
+  - [setFamine](#setFamine)
+  - [updateQuarryRewards](#updateQuarryRewards)
+  - [createMiner](#createMiner)
+  - [createMinerV2](#createMinerV2)
+  - [claimRewards](#claimRewards)
+  - [claimRewardsV2](#claimRewardsV2)
+  - [stakeTokens](#stakeTokens)
+  - [withdrawTokens](#withdrawTokens)
+  - [rescueTokens](#rescueTokens)
+  - [extractFees](#extractFees)
 - [PDAs](#pdas)
-  - [rewarder](#rewarder-2)
-  - [quarry](#quarry-2)
-  - [miner](#miner-2)
+  - [rewarder](#rewarder)
+  - [quarry](#quarry)
+  - [miner](#miner)
 - [Types](#types)
-  - [stakeAction](#stakeAction-3)
-  - [claimEvent](#claimEvent-3)
-  - [minerCreateEvent](#minerCreateEvent-3)
-  - [quarryCreateEvent](#quarryCreateEvent-3)
-  - [newRewarderEvent](#newRewarderEvent-3)
-  - [stakeEvent](#stakeEvent-3)
-  - [withdrawEvent](#withdrawEvent-3)
-  - [rewarderAnnualRewardsUpdateEvent](#rewarderAnnualRewardsUpdateEvent-3)
-  - [quarryRewardsUpdateEvent](#quarryRewardsUpdateEvent-3)
+  - [stakeAction](#stakeAction)
+  - [claimEvent](#claimEvent)
+  - [minerCreateEvent](#minerCreateEvent)
+  - [quarryCreateEvent](#quarryCreateEvent)
+  - [newRewarderEvent](#newRewarderEvent)
+  - [stakeEvent](#stakeEvent)
+  - [withdrawEvent](#withdrawEvent)
+  - [rewarderAnnualRewardsUpdateEvent](#rewarderAnnualRewardsUpdateEvent)
+  - [quarryRewardsUpdateEvent](#quarryRewardsUpdateEvent)
 - [Errors](#errors)
 
 ## Accounts
@@ -160,8 +160,8 @@
 
 | Account             | Type     | Description |
 | ------------------- | -------- | ----------- |
-| `authority`         | signer   |             |
-| `rewarder`          | writable |             |
+| `authAuthority`     | signer   |             |
+| `authRewarder`      | writable |             |
 | `newPauseAuthority` | readonly |             |
 
 **Arguments:**
@@ -235,10 +235,10 @@
 
 **Accounts:**
 
-| Account     | Type     | Description |
-| ----------- | -------- | ----------- |
-| `authority` | signer   |             |
-| `rewarder`  | writable |             |
+| Account         | Type     | Description |
+| --------------- | -------- | ----------- |
+| `authAuthority` | signer   |             |
+| `authRewarder`  | writable |             |
 
 **Arguments:**
 
@@ -254,8 +254,8 @@
 | Account         | Type             | Description |
 | --------------- | ---------------- | ----------- |
 | `quarry`        | writable         |             |
-| `authority`     | signer           |             |
-| `rewarder`      | writable         |             |
+| `authAuthority` | signer           |             |
+| `authRewarder`  | writable         |             |
 | `tokenMint`     | readonly         |             |
 | `payer`         | signer, writable |             |
 | `unusedAccount` | readonly         |             |
@@ -275,8 +275,8 @@
 | Account         | Type             | Description |
 | --------------- | ---------------- | ----------- |
 | `quarry`        | writable         |             |
-| `authority`     | signer           |             |
-| `rewarder`      | writable         |             |
+| `authAuthority` | signer           |             |
+| `authRewarder`  | writable         |             |
 | `tokenMint`     | readonly         |             |
 | `payer`         | signer, writable |             |
 | `systemProgram` | readonly         |             |
@@ -291,11 +291,11 @@
 
 **Accounts:**
 
-| Account     | Type     | Description |
-| ----------- | -------- | ----------- |
-| `authority` | signer   |             |
-| `rewarder`  | writable |             |
-| `quarry`    | writable |             |
+| Account         | Type     | Description |
+| --------------- | -------- | ----------- |
+| `authAuthority` | signer   |             |
+| `authRewarder`  | writable |             |
+| `quarry`        | writable |             |
 
 **Arguments:**
 
@@ -308,11 +308,11 @@
 
 **Accounts:**
 
-| Account     | Type     | Description |
-| ----------- | -------- | ----------- |
-| `authority` | signer   |             |
-| `rewarder`  | readonly |             |
-| `quarry`    | writable |             |
+| Account         | Type     | Description |
+| --------------- | -------- | ----------- |
+| `authAuthority` | signer   |             |
+| `authRewarder`  | readonly |             |
+| `quarry`        | writable |             |
 
 **Arguments:**
 
@@ -385,21 +385,21 @@
 
 **Accounts:**
 
-| Account                | Type     | Description |
-| ---------------------- | -------- | ----------- |
-| `mintWrapper`          | writable |             |
-| `mintWrapperProgram`   | readonly |             |
-| `minter`               | writable |             |
-| `rewardsTokenMint`     | writable |             |
-| `rewardsTokenAccount`  | writable |             |
-| `claimFeeTokenAccount` | writable |             |
-| `authority`            | signer   |             |
-| `miner`                | writable |             |
-| `quarry`               | writable |             |
-| `unusedMinerVault`     | readonly |             |
-| `unusedTokenAccount`   | readonly |             |
-| `tokenProgram`         | readonly |             |
-| `rewarder`             | readonly |             |
+| Account                     | Type     | Description |
+| --------------------------- | -------- | ----------- |
+| `mintWrapper`               | writable |             |
+| `mintWrapperProgram`        | readonly |             |
+| `minter`                    | writable |             |
+| `rewardsTokenMint`          | writable |             |
+| `rewardsTokenAccount`       | writable |             |
+| `claimFeeTokenAccount`      | writable |             |
+| `claimV1Authority`          | signer   |             |
+| `claimV1Miner`              | writable |             |
+| `claimV1Quarry`             | writable |             |
+| `claimV1UnusedMinerVault`   | readonly |             |
+| `claimV1UnusedTokenAccount` | readonly |             |
+| `claimV1TokenProgram`       | readonly |             |
+| `claimV1Rewarder`           | readonly |             |
 
 **Arguments:**
 
@@ -419,11 +419,11 @@
 | `rewardsTokenMint`     | writable |             |
 | `rewardsTokenAccount`  | writable |             |
 | `claimFeeTokenAccount` | writable |             |
-| `authority`            | signer   |             |
-| `miner`                | writable |             |
-| `quarry`               | writable |             |
-| `tokenProgram`         | readonly |             |
-| `rewarder`             | readonly |             |
+| `claimAuthority`       | signer   |             |
+| `claimMiner`           | writable |             |
+| `claimQuarry`          | writable |             |
+| `claimTokenProgram`    | readonly |             |
+| `claimRewarder`        | readonly |             |
 
 **Arguments:**
 
@@ -652,15 +652,15 @@
 
 ## Errors
 
-- **unauthorized** (Code: 6000 / `6000` / `0x1770`) -- You are not authorized to perform this action.
-- **insufficientBalance** (Code: 6001 / `6001` / `0x1771`) -- Insufficient staked balance for withdraw request.
-- **pendingAuthorityNotSet** (Code: 6002 / `6002` / `0x1772`) -- Pending authority not set
-- **invalidRewardsShare** (Code: 6003 / `6003` / `0x1773`) -- Invalid quarry rewards share
-- **insufficientAllowance** (Code: 6004 / `6004` / `0x1774`) -- Insufficient allowance.
-- **newVaultNotEmpty** (Code: 6005 / `6005` / `0x1775`) -- New vault not empty.
-- **notEnoughTokens** (Code: 6006 / `6006` / `0x1776`) -- Not enough tokens.
-- **invalidTimestamp** (Code: 6007 / `6007` / `0x1777`) -- Invalid timestamp.
-- **invalidMaxClaimFee** (Code: 6008 / `6008` / `0x1778`) -- Invalid max claim fee.
-- **maxAnnualRewardsRateExceeded** (Code: 6009 / `6009` / `0x1779`) -- Max annual rewards rate exceeded.
-- **paused** (Code: 6010 / `6010` / `0x177a`) -- Rewarder is paused.
-- **upperboundExceeded** (Code: 6011 / `6011` / `0x177b`) -- Rewards earned exceeded quarry's upper bound.
+- **6000 - Unauthorized**: You are not authorized to perform this action. _(Hex: `0x1770`)_
+- **6001 - InsufficientBalance**: Insufficient staked balance for withdraw request. _(Hex: `0x1771`)_
+- **6002 - PendingAuthorityNotSet**: Pending authority not set _(Hex: `0x1772`)_
+- **6003 - InvalidRewardsShare**: Invalid quarry rewards share _(Hex: `0x1773`)_
+- **6004 - InsufficientAllowance**: Insufficient allowance. _(Hex: `0x1774`)_
+- **6005 - NewVaultNotEmpty**: New vault not empty. _(Hex: `0x1775`)_
+- **6006 - NotEnoughTokens**: Not enough tokens. _(Hex: `0x1776`)_
+- **6007 - InvalidTimestamp**: Invalid timestamp. _(Hex: `0x1777`)_
+- **6008 - InvalidMaxClaimFee**: Invalid max claim fee. _(Hex: `0x1778`)_
+- **6009 - MaxAnnualRewardsRateExceeded**: Max annual rewards rate exceeded. _(Hex: `0x1779`)_
+- **6010 - Paused**: Rewarder is paused. _(Hex: `0x177a`)_
+- **6011 - UpperboundExceeded**: Rewards earned exceeded quarry's upper bound. _(Hex: `0x177b`)_

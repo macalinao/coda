@@ -1,0 +1,66 @@
+{
+  "name": "@macalinao/clients-kamino-lending",
+  "version": "0.0.1",
+  "description": "TypeScript client for the Kamino Lending program",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://coda.ianm.com",
+  "license": "Apache-2.0",
+  "keywords": [
+    "coda",
+    "solana",
+    "kamino",
+    "lending",
+    "defi",
+    "client",
+    "esm",
+    "typescript",
+    "ian-macalinao"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/kamino-lending"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -fr dist/",
+    "lint": "eslint . --cache",
+    "test": "echo 'No tests yet'",
+    "codegen": "coda generate"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*"
+  },
+  "devDependencies": {
+    "@macalinao/coda": "workspace:*",
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "*",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts}": [
+      "biome check --write --no-errors-on-unmatched",
+      "eslint --fix --cache"
+    ],
+    "*.{json,jsonc,html}": "biome format --write --no-errors-on-unmatched"
+  }
+}

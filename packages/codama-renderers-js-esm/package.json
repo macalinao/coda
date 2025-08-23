@@ -9,10 +9,12 @@
   "license": "Apache-2.0",
   "keywords": [
     "codama",
+    "coda",
     "solana",
     "esm",
     "typescript",
-    "code-generation"
+    "code-generation",
+    "ian-macalinao"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -41,9 +43,9 @@
     "test": "echo 'No tests yet'"
   },
   "dependencies": {
-    "@codama/renderers-core": "*",
-    "@codama/renderers-js": "*",
-    "codama": "*"
+    "@codama/renderers-core": "catalog:",
+    "@codama/renderers-js": "catalog:",
+    "codama": "catalog:"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",
