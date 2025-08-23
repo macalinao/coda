@@ -4,6 +4,7 @@ import {
   defineConfig,
   numberTypeNode,
   publicKeyTypeNode,
+  renameVisitor,
   stringTypeNode,
   variablePdaSeedNode,
 } from "@macalinao/coda";
@@ -109,6 +110,13 @@ export default defineConfig({
           ],
         },
       ],
+    }),
+    renameVisitor({
+      farms: {
+        definedTypes: {
+          tokenInfo: "farmsTokenInfo",
+        },
+      },
     }),
   ],
 });

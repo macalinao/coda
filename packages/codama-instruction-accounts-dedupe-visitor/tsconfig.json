@@ -1,3 +1,4 @@
 {
-  "extends": "@macalinao/tsconfig/tsconfig.base.json"
+  "extends": "@macalinao/tsconfig/tsconfig.base.json",
+  "exclude": ["**/*.test.ts", "dist"]
 }

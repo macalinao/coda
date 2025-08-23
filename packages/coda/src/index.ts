@@ -1,5 +1,6 @@
 // Re-export useful visitors and utilities
 
+export { renameVisitor } from "@macalinao/codama-rename-visitor";
 export {
   ESM_DEPENDENCY_MAP,
   renderESMTypeScriptVisitor,

@@ -97,6 +97,7 @@
       "dependencies": {
         "@codama/nodes-from-anchor": "catalog:",
         "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
+        "@macalinao/codama-rename-visitor": "workspace:*",
         "@macalinao/codama-renderers-js-esm": "workspace:*",
         "@macalinao/codama-renderers-markdown": "workspace:*",
         "codama": "catalog:",
