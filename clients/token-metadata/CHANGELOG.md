@@ -1,5 +1,11 @@
 # @macalinao/token-metadata-client
 
+## 0.2.2
+
+### Patch Changes
+
+- f7a50ca: Add codama-renderers-markdown
+
 ## 0.2.1
 
 ### Patch Changes

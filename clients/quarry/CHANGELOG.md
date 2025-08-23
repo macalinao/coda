@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.1.2
+
+### Patch Changes
+
+- f7a50ca: Add codama-renderers-markdown
+
 ## 0.1.1
 
 ### Patch Changes
