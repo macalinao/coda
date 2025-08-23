@@ -1,3 +1,4 @@
+import type { RootNode } from "@codama/nodes";
 import { getAllPrograms } from "@codama/nodes";
 import { RenderMap } from "@codama/renderers-core";
 import {
@@ -21,7 +22,7 @@ export function renderMarkdownVisitor(
     visit(root, getRecordLinkablesVisitor(linkables));
 
     const map = new RenderMap();
-    const programs = getAllPrograms(root);
+    const programs = getAllPrograms(root as unknown as RootNode);
 
     // Generate markdown for each program
     for (const program of programs) {

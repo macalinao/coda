@@ -37,15 +37,13 @@
     "url": "https://github.com/macalinao/coda/issues"
   },
   "dependencies": {
-    "@codama/nodes": "*",
-    "@codama/nodes-from-anchor": "*"
+    "@codama/nodes": "^1.3.3",
+    "@codama/nodes-from-anchor": "^1.2.5",
+    "@macalinao/codama-instruction-accounts-dedupe-visitor": "^0.2.1",
+    "codama": "^1.3.3"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5.7.3"
-  },
-  "peerDependencies": {
-    "@codama/nodes": "*",
-    "@codama/nodes-from-anchor": "*"
+    "typescript": "^5.9.2"
   }
 }

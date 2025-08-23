@@ -1,10 +1,11 @@
-import type { RootNode } from "@codama/nodes";
+import type { ProgramNode, RootNode } from "@codama/nodes";
 import { rootNode } from "@codama/nodes";
 import type { AnchorIdl, IdlV00, IdlV01 } from "@codama/nodes-from-anchor";
 import {
   programNodeFromAnchorV00,
   programNodeFromAnchorV01,
 } from "@codama/nodes-from-anchor";
+import { instructionAccountsDedupeProgramVisitor } from "@macalinao/codama-instruction-accounts-dedupe-visitor";
 
 /**
  * Creates a Codama root node from multiple Anchor IDLs.
@@ -48,7 +49,11 @@ export function rootNodeFromAnchorIdls(idls: AnchorIdl[]): RootNode {
       "spec" in idl.metadata &&
       idl.metadata.spec === "0.1.0"
     ) {
-      return programNodeFromAnchorV01(idl as unknown as IdlV01);
+      const idlV01 = idl as unknown as IdlV01;
+      const program = programNodeFromAnchorV01(
+        idlV01,
+      ) as unknown as ProgramNode;
+      return instructionAccountsDedupeProgramVisitor(idlV01, program);
     }
     return programNodeFromAnchorV00(idl as unknown as IdlV00);
   });
@@ -58,5 +63,8 @@ export function rootNodeFromAnchorIdls(idls: AnchorIdl[]): RootNode {
     throw new Error("No program nodes could be created from the provided IDLs");
   }
 
-  return rootNode(firstProgramNode, restProgramNodes);
+  return rootNode(
+    firstProgramNode as unknown as ProgramNode,
+    restProgramNodes as unknown as ProgramNode[],
+  );
 }

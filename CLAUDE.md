@@ -189,6 +189,7 @@ export default defineConfig({
 - Arrays use shorthand syntax: `string[]` not `Array<string>`
 - **Use double quotes for strings** (not single quotes)
 - ES modules with `.js` extensions for imports
+- **File naming**: Use kebab-case for all TypeScript files (e.g., `root-node-from-anchor.ts`, `create-codama-from-idls.ts`)
 
 ### After Making Code Changes
 **Always run these commands to ensure code quality:**

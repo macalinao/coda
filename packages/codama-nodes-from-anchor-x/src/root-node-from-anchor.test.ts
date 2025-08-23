@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
-import { rootNodeFromAnchor } from "./rootNodeFromAnchor.js";
+import { rootNodeFromAnchor } from "./root-node-from-anchor.js";
 
 describe("rootNodeFromAnchor", () => {
   const createMockIdl = (name: string, version = "0.0.0"): AnchorIdl => ({
@@ -63,9 +63,7 @@ describe("rootNodeFromAnchor", () => {
         {
           name: "transfer",
           accounts: [],
-          args: [
-            { name: "amount", type: "u64" },
-          ],
+          args: [{ name: "amount", type: "u64" }],
         },
       ],
       accounts: [
