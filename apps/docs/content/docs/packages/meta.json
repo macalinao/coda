@@ -4,6 +4,8 @@
     "index",
     "---Core Package---",
     "coda",
+    "---Parsers---",
+    "codama-nodes-from-anchor-x",
     "---Visitors---",
     "codama-instruction-accounts-dedupe-visitor",
     "codama-rename-visitor",
