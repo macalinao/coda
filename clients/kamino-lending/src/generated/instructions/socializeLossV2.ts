@@ -50,15 +50,27 @@ export function getSocializeLossV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SocializeLossV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountRiskCouncil extends string | AccountMeta<string> = string,
-  TAccountObligation extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TAccountInstructionSysvarAccount extends
+  TAccountSocializeLossAccountsRiskCouncil extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountSocializeLossAccountsObligation extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountSocializeLossAccountsLendingMarket extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountSocializeLossAccountsReserve extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountSocializeLossAccountsInstructionSysvarAccount extends
     | string
     | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
-  TAccountObligationFarmUserState extends string | AccountMeta<string> = string,
-  TAccountReserveFarmState extends string | AccountMeta<string> = string,
+  TAccountSocializeLossV2FarmsAccountsObligationFarmUserState extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountSocializeLossV2FarmsAccountsReserveFarmState extends
+    | string
+    | AccountMeta<string> = string,
   TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
   TAccountFarmsProgram extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -66,28 +78,28 @@ export type SocializeLossV2Instruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountRiskCouncil extends string
-        ? ReadonlySignerAccount<TAccountRiskCouncil> &
-            AccountSignerMeta<TAccountRiskCouncil>
-        : TAccountRiskCouncil,
-      TAccountObligation extends string
-        ? WritableAccount<TAccountObligation>
-        : TAccountObligation,
-      TAccountLendingMarket extends string
-        ? ReadonlyAccount<TAccountLendingMarket>
-        : TAccountLendingMarket,
-      TAccountReserve extends string
-        ? WritableAccount<TAccountReserve>
-        : TAccountReserve,
-      TAccountInstructionSysvarAccount extends string
-        ? ReadonlyAccount<TAccountInstructionSysvarAccount>
-        : TAccountInstructionSysvarAccount,
-      TAccountObligationFarmUserState extends string
-        ? WritableAccount<TAccountObligationFarmUserState>
-        : TAccountObligationFarmUserState,
-      TAccountReserveFarmState extends string
-        ? WritableAccount<TAccountReserveFarmState>
-        : TAccountReserveFarmState,
+      TAccountSocializeLossAccountsRiskCouncil extends string
+        ? ReadonlySignerAccount<TAccountSocializeLossAccountsRiskCouncil> &
+            AccountSignerMeta<TAccountSocializeLossAccountsRiskCouncil>
+        : TAccountSocializeLossAccountsRiskCouncil,
+      TAccountSocializeLossAccountsObligation extends string
+        ? WritableAccount<TAccountSocializeLossAccountsObligation>
+        : TAccountSocializeLossAccountsObligation,
+      TAccountSocializeLossAccountsLendingMarket extends string
+        ? ReadonlyAccount<TAccountSocializeLossAccountsLendingMarket>
+        : TAccountSocializeLossAccountsLendingMarket,
+      TAccountSocializeLossAccountsReserve extends string
+        ? WritableAccount<TAccountSocializeLossAccountsReserve>
+        : TAccountSocializeLossAccountsReserve,
+      TAccountSocializeLossAccountsInstructionSysvarAccount extends string
+        ? ReadonlyAccount<TAccountSocializeLossAccountsInstructionSysvarAccount>
+        : TAccountSocializeLossAccountsInstructionSysvarAccount,
+      TAccountSocializeLossV2FarmsAccountsObligationFarmUserState extends string
+        ? WritableAccount<TAccountSocializeLossV2FarmsAccountsObligationFarmUserState>
+        : TAccountSocializeLossV2FarmsAccountsObligationFarmUserState,
+      TAccountSocializeLossV2FarmsAccountsReserveFarmState extends string
+        ? WritableAccount<TAccountSocializeLossV2FarmsAccountsReserveFarmState>
+        : TAccountSocializeLossV2FarmsAccountsReserveFarmState,
       TAccountLendingMarketAuthority extends string
         ? ReadonlyAccount<TAccountLendingMarketAuthority>
         : TAccountLendingMarketAuthority,
@@ -135,61 +147,62 @@ export function getSocializeLossV2InstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SocializeLossV2Input<
-  TAccountRiskCouncil extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountReserve extends string = string,
-  TAccountInstructionSysvarAccount extends string = string,
-  TAccountObligationFarmUserState extends string = string,
-  TAccountReserveFarmState extends string = string,
+  TAccountSocializeLossAccountsRiskCouncil extends string = string,
+  TAccountSocializeLossAccountsObligation extends string = string,
+  TAccountSocializeLossAccountsLendingMarket extends string = string,
+  TAccountSocializeLossAccountsReserve extends string = string,
+  TAccountSocializeLossAccountsInstructionSysvarAccount extends string = string,
+  TAccountSocializeLossV2FarmsAccountsObligationFarmUserState extends
+    string = string,
+  TAccountSocializeLossV2FarmsAccountsReserveFarmState extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountFarmsProgram extends string = string,
 > = {
-  riskCouncil: TransactionSigner<TAccountRiskCouncil>;
-  obligation: Address<TAccountObligation>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  reserve: Address<TAccountReserve>;
-  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
-  obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
-  reserveFarmState?: Address<TAccountReserveFarmState>;
+  socializeLossAccountsRiskCouncil: TransactionSigner<TAccountSocializeLossAccountsRiskCouncil>;
+  socializeLossAccountsObligation: Address<TAccountSocializeLossAccountsObligation>;
+  socializeLossAccountsLendingMarket: Address<TAccountSocializeLossAccountsLendingMarket>;
+  socializeLossAccountsReserve: Address<TAccountSocializeLossAccountsReserve>;
+  socializeLossAccountsInstructionSysvarAccount?: Address<TAccountSocializeLossAccountsInstructionSysvarAccount>;
+  socializeLossV2FarmsAccountsObligationFarmUserState?: Address<TAccountSocializeLossV2FarmsAccountsObligationFarmUserState>;
+  socializeLossV2FarmsAccountsReserveFarmState?: Address<TAccountSocializeLossV2FarmsAccountsReserveFarmState>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   farmsProgram: Address<TAccountFarmsProgram>;
   liquidityAmount: SocializeLossV2InstructionDataArgs["liquidityAmount"];
 };
 
 export function getSocializeLossV2Instruction<
-  TAccountRiskCouncil extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarket extends string,
-  TAccountReserve extends string,
-  TAccountInstructionSysvarAccount extends string,
-  TAccountObligationFarmUserState extends string,
-  TAccountReserveFarmState extends string,
+  TAccountSocializeLossAccountsRiskCouncil extends string,
+  TAccountSocializeLossAccountsObligation extends string,
+  TAccountSocializeLossAccountsLendingMarket extends string,
+  TAccountSocializeLossAccountsReserve extends string,
+  TAccountSocializeLossAccountsInstructionSysvarAccount extends string,
+  TAccountSocializeLossV2FarmsAccountsObligationFarmUserState extends string,
+  TAccountSocializeLossV2FarmsAccountsReserveFarmState extends string,
   TAccountLendingMarketAuthority extends string,
   TAccountFarmsProgram extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: SocializeLossV2Input<
-    TAccountRiskCouncil,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountReserve,
-    TAccountInstructionSysvarAccount,
-    TAccountObligationFarmUserState,
-    TAccountReserveFarmState,
+    TAccountSocializeLossAccountsRiskCouncil,
+    TAccountSocializeLossAccountsObligation,
+    TAccountSocializeLossAccountsLendingMarket,
+    TAccountSocializeLossAccountsReserve,
+    TAccountSocializeLossAccountsInstructionSysvarAccount,
+    TAccountSocializeLossV2FarmsAccountsObligationFarmUserState,
+    TAccountSocializeLossV2FarmsAccountsReserveFarmState,
     TAccountLendingMarketAuthority,
     TAccountFarmsProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): SocializeLossV2Instruction<
   TProgramAddress,
-  TAccountRiskCouncil,
-  TAccountObligation,
-  TAccountLendingMarket,
-  TAccountReserve,
-  TAccountInstructionSysvarAccount,
-  TAccountObligationFarmUserState,
-  TAccountReserveFarmState,
+  TAccountSocializeLossAccountsRiskCouncil,
+  TAccountSocializeLossAccountsObligation,
+  TAccountSocializeLossAccountsLendingMarket,
+  TAccountSocializeLossAccountsReserve,
+  TAccountSocializeLossAccountsInstructionSysvarAccount,
+  TAccountSocializeLossV2FarmsAccountsObligationFarmUserState,
+  TAccountSocializeLossV2FarmsAccountsReserveFarmState,
   TAccountLendingMarketAuthority,
   TAccountFarmsProgram
 > {
@@ -199,20 +212,32 @@ export function getSocializeLossV2Instruction<
 
   // Original accounts.
   const originalAccounts = {
-    riskCouncil: { value: input.riskCouncil ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: true },
-    instructionSysvarAccount: {
-      value: input.instructionSysvarAccount ?? null,
+    socializeLossAccountsRiskCouncil: {
+      value: input.socializeLossAccountsRiskCouncil ?? null,
       isWritable: false,
     },
-    obligationFarmUserState: {
-      value: input.obligationFarmUserState ?? null,
+    socializeLossAccountsObligation: {
+      value: input.socializeLossAccountsObligation ?? null,
       isWritable: true,
     },
-    reserveFarmState: {
-      value: input.reserveFarmState ?? null,
+    socializeLossAccountsLendingMarket: {
+      value: input.socializeLossAccountsLendingMarket ?? null,
+      isWritable: false,
+    },
+    socializeLossAccountsReserve: {
+      value: input.socializeLossAccountsReserve ?? null,
+      isWritable: true,
+    },
+    socializeLossAccountsInstructionSysvarAccount: {
+      value: input.socializeLossAccountsInstructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+    socializeLossV2FarmsAccountsObligationFarmUserState: {
+      value: input.socializeLossV2FarmsAccountsObligationFarmUserState ?? null,
+      isWritable: true,
+    },
+    socializeLossV2FarmsAccountsReserveFarmState: {
+      value: input.socializeLossV2FarmsAccountsReserveFarmState ?? null,
       isWritable: true,
     },
     lendingMarketAuthority: {
@@ -230,21 +255,23 @@ export function getSocializeLossV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.instructionSysvarAccount.value) {
-    accounts.instructionSysvarAccount.value =
+  if (!accounts.socializeLossAccountsInstructionSysvarAccount.value) {
+    accounts.socializeLossAccountsInstructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.riskCouncil),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.instructionSysvarAccount),
-      getAccountMeta(accounts.obligationFarmUserState),
-      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.socializeLossAccountsRiskCouncil),
+      getAccountMeta(accounts.socializeLossAccountsObligation),
+      getAccountMeta(accounts.socializeLossAccountsLendingMarket),
+      getAccountMeta(accounts.socializeLossAccountsReserve),
+      getAccountMeta(accounts.socializeLossAccountsInstructionSysvarAccount),
+      getAccountMeta(
+        accounts.socializeLossV2FarmsAccountsObligationFarmUserState,
+      ),
+      getAccountMeta(accounts.socializeLossV2FarmsAccountsReserveFarmState),
       getAccountMeta(accounts.lendingMarketAuthority),
       getAccountMeta(accounts.farmsProgram),
     ],
@@ -254,13 +281,13 @@ export function getSocializeLossV2Instruction<
     ),
   } as SocializeLossV2Instruction<
     TProgramAddress,
-    TAccountRiskCouncil,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountReserve,
-    TAccountInstructionSysvarAccount,
-    TAccountObligationFarmUserState,
-    TAccountReserveFarmState,
+    TAccountSocializeLossAccountsRiskCouncil,
+    TAccountSocializeLossAccountsObligation,
+    TAccountSocializeLossAccountsLendingMarket,
+    TAccountSocializeLossAccountsReserve,
+    TAccountSocializeLossAccountsInstructionSysvarAccount,
+    TAccountSocializeLossV2FarmsAccountsObligationFarmUserState,
+    TAccountSocializeLossV2FarmsAccountsReserveFarmState,
     TAccountLendingMarketAuthority,
     TAccountFarmsProgram
   >;
@@ -274,13 +301,15 @@ export type ParsedSocializeLossV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    riskCouncil: TAccountMetas[0];
-    obligation: TAccountMetas[1];
-    lendingMarket: TAccountMetas[2];
-    reserve: TAccountMetas[3];
-    instructionSysvarAccount: TAccountMetas[4];
-    obligationFarmUserState?: TAccountMetas[5] | undefined;
-    reserveFarmState?: TAccountMetas[6] | undefined;
+    socializeLossAccountsRiskCouncil: TAccountMetas[0];
+    socializeLossAccountsObligation: TAccountMetas[1];
+    socializeLossAccountsLendingMarket: TAccountMetas[2];
+    socializeLossAccountsReserve: TAccountMetas[3];
+    socializeLossAccountsInstructionSysvarAccount: TAccountMetas[4];
+    socializeLossV2FarmsAccountsObligationFarmUserState?:
+      | TAccountMetas[5]
+      | undefined;
+    socializeLossV2FarmsAccountsReserveFarmState?: TAccountMetas[6] | undefined;
     lendingMarketAuthority: TAccountMetas[7];
     farmsProgram: TAccountMetas[8];
   };
@@ -314,13 +343,14 @@ export function parseSocializeLossV2Instruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      riskCouncil: getNextAccount(),
-      obligation: getNextAccount(),
-      lendingMarket: getNextAccount(),
-      reserve: getNextAccount(),
-      instructionSysvarAccount: getNextAccount(),
-      obligationFarmUserState: getNextOptionalAccount(),
-      reserveFarmState: getNextOptionalAccount(),
+      socializeLossAccountsRiskCouncil: getNextAccount(),
+      socializeLossAccountsObligation: getNextAccount(),
+      socializeLossAccountsLendingMarket: getNextAccount(),
+      socializeLossAccountsReserve: getNextAccount(),
+      socializeLossAccountsInstructionSysvarAccount: getNextAccount(),
+      socializeLossV2FarmsAccountsObligationFarmUserState:
+        getNextOptionalAccount(),
+      socializeLossV2FarmsAccountsReserveFarmState: getNextOptionalAccount(),
       lendingMarketAuthority: getNextAccount(),
       farmsProgram: getNextAccount(),
     },

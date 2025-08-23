@@ -34,8 +34,8 @@ export function renderESMTypeScriptVisitor(
       "index.ts",
       index.replace(
         /(export\s+\*\s+from\s+['"])(\.\/[^'"]+)(['"])/g,
-        (_, prefix, path, quote) =>
-          `${prefix as string}${path as string}/index.js${quote as string}`,
+        (_: string, prefix: string, path: string, quote: string) =>
+          `${prefix}${path}/index.js${quote}`,
       ),
     );
 
@@ -63,7 +63,7 @@ export function renderESMTypeScriptVisitor(
         )
         .replace(
           /(export\s+\*\s+from\s+['"])(\.\/[^'"]+?)(?<!\.(js|ts|mjs|cjs|json))(['"])/g,
-          (_, prefix, path) => `${prefix as string}${path as string}.js'`,
+          (_: string, prefix: string, path: string) => `${prefix}${path}.js'`,
         )
         .replace(/from\s+['"]\.['"]/g, 'from "./index.js"');
 

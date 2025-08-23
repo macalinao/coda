@@ -41,9 +41,9 @@
     "test": "echo 'No tests yet'"
   },
   "dependencies": {
-    "@codama/renderers-core": "*",
-    "@codama/renderers-js": "*",
-    "codama": "*"
+    "@codama/renderers-core": "catalog:",
+    "@codama/renderers-js": "catalog:",
+    "codama": "catalog:"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",

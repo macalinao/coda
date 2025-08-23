@@ -41,8 +41,8 @@
     "lint": "eslint . --cache"
   },
   "dependencies": {
-    "@codama/nodes-from-anchor": "*",
-    "codama": "*"
+    "@codama/nodes-from-anchor": "catalog:",
+    "codama": "catalog:"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",

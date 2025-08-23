@@ -1,6 +1,10 @@
 import type { IdlV01InstructionAccountItem } from "@codama/nodes-from-anchor";
 import { instructionAccountNodeFromAnchorV01 } from "@codama/nodes-from-anchor";
-import type { AccountNode, InstructionArgumentNode } from "codama";
+import type {
+  AccountNode,
+  InstructionAccountNode,
+  InstructionArgumentNode,
+} from "codama";
 
 /**
  * Recursively flattens nested instruction account structures from Anchor IDL v0.1.0 format.
@@ -45,7 +49,7 @@ export function instructionAccountNodesFromAnchorV01(
   instructionArguments: InstructionArgumentNode[],
   idl: IdlV01InstructionAccountItem[],
   parent: string | null = null,
-): any[] {
+): InstructionAccountNode[] {
   return idl.flatMap((account) =>
     "accounts" in account
       ? instructionAccountNodesFromAnchorV01(
@@ -56,8 +60,8 @@ export function instructionAccountNodesFromAnchorV01(
         )
       : [
           instructionAccountNodeFromAnchorV01(
-            allAccounts as any,
-            instructionArguments as any,
+            allAccounts,
+            instructionArguments,
             {
               ...account,
               name: parent ? `${parent}_${account.name}` : account.name,

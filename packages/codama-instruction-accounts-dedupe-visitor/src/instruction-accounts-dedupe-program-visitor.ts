@@ -1,5 +1,4 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
-import { instructionAccountNodesFromAnchorV01 as oldInstructionAccountNodesFromAnchorV01 } from "@codama/nodes-from-anchor";
 import type { ProgramNode } from "codama";
 import {
   assertIsNode,
@@ -56,24 +55,14 @@ export function instructionAccountsDedupeProgramVisitor(
             `Instruction ${instructionNode.name} not found in IDL`,
           );
         }
-        const oldAccounts = oldInstructionAccountNodesFromAnchorV01(
-          accountNodes,
-          instructionNode.arguments,
-          idlIx.accounts,
-        );
-        const accountNames = oldAccounts.map((account) => account.name);
-        const hasDuplicates = accountNames.some(
-          (name, index) => accountNames.indexOf(name) !== index,
-        );
+        // Always use the flattening visitor to handle nested accounts
         return {
           ...instructionNode,
-          accounts: hasDuplicates
-            ? instructionAccountNodesFromAnchorV01(
-                accountNodes,
-                instructionNode.arguments,
-                idlIx.accounts,
-              )
-            : oldAccounts,
+          accounts: instructionAccountNodesFromAnchorV01(
+            accountNodes,
+            instructionNode.arguments,
+            idlIx.accounts,
+          ),
         };
       },
     },

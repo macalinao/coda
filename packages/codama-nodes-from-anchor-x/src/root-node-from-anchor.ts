@@ -1,10 +1,7 @@
 import type { RootNode } from "@codama/nodes";
 import { rootNode } from "@codama/nodes";
-import type { AnchorIdl, IdlV00, IdlV01 } from "@codama/nodes-from-anchor";
-import {
-  programNodeFromAnchorV00,
-  programNodeFromAnchorV01,
-} from "@codama/nodes-from-anchor";
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
+import { programNodeFromAnchor } from "./program-node-from-anchor.js";
 
 /**
  * Creates a Codama root node from a single Anchor IDL.
@@ -34,11 +31,6 @@ import {
  * - For multiple IDLs, use `rootNodeFromAnchorIdls` instead
  */
 export function rootNodeFromAnchor(idl: AnchorIdl): RootNode {
-  // Detect IDL version and create program node
-  const programNode =
-    idl.metadata && "spec" in idl.metadata && idl.metadata.spec === "0.1.0"
-      ? programNodeFromAnchorV01(idl as unknown as IdlV01)
-      : programNodeFromAnchorV00(idl as unknown as IdlV00);
-
-  return rootNode(programNode as any);
+  const program = programNodeFromAnchor(idl);
+  return rootNode(program);
 }

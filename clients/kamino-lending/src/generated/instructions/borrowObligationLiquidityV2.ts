@@ -50,77 +50,95 @@ export function getBorrowObligationLiquidityV2DiscriminatorBytes(): ReadonlyUint
 
 export type BorrowObligationLiquidityV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountObligation extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
-  TAccountBorrowReserve extends string | AccountMeta<string> = string,
-  TAccountBorrowReserveLiquidityMint extends
+  TAccountBorrowAccountsOwner extends string | AccountMeta<string> = string,
+  TAccountBorrowAccountsObligation extends
     | string
     | AccountMeta<string> = string,
-  TAccountReserveSourceLiquidity extends string | AccountMeta<string> = string,
-  TAccountBorrowReserveLiquidityFeeReceiver extends
+  TAccountBorrowAccountsLendingMarket extends
     | string
     | AccountMeta<string> = string,
-  TAccountUserDestinationLiquidity extends
+  TAccountBorrowAccountsLendingMarketAuthority extends
     | string
     | AccountMeta<string> = string,
-  TAccountReferrerTokenState extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends string | AccountMeta<string> = string,
-  TAccountInstructionSysvarAccount extends
+  TAccountBorrowAccountsBorrowReserve extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowAccountsBorrowReserveLiquidityMint extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowAccountsReserveSourceLiquidity extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowAccountsUserDestinationLiquidity extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowAccountsReferrerTokenState extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowAccountsTokenProgram extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowAccountsInstructionSysvarAccount extends
     | string
     | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
-  TAccountObligationFarmUserState extends string | AccountMeta<string> = string,
-  TAccountReserveFarmState extends string | AccountMeta<string> = string,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState extends
+    | string
+    | AccountMeta<string> = string,
   TAccountFarmsProgram extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountOwner extends string
-        ? ReadonlySignerAccount<TAccountOwner> &
-            AccountSignerMeta<TAccountOwner>
-        : TAccountOwner,
-      TAccountObligation extends string
-        ? WritableAccount<TAccountObligation>
-        : TAccountObligation,
-      TAccountLendingMarket extends string
-        ? ReadonlyAccount<TAccountLendingMarket>
-        : TAccountLendingMarket,
-      TAccountLendingMarketAuthority extends string
-        ? ReadonlyAccount<TAccountLendingMarketAuthority>
-        : TAccountLendingMarketAuthority,
-      TAccountBorrowReserve extends string
-        ? WritableAccount<TAccountBorrowReserve>
-        : TAccountBorrowReserve,
-      TAccountBorrowReserveLiquidityMint extends string
-        ? ReadonlyAccount<TAccountBorrowReserveLiquidityMint>
-        : TAccountBorrowReserveLiquidityMint,
-      TAccountReserveSourceLiquidity extends string
-        ? WritableAccount<TAccountReserveSourceLiquidity>
-        : TAccountReserveSourceLiquidity,
-      TAccountBorrowReserveLiquidityFeeReceiver extends string
-        ? WritableAccount<TAccountBorrowReserveLiquidityFeeReceiver>
-        : TAccountBorrowReserveLiquidityFeeReceiver,
-      TAccountUserDestinationLiquidity extends string
-        ? WritableAccount<TAccountUserDestinationLiquidity>
-        : TAccountUserDestinationLiquidity,
-      TAccountReferrerTokenState extends string
-        ? WritableAccount<TAccountReferrerTokenState>
-        : TAccountReferrerTokenState,
-      TAccountTokenProgram extends string
-        ? ReadonlyAccount<TAccountTokenProgram>
-        : TAccountTokenProgram,
-      TAccountInstructionSysvarAccount extends string
-        ? ReadonlyAccount<TAccountInstructionSysvarAccount>
-        : TAccountInstructionSysvarAccount,
-      TAccountObligationFarmUserState extends string
-        ? WritableAccount<TAccountObligationFarmUserState>
-        : TAccountObligationFarmUserState,
-      TAccountReserveFarmState extends string
-        ? WritableAccount<TAccountReserveFarmState>
-        : TAccountReserveFarmState,
+      TAccountBorrowAccountsOwner extends string
+        ? ReadonlySignerAccount<TAccountBorrowAccountsOwner> &
+            AccountSignerMeta<TAccountBorrowAccountsOwner>
+        : TAccountBorrowAccountsOwner,
+      TAccountBorrowAccountsObligation extends string
+        ? WritableAccount<TAccountBorrowAccountsObligation>
+        : TAccountBorrowAccountsObligation,
+      TAccountBorrowAccountsLendingMarket extends string
+        ? ReadonlyAccount<TAccountBorrowAccountsLendingMarket>
+        : TAccountBorrowAccountsLendingMarket,
+      TAccountBorrowAccountsLendingMarketAuthority extends string
+        ? ReadonlyAccount<TAccountBorrowAccountsLendingMarketAuthority>
+        : TAccountBorrowAccountsLendingMarketAuthority,
+      TAccountBorrowAccountsBorrowReserve extends string
+        ? WritableAccount<TAccountBorrowAccountsBorrowReserve>
+        : TAccountBorrowAccountsBorrowReserve,
+      TAccountBorrowAccountsBorrowReserveLiquidityMint extends string
+        ? ReadonlyAccount<TAccountBorrowAccountsBorrowReserveLiquidityMint>
+        : TAccountBorrowAccountsBorrowReserveLiquidityMint,
+      TAccountBorrowAccountsReserveSourceLiquidity extends string
+        ? WritableAccount<TAccountBorrowAccountsReserveSourceLiquidity>
+        : TAccountBorrowAccountsReserveSourceLiquidity,
+      TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver extends string
+        ? WritableAccount<TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver>
+        : TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver,
+      TAccountBorrowAccountsUserDestinationLiquidity extends string
+        ? WritableAccount<TAccountBorrowAccountsUserDestinationLiquidity>
+        : TAccountBorrowAccountsUserDestinationLiquidity,
+      TAccountBorrowAccountsReferrerTokenState extends string
+        ? WritableAccount<TAccountBorrowAccountsReferrerTokenState>
+        : TAccountBorrowAccountsReferrerTokenState,
+      TAccountBorrowAccountsTokenProgram extends string
+        ? ReadonlyAccount<TAccountBorrowAccountsTokenProgram>
+        : TAccountBorrowAccountsTokenProgram,
+      TAccountBorrowAccountsInstructionSysvarAccount extends string
+        ? ReadonlyAccount<TAccountBorrowAccountsInstructionSysvarAccount>
+        : TAccountBorrowAccountsInstructionSysvarAccount,
+      TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState extends string
+        ? WritableAccount<TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState>
+        : TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState,
+      TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState extends string
+        ? WritableAccount<TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState>
+        : TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState,
       TAccountFarmsProgram extends string
         ? ReadonlyAccount<TAccountFarmsProgram>
         : TAccountFarmsProgram,
@@ -168,92 +186,97 @@ export function getBorrowObligationLiquidityV2InstructionDataCodec(): FixedSizeC
 }
 
 export type BorrowObligationLiquidityV2Input<
-  TAccountOwner extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountBorrowReserve extends string = string,
-  TAccountBorrowReserveLiquidityMint extends string = string,
-  TAccountReserveSourceLiquidity extends string = string,
-  TAccountBorrowReserveLiquidityFeeReceiver extends string = string,
-  TAccountUserDestinationLiquidity extends string = string,
-  TAccountReferrerTokenState extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountInstructionSysvarAccount extends string = string,
-  TAccountObligationFarmUserState extends string = string,
-  TAccountReserveFarmState extends string = string,
+  TAccountBorrowAccountsOwner extends string = string,
+  TAccountBorrowAccountsObligation extends string = string,
+  TAccountBorrowAccountsLendingMarket extends string = string,
+  TAccountBorrowAccountsLendingMarketAuthority extends string = string,
+  TAccountBorrowAccountsBorrowReserve extends string = string,
+  TAccountBorrowAccountsBorrowReserveLiquidityMint extends string = string,
+  TAccountBorrowAccountsReserveSourceLiquidity extends string = string,
+  TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver extends
+    string = string,
+  TAccountBorrowAccountsUserDestinationLiquidity extends string = string,
+  TAccountBorrowAccountsReferrerTokenState extends string = string,
+  TAccountBorrowAccountsTokenProgram extends string = string,
+  TAccountBorrowAccountsInstructionSysvarAccount extends string = string,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState extends
+    string = string,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState extends
+    string = string,
   TAccountFarmsProgram extends string = string,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  obligation: Address<TAccountObligation>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
-  borrowReserve: Address<TAccountBorrowReserve>;
-  borrowReserveLiquidityMint: Address<TAccountBorrowReserveLiquidityMint>;
-  reserveSourceLiquidity: Address<TAccountReserveSourceLiquidity>;
-  borrowReserveLiquidityFeeReceiver: Address<TAccountBorrowReserveLiquidityFeeReceiver>;
-  userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
-  referrerTokenState?: Address<TAccountReferrerTokenState>;
-  tokenProgram: Address<TAccountTokenProgram>;
-  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
-  obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
-  reserveFarmState?: Address<TAccountReserveFarmState>;
+  borrowAccountsOwner: TransactionSigner<TAccountBorrowAccountsOwner>;
+  borrowAccountsObligation: Address<TAccountBorrowAccountsObligation>;
+  borrowAccountsLendingMarket: Address<TAccountBorrowAccountsLendingMarket>;
+  borrowAccountsLendingMarketAuthority: Address<TAccountBorrowAccountsLendingMarketAuthority>;
+  borrowAccountsBorrowReserve: Address<TAccountBorrowAccountsBorrowReserve>;
+  borrowAccountsBorrowReserveLiquidityMint: Address<TAccountBorrowAccountsBorrowReserveLiquidityMint>;
+  borrowAccountsReserveSourceLiquidity: Address<TAccountBorrowAccountsReserveSourceLiquidity>;
+  borrowAccountsBorrowReserveLiquidityFeeReceiver: Address<TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver>;
+  borrowAccountsUserDestinationLiquidity: Address<TAccountBorrowAccountsUserDestinationLiquidity>;
+  borrowAccountsReferrerTokenState?: Address<TAccountBorrowAccountsReferrerTokenState>;
+  borrowAccountsTokenProgram: Address<TAccountBorrowAccountsTokenProgram>;
+  borrowAccountsInstructionSysvarAccount?: Address<TAccountBorrowAccountsInstructionSysvarAccount>;
+  borrowObligationLiquidityV2FarmsAccountsObligationFarmUserState?: Address<TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState>;
+  borrowObligationLiquidityV2FarmsAccountsReserveFarmState?: Address<TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState>;
   farmsProgram: Address<TAccountFarmsProgram>;
   liquidityAmount: BorrowObligationLiquidityV2InstructionDataArgs["liquidityAmount"];
 };
 
 export function getBorrowObligationLiquidityV2Instruction<
-  TAccountOwner extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarket extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountBorrowReserve extends string,
-  TAccountBorrowReserveLiquidityMint extends string,
-  TAccountReserveSourceLiquidity extends string,
-  TAccountBorrowReserveLiquidityFeeReceiver extends string,
-  TAccountUserDestinationLiquidity extends string,
-  TAccountReferrerTokenState extends string,
-  TAccountTokenProgram extends string,
-  TAccountInstructionSysvarAccount extends string,
-  TAccountObligationFarmUserState extends string,
-  TAccountReserveFarmState extends string,
+  TAccountBorrowAccountsOwner extends string,
+  TAccountBorrowAccountsObligation extends string,
+  TAccountBorrowAccountsLendingMarket extends string,
+  TAccountBorrowAccountsLendingMarketAuthority extends string,
+  TAccountBorrowAccountsBorrowReserve extends string,
+  TAccountBorrowAccountsBorrowReserveLiquidityMint extends string,
+  TAccountBorrowAccountsReserveSourceLiquidity extends string,
+  TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver extends string,
+  TAccountBorrowAccountsUserDestinationLiquidity extends string,
+  TAccountBorrowAccountsReferrerTokenState extends string,
+  TAccountBorrowAccountsTokenProgram extends string,
+  TAccountBorrowAccountsInstructionSysvarAccount extends string,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState extends
+    string,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState extends
+    string,
   TAccountFarmsProgram extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: BorrowObligationLiquidityV2Input<
-    TAccountOwner,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountLendingMarketAuthority,
-    TAccountBorrowReserve,
-    TAccountBorrowReserveLiquidityMint,
-    TAccountReserveSourceLiquidity,
-    TAccountBorrowReserveLiquidityFeeReceiver,
-    TAccountUserDestinationLiquidity,
-    TAccountReferrerTokenState,
-    TAccountTokenProgram,
-    TAccountInstructionSysvarAccount,
-    TAccountObligationFarmUserState,
-    TAccountReserveFarmState,
+    TAccountBorrowAccountsOwner,
+    TAccountBorrowAccountsObligation,
+    TAccountBorrowAccountsLendingMarket,
+    TAccountBorrowAccountsLendingMarketAuthority,
+    TAccountBorrowAccountsBorrowReserve,
+    TAccountBorrowAccountsBorrowReserveLiquidityMint,
+    TAccountBorrowAccountsReserveSourceLiquidity,
+    TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver,
+    TAccountBorrowAccountsUserDestinationLiquidity,
+    TAccountBorrowAccountsReferrerTokenState,
+    TAccountBorrowAccountsTokenProgram,
+    TAccountBorrowAccountsInstructionSysvarAccount,
+    TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState,
+    TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState,
     TAccountFarmsProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): BorrowObligationLiquidityV2Instruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountObligation,
-  TAccountLendingMarket,
-  TAccountLendingMarketAuthority,
-  TAccountBorrowReserve,
-  TAccountBorrowReserveLiquidityMint,
-  TAccountReserveSourceLiquidity,
-  TAccountBorrowReserveLiquidityFeeReceiver,
-  TAccountUserDestinationLiquidity,
-  TAccountReferrerTokenState,
-  TAccountTokenProgram,
-  TAccountInstructionSysvarAccount,
-  TAccountObligationFarmUserState,
-  TAccountReserveFarmState,
+  TAccountBorrowAccountsOwner,
+  TAccountBorrowAccountsObligation,
+  TAccountBorrowAccountsLendingMarket,
+  TAccountBorrowAccountsLendingMarketAuthority,
+  TAccountBorrowAccountsBorrowReserve,
+  TAccountBorrowAccountsBorrowReserveLiquidityMint,
+  TAccountBorrowAccountsReserveSourceLiquidity,
+  TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver,
+  TAccountBorrowAccountsUserDestinationLiquidity,
+  TAccountBorrowAccountsReferrerTokenState,
+  TAccountBorrowAccountsTokenProgram,
+  TAccountBorrowAccountsInstructionSysvarAccount,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState,
+  TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState,
   TAccountFarmsProgram
 > {
   // Program address.
@@ -262,45 +285,63 @@ export function getBorrowObligationLiquidityV2Instruction<
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    lendingMarketAuthority: {
-      value: input.lendingMarketAuthority ?? null,
+    borrowAccountsOwner: {
+      value: input.borrowAccountsOwner ?? null,
       isWritable: false,
     },
-    borrowReserve: { value: input.borrowReserve ?? null, isWritable: true },
-    borrowReserveLiquidityMint: {
-      value: input.borrowReserveLiquidityMint ?? null,
+    borrowAccountsObligation: {
+      value: input.borrowAccountsObligation ?? null,
+      isWritable: true,
+    },
+    borrowAccountsLendingMarket: {
+      value: input.borrowAccountsLendingMarket ?? null,
       isWritable: false,
     },
-    reserveSourceLiquidity: {
-      value: input.reserveSourceLiquidity ?? null,
-      isWritable: true,
-    },
-    borrowReserveLiquidityFeeReceiver: {
-      value: input.borrowReserveLiquidityFeeReceiver ?? null,
-      isWritable: true,
-    },
-    userDestinationLiquidity: {
-      value: input.userDestinationLiquidity ?? null,
-      isWritable: true,
-    },
-    referrerTokenState: {
-      value: input.referrerTokenState ?? null,
-      isWritable: true,
-    },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    instructionSysvarAccount: {
-      value: input.instructionSysvarAccount ?? null,
+    borrowAccountsLendingMarketAuthority: {
+      value: input.borrowAccountsLendingMarketAuthority ?? null,
       isWritable: false,
     },
-    obligationFarmUserState: {
-      value: input.obligationFarmUserState ?? null,
+    borrowAccountsBorrowReserve: {
+      value: input.borrowAccountsBorrowReserve ?? null,
       isWritable: true,
     },
-    reserveFarmState: {
-      value: input.reserveFarmState ?? null,
+    borrowAccountsBorrowReserveLiquidityMint: {
+      value: input.borrowAccountsBorrowReserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    borrowAccountsReserveSourceLiquidity: {
+      value: input.borrowAccountsReserveSourceLiquidity ?? null,
+      isWritable: true,
+    },
+    borrowAccountsBorrowReserveLiquidityFeeReceiver: {
+      value: input.borrowAccountsBorrowReserveLiquidityFeeReceiver ?? null,
+      isWritable: true,
+    },
+    borrowAccountsUserDestinationLiquidity: {
+      value: input.borrowAccountsUserDestinationLiquidity ?? null,
+      isWritable: true,
+    },
+    borrowAccountsReferrerTokenState: {
+      value: input.borrowAccountsReferrerTokenState ?? null,
+      isWritable: true,
+    },
+    borrowAccountsTokenProgram: {
+      value: input.borrowAccountsTokenProgram ?? null,
+      isWritable: false,
+    },
+    borrowAccountsInstructionSysvarAccount: {
+      value: input.borrowAccountsInstructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+    borrowObligationLiquidityV2FarmsAccountsObligationFarmUserState: {
+      value:
+        input.borrowObligationLiquidityV2FarmsAccountsObligationFarmUserState ??
+        null,
+      isWritable: true,
+    },
+    borrowObligationLiquidityV2FarmsAccountsReserveFarmState: {
+      value:
+        input.borrowObligationLiquidityV2FarmsAccountsReserveFarmState ?? null,
       isWritable: true,
     },
     farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
@@ -314,28 +355,32 @@ export function getBorrowObligationLiquidityV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.instructionSysvarAccount.value) {
-    accounts.instructionSysvarAccount.value =
+  if (!accounts.borrowAccountsInstructionSysvarAccount.value) {
+    accounts.borrowAccountsInstructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.borrowReserve),
-      getAccountMeta(accounts.borrowReserveLiquidityMint),
-      getAccountMeta(accounts.reserveSourceLiquidity),
-      getAccountMeta(accounts.borrowReserveLiquidityFeeReceiver),
-      getAccountMeta(accounts.userDestinationLiquidity),
-      getAccountMeta(accounts.referrerTokenState),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
-      getAccountMeta(accounts.obligationFarmUserState),
-      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.borrowAccountsOwner),
+      getAccountMeta(accounts.borrowAccountsObligation),
+      getAccountMeta(accounts.borrowAccountsLendingMarket),
+      getAccountMeta(accounts.borrowAccountsLendingMarketAuthority),
+      getAccountMeta(accounts.borrowAccountsBorrowReserve),
+      getAccountMeta(accounts.borrowAccountsBorrowReserveLiquidityMint),
+      getAccountMeta(accounts.borrowAccountsReserveSourceLiquidity),
+      getAccountMeta(accounts.borrowAccountsBorrowReserveLiquidityFeeReceiver),
+      getAccountMeta(accounts.borrowAccountsUserDestinationLiquidity),
+      getAccountMeta(accounts.borrowAccountsReferrerTokenState),
+      getAccountMeta(accounts.borrowAccountsTokenProgram),
+      getAccountMeta(accounts.borrowAccountsInstructionSysvarAccount),
+      getAccountMeta(
+        accounts.borrowObligationLiquidityV2FarmsAccountsObligationFarmUserState,
+      ),
+      getAccountMeta(
+        accounts.borrowObligationLiquidityV2FarmsAccountsReserveFarmState,
+      ),
       getAccountMeta(accounts.farmsProgram),
     ],
     programAddress,
@@ -344,20 +389,20 @@ export function getBorrowObligationLiquidityV2Instruction<
     ),
   } as BorrowObligationLiquidityV2Instruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountLendingMarketAuthority,
-    TAccountBorrowReserve,
-    TAccountBorrowReserveLiquidityMint,
-    TAccountReserveSourceLiquidity,
-    TAccountBorrowReserveLiquidityFeeReceiver,
-    TAccountUserDestinationLiquidity,
-    TAccountReferrerTokenState,
-    TAccountTokenProgram,
-    TAccountInstructionSysvarAccount,
-    TAccountObligationFarmUserState,
-    TAccountReserveFarmState,
+    TAccountBorrowAccountsOwner,
+    TAccountBorrowAccountsObligation,
+    TAccountBorrowAccountsLendingMarket,
+    TAccountBorrowAccountsLendingMarketAuthority,
+    TAccountBorrowAccountsBorrowReserve,
+    TAccountBorrowAccountsBorrowReserveLiquidityMint,
+    TAccountBorrowAccountsReserveSourceLiquidity,
+    TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver,
+    TAccountBorrowAccountsUserDestinationLiquidity,
+    TAccountBorrowAccountsReferrerTokenState,
+    TAccountBorrowAccountsTokenProgram,
+    TAccountBorrowAccountsInstructionSysvarAccount,
+    TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState,
+    TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState,
     TAccountFarmsProgram
   >;
 
@@ -370,20 +415,24 @@ export type ParsedBorrowObligationLiquidityV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    owner: TAccountMetas[0];
-    obligation: TAccountMetas[1];
-    lendingMarket: TAccountMetas[2];
-    lendingMarketAuthority: TAccountMetas[3];
-    borrowReserve: TAccountMetas[4];
-    borrowReserveLiquidityMint: TAccountMetas[5];
-    reserveSourceLiquidity: TAccountMetas[6];
-    borrowReserveLiquidityFeeReceiver: TAccountMetas[7];
-    userDestinationLiquidity: TAccountMetas[8];
-    referrerTokenState?: TAccountMetas[9] | undefined;
-    tokenProgram: TAccountMetas[10];
-    instructionSysvarAccount: TAccountMetas[11];
-    obligationFarmUserState?: TAccountMetas[12] | undefined;
-    reserveFarmState?: TAccountMetas[13] | undefined;
+    borrowAccountsOwner: TAccountMetas[0];
+    borrowAccountsObligation: TAccountMetas[1];
+    borrowAccountsLendingMarket: TAccountMetas[2];
+    borrowAccountsLendingMarketAuthority: TAccountMetas[3];
+    borrowAccountsBorrowReserve: TAccountMetas[4];
+    borrowAccountsBorrowReserveLiquidityMint: TAccountMetas[5];
+    borrowAccountsReserveSourceLiquidity: TAccountMetas[6];
+    borrowAccountsBorrowReserveLiquidityFeeReceiver: TAccountMetas[7];
+    borrowAccountsUserDestinationLiquidity: TAccountMetas[8];
+    borrowAccountsReferrerTokenState?: TAccountMetas[9] | undefined;
+    borrowAccountsTokenProgram: TAccountMetas[10];
+    borrowAccountsInstructionSysvarAccount: TAccountMetas[11];
+    borrowObligationLiquidityV2FarmsAccountsObligationFarmUserState?:
+      | TAccountMetas[12]
+      | undefined;
+    borrowObligationLiquidityV2FarmsAccountsReserveFarmState?:
+      | TAccountMetas[13]
+      | undefined;
     farmsProgram: TAccountMetas[14];
   };
   data: BorrowObligationLiquidityV2InstructionData;
@@ -416,20 +465,22 @@ export function parseBorrowObligationLiquidityV2Instruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      owner: getNextAccount(),
-      obligation: getNextAccount(),
-      lendingMarket: getNextAccount(),
-      lendingMarketAuthority: getNextAccount(),
-      borrowReserve: getNextAccount(),
-      borrowReserveLiquidityMint: getNextAccount(),
-      reserveSourceLiquidity: getNextAccount(),
-      borrowReserveLiquidityFeeReceiver: getNextAccount(),
-      userDestinationLiquidity: getNextAccount(),
-      referrerTokenState: getNextOptionalAccount(),
-      tokenProgram: getNextAccount(),
-      instructionSysvarAccount: getNextAccount(),
-      obligationFarmUserState: getNextOptionalAccount(),
-      reserveFarmState: getNextOptionalAccount(),
+      borrowAccountsOwner: getNextAccount(),
+      borrowAccountsObligation: getNextAccount(),
+      borrowAccountsLendingMarket: getNextAccount(),
+      borrowAccountsLendingMarketAuthority: getNextAccount(),
+      borrowAccountsBorrowReserve: getNextAccount(),
+      borrowAccountsBorrowReserveLiquidityMint: getNextAccount(),
+      borrowAccountsReserveSourceLiquidity: getNextAccount(),
+      borrowAccountsBorrowReserveLiquidityFeeReceiver: getNextAccount(),
+      borrowAccountsUserDestinationLiquidity: getNextAccount(),
+      borrowAccountsReferrerTokenState: getNextOptionalAccount(),
+      borrowAccountsTokenProgram: getNextAccount(),
+      borrowAccountsInstructionSysvarAccount: getNextAccount(),
+      borrowObligationLiquidityV2FarmsAccountsObligationFarmUserState:
+        getNextOptionalAccount(),
+      borrowObligationLiquidityV2FarmsAccountsReserveFarmState:
+        getNextOptionalAccount(),
       farmsProgram: getNextAccount(),
     },
     data: getBorrowObligationLiquidityV2InstructionDataDecoder().decode(

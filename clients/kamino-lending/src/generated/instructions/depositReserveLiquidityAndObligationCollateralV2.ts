@@ -49,83 +49,105 @@ export function getDepositReserveLiquidityAndObligationCollateralV2Discriminator
 
 export type DepositReserveLiquidityAndObligationCollateralV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountObligation extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
-  TAccountReserveLiquiditySupply extends string | AccountMeta<string> = string,
-  TAccountReserveCollateralMint extends string | AccountMeta<string> = string,
-  TAccountReserveDestinationDepositCollateral extends
+  TAccountDepositAccountsOwner extends string | AccountMeta<string> = string,
+  TAccountDepositAccountsObligation extends
     | string
     | AccountMeta<string> = string,
-  TAccountUserSourceLiquidity extends string | AccountMeta<string> = string,
-  TAccountPlaceholderUserDestinationCollateral extends
+  TAccountDepositAccountsLendingMarket extends
     | string
     | AccountMeta<string> = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta<string> = string,
-  TAccountLiquidityTokenProgram extends string | AccountMeta<string> = string,
-  TAccountInstructionSysvarAccount extends
+  TAccountDepositAccountsLendingMarketAuthority extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsReserve extends string | AccountMeta<string> = string,
+  TAccountDepositAccountsReserveLiquidityMint extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsReserveLiquiditySupply extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsReserveCollateralMint extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsReserveDestinationDepositCollateral extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsUserSourceLiquidity extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsPlaceholderUserDestinationCollateral extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsCollateralTokenProgram extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsLiquidityTokenProgram extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositAccountsInstructionSysvarAccount extends
     | string
     | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
-  TAccountObligationFarmUserState extends string | AccountMeta<string> = string,
-  TAccountReserveFarmState extends string | AccountMeta<string> = string,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState extends
+    | string
+    | AccountMeta<string> = string,
   TAccountFarmsProgram extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountOwner extends string
-        ? WritableSignerAccount<TAccountOwner> &
-            AccountSignerMeta<TAccountOwner>
-        : TAccountOwner,
-      TAccountObligation extends string
-        ? WritableAccount<TAccountObligation>
-        : TAccountObligation,
-      TAccountLendingMarket extends string
-        ? ReadonlyAccount<TAccountLendingMarket>
-        : TAccountLendingMarket,
-      TAccountLendingMarketAuthority extends string
-        ? ReadonlyAccount<TAccountLendingMarketAuthority>
-        : TAccountLendingMarketAuthority,
-      TAccountReserve extends string
-        ? WritableAccount<TAccountReserve>
-        : TAccountReserve,
-      TAccountReserveLiquidityMint extends string
-        ? ReadonlyAccount<TAccountReserveLiquidityMint>
-        : TAccountReserveLiquidityMint,
-      TAccountReserveLiquiditySupply extends string
-        ? WritableAccount<TAccountReserveLiquiditySupply>
-        : TAccountReserveLiquiditySupply,
-      TAccountReserveCollateralMint extends string
-        ? WritableAccount<TAccountReserveCollateralMint>
-        : TAccountReserveCollateralMint,
-      TAccountReserveDestinationDepositCollateral extends string
-        ? WritableAccount<TAccountReserveDestinationDepositCollateral>
-        : TAccountReserveDestinationDepositCollateral,
-      TAccountUserSourceLiquidity extends string
-        ? WritableAccount<TAccountUserSourceLiquidity>
-        : TAccountUserSourceLiquidity,
-      TAccountPlaceholderUserDestinationCollateral extends string
-        ? ReadonlyAccount<TAccountPlaceholderUserDestinationCollateral>
-        : TAccountPlaceholderUserDestinationCollateral,
-      TAccountCollateralTokenProgram extends string
-        ? ReadonlyAccount<TAccountCollateralTokenProgram>
-        : TAccountCollateralTokenProgram,
-      TAccountLiquidityTokenProgram extends string
-        ? ReadonlyAccount<TAccountLiquidityTokenProgram>
-        : TAccountLiquidityTokenProgram,
-      TAccountInstructionSysvarAccount extends string
-        ? ReadonlyAccount<TAccountInstructionSysvarAccount>
-        : TAccountInstructionSysvarAccount,
-      TAccountObligationFarmUserState extends string
-        ? WritableAccount<TAccountObligationFarmUserState>
-        : TAccountObligationFarmUserState,
-      TAccountReserveFarmState extends string
-        ? WritableAccount<TAccountReserveFarmState>
-        : TAccountReserveFarmState,
+      TAccountDepositAccountsOwner extends string
+        ? WritableSignerAccount<TAccountDepositAccountsOwner> &
+            AccountSignerMeta<TAccountDepositAccountsOwner>
+        : TAccountDepositAccountsOwner,
+      TAccountDepositAccountsObligation extends string
+        ? WritableAccount<TAccountDepositAccountsObligation>
+        : TAccountDepositAccountsObligation,
+      TAccountDepositAccountsLendingMarket extends string
+        ? ReadonlyAccount<TAccountDepositAccountsLendingMarket>
+        : TAccountDepositAccountsLendingMarket,
+      TAccountDepositAccountsLendingMarketAuthority extends string
+        ? ReadonlyAccount<TAccountDepositAccountsLendingMarketAuthority>
+        : TAccountDepositAccountsLendingMarketAuthority,
+      TAccountDepositAccountsReserve extends string
+        ? WritableAccount<TAccountDepositAccountsReserve>
+        : TAccountDepositAccountsReserve,
+      TAccountDepositAccountsReserveLiquidityMint extends string
+        ? ReadonlyAccount<TAccountDepositAccountsReserveLiquidityMint>
+        : TAccountDepositAccountsReserveLiquidityMint,
+      TAccountDepositAccountsReserveLiquiditySupply extends string
+        ? WritableAccount<TAccountDepositAccountsReserveLiquiditySupply>
+        : TAccountDepositAccountsReserveLiquiditySupply,
+      TAccountDepositAccountsReserveCollateralMint extends string
+        ? WritableAccount<TAccountDepositAccountsReserveCollateralMint>
+        : TAccountDepositAccountsReserveCollateralMint,
+      TAccountDepositAccountsReserveDestinationDepositCollateral extends string
+        ? WritableAccount<TAccountDepositAccountsReserveDestinationDepositCollateral>
+        : TAccountDepositAccountsReserveDestinationDepositCollateral,
+      TAccountDepositAccountsUserSourceLiquidity extends string
+        ? WritableAccount<TAccountDepositAccountsUserSourceLiquidity>
+        : TAccountDepositAccountsUserSourceLiquidity,
+      TAccountDepositAccountsPlaceholderUserDestinationCollateral extends string
+        ? ReadonlyAccount<TAccountDepositAccountsPlaceholderUserDestinationCollateral>
+        : TAccountDepositAccountsPlaceholderUserDestinationCollateral,
+      TAccountDepositAccountsCollateralTokenProgram extends string
+        ? ReadonlyAccount<TAccountDepositAccountsCollateralTokenProgram>
+        : TAccountDepositAccountsCollateralTokenProgram,
+      TAccountDepositAccountsLiquidityTokenProgram extends string
+        ? ReadonlyAccount<TAccountDepositAccountsLiquidityTokenProgram>
+        : TAccountDepositAccountsLiquidityTokenProgram,
+      TAccountDepositAccountsInstructionSysvarAccount extends string
+        ? ReadonlyAccount<TAccountDepositAccountsInstructionSysvarAccount>
+        : TAccountDepositAccountsInstructionSysvarAccount,
+      TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState extends string
+        ? WritableAccount<TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState>
+        : TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState,
+      TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState extends string
+        ? WritableAccount<TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState>
+        : TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState,
       TAccountFarmsProgram extends string
         ? ReadonlyAccount<TAccountFarmsProgram>
         : TAccountFarmsProgram,
@@ -173,102 +195,108 @@ export function getDepositReserveLiquidityAndObligationCollateralV2InstructionDa
 }
 
 export type DepositReserveLiquidityAndObligationCollateralV2Input<
-  TAccountOwner extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountReserve extends string = string,
-  TAccountReserveLiquidityMint extends string = string,
-  TAccountReserveLiquiditySupply extends string = string,
-  TAccountReserveCollateralMint extends string = string,
-  TAccountReserveDestinationDepositCollateral extends string = string,
-  TAccountUserSourceLiquidity extends string = string,
-  TAccountPlaceholderUserDestinationCollateral extends string = string,
-  TAccountCollateralTokenProgram extends string = string,
-  TAccountLiquidityTokenProgram extends string = string,
-  TAccountInstructionSysvarAccount extends string = string,
-  TAccountObligationFarmUserState extends string = string,
-  TAccountReserveFarmState extends string = string,
+  TAccountDepositAccountsOwner extends string = string,
+  TAccountDepositAccountsObligation extends string = string,
+  TAccountDepositAccountsLendingMarket extends string = string,
+  TAccountDepositAccountsLendingMarketAuthority extends string = string,
+  TAccountDepositAccountsReserve extends string = string,
+  TAccountDepositAccountsReserveLiquidityMint extends string = string,
+  TAccountDepositAccountsReserveLiquiditySupply extends string = string,
+  TAccountDepositAccountsReserveCollateralMint extends string = string,
+  TAccountDepositAccountsReserveDestinationDepositCollateral extends
+    string = string,
+  TAccountDepositAccountsUserSourceLiquidity extends string = string,
+  TAccountDepositAccountsPlaceholderUserDestinationCollateral extends
+    string = string,
+  TAccountDepositAccountsCollateralTokenProgram extends string = string,
+  TAccountDepositAccountsLiquidityTokenProgram extends string = string,
+  TAccountDepositAccountsInstructionSysvarAccount extends string = string,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState extends
+    string = string,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState extends
+    string = string,
   TAccountFarmsProgram extends string = string,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  obligation: Address<TAccountObligation>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
-  reserve: Address<TAccountReserve>;
-  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  reserveLiquiditySupply: Address<TAccountReserveLiquiditySupply>;
-  reserveCollateralMint: Address<TAccountReserveCollateralMint>;
-  reserveDestinationDepositCollateral: Address<TAccountReserveDestinationDepositCollateral>;
-  userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
-  placeholderUserDestinationCollateral?: Address<TAccountPlaceholderUserDestinationCollateral>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
-  liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
-  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
-  obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
-  reserveFarmState?: Address<TAccountReserveFarmState>;
+  depositAccountsOwner: TransactionSigner<TAccountDepositAccountsOwner>;
+  depositAccountsObligation: Address<TAccountDepositAccountsObligation>;
+  depositAccountsLendingMarket: Address<TAccountDepositAccountsLendingMarket>;
+  depositAccountsLendingMarketAuthority: Address<TAccountDepositAccountsLendingMarketAuthority>;
+  depositAccountsReserve: Address<TAccountDepositAccountsReserve>;
+  depositAccountsReserveLiquidityMint: Address<TAccountDepositAccountsReserveLiquidityMint>;
+  depositAccountsReserveLiquiditySupply: Address<TAccountDepositAccountsReserveLiquiditySupply>;
+  depositAccountsReserveCollateralMint: Address<TAccountDepositAccountsReserveCollateralMint>;
+  depositAccountsReserveDestinationDepositCollateral: Address<TAccountDepositAccountsReserveDestinationDepositCollateral>;
+  depositAccountsUserSourceLiquidity: Address<TAccountDepositAccountsUserSourceLiquidity>;
+  depositAccountsPlaceholderUserDestinationCollateral?: Address<TAccountDepositAccountsPlaceholderUserDestinationCollateral>;
+  depositAccountsCollateralTokenProgram: Address<TAccountDepositAccountsCollateralTokenProgram>;
+  depositAccountsLiquidityTokenProgram: Address<TAccountDepositAccountsLiquidityTokenProgram>;
+  depositAccountsInstructionSysvarAccount?: Address<TAccountDepositAccountsInstructionSysvarAccount>;
+  depositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState?: Address<TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState>;
+  depositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState?: Address<TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState>;
   farmsProgram: Address<TAccountFarmsProgram>;
   liquidityAmount: DepositReserveLiquidityAndObligationCollateralV2InstructionDataArgs["liquidityAmount"];
 };
 
 export function getDepositReserveLiquidityAndObligationCollateralV2Instruction<
-  TAccountOwner extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarket extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountReserve extends string,
-  TAccountReserveLiquidityMint extends string,
-  TAccountReserveLiquiditySupply extends string,
-  TAccountReserveCollateralMint extends string,
-  TAccountReserveDestinationDepositCollateral extends string,
-  TAccountUserSourceLiquidity extends string,
-  TAccountPlaceholderUserDestinationCollateral extends string,
-  TAccountCollateralTokenProgram extends string,
-  TAccountLiquidityTokenProgram extends string,
-  TAccountInstructionSysvarAccount extends string,
-  TAccountObligationFarmUserState extends string,
-  TAccountReserveFarmState extends string,
+  TAccountDepositAccountsOwner extends string,
+  TAccountDepositAccountsObligation extends string,
+  TAccountDepositAccountsLendingMarket extends string,
+  TAccountDepositAccountsLendingMarketAuthority extends string,
+  TAccountDepositAccountsReserve extends string,
+  TAccountDepositAccountsReserveLiquidityMint extends string,
+  TAccountDepositAccountsReserveLiquiditySupply extends string,
+  TAccountDepositAccountsReserveCollateralMint extends string,
+  TAccountDepositAccountsReserveDestinationDepositCollateral extends string,
+  TAccountDepositAccountsUserSourceLiquidity extends string,
+  TAccountDepositAccountsPlaceholderUserDestinationCollateral extends string,
+  TAccountDepositAccountsCollateralTokenProgram extends string,
+  TAccountDepositAccountsLiquidityTokenProgram extends string,
+  TAccountDepositAccountsInstructionSysvarAccount extends string,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState extends
+    string,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState extends
+    string,
   TAccountFarmsProgram extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: DepositReserveLiquidityAndObligationCollateralV2Input<
-    TAccountOwner,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountLendingMarketAuthority,
-    TAccountReserve,
-    TAccountReserveLiquidityMint,
-    TAccountReserveLiquiditySupply,
-    TAccountReserveCollateralMint,
-    TAccountReserveDestinationDepositCollateral,
-    TAccountUserSourceLiquidity,
-    TAccountPlaceholderUserDestinationCollateral,
-    TAccountCollateralTokenProgram,
-    TAccountLiquidityTokenProgram,
-    TAccountInstructionSysvarAccount,
-    TAccountObligationFarmUserState,
-    TAccountReserveFarmState,
+    TAccountDepositAccountsOwner,
+    TAccountDepositAccountsObligation,
+    TAccountDepositAccountsLendingMarket,
+    TAccountDepositAccountsLendingMarketAuthority,
+    TAccountDepositAccountsReserve,
+    TAccountDepositAccountsReserveLiquidityMint,
+    TAccountDepositAccountsReserveLiquiditySupply,
+    TAccountDepositAccountsReserveCollateralMint,
+    TAccountDepositAccountsReserveDestinationDepositCollateral,
+    TAccountDepositAccountsUserSourceLiquidity,
+    TAccountDepositAccountsPlaceholderUserDestinationCollateral,
+    TAccountDepositAccountsCollateralTokenProgram,
+    TAccountDepositAccountsLiquidityTokenProgram,
+    TAccountDepositAccountsInstructionSysvarAccount,
+    TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState,
+    TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState,
     TAccountFarmsProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): DepositReserveLiquidityAndObligationCollateralV2Instruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountObligation,
-  TAccountLendingMarket,
-  TAccountLendingMarketAuthority,
-  TAccountReserve,
-  TAccountReserveLiquidityMint,
-  TAccountReserveLiquiditySupply,
-  TAccountReserveCollateralMint,
-  TAccountReserveDestinationDepositCollateral,
-  TAccountUserSourceLiquidity,
-  TAccountPlaceholderUserDestinationCollateral,
-  TAccountCollateralTokenProgram,
-  TAccountLiquidityTokenProgram,
-  TAccountInstructionSysvarAccount,
-  TAccountObligationFarmUserState,
-  TAccountReserveFarmState,
+  TAccountDepositAccountsOwner,
+  TAccountDepositAccountsObligation,
+  TAccountDepositAccountsLendingMarket,
+  TAccountDepositAccountsLendingMarketAuthority,
+  TAccountDepositAccountsReserve,
+  TAccountDepositAccountsReserveLiquidityMint,
+  TAccountDepositAccountsReserveLiquiditySupply,
+  TAccountDepositAccountsReserveCollateralMint,
+  TAccountDepositAccountsReserveDestinationDepositCollateral,
+  TAccountDepositAccountsUserSourceLiquidity,
+  TAccountDepositAccountsPlaceholderUserDestinationCollateral,
+  TAccountDepositAccountsCollateralTokenProgram,
+  TAccountDepositAccountsLiquidityTokenProgram,
+  TAccountDepositAccountsInstructionSysvarAccount,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState,
+  TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState,
   TAccountFarmsProgram
 > {
   // Program address.
@@ -277,58 +305,76 @@ export function getDepositReserveLiquidityAndObligationCollateralV2Instruction<
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: true },
-    obligation: { value: input.obligation ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    lendingMarketAuthority: {
-      value: input.lendingMarketAuthority ?? null,
-      isWritable: false,
-    },
-    reserve: { value: input.reserve ?? null, isWritable: true },
-    reserveLiquidityMint: {
-      value: input.reserveLiquidityMint ?? null,
-      isWritable: false,
-    },
-    reserveLiquiditySupply: {
-      value: input.reserveLiquiditySupply ?? null,
+    depositAccountsOwner: {
+      value: input.depositAccountsOwner ?? null,
       isWritable: true,
     },
-    reserveCollateralMint: {
-      value: input.reserveCollateralMint ?? null,
+    depositAccountsObligation: {
+      value: input.depositAccountsObligation ?? null,
       isWritable: true,
     },
-    reserveDestinationDepositCollateral: {
-      value: input.reserveDestinationDepositCollateral ?? null,
-      isWritable: true,
-    },
-    userSourceLiquidity: {
-      value: input.userSourceLiquidity ?? null,
-      isWritable: true,
-    },
-    placeholderUserDestinationCollateral: {
-      value: input.placeholderUserDestinationCollateral ?? null,
+    depositAccountsLendingMarket: {
+      value: input.depositAccountsLendingMarket ?? null,
       isWritable: false,
     },
-    collateralTokenProgram: {
-      value: input.collateralTokenProgram ?? null,
+    depositAccountsLendingMarketAuthority: {
+      value: input.depositAccountsLendingMarketAuthority ?? null,
       isWritable: false,
     },
-    liquidityTokenProgram: {
-      value: input.liquidityTokenProgram ?? null,
-      isWritable: false,
-    },
-    instructionSysvarAccount: {
-      value: input.instructionSysvarAccount ?? null,
-      isWritable: false,
-    },
-    obligationFarmUserState: {
-      value: input.obligationFarmUserState ?? null,
+    depositAccountsReserve: {
+      value: input.depositAccountsReserve ?? null,
       isWritable: true,
     },
-    reserveFarmState: {
-      value: input.reserveFarmState ?? null,
+    depositAccountsReserveLiquidityMint: {
+      value: input.depositAccountsReserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    depositAccountsReserveLiquiditySupply: {
+      value: input.depositAccountsReserveLiquiditySupply ?? null,
       isWritable: true,
     },
+    depositAccountsReserveCollateralMint: {
+      value: input.depositAccountsReserveCollateralMint ?? null,
+      isWritable: true,
+    },
+    depositAccountsReserveDestinationDepositCollateral: {
+      value: input.depositAccountsReserveDestinationDepositCollateral ?? null,
+      isWritable: true,
+    },
+    depositAccountsUserSourceLiquidity: {
+      value: input.depositAccountsUserSourceLiquidity ?? null,
+      isWritable: true,
+    },
+    depositAccountsPlaceholderUserDestinationCollateral: {
+      value: input.depositAccountsPlaceholderUserDestinationCollateral ?? null,
+      isWritable: false,
+    },
+    depositAccountsCollateralTokenProgram: {
+      value: input.depositAccountsCollateralTokenProgram ?? null,
+      isWritable: false,
+    },
+    depositAccountsLiquidityTokenProgram: {
+      value: input.depositAccountsLiquidityTokenProgram ?? null,
+      isWritable: false,
+    },
+    depositAccountsInstructionSysvarAccount: {
+      value: input.depositAccountsInstructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+    depositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState:
+      {
+        value:
+          input.depositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState ??
+          null,
+        isWritable: true,
+      },
+    depositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState:
+      {
+        value:
+          input.depositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState ??
+          null,
+        isWritable: true,
+      },
     farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
@@ -340,30 +386,38 @@ export function getDepositReserveLiquidityAndObligationCollateralV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.instructionSysvarAccount.value) {
-    accounts.instructionSysvarAccount.value =
+  if (!accounts.depositAccountsInstructionSysvarAccount.value) {
+    accounts.depositAccountsInstructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.reserveLiquidityMint),
-      getAccountMeta(accounts.reserveLiquiditySupply),
-      getAccountMeta(accounts.reserveCollateralMint),
-      getAccountMeta(accounts.reserveDestinationDepositCollateral),
-      getAccountMeta(accounts.userSourceLiquidity),
-      getAccountMeta(accounts.placeholderUserDestinationCollateral),
-      getAccountMeta(accounts.collateralTokenProgram),
-      getAccountMeta(accounts.liquidityTokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
-      getAccountMeta(accounts.obligationFarmUserState),
-      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.depositAccountsOwner),
+      getAccountMeta(accounts.depositAccountsObligation),
+      getAccountMeta(accounts.depositAccountsLendingMarket),
+      getAccountMeta(accounts.depositAccountsLendingMarketAuthority),
+      getAccountMeta(accounts.depositAccountsReserve),
+      getAccountMeta(accounts.depositAccountsReserveLiquidityMint),
+      getAccountMeta(accounts.depositAccountsReserveLiquiditySupply),
+      getAccountMeta(accounts.depositAccountsReserveCollateralMint),
+      getAccountMeta(
+        accounts.depositAccountsReserveDestinationDepositCollateral,
+      ),
+      getAccountMeta(accounts.depositAccountsUserSourceLiquidity),
+      getAccountMeta(
+        accounts.depositAccountsPlaceholderUserDestinationCollateral,
+      ),
+      getAccountMeta(accounts.depositAccountsCollateralTokenProgram),
+      getAccountMeta(accounts.depositAccountsLiquidityTokenProgram),
+      getAccountMeta(accounts.depositAccountsInstructionSysvarAccount),
+      getAccountMeta(
+        accounts.depositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState,
+      ),
+      getAccountMeta(
+        accounts.depositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState,
+      ),
       getAccountMeta(accounts.farmsProgram),
     ],
     programAddress,
@@ -372,22 +426,22 @@ export function getDepositReserveLiquidityAndObligationCollateralV2Instruction<
     ),
   } as DepositReserveLiquidityAndObligationCollateralV2Instruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountLendingMarketAuthority,
-    TAccountReserve,
-    TAccountReserveLiquidityMint,
-    TAccountReserveLiquiditySupply,
-    TAccountReserveCollateralMint,
-    TAccountReserveDestinationDepositCollateral,
-    TAccountUserSourceLiquidity,
-    TAccountPlaceholderUserDestinationCollateral,
-    TAccountCollateralTokenProgram,
-    TAccountLiquidityTokenProgram,
-    TAccountInstructionSysvarAccount,
-    TAccountObligationFarmUserState,
-    TAccountReserveFarmState,
+    TAccountDepositAccountsOwner,
+    TAccountDepositAccountsObligation,
+    TAccountDepositAccountsLendingMarket,
+    TAccountDepositAccountsLendingMarketAuthority,
+    TAccountDepositAccountsReserve,
+    TAccountDepositAccountsReserveLiquidityMint,
+    TAccountDepositAccountsReserveLiquiditySupply,
+    TAccountDepositAccountsReserveCollateralMint,
+    TAccountDepositAccountsReserveDestinationDepositCollateral,
+    TAccountDepositAccountsUserSourceLiquidity,
+    TAccountDepositAccountsPlaceholderUserDestinationCollateral,
+    TAccountDepositAccountsCollateralTokenProgram,
+    TAccountDepositAccountsLiquidityTokenProgram,
+    TAccountDepositAccountsInstructionSysvarAccount,
+    TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState,
+    TAccountDepositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState,
     TAccountFarmsProgram
   >;
 
@@ -400,22 +454,28 @@ export type ParsedDepositReserveLiquidityAndObligationCollateralV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    owner: TAccountMetas[0];
-    obligation: TAccountMetas[1];
-    lendingMarket: TAccountMetas[2];
-    lendingMarketAuthority: TAccountMetas[3];
-    reserve: TAccountMetas[4];
-    reserveLiquidityMint: TAccountMetas[5];
-    reserveLiquiditySupply: TAccountMetas[6];
-    reserveCollateralMint: TAccountMetas[7];
-    reserveDestinationDepositCollateral: TAccountMetas[8];
-    userSourceLiquidity: TAccountMetas[9];
-    placeholderUserDestinationCollateral?: TAccountMetas[10] | undefined;
-    collateralTokenProgram: TAccountMetas[11];
-    liquidityTokenProgram: TAccountMetas[12];
-    instructionSysvarAccount: TAccountMetas[13];
-    obligationFarmUserState?: TAccountMetas[14] | undefined;
-    reserveFarmState?: TAccountMetas[15] | undefined;
+    depositAccountsOwner: TAccountMetas[0];
+    depositAccountsObligation: TAccountMetas[1];
+    depositAccountsLendingMarket: TAccountMetas[2];
+    depositAccountsLendingMarketAuthority: TAccountMetas[3];
+    depositAccountsReserve: TAccountMetas[4];
+    depositAccountsReserveLiquidityMint: TAccountMetas[5];
+    depositAccountsReserveLiquiditySupply: TAccountMetas[6];
+    depositAccountsReserveCollateralMint: TAccountMetas[7];
+    depositAccountsReserveDestinationDepositCollateral: TAccountMetas[8];
+    depositAccountsUserSourceLiquidity: TAccountMetas[9];
+    depositAccountsPlaceholderUserDestinationCollateral?:
+      | TAccountMetas[10]
+      | undefined;
+    depositAccountsCollateralTokenProgram: TAccountMetas[11];
+    depositAccountsLiquidityTokenProgram: TAccountMetas[12];
+    depositAccountsInstructionSysvarAccount: TAccountMetas[13];
+    depositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState?:
+      | TAccountMetas[14]
+      | undefined;
+    depositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState?:
+      | TAccountMetas[15]
+      | undefined;
     farmsProgram: TAccountMetas[16];
   };
   data: DepositReserveLiquidityAndObligationCollateralV2InstructionData;
@@ -451,22 +511,25 @@ export function parseDepositReserveLiquidityAndObligationCollateralV2Instruction
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      owner: getNextAccount(),
-      obligation: getNextAccount(),
-      lendingMarket: getNextAccount(),
-      lendingMarketAuthority: getNextAccount(),
-      reserve: getNextAccount(),
-      reserveLiquidityMint: getNextAccount(),
-      reserveLiquiditySupply: getNextAccount(),
-      reserveCollateralMint: getNextAccount(),
-      reserveDestinationDepositCollateral: getNextAccount(),
-      userSourceLiquidity: getNextAccount(),
-      placeholderUserDestinationCollateral: getNextOptionalAccount(),
-      collateralTokenProgram: getNextAccount(),
-      liquidityTokenProgram: getNextAccount(),
-      instructionSysvarAccount: getNextAccount(),
-      obligationFarmUserState: getNextOptionalAccount(),
-      reserveFarmState: getNextOptionalAccount(),
+      depositAccountsOwner: getNextAccount(),
+      depositAccountsObligation: getNextAccount(),
+      depositAccountsLendingMarket: getNextAccount(),
+      depositAccountsLendingMarketAuthority: getNextAccount(),
+      depositAccountsReserve: getNextAccount(),
+      depositAccountsReserveLiquidityMint: getNextAccount(),
+      depositAccountsReserveLiquiditySupply: getNextAccount(),
+      depositAccountsReserveCollateralMint: getNextAccount(),
+      depositAccountsReserveDestinationDepositCollateral: getNextAccount(),
+      depositAccountsUserSourceLiquidity: getNextAccount(),
+      depositAccountsPlaceholderUserDestinationCollateral:
+        getNextOptionalAccount(),
+      depositAccountsCollateralTokenProgram: getNextAccount(),
+      depositAccountsLiquidityTokenProgram: getNextAccount(),
+      depositAccountsInstructionSysvarAccount: getNextAccount(),
+      depositReserveLiquidityAndObligationCollateralV2FarmsAccountsObligationFarmUserState:
+        getNextOptionalAccount(),
+      depositReserveLiquidityAndObligationCollateralV2FarmsAccountsReserveFarmState:
+        getNextOptionalAccount(),
       farmsProgram: getNextAccount(),
     },
     data: getDepositReserveLiquidityAndObligationCollateralV2InstructionDataDecoder().decode(

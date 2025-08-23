@@ -1,4 +1,12 @@
-import { addPdasVisitor, defineConfig } from "@macalinao/coda";
+import {
+  addPdasVisitor,
+  constantPdaSeedNodeFromString,
+  defineConfig,
+  numberTypeNode,
+  publicKeyTypeNode,
+  stringTypeNode,
+  variablePdaSeedNode,
+} from "@macalinao/coda";
 
 /** @type {import("@macalinao/coda").CodaConfig} */
 export default defineConfig({

@@ -47,11 +47,11 @@
     "test": "echo 'No tests yet'"
   },
   "dependencies": {
-    "@codama/nodes-from-anchor": "*",
+    "@codama/nodes-from-anchor": "catalog:",
     "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
     "@macalinao/codama-renderers-js-esm": "workspace:*",
     "@macalinao/codama-renderers-markdown": "workspace:*",
-    "codama": "*",
+    "codama": "catalog:",
     "commander": "^14.0.0",
     "glob": "^11.0.3"
   },

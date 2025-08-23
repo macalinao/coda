@@ -25,18 +25,18 @@
     "test:watch": "bun test --watch"
   },
   "dependencies": {
-    "@codama/errors": "^1.3.3",
-    "@codama/nodes": "^1.3.3",
-    "@codama/renderers-core": "^1.0.19",
-    "@codama/visitors-core": "^1.3.3",
-    "codama": "^1.3.3",
+    "@codama/errors": "catalog:",
+    "@codama/nodes": "catalog:",
+    "@codama/renderers-core": "catalog:",
+    "@codama/visitors-core": "catalog:",
+    "codama": "catalog:",
     "prettier": "^3.6.2"
   },
   "devDependencies": {
-    "@macalinao/eslint-config": "^5.0.1",
-    "@macalinao/tsconfig": "^3.2.3",
-    "@types/bun": "^1.2.20",
-    "typescript": "^5.9.2"
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/tsconfig": "catalog:",
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   },
   "repository": {
     "type": "git",

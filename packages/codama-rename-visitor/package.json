@@ -43,7 +43,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "codama": "*"
+    "codama": "catalog:"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",

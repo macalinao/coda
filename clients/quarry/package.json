@@ -52,7 +52,6 @@
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "*",
-    "codama": "*",
     "eslint": "catalog:",
     "typescript": "catalog:"
   },
