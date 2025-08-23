@@ -5,16 +5,25 @@ description: Core packages that power Coda's client generation capabilities
 
 Coda is built as a modular system of packages that work together to generate high-quality TypeScript clients from Solana IDLs. Each package serves a specific purpose in the generation pipeline.
 
-## Core Packages
+## Core Package
 
 ### [@macalinao/coda](/docs/packages/coda)
-The main CLI tool for generating TypeScript clients from Anchor IDLs. Provides zero-config defaults and extensible configuration.
+The main CLI tool for generating TypeScript clients from Anchor IDLs. Works out of the box with sensible defaults and extensible configuration.
+
+## Parsers
+
+### [@macalinao/codama-nodes-from-anchor-x](/docs/packages/codama-nodes-from-anchor-x)
+Creates Codama root nodes from multiple Anchor IDLs with enhanced support for various IDL versions.
+
+## Visitors
 
 ### [@macalinao/codama-instruction-accounts-dedupe-visitor](/docs/packages/codama-instruction-accounts-dedupe-visitor)
 Flattens nested account structures from Anchor IDLs while preserving relationships through naming conventions.
 
 ### [@macalinao/codama-rename-visitor](/docs/packages/codama-rename-visitor)
-Provides utilities for renaming nodes in the Codama AST, useful for customizing generated code naming.
+Renames accounts, instructions, and defined types in the Codama AST to avoid conflicts and customize naming.
+
+## Renderers
 
 ### [@macalinao/codama-renderers-js-esm](/docs/packages/codama-renderers-js-esm)
 ESM-native TypeScript renderer that generates modern JavaScript modules with proper `.js` extensions.
@@ -39,9 +48,16 @@ Each package can be installed individually based on your needs:
 # Install the main CLI
 bun add -D @macalinao/coda
 
-# Install specific visitors
-bun add -D @macalinao/codama-instruction-accounts-dedupe-visitor
-bun add -D @macalinao/codama-renderers-js-esm
+# Install parsers
+bun add @macalinao/codama-nodes-from-anchor-x
+
+# Install visitors
+bun add @macalinao/codama-instruction-accounts-dedupe-visitor
+bun add @macalinao/codama-rename-visitor
+
+# Install renderers
+bun add @macalinao/codama-renderers-js-esm
+bun add @macalinao/codama-renderers-markdown
 ```
 
 ## Contributing

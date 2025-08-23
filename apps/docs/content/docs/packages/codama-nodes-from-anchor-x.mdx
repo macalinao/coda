@@ -1,0 +1,197 @@
+---
+title: "@macalinao/codama-nodes-from-anchor-x"
+description: Create Codama root nodes from multiple Anchor IDLs with enhanced support
+---
+
+This package extends Codama's Anchor IDL parsing capabilities to support multiple IDLs and provides enhanced compatibility for various Anchor versions.
+
+## Installation
+
+```bash
+npm install @macalinao/codama-nodes-from-anchor-x
+```
+
+## Features
+
+- **Multiple IDL Support**: Parse and combine multiple Anchor IDLs into a single Codama root node
+- **Version Compatibility**: Supports both Anchor v0.0.0 and v0.1.0 IDL formats
+- **Enhanced Parsing**: Flattens nested account structures for better code generation
+- **Type Safety**: Full TypeScript support with proper type exports
+
+## Usage
+
+### Single IDL
+
+For projects with a single Anchor program:
+
+```typescript
+import { rootNodeFromAnchor } from "@macalinao/codama-nodes-from-anchor-x";
+import { createFromRoot } from "codama";
+
+// Load your IDL
+const idl = JSON.parse(fs.readFileSync("./idl.json", "utf-8"));
+
+// Create a root node
+const root = rootNodeFromAnchor(idl);
+
+// Use with Codama
+const codama = createFromRoot(root);
+```
+
+### Multiple IDLs
+
+For projects with multiple programs (like Quarry):
+
+```typescript
+import { rootNodeFromAnchorIdls } from "@macalinao/codama-nodes-from-anchor-x";
+
+// Load multiple IDLs
+const idls = [
+  JSON.parse(fs.readFileSync("./idls/program1.json", "utf-8")),
+  JSON.parse(fs.readFileSync("./idls/program2.json", "utf-8")),
+  JSON.parse(fs.readFileSync("./idls/program3.json", "utf-8")),
+];
+
+// Create a root node containing all programs
+const root = rootNodeFromAnchorIdls(idls);
+
+// The first IDL becomes the main program
+// Additional IDLs are added as additional programs
+```
+
+### Program Node Only
+
+Get just the program node without the root wrapper:
+
+```typescript
+import { programNodeFromAnchor } from "@macalinao/codama-nodes-from-anchor-x";
+
+// Get the program node directly
+const program = programNodeFromAnchor(idl);
+```
+
+## API Reference
+
+### `rootNodeFromAnchor(idl: Idl): RootNode`
+
+Creates a Codama root node from a single Anchor IDL.
+
+**Parameters:**
+- `idl`: Anchor IDL object (v0.0.0 or v0.1.0)
+
+**Returns:**
+- Codama `RootNode` containing the parsed program
+
+### `rootNodeFromAnchorIdls(idls: Idl[]): RootNode`
+
+Creates a Codama root node from multiple Anchor IDLs.
+
+**Parameters:**
+- `idls`: Array of Anchor IDL objects
+
+**Returns:**
+- Codama `RootNode` with the first IDL as the main program and others as additional programs
+
+### `programNodeFromAnchor(idl: Idl): ProgramNode`
+
+Creates a Codama program node from an Anchor IDL.
+
+**Parameters:**
+- `idl`: Anchor IDL object
+
+**Returns:**
+- Codama `ProgramNode` without the root wrapper
+
+## Handling Multiple Programs
+
+When working with multiple IDLs, be aware of potential naming conflicts:
+
+```typescript
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
+
+// Rename conflicting instructions
+const visitor = renameVisitor({
+  programA: {
+    instructions: {
+      transfer: "transferA",
+    },
+  },
+  programB: {
+    instructions: {
+      transfer: "transferB",
+    },
+  },
+});
+
+// Apply to the root node
+const updatedRoot = visit(root, visitor);
+```
+
+## Version Support
+
+This package supports multiple Anchor IDL versions:
+
+- **v0.0.0**: Legacy format with `metadata.address`
+- **v0.1.0**: Current format with `address` field
+
+The package automatically detects and handles the version differences.
+
+## Integration with Coda
+
+This package is the default parser for [Coda](https://coda.ianm.com), providing the foundation for generating TypeScript clients:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { rootNodeFromAnchorIdls } from "@macalinao/codama-nodes-from-anchor-x";
+
+export default defineConfig({
+  idlPath: ["./idls/*.json"],
+  // Uses rootNodeFromAnchorIdls internally for multiple IDLs
+});
+```
+
+## Examples
+
+### Real-World Usage
+
+The [Quarry client](https://github.com/macalinao/coda/tree/master/clients/quarry) uses this package to parse 6 different program IDLs:
+
+```javascript
+const idls = [
+  quarryMine,
+  quarryMergeMine,
+  quarryMintWrapper,
+  quarryOperator,
+  quarryRedeemer,
+  quarryRegistry,
+];
+
+const root = rootNodeFromAnchorIdls(idls);
+```
+
+### Migration Support
+
+Support multiple versions of the same program:
+
+```typescript
+const idls = [
+  currentVersionIdl,
+  legacyVersionIdl,
+];
+
+const root = rootNodeFromAnchorIdls(idls);
+// Both versions available for migration tools
+```
+
+## Best Practices
+
+1. **Order Matters**: The first IDL becomes the main program, so order them by importance
+2. **Handle Conflicts**: Use `renameVisitor` to resolve naming conflicts between programs
+3. **Version Check**: Ensure your IDLs are compatible versions before parsing
+4. **Type Safety**: Use TypeScript for better type inference and safety
+
+## See Also
+
+- [Coda CLI Documentation](/docs/getting-started) - Automated client generation
+- [codama-rename-visitor](/docs/packages/codama-rename-visitor) - Handle naming conflicts
+- [codama-instruction-accounts-dedupe-visitor](/docs/packages/codama-instruction-accounts-dedupe-visitor) - Flatten nested accounts

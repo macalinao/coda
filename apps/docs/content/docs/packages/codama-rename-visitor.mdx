@@ -1,9 +1,9 @@
 ---
 title: "@macalinao/codama-rename-visitor"
-description: Codama visitor for renaming instructions, events, and types within Solana programs
+description: Codama visitor for renaming accounts, instructions, and defined types within Solana programs
 ---
 
-This package provides flexible visitors for renaming instructions, events, and defined types in your Codama AST. It's particularly useful when you want to change naming conventions without modifying the original IDL.
+This package provides flexible visitors for renaming accounts, instructions, and defined types in your Codama AST. It's particularly useful when working with multiple programs that may have naming conflicts.
 
 ## Installation
 
@@ -18,12 +18,12 @@ npm install -D @macalinao/codama-rename-visitor
 
 ## Why Use This Package?
 
-When working with Solana programs, you might need to:
+When working with multiple Solana programs, you might need to:
 
 - **Avoid naming conflicts** between multiple programs
 - **Follow consistent naming conventions** across your codebase
 - **Add context** to generic instruction names
-- **Maintain backward compatibility** while improving naming
+- **Customize generated code** without modifying the original IDL
 
 This visitor allows you to rename elements at the AST level, ensuring all references are updated correctly throughout the generated code.
 
@@ -41,16 +41,23 @@ import { visit } from "codama";
 const visitor = renameVisitor({
   quarryMine: {
     instructions: {
-      claimRewards: "claimRewardsMine"
+      claimRewards: "claimRewardsMine",
+      stake: "stakeInQuarry"
+    },
+    accounts: {
+      miner: "quarryMiner"
+    },
+    definedTypes: {
+      StakeEvent: "QuarryStakeEvent"
     }
   },
-  token: {
+  quarryMergeMine: {
     instructions: {
-      transfer: "transferTokens",
-      mint: "mintNft"
+      claimRewards: "claimRewardsMergeMine",
+      stake: "stakeInMergePool"
     },
-    events: {
-      tokenMinted: "nftMinted"
+    accounts: {
+      miner: "mergeMiner"
     }
   }
 });
@@ -91,7 +98,7 @@ export default defineConfig({
 
 ### Renaming Specific Element Types
 
-For simpler use cases, you can rename just instructions or events across all programs:
+For simpler use cases, you can rename specific types of elements across all programs:
 
 #### Rename Instructions Only
 
@@ -99,49 +106,39 @@ For simpler use cases, you can rename just instructions or events across all pro
 import { renameInstructionsVisitor } from "@macalinao/codama-rename-visitor";
 
 const visitor = renameInstructionsVisitor({
-  oldInstructionName: "newInstructionName",
   transfer: "transferTokens",
-  mint: "mintNft"
+  mint: "mintNft",
+  burn: "burnToken"
 });
 
 const updatedRoot = visit(root, visitor);
 ```
 
-#### Rename Events Only
+#### Rename Accounts Only
 
 ```typescript
-import { renameEventsVisitor } from "@macalinao/codama-rename-visitor";
+import { renameAccountsVisitor } from "@macalinao/codama-rename-visitor";
 
-const visitor = renameEventsVisitor({
-  oldEventName: "newEventName",
-  tokenMinted: "nftMinted",
-  transferComplete: "transferFinished"
+const visitor = renameAccountsVisitor({
+  userAccount: "user",
+  configAccount: "config",
+  metadataAccount: "metadata"
 });
 
 const updatedRoot = visit(root, visitor);
 ```
 
-### Legacy Single-Program Format
-
-For backward compatibility, you can use the legacy format for renaming in a single program:
+#### Rename Defined Types Only
 
 ```typescript
-import { renameVisitor } from "@macalinao/codama-rename-visitor";
+import { renameDefinedTypesVisitor } from "@macalinao/codama-rename-visitor";
 
-// Legacy format: applies to the current program
-const visitor = renameVisitor({
-  instructions: {
-    transfer: "transferTokens",
-    mint: "mintNft"
-  },
-  events: {
-    tokenMinted: "nftMinted",
-    transferComplete: "transferFinished"
-  },
-  definedTypes: {
-    TokenMetadata: "NftMetadata"
-  }
+const visitor = renameDefinedTypesVisitor({
+  TokenMetadata: "NftMetadata",
+  TransferEvent: "TokenTransferEvent"
 });
+
+const updatedRoot = visit(root, visitor);
 ```
 
 ## API Reference
@@ -152,27 +149,18 @@ The main visitor for comprehensive renaming:
 
 ```typescript
 function renameVisitor(
-  config: RenameConfig | LegacyRenameConfig
+  renamesByProgram: Record<string, ProgramRenameOptions>
 ): Visitor;
 
-// Program-specific renaming (recommended)
-interface RenameConfig {
-  [programName: string]: ProgramRenameOptions;
-}
-
 interface ProgramRenameOptions {
+  accounts?: Record<string, string>;
   instructions?: Record<string, string>;
-  events?: Record<string, string>;
-  definedTypes?: Record<string, string>;
-}
-
-// Legacy single-program format
-interface LegacyRenameConfig {
-  instructions?: Record<string, string>;
-  events?: Record<string, string>;
   definedTypes?: Record<string, string>;
 }
 ```
+
+**Parameters:**
+- `renamesByProgram`: Object mapping program names to their rename configurations
 
 ### renameInstructionsVisitor
 
@@ -187,24 +175,50 @@ function renameInstructionsVisitor(
 **Parameters:**
 - `mapping`: Object mapping old instruction names to new names
 
-### renameEventsVisitor
+### renameAccountsVisitor
 
-Visitor for renaming only events (defined types):
+Visitor for renaming only accounts:
 
 ```typescript
-function renameEventsVisitor(
+function renameAccountsVisitor(
   mapping: Record<string, string>
 ): Visitor;
 ```
 
 **Parameters:**
-- `mapping`: Object mapping old event names to new names
+- `mapping`: Object mapping old account names to new names
+
+### renameDefinedTypesVisitor
+
+Visitor for renaming only defined types:
+
+```typescript
+function renameDefinedTypesVisitor(
+  mapping: Record<string, string>
+): Visitor;
+```
+
+**Parameters:**
+- `mapping`: Object mapping old type names to new names
+
+### Transform Functions
+
+The package also exports transform functions that can be used directly:
+
+```typescript
+// Transform individual nodes
+renameInstructionTransform(node, mapping);
+renameAccountTransform(node, mapping);
+renameDefinedTypeTransform(node, mapping);
+```
+
+These are useful when building custom visitors or transforming nodes directly.
 
 ## Use Cases
 
 ### Avoiding Naming Conflicts
 
-When working with multiple related programs:
+When working with multiple related programs like Quarry:
 
 ```typescript
 renameVisitor({
@@ -212,14 +226,24 @@ renameVisitor({
   quarryMine: {
     instructions: {
       createMiner: "createQuarryMiner",
-      stake: "stakeInQuarry"
+      stake: "stakeInQuarry",
+      claimRewards: "claimQuarryRewards"
+    },
+    accounts: {
+      miner: "quarryMiner",
+      quarry: "quarryAccount"
     }
   },
   // Quarry Merge Mine program
   quarryMergeMine: {
     instructions: {
       createMiner: "createMergeMiner",
-      stake: "stakeInMergePool"
+      stake: "stakeInMergePool",
+      claimRewards: "claimMergeRewards"
+    },
+    accounts: {
+      miner: "mergeMiner",
+      pool: "mergePool"
     }
   }
 })
@@ -234,13 +258,23 @@ renameVisitor({
   token: {
     instructions: {
       transfer: "transferToken",
-      burn: "burnToken"
+      burn: "burnToken",
+      mint: "mintToken"
+    },
+    accounts: {
+      account: "tokenAccount",
+      mint: "tokenMint"
     }
   },
   nft: {
     instructions: {
       transfer: "transferNft",
-      burn: "burnNft"
+      burn: "burnNft",
+      mint: "mintNft"
+    },
+    accounts: {
+      metadata: "nftMetadata",
+      edition: "nftEdition"
     }
   }
 })
@@ -254,15 +288,45 @@ Enforce naming patterns across your codebase:
 renameVisitor({
   myProgram: {
     instructions: {
-      // Convert to camelCase
+      // Convert snake_case to camelCase
       create_account: "createAccount",
       update_metadata: "updateMetadata",
       delete_record: "deleteRecord"
     },
-    events: {
-      // Add "Event" suffix
-      accountCreated: "accountCreatedEvent",
-      metadataUpdated: "metadataUpdatedEvent"
+    definedTypes: {
+      // Add consistent suffixes
+      AccountCreated: "AccountCreatedEvent",
+      MetadataUpdated: "MetadataUpdatedEvent",
+      RecordDeleted: "RecordDeletedEvent"
+    }
+  }
+})
+```
+
+## Real-World Example
+
+The Quarry client uses this visitor to handle conflicts between multiple programs:
+
+```javascript
+// From clients/quarry/coda.config.mjs
+renameVisitor({
+  quarryMine: {
+    instructions: {
+      claimRewards: "claimRewardsMine",
+      claimRewardsV2: "claimRewardsMineV2",
+      extractFees: "extractFeesMine",
+      pause: "pauseMine",
+      rescueTokens: "rescueTokensMine",
+      unpause: "unpauseMine",
+      // ... more renames
+    }
+  },
+  quarryMergeMine: {
+    instructions: {
+      claimRewards: "claimRewardsMergeMine",
+      initMergeMiner: "initMergeMinerV2",
+      initMiner: "initMinerMergeMine",
+      withdrawTokens: "withdrawTokensMergeMine"
     }
   }
 })
@@ -274,6 +338,7 @@ renameVisitor({
 2. **Document Renames**: Comment why certain renames are necessary
 3. **Be Consistent**: Apply similar naming patterns across related programs
 4. **Test Generated Code**: Verify that renamed elements work correctly in your client code
+5. **Order Matters**: Apply rename visitors early in your visitor chain
 
 ## Troubleshooting
 
@@ -282,18 +347,23 @@ renameVisitor({
 Ensure the visitor is added to your configuration and that names match exactly:
 
 ```javascript
-// Check that program names match your IDL
-console.log(idl.metadata.name); // Should match keys in renameVisitor config
+// Program names must match your IDL
+console.log(idl.metadata?.name || idl.name); // Should match keys in renameVisitor config
 ```
 
 ### Type Errors After Renaming
 
 Make sure all references are updated. The visitor handles most cases, but verify:
 - Instruction builders use new names
-- Event types use new names
-- PDA derivations reference correct instruction names
+- Account types use new names
+- Defined types are correctly referenced
+
+### Case Sensitivity
+
+All names are converted to camelCase automatically. The visitor handles this conversion for you.
 
 ## Related Packages
 
-- [@macalinao/coda](./coda) - Main CLI for client generation
-- [@macalinao/codama-instruction-accounts-dedupe-visitor](./codama-instruction-accounts-dedupe-visitor) - Flatten nested accounts
+- [@macalinao/coda](/docs/packages/coda) - Main CLI for client generation
+- [@macalinao/codama-instruction-accounts-dedupe-visitor](/docs/packages/codama-instruction-accounts-dedupe-visitor) - Flatten nested accounts
+- [@macalinao/codama-nodes-from-anchor-x](/docs/packages/codama-nodes-from-anchor-x) - Parse multiple IDLs
