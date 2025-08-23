@@ -38,7 +38,7 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SET_FAMINE_DISCRIMINATOR = new Uint8Array([
+export const SET_FAMINE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   30, 50, 21, 169, 103, 68, 155, 192,
 ]);
 
@@ -48,21 +48,21 @@ export function getSetFamineDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetFamineInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
+  TAccountAuthAuthority extends string | AccountMeta = string,
+  TAccountAuthRewarder extends string | AccountMeta = string,
   TAccountQuarry extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> &
-            AccountSignerMeta<TAccountAuthority>
-        : TAccountAuthority,
-      TAccountRewarder extends string
-        ? ReadonlyAccount<TAccountRewarder>
-        : TAccountRewarder,
+      TAccountAuthAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthAuthority> &
+            AccountSignerMeta<TAccountAuthAuthority>
+        : TAccountAuthAuthority,
+      TAccountAuthRewarder extends string
+        ? ReadonlyAccount<TAccountAuthRewarder>
+        : TAccountAuthRewarder,
       TAccountQuarry extends string
         ? WritableAccount<TAccountQuarry>
         : TAccountQuarry,
@@ -107,28 +107,32 @@ export function getSetFamineInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface SetFamineInput<
-  TAccountAuthority extends string = string,
-  TAccountRewarder extends string = string,
+  TAccountAuthAuthority extends string = string,
+  TAccountAuthRewarder extends string = string,
   TAccountQuarry extends string = string,
 > {
-  authority: TransactionSigner<TAccountAuthority>;
-  rewarder: Address<TAccountRewarder>;
+  authAuthority: TransactionSigner<TAccountAuthAuthority>;
+  authRewarder: Address<TAccountAuthRewarder>;
   quarry: Address<TAccountQuarry>;
   famineTs: SetFamineInstructionDataArgs["famineTs"];
 }
 
 export function getSetFamineInstruction<
-  TAccountAuthority extends string,
-  TAccountRewarder extends string,
+  TAccountAuthAuthority extends string,
+  TAccountAuthRewarder extends string,
   TAccountQuarry extends string,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
-  input: SetFamineInput<TAccountAuthority, TAccountRewarder, TAccountQuarry>,
+  input: SetFamineInput<
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
+    TAccountQuarry
+  >,
   config?: { programAddress?: TProgramAddress },
 ): SetFamineInstruction<
   TProgramAddress,
-  TAccountAuthority,
-  TAccountRewarder,
+  TAccountAuthAuthority,
+  TAccountAuthRewarder,
   TAccountQuarry
 > {
   // Program address.
@@ -136,8 +140,8 @@ export function getSetFamineInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: false },
+    authAuthority: { value: input.authAuthority ?? null, isWritable: false },
+    authRewarder: { value: input.authRewarder ?? null, isWritable: false },
     quarry: { value: input.quarry ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
@@ -151,8 +155,8 @@ export function getSetFamineInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta(accounts.authAuthority),
+      getAccountMeta(accounts.authRewarder),
       getAccountMeta(accounts.quarry),
     ],
     programAddress,
@@ -161,8 +165,8 @@ export function getSetFamineInstruction<
     ),
   } as SetFamineInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountRewarder,
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
     TAccountQuarry
   >;
 
@@ -175,8 +179,8 @@ export interface ParsedSetFamineInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    authority: TAccountMetas[0];
-    rewarder: TAccountMetas[1];
+    authAuthority: TAccountMetas[0];
+    authRewarder: TAccountMetas[1];
     quarry: TAccountMetas[2];
   };
   data: SetFamineInstructionData;
@@ -203,8 +207,8 @@ export function parseSetFamineInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      authority: getNextAccount(),
-      rewarder: getNextAccount(),
+      authAuthority: getNextAccount(),
+      authRewarder: getNextAccount(),
       quarry: getNextAccount(),
     },
     data: getSetFamineInstructionDataDecoder().decode(instruction.data),

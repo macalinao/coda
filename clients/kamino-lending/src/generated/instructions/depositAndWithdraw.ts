@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DEPOSIT_AND_WITHDRAW_DISCRIMINATOR = new Uint8Array([
-  141, 153, 39, 15, 64, 61, 88, 84,
-]);
+export const DEPOSIT_AND_WITHDRAW_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([141, 153, 39, 15, 64, 61, 88, 84]);
 
 export function getDepositAndWithdrawDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,98 +49,88 @@ export function getDepositAndWithdrawDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DepositAndWithdrawInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountDepositAccountsOwner extends string | AccountMeta<string> = string,
-  TAccountDepositAccountsObligation extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountDepositAccountsLendingMarket extends
-    | string
-    | AccountMeta<string> = string,
+  TAccountDepositAccountsOwner extends string | AccountMeta = string,
+  TAccountDepositAccountsObligation extends string | AccountMeta = string,
+  TAccountDepositAccountsLendingMarket extends string | AccountMeta = string,
   TAccountDepositAccountsLendingMarketAuthority extends
     | string
-    | AccountMeta<string> = string,
-  TAccountDepositAccountsReserve extends string | AccountMeta<string> = string,
+    | AccountMeta = string,
+  TAccountDepositAccountsReserve extends string | AccountMeta = string,
   TAccountDepositAccountsReserveLiquidityMint extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsReserveLiquiditySupply extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsReserveCollateralMint extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsReserveDestinationDepositCollateral extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsUserSourceLiquidity extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsPlaceholderUserDestinationCollateral extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsCollateralTokenProgram extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsLiquidityTokenProgram extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
-  TAccountWithdrawAccountsOwner extends string | AccountMeta<string> = string,
-  TAccountWithdrawAccountsObligation extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountWithdrawAccountsLendingMarket extends
-    | string
-    | AccountMeta<string> = string,
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
+  TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
+  TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarketAuthority extends
     | string
-    | AccountMeta<string> = string,
-  TAccountWithdrawAccountsWithdrawReserve extends
-    | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
+  TAccountWithdrawAccountsWithdrawReserve extends string | AccountMeta = string,
   TAccountWithdrawAccountsReserveLiquidityMint extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsReserveSourceCollateral extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsReserveCollateralMint extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsReserveLiquiditySupply extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsUserDestinationLiquidity extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsPlaceholderUserDestinationCollateral extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsCollateralTokenProgram extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsLiquidityTokenProgram extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountDepositFarmsAccountsObligationFarmUserState extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountDepositFarmsAccountsReserveFarmState extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawFarmsAccountsObligationFarmUserState extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountWithdrawFarmsAccountsReserveFarmState extends
     | string
-    | AccountMeta<string> = string,
-  TAccountFarmsProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    | AccountMeta = string,
+  TAccountFarmsProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -251,16 +240,16 @@ export type DepositAndWithdrawInstruction<
     ]
   >;
 
-export type DepositAndWithdrawInstructionData = {
+export interface DepositAndWithdrawInstructionData {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
   withdrawCollateralAmount: bigint;
-};
+}
 
-export type DepositAndWithdrawInstructionDataArgs = {
+export interface DepositAndWithdrawInstructionDataArgs {
   liquidityAmount: number | bigint;
   withdrawCollateralAmount: number | bigint;
-};
+}
 
 export function getDepositAndWithdrawInstructionDataEncoder(): FixedSizeEncoder<DepositAndWithdrawInstructionDataArgs> {
   return transformEncoder(
@@ -294,7 +283,7 @@ export function getDepositAndWithdrawInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type DepositAndWithdrawInput<
+export interface DepositAndWithdrawInput<
   TAccountDepositAccountsOwner extends string = string,
   TAccountDepositAccountsObligation extends string = string,
   TAccountDepositAccountsLendingMarket extends string = string,
@@ -331,7 +320,7 @@ export type DepositAndWithdrawInput<
   TAccountWithdrawFarmsAccountsObligationFarmUserState extends string = string,
   TAccountWithdrawFarmsAccountsReserveFarmState extends string = string,
   TAccountFarmsProgram extends string = string,
-> = {
+> {
   depositAccountsOwner: TransactionSigner<TAccountDepositAccountsOwner>;
   depositAccountsObligation: Address<TAccountDepositAccountsObligation>;
   depositAccountsLendingMarket: Address<TAccountDepositAccountsLendingMarket>;
@@ -367,7 +356,7 @@ export type DepositAndWithdrawInput<
   farmsProgram: Address<TAccountFarmsProgram>;
   liquidityAmount: DepositAndWithdrawInstructionDataArgs["liquidityAmount"];
   withdrawCollateralAmount: DepositAndWithdrawInstructionDataArgs["withdrawCollateralAmount"];
-};
+}
 
 export function getDepositAndWithdrawInstruction<
   TAccountDepositAccountsOwner extends string,
@@ -718,10 +707,10 @@ export function getDepositAndWithdrawInstruction<
   return instruction;
 }
 
-export type ParsedDepositAndWithdrawInstruction<
+export interface ParsedDepositAndWithdrawInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     depositAccountsOwner: TAccountMetas[0];
@@ -765,7 +754,7 @@ export type ParsedDepositAndWithdrawInstruction<
     farmsProgram: TAccountMetas[32];
   };
   data: DepositAndWithdrawInstructionData;
-};
+}
 
 export function parseDepositAndWithdrawInstruction<
   TProgram extends string,

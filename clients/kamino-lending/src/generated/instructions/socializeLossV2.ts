@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SOCIALIZE_LOSS_V2_DISCRIMINATOR = new Uint8Array([
-  238, 95, 98, 220, 187, 40, 204, 154,
-]);
+export const SOCIALIZE_LOSS_V2_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([238, 95, 98, 220, 187, 40, 204, 154]);
 
 export function getSocializeLossV2DiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -52,28 +51,24 @@ export type SocializeLossV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountSocializeLossAccountsRiskCouncil extends
     | string
-    | AccountMeta<string> = string,
-  TAccountSocializeLossAccountsObligation extends
-    | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
+  TAccountSocializeLossAccountsObligation extends string | AccountMeta = string,
   TAccountSocializeLossAccountsLendingMarket extends
     | string
-    | AccountMeta<string> = string,
-  TAccountSocializeLossAccountsReserve extends
-    | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
+  TAccountSocializeLossAccountsReserve extends string | AccountMeta = string,
   TAccountSocializeLossAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountSocializeLossV2FarmsAccountsObligationFarmUserState extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountSocializeLossV2FarmsAccountsReserveFarmState extends
     | string
-    | AccountMeta<string> = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
-  TAccountFarmsProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    | AccountMeta = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta = string,
+  TAccountFarmsProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -110,14 +105,14 @@ export type SocializeLossV2Instruction<
     ]
   >;
 
-export type SocializeLossV2InstructionData = {
+export interface SocializeLossV2InstructionData {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
-};
+}
 
-export type SocializeLossV2InstructionDataArgs = {
+export interface SocializeLossV2InstructionDataArgs {
   liquidityAmount: number | bigint;
-};
+}
 
 export function getSocializeLossV2InstructionDataEncoder(): FixedSizeEncoder<SocializeLossV2InstructionDataArgs> {
   return transformEncoder(
@@ -146,7 +141,7 @@ export function getSocializeLossV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type SocializeLossV2Input<
+export interface SocializeLossV2Input<
   TAccountSocializeLossAccountsRiskCouncil extends string = string,
   TAccountSocializeLossAccountsObligation extends string = string,
   TAccountSocializeLossAccountsLendingMarket extends string = string,
@@ -157,7 +152,7 @@ export type SocializeLossV2Input<
   TAccountSocializeLossV2FarmsAccountsReserveFarmState extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountFarmsProgram extends string = string,
-> = {
+> {
   socializeLossAccountsRiskCouncil: TransactionSigner<TAccountSocializeLossAccountsRiskCouncil>;
   socializeLossAccountsObligation: Address<TAccountSocializeLossAccountsObligation>;
   socializeLossAccountsLendingMarket: Address<TAccountSocializeLossAccountsLendingMarket>;
@@ -168,7 +163,7 @@ export type SocializeLossV2Input<
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   farmsProgram: Address<TAccountFarmsProgram>;
   liquidityAmount: SocializeLossV2InstructionDataArgs["liquidityAmount"];
-};
+}
 
 export function getSocializeLossV2Instruction<
   TAccountSocializeLossAccountsRiskCouncil extends string,
@@ -295,10 +290,10 @@ export function getSocializeLossV2Instruction<
   return instruction;
 }
 
-export type ParsedSocializeLossV2Instruction<
+export interface ParsedSocializeLossV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     socializeLossAccountsRiskCouncil: TAccountMetas[0];
@@ -314,7 +309,7 @@ export type ParsedSocializeLossV2Instruction<
     farmsProgram: TAccountMetas[8];
   };
   data: SocializeLossV2InstructionData;
-};
+}
 
 export function parseSocializeLossV2Instruction<
   TProgram extends string,

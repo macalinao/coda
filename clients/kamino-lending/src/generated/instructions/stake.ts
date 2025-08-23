@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,23 +32,13 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const STAKE_DISCRIMINATOR = new Uint8Array([
+export const STAKE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   206, 176, 202, 18, 200, 209, 179, 108,
 ]);
 
@@ -48,15 +48,15 @@ export function getStakeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type StakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountUserState extends string | AccountMeta<string> = string,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountFarmVault extends string | AccountMeta<string> = string,
-  TAccountUserAta extends string | AccountMeta<string> = string,
-  TAccountTokenMint extends string | AccountMeta<string> = string,
-  TAccountScopePrices extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountUserState extends string | AccountMeta = string,
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountFarmVault extends string | AccountMeta = string,
+  TAccountUserAta extends string | AccountMeta = string,
+  TAccountTokenMint extends string | AccountMeta = string,
+  TAccountScopePrices extends string | AccountMeta = string,
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -90,12 +90,14 @@ export type StakeInstruction<
     ]
   >;
 
-export type StakeInstructionData = {
+export interface StakeInstructionData {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-};
+}
 
-export type StakeInstructionDataArgs = { amount: number | bigint };
+export interface StakeInstructionDataArgs {
+  amount: number | bigint;
+}
 
 export function getStakeInstructionDataEncoder(): FixedSizeEncoder<StakeInstructionDataArgs> {
   return transformEncoder(
@@ -124,7 +126,7 @@ export function getStakeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type StakeInput<
+export interface StakeInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -133,7 +135,7 @@ export type StakeInput<
   TAccountTokenMint extends string = string,
   TAccountScopePrices extends string = string,
   TAccountTokenProgram extends string = string,
-> = {
+> {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -143,7 +145,7 @@ export type StakeInput<
   scopePrices?: Address<TAccountScopePrices>;
   tokenProgram: Address<TAccountTokenProgram>;
   amount: StakeInstructionDataArgs["amount"];
-};
+}
 
 export function getStakeInstruction<
   TAccountOwner extends string,
@@ -231,10 +233,10 @@ export function getStakeInstruction<
   return instruction;
 }
 
-export type ParsedStakeInstruction<
+export interface ParsedStakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -247,7 +249,7 @@ export type ParsedStakeInstruction<
     tokenProgram: TAccountMetas[7];
   };
   data: StakeInstructionData;
-};
+}
 
 export function parseStakeInstruction<
   TProgram extends string,

@@ -37,7 +37,7 @@ import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const MINTER_UPDATE_DISCRIMINATOR = new Uint8Array([
+export const MINTER_UPDATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   11, 219, 68, 245, 38, 222, 221, 184,
 ]);
 
@@ -49,21 +49,21 @@ export function getMinterUpdateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type MinterUpdateInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
+  TAccountMinterUpdateAuthMintWrapper extends string | AccountMeta = string,
+  TAccountMinterUpdateAuthAdmin extends string | AccountMeta = string,
   TAccountMinter extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMintWrapper extends string
-        ? WritableAccount<TAccountMintWrapper>
-        : TAccountMintWrapper,
-      TAccountAdmin extends string
-        ? ReadonlySignerAccount<TAccountAdmin> &
-            AccountSignerMeta<TAccountAdmin>
-        : TAccountAdmin,
+      TAccountMinterUpdateAuthMintWrapper extends string
+        ? WritableAccount<TAccountMinterUpdateAuthMintWrapper>
+        : TAccountMinterUpdateAuthMintWrapper,
+      TAccountMinterUpdateAuthAdmin extends string
+        ? ReadonlySignerAccount<TAccountMinterUpdateAuthAdmin> &
+            AccountSignerMeta<TAccountMinterUpdateAuthAdmin>
+        : TAccountMinterUpdateAuthAdmin,
       TAccountMinter extends string
         ? WritableAccount<TAccountMinter>
         : TAccountMinter,
@@ -108,28 +108,32 @@ export function getMinterUpdateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface MinterUpdateInput<
-  TAccountMintWrapper extends string = string,
-  TAccountAdmin extends string = string,
+  TAccountMinterUpdateAuthMintWrapper extends string = string,
+  TAccountMinterUpdateAuthAdmin extends string = string,
   TAccountMinter extends string = string,
 > {
-  mintWrapper: Address<TAccountMintWrapper>;
-  admin: TransactionSigner<TAccountAdmin>;
+  minterUpdateAuthMintWrapper: Address<TAccountMinterUpdateAuthMintWrapper>;
+  minterUpdateAuthAdmin: TransactionSigner<TAccountMinterUpdateAuthAdmin>;
   minter: Address<TAccountMinter>;
   allowance: MinterUpdateInstructionDataArgs["allowance"];
 }
 
 export function getMinterUpdateInstruction<
-  TAccountMintWrapper extends string,
-  TAccountAdmin extends string,
+  TAccountMinterUpdateAuthMintWrapper extends string,
+  TAccountMinterUpdateAuthAdmin extends string,
   TAccountMinter extends string,
   TProgramAddress extends Address = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
 >(
-  input: MinterUpdateInput<TAccountMintWrapper, TAccountAdmin, TAccountMinter>,
+  input: MinterUpdateInput<
+    TAccountMinterUpdateAuthMintWrapper,
+    TAccountMinterUpdateAuthAdmin,
+    TAccountMinter
+  >,
   config?: { programAddress?: TProgramAddress },
 ): MinterUpdateInstruction<
   TProgramAddress,
-  TAccountMintWrapper,
-  TAccountAdmin,
+  TAccountMinterUpdateAuthMintWrapper,
+  TAccountMinterUpdateAuthAdmin,
   TAccountMinter
 > {
   // Program address.
@@ -138,8 +142,14 @@ export function getMinterUpdateInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
+    minterUpdateAuthMintWrapper: {
+      value: input.minterUpdateAuthMintWrapper ?? null,
+      isWritable: true,
+    },
+    minterUpdateAuthAdmin: {
+      value: input.minterUpdateAuthAdmin ?? null,
+      isWritable: false,
+    },
     minter: { value: input.minter ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
@@ -153,8 +163,8 @@ export function getMinterUpdateInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
+      getAccountMeta(accounts.minterUpdateAuthMintWrapper),
+      getAccountMeta(accounts.minterUpdateAuthAdmin),
       getAccountMeta(accounts.minter),
     ],
     programAddress,
@@ -163,8 +173,8 @@ export function getMinterUpdateInstruction<
     ),
   } as MinterUpdateInstruction<
     TProgramAddress,
-    TAccountMintWrapper,
-    TAccountAdmin,
+    TAccountMinterUpdateAuthMintWrapper,
+    TAccountMinterUpdateAuthAdmin,
     TAccountMinter
   >;
 
@@ -177,8 +187,8 @@ export interface ParsedMinterUpdateInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    mintWrapper: TAccountMetas[0];
-    admin: TAccountMetas[1];
+    minterUpdateAuthMintWrapper: TAccountMetas[0];
+    minterUpdateAuthAdmin: TAccountMetas[1];
     minter: TAccountMetas[2];
   };
   data: MinterUpdateInstructionData;
@@ -205,8 +215,8 @@ export function parseMinterUpdateInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      mintWrapper: getNextAccount(),
-      admin: getNextAccount(),
+      minterUpdateAuthMintWrapper: getNextAccount(),
+      minterUpdateAuthAdmin: getNextAccount(),
       minter: getNextAccount(),
     },
     data: getMinterUpdateInstructionDataDecoder().decode(instruction.data),

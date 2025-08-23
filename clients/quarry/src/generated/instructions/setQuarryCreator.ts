@@ -36,9 +36,8 @@ import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SET_QUARRY_CREATOR_DISCRIMINATOR = new Uint8Array([
-  59, 91, 208, 54, 209, 64, 234, 68,
-]);
+export const SET_QUARRY_CREATOR_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([59, 91, 208, 54, 209, 64, 234, 68]);
 
 export function getSetQuarryCreatorDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

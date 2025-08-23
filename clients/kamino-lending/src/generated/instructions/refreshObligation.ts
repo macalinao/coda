@@ -6,36 +6,35 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REFRESH_OBLIGATION_DISCRIMINATOR = new Uint8Array([
-  33, 132, 147, 228, 151, 192, 72, 89,
-]);
+export const REFRESH_OBLIGATION_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([33, 132, 147, 228, 151, 192, 72, 89]);
 
 export function getRefreshObligationDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -45,9 +44,9 @@ export function getRefreshObligationDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RefreshObligationInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountObligation extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountObligation extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -62,11 +61,11 @@ export type RefreshObligationInstruction<
     ]
   >;
 
-export type RefreshObligationInstructionData = {
+export interface RefreshObligationInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type RefreshObligationInstructionDataArgs = {};
+export interface RefreshObligationInstructionDataArgs {}
 
 export function getRefreshObligationInstructionDataEncoder(): FixedSizeEncoder<RefreshObligationInstructionDataArgs> {
   return transformEncoder(
@@ -91,13 +90,13 @@ export function getRefreshObligationInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type RefreshObligationInput<
+export interface RefreshObligationInput<
   TAccountLendingMarket extends string = string,
   TAccountObligation extends string = string,
-> = {
+> {
   lendingMarket: Address<TAccountLendingMarket>;
   obligation: Address<TAccountObligation>;
-};
+}
 
 export function getRefreshObligationInstruction<
   TAccountLendingMarket extends string,
@@ -142,17 +141,17 @@ export function getRefreshObligationInstruction<
   return instruction;
 }
 
-export type ParsedRefreshObligationInstruction<
+export interface ParsedRefreshObligationInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarket: TAccountMetas[0];
     obligation: TAccountMetas[1];
   };
   data: RefreshObligationInstructionData;
-};
+}
 
 export function parseRefreshObligationInstruction<
   TProgram extends string,

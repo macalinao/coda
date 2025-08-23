@@ -6,14 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getAddressDecoder,
@@ -22,24 +31,14 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const TRANSFER_OWNERSHIP_DISCRIMINATOR = new Uint8Array([
-  65, 177, 215, 73, 53, 45, 99, 47,
-]);
+export const TRANSFER_OWNERSHIP_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([65, 177, 215, 73, 53, 45, 99, 47]);
 
 export function getTransferOwnershipDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -49,9 +48,9 @@ export function getTransferOwnershipDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type TransferOwnershipInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountUserState extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountUserState extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -67,12 +66,14 @@ export type TransferOwnershipInstruction<
     ]
   >;
 
-export type TransferOwnershipInstructionData = {
+export interface TransferOwnershipInstructionData {
   discriminator: ReadonlyUint8Array;
   newOwner: Address;
-};
+}
 
-export type TransferOwnershipInstructionDataArgs = { newOwner: Address };
+export interface TransferOwnershipInstructionDataArgs {
+  newOwner: Address;
+}
 
 export function getTransferOwnershipInstructionDataEncoder(): FixedSizeEncoder<TransferOwnershipInstructionDataArgs> {
   return transformEncoder(
@@ -101,14 +102,14 @@ export function getTransferOwnershipInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type TransferOwnershipInput<
+export interface TransferOwnershipInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
-> = {
+> {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   newOwner: TransferOwnershipInstructionDataArgs["newOwner"];
-};
+}
 
 export function getTransferOwnershipInstruction<
   TAccountOwner extends string,
@@ -157,17 +158,17 @@ export function getTransferOwnershipInstruction<
   return instruction;
 }
 
-export type ParsedTransferOwnershipInstruction<
+export interface ParsedTransferOwnershipInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
     userState: TAccountMetas[1];
   };
   data: TransferOwnershipInstructionData;
-};
+}
 
 export function parseTransferOwnershipInstruction<
   TProgram extends string,

@@ -6,24 +6,28 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
 } from "@solana/kit";
+import type {
+  RewardPerTimeUnitPoint,
+  RewardPerTimeUnitPointArgs,
+} from "./index.js";
 import {
   getRewardPerTimeUnitPointDecoder,
   getRewardPerTimeUnitPointEncoder,
-  type RewardPerTimeUnitPoint,
-  type RewardPerTimeUnitPointArgs,
 } from "./index.js";
 
-export type RewardScheduleCurve = {
+export interface RewardScheduleCurve {
   /**
    * This is a stepwise function, meaning that each point represents
    * how many rewards are issued per time unit since the beginning
@@ -36,9 +40,9 @@ export type RewardScheduleCurve = {
    * meaning that from t0 to u64::max, 100 rewards are issued per time unit
    */
   points: RewardPerTimeUnitPoint[];
-};
+}
 
-export type RewardScheduleCurveArgs = {
+export interface RewardScheduleCurveArgs {
   /**
    * This is a stepwise function, meaning that each point represents
    * how many rewards are issued per time unit since the beginning
@@ -51,7 +55,7 @@ export type RewardScheduleCurveArgs = {
    * meaning that from t0 to u64::max, 100 rewards are issued per time unit
    */
   points: RewardPerTimeUnitPointArgs[];
-};
+}
 
 export function getRewardScheduleCurveEncoder(): FixedSizeEncoder<RewardScheduleCurveArgs> {
   return getStructEncoder([

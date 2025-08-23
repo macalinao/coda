@@ -6,19 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
 } from "@solana/kit";
 
-export type PythConfiguration = { price: Address };
+export interface PythConfiguration {
+  price: Address;
+}
 
 export type PythConfigurationArgs = PythConfiguration;
 

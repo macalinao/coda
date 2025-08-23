@@ -6,12 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
@@ -24,21 +26,21 @@ import {
   getU128Encoder,
 } from "@solana/kit";
 
-export type ReserveCollateral = {
+export interface ReserveCollateral {
   mintPubkey: Address;
   mintTotalSupply: bigint;
   supplyVault: Address;
   padding1: bigint[];
   padding2: bigint[];
-};
+}
 
-export type ReserveCollateralArgs = {
+export interface ReserveCollateralArgs {
   mintPubkey: Address;
   mintTotalSupply: number | bigint;
   supplyVault: Address;
-  padding1: Array<number | bigint>;
-  padding2: Array<number | bigint>;
-};
+  padding1: (number | bigint)[];
+  padding2: (number | bigint)[];
+}
 
 export function getReserveCollateralEncoder(): FixedSizeEncoder<ReserveCollateralArgs> {
   return getStructEncoder([

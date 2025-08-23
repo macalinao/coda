@@ -6,40 +6,52 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  Codec,
+  Decoder,
+  Encoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
-  type Codec,
   combineCodec,
-  type Decoder,
-  type Encoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  AssetTier,
+  AssetTierArgs,
+  FeeCalculation,
+  FeeCalculationArgs,
+  ReserveFarmKind,
+  ReserveFarmKindArgs,
+  ReserveStatus,
+  ReserveStatusArgs,
+  UpdateConfigMode,
+  UpdateConfigModeArgs,
+  UpdateLendingMarketConfigValue,
+  UpdateLendingMarketConfigValueArgs,
+  UpdateLendingMarketMode,
+  UpdateLendingMarketModeArgs,
+} from "../types/index.js";
 import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
-import {
-  type AssetTier,
-  type AssetTierArgs,
-  type FeeCalculation,
-  type FeeCalculationArgs,
   getAssetTierDecoder,
   getAssetTierEncoder,
   getFeeCalculationDecoder,
@@ -54,21 +66,10 @@ import {
   getUpdateLendingMarketConfigValueEncoder,
   getUpdateLendingMarketModeDecoder,
   getUpdateLendingMarketModeEncoder,
-  type ReserveFarmKind,
-  type ReserveFarmKindArgs,
-  type ReserveStatus,
-  type ReserveStatusArgs,
-  type UpdateConfigMode,
-  type UpdateConfigModeArgs,
-  type UpdateLendingMarketConfigValue,
-  type UpdateLendingMarketConfigValueArgs,
-  type UpdateLendingMarketMode,
-  type UpdateLendingMarketModeArgs,
 } from "../types/index.js";
 
-export const IDL_MISSING_TYPES_DISCRIMINATOR = new Uint8Array([
-  130, 80, 38, 153, 80, 212, 182, 253,
-]);
+export const IDL_MISSING_TYPES_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([130, 80, 38, 153, 80, 212, 182, 253]);
 
 export function getIdlMissingTypesDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -78,10 +79,10 @@ export function getIdlMissingTypesDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type IdlMissingTypesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountLendingMarketOwner extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountReserve extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -100,7 +101,7 @@ export type IdlMissingTypesInstruction<
     ]
   >;
 
-export type IdlMissingTypesInstructionData = {
+export interface IdlMissingTypesInstructionData {
   discriminator: ReadonlyUint8Array;
   reserveFarmKind: ReserveFarmKind;
   assetTier: AssetTier;
@@ -109,9 +110,9 @@ export type IdlMissingTypesInstructionData = {
   updateConfigMode: UpdateConfigMode;
   updateLendingMarketConfigValue: UpdateLendingMarketConfigValue;
   updateLendingMarketConfigMode: UpdateLendingMarketMode;
-};
+}
 
-export type IdlMissingTypesInstructionDataArgs = {
+export interface IdlMissingTypesInstructionDataArgs {
   reserveFarmKind: ReserveFarmKindArgs;
   assetTier: AssetTierArgs;
   feeCalculation: FeeCalculationArgs;
@@ -119,7 +120,7 @@ export type IdlMissingTypesInstructionDataArgs = {
   updateConfigMode: UpdateConfigModeArgs;
   updateLendingMarketConfigValue: UpdateLendingMarketConfigValueArgs;
   updateLendingMarketConfigMode: UpdateLendingMarketModeArgs;
-};
+}
 
 export function getIdlMissingTypesInstructionDataEncoder(): Encoder<IdlMissingTypesInstructionDataArgs> {
   return transformEncoder(
@@ -166,11 +167,11 @@ export function getIdlMissingTypesInstructionDataCodec(): Codec<
   );
 }
 
-export type IdlMissingTypesInput<
+export interface IdlMissingTypesInput<
   TAccountLendingMarketOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
-> = {
+> {
   lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
@@ -181,7 +182,7 @@ export type IdlMissingTypesInput<
   updateConfigMode: IdlMissingTypesInstructionDataArgs["updateConfigMode"];
   updateLendingMarketConfigValue: IdlMissingTypesInstructionDataArgs["updateLendingMarketConfigValue"];
   updateLendingMarketConfigMode: IdlMissingTypesInstructionDataArgs["updateLendingMarketConfigMode"];
-};
+}
 
 export function getIdlMissingTypesInstruction<
   TAccountLendingMarketOwner extends string,
@@ -243,10 +244,10 @@ export function getIdlMissingTypesInstruction<
   return instruction;
 }
 
-export type ParsedIdlMissingTypesInstruction<
+export interface ParsedIdlMissingTypesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarketOwner: TAccountMetas[0];
@@ -254,7 +255,7 @@ export type ParsedIdlMissingTypesInstruction<
     reserve: TAccountMetas[2];
   };
   data: IdlMissingTypesInstructionData;
-};
+}
 
 export function parseIdlMissingTypesInstruction<
   TProgram extends string,

@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DEPOSIT_TO_FARM_VAULT_DISCRIMINATOR = new Uint8Array([
-  131, 166, 64, 94, 108, 213, 114, 183,
-]);
+export const DEPOSIT_TO_FARM_VAULT_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([131, 166, 64, 94, 108, 213, 114, 183]);
 
 export function getDepositToFarmVaultDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,12 +49,12 @@ export function getDepositToFarmVaultDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DepositToFarmVaultInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountDepositor extends string | AccountMeta<string> = string,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountFarmVault extends string | AccountMeta<string> = string,
-  TAccountDepositorAta extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountDepositor extends string | AccountMeta = string,
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountFarmVault extends string | AccountMeta = string,
+  TAccountDepositorAta extends string | AccountMeta = string,
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -80,12 +79,14 @@ export type DepositToFarmVaultInstruction<
     ]
   >;
 
-export type DepositToFarmVaultInstructionData = {
+export interface DepositToFarmVaultInstructionData {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-};
+}
 
-export type DepositToFarmVaultInstructionDataArgs = { amount: number | bigint };
+export interface DepositToFarmVaultInstructionDataArgs {
+  amount: number | bigint;
+}
 
 export function getDepositToFarmVaultInstructionDataEncoder(): FixedSizeEncoder<DepositToFarmVaultInstructionDataArgs> {
   return transformEncoder(
@@ -117,20 +118,20 @@ export function getDepositToFarmVaultInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type DepositToFarmVaultInput<
+export interface DepositToFarmVaultInput<
   TAccountDepositor extends string = string,
   TAccountFarmState extends string = string,
   TAccountFarmVault extends string = string,
   TAccountDepositorAta extends string = string,
   TAccountTokenProgram extends string = string,
-> = {
+> {
   depositor: TransactionSigner<TAccountDepositor>;
   farmState: Address<TAccountFarmState>;
   farmVault: Address<TAccountFarmVault>;
   depositorAta: Address<TAccountDepositorAta>;
   tokenProgram: Address<TAccountTokenProgram>;
   amount: DepositToFarmVaultInstructionDataArgs["amount"];
-};
+}
 
 export function getDepositToFarmVaultInstruction<
   TAccountDepositor extends string,
@@ -200,10 +201,10 @@ export function getDepositToFarmVaultInstruction<
   return instruction;
 }
 
-export type ParsedDepositToFarmVaultInstruction<
+export interface ParsedDepositToFarmVaultInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     depositor: TAccountMetas[0];
@@ -213,7 +214,7 @@ export type ParsedDepositToFarmVaultInstruction<
     tokenProgram: TAccountMetas[4];
   };
   data: DepositToFarmVaultInstructionData;
-};
+}
 
 export function parseDepositToFarmVaultInstruction<
   TProgram extends string,

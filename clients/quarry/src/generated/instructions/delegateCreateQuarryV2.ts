@@ -37,9 +37,8 @@ import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DELEGATE_CREATE_QUARRY_V2_DISCRIMINATOR = new Uint8Array([
-  69, 180, 9, 212, 75, 142, 202, 62,
-]);
+export const DELEGATE_CREATE_QUARRY_V2_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([69, 180, 9, 212, 75, 142, 202, 62]);
 
 export function getDelegateCreateQuarryV2DiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -49,10 +48,16 @@ export function getDelegateCreateQuarryV2DiscriminatorBytes(): ReadonlyUint8Arra
 
 export type DelegateCreateQuarryV2Instruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarryMineProgram extends
+  TAccountCreateQuarryV2WithDelegateOperator extends
+    | string
+    | AccountMeta = string,
+  TAccountCreateQuarryV2WithDelegateDelegate extends
+    | string
+    | AccountMeta = string,
+  TAccountCreateQuarryV2WithDelegateRewarder extends
+    | string
+    | AccountMeta = string,
+  TAccountCreateQuarryV2WithDelegateQuarryMineProgram extends
     | string
     | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountQuarry extends string | AccountMeta = string,
@@ -66,19 +71,19 @@ export type DelegateCreateQuarryV2Instruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountOperator extends string
-        ? WritableAccount<TAccountOperator>
-        : TAccountOperator,
-      TAccountDelegate extends string
-        ? ReadonlySignerAccount<TAccountDelegate> &
-            AccountSignerMeta<TAccountDelegate>
-        : TAccountDelegate,
-      TAccountRewarder extends string
-        ? WritableAccount<TAccountRewarder>
-        : TAccountRewarder,
-      TAccountQuarryMineProgram extends string
-        ? ReadonlyAccount<TAccountQuarryMineProgram>
-        : TAccountQuarryMineProgram,
+      TAccountCreateQuarryV2WithDelegateOperator extends string
+        ? WritableAccount<TAccountCreateQuarryV2WithDelegateOperator>
+        : TAccountCreateQuarryV2WithDelegateOperator,
+      TAccountCreateQuarryV2WithDelegateDelegate extends string
+        ? ReadonlySignerAccount<TAccountCreateQuarryV2WithDelegateDelegate> &
+            AccountSignerMeta<TAccountCreateQuarryV2WithDelegateDelegate>
+        : TAccountCreateQuarryV2WithDelegateDelegate,
+      TAccountCreateQuarryV2WithDelegateRewarder extends string
+        ? WritableAccount<TAccountCreateQuarryV2WithDelegateRewarder>
+        : TAccountCreateQuarryV2WithDelegateRewarder,
+      TAccountCreateQuarryV2WithDelegateQuarryMineProgram extends string
+        ? ReadonlyAccount<TAccountCreateQuarryV2WithDelegateQuarryMineProgram>
+        : TAccountCreateQuarryV2WithDelegateQuarryMineProgram,
       TAccountQuarry extends string
         ? WritableAccount<TAccountQuarry>
         : TAccountQuarry,
@@ -129,19 +134,19 @@ export function getDelegateCreateQuarryV2InstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface DelegateCreateQuarryV2Input<
-  TAccountOperator extends string = string,
-  TAccountDelegate extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarryMineProgram extends string = string,
+  TAccountCreateQuarryV2WithDelegateOperator extends string = string,
+  TAccountCreateQuarryV2WithDelegateDelegate extends string = string,
+  TAccountCreateQuarryV2WithDelegateRewarder extends string = string,
+  TAccountCreateQuarryV2WithDelegateQuarryMineProgram extends string = string,
   TAccountQuarry extends string = string,
   TAccountTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
 > {
-  operator: Address<TAccountOperator>;
-  delegate: TransactionSigner<TAccountDelegate>;
-  rewarder: Address<TAccountRewarder>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
+  createQuarryV2WithDelegateOperator: Address<TAccountCreateQuarryV2WithDelegateOperator>;
+  createQuarryV2WithDelegateDelegate: TransactionSigner<TAccountCreateQuarryV2WithDelegateDelegate>;
+  createQuarryV2WithDelegateRewarder: Address<TAccountCreateQuarryV2WithDelegateRewarder>;
+  createQuarryV2WithDelegateQuarryMineProgram?: Address<TAccountCreateQuarryV2WithDelegateQuarryMineProgram>;
   quarry: Address<TAccountQuarry>;
   tokenMint: Address<TAccountTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
@@ -149,10 +154,10 @@ export interface DelegateCreateQuarryV2Input<
 }
 
 export function getDelegateCreateQuarryV2Instruction<
-  TAccountOperator extends string,
-  TAccountDelegate extends string,
-  TAccountRewarder extends string,
-  TAccountQuarryMineProgram extends string,
+  TAccountCreateQuarryV2WithDelegateOperator extends string,
+  TAccountCreateQuarryV2WithDelegateDelegate extends string,
+  TAccountCreateQuarryV2WithDelegateRewarder extends string,
+  TAccountCreateQuarryV2WithDelegateQuarryMineProgram extends string,
   TAccountQuarry extends string,
   TAccountTokenMint extends string,
   TAccountPayer extends string,
@@ -160,10 +165,10 @@ export function getDelegateCreateQuarryV2Instruction<
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: DelegateCreateQuarryV2Input<
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
+    TAccountCreateQuarryV2WithDelegateOperator,
+    TAccountCreateQuarryV2WithDelegateDelegate,
+    TAccountCreateQuarryV2WithDelegateRewarder,
+    TAccountCreateQuarryV2WithDelegateQuarryMineProgram,
     TAccountQuarry,
     TAccountTokenMint,
     TAccountPayer,
@@ -172,10 +177,10 @@ export function getDelegateCreateQuarryV2Instruction<
   config?: { programAddress?: TProgramAddress },
 ): DelegateCreateQuarryV2Instruction<
   TProgramAddress,
-  TAccountOperator,
-  TAccountDelegate,
-  TAccountRewarder,
-  TAccountQuarryMineProgram,
+  TAccountCreateQuarryV2WithDelegateOperator,
+  TAccountCreateQuarryV2WithDelegateDelegate,
+  TAccountCreateQuarryV2WithDelegateRewarder,
+  TAccountCreateQuarryV2WithDelegateQuarryMineProgram,
   TAccountQuarry,
   TAccountTokenMint,
   TAccountPayer,
@@ -187,11 +192,20 @@ export function getDelegateCreateQuarryV2Instruction<
 
   // Original accounts.
   const originalAccounts = {
-    operator: { value: input.operator ?? null, isWritable: true },
-    delegate: { value: input.delegate ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
+    createQuarryV2WithDelegateOperator: {
+      value: input.createQuarryV2WithDelegateOperator ?? null,
+      isWritable: true,
+    },
+    createQuarryV2WithDelegateDelegate: {
+      value: input.createQuarryV2WithDelegateDelegate ?? null,
+      isWritable: false,
+    },
+    createQuarryV2WithDelegateRewarder: {
+      value: input.createQuarryV2WithDelegateRewarder ?? null,
+      isWritable: true,
+    },
+    createQuarryV2WithDelegateQuarryMineProgram: {
+      value: input.createQuarryV2WithDelegateQuarryMineProgram ?? null,
       isWritable: false,
     },
     quarry: { value: input.quarry ?? null, isWritable: true },
@@ -205,8 +219,8 @@ export function getDelegateCreateQuarryV2Instruction<
   >;
 
   // Resolve default values.
-  if (!accounts.quarryMineProgram.value) {
-    accounts.quarryMineProgram.value =
+  if (!accounts.createQuarryV2WithDelegateQuarryMineProgram.value) {
+    accounts.createQuarryV2WithDelegateQuarryMineProgram.value =
       "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
   }
   if (!accounts.systemProgram.value) {
@@ -217,10 +231,10 @@ export function getDelegateCreateQuarryV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
+      getAccountMeta(accounts.createQuarryV2WithDelegateOperator),
+      getAccountMeta(accounts.createQuarryV2WithDelegateDelegate),
+      getAccountMeta(accounts.createQuarryV2WithDelegateRewarder),
+      getAccountMeta(accounts.createQuarryV2WithDelegateQuarryMineProgram),
       getAccountMeta(accounts.quarry),
       getAccountMeta(accounts.tokenMint),
       getAccountMeta(accounts.payer),
@@ -230,10 +244,10 @@ export function getDelegateCreateQuarryV2Instruction<
     data: getDelegateCreateQuarryV2InstructionDataEncoder().encode({}),
   } as DelegateCreateQuarryV2Instruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
+    TAccountCreateQuarryV2WithDelegateOperator,
+    TAccountCreateQuarryV2WithDelegateDelegate,
+    TAccountCreateQuarryV2WithDelegateRewarder,
+    TAccountCreateQuarryV2WithDelegateQuarryMineProgram,
     TAccountQuarry,
     TAccountTokenMint,
     TAccountPayer,
@@ -249,10 +263,10 @@ export interface ParsedDelegateCreateQuarryV2Instruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    operator: TAccountMetas[0];
-    delegate: TAccountMetas[1];
-    rewarder: TAccountMetas[2];
-    quarryMineProgram: TAccountMetas[3];
+    createQuarryV2WithDelegateOperator: TAccountMetas[0];
+    createQuarryV2WithDelegateDelegate: TAccountMetas[1];
+    createQuarryV2WithDelegateRewarder: TAccountMetas[2];
+    createQuarryV2WithDelegateQuarryMineProgram: TAccountMetas[3];
     quarry: TAccountMetas[4];
     tokenMint: TAccountMetas[5];
     payer: TAccountMetas[6];
@@ -282,10 +296,10 @@ export function parseDelegateCreateQuarryV2Instruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      operator: getNextAccount(),
-      delegate: getNextAccount(),
-      rewarder: getNextAccount(),
-      quarryMineProgram: getNextAccount(),
+      createQuarryV2WithDelegateOperator: getNextAccount(),
+      createQuarryV2WithDelegateDelegate: getNextAccount(),
+      createQuarryV2WithDelegateRewarder: getNextAccount(),
+      createQuarryV2WithDelegateQuarryMineProgram: getNextAccount(),
       quarry: getNextAccount(),
       tokenMint: getNextAccount(),
       payer: getNextAccount(),

@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const WITHDRAW_PROTOCOL_FEE_DISCRIMINATOR = new Uint8Array([
-  158, 201, 158, 189, 33, 93, 162, 103,
-]);
+export const WITHDRAW_PROTOCOL_FEE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([158, 201, 158, 189, 33, 93, 162, 103]);
 
 export function getWithdrawProtocolFeeDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,17 +49,17 @@ export function getWithdrawProtocolFeeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawProtocolFeeInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
-  TAccountFeeVault extends string | AccountMeta<string> = string,
-  TAccountLendingMarketOwnerAta extends string | AccountMeta<string> = string,
+  TAccountLendingMarketOwner extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountReserve extends string | AccountMeta = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta = string,
+  TAccountFeeVault extends string | AccountMeta = string,
+  TAccountLendingMarketOwnerAta extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -94,14 +93,14 @@ export type WithdrawProtocolFeeInstruction<
     ]
   >;
 
-export type WithdrawProtocolFeeInstructionData = {
+export interface WithdrawProtocolFeeInstructionData {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-};
+}
 
-export type WithdrawProtocolFeeInstructionDataArgs = {
+export interface WithdrawProtocolFeeInstructionDataArgs {
   amount: number | bigint;
-};
+}
 
 export function getWithdrawProtocolFeeInstructionDataEncoder(): FixedSizeEncoder<WithdrawProtocolFeeInstructionDataArgs> {
   return transformEncoder(
@@ -133,7 +132,7 @@ export function getWithdrawProtocolFeeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type WithdrawProtocolFeeInput<
+export interface WithdrawProtocolFeeInput<
   TAccountLendingMarketOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
@@ -142,7 +141,7 @@ export type WithdrawProtocolFeeInput<
   TAccountFeeVault extends string = string,
   TAccountLendingMarketOwnerAta extends string = string,
   TAccountTokenProgram extends string = string,
-> = {
+> {
   lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
@@ -152,7 +151,7 @@ export type WithdrawProtocolFeeInput<
   lendingMarketOwnerAta: Address<TAccountLendingMarketOwnerAta>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: WithdrawProtocolFeeInstructionDataArgs["amount"];
-};
+}
 
 export function getWithdrawProtocolFeeInstruction<
   TAccountLendingMarketOwner extends string,
@@ -259,10 +258,10 @@ export function getWithdrawProtocolFeeInstruction<
   return instruction;
 }
 
-export type ParsedWithdrawProtocolFeeInstruction<
+export interface ParsedWithdrawProtocolFeeInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarketOwner: TAccountMetas[0];
@@ -275,7 +274,7 @@ export type ParsedWithdrawProtocolFeeInstruction<
     tokenProgram: TAccountMetas[7];
   };
   data: WithdrawProtocolFeeInstructionData;
-};
+}
 
 export function parseWithdrawProtocolFeeInstruction<
   TProgram extends string,

@@ -113,8 +113,15 @@ export default defineConfig({
     }),
     renameVisitor({
       farms: {
+        accounts: {
+          userState: "farmsUserState",
+        },
+        instructions: {
+          idlMissingTypes: "farmsIdlMissingTypes",
+        },
         definedTypes: {
           tokenInfo: "farmsTokenInfo",
+          userState: "farmsUserState",
         },
       },
     }),

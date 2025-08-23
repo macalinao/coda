@@ -6,21 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  Codec,
+  Decoder,
+  EncodedAccount,
+  Encoder,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   addDecoderSizePrefix,
   addEncoderSizePrefix,
   assertAccountExists,
   assertAccountsExist,
-  type Codec,
   combineCodec,
-  type Decoder,
   decodeAccount,
-  type EncodedAccount,
-  type Encoder,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -35,13 +40,10 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
 
-export const SHORT_URL_DISCRIMINATOR = new Uint8Array([
+export const SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   28, 89, 174, 25, 226, 124, 126, 212,
 ]);
 
@@ -49,13 +51,16 @@ export function getShortUrlDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(SHORT_URL_DISCRIMINATOR);
 }
 
-export type ShortUrl = {
+export interface ShortUrl {
   discriminator: ReadonlyUint8Array;
   referrer: Address;
   shortUrl: string;
-};
+}
 
-export type ShortUrlArgs = { referrer: Address; shortUrl: string };
+export interface ShortUrlArgs {
+  referrer: Address;
+  shortUrl: string;
+}
 
 export function getShortUrlEncoder(): Encoder<ShortUrlArgs> {
   return transformEncoder(

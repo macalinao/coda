@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -33,11 +38,18 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
+import type {
+  LastUpdate,
+  LastUpdateArgs,
+  ReserveCollateral,
+  ReserveCollateralArgs,
+  ReserveConfig,
+  ReserveConfigArgs,
+  ReserveLiquidity,
+  ReserveLiquidityArgs,
+} from "../types/index.js";
 import {
   getLastUpdateDecoder,
   getLastUpdateEncoder,
@@ -47,17 +59,9 @@ import {
   getReserveConfigEncoder,
   getReserveLiquidityDecoder,
   getReserveLiquidityEncoder,
-  type LastUpdate,
-  type LastUpdateArgs,
-  type ReserveCollateral,
-  type ReserveCollateralArgs,
-  type ReserveConfig,
-  type ReserveConfigArgs,
-  type ReserveLiquidity,
-  type ReserveLiquidityArgs,
 } from "../types/index.js";
 
-export const RESERVE_DISCRIMINATOR = new Uint8Array([
+export const RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   43, 242, 204, 202, 26, 247, 59, 127,
 ]);
 
@@ -65,7 +69,7 @@ export function getReserveDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(RESERVE_DISCRIMINATOR);
 }
 
-export type Reserve = {
+export interface Reserve {
   discriminator: ReadonlyUint8Array;
   version: bigint;
   lastUpdate: LastUpdate;
@@ -81,24 +85,24 @@ export type Reserve = {
   borrowedAmountOutsideElevationGroup: bigint;
   borrowedAmountsAgainstThisReserveInElevationGroups: bigint[];
   padding: bigint[];
-};
+}
 
-export type ReserveArgs = {
+export interface ReserveArgs {
   version: number | bigint;
   lastUpdate: LastUpdateArgs;
   lendingMarket: Address;
   farmCollateral: Address;
   farmDebt: Address;
   liquidity: ReserveLiquidityArgs;
-  reserveLiquidityPadding: Array<number | bigint>;
+  reserveLiquidityPadding: (number | bigint)[];
   collateral: ReserveCollateralArgs;
-  reserveCollateralPadding: Array<number | bigint>;
+  reserveCollateralPadding: (number | bigint)[];
   config: ReserveConfigArgs;
-  configPadding: Array<number | bigint>;
+  configPadding: (number | bigint)[];
   borrowedAmountOutsideElevationGroup: number | bigint;
-  borrowedAmountsAgainstThisReserveInElevationGroups: Array<number | bigint>;
-  padding: Array<number | bigint>;
-};
+  borrowedAmountsAgainstThisReserveInElevationGroups: (number | bigint)[];
+  padding: (number | bigint)[];
+}
 
 export function getReserveEncoder(): FixedSizeEncoder<ReserveArgs> {
   return transformEncoder(

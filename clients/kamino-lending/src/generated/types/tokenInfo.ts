@@ -6,11 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
@@ -20,6 +22,16 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
+import type {
+  PriceHeuristic,
+  PriceHeuristicArgs,
+  PythConfiguration,
+  PythConfigurationArgs,
+  ScopeConfiguration,
+  ScopeConfigurationArgs,
+  SwitchboardConfiguration,
+  SwitchboardConfigurationArgs,
+} from "./index.js";
 import {
   getPriceHeuristicDecoder,
   getPriceHeuristicEncoder,
@@ -29,17 +41,9 @@ import {
   getScopeConfigurationEncoder,
   getSwitchboardConfigurationDecoder,
   getSwitchboardConfigurationEncoder,
-  type PriceHeuristic,
-  type PriceHeuristicArgs,
-  type PythConfiguration,
-  type PythConfigurationArgs,
-  type ScopeConfiguration,
-  type ScopeConfigurationArgs,
-  type SwitchboardConfiguration,
-  type SwitchboardConfigurationArgs,
 } from "./index.js";
 
-export type TokenInfo = {
+export interface TokenInfo {
   name: number[];
   heuristic: PriceHeuristic;
   maxTwapDivergenceBps: bigint;
@@ -51,9 +55,9 @@ export type TokenInfo = {
   blockPriceUsage: number;
   reserved: number[];
   padding: bigint[];
-};
+}
 
-export type TokenInfoArgs = {
+export interface TokenInfoArgs {
   name: number[];
   heuristic: PriceHeuristicArgs;
   maxTwapDivergenceBps: number | bigint;
@@ -64,8 +68,8 @@ export type TokenInfoArgs = {
   pythConfiguration: PythConfigurationArgs;
   blockPriceUsage: number;
   reserved: number[];
-  padding: Array<number | bigint>;
-};
+  padding: (number | bigint)[];
+}
 
 export function getTokenInfoEncoder(): FixedSizeEncoder<TokenInfoArgs> {
   return getStructEncoder([

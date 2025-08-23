@@ -6,40 +6,40 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const INITIALIZE_USER_DISCRIMINATOR = new Uint8Array([
-  111, 17, 185, 250, 60, 122, 38, 254,
-]);
+export const INITIALIZE_USER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
+  [111, 17, 185, 250, 60, 122, 38, 254],
+);
 
 export function getInitializeUserDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -49,15 +49,15 @@ export function getInitializeUserDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeUserInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta<string> = string,
-  TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountDelegatee extends string | AccountMeta<string> = string,
-  TAccountUserState extends string | AccountMeta<string> = string,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = string,
-  TAccountRent extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountAuthority extends string | AccountMeta = string,
+  TAccountPayer extends string | AccountMeta = string,
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountDelegatee extends string | AccountMeta = string,
+  TAccountUserState extends string | AccountMeta = string,
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountRent extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -92,11 +92,11 @@ export type InitializeUserInstruction<
     ]
   >;
 
-export type InitializeUserInstructionData = {
+export interface InitializeUserInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type InitializeUserInstructionDataArgs = {};
+export interface InitializeUserInstructionDataArgs {}
 
 export function getInitializeUserInstructionDataEncoder(): FixedSizeEncoder<InitializeUserInstructionDataArgs> {
   return transformEncoder(
@@ -121,7 +121,7 @@ export function getInitializeUserInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type InitializeUserInput<
+export interface InitializeUserInput<
   TAccountAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountOwner extends string = string,
@@ -130,7 +130,7 @@ export type InitializeUserInput<
   TAccountFarmState extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> = {
+> {
   authority: TransactionSigner<TAccountAuthority>;
   payer: TransactionSigner<TAccountPayer>;
   owner: Address<TAccountOwner>;
@@ -139,7 +139,7 @@ export type InitializeUserInput<
   farmState: Address<TAccountFarmState>;
   systemProgram: Address<TAccountSystemProgram>;
   rent: Address<TAccountRent>;
-};
+}
 
 export function getInitializeUserInstruction<
   TAccountAuthority extends string,
@@ -222,10 +222,10 @@ export function getInitializeUserInstruction<
   return instruction;
 }
 
-export type ParsedInitializeUserInstruction<
+export interface ParsedInitializeUserInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     authority: TAccountMetas[0];
@@ -238,7 +238,7 @@ export type ParsedInitializeUserInstruction<
     rent: TAccountMetas[7];
   };
   data: InitializeUserInstructionData;
-};
+}
 
 export function parseInitializeUserInstruction<
   TProgram extends string,

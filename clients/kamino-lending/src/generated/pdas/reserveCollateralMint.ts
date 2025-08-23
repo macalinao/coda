@@ -6,19 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
-  type Address,
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
-  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export type ReserveCollateralMintSeeds = {
+export interface ReserveCollateralMintSeeds {
   lendingMarket: Address;
 
   mint: Address;
-};
+}
 
 export async function findReserveCollateralMintPda(
   seeds: ReserveCollateralMintSeeds,

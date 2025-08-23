@@ -27,10 +27,8 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -41,9 +39,9 @@ import {
 } from "@solana/kit";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const NEW_WRAPPER_DISCRIMINATOR = new Uint8Array([
+export const NEW_WRAPPER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   106, 226, 139, 13, 35, 121, 62, 171,
 ]);
 
@@ -133,132 +131,6 @@ export function getNewWrapperInstructionDataCodec(): FixedSizeCodec<
     getNewWrapperInstructionDataEncoder(),
     getNewWrapperInstructionDataDecoder(),
   );
-}
-
-export interface NewWrapperAsyncInput<
-  TAccountBase extends string = string,
-  TAccountMintWrapper extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-> {
-  base: TransactionSigner<TAccountBase>;
-  mintWrapper?: Address<TAccountMintWrapper>;
-  admin: Address<TAccountAdmin>;
-  tokenMint: Address<TAccountTokenMint>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  bump: NewWrapperInstructionDataArgs["bump"];
-  hardCap: NewWrapperInstructionDataArgs["hardCap"];
-}
-
-export async function getNewWrapperInstructionAsync<
-  TAccountBase extends string,
-  TAccountMintWrapper extends string,
-  TAccountAdmin extends string,
-  TAccountTokenMint extends string,
-  TAccountTokenProgram extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgramAddress extends Address = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
->(
-  input: NewWrapperAsyncInput<
-    TAccountBase,
-    TAccountMintWrapper,
-    TAccountAdmin,
-    TAccountTokenMint,
-    TAccountTokenProgram,
-    TAccountPayer,
-    TAccountSystemProgram
-  >,
-  config?: { programAddress?: TProgramAddress },
-): Promise<
-  NewWrapperInstruction<
-    TProgramAddress,
-    TAccountBase,
-    TAccountMintWrapper,
-    TAccountAdmin,
-    TAccountTokenMint,
-    TAccountTokenProgram,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-> {
-  // Program address.
-  const programAddress =
-    config?.programAddress ?? QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS;
-
-  // Original accounts.
-  const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-  };
-  const accounts = originalAccounts as Record<
-    keyof typeof originalAccounts,
-    ResolvedAccount
-  >;
-
-  // Original args.
-  const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.mintWrapper.value) {
-    accounts.mintWrapper.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            34, 77, 105, 110, 116, 87, 114, 97, 112, 112, 101, 114, 34,
-          ]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.base.value)),
-      ],
-    });
-  }
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
-  const instruction = {
-    accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-    ],
-    programAddress,
-    data: getNewWrapperInstructionDataEncoder().encode(
-      args as NewWrapperInstructionDataArgs,
-    ),
-  } as NewWrapperInstruction<
-    TProgramAddress,
-    TAccountBase,
-    TAccountMintWrapper,
-    TAccountAdmin,
-    TAccountTokenMint,
-    TAccountTokenProgram,
-    TAccountPayer,
-    TAccountSystemProgram
-  >;
-
-  return instruction;
 }
 
 export interface NewWrapperInput<

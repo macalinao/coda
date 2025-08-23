@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -35,13 +40,10 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
 
-export const GLOBAL_CONFIG_DISCRIMINATOR = new Uint8Array([
+export const GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   149, 8, 156, 202, 160, 252, 176, 217,
 ]);
 
@@ -51,7 +53,7 @@ export function getGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export type GlobalConfig = {
+export interface GlobalConfig {
   discriminator: ReadonlyUint8Array;
   globalAdmin: Address;
   treasuryFeeBps: bigint;
@@ -59,16 +61,16 @@ export type GlobalConfig = {
   treasuryVaultsAuthorityBump: bigint;
   pendingGlobalAdmin: Address;
   padding1: bigint[];
-};
+}
 
-export type GlobalConfigArgs = {
+export interface GlobalConfigArgs {
   globalAdmin: Address;
   treasuryFeeBps: number | bigint;
   treasuryVaultsAuthority: Address;
   treasuryVaultsAuthorityBump: number | bigint;
   pendingGlobalAdmin: Address;
-  padding1: Array<number | bigint>;
-};
+  padding1: (number | bigint)[];
+}
 
 export function getGlobalConfigEncoder(): FixedSizeEncoder<GlobalConfigArgs> {
   return transformEncoder(

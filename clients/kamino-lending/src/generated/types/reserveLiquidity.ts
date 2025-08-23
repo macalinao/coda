@@ -6,12 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
@@ -23,14 +25,13 @@ import {
   getU128Decoder,
   getU128Encoder,
 } from "@solana/kit";
+import type { BigFractionBytes, BigFractionBytesArgs } from "./index.js";
 import {
-  type BigFractionBytes,
-  type BigFractionBytesArgs,
   getBigFractionBytesDecoder,
   getBigFractionBytesEncoder,
 } from "./index.js";
 
-export type ReserveLiquidity = {
+export interface ReserveLiquidity {
   mintPubkey: Address;
   supplyVault: Address;
   feeVault: Address;
@@ -49,9 +50,9 @@ export type ReserveLiquidity = {
   tokenProgram: Address;
   padding2: bigint[];
   padding3: bigint[];
-};
+}
 
-export type ReserveLiquidityArgs = {
+export interface ReserveLiquidityArgs {
   mintPubkey: Address;
   supplyVault: Address;
   feeVault: Address;
@@ -68,9 +69,9 @@ export type ReserveLiquidityArgs = {
   pendingReferrerFeesSf: number | bigint;
   absoluteReferralRateSf: number | bigint;
   tokenProgram: Address;
-  padding2: Array<number | bigint>;
-  padding3: Array<number | bigint>;
-};
+  padding2: (number | bigint)[];
+  padding3: (number | bigint)[];
+}
 
 export function getReserveLiquidityEncoder(): FixedSizeEncoder<ReserveLiquidityArgs> {
   return getStructEncoder([

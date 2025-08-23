@@ -6,12 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
@@ -23,14 +25,13 @@ import {
   getU128Decoder,
   getU128Encoder,
 } from "@solana/kit";
+import type { BigFractionBytes, BigFractionBytesArgs } from "./index.js";
 import {
-  type BigFractionBytes,
-  type BigFractionBytesArgs,
   getBigFractionBytesDecoder,
   getBigFractionBytesEncoder,
 } from "./index.js";
 
-export type ObligationLiquidity = {
+export interface ObligationLiquidity {
   borrowReserve: Address;
   cumulativeBorrowRateBsf: BigFractionBytes;
   padding: bigint;
@@ -39,9 +40,9 @@ export type ObligationLiquidity = {
   borrowFactorAdjustedMarketValueSf: bigint;
   borrowedAmountOutsideElevationGroups: bigint;
   padding2: bigint[];
-};
+}
 
-export type ObligationLiquidityArgs = {
+export interface ObligationLiquidityArgs {
   borrowReserve: Address;
   cumulativeBorrowRateBsf: BigFractionBytesArgs;
   padding: number | bigint;
@@ -49,8 +50,8 @@ export type ObligationLiquidityArgs = {
   marketValueSf: number | bigint;
   borrowFactorAdjustedMarketValueSf: number | bigint;
   borrowedAmountOutsideElevationGroups: number | bigint;
-  padding2: Array<number | bigint>;
-};
+  padding2: (number | bigint)[];
+}
 
 export function getObligationLiquidityEncoder(): FixedSizeEncoder<ObligationLiquidityArgs> {
   return getStructEncoder([

@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,23 +32,13 @@ import {
   getStructEncoder,
   getU128Decoder,
   getU128Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const UNSTAKE_DISCRIMINATOR = new Uint8Array([
+export const UNSTAKE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   90, 95, 107, 42, 205, 124, 50, 225,
 ]);
 
@@ -48,11 +48,11 @@ export function getUnstakeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UnstakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountUserState extends string | AccountMeta<string> = string,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountScopePrices extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountUserState extends string | AccountMeta = string,
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountScopePrices extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -74,12 +74,14 @@ export type UnstakeInstruction<
     ]
   >;
 
-export type UnstakeInstructionData = {
+export interface UnstakeInstructionData {
   discriminator: ReadonlyUint8Array;
   stakeSharesScaled: bigint;
-};
+}
 
-export type UnstakeInstructionDataArgs = { stakeSharesScaled: number | bigint };
+export interface UnstakeInstructionDataArgs {
+  stakeSharesScaled: number | bigint;
+}
 
 export function getUnstakeInstructionDataEncoder(): FixedSizeEncoder<UnstakeInstructionDataArgs> {
   return transformEncoder(
@@ -108,18 +110,18 @@ export function getUnstakeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type UnstakeInput<
+export interface UnstakeInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
   TAccountScopePrices extends string = string,
-> = {
+> {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
   scopePrices?: Address<TAccountScopePrices>;
   stakeSharesScaled: UnstakeInstructionDataArgs["stakeSharesScaled"];
-};
+}
 
 export function getUnstakeInstruction<
   TAccountOwner extends string,
@@ -183,10 +185,10 @@ export function getUnstakeInstruction<
   return instruction;
 }
 
-export type ParsedUnstakeInstruction<
+export interface ParsedUnstakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -195,7 +197,7 @@ export type ParsedUnstakeInstruction<
     scopePrices?: TAccountMetas[3] | undefined;
   };
   data: UnstakeInstructionData;
-};
+}
 
 export function parseUnstakeInstruction<
   TProgram extends string,

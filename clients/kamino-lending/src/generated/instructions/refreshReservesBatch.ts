@@ -6,13 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBooleanDecoder,
@@ -21,17 +27,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
-export const REFRESH_RESERVES_BATCH_DISCRIMINATOR = new Uint8Array([
-  144, 110, 26, 103, 162, 204, 252, 147,
-]);
+export const REFRESH_RESERVES_BATCH_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([144, 110, 26, 103, 162, 204, 252, 147]);
 
 export function getRefreshReservesBatchDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -41,19 +42,19 @@ export function getRefreshReservesBatchDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type RefreshReservesBatchInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<TRemainingAccounts>;
 
-export type RefreshReservesBatchInstructionData = {
+export interface RefreshReservesBatchInstructionData {
   discriminator: ReadonlyUint8Array;
   skipPriceUpdates: boolean;
-};
+}
 
-export type RefreshReservesBatchInstructionDataArgs = {
+export interface RefreshReservesBatchInstructionDataArgs {
   skipPriceUpdates: boolean;
-};
+}
 
 export function getRefreshReservesBatchInstructionDataEncoder(): FixedSizeEncoder<RefreshReservesBatchInstructionDataArgs> {
   return transformEncoder(
@@ -85,9 +86,9 @@ export function getRefreshReservesBatchInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type RefreshReservesBatchInput = {
+export interface RefreshReservesBatchInput {
   skipPriceUpdates: RefreshReservesBatchInstructionDataArgs["skipPriceUpdates"];
-};
+}
 
 export function getRefreshReservesBatchInstruction<
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
@@ -112,12 +113,12 @@ export function getRefreshReservesBatchInstruction<
   return instruction;
 }
 
-export type ParsedRefreshReservesBatchInstruction<
+export interface ParsedRefreshReservesBatchInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-> = {
+> {
   programAddress: Address<TProgram>;
   data: RefreshReservesBatchInstructionData;
-};
+}
 
 export function parseRefreshReservesBatchInstruction<TProgram extends string>(
   instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,

@@ -36,9 +36,8 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SET_PAUSE_AUTHORITY_DISCRIMINATOR = new Uint8Array([
-  127, 70, 214, 12, 172, 8, 89, 114,
-]);
+export const SET_PAUSE_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([127, 70, 214, 12, 172, 8, 89, 114]);
 
 export function getSetPauseAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -48,21 +47,21 @@ export function getSetPauseAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetPauseAuthorityInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
+  TAccountAuthAuthority extends string | AccountMeta = string,
+  TAccountAuthRewarder extends string | AccountMeta = string,
   TAccountNewPauseAuthority extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> &
-            AccountSignerMeta<TAccountAuthority>
-        : TAccountAuthority,
-      TAccountRewarder extends string
-        ? WritableAccount<TAccountRewarder>
-        : TAccountRewarder,
+      TAccountAuthAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthAuthority> &
+            AccountSignerMeta<TAccountAuthAuthority>
+        : TAccountAuthAuthority,
+      TAccountAuthRewarder extends string
+        ? WritableAccount<TAccountAuthRewarder>
+        : TAccountAuthRewarder,
       TAccountNewPauseAuthority extends string
         ? ReadonlyAccount<TAccountNewPauseAuthority>
         : TAccountNewPauseAuthority,
@@ -100,31 +99,31 @@ export function getSetPauseAuthorityInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface SetPauseAuthorityInput<
-  TAccountAuthority extends string = string,
-  TAccountRewarder extends string = string,
+  TAccountAuthAuthority extends string = string,
+  TAccountAuthRewarder extends string = string,
   TAccountNewPauseAuthority extends string = string,
 > {
-  authority: TransactionSigner<TAccountAuthority>;
-  rewarder: Address<TAccountRewarder>;
+  authAuthority: TransactionSigner<TAccountAuthAuthority>;
+  authRewarder: Address<TAccountAuthRewarder>;
   newPauseAuthority: Address<TAccountNewPauseAuthority>;
 }
 
 export function getSetPauseAuthorityInstruction<
-  TAccountAuthority extends string,
-  TAccountRewarder extends string,
+  TAccountAuthAuthority extends string,
+  TAccountAuthRewarder extends string,
   TAccountNewPauseAuthority extends string,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: SetPauseAuthorityInput<
-    TAccountAuthority,
-    TAccountRewarder,
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
     TAccountNewPauseAuthority
   >,
   config?: { programAddress?: TProgramAddress },
 ): SetPauseAuthorityInstruction<
   TProgramAddress,
-  TAccountAuthority,
-  TAccountRewarder,
+  TAccountAuthAuthority,
+  TAccountAuthRewarder,
   TAccountNewPauseAuthority
 > {
   // Program address.
@@ -132,8 +131,8 @@ export function getSetPauseAuthorityInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    authAuthority: { value: input.authAuthority ?? null, isWritable: false },
+    authRewarder: { value: input.authRewarder ?? null, isWritable: true },
     newPauseAuthority: {
       value: input.newPauseAuthority ?? null,
       isWritable: false,
@@ -147,16 +146,16 @@ export function getSetPauseAuthorityInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta(accounts.authAuthority),
+      getAccountMeta(accounts.authRewarder),
       getAccountMeta(accounts.newPauseAuthority),
     ],
     programAddress,
     data: getSetPauseAuthorityInstructionDataEncoder().encode({}),
   } as SetPauseAuthorityInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountRewarder,
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
     TAccountNewPauseAuthority
   >;
 
@@ -169,8 +168,8 @@ export interface ParsedSetPauseAuthorityInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    authority: TAccountMetas[0];
-    rewarder: TAccountMetas[1];
+    authAuthority: TAccountMetas[0];
+    authRewarder: TAccountMetas[1];
     newPauseAuthority: TAccountMetas[2];
   };
   data: SetPauseAuthorityInstructionData;
@@ -197,8 +196,8 @@ export function parseSetPauseAuthorityInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      authority: getNextAccount(),
-      rewarder: getNextAccount(),
+      authAuthority: getNextAccount(),
+      authRewarder: getNextAccount(),
       newPauseAuthority: getNextAccount(),
     },
     data: getSetPauseAuthorityInstructionDataDecoder().decode(instruction.data),

@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const BORROW_OBLIGATION_LIQUIDITY_V2_DISCRIMINATOR = new Uint8Array([
-  161, 128, 143, 245, 171, 199, 194, 6,
-]);
+export const BORROW_OBLIGATION_LIQUIDITY_V2_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([161, 128, 143, 245, 171, 199, 194, 6]);
 
 export function getBorrowObligationLiquidityV2DiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,48 +49,40 @@ export function getBorrowObligationLiquidityV2DiscriminatorBytes(): ReadonlyUint
 
 export type BorrowObligationLiquidityV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountBorrowAccountsOwner extends string | AccountMeta<string> = string,
-  TAccountBorrowAccountsObligation extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountBorrowAccountsLendingMarket extends
-    | string
-    | AccountMeta<string> = string,
+  TAccountBorrowAccountsOwner extends string | AccountMeta = string,
+  TAccountBorrowAccountsObligation extends string | AccountMeta = string,
+  TAccountBorrowAccountsLendingMarket extends string | AccountMeta = string,
   TAccountBorrowAccountsLendingMarketAuthority extends
     | string
-    | AccountMeta<string> = string,
-  TAccountBorrowAccountsBorrowReserve extends
-    | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
+  TAccountBorrowAccountsBorrowReserve extends string | AccountMeta = string,
   TAccountBorrowAccountsBorrowReserveLiquidityMint extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountBorrowAccountsReserveSourceLiquidity extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountBorrowAccountsBorrowReserveLiquidityFeeReceiver extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountBorrowAccountsUserDestinationLiquidity extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountBorrowAccountsReferrerTokenState extends
     | string
-    | AccountMeta<string> = string,
-  TAccountBorrowAccountsTokenProgram extends
-    | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
+  TAccountBorrowAccountsTokenProgram extends string | AccountMeta = string,
   TAccountBorrowAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountBorrowObligationLiquidityV2FarmsAccountsObligationFarmUserState extends
     | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
   TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState extends
     | string
-    | AccountMeta<string> = string,
-  TAccountFarmsProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    | AccountMeta = string,
+  TAccountFarmsProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -146,14 +137,14 @@ export type BorrowObligationLiquidityV2Instruction<
     ]
   >;
 
-export type BorrowObligationLiquidityV2InstructionData = {
+export interface BorrowObligationLiquidityV2InstructionData {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
-};
+}
 
-export type BorrowObligationLiquidityV2InstructionDataArgs = {
+export interface BorrowObligationLiquidityV2InstructionDataArgs {
   liquidityAmount: number | bigint;
-};
+}
 
 export function getBorrowObligationLiquidityV2InstructionDataEncoder(): FixedSizeEncoder<BorrowObligationLiquidityV2InstructionDataArgs> {
   return transformEncoder(
@@ -185,7 +176,7 @@ export function getBorrowObligationLiquidityV2InstructionDataCodec(): FixedSizeC
   );
 }
 
-export type BorrowObligationLiquidityV2Input<
+export interface BorrowObligationLiquidityV2Input<
   TAccountBorrowAccountsOwner extends string = string,
   TAccountBorrowAccountsObligation extends string = string,
   TAccountBorrowAccountsLendingMarket extends string = string,
@@ -204,7 +195,7 @@ export type BorrowObligationLiquidityV2Input<
   TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState extends
     string = string,
   TAccountFarmsProgram extends string = string,
-> = {
+> {
   borrowAccountsOwner: TransactionSigner<TAccountBorrowAccountsOwner>;
   borrowAccountsObligation: Address<TAccountBorrowAccountsObligation>;
   borrowAccountsLendingMarket: Address<TAccountBorrowAccountsLendingMarket>;
@@ -221,7 +212,7 @@ export type BorrowObligationLiquidityV2Input<
   borrowObligationLiquidityV2FarmsAccountsReserveFarmState?: Address<TAccountBorrowObligationLiquidityV2FarmsAccountsReserveFarmState>;
   farmsProgram: Address<TAccountFarmsProgram>;
   liquidityAmount: BorrowObligationLiquidityV2InstructionDataArgs["liquidityAmount"];
-};
+}
 
 export function getBorrowObligationLiquidityV2Instruction<
   TAccountBorrowAccountsOwner extends string,
@@ -409,10 +400,10 @@ export function getBorrowObligationLiquidityV2Instruction<
   return instruction;
 }
 
-export type ParsedBorrowObligationLiquidityV2Instruction<
+export interface ParsedBorrowObligationLiquidityV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     borrowAccountsOwner: TAccountMetas[0];
@@ -436,7 +427,7 @@ export type ParsedBorrowObligationLiquidityV2Instruction<
     farmsProgram: TAccountMetas[14];
   };
   data: BorrowObligationLiquidityV2InstructionData;
-};
+}
 
 export function parseBorrowObligationLiquidityV2Instruction<
   TProgram extends string,

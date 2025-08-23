@@ -6,12 +6,9 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import {
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
@@ -25,18 +22,20 @@ import {
   getU128Decoder,
   getU128Encoder,
 } from "@solana/kit";
+import type {
+  RewardScheduleCurve,
+  RewardScheduleCurveArgs,
+  TokenInfo,
+  TokenInfoArgs,
+} from "./index.js";
 import {
   getRewardScheduleCurveDecoder,
   getRewardScheduleCurveEncoder,
   getTokenInfoDecoder,
   getTokenInfoEncoder,
-  type RewardScheduleCurve,
-  type RewardScheduleCurveArgs,
-  type TokenInfo,
-  type TokenInfoArgs,
 } from "./index.js";
 
-export type RewardInfo = {
+export interface RewardInfo {
   token: TokenInfo;
   rewardsVault: Address;
   rewardsAvailable: bigint;
@@ -51,9 +50,9 @@ export type RewardInfo = {
   rewardsPerSecondDecimals: number;
   padding0: number[];
   padding1: bigint[];
-};
+}
 
-export type RewardInfoArgs = {
+export interface RewardInfoArgs {
   token: TokenInfoArgs;
   rewardsVault: Address;
   rewardsAvailable: number | bigint;
@@ -67,10 +66,10 @@ export type RewardInfoArgs = {
   rewardType: number;
   rewardsPerSecondDecimals: number;
   padding0: number[];
-  padding1: Array<number | bigint>;
-};
+  padding1: (number | bigint)[];
+}
 
-export function getRewardInfoEncoder(): FixedSizeEncoder<RewardInfoArgs> {
+export function getRewardInfoEncoder(): Encoder<RewardInfoArgs> {
   return getStructEncoder([
     ["token", getTokenInfoEncoder()],
     ["rewardsVault", getAddressEncoder()],
@@ -89,7 +88,7 @@ export function getRewardInfoEncoder(): FixedSizeEncoder<RewardInfoArgs> {
   ]);
 }
 
-export function getRewardInfoDecoder(): FixedSizeDecoder<RewardInfo> {
+export function getRewardInfoDecoder(): Decoder<RewardInfo> {
   return getStructDecoder([
     ["token", getTokenInfoDecoder()],
     ["rewardsVault", getAddressDecoder()],
@@ -108,9 +107,6 @@ export function getRewardInfoDecoder(): FixedSizeDecoder<RewardInfo> {
   ]);
 }
 
-export function getRewardInfoCodec(): FixedSizeCodec<
-  RewardInfoArgs,
-  RewardInfo
-> {
+export function getRewardInfoCodec(): Codec<RewardInfoArgs, RewardInfo> {
   return combineCodec(getRewardInfoEncoder(), getRewardInfoDecoder());
 }

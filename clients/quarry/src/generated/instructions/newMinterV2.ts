@@ -37,7 +37,7 @@ import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const NEW_MINTER_V2_DISCRIMINATOR = new Uint8Array([
+export const NEW_MINTER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   7, 93, 245, 202, 126, 212, 61, 195,
 ]);
 
@@ -49,8 +49,8 @@ export function getNewMinterV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewMinterV2Instruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
+  TAccountNewMinterV2AuthMintWrapper extends string | AccountMeta = string,
+  TAccountNewMinterV2AuthAdmin extends string | AccountMeta = string,
   TAccountNewMinterAuthority extends string | AccountMeta = string,
   TAccountMinter extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
@@ -62,13 +62,13 @@ export type NewMinterV2Instruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountMintWrapper extends string
-        ? WritableAccount<TAccountMintWrapper>
-        : TAccountMintWrapper,
-      TAccountAdmin extends string
-        ? ReadonlySignerAccount<TAccountAdmin> &
-            AccountSignerMeta<TAccountAdmin>
-        : TAccountAdmin,
+      TAccountNewMinterV2AuthMintWrapper extends string
+        ? WritableAccount<TAccountNewMinterV2AuthMintWrapper>
+        : TAccountNewMinterV2AuthMintWrapper,
+      TAccountNewMinterV2AuthAdmin extends string
+        ? ReadonlySignerAccount<TAccountNewMinterV2AuthAdmin> &
+            AccountSignerMeta<TAccountNewMinterV2AuthAdmin>
+        : TAccountNewMinterV2AuthAdmin,
       TAccountNewMinterAuthority extends string
         ? ReadonlyAccount<TAccountNewMinterAuthority>
         : TAccountNewMinterAuthority,
@@ -116,15 +116,15 @@ export function getNewMinterV2InstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface NewMinterV2Input<
-  TAccountMintWrapper extends string = string,
-  TAccountAdmin extends string = string,
+  TAccountNewMinterV2AuthMintWrapper extends string = string,
+  TAccountNewMinterV2AuthAdmin extends string = string,
   TAccountNewMinterAuthority extends string = string,
   TAccountMinter extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
 > {
-  mintWrapper: Address<TAccountMintWrapper>;
-  admin: TransactionSigner<TAccountAdmin>;
+  newMinterV2AuthMintWrapper: Address<TAccountNewMinterV2AuthMintWrapper>;
+  newMinterV2AuthAdmin: TransactionSigner<TAccountNewMinterV2AuthAdmin>;
   newMinterAuthority: Address<TAccountNewMinterAuthority>;
   minter: Address<TAccountMinter>;
   payer: TransactionSigner<TAccountPayer>;
@@ -132,8 +132,8 @@ export interface NewMinterV2Input<
 }
 
 export function getNewMinterV2Instruction<
-  TAccountMintWrapper extends string,
-  TAccountAdmin extends string,
+  TAccountNewMinterV2AuthMintWrapper extends string,
+  TAccountNewMinterV2AuthAdmin extends string,
   TAccountNewMinterAuthority extends string,
   TAccountMinter extends string,
   TAccountPayer extends string,
@@ -141,8 +141,8 @@ export function getNewMinterV2Instruction<
   TProgramAddress extends Address = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
 >(
   input: NewMinterV2Input<
-    TAccountMintWrapper,
-    TAccountAdmin,
+    TAccountNewMinterV2AuthMintWrapper,
+    TAccountNewMinterV2AuthAdmin,
     TAccountNewMinterAuthority,
     TAccountMinter,
     TAccountPayer,
@@ -151,8 +151,8 @@ export function getNewMinterV2Instruction<
   config?: { programAddress?: TProgramAddress },
 ): NewMinterV2Instruction<
   TProgramAddress,
-  TAccountMintWrapper,
-  TAccountAdmin,
+  TAccountNewMinterV2AuthMintWrapper,
+  TAccountNewMinterV2AuthAdmin,
   TAccountNewMinterAuthority,
   TAccountMinter,
   TAccountPayer,
@@ -164,8 +164,14 @@ export function getNewMinterV2Instruction<
 
   // Original accounts.
   const originalAccounts = {
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
+    newMinterV2AuthMintWrapper: {
+      value: input.newMinterV2AuthMintWrapper ?? null,
+      isWritable: true,
+    },
+    newMinterV2AuthAdmin: {
+      value: input.newMinterV2AuthAdmin ?? null,
+      isWritable: false,
+    },
     newMinterAuthority: {
       value: input.newMinterAuthority ?? null,
       isWritable: false,
@@ -188,8 +194,8 @@ export function getNewMinterV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
+      getAccountMeta(accounts.newMinterV2AuthMintWrapper),
+      getAccountMeta(accounts.newMinterV2AuthAdmin),
       getAccountMeta(accounts.newMinterAuthority),
       getAccountMeta(accounts.minter),
       getAccountMeta(accounts.payer),
@@ -199,8 +205,8 @@ export function getNewMinterV2Instruction<
     data: getNewMinterV2InstructionDataEncoder().encode({}),
   } as NewMinterV2Instruction<
     TProgramAddress,
-    TAccountMintWrapper,
-    TAccountAdmin,
+    TAccountNewMinterV2AuthMintWrapper,
+    TAccountNewMinterV2AuthAdmin,
     TAccountNewMinterAuthority,
     TAccountMinter,
     TAccountPayer,
@@ -216,8 +222,8 @@ export interface ParsedNewMinterV2Instruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    mintWrapper: TAccountMetas[0];
-    admin: TAccountMetas[1];
+    newMinterV2AuthMintWrapper: TAccountMetas[0];
+    newMinterV2AuthAdmin: TAccountMetas[1];
     newMinterAuthority: TAccountMetas[2];
     minter: TAccountMetas[3];
     payer: TAccountMetas[4];
@@ -247,8 +253,8 @@ export function parseNewMinterV2Instruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      mintWrapper: getNextAccount(),
-      admin: getNextAccount(),
+      newMinterV2AuthMintWrapper: getNextAccount(),
+      newMinterV2AuthAdmin: getNextAccount(),
       newMinterAuthority: getNextAccount(),
       minter: getNextAccount(),
       payer: getNextAccount(),

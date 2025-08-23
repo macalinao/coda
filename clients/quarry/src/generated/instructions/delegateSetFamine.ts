@@ -38,9 +38,8 @@ import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DELEGATE_SET_FAMINE_DISCRIMINATOR = new Uint8Array([
-  1, 196, 52, 171, 199, 237, 240, 134,
-]);
+export const DELEGATE_SET_FAMINE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([1, 196, 52, 171, 199, 237, 240, 134]);
 
 export function getDelegateSetFamineDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,10 +49,10 @@ export function getDelegateSetFamineDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DelegateSetFamineInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarryMineProgram extends
+  TAccountSetFamineWithDelegateOperator extends string | AccountMeta = string,
+  TAccountSetFamineWithDelegateDelegate extends string | AccountMeta = string,
+  TAccountSetFamineWithDelegateRewarder extends string | AccountMeta = string,
+  TAccountSetFamineWithDelegateQuarryMineProgram extends
     | string
     | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountQuarry extends string | AccountMeta = string,
@@ -62,19 +61,19 @@ export type DelegateSetFamineInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountOperator extends string
-        ? WritableAccount<TAccountOperator>
-        : TAccountOperator,
-      TAccountDelegate extends string
-        ? ReadonlySignerAccount<TAccountDelegate> &
-            AccountSignerMeta<TAccountDelegate>
-        : TAccountDelegate,
-      TAccountRewarder extends string
-        ? WritableAccount<TAccountRewarder>
-        : TAccountRewarder,
-      TAccountQuarryMineProgram extends string
-        ? ReadonlyAccount<TAccountQuarryMineProgram>
-        : TAccountQuarryMineProgram,
+      TAccountSetFamineWithDelegateOperator extends string
+        ? WritableAccount<TAccountSetFamineWithDelegateOperator>
+        : TAccountSetFamineWithDelegateOperator,
+      TAccountSetFamineWithDelegateDelegate extends string
+        ? ReadonlySignerAccount<TAccountSetFamineWithDelegateDelegate> &
+            AccountSignerMeta<TAccountSetFamineWithDelegateDelegate>
+        : TAccountSetFamineWithDelegateDelegate,
+      TAccountSetFamineWithDelegateRewarder extends string
+        ? WritableAccount<TAccountSetFamineWithDelegateRewarder>
+        : TAccountSetFamineWithDelegateRewarder,
+      TAccountSetFamineWithDelegateQuarryMineProgram extends string
+        ? ReadonlyAccount<TAccountSetFamineWithDelegateQuarryMineProgram>
+        : TAccountSetFamineWithDelegateQuarryMineProgram,
       TAccountQuarry extends string
         ? WritableAccount<TAccountQuarry>
         : TAccountQuarry,
@@ -119,42 +118,42 @@ export function getDelegateSetFamineInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface DelegateSetFamineInput<
-  TAccountOperator extends string = string,
-  TAccountDelegate extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarryMineProgram extends string = string,
+  TAccountSetFamineWithDelegateOperator extends string = string,
+  TAccountSetFamineWithDelegateDelegate extends string = string,
+  TAccountSetFamineWithDelegateRewarder extends string = string,
+  TAccountSetFamineWithDelegateQuarryMineProgram extends string = string,
   TAccountQuarry extends string = string,
 > {
-  operator: Address<TAccountOperator>;
-  delegate: TransactionSigner<TAccountDelegate>;
-  rewarder: Address<TAccountRewarder>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
+  setFamineWithDelegateOperator: Address<TAccountSetFamineWithDelegateOperator>;
+  setFamineWithDelegateDelegate: TransactionSigner<TAccountSetFamineWithDelegateDelegate>;
+  setFamineWithDelegateRewarder: Address<TAccountSetFamineWithDelegateRewarder>;
+  setFamineWithDelegateQuarryMineProgram?: Address<TAccountSetFamineWithDelegateQuarryMineProgram>;
   quarry: Address<TAccountQuarry>;
   famineTs: DelegateSetFamineInstructionDataArgs["famineTs"];
 }
 
 export function getDelegateSetFamineInstruction<
-  TAccountOperator extends string,
-  TAccountDelegate extends string,
-  TAccountRewarder extends string,
-  TAccountQuarryMineProgram extends string,
+  TAccountSetFamineWithDelegateOperator extends string,
+  TAccountSetFamineWithDelegateDelegate extends string,
+  TAccountSetFamineWithDelegateRewarder extends string,
+  TAccountSetFamineWithDelegateQuarryMineProgram extends string,
   TAccountQuarry extends string,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: DelegateSetFamineInput<
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
+    TAccountSetFamineWithDelegateOperator,
+    TAccountSetFamineWithDelegateDelegate,
+    TAccountSetFamineWithDelegateRewarder,
+    TAccountSetFamineWithDelegateQuarryMineProgram,
     TAccountQuarry
   >,
   config?: { programAddress?: TProgramAddress },
 ): DelegateSetFamineInstruction<
   TProgramAddress,
-  TAccountOperator,
-  TAccountDelegate,
-  TAccountRewarder,
-  TAccountQuarryMineProgram,
+  TAccountSetFamineWithDelegateOperator,
+  TAccountSetFamineWithDelegateDelegate,
+  TAccountSetFamineWithDelegateRewarder,
+  TAccountSetFamineWithDelegateQuarryMineProgram,
   TAccountQuarry
 > {
   // Program address.
@@ -163,11 +162,20 @@ export function getDelegateSetFamineInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    operator: { value: input.operator ?? null, isWritable: true },
-    delegate: { value: input.delegate ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
+    setFamineWithDelegateOperator: {
+      value: input.setFamineWithDelegateOperator ?? null,
+      isWritable: true,
+    },
+    setFamineWithDelegateDelegate: {
+      value: input.setFamineWithDelegateDelegate ?? null,
+      isWritable: false,
+    },
+    setFamineWithDelegateRewarder: {
+      value: input.setFamineWithDelegateRewarder ?? null,
+      isWritable: true,
+    },
+    setFamineWithDelegateQuarryMineProgram: {
+      value: input.setFamineWithDelegateQuarryMineProgram ?? null,
       isWritable: false,
     },
     quarry: { value: input.quarry ?? null, isWritable: true },
@@ -181,18 +189,18 @@ export function getDelegateSetFamineInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.quarryMineProgram.value) {
-    accounts.quarryMineProgram.value =
+  if (!accounts.setFamineWithDelegateQuarryMineProgram.value) {
+    accounts.setFamineWithDelegateQuarryMineProgram.value =
       "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
+      getAccountMeta(accounts.setFamineWithDelegateOperator),
+      getAccountMeta(accounts.setFamineWithDelegateDelegate),
+      getAccountMeta(accounts.setFamineWithDelegateRewarder),
+      getAccountMeta(accounts.setFamineWithDelegateQuarryMineProgram),
       getAccountMeta(accounts.quarry),
     ],
     programAddress,
@@ -201,10 +209,10 @@ export function getDelegateSetFamineInstruction<
     ),
   } as DelegateSetFamineInstruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
+    TAccountSetFamineWithDelegateOperator,
+    TAccountSetFamineWithDelegateDelegate,
+    TAccountSetFamineWithDelegateRewarder,
+    TAccountSetFamineWithDelegateQuarryMineProgram,
     TAccountQuarry
   >;
 
@@ -217,10 +225,10 @@ export interface ParsedDelegateSetFamineInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    operator: TAccountMetas[0];
-    delegate: TAccountMetas[1];
-    rewarder: TAccountMetas[2];
-    quarryMineProgram: TAccountMetas[3];
+    setFamineWithDelegateOperator: TAccountMetas[0];
+    setFamineWithDelegateDelegate: TAccountMetas[1];
+    setFamineWithDelegateRewarder: TAccountMetas[2];
+    setFamineWithDelegateQuarryMineProgram: TAccountMetas[3];
     quarry: TAccountMetas[4];
   };
   data: DelegateSetFamineInstructionData;
@@ -247,10 +255,10 @@ export function parseDelegateSetFamineInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      operator: getNextAccount(),
-      delegate: getNextAccount(),
-      rewarder: getNextAccount(),
-      quarryMineProgram: getNextAccount(),
+      setFamineWithDelegateOperator: getNextAccount(),
+      setFamineWithDelegateDelegate: getNextAccount(),
+      setFamineWithDelegateRewarder: getNextAccount(),
+      setFamineWithDelegateQuarryMineProgram: getNextAccount(),
       quarry: getNextAccount(),
     },
     data: getDelegateSetFamineInstructionDataDecoder().decode(instruction.data),

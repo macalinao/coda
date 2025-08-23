@@ -6,11 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
@@ -20,30 +22,26 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
-import {
-  getPriceDecoder,
-  getPriceEncoder,
-  type Price,
-  type PriceArgs,
-} from "./index.js";
+import type { Price, PriceArgs } from "./index.js";
+import { getPriceDecoder, getPriceEncoder } from "./index.js";
 
-export type DatedPrice = {
+export interface DatedPrice {
   price: Price;
   lastUpdatedSlot: bigint;
   unixTimestamp: bigint;
   reserved: bigint[];
   reserved2: number[];
   index: number;
-};
+}
 
-export type DatedPriceArgs = {
+export interface DatedPriceArgs {
   price: PriceArgs;
   lastUpdatedSlot: number | bigint;
   unixTimestamp: number | bigint;
-  reserved: Array<number | bigint>;
+  reserved: (number | bigint)[];
   reserved2: number[];
   index: number;
-};
+}
 
 export function getDatedPriceEncoder(): FixedSizeEncoder<DatedPriceArgs> {
   return getStructEncoder([

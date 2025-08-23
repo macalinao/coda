@@ -37,9 +37,8 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SET_REWARDS_SHARE_DISCRIMINATOR = new Uint8Array([
-  186, 168, 34, 15, 178, 135, 189, 129,
-]);
+export const SET_REWARDS_SHARE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([186, 168, 34, 15, 178, 135, 189, 129]);
 
 export function getSetRewardsShareDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -49,21 +48,21 @@ export function getSetRewardsShareDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetRewardsShareInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
+  TAccountAuthAuthority extends string | AccountMeta = string,
+  TAccountAuthRewarder extends string | AccountMeta = string,
   TAccountQuarry extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> &
-            AccountSignerMeta<TAccountAuthority>
-        : TAccountAuthority,
-      TAccountRewarder extends string
-        ? WritableAccount<TAccountRewarder>
-        : TAccountRewarder,
+      TAccountAuthAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthAuthority> &
+            AccountSignerMeta<TAccountAuthAuthority>
+        : TAccountAuthAuthority,
+      TAccountAuthRewarder extends string
+        ? WritableAccount<TAccountAuthRewarder>
+        : TAccountAuthRewarder,
       TAccountQuarry extends string
         ? WritableAccount<TAccountQuarry>
         : TAccountQuarry,
@@ -108,32 +107,32 @@ export function getSetRewardsShareInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface SetRewardsShareInput<
-  TAccountAuthority extends string = string,
-  TAccountRewarder extends string = string,
+  TAccountAuthAuthority extends string = string,
+  TAccountAuthRewarder extends string = string,
   TAccountQuarry extends string = string,
 > {
-  authority: TransactionSigner<TAccountAuthority>;
-  rewarder: Address<TAccountRewarder>;
+  authAuthority: TransactionSigner<TAccountAuthAuthority>;
+  authRewarder: Address<TAccountAuthRewarder>;
   quarry: Address<TAccountQuarry>;
   newShare: SetRewardsShareInstructionDataArgs["newShare"];
 }
 
 export function getSetRewardsShareInstruction<
-  TAccountAuthority extends string,
-  TAccountRewarder extends string,
+  TAccountAuthAuthority extends string,
+  TAccountAuthRewarder extends string,
   TAccountQuarry extends string,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: SetRewardsShareInput<
-    TAccountAuthority,
-    TAccountRewarder,
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
     TAccountQuarry
   >,
   config?: { programAddress?: TProgramAddress },
 ): SetRewardsShareInstruction<
   TProgramAddress,
-  TAccountAuthority,
-  TAccountRewarder,
+  TAccountAuthAuthority,
+  TAccountAuthRewarder,
   TAccountQuarry
 > {
   // Program address.
@@ -141,8 +140,8 @@ export function getSetRewardsShareInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    authAuthority: { value: input.authAuthority ?? null, isWritable: false },
+    authRewarder: { value: input.authRewarder ?? null, isWritable: true },
     quarry: { value: input.quarry ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
@@ -156,8 +155,8 @@ export function getSetRewardsShareInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta(accounts.authAuthority),
+      getAccountMeta(accounts.authRewarder),
       getAccountMeta(accounts.quarry),
     ],
     programAddress,
@@ -166,8 +165,8 @@ export function getSetRewardsShareInstruction<
     ),
   } as SetRewardsShareInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountRewarder,
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
     TAccountQuarry
   >;
 
@@ -180,8 +179,8 @@ export interface ParsedSetRewardsShareInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    authority: TAccountMetas[0];
-    rewarder: TAccountMetas[1];
+    authAuthority: TAccountMetas[0];
+    authRewarder: TAccountMetas[1];
     quarry: TAccountMetas[2];
   };
   data: SetRewardsShareInstructionData;
@@ -208,8 +207,8 @@ export function parseSetRewardsShareInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      authority: getNextAccount(),
-      rewarder: getNextAccount(),
+      authAuthority: getNextAccount(),
+      authRewarder: getNextAccount(),
       quarry: getNextAccount(),
     },
     data: getSetRewardsShareInstructionDataDecoder().decode(instruction.data),

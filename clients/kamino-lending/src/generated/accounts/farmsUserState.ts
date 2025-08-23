@@ -45,56 +45,107 @@ import {
   transformEncoder,
 } from "@solana/kit";
 
-export const USER_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  72, 177, 85, 249, 76, 167, 186, 126,
-]);
+export const FARMS_USER_STATE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([72, 177, 85, 249, 76, 167, 186, 126]);
 
-export function getUserStateDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(USER_STATE_DISCRIMINATOR);
+export function getFarmsUserStateDiscriminatorBytes(): ReadonlyUint8Array {
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    FARMS_USER_STATE_DISCRIMINATOR,
+  );
 }
 
-export interface UserState {
+export interface FarmsUserState {
   discriminator: ReadonlyUint8Array;
   userId: bigint;
   farmState: Address;
   owner: Address;
+  /** Indicate if this user state is part of a delegated farm */
   isFarmDelegated: number;
   padding0: number[];
+  /**
+   * Rewards tally used for computation of gained rewards
+   * (scaled from `Decimal` representation).
+   */
   rewardsTallyScaled: bigint[];
+  /** Number of reward tokens ready for claim */
   rewardsIssuedUnclaimed: bigint[];
   lastClaimTs: bigint[];
+  /**
+   * User stake deposited and usable, generating rewards and fees.
+   * (scaled from `Decimal` representation).
+   */
   activeStakeScaled: bigint;
+  /**
+   * User stake deposited but not usable and not generating rewards yet.
+   * (scaled from `Decimal` representation).
+   */
   pendingDepositStakeScaled: bigint;
+  /**
+   * After this timestamp, pending user stake can be moved to user stake
+   * Initialized to now() + delayed user stake period
+   */
   pendingDepositStakeTs: bigint;
+  /**
+   * User deposits unstaked, pending for withdrawal, not usable and not generating rewards.
+   * (scaled from `Decimal` representation).
+   */
   pendingWithdrawalUnstakeScaled: bigint;
+  /** After this timestamp, user can withdraw their deposit. */
   pendingWithdrawalUnstakeTs: bigint;
+  /** User bump used for account address validation */
   bump: bigint;
+  /** Delegatee used for initialisation - useful to check against */
   delegatee: Address;
   lastStakeTs: bigint;
   padding1: bigint[];
 }
 
-export interface UserStateArgs {
+export interface FarmsUserStateArgs {
   userId: number | bigint;
   farmState: Address;
   owner: Address;
+  /** Indicate if this user state is part of a delegated farm */
   isFarmDelegated: number;
   padding0: number[];
+  /**
+   * Rewards tally used for computation of gained rewards
+   * (scaled from `Decimal` representation).
+   */
   rewardsTallyScaled: (number | bigint)[];
+  /** Number of reward tokens ready for claim */
   rewardsIssuedUnclaimed: (number | bigint)[];
   lastClaimTs: (number | bigint)[];
+  /**
+   * User stake deposited and usable, generating rewards and fees.
+   * (scaled from `Decimal` representation).
+   */
   activeStakeScaled: number | bigint;
+  /**
+   * User stake deposited but not usable and not generating rewards yet.
+   * (scaled from `Decimal` representation).
+   */
   pendingDepositStakeScaled: number | bigint;
+  /**
+   * After this timestamp, pending user stake can be moved to user stake
+   * Initialized to now() + delayed user stake period
+   */
   pendingDepositStakeTs: number | bigint;
+  /**
+   * User deposits unstaked, pending for withdrawal, not usable and not generating rewards.
+   * (scaled from `Decimal` representation).
+   */
   pendingWithdrawalUnstakeScaled: number | bigint;
+  /** After this timestamp, user can withdraw their deposit. */
   pendingWithdrawalUnstakeTs: number | bigint;
+  /** User bump used for account address validation */
   bump: number | bigint;
+  /** Delegatee used for initialisation - useful to check against */
   delegatee: Address;
   lastStakeTs: number | bigint;
   padding1: (number | bigint)[];
 }
 
-export function getUserStateEncoder(): FixedSizeEncoder<UserStateArgs> {
+export function getFarmsUserStateEncoder(): FixedSizeEncoder<FarmsUserStateArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
@@ -119,11 +170,11 @@ export function getUserStateEncoder(): FixedSizeEncoder<UserStateArgs> {
       ["lastStakeTs", getU64Encoder()],
       ["padding1", getArrayEncoder(getU64Encoder(), { size: 50 })],
     ]),
-    (value) => ({ ...value, discriminator: USER_STATE_DISCRIMINATOR }),
+    (value) => ({ ...value, discriminator: FARMS_USER_STATE_DISCRIMINATOR }),
   );
 }
 
-export function getUserStateDecoder(): FixedSizeDecoder<UserState> {
+export function getFarmsUserStateDecoder(): FixedSizeDecoder<FarmsUserState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["userId", getU64Decoder()],
@@ -146,59 +197,70 @@ export function getUserStateDecoder(): FixedSizeDecoder<UserState> {
   ]);
 }
 
-export function getUserStateCodec(): FixedSizeCodec<UserStateArgs, UserState> {
-  return combineCodec(getUserStateEncoder(), getUserStateDecoder());
+export function getFarmsUserStateCodec(): FixedSizeCodec<
+  FarmsUserStateArgs,
+  FarmsUserState
+> {
+  return combineCodec(getFarmsUserStateEncoder(), getFarmsUserStateDecoder());
 }
 
-export function decodeUserState<TAddress extends string = string>(
+export function decodeFarmsUserState<TAddress extends string = string>(
   encodedAccount: EncodedAccount<TAddress>,
-): Account<UserState, TAddress>;
-export function decodeUserState<TAddress extends string = string>(
+): Account<FarmsUserState, TAddress>;
+export function decodeFarmsUserState<TAddress extends string = string>(
   encodedAccount: MaybeEncodedAccount<TAddress>,
-): MaybeAccount<UserState, TAddress>;
-export function decodeUserState<TAddress extends string = string>(
+): MaybeAccount<FarmsUserState, TAddress>;
+export function decodeFarmsUserState<TAddress extends string = string>(
   encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
-): Account<UserState, TAddress> | MaybeAccount<UserState, TAddress> {
+): Account<FarmsUserState, TAddress> | MaybeAccount<FarmsUserState, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getUserStateDecoder(),
+    getFarmsUserStateDecoder(),
   );
 }
 
-export async function fetchUserState<TAddress extends string = string>(
+export async function fetchFarmsUserState<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig,
-): Promise<Account<UserState, TAddress>> {
-  const maybeAccount = await fetchMaybeUserState(rpc, address, config);
+): Promise<Account<FarmsUserState, TAddress>> {
+  const maybeAccount = await fetchMaybeFarmsUserState(rpc, address, config);
   assertAccountExists(maybeAccount);
   return maybeAccount;
 }
 
-export async function fetchMaybeUserState<TAddress extends string = string>(
+export async function fetchMaybeFarmsUserState<
+  TAddress extends string = string,
+>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig,
-): Promise<MaybeAccount<UserState, TAddress>> {
+): Promise<MaybeAccount<FarmsUserState, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
-  return decodeUserState(maybeAccount);
+  return decodeFarmsUserState(maybeAccount);
 }
 
-export async function fetchAllUserState(
+export async function fetchAllFarmsUserState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Address[],
   config?: FetchAccountsConfig,
-): Promise<Account<UserState>[]> {
-  const maybeAccounts = await fetchAllMaybeUserState(rpc, addresses, config);
+): Promise<Account<FarmsUserState>[]> {
+  const maybeAccounts = await fetchAllMaybeFarmsUserState(
+    rpc,
+    addresses,
+    config,
+  );
   assertAccountsExist(maybeAccounts);
   return maybeAccounts;
 }
 
-export async function fetchAllMaybeUserState(
+export async function fetchAllMaybeFarmsUserState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Address[],
   config?: FetchAccountsConfig,
-): Promise<MaybeAccount<UserState>[]> {
+): Promise<MaybeAccount<FarmsUserState>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
-  return maybeAccounts.map((maybeAccount) => decodeUserState(maybeAccount));
+  return maybeAccounts.map((maybeAccount) =>
+    decodeFarmsUserState(maybeAccount),
+  );
 }

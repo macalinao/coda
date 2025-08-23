@@ -25,30 +25,50 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getArrayDecoder,
-  getArrayEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  FarmConfigOption,
+  FarmConfigOptionArgs,
+  GlobalConfigOption,
+  GlobalConfigOptionArgs,
+  LockingMode,
+  LockingModeArgs,
+  RewardType,
+  RewardTypeArgs,
+  TimeUnit,
+  TimeUnitArgs,
+} from "../types/index.js";
+import {
+  getFarmConfigOptionDecoder,
+  getFarmConfigOptionEncoder,
+  getGlobalConfigOptionDecoder,
+  getGlobalConfigOptionEncoder,
+  getLockingModeDecoder,
+  getLockingModeEncoder,
+  getRewardTypeDecoder,
+  getRewardTypeEncoder,
+  getTimeUnitDecoder,
+  getTimeUnitEncoder,
+} from "../types/index.js";
 
-export const UPDATE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([164, 84, 130, 189, 111, 58, 250, 200]);
+export const FARMS_IDL_MISSING_TYPES_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([130, 80, 38, 153, 80, 212, 182, 253]);
 
-export function getUpdateGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
+export function getFarmsIdlMissingTypesDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    UPDATE_GLOBAL_CONFIG_DISCRIMINATOR,
+    FARMS_IDL_MISSING_TYPES_DISCRIMINATOR,
   );
 }
 
-export type UpdateGlobalConfigInstruction<
+export type FarmsIdlMissingTypesInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountGlobalAdmin extends string | AccountMeta = string,
   TAccountGlobalConfig extends string | AccountMeta = string,
@@ -68,67 +88,82 @@ export type UpdateGlobalConfigInstruction<
     ]
   >;
 
-export interface UpdateGlobalConfigInstructionData {
+export interface FarmsIdlMissingTypesInstructionData {
   discriminator: ReadonlyUint8Array;
-  mode: number;
-  value: number[];
+  globalConfigOptionKind: GlobalConfigOption;
+  farmConfigOptionKind: FarmConfigOption;
+  timeUnit: TimeUnit;
+  lockingMode: LockingMode;
+  rewardType: RewardType;
 }
 
-export interface UpdateGlobalConfigInstructionDataArgs {
-  mode: number;
-  value: number[];
+export interface FarmsIdlMissingTypesInstructionDataArgs {
+  globalConfigOptionKind: GlobalConfigOptionArgs;
+  farmConfigOptionKind: FarmConfigOptionArgs;
+  timeUnit: TimeUnitArgs;
+  lockingMode: LockingModeArgs;
+  rewardType: RewardTypeArgs;
 }
 
-export function getUpdateGlobalConfigInstructionDataEncoder(): FixedSizeEncoder<UpdateGlobalConfigInstructionDataArgs> {
+export function getFarmsIdlMissingTypesInstructionDataEncoder(): FixedSizeEncoder<FarmsIdlMissingTypesInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["mode", getU8Encoder()],
-      ["value", getArrayEncoder(getU8Encoder(), { size: 32 })],
+      ["globalConfigOptionKind", getGlobalConfigOptionEncoder()],
+      ["farmConfigOptionKind", getFarmConfigOptionEncoder()],
+      ["timeUnit", getTimeUnitEncoder()],
+      ["lockingMode", getLockingModeEncoder()],
+      ["rewardType", getRewardTypeEncoder()],
     ]),
     (value) => ({
       ...value,
-      discriminator: UPDATE_GLOBAL_CONFIG_DISCRIMINATOR,
+      discriminator: FARMS_IDL_MISSING_TYPES_DISCRIMINATOR,
     }),
   );
 }
 
-export function getUpdateGlobalConfigInstructionDataDecoder(): FixedSizeDecoder<UpdateGlobalConfigInstructionData> {
+export function getFarmsIdlMissingTypesInstructionDataDecoder(): FixedSizeDecoder<FarmsIdlMissingTypesInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["mode", getU8Decoder()],
-    ["value", getArrayDecoder(getU8Decoder(), { size: 32 })],
+    ["globalConfigOptionKind", getGlobalConfigOptionDecoder()],
+    ["farmConfigOptionKind", getFarmConfigOptionDecoder()],
+    ["timeUnit", getTimeUnitDecoder()],
+    ["lockingMode", getLockingModeDecoder()],
+    ["rewardType", getRewardTypeDecoder()],
   ]);
 }
 
-export function getUpdateGlobalConfigInstructionDataCodec(): FixedSizeCodec<
-  UpdateGlobalConfigInstructionDataArgs,
-  UpdateGlobalConfigInstructionData
+export function getFarmsIdlMissingTypesInstructionDataCodec(): FixedSizeCodec<
+  FarmsIdlMissingTypesInstructionDataArgs,
+  FarmsIdlMissingTypesInstructionData
 > {
   return combineCodec(
-    getUpdateGlobalConfigInstructionDataEncoder(),
-    getUpdateGlobalConfigInstructionDataDecoder(),
+    getFarmsIdlMissingTypesInstructionDataEncoder(),
+    getFarmsIdlMissingTypesInstructionDataDecoder(),
   );
 }
 
-export interface UpdateGlobalConfigInput<
+export interface FarmsIdlMissingTypesInput<
   TAccountGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
 > {
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
-  mode: UpdateGlobalConfigInstructionDataArgs["mode"];
-  value: UpdateGlobalConfigInstructionDataArgs["value"];
+  globalConfigOptionKind: FarmsIdlMissingTypesInstructionDataArgs["globalConfigOptionKind"];
+  farmConfigOptionKind: FarmsIdlMissingTypesInstructionDataArgs["farmConfigOptionKind"];
+  timeUnit: FarmsIdlMissingTypesInstructionDataArgs["timeUnit"];
+  lockingMode: FarmsIdlMissingTypesInstructionDataArgs["lockingMode"];
+  rewardType: FarmsIdlMissingTypesInstructionDataArgs["rewardType"];
 }
 
-export function getUpdateGlobalConfigInstruction<
+export function getFarmsIdlMissingTypesInstruction<
   TAccountGlobalAdmin extends string,
   TAccountGlobalConfig extends string,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
-  input: UpdateGlobalConfigInput<TAccountGlobalAdmin, TAccountGlobalConfig>,
+  input: FarmsIdlMissingTypesInput<TAccountGlobalAdmin, TAccountGlobalConfig>,
   config?: { programAddress?: TProgramAddress },
-): UpdateGlobalConfigInstruction<
+): FarmsIdlMissingTypesInstruction<
   TProgramAddress,
   TAccountGlobalAdmin,
   TAccountGlobalConfig
@@ -156,10 +191,10 @@ export function getUpdateGlobalConfigInstruction<
       getAccountMeta(accounts.globalConfig),
     ],
     programAddress,
-    data: getUpdateGlobalConfigInstructionDataEncoder().encode(
-      args as UpdateGlobalConfigInstructionDataArgs,
+    data: getFarmsIdlMissingTypesInstructionDataEncoder().encode(
+      args as FarmsIdlMissingTypesInstructionDataArgs,
     ),
-  } as UpdateGlobalConfigInstruction<
+  } as FarmsIdlMissingTypesInstruction<
     TProgramAddress,
     TAccountGlobalAdmin,
     TAccountGlobalConfig
@@ -168,7 +203,7 @@ export function getUpdateGlobalConfigInstruction<
   return instruction;
 }
 
-export interface ParsedUpdateGlobalConfigInstruction<
+export interface ParsedFarmsIdlMissingTypesInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
@@ -177,17 +212,17 @@ export interface ParsedUpdateGlobalConfigInstruction<
     globalAdmin: TAccountMetas[0];
     globalConfig: TAccountMetas[1];
   };
-  data: UpdateGlobalConfigInstructionData;
+  data: FarmsIdlMissingTypesInstructionData;
 }
 
-export function parseUpdateGlobalConfigInstruction<
+export function parseFarmsIdlMissingTypesInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedUpdateGlobalConfigInstruction<TProgram, TAccountMetas> {
+): ParsedFarmsIdlMissingTypesInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -204,7 +239,7 @@ export function parseUpdateGlobalConfigInstruction<
       globalAdmin: getNextAccount(),
       globalConfig: getNextAccount(),
     },
-    data: getUpdateGlobalConfigInstructionDataDecoder().decode(
+    data: getFarmsIdlMissingTypesInstructionDataDecoder().decode(
       instruction.data,
     ),
   };

@@ -38,9 +38,8 @@ import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DELEGATE_SET_ANNUAL_REWARDS_DISCRIMINATOR = new Uint8Array([
-  121, 174, 85, 150, 174, 18, 13, 31,
-]);
+export const DELEGATE_SET_ANNUAL_REWARDS_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([121, 174, 85, 150, 174, 18, 13, 31]);
 
 export function getDelegateSetAnnualRewardsDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,10 +49,16 @@ export function getDelegateSetAnnualRewardsDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type DelegateSetAnnualRewardsInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarryMineProgram extends
+  TAccountSetAnnualRewardsWithDelegateOperator extends
+    | string
+    | AccountMeta = string,
+  TAccountSetAnnualRewardsWithDelegateDelegate extends
+    | string
+    | AccountMeta = string,
+  TAccountSetAnnualRewardsWithDelegateRewarder extends
+    | string
+    | AccountMeta = string,
+  TAccountSetAnnualRewardsWithDelegateQuarryMineProgram extends
     | string
     | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -61,19 +66,19 @@ export type DelegateSetAnnualRewardsInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountOperator extends string
-        ? WritableAccount<TAccountOperator>
-        : TAccountOperator,
-      TAccountDelegate extends string
-        ? ReadonlySignerAccount<TAccountDelegate> &
-            AccountSignerMeta<TAccountDelegate>
-        : TAccountDelegate,
-      TAccountRewarder extends string
-        ? WritableAccount<TAccountRewarder>
-        : TAccountRewarder,
-      TAccountQuarryMineProgram extends string
-        ? ReadonlyAccount<TAccountQuarryMineProgram>
-        : TAccountQuarryMineProgram,
+      TAccountSetAnnualRewardsWithDelegateOperator extends string
+        ? WritableAccount<TAccountSetAnnualRewardsWithDelegateOperator>
+        : TAccountSetAnnualRewardsWithDelegateOperator,
+      TAccountSetAnnualRewardsWithDelegateDelegate extends string
+        ? ReadonlySignerAccount<TAccountSetAnnualRewardsWithDelegateDelegate> &
+            AccountSignerMeta<TAccountSetAnnualRewardsWithDelegateDelegate>
+        : TAccountSetAnnualRewardsWithDelegateDelegate,
+      TAccountSetAnnualRewardsWithDelegateRewarder extends string
+        ? WritableAccount<TAccountSetAnnualRewardsWithDelegateRewarder>
+        : TAccountSetAnnualRewardsWithDelegateRewarder,
+      TAccountSetAnnualRewardsWithDelegateQuarryMineProgram extends string
+        ? ReadonlyAccount<TAccountSetAnnualRewardsWithDelegateQuarryMineProgram>
+        : TAccountSetAnnualRewardsWithDelegateQuarryMineProgram,
       ...TRemainingAccounts,
     ]
   >;
@@ -118,38 +123,38 @@ export function getDelegateSetAnnualRewardsInstructionDataCodec(): FixedSizeCode
 }
 
 export interface DelegateSetAnnualRewardsInput<
-  TAccountOperator extends string = string,
-  TAccountDelegate extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarryMineProgram extends string = string,
+  TAccountSetAnnualRewardsWithDelegateOperator extends string = string,
+  TAccountSetAnnualRewardsWithDelegateDelegate extends string = string,
+  TAccountSetAnnualRewardsWithDelegateRewarder extends string = string,
+  TAccountSetAnnualRewardsWithDelegateQuarryMineProgram extends string = string,
 > {
-  operator: Address<TAccountOperator>;
-  delegate: TransactionSigner<TAccountDelegate>;
-  rewarder: Address<TAccountRewarder>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
+  setAnnualRewardsWithDelegateOperator: Address<TAccountSetAnnualRewardsWithDelegateOperator>;
+  setAnnualRewardsWithDelegateDelegate: TransactionSigner<TAccountSetAnnualRewardsWithDelegateDelegate>;
+  setAnnualRewardsWithDelegateRewarder: Address<TAccountSetAnnualRewardsWithDelegateRewarder>;
+  setAnnualRewardsWithDelegateQuarryMineProgram?: Address<TAccountSetAnnualRewardsWithDelegateQuarryMineProgram>;
   newRate: DelegateSetAnnualRewardsInstructionDataArgs["newRate"];
 }
 
 export function getDelegateSetAnnualRewardsInstruction<
-  TAccountOperator extends string,
-  TAccountDelegate extends string,
-  TAccountRewarder extends string,
-  TAccountQuarryMineProgram extends string,
+  TAccountSetAnnualRewardsWithDelegateOperator extends string,
+  TAccountSetAnnualRewardsWithDelegateDelegate extends string,
+  TAccountSetAnnualRewardsWithDelegateRewarder extends string,
+  TAccountSetAnnualRewardsWithDelegateQuarryMineProgram extends string,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: DelegateSetAnnualRewardsInput<
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram
+    TAccountSetAnnualRewardsWithDelegateOperator,
+    TAccountSetAnnualRewardsWithDelegateDelegate,
+    TAccountSetAnnualRewardsWithDelegateRewarder,
+    TAccountSetAnnualRewardsWithDelegateQuarryMineProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): DelegateSetAnnualRewardsInstruction<
   TProgramAddress,
-  TAccountOperator,
-  TAccountDelegate,
-  TAccountRewarder,
-  TAccountQuarryMineProgram
+  TAccountSetAnnualRewardsWithDelegateOperator,
+  TAccountSetAnnualRewardsWithDelegateDelegate,
+  TAccountSetAnnualRewardsWithDelegateRewarder,
+  TAccountSetAnnualRewardsWithDelegateQuarryMineProgram
 > {
   // Program address.
   const programAddress =
@@ -157,11 +162,20 @@ export function getDelegateSetAnnualRewardsInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    operator: { value: input.operator ?? null, isWritable: true },
-    delegate: { value: input.delegate ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
+    setAnnualRewardsWithDelegateOperator: {
+      value: input.setAnnualRewardsWithDelegateOperator ?? null,
+      isWritable: true,
+    },
+    setAnnualRewardsWithDelegateDelegate: {
+      value: input.setAnnualRewardsWithDelegateDelegate ?? null,
+      isWritable: false,
+    },
+    setAnnualRewardsWithDelegateRewarder: {
+      value: input.setAnnualRewardsWithDelegateRewarder ?? null,
+      isWritable: true,
+    },
+    setAnnualRewardsWithDelegateQuarryMineProgram: {
+      value: input.setAnnualRewardsWithDelegateQuarryMineProgram ?? null,
       isWritable: false,
     },
   };
@@ -174,18 +188,18 @@ export function getDelegateSetAnnualRewardsInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.quarryMineProgram.value) {
-    accounts.quarryMineProgram.value =
+  if (!accounts.setAnnualRewardsWithDelegateQuarryMineProgram.value) {
+    accounts.setAnnualRewardsWithDelegateQuarryMineProgram.value =
       "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
+      getAccountMeta(accounts.setAnnualRewardsWithDelegateOperator),
+      getAccountMeta(accounts.setAnnualRewardsWithDelegateDelegate),
+      getAccountMeta(accounts.setAnnualRewardsWithDelegateRewarder),
+      getAccountMeta(accounts.setAnnualRewardsWithDelegateQuarryMineProgram),
     ],
     programAddress,
     data: getDelegateSetAnnualRewardsInstructionDataEncoder().encode(
@@ -193,10 +207,10 @@ export function getDelegateSetAnnualRewardsInstruction<
     ),
   } as DelegateSetAnnualRewardsInstruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram
+    TAccountSetAnnualRewardsWithDelegateOperator,
+    TAccountSetAnnualRewardsWithDelegateDelegate,
+    TAccountSetAnnualRewardsWithDelegateRewarder,
+    TAccountSetAnnualRewardsWithDelegateQuarryMineProgram
   >;
 
   return instruction;
@@ -208,10 +222,10 @@ export interface ParsedDelegateSetAnnualRewardsInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    operator: TAccountMetas[0];
-    delegate: TAccountMetas[1];
-    rewarder: TAccountMetas[2];
-    quarryMineProgram: TAccountMetas[3];
+    setAnnualRewardsWithDelegateOperator: TAccountMetas[0];
+    setAnnualRewardsWithDelegateDelegate: TAccountMetas[1];
+    setAnnualRewardsWithDelegateRewarder: TAccountMetas[2];
+    setAnnualRewardsWithDelegateQuarryMineProgram: TAccountMetas[3];
   };
   data: DelegateSetAnnualRewardsInstructionData;
 }
@@ -237,10 +251,10 @@ export function parseDelegateSetAnnualRewardsInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      operator: getNextAccount(),
-      delegate: getNextAccount(),
-      rewarder: getNextAccount(),
-      quarryMineProgram: getNextAccount(),
+      setAnnualRewardsWithDelegateOperator: getNextAccount(),
+      setAnnualRewardsWithDelegateDelegate: getNextAccount(),
+      setAnnualRewardsWithDelegateRewarder: getNextAccount(),
+      setAnnualRewardsWithDelegateQuarryMineProgram: getNextAccount(),
     },
     data: getDelegateSetAnnualRewardsInstructionDataDecoder().decode(
       instruction.data,

@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DEPOSIT_RESERVE_LIQUIDITY_DISCRIMINATOR = new Uint8Array([
-  169, 201, 30, 126, 6, 205, 102, 68,
-]);
+export const DEPOSIT_RESERVE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([169, 201, 30, 126, 6, 205, 102, 68]);
 
 export function getDepositReserveLiquidityDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,23 +49,21 @@ export function getDepositReserveLiquidityDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type DepositReserveLiquidityInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
-  TAccountReserveLiquiditySupply extends string | AccountMeta<string> = string,
-  TAccountReserveCollateralMint extends string | AccountMeta<string> = string,
-  TAccountUserSourceLiquidity extends string | AccountMeta<string> = string,
-  TAccountUserDestinationCollateral extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta<string> = string,
-  TAccountLiquidityTokenProgram extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountReserve extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta = string,
+  TAccountReserveLiquiditySupply extends string | AccountMeta = string,
+  TAccountReserveCollateralMint extends string | AccountMeta = string,
+  TAccountUserSourceLiquidity extends string | AccountMeta = string,
+  TAccountUserDestinationCollateral extends string | AccountMeta = string,
+  TAccountCollateralTokenProgram extends string | AccountMeta = string,
+  TAccountLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends
     | string
-    | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -112,14 +109,14 @@ export type DepositReserveLiquidityInstruction<
     ]
   >;
 
-export type DepositReserveLiquidityInstructionData = {
+export interface DepositReserveLiquidityInstructionData {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
-};
+}
 
-export type DepositReserveLiquidityInstructionDataArgs = {
+export interface DepositReserveLiquidityInstructionDataArgs {
   liquidityAmount: number | bigint;
-};
+}
 
 export function getDepositReserveLiquidityInstructionDataEncoder(): FixedSizeEncoder<DepositReserveLiquidityInstructionDataArgs> {
   return transformEncoder(
@@ -151,7 +148,7 @@ export function getDepositReserveLiquidityInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export type DepositReserveLiquidityInput<
+export interface DepositReserveLiquidityInput<
   TAccountOwner extends string = string,
   TAccountReserve extends string = string,
   TAccountLendingMarket extends string = string,
@@ -164,7 +161,7 @@ export type DepositReserveLiquidityInput<
   TAccountCollateralTokenProgram extends string = string,
   TAccountLiquidityTokenProgram extends string = string,
   TAccountInstructionSysvarAccount extends string = string,
-> = {
+> {
   owner: TransactionSigner<TAccountOwner>;
   reserve: Address<TAccountReserve>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -178,7 +175,7 @@ export type DepositReserveLiquidityInput<
   liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   liquidityAmount: DepositReserveLiquidityInstructionDataArgs["liquidityAmount"];
-};
+}
 
 export function getDepositReserveLiquidityInstruction<
   TAccountOwner extends string,
@@ -324,10 +321,10 @@ export function getDepositReserveLiquidityInstruction<
   return instruction;
 }
 
-export type ParsedDepositReserveLiquidityInstruction<
+export interface ParsedDepositReserveLiquidityInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -344,7 +341,7 @@ export type ParsedDepositReserveLiquidityInstruction<
     instructionSysvarAccount: TAccountMetas[11];
   };
   data: DepositReserveLiquidityInstructionData;
-};
+}
 
 export function parseDepositReserveLiquidityInstruction<
   TProgram extends string,

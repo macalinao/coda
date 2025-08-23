@@ -6,13 +6,8 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  type Address,
-  containsBytes,
-  fixEncoderSize,
-  getBytesEncoder,
-  type ReadonlyUint8Array,
-} from "@solana/kit";
+import type { Address, ReadonlyUint8Array } from "@solana/kit";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedBorrowObligationLiquidityInstruction,
   ParsedBorrowObligationLiquidityV2Instruction,

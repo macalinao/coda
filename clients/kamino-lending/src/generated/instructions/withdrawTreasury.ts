@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const WITHDRAW_TREASURY_DISCRIMINATOR = new Uint8Array([
-  40, 63, 122, 158, 144, 216, 83, 96,
-]);
+export const WITHDRAW_TREASURY_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([40, 63, 122, 158, 144, 216, 83, 96]);
 
 export function getWithdrawTreasuryDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,16 +49,14 @@ export function getWithdrawTreasuryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawTreasuryInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountGlobalAdmin extends string | AccountMeta<string> = string,
-  TAccountGlobalConfig extends string | AccountMeta<string> = string,
-  TAccountRewardMint extends string | AccountMeta<string> = string,
-  TAccountRewardTreasuryVault extends string | AccountMeta<string> = string,
-  TAccountTreasuryVaultAuthority extends string | AccountMeta<string> = string,
-  TAccountWithdrawDestinationTokenAccount extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountTokenProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountGlobalAdmin extends string | AccountMeta = string,
+  TAccountGlobalConfig extends string | AccountMeta = string,
+  TAccountRewardMint extends string | AccountMeta = string,
+  TAccountRewardTreasuryVault extends string | AccountMeta = string,
+  TAccountTreasuryVaultAuthority extends string | AccountMeta = string,
+  TAccountWithdrawDestinationTokenAccount extends string | AccountMeta = string,
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -90,12 +87,14 @@ export type WithdrawTreasuryInstruction<
     ]
   >;
 
-export type WithdrawTreasuryInstructionData = {
+export interface WithdrawTreasuryInstructionData {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-};
+}
 
-export type WithdrawTreasuryInstructionDataArgs = { amount: number | bigint };
+export interface WithdrawTreasuryInstructionDataArgs {
+  amount: number | bigint;
+}
 
 export function getWithdrawTreasuryInstructionDataEncoder(): FixedSizeEncoder<WithdrawTreasuryInstructionDataArgs> {
   return transformEncoder(
@@ -124,7 +123,7 @@ export function getWithdrawTreasuryInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type WithdrawTreasuryInput<
+export interface WithdrawTreasuryInput<
   TAccountGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountRewardMint extends string = string,
@@ -132,7 +131,7 @@ export type WithdrawTreasuryInput<
   TAccountTreasuryVaultAuthority extends string = string,
   TAccountWithdrawDestinationTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
-> = {
+> {
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
   rewardMint: Address<TAccountRewardMint>;
@@ -141,7 +140,7 @@ export type WithdrawTreasuryInput<
   withdrawDestinationTokenAccount: Address<TAccountWithdrawDestinationTokenAccount>;
   tokenProgram: Address<TAccountTokenProgram>;
   amount: WithdrawTreasuryInstructionDataArgs["amount"];
-};
+}
 
 export function getWithdrawTreasuryInstruction<
   TAccountGlobalAdmin extends string,
@@ -232,10 +231,10 @@ export function getWithdrawTreasuryInstruction<
   return instruction;
 }
 
-export type ParsedWithdrawTreasuryInstruction<
+export interface ParsedWithdrawTreasuryInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     globalAdmin: TAccountMetas[0];
@@ -247,7 +246,7 @@ export type ParsedWithdrawTreasuryInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: WithdrawTreasuryInstructionData;
-};
+}
 
 export function parseWithdrawTreasuryInstruction<
   TProgram extends string,

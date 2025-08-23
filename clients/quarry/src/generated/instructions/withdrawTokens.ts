@@ -38,9 +38,9 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const WITHDRAW_TOKENS_DISCRIMINATOR = new Uint8Array([
-  2, 4, 225, 61, 19, 182, 106, 170,
-]);
+export const WITHDRAW_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
+  [2, 4, 225, 61, 19, 182, 106, 170],
+);
 
 export function getWithdrawTokensDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

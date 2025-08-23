@@ -6,18 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  type Address,
-  containsBytes,
-  fixEncoderSize,
-  getBytesEncoder,
-  type ReadonlyUint8Array,
-} from "@solana/kit";
+import type { Address, ReadonlyUint8Array } from "@solana/kit";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedAddRewardsInstruction,
   ParsedDepositToFarmVaultInstruction,
+  ParsedFarmsIdlMissingTypesInstruction,
   ParsedHarvestRewardInstruction,
-  ParsedIdlMissingTypesInstruction,
   ParsedInitializeFarmDelegatedInstruction,
   ParsedInitializeFarmInstruction,
   ParsedInitializeGlobalConfigInstruction,
@@ -47,7 +42,7 @@ export const FARMS_PROGRAM_ADDRESS =
 export enum FarmsAccount {
   FarmState = 0,
   GlobalConfig = 1,
-  UserState = 2,
+  FarmsUserState = 2,
   OraclePrices = 3,
 }
 
@@ -86,7 +81,7 @@ export function identifyFarmsAccount(
       0,
     )
   ) {
-    return FarmsAccount.UserState;
+    return FarmsAccount.FarmsUserState;
   }
   if (
     containsBytes(
@@ -129,7 +124,7 @@ export enum FarmsInstruction {
   UpdateFarmAdmin = 21,
   UpdateGlobalConfigAdmin = 22,
   WithdrawReward = 23,
-  IdlMissingTypes = 24,
+  FarmsIdlMissingTypes = 24,
 }
 
 export function identifyFarmsInstruction(
@@ -409,7 +404,7 @@ export function identifyFarmsInstruction(
       0,
     )
   ) {
-    return FarmsInstruction.IdlMissingTypes;
+    return FarmsInstruction.FarmsIdlMissingTypes;
   }
   throw new Error(
     "The provided instruction could not be identified as a farms instruction.",
@@ -492,5 +487,5 @@ export type ParsedFarmsInstruction<
       instructionType: FarmsInstruction.WithdrawReward;
     } & ParsedWithdrawRewardInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.IdlMissingTypes;
-    } & ParsedIdlMissingTypesInstruction<TProgram>);
+      instructionType: FarmsInstruction.FarmsIdlMissingTypes;
+    } & ParsedFarmsIdlMissingTypesInstruction<TProgram>);

@@ -6,19 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
-  type Address,
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
-  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export type ReferrerTokenStateSeeds = {
+export interface ReferrerTokenStateSeeds {
   referrer: Address;
 
   reserve: Address;
-};
+}
 
 export async function findReferrerTokenStatePda(
   seeds: ReferrerTokenStateSeeds,

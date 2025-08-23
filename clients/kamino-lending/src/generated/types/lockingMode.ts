@@ -6,14 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
-  getEnumDecoder,
-  getEnumEncoder,
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
 } from "@solana/kit";
+import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum LockingMode {
   None = 0,

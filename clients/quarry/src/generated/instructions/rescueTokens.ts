@@ -36,7 +36,7 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const RESCUE_TOKENS_DISCRIMINATOR = new Uint8Array([
+export const RESCUE_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   222, 81, 199, 209, 182, 62, 62, 186,
 ]);
 

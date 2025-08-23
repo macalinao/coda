@@ -6,16 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  Codec,
+  Decoder,
+  Encoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   addDecoderSizePrefix,
   addEncoderSizePrefix,
-  type Codec,
   combineCodec,
-  type Decoder,
-  type Encoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -26,25 +36,14 @@ import {
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const UPDATE_FARM_CONFIG_DISCRIMINATOR = new Uint8Array([
-  214, 176, 188, 244, 203, 59, 230, 207,
-]);
+export const UPDATE_FARM_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([214, 176, 188, 244, 203, 59, 230, 207]);
 
 export function getUpdateFarmConfigDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -54,10 +53,10 @@ export function getUpdateFarmConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateFarmConfigInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountSigner extends string | AccountMeta<string> = string,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountScopePrices extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountSigner extends string | AccountMeta = string,
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountScopePrices extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -76,16 +75,16 @@ export type UpdateFarmConfigInstruction<
     ]
   >;
 
-export type UpdateFarmConfigInstructionData = {
+export interface UpdateFarmConfigInstructionData {
   discriminator: ReadonlyUint8Array;
   mode: number;
   data: ReadonlyUint8Array;
-};
+}
 
-export type UpdateFarmConfigInstructionDataArgs = {
+export interface UpdateFarmConfigInstructionDataArgs {
   mode: number;
   data: ReadonlyUint8Array;
-};
+}
 
 export function getUpdateFarmConfigInstructionDataEncoder(): Encoder<UpdateFarmConfigInstructionDataArgs> {
   return transformEncoder(
@@ -116,17 +115,17 @@ export function getUpdateFarmConfigInstructionDataCodec(): Codec<
   );
 }
 
-export type UpdateFarmConfigInput<
+export interface UpdateFarmConfigInput<
   TAccountSigner extends string = string,
   TAccountFarmState extends string = string,
   TAccountScopePrices extends string = string,
-> = {
+> {
   signer: TransactionSigner<TAccountSigner>;
   farmState: Address<TAccountFarmState>;
   scopePrices?: Address<TAccountScopePrices>;
   mode: UpdateFarmConfigInstructionDataArgs["mode"];
   data: UpdateFarmConfigInstructionDataArgs["data"];
-};
+}
 
 export function getUpdateFarmConfigInstruction<
   TAccountSigner extends string,
@@ -184,10 +183,10 @@ export function getUpdateFarmConfigInstruction<
   return instruction;
 }
 
-export type ParsedUpdateFarmConfigInstruction<
+export interface ParsedUpdateFarmConfigInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     signer: TAccountMetas[0];
@@ -195,7 +194,7 @@ export type ParsedUpdateFarmConfigInstruction<
     scopePrices?: TAccountMetas[2] | undefined;
   };
   data: UpdateFarmConfigInstructionData;
-};
+}
 
 export function parseUpdateFarmConfigInstruction<
   TProgram extends string,

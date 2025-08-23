@@ -6,39 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DELETE_REFERRER_STATE_AND_SHORT_URL_DISCRIMINATOR = new Uint8Array(
-  [153, 185, 99, 28, 228, 179, 187, 150],
-);
+export const DELETE_REFERRER_STATE_AND_SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([153, 185, 99, 28, 228, 179, 187, 150]);
 
 export function getDeleteReferrerStateAndShortUrlDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -48,12 +47,12 @@ export function getDeleteReferrerStateAndShortUrlDiscriminatorBytes(): ReadonlyU
 
 export type DeleteReferrerStateAndShortUrlInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountReferrer extends string | AccountMeta<string> = string,
-  TAccountReferrerState extends string | AccountMeta<string> = string,
-  TAccountShortUrl extends string | AccountMeta<string> = string,
-  TAccountRent extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountReferrer extends string | AccountMeta = string,
+  TAccountReferrerState extends string | AccountMeta = string,
+  TAccountShortUrl extends string | AccountMeta = string,
+  TAccountRent extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -78,11 +77,11 @@ export type DeleteReferrerStateAndShortUrlInstruction<
     ]
   >;
 
-export type DeleteReferrerStateAndShortUrlInstructionData = {
+export interface DeleteReferrerStateAndShortUrlInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type DeleteReferrerStateAndShortUrlInstructionDataArgs = {};
+export interface DeleteReferrerStateAndShortUrlInstructionDataArgs {}
 
 export function getDeleteReferrerStateAndShortUrlInstructionDataEncoder(): FixedSizeEncoder<DeleteReferrerStateAndShortUrlInstructionDataArgs> {
   return transformEncoder(
@@ -110,19 +109,19 @@ export function getDeleteReferrerStateAndShortUrlInstructionDataCodec(): FixedSi
   );
 }
 
-export type DeleteReferrerStateAndShortUrlInput<
+export interface DeleteReferrerStateAndShortUrlInput<
   TAccountReferrer extends string = string,
   TAccountReferrerState extends string = string,
   TAccountShortUrl extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> = {
+> {
   referrer: TransactionSigner<TAccountReferrer>;
   referrerState: Address<TAccountReferrerState>;
   shortUrl: Address<TAccountShortUrl>;
   rent: Address<TAccountRent>;
   systemProgram: Address<TAccountSystemProgram>;
-};
+}
 
 export function getDeleteReferrerStateAndShortUrlInstruction<
   TAccountReferrer extends string,
@@ -188,10 +187,10 @@ export function getDeleteReferrerStateAndShortUrlInstruction<
   return instruction;
 }
 
-export type ParsedDeleteReferrerStateAndShortUrlInstruction<
+export interface ParsedDeleteReferrerStateAndShortUrlInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     referrer: TAccountMetas[0];
@@ -201,7 +200,7 @@ export type ParsedDeleteReferrerStateAndShortUrlInstruction<
     systemProgram: TAccountMetas[4];
   };
   data: DeleteReferrerStateAndShortUrlInstructionData;
-};
+}
 
 export function parseDeleteReferrerStateAndShortUrlInstruction<
   TProgram extends string,

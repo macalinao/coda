@@ -36,9 +36,8 @@ import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const INIT_MINER_M_M_V2_DISCRIMINATOR = new Uint8Array([
-  189, 125, 116, 157, 73, 4, 253, 156,
-]);
+export const INIT_MINER_M_M_V2_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([189, 125, 116, 157, 73, 4, 253, 156]);
 
 export function getInitMinerMMV2DiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

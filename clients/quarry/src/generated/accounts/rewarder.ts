@@ -45,7 +45,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 
-export const REWARDER_DISCRIMINATOR = new Uint8Array([
+export const REWARDER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   83, 3, 203, 174, 244, 30, 172, 198,
 ]);
 

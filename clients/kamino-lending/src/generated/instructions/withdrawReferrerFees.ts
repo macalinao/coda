@@ -6,39 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const WITHDRAW_REFERRER_FEES_DISCRIMINATOR = new Uint8Array([
-  171, 118, 121, 201, 233, 140, 23, 228,
-]);
+export const WITHDRAW_REFERRER_FEES_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([171, 118, 121, 201, 233, 140, 23, 228]);
 
 export function getWithdrawReferrerFeesDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -48,16 +47,16 @@ export function getWithdrawReferrerFeesDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type WithdrawReferrerFeesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountReferrer extends string | AccountMeta<string> = string,
-  TAccountReferrerTokenState extends string | AccountMeta<string> = string,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
-  TAccountReserveSupplyLiquidity extends string | AccountMeta<string> = string,
-  TAccountReferrerTokenAccount extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountReferrer extends string | AccountMeta = string,
+  TAccountReferrerTokenState extends string | AccountMeta = string,
+  TAccountReserve extends string | AccountMeta = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta = string,
+  TAccountReserveSupplyLiquidity extends string | AccountMeta = string,
+  TAccountReferrerTokenAccount extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta = string,
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -94,11 +93,11 @@ export type WithdrawReferrerFeesInstruction<
     ]
   >;
 
-export type WithdrawReferrerFeesInstructionData = {
+export interface WithdrawReferrerFeesInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type WithdrawReferrerFeesInstructionDataArgs = {};
+export interface WithdrawReferrerFeesInstructionDataArgs {}
 
 export function getWithdrawReferrerFeesInstructionDataEncoder(): FixedSizeEncoder<WithdrawReferrerFeesInstructionDataArgs> {
   return transformEncoder(
@@ -126,7 +125,7 @@ export function getWithdrawReferrerFeesInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type WithdrawReferrerFeesInput<
+export interface WithdrawReferrerFeesInput<
   TAccountReferrer extends string = string,
   TAccountReferrerTokenState extends string = string,
   TAccountReserve extends string = string,
@@ -136,7 +135,7 @@ export type WithdrawReferrerFeesInput<
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> = {
+> {
   referrer: TransactionSigner<TAccountReferrer>;
   referrerTokenState: Address<TAccountReferrerTokenState>;
   reserve: Address<TAccountReserve>;
@@ -146,7 +145,7 @@ export type WithdrawReferrerFeesInput<
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   tokenProgram: Address<TAccountTokenProgram>;
-};
+}
 
 export function getWithdrawReferrerFeesInstruction<
   TAccountReferrer extends string,
@@ -251,10 +250,10 @@ export function getWithdrawReferrerFeesInstruction<
   return instruction;
 }
 
-export type ParsedWithdrawReferrerFeesInstruction<
+export interface ParsedWithdrawReferrerFeesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     referrer: TAccountMetas[0];
@@ -268,7 +267,7 @@ export type ParsedWithdrawReferrerFeesInstruction<
     tokenProgram: TAccountMetas[8];
   };
   data: WithdrawReferrerFeesInstructionData;
-};
+}
 
 export function parseWithdrawReferrerFeesInstruction<
   TProgram extends string,

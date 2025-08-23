@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,23 +32,13 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const LIQUIDATE_OBLIGATION_AND_REDEEM_RESERVE_COLLATERAL_DISCRIMINATOR =
+export const LIQUIDATE_OBLIGATION_AND_REDEEM_RESERVE_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([177, 71, 154, 188, 226, 133, 74, 55]);
 
 export function getLiquidateObligationAndRedeemReserveCollateralDiscriminatorBytes(): ReadonlyUint8Array {
@@ -49,51 +49,31 @@ export function getLiquidateObligationAndRedeemReserveCollateralDiscriminatorByt
 
 export type LiquidateObligationAndRedeemReserveCollateralInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLiquidator extends string | AccountMeta<string> = string,
-  TAccountObligation extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
-  TAccountRepayReserve extends string | AccountMeta<string> = string,
-  TAccountRepayReserveLiquidityMint extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountRepayReserveLiquiditySupply extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountWithdrawReserve extends string | AccountMeta<string> = string,
-  TAccountWithdrawReserveLiquidityMint extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountWithdrawReserveCollateralMint extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountWithdrawReserveCollateralSupply extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountWithdrawReserveLiquiditySupply extends
-    | string
-    | AccountMeta<string> = string,
+  TAccountLiquidator extends string | AccountMeta = string,
+  TAccountObligation extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta = string,
+  TAccountRepayReserve extends string | AccountMeta = string,
+  TAccountRepayReserveLiquidityMint extends string | AccountMeta = string,
+  TAccountRepayReserveLiquiditySupply extends string | AccountMeta = string,
+  TAccountWithdrawReserve extends string | AccountMeta = string,
+  TAccountWithdrawReserveLiquidityMint extends string | AccountMeta = string,
+  TAccountWithdrawReserveCollateralMint extends string | AccountMeta = string,
+  TAccountWithdrawReserveCollateralSupply extends string | AccountMeta = string,
+  TAccountWithdrawReserveLiquiditySupply extends string | AccountMeta = string,
   TAccountWithdrawReserveLiquidityFeeReceiver extends
     | string
-    | AccountMeta<string> = string,
-  TAccountUserSourceLiquidity extends string | AccountMeta<string> = string,
-  TAccountUserDestinationCollateral extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountUserDestinationLiquidity extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta<string> = string,
-  TAccountRepayLiquidityTokenProgram extends
-    | string
-    | AccountMeta<string> = string,
-  TAccountWithdrawLiquidityTokenProgram extends
-    | string
-    | AccountMeta<string> = string,
+    | AccountMeta = string,
+  TAccountUserSourceLiquidity extends string | AccountMeta = string,
+  TAccountUserDestinationCollateral extends string | AccountMeta = string,
+  TAccountUserDestinationLiquidity extends string | AccountMeta = string,
+  TAccountCollateralTokenProgram extends string | AccountMeta = string,
+  TAccountRepayLiquidityTokenProgram extends string | AccountMeta = string,
+  TAccountWithdrawLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends
     | string
-    | AccountMeta<string> = "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -163,18 +143,18 @@ export type LiquidateObligationAndRedeemReserveCollateralInstruction<
     ]
   >;
 
-export type LiquidateObligationAndRedeemReserveCollateralInstructionData = {
+export interface LiquidateObligationAndRedeemReserveCollateralInstructionData {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
   minAcceptableReceivedLiquidityAmount: bigint;
   maxAllowedLtvOverridePercent: bigint;
-};
+}
 
-export type LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs = {
+export interface LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs {
   liquidityAmount: number | bigint;
   minAcceptableReceivedLiquidityAmount: number | bigint;
   maxAllowedLtvOverridePercent: number | bigint;
-};
+}
 
 export function getLiquidateObligationAndRedeemReserveCollateralInstructionDataEncoder(): FixedSizeEncoder<LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs> {
   return transformEncoder(
@@ -211,7 +191,7 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstructionDataC
   );
 }
 
-export type LiquidateObligationAndRedeemReserveCollateralInput<
+export interface LiquidateObligationAndRedeemReserveCollateralInput<
   TAccountLiquidator extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
@@ -232,7 +212,7 @@ export type LiquidateObligationAndRedeemReserveCollateralInput<
   TAccountRepayLiquidityTokenProgram extends string = string,
   TAccountWithdrawLiquidityTokenProgram extends string = string,
   TAccountInstructionSysvarAccount extends string = string,
-> = {
+> {
   liquidator: TransactionSigner<TAccountLiquidator>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -256,7 +236,7 @@ export type LiquidateObligationAndRedeemReserveCollateralInput<
   liquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["liquidityAmount"];
   minAcceptableReceivedLiquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["minAcceptableReceivedLiquidityAmount"];
   maxAllowedLtvOverridePercent: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["maxAllowedLtvOverridePercent"];
-};
+}
 
 export function getLiquidateObligationAndRedeemReserveCollateralInstruction<
   TAccountLiquidator extends string,
@@ -468,10 +448,10 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstruction<
   return instruction;
 }
 
-export type ParsedLiquidateObligationAndRedeemReserveCollateralInstruction<
+export interface ParsedLiquidateObligationAndRedeemReserveCollateralInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     liquidator: TAccountMetas[0];
@@ -496,7 +476,7 @@ export type ParsedLiquidateObligationAndRedeemReserveCollateralInstruction<
     instructionSysvarAccount: TAccountMetas[19];
   };
   data: LiquidateObligationAndRedeemReserveCollateralInstructionData;
-};
+}
 
 export function parseLiquidateObligationAndRedeemReserveCollateralInstruction<
   TProgram extends string,

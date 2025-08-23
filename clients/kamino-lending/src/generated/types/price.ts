@@ -6,20 +6,28 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
 
-export type Price = { value: bigint; exp: bigint };
+export interface Price {
+  value: bigint;
+  exp: bigint;
+}
 
-export type PriceArgs = { value: number | bigint; exp: number | bigint };
+export interface PriceArgs {
+  value: number | bigint;
+  exp: number | bigint;
+}
 
 export function getPriceEncoder(): FixedSizeEncoder<PriceArgs> {
   return getStructEncoder([

@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -33,13 +38,10 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
 
-export const USER_METADATA_DISCRIMINATOR = new Uint8Array([
+export const USER_METADATA_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   157, 214, 220, 235, 98, 135, 171, 28,
 ]);
 
@@ -49,7 +51,7 @@ export function getUserMetadataDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export type UserMetadata = {
+export interface UserMetadata {
   discriminator: ReadonlyUint8Array;
   referrer: Address;
   bump: bigint;
@@ -57,16 +59,16 @@ export type UserMetadata = {
   owner: Address;
   padding1: bigint[];
   padding2: bigint[];
-};
+}
 
-export type UserMetadataArgs = {
+export interface UserMetadataArgs {
   referrer: Address;
   bump: number | bigint;
   userLookupTable: Address;
   owner: Address;
-  padding1: Array<number | bigint>;
-  padding2: Array<number | bigint>;
-};
+  padding1: (number | bigint)[];
+  padding2: (number | bigint)[];
+}
 
 export function getUserMetadataEncoder(): FixedSizeEncoder<UserMetadataArgs> {
   return transformEncoder(

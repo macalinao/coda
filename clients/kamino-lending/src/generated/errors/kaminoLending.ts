@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  type Address,
-  isProgramError,
-  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  type SolanaError,
+import type {
+  Address,
+  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  SolanaError,
 } from "@solana/kit";
+import { isProgramError } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** InvalidMarketAuthority: Market authority is invalid */
@@ -609,9 +609,7 @@ if (true) {
 
 export function getKaminoLendingErrorMessage(code: KaminoLendingError): string {
   if (true) {
-    return (kaminoLendingErrorMessages as Record<KaminoLendingError, string>)[
-      code
-    ];
+    return kaminoLendingErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

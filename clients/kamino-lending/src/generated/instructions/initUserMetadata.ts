@@ -6,14 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getAddressDecoder,
@@ -22,26 +33,14 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const INIT_USER_METADATA_DISCRIMINATOR = new Uint8Array([
-  117, 169, 176, 69, 197, 23, 15, 162,
-]);
+export const INIT_USER_METADATA_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([117, 169, 176, 69, 197, 23, 15, 162]);
 
 export function getInitUserMetadataDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -51,13 +50,13 @@ export function getInitUserMetadataDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitUserMetadataInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountFeePayer extends string | AccountMeta<string> = string,
-  TAccountUserMetadata extends string | AccountMeta<string> = string,
-  TAccountReferrerUserMetadata extends string | AccountMeta<string> = string,
-  TAccountRent extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountFeePayer extends string | AccountMeta = string,
+  TAccountUserMetadata extends string | AccountMeta = string,
+  TAccountReferrerUserMetadata extends string | AccountMeta = string,
+  TAccountRent extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -86,12 +85,14 @@ export type InitUserMetadataInstruction<
     ]
   >;
 
-export type InitUserMetadataInstructionData = {
+export interface InitUserMetadataInstructionData {
   discriminator: ReadonlyUint8Array;
   userLookupTable: Address;
-};
+}
 
-export type InitUserMetadataInstructionDataArgs = { userLookupTable: Address };
+export interface InitUserMetadataInstructionDataArgs {
+  userLookupTable: Address;
+}
 
 export function getInitUserMetadataInstructionDataEncoder(): FixedSizeEncoder<InitUserMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -120,14 +121,14 @@ export function getInitUserMetadataInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type InitUserMetadataInput<
+export interface InitUserMetadataInput<
   TAccountOwner extends string = string,
   TAccountFeePayer extends string = string,
   TAccountUserMetadata extends string = string,
   TAccountReferrerUserMetadata extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> = {
+> {
   owner: TransactionSigner<TAccountOwner>;
   feePayer: TransactionSigner<TAccountFeePayer>;
   userMetadata: Address<TAccountUserMetadata>;
@@ -135,7 +136,7 @@ export type InitUserMetadataInput<
   rent: Address<TAccountRent>;
   systemProgram: Address<TAccountSystemProgram>;
   userLookupTable: InitUserMetadataInstructionDataArgs["userLookupTable"];
-};
+}
 
 export function getInitUserMetadataInstruction<
   TAccountOwner extends string,
@@ -215,10 +216,10 @@ export function getInitUserMetadataInstruction<
   return instruction;
 }
 
-export type ParsedInitUserMetadataInstruction<
+export interface ParsedInitUserMetadataInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -229,7 +230,7 @@ export type ParsedInitUserMetadataInstruction<
     systemProgram: TAccountMetas[5];
   };
   data: InitUserMetadataInstructionData;
-};
+}
 
 export function parseInitUserMetadataInstruction<
   TProgram extends string,

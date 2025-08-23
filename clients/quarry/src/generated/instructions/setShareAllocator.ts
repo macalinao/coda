@@ -36,9 +36,8 @@ import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SET_SHARE_ALLOCATOR_DISCRIMINATOR = new Uint8Array([
-  96, 77, 203, 216, 167, 175, 61, 189,
-]);
+export const SET_SHARE_ALLOCATOR_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([96, 77, 203, 216, 167, 175, 61, 189]);
 
 export function getSetShareAllocatorDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

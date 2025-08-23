@@ -35,9 +35,8 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const ACCEPT_AUTHORITY_DISCRIMINATOR = new Uint8Array([
-  107, 86, 198, 91, 33, 12, 107, 160,
-]);
+export const ACCEPT_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([107, 86, 198, 91, 33, 12, 107, 160]);
 
 export function getAcceptAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

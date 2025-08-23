@@ -38,7 +38,7 @@ import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const INIT_MINER_M_M_DISCRIMINATOR = new Uint8Array([
+export const INIT_MINER_M_M_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   144, 159, 202, 208, 234, 154, 242, 55,
 ]);
 

@@ -6,12 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
@@ -24,21 +26,21 @@ import {
   getU128Encoder,
 } from "@solana/kit";
 
-export type ObligationCollateral = {
+export interface ObligationCollateral {
   depositReserve: Address;
   depositedAmount: bigint;
   marketValueSf: bigint;
   borrowedAmountAgainstThisCollateralInElevationGroup: bigint;
   padding: bigint[];
-};
+}
 
-export type ObligationCollateralArgs = {
+export interface ObligationCollateralArgs {
   depositReserve: Address;
   depositedAmount: number | bigint;
   marketValueSf: number | bigint;
   borrowedAmountAgainstThisCollateralInElevationGroup: number | bigint;
-  padding: Array<number | bigint>;
-};
+  padding: (number | bigint)[];
+}
 
 export function getObligationCollateralEncoder(): FixedSizeEncoder<ObligationCollateralArgs> {
   return getStructEncoder([

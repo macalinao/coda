@@ -41,7 +41,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 
-export const MINT_WRAPPER_DISCRIMINATOR = new Uint8Array([
+export const MINT_WRAPPER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   154, 166, 64, 239, 170, 99, 74, 158,
 ]);
 

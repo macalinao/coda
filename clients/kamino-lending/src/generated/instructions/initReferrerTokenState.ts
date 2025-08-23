@@ -6,39 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const INIT_REFERRER_TOKEN_STATE_DISCRIMINATOR = new Uint8Array([
-  116, 45, 66, 148, 58, 13, 218, 115,
-]);
+export const INIT_REFERRER_TOKEN_STATE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([116, 45, 66, 148, 58, 13, 218, 115]);
 
 export function getInitReferrerTokenStateDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -48,14 +47,14 @@ export function getInitReferrerTokenStateDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type InitReferrerTokenStateInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TAccountReferrer extends string | AccountMeta<string> = string,
-  TAccountReferrerTokenState extends string | AccountMeta<string> = string,
-  TAccountRent extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountPayer extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountReserve extends string | AccountMeta = string,
+  TAccountReferrer extends string | AccountMeta = string,
+  TAccountReferrerTokenState extends string | AccountMeta = string,
+  TAccountRent extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -86,11 +85,11 @@ export type InitReferrerTokenStateInstruction<
     ]
   >;
 
-export type InitReferrerTokenStateInstructionData = {
+export interface InitReferrerTokenStateInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type InitReferrerTokenStateInstructionDataArgs = {};
+export interface InitReferrerTokenStateInstructionDataArgs {}
 
 export function getInitReferrerTokenStateInstructionDataEncoder(): FixedSizeEncoder<InitReferrerTokenStateInstructionDataArgs> {
   return transformEncoder(
@@ -118,7 +117,7 @@ export function getInitReferrerTokenStateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type InitReferrerTokenStateInput<
+export interface InitReferrerTokenStateInput<
   TAccountPayer extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
@@ -126,7 +125,7 @@ export type InitReferrerTokenStateInput<
   TAccountReferrerTokenState extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> = {
+> {
   payer: TransactionSigner<TAccountPayer>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
@@ -134,7 +133,7 @@ export type InitReferrerTokenStateInput<
   referrerTokenState: Address<TAccountReferrerTokenState>;
   rent: Address<TAccountRent>;
   systemProgram: Address<TAccountSystemProgram>;
-};
+}
 
 export function getInitReferrerTokenStateInstruction<
   TAccountPayer extends string,
@@ -215,10 +214,10 @@ export function getInitReferrerTokenStateInstruction<
   return instruction;
 }
 
-export type ParsedInitReferrerTokenStateInstruction<
+export interface ParsedInitReferrerTokenStateInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     payer: TAccountMetas[0];
@@ -230,7 +229,7 @@ export type ParsedInitReferrerTokenStateInstruction<
     systemProgram: TAccountMetas[6];
   };
   data: InitReferrerTokenStateInstructionData;
-};
+}
 
 export function parseInitReferrerTokenStateInstruction<
   TProgram extends string,

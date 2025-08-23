@@ -6,24 +6,30 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
 
-export type PriceHeuristic = { lower: bigint; upper: bigint; exp: bigint };
+export interface PriceHeuristic {
+  lower: bigint;
+  upper: bigint;
+  exp: bigint;
+}
 
-export type PriceHeuristicArgs = {
+export interface PriceHeuristicArgs {
   lower: number | bigint;
   upper: number | bigint;
   exp: number | bigint;
-};
+}
 
 export function getPriceHeuristicEncoder(): FixedSizeEncoder<PriceHeuristicArgs> {
   return getStructEncoder([

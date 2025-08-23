@@ -47,7 +47,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 
-export const QUARRY_DISCRIMINATOR = new Uint8Array([
+export const QUARRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 248, 54, 182, 240, 85, 9, 77,
 ]);
 

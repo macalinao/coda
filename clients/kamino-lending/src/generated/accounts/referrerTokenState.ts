@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -35,15 +40,11 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
 
-export const REFERRER_TOKEN_STATE_DISCRIMINATOR = new Uint8Array([
-  39, 15, 208, 77, 32, 195, 105, 56,
-]);
+export const REFERRER_TOKEN_STATE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([39, 15, 208, 77, 32, 195, 105, 56]);
 
 export function getReferrerTokenStateDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -51,7 +52,7 @@ export function getReferrerTokenStateDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export type ReferrerTokenState = {
+export interface ReferrerTokenState {
   discriminator: ReadonlyUint8Array;
   referrer: Address;
   mint: Address;
@@ -59,16 +60,16 @@ export type ReferrerTokenState = {
   amountCumulativeSf: bigint;
   bump: bigint;
   padding: bigint[];
-};
+}
 
-export type ReferrerTokenStateArgs = {
+export interface ReferrerTokenStateArgs {
   referrer: Address;
   mint: Address;
   amountUnclaimedSf: number | bigint;
   amountCumulativeSf: number | bigint;
   bump: number | bigint;
-  padding: Array<number | bigint>;
-};
+  padding: (number | bigint)[];
+}
 
 export function getReferrerTokenStateEncoder(): FixedSizeEncoder<ReferrerTokenStateArgs> {
   return transformEncoder(

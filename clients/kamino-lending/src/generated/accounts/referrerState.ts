@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -29,13 +34,10 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
 
-export const REFERRER_STATE_DISCRIMINATOR = new Uint8Array([
+export const REFERRER_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   194, 81, 217, 103, 12, 19, 12, 66,
 ]);
 
@@ -45,13 +47,16 @@ export function getReferrerStateDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export type ReferrerState = {
+export interface ReferrerState {
   discriminator: ReadonlyUint8Array;
   shortUrl: Address;
   owner: Address;
-};
+}
 
-export type ReferrerStateArgs = { shortUrl: Address; owner: Address };
+export interface ReferrerStateArgs {
+  shortUrl: Address;
+  owner: Address;
+}
 
 export function getReferrerStateEncoder(): FixedSizeEncoder<ReferrerStateArgs> {
   return transformEncoder(

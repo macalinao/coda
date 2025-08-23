@@ -6,14 +6,16 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Address,
+  Codec,
+  Decoder,
+  Encoder,
+  GetDiscriminatedUnionVariant,
+  GetDiscriminatedUnionVariantContent,
+} from "@solana/kit";
 import {
-  type Address,
-  type Codec,
   combineCodec,
-  type Decoder,
-  type Encoder,
-  type GetDiscriminatedUnionVariant,
-  type GetDiscriminatedUnionVariantContent,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
@@ -35,12 +37,8 @@ import {
   getU128Decoder,
   getU128Encoder,
 } from "@solana/kit";
-import {
-  type ElevationGroup,
-  type ElevationGroupArgs,
-  getElevationGroupDecoder,
-  getElevationGroupEncoder,
-} from "./index.js";
+import type { ElevationGroup, ElevationGroupArgs } from "./index.js";
+import { getElevationGroupDecoder, getElevationGroupEncoder } from "./index.js";
 
 export type UpdateLendingMarketConfigValue =
   | { __kind: "Bool"; fields: readonly [boolean] }

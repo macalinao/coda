@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -37,11 +42,16 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
+import type {
+  LastUpdate,
+  LastUpdateArgs,
+  ObligationCollateral,
+  ObligationCollateralArgs,
+  ObligationLiquidity,
+  ObligationLiquidityArgs,
+} from "../types/index.js";
 import {
   getLastUpdateDecoder,
   getLastUpdateEncoder,
@@ -49,15 +59,9 @@ import {
   getObligationCollateralEncoder,
   getObligationLiquidityDecoder,
   getObligationLiquidityEncoder,
-  type LastUpdate,
-  type LastUpdateArgs,
-  type ObligationCollateral,
-  type ObligationCollateralArgs,
-  type ObligationLiquidity,
-  type ObligationLiquidityArgs,
 } from "../types/index.js";
 
-export const OBLIGATION_DISCRIMINATOR = new Uint8Array([
+export const OBLIGATION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   168, 206, 141, 106, 88, 76, 172, 167,
 ]);
 
@@ -65,7 +69,7 @@ export function getObligationDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(OBLIGATION_DISCRIMINATOR);
 }
 
-export type Obligation = {
+export interface Obligation {
   discriminator: ReadonlyUint8Array;
   tag: bigint;
   lastUpdate: LastUpdate;
@@ -92,9 +96,9 @@ export type Obligation = {
   highestBorrowFactorPct: bigint;
   autodeleverageMarginCallStartedTimestamp: bigint;
   padding3: bigint[];
-};
+}
 
-export type ObligationArgs = {
+export interface ObligationArgs {
   tag: number | bigint;
   lastUpdate: LastUpdateArgs;
   lendingMarket: Address;
@@ -119,8 +123,8 @@ export type ObligationArgs = {
   reserved: number[];
   highestBorrowFactorPct: number | bigint;
   autodeleverageMarginCallStartedTimestamp: number | bigint;
-  padding3: Array<number | bigint>;
-};
+  padding3: (number | bigint)[];
+}
 
 export function getObligationEncoder(): FixedSizeEncoder<ObligationArgs> {
   return transformEncoder(

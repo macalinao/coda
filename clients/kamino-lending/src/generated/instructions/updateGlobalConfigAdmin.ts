@@ -6,38 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const UPDATE_GLOBAL_CONFIG_ADMIN_DISCRIMINATOR = new Uint8Array([
-  184, 87, 23, 193, 156, 238, 175, 119,
-]);
+export const UPDATE_GLOBAL_CONFIG_ADMIN_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([184, 87, 23, 193, 156, 238, 175, 119]);
 
 export function getUpdateGlobalConfigAdminDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -47,9 +46,9 @@ export function getUpdateGlobalConfigAdminDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type UpdateGlobalConfigAdminInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountPendingGlobalAdmin extends string | AccountMeta<string> = string,
-  TAccountGlobalConfig extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountPendingGlobalAdmin extends string | AccountMeta = string,
+  TAccountGlobalConfig extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -65,11 +64,11 @@ export type UpdateGlobalConfigAdminInstruction<
     ]
   >;
 
-export type UpdateGlobalConfigAdminInstructionData = {
+export interface UpdateGlobalConfigAdminInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type UpdateGlobalConfigAdminInstructionDataArgs = {};
+export interface UpdateGlobalConfigAdminInstructionDataArgs {}
 
 export function getUpdateGlobalConfigAdminInstructionDataEncoder(): FixedSizeEncoder<UpdateGlobalConfigAdminInstructionDataArgs> {
   return transformEncoder(
@@ -97,13 +96,13 @@ export function getUpdateGlobalConfigAdminInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export type UpdateGlobalConfigAdminInput<
+export interface UpdateGlobalConfigAdminInput<
   TAccountPendingGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
-> = {
+> {
   pendingGlobalAdmin: TransactionSigner<TAccountPendingGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
-};
+}
 
 export function getUpdateGlobalConfigAdminInstruction<
   TAccountPendingGlobalAdmin extends string,
@@ -153,17 +152,17 @@ export function getUpdateGlobalConfigAdminInstruction<
   return instruction;
 }
 
-export type ParsedUpdateGlobalConfigAdminInstruction<
+export interface ParsedUpdateGlobalConfigAdminInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     pendingGlobalAdmin: TAccountMetas[0];
     globalConfig: TAccountMetas[1];
   };
   data: UpdateGlobalConfigAdminInstructionData;
-};
+}
 
 export function parseUpdateGlobalConfigAdminInstruction<
   TProgram extends string,

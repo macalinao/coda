@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,25 +32,14 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REQUEST_ELEVATION_GROUP_DISCRIMINATOR = new Uint8Array([
-  36, 119, 251, 129, 34, 240, 7, 147,
-]);
+export const REQUEST_ELEVATION_GROUP_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([36, 119, 251, 129, 34, 240, 7, 147]);
 
 export function getRequestElevationGroupDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,10 +49,10 @@ export function getRequestElevationGroupDiscriminatorBytes(): ReadonlyUint8Array
 
 export type RequestElevationGroupInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountObligation extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountObligation extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -72,14 +71,14 @@ export type RequestElevationGroupInstruction<
     ]
   >;
 
-export type RequestElevationGroupInstructionData = {
+export interface RequestElevationGroupInstructionData {
   discriminator: ReadonlyUint8Array;
   elevationGroup: number;
-};
+}
 
-export type RequestElevationGroupInstructionDataArgs = {
+export interface RequestElevationGroupInstructionDataArgs {
   elevationGroup: number;
-};
+}
 
 export function getRequestElevationGroupInstructionDataEncoder(): FixedSizeEncoder<RequestElevationGroupInstructionDataArgs> {
   return transformEncoder(
@@ -111,16 +110,16 @@ export function getRequestElevationGroupInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type RequestElevationGroupInput<
+export interface RequestElevationGroupInput<
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
-> = {
+> {
   owner: TransactionSigner<TAccountOwner>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
   elevationGroup: RequestElevationGroupInstructionDataArgs["elevationGroup"];
-};
+}
 
 export function getRequestElevationGroupInstruction<
   TAccountOwner extends string,
@@ -179,10 +178,10 @@ export function getRequestElevationGroupInstruction<
   return instruction;
 }
 
-export type ParsedRequestElevationGroupInstruction<
+export interface ParsedRequestElevationGroupInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -190,7 +189,7 @@ export type ParsedRequestElevationGroupInstruction<
     lendingMarket: TAccountMetas[2];
   };
   data: RequestElevationGroupInstructionData;
-};
+}
 
 export function parseRequestElevationGroupInstruction<
   TProgram extends string,

@@ -6,11 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
@@ -22,9 +24,17 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
+import type {
+  BorrowRateCurve,
+  BorrowRateCurveArgs,
+  ReserveFees,
+  ReserveFeesArgs,
+  TokenInfo,
+  TokenInfoArgs,
+  WithdrawalCaps,
+  WithdrawalCapsArgs,
+} from "./index.js";
 import {
-  type BorrowRateCurve,
-  type BorrowRateCurveArgs,
   getBorrowRateCurveDecoder,
   getBorrowRateCurveEncoder,
   getReserveFeesDecoder,
@@ -33,15 +43,9 @@ import {
   getTokenInfoEncoder,
   getWithdrawalCapsDecoder,
   getWithdrawalCapsEncoder,
-  type ReserveFees,
-  type ReserveFeesArgs,
-  type TokenInfo,
-  type TokenInfoArgs,
-  type WithdrawalCaps,
-  type WithdrawalCapsArgs,
 } from "./index.js";
 
-export type ReserveConfig = {
+export interface ReserveConfig {
   status: number;
   assetTier: number;
   hostFixedInterestRateBps: number;
@@ -72,9 +76,9 @@ export type ReserveConfig = {
   borrowLimitOutsideElevationGroup: bigint;
   borrowLimitAgainstThisCollateralInElevationGroup: bigint[];
   deleveragingBonusIncreaseBpsPerDay: bigint;
-};
+}
 
-export type ReserveConfigArgs = {
+export interface ReserveConfigArgs {
   status: number;
   assetTier: number;
   hostFixedInterestRateBps: number;
@@ -103,9 +107,9 @@ export type ReserveConfigArgs = {
   autodeleverageEnabled: number;
   reserved1: number[];
   borrowLimitOutsideElevationGroup: number | bigint;
-  borrowLimitAgainstThisCollateralInElevationGroup: Array<number | bigint>;
+  borrowLimitAgainstThisCollateralInElevationGroup: (number | bigint)[];
   deleveragingBonusIncreaseBpsPerDay: number | bigint;
-};
+}
 
 export function getReserveConfigEncoder(): FixedSizeEncoder<ReserveConfigArgs> {
   return getStructEncoder([

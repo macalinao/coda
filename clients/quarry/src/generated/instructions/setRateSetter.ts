@@ -36,9 +36,9 @@ import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SET_RATE_SETTER_DISCRIMINATOR = new Uint8Array([
-  59, 193, 107, 111, 94, 23, 64, 107,
-]);
+export const SET_RATE_SETTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
+  [59, 193, 107, 111, 94, 23, 64, 107],
+);
 
 export function getSetRateSetterDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

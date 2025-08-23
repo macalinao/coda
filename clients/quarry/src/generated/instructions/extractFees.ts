@@ -33,7 +33,7 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const EXTRACT_FEES_DISCRIMINATOR = new Uint8Array([
+export const EXTRACT_FEES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   57, 219, 44, 55, 130, 127, 165, 183,
 ]);
 

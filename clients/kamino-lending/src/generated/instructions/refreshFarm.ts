@@ -6,34 +6,34 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REFRESH_FARM_DISCRIMINATOR = new Uint8Array([
+export const REFRESH_FARM_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   214, 131, 138, 183, 144, 194, 172, 42,
 ]);
 
@@ -45,9 +45,9 @@ export function getRefreshFarmDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RefreshFarmInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountScopePrices extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountScopePrices extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -62,9 +62,11 @@ export type RefreshFarmInstruction<
     ]
   >;
 
-export type RefreshFarmInstructionData = { discriminator: ReadonlyUint8Array };
+export interface RefreshFarmInstructionData {
+  discriminator: ReadonlyUint8Array;
+}
 
-export type RefreshFarmInstructionDataArgs = {};
+export interface RefreshFarmInstructionDataArgs {}
 
 export function getRefreshFarmInstructionDataEncoder(): FixedSizeEncoder<RefreshFarmInstructionDataArgs> {
   return transformEncoder(
@@ -89,13 +91,13 @@ export function getRefreshFarmInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type RefreshFarmInput<
+export interface RefreshFarmInput<
   TAccountFarmState extends string = string,
   TAccountScopePrices extends string = string,
-> = {
+> {
   farmState: Address<TAccountFarmState>;
   scopePrices?: Address<TAccountScopePrices>;
-};
+}
 
 export function getRefreshFarmInstruction<
   TAccountFarmState extends string,
@@ -139,17 +141,17 @@ export function getRefreshFarmInstruction<
   return instruction;
 }
 
-export type ParsedRefreshFarmInstruction<
+export interface ParsedRefreshFarmInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     farmState: TAccountMetas[0];
     scopePrices?: TAccountMetas[1] | undefined;
   };
   data: RefreshFarmInstructionData;
-};
+}
 
 export function parseRefreshFarmInstruction<
   TProgram extends string,

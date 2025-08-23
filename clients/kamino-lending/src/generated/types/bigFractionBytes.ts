@@ -6,11 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
@@ -19,12 +21,15 @@ import {
   getU64Encoder,
 } from "@solana/kit";
 
-export type BigFractionBytes = { value: bigint[]; padding: bigint[] };
+export interface BigFractionBytes {
+  value: bigint[];
+  padding: bigint[];
+}
 
-export type BigFractionBytesArgs = {
-  value: Array<number | bigint>;
-  padding: Array<number | bigint>;
-};
+export interface BigFractionBytesArgs {
+  value: (number | bigint)[];
+  padding: (number | bigint)[];
+}
 
 export function getBigFractionBytesEncoder(): FixedSizeEncoder<BigFractionBytesArgs> {
   return getStructEncoder([

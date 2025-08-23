@@ -38,7 +38,7 @@ import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const ADD_REWARDS_DISCRIMINATOR = new Uint8Array([
+export const ADD_REWARDS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   88, 186, 25, 227, 38, 137, 81, 23,
 ]);
 

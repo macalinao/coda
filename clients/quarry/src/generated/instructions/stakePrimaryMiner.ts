@@ -36,9 +36,8 @@ import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const STAKE_PRIMARY_MINER_DISCRIMINATOR = new Uint8Array([
-  72, 59, 23, 242, 117, 178, 129, 138,
-]);
+export const STAKE_PRIMARY_MINER_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([72, 59, 23, 242, 117, 178, 129, 138]);
 
 export function getStakePrimaryMinerDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,16 +49,18 @@ export type StakePrimaryMinerInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMmOwner extends string | AccountMeta = string,
   TAccountMmPrimaryTokenAccount extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountMinerVault extends string | AccountMeta = string,
-  TAccountTokenProgram extends
+  TAccountStakePrimaryMinerStakePool extends string | AccountMeta = string,
+  TAccountStakePrimaryMinerStakeMm extends string | AccountMeta = string,
+  TAccountStakePrimaryMinerStakeRewarder extends string | AccountMeta = string,
+  TAccountStakePrimaryMinerStakeQuarry extends string | AccountMeta = string,
+  TAccountStakePrimaryMinerStakeMiner extends string | AccountMeta = string,
+  TAccountStakePrimaryMinerStakeMinerVault extends
+    | string
+    | AccountMeta = string,
+  TAccountStakePrimaryMinerStakeTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountMineProgram extends
+  TAccountStakePrimaryMinerStakeMineProgram extends
     | string
     | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -74,28 +75,30 @@ export type StakePrimaryMinerInstruction<
       TAccountMmPrimaryTokenAccount extends string
         ? WritableAccount<TAccountMmPrimaryTokenAccount>
         : TAccountMmPrimaryTokenAccount,
-      TAccountPool extends string
-        ? WritableAccount<TAccountPool>
-        : TAccountPool,
-      TAccountMm extends string ? WritableAccount<TAccountMm> : TAccountMm,
-      TAccountRewarder extends string
-        ? ReadonlyAccount<TAccountRewarder>
-        : TAccountRewarder,
-      TAccountQuarry extends string
-        ? WritableAccount<TAccountQuarry>
-        : TAccountQuarry,
-      TAccountMiner extends string
-        ? WritableAccount<TAccountMiner>
-        : TAccountMiner,
-      TAccountMinerVault extends string
-        ? WritableAccount<TAccountMinerVault>
-        : TAccountMinerVault,
-      TAccountTokenProgram extends string
-        ? ReadonlyAccount<TAccountTokenProgram>
-        : TAccountTokenProgram,
-      TAccountMineProgram extends string
-        ? ReadonlyAccount<TAccountMineProgram>
-        : TAccountMineProgram,
+      TAccountStakePrimaryMinerStakePool extends string
+        ? WritableAccount<TAccountStakePrimaryMinerStakePool>
+        : TAccountStakePrimaryMinerStakePool,
+      TAccountStakePrimaryMinerStakeMm extends string
+        ? WritableAccount<TAccountStakePrimaryMinerStakeMm>
+        : TAccountStakePrimaryMinerStakeMm,
+      TAccountStakePrimaryMinerStakeRewarder extends string
+        ? ReadonlyAccount<TAccountStakePrimaryMinerStakeRewarder>
+        : TAccountStakePrimaryMinerStakeRewarder,
+      TAccountStakePrimaryMinerStakeQuarry extends string
+        ? WritableAccount<TAccountStakePrimaryMinerStakeQuarry>
+        : TAccountStakePrimaryMinerStakeQuarry,
+      TAccountStakePrimaryMinerStakeMiner extends string
+        ? WritableAccount<TAccountStakePrimaryMinerStakeMiner>
+        : TAccountStakePrimaryMinerStakeMiner,
+      TAccountStakePrimaryMinerStakeMinerVault extends string
+        ? WritableAccount<TAccountStakePrimaryMinerStakeMinerVault>
+        : TAccountStakePrimaryMinerStakeMinerVault,
+      TAccountStakePrimaryMinerStakeTokenProgram extends string
+        ? ReadonlyAccount<TAccountStakePrimaryMinerStakeTokenProgram>
+        : TAccountStakePrimaryMinerStakeTokenProgram,
+      TAccountStakePrimaryMinerStakeMineProgram extends string
+        ? ReadonlyAccount<TAccountStakePrimaryMinerStakeMineProgram>
+        : TAccountStakePrimaryMinerStakeMineProgram,
       ...TRemainingAccounts,
     ]
   >;
@@ -132,65 +135,65 @@ export function getStakePrimaryMinerInstructionDataCodec(): FixedSizeCodec<
 export interface StakePrimaryMinerInput<
   TAccountMmOwner extends string = string,
   TAccountMmPrimaryTokenAccount extends string = string,
-  TAccountPool extends string = string,
-  TAccountMm extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarry extends string = string,
-  TAccountMiner extends string = string,
-  TAccountMinerVault extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountMineProgram extends string = string,
+  TAccountStakePrimaryMinerStakePool extends string = string,
+  TAccountStakePrimaryMinerStakeMm extends string = string,
+  TAccountStakePrimaryMinerStakeRewarder extends string = string,
+  TAccountStakePrimaryMinerStakeQuarry extends string = string,
+  TAccountStakePrimaryMinerStakeMiner extends string = string,
+  TAccountStakePrimaryMinerStakeMinerVault extends string = string,
+  TAccountStakePrimaryMinerStakeTokenProgram extends string = string,
+  TAccountStakePrimaryMinerStakeMineProgram extends string = string,
 > {
   mmOwner: TransactionSigner<TAccountMmOwner>;
   mmPrimaryTokenAccount: Address<TAccountMmPrimaryTokenAccount>;
-  pool: Address<TAccountPool>;
-  mm: Address<TAccountMm>;
-  rewarder: Address<TAccountRewarder>;
-  quarry: Address<TAccountQuarry>;
-  miner: Address<TAccountMiner>;
-  minerVault: Address<TAccountMinerVault>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  mineProgram?: Address<TAccountMineProgram>;
+  stakePrimaryMinerStakePool: Address<TAccountStakePrimaryMinerStakePool>;
+  stakePrimaryMinerStakeMm: Address<TAccountStakePrimaryMinerStakeMm>;
+  stakePrimaryMinerStakeRewarder: Address<TAccountStakePrimaryMinerStakeRewarder>;
+  stakePrimaryMinerStakeQuarry: Address<TAccountStakePrimaryMinerStakeQuarry>;
+  stakePrimaryMinerStakeMiner: Address<TAccountStakePrimaryMinerStakeMiner>;
+  stakePrimaryMinerStakeMinerVault: Address<TAccountStakePrimaryMinerStakeMinerVault>;
+  stakePrimaryMinerStakeTokenProgram?: Address<TAccountStakePrimaryMinerStakeTokenProgram>;
+  stakePrimaryMinerStakeMineProgram?: Address<TAccountStakePrimaryMinerStakeMineProgram>;
 }
 
 export function getStakePrimaryMinerInstruction<
   TAccountMmOwner extends string,
   TAccountMmPrimaryTokenAccount extends string,
-  TAccountPool extends string,
-  TAccountMm extends string,
-  TAccountRewarder extends string,
-  TAccountQuarry extends string,
-  TAccountMiner extends string,
-  TAccountMinerVault extends string,
-  TAccountTokenProgram extends string,
-  TAccountMineProgram extends string,
+  TAccountStakePrimaryMinerStakePool extends string,
+  TAccountStakePrimaryMinerStakeMm extends string,
+  TAccountStakePrimaryMinerStakeRewarder extends string,
+  TAccountStakePrimaryMinerStakeQuarry extends string,
+  TAccountStakePrimaryMinerStakeMiner extends string,
+  TAccountStakePrimaryMinerStakeMinerVault extends string,
+  TAccountStakePrimaryMinerStakeTokenProgram extends string,
+  TAccountStakePrimaryMinerStakeMineProgram extends string,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
   input: StakePrimaryMinerInput<
     TAccountMmOwner,
     TAccountMmPrimaryTokenAccount,
-    TAccountPool,
-    TAccountMm,
-    TAccountRewarder,
-    TAccountQuarry,
-    TAccountMiner,
-    TAccountMinerVault,
-    TAccountTokenProgram,
-    TAccountMineProgram
+    TAccountStakePrimaryMinerStakePool,
+    TAccountStakePrimaryMinerStakeMm,
+    TAccountStakePrimaryMinerStakeRewarder,
+    TAccountStakePrimaryMinerStakeQuarry,
+    TAccountStakePrimaryMinerStakeMiner,
+    TAccountStakePrimaryMinerStakeMinerVault,
+    TAccountStakePrimaryMinerStakeTokenProgram,
+    TAccountStakePrimaryMinerStakeMineProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): StakePrimaryMinerInstruction<
   TProgramAddress,
   TAccountMmOwner,
   TAccountMmPrimaryTokenAccount,
-  TAccountPool,
-  TAccountMm,
-  TAccountRewarder,
-  TAccountQuarry,
-  TAccountMiner,
-  TAccountMinerVault,
-  TAccountTokenProgram,
-  TAccountMineProgram
+  TAccountStakePrimaryMinerStakePool,
+  TAccountStakePrimaryMinerStakeMm,
+  TAccountStakePrimaryMinerStakeRewarder,
+  TAccountStakePrimaryMinerStakeQuarry,
+  TAccountStakePrimaryMinerStakeMiner,
+  TAccountStakePrimaryMinerStakeMinerVault,
+  TAccountStakePrimaryMinerStakeTokenProgram,
+  TAccountStakePrimaryMinerStakeMineProgram
 > {
   // Program address.
   const programAddress =
@@ -203,14 +206,38 @@ export function getStakePrimaryMinerInstruction<
       value: input.mmPrimaryTokenAccount ?? null,
       isWritable: true,
     },
-    pool: { value: input.pool ?? null, isWritable: true },
-    mm: { value: input.mm ?? null, isWritable: true },
-    rewarder: { value: input.rewarder ?? null, isWritable: false },
-    quarry: { value: input.quarry ?? null, isWritable: true },
-    miner: { value: input.miner ?? null, isWritable: true },
-    minerVault: { value: input.minerVault ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    mineProgram: { value: input.mineProgram ?? null, isWritable: false },
+    stakePrimaryMinerStakePool: {
+      value: input.stakePrimaryMinerStakePool ?? null,
+      isWritable: true,
+    },
+    stakePrimaryMinerStakeMm: {
+      value: input.stakePrimaryMinerStakeMm ?? null,
+      isWritable: true,
+    },
+    stakePrimaryMinerStakeRewarder: {
+      value: input.stakePrimaryMinerStakeRewarder ?? null,
+      isWritable: false,
+    },
+    stakePrimaryMinerStakeQuarry: {
+      value: input.stakePrimaryMinerStakeQuarry ?? null,
+      isWritable: true,
+    },
+    stakePrimaryMinerStakeMiner: {
+      value: input.stakePrimaryMinerStakeMiner ?? null,
+      isWritable: true,
+    },
+    stakePrimaryMinerStakeMinerVault: {
+      value: input.stakePrimaryMinerStakeMinerVault ?? null,
+      isWritable: true,
+    },
+    stakePrimaryMinerStakeTokenProgram: {
+      value: input.stakePrimaryMinerStakeTokenProgram ?? null,
+      isWritable: false,
+    },
+    stakePrimaryMinerStakeMineProgram: {
+      value: input.stakePrimaryMinerStakeMineProgram ?? null,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -218,12 +245,12 @@ export function getStakePrimaryMinerInstruction<
   >;
 
   // Resolve default values.
-  if (!accounts.tokenProgram.value) {
-    accounts.tokenProgram.value =
+  if (!accounts.stakePrimaryMinerStakeTokenProgram.value) {
+    accounts.stakePrimaryMinerStakeTokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
-  if (!accounts.mineProgram.value) {
-    accounts.mineProgram.value =
+  if (!accounts.stakePrimaryMinerStakeMineProgram.value) {
+    accounts.stakePrimaryMinerStakeMineProgram.value =
       "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
   }
 
@@ -232,14 +259,14 @@ export function getStakePrimaryMinerInstruction<
     accounts: [
       getAccountMeta(accounts.mmOwner),
       getAccountMeta(accounts.mmPrimaryTokenAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.mineProgram),
+      getAccountMeta(accounts.stakePrimaryMinerStakePool),
+      getAccountMeta(accounts.stakePrimaryMinerStakeMm),
+      getAccountMeta(accounts.stakePrimaryMinerStakeRewarder),
+      getAccountMeta(accounts.stakePrimaryMinerStakeQuarry),
+      getAccountMeta(accounts.stakePrimaryMinerStakeMiner),
+      getAccountMeta(accounts.stakePrimaryMinerStakeMinerVault),
+      getAccountMeta(accounts.stakePrimaryMinerStakeTokenProgram),
+      getAccountMeta(accounts.stakePrimaryMinerStakeMineProgram),
     ],
     programAddress,
     data: getStakePrimaryMinerInstructionDataEncoder().encode({}),
@@ -247,14 +274,14 @@ export function getStakePrimaryMinerInstruction<
     TProgramAddress,
     TAccountMmOwner,
     TAccountMmPrimaryTokenAccount,
-    TAccountPool,
-    TAccountMm,
-    TAccountRewarder,
-    TAccountQuarry,
-    TAccountMiner,
-    TAccountMinerVault,
-    TAccountTokenProgram,
-    TAccountMineProgram
+    TAccountStakePrimaryMinerStakePool,
+    TAccountStakePrimaryMinerStakeMm,
+    TAccountStakePrimaryMinerStakeRewarder,
+    TAccountStakePrimaryMinerStakeQuarry,
+    TAccountStakePrimaryMinerStakeMiner,
+    TAccountStakePrimaryMinerStakeMinerVault,
+    TAccountStakePrimaryMinerStakeTokenProgram,
+    TAccountStakePrimaryMinerStakeMineProgram
   >;
 
   return instruction;
@@ -268,14 +295,14 @@ export interface ParsedStakePrimaryMinerInstruction<
   accounts: {
     mmOwner: TAccountMetas[0];
     mmPrimaryTokenAccount: TAccountMetas[1];
-    pool: TAccountMetas[2];
-    mm: TAccountMetas[3];
-    rewarder: TAccountMetas[4];
-    quarry: TAccountMetas[5];
-    miner: TAccountMetas[6];
-    minerVault: TAccountMetas[7];
-    tokenProgram: TAccountMetas[8];
-    mineProgram: TAccountMetas[9];
+    stakePrimaryMinerStakePool: TAccountMetas[2];
+    stakePrimaryMinerStakeMm: TAccountMetas[3];
+    stakePrimaryMinerStakeRewarder: TAccountMetas[4];
+    stakePrimaryMinerStakeQuarry: TAccountMetas[5];
+    stakePrimaryMinerStakeMiner: TAccountMetas[6];
+    stakePrimaryMinerStakeMinerVault: TAccountMetas[7];
+    stakePrimaryMinerStakeTokenProgram: TAccountMetas[8];
+    stakePrimaryMinerStakeMineProgram: TAccountMetas[9];
   };
   data: StakePrimaryMinerInstructionData;
 }
@@ -303,14 +330,14 @@ export function parseStakePrimaryMinerInstruction<
     accounts: {
       mmOwner: getNextAccount(),
       mmPrimaryTokenAccount: getNextAccount(),
-      pool: getNextAccount(),
-      mm: getNextAccount(),
-      rewarder: getNextAccount(),
-      quarry: getNextAccount(),
-      miner: getNextAccount(),
-      minerVault: getNextAccount(),
-      tokenProgram: getNextAccount(),
-      mineProgram: getNextAccount(),
+      stakePrimaryMinerStakePool: getNextAccount(),
+      stakePrimaryMinerStakeMm: getNextAccount(),
+      stakePrimaryMinerStakeRewarder: getNextAccount(),
+      stakePrimaryMinerStakeQuarry: getNextAccount(),
+      stakePrimaryMinerStakeMiner: getNextAccount(),
+      stakePrimaryMinerStakeMinerVault: getNextAccount(),
+      stakePrimaryMinerStakeTokenProgram: getNextAccount(),
+      stakePrimaryMinerStakeMineProgram: getNextAccount(),
     },
     data: getStakePrimaryMinerInstructionDataDecoder().decode(instruction.data),
   };

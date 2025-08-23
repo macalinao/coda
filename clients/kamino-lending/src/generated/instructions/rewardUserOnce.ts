@@ -6,14 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,24 +31,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REWARD_USER_ONCE_DISCRIMINATOR = new Uint8Array([
-  219, 137, 57, 22, 94, 186, 96, 114,
-]);
+export const REWARD_USER_ONCE_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([219, 137, 57, 22, 94, 186, 96, 114]);
 
 export function getRewardUserOnceDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -49,10 +48,10 @@ export function getRewardUserOnceDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RewardUserOnceInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountFarmAdmin extends string | AccountMeta<string> = string,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountUserState extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountFarmAdmin extends string | AccountMeta = string,
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountUserState extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -71,16 +70,16 @@ export type RewardUserOnceInstruction<
     ]
   >;
 
-export type RewardUserOnceInstructionData = {
+export interface RewardUserOnceInstructionData {
   discriminator: ReadonlyUint8Array;
   rewardIndex: bigint;
   amount: bigint;
-};
+}
 
-export type RewardUserOnceInstructionDataArgs = {
+export interface RewardUserOnceInstructionDataArgs {
   rewardIndex: number | bigint;
   amount: number | bigint;
-};
+}
 
 export function getRewardUserOnceInstructionDataEncoder(): FixedSizeEncoder<RewardUserOnceInstructionDataArgs> {
   return transformEncoder(
@@ -111,17 +110,17 @@ export function getRewardUserOnceInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type RewardUserOnceInput<
+export interface RewardUserOnceInput<
   TAccountFarmAdmin extends string = string,
   TAccountFarmState extends string = string,
   TAccountUserState extends string = string,
-> = {
+> {
   farmAdmin: TransactionSigner<TAccountFarmAdmin>;
   farmState: Address<TAccountFarmState>;
   userState: Address<TAccountUserState>;
   rewardIndex: RewardUserOnceInstructionDataArgs["rewardIndex"];
   amount: RewardUserOnceInstructionDataArgs["amount"];
-};
+}
 
 export function getRewardUserOnceInstruction<
   TAccountFarmAdmin extends string,
@@ -179,10 +178,10 @@ export function getRewardUserOnceInstruction<
   return instruction;
 }
 
-export type ParsedRewardUserOnceInstruction<
+export interface ParsedRewardUserOnceInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     farmAdmin: TAccountMetas[0];
@@ -190,7 +189,7 @@ export type ParsedRewardUserOnceInstruction<
     userState: TAccountMetas[2];
   };
   data: RewardUserOnceInstructionData;
-};
+}
 
 export function parseRewardUserOnceInstruction<
   TProgram extends string,

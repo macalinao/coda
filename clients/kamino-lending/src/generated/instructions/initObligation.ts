@@ -6,46 +6,48 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  InitObligationArgs,
+  InitObligationArgsArgs,
+} from "../types/index.js";
 import {
   getInitObligationArgsDecoder,
   getInitObligationArgsEncoder,
-  type InitObligationArgs,
-  type InitObligationArgsArgs,
 } from "../types/index.js";
 
-export const INIT_OBLIGATION_DISCRIMINATOR = new Uint8Array([
-  251, 10, 231, 76, 27, 11, 159, 96,
-]);
+export const INIT_OBLIGATION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
+  [251, 10, 231, 76, 27, 11, 159, 96],
+);
 
 export function getInitObligationDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -55,16 +57,16 @@ export function getInitObligationDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitObligationInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountObligationOwner extends string | AccountMeta<string> = string,
-  TAccountFeePayer extends string | AccountMeta<string> = string,
-  TAccountObligation extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountSeed1Account extends string | AccountMeta<string> = string,
-  TAccountSeed2Account extends string | AccountMeta<string> = string,
-  TAccountOwnerUserMetadata extends string | AccountMeta<string> = string,
-  TAccountRent extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountObligationOwner extends string | AccountMeta = string,
+  TAccountFeePayer extends string | AccountMeta = string,
+  TAccountObligation extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountSeed1Account extends string | AccountMeta = string,
+  TAccountSeed2Account extends string | AccountMeta = string,
+  TAccountOwnerUserMetadata extends string | AccountMeta = string,
+  TAccountRent extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -102,14 +104,14 @@ export type InitObligationInstruction<
     ]
   >;
 
-export type InitObligationInstructionData = {
+export interface InitObligationInstructionData {
   discriminator: ReadonlyUint8Array;
   args: InitObligationArgs;
-};
+}
 
-export type InitObligationInstructionDataArgs = {
+export interface InitObligationInstructionDataArgs {
   args: InitObligationArgsArgs;
-};
+}
 
 export function getInitObligationInstructionDataEncoder(): FixedSizeEncoder<InitObligationInstructionDataArgs> {
   return transformEncoder(
@@ -138,7 +140,7 @@ export function getInitObligationInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type InitObligationInput<
+export interface InitObligationInput<
   TAccountObligationOwner extends string = string,
   TAccountFeePayer extends string = string,
   TAccountObligation extends string = string,
@@ -148,7 +150,7 @@ export type InitObligationInput<
   TAccountOwnerUserMetadata extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> = {
+> {
   obligationOwner: TransactionSigner<TAccountObligationOwner>;
   feePayer: TransactionSigner<TAccountFeePayer>;
   obligation: Address<TAccountObligation>;
@@ -159,7 +161,7 @@ export type InitObligationInput<
   rent: Address<TAccountRent>;
   systemProgram: Address<TAccountSystemProgram>;
   args: InitObligationInstructionDataArgs["args"];
-};
+}
 
 export function getInitObligationInstruction<
   TAccountObligationOwner extends string,
@@ -260,10 +262,10 @@ export function getInitObligationInstruction<
   return instruction;
 }
 
-export type ParsedInitObligationInstruction<
+export interface ParsedInitObligationInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     obligationOwner: TAccountMetas[0];
@@ -277,7 +279,7 @@ export type ParsedInitObligationInstruction<
     systemProgram: TAccountMetas[8];
   };
   data: InitObligationInstructionData;
-};
+}
 
 export function parseInitObligationInstruction<
   TProgram extends string,

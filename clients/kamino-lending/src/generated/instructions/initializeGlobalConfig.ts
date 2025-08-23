@@ -6,39 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const INITIALIZE_GLOBAL_CONFIG_DISCRIMINATOR = new Uint8Array([
-  113, 216, 122, 131, 225, 209, 22, 55,
-]);
+export const INITIALIZE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([113, 216, 122, 131, 225, 209, 22, 55]);
 
 export function getInitializeGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -48,11 +47,11 @@ export function getInitializeGlobalConfigDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type InitializeGlobalConfigInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountGlobalAdmin extends string | AccountMeta<string> = string,
-  TAccountGlobalConfig extends string | AccountMeta<string> = string,
-  TAccountTreasuryVaultsAuthority extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountGlobalAdmin extends string | AccountMeta = string,
+  TAccountGlobalConfig extends string | AccountMeta = string,
+  TAccountTreasuryVaultsAuthority extends string | AccountMeta = string,
+  TAccountSystemProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -74,11 +73,11 @@ export type InitializeGlobalConfigInstruction<
     ]
   >;
 
-export type InitializeGlobalConfigInstructionData = {
+export interface InitializeGlobalConfigInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type InitializeGlobalConfigInstructionDataArgs = {};
+export interface InitializeGlobalConfigInstructionDataArgs {}
 
 export function getInitializeGlobalConfigInstructionDataEncoder(): FixedSizeEncoder<InitializeGlobalConfigInstructionDataArgs> {
   return transformEncoder(
@@ -106,17 +105,17 @@ export function getInitializeGlobalConfigInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type InitializeGlobalConfigInput<
+export interface InitializeGlobalConfigInput<
   TAccountGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountTreasuryVaultsAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> = {
+> {
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
   treasuryVaultsAuthority: Address<TAccountTreasuryVaultsAuthority>;
   systemProgram: Address<TAccountSystemProgram>;
-};
+}
 
 export function getInitializeGlobalConfigInstruction<
   TAccountGlobalAdmin extends string,
@@ -178,10 +177,10 @@ export function getInitializeGlobalConfigInstruction<
   return instruction;
 }
 
-export type ParsedInitializeGlobalConfigInstruction<
+export interface ParsedInitializeGlobalConfigInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     globalAdmin: TAccountMetas[0];
@@ -190,7 +189,7 @@ export type ParsedInitializeGlobalConfigInstruction<
     systemProgram: TAccountMetas[3];
   };
   data: InitializeGlobalConfigInstructionData;
-};
+}
 
 export function parseInitializeGlobalConfigInstruction<
   TProgram extends string,

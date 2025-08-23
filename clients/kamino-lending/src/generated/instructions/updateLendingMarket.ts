@@ -6,14 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getArrayDecoder,
@@ -26,24 +35,14 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const UPDATE_LENDING_MARKET_DISCRIMINATOR = new Uint8Array([
-  209, 157, 53, 210, 97, 180, 31, 45,
-]);
+export const UPDATE_LENDING_MARKET_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([209, 157, 53, 210, 97, 180, 31, 45]);
 
 export function getUpdateLendingMarketDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -53,9 +52,9 @@ export function getUpdateLendingMarketDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateLendingMarketInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountLendingMarketOwner extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -71,16 +70,16 @@ export type UpdateLendingMarketInstruction<
     ]
   >;
 
-export type UpdateLendingMarketInstructionData = {
+export interface UpdateLendingMarketInstructionData {
   discriminator: ReadonlyUint8Array;
   mode: bigint;
   value: number[];
-};
+}
 
-export type UpdateLendingMarketInstructionDataArgs = {
+export interface UpdateLendingMarketInstructionDataArgs {
   mode: number | bigint;
   value: number[];
-};
+}
 
 export function getUpdateLendingMarketInstructionDataEncoder(): FixedSizeEncoder<UpdateLendingMarketInstructionDataArgs> {
   return transformEncoder(
@@ -114,15 +113,15 @@ export function getUpdateLendingMarketInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type UpdateLendingMarketInput<
+export interface UpdateLendingMarketInput<
   TAccountLendingMarketOwner extends string = string,
   TAccountLendingMarket extends string = string,
-> = {
+> {
   lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   mode: UpdateLendingMarketInstructionDataArgs["mode"];
   value: UpdateLendingMarketInstructionDataArgs["value"];
-};
+}
 
 export function getUpdateLendingMarketInstruction<
   TAccountLendingMarketOwner extends string,
@@ -178,17 +177,17 @@ export function getUpdateLendingMarketInstruction<
   return instruction;
 }
 
-export type ParsedUpdateLendingMarketInstruction<
+export interface ParsedUpdateLendingMarketInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarketOwner: TAccountMetas[0];
     lendingMarket: TAccountMetas[1];
   };
   data: UpdateLendingMarketInstructionData;
-};
+}
 
 export function parseUpdateLendingMarketInstruction<
   TProgram extends string,

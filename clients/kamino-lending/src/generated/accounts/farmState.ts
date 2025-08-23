@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  Codec,
+  Decoder,
+  EncodedAccount,
+  Encoder,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -39,23 +44,22 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
+import type {
+  RewardInfo,
+  RewardInfoArgs,
+  TokenInfo,
+  TokenInfoArgs,
+} from "../types/index.js";
 import {
   getRewardInfoDecoder,
   getRewardInfoEncoder,
   getTokenInfoDecoder,
   getTokenInfoEncoder,
-  type RewardInfo,
-  type RewardInfoArgs,
-  type TokenInfo,
-  type TokenInfoArgs,
 } from "../types/index.js";
 
-export const FARM_STATE_DISCRIMINATOR = new Uint8Array([
+export const FARM_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   198, 102, 216, 74, 63, 66, 163, 190,
 ]);
 
@@ -63,7 +67,7 @@ export function getFarmStateDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(FARM_STATE_DISCRIMINATOR);
 }
 
-export type FarmState = {
+export interface FarmState {
   discriminator: ReadonlyUint8Array;
   farmAdmin: Address;
   globalConfig: Address;
@@ -140,9 +144,9 @@ export type FarmState = {
   delegatedRpsAdmin: Address;
   vaultId: Address;
   padding: bigint[];
-};
+}
 
-export type FarmStateArgs = {
+export interface FarmStateArgs {
   farmAdmin: Address;
   globalConfig: Address;
   token: TokenInfoArgs;
@@ -217,10 +221,10 @@ export type FarmStateArgs = {
   strategyId: Address;
   delegatedRpsAdmin: Address;
   vaultId: Address;
-  padding: Array<number | bigint>;
-};
+  padding: (number | bigint)[];
+}
 
-export function getFarmStateEncoder(): FixedSizeEncoder<FarmStateArgs> {
+export function getFarmStateEncoder(): Encoder<FarmStateArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
@@ -266,7 +270,7 @@ export function getFarmStateEncoder(): FixedSizeEncoder<FarmStateArgs> {
   );
 }
 
-export function getFarmStateDecoder(): FixedSizeDecoder<FarmState> {
+export function getFarmStateDecoder(): Decoder<FarmState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["farmAdmin", getAddressDecoder()],
@@ -309,7 +313,7 @@ export function getFarmStateDecoder(): FixedSizeDecoder<FarmState> {
   ]);
 }
 
-export function getFarmStateCodec(): FixedSizeCodec<FarmStateArgs, FarmState> {
+export function getFarmStateCodec(): Codec<FarmStateArgs, FarmState> {
   return combineCodec(getFarmStateEncoder(), getFarmStateDecoder());
 }
 

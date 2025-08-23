@@ -7,6 +7,7 @@
  */
 
 export * from "./farmState.js";
+export * from "./farmsUserState.js";
 export * from "./globalConfig.js";
 export * from "./lendingMarket.js";
 export * from "./obligation.js";
@@ -16,5 +17,4 @@ export * from "./referrerTokenState.js";
 export * from "./reserve.js";
 export * from "./shortUrl.js";
 export * from "./userMetadata.js";
-export * from "./userState.js";
 export * from "./userState.js";

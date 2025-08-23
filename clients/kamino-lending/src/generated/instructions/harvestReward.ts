@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,23 +32,13 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
   transformEncoder,
-  type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const HARVEST_REWARD_DISCRIMINATOR = new Uint8Array([
+export const HARVEST_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   68, 200, 228, 233, 184, 32, 226, 188,
 ]);
 
@@ -50,18 +50,18 @@ export function getHarvestRewardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type HarvestRewardInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountUserState extends string | AccountMeta<string> = string,
-  TAccountFarmState extends string | AccountMeta<string> = string,
-  TAccountGlobalConfig extends string | AccountMeta<string> = string,
-  TAccountRewardMint extends string | AccountMeta<string> = string,
-  TAccountUserRewardAta extends string | AccountMeta<string> = string,
-  TAccountRewardsVault extends string | AccountMeta<string> = string,
-  TAccountRewardsTreasuryVault extends string | AccountMeta<string> = string,
-  TAccountFarmVaultsAuthority extends string | AccountMeta<string> = string,
-  TAccountScopePrices extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountUserState extends string | AccountMeta = string,
+  TAccountFarmState extends string | AccountMeta = string,
+  TAccountGlobalConfig extends string | AccountMeta = string,
+  TAccountRewardMint extends string | AccountMeta = string,
+  TAccountUserRewardAta extends string | AccountMeta = string,
+  TAccountRewardsVault extends string | AccountMeta = string,
+  TAccountRewardsTreasuryVault extends string | AccountMeta = string,
+  TAccountFarmVaultsAuthority extends string | AccountMeta = string,
+  TAccountScopePrices extends string | AccountMeta = string,
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -104,12 +104,14 @@ export type HarvestRewardInstruction<
     ]
   >;
 
-export type HarvestRewardInstructionData = {
+export interface HarvestRewardInstructionData {
   discriminator: ReadonlyUint8Array;
   rewardIndex: bigint;
-};
+}
 
-export type HarvestRewardInstructionDataArgs = { rewardIndex: number | bigint };
+export interface HarvestRewardInstructionDataArgs {
+  rewardIndex: number | bigint;
+}
 
 export function getHarvestRewardInstructionDataEncoder(): FixedSizeEncoder<HarvestRewardInstructionDataArgs> {
   return transformEncoder(
@@ -138,7 +140,7 @@ export function getHarvestRewardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type HarvestRewardInput<
+export interface HarvestRewardInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -150,7 +152,7 @@ export type HarvestRewardInput<
   TAccountFarmVaultsAuthority extends string = string,
   TAccountScopePrices extends string = string,
   TAccountTokenProgram extends string = string,
-> = {
+> {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -163,7 +165,7 @@ export type HarvestRewardInput<
   scopePrices?: Address<TAccountScopePrices>;
   tokenProgram: Address<TAccountTokenProgram>;
   rewardIndex: HarvestRewardInstructionDataArgs["rewardIndex"];
-};
+}
 
 export function getHarvestRewardInstruction<
   TAccountOwner extends string,
@@ -275,10 +277,10 @@ export function getHarvestRewardInstruction<
   return instruction;
 }
 
-export type ParsedHarvestRewardInstruction<
+export interface ParsedHarvestRewardInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -294,7 +296,7 @@ export type ParsedHarvestRewardInstruction<
     tokenProgram: TAccountMetas[10];
   };
   data: HarvestRewardInstructionData;
-};
+}
 
 export function parseHarvestRewardInstruction<
   TProgram extends string,

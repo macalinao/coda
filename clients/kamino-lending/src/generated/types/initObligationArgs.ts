@@ -6,18 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
 } from "@solana/kit";
 
-export type InitObligationArgs = { tag: number; id: number };
+export interface InitObligationArgs {
+  tag: number;
+  id: number;
+}
 
 export type InitObligationArgsArgs = InitObligationArgs;
 

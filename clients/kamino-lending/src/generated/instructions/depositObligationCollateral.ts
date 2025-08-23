@@ -38,9 +38,8 @@ import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DEPOSIT_OBLIGATION_COLLATERAL_DISCRIMINATOR = new Uint8Array([
-  108, 209, 4, 72, 21, 22, 118, 133,
-]);
+export const DEPOSIT_OBLIGATION_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([108, 209, 4, 72, 21, 22, 118, 133]);
 
 export function getDepositObligationCollateralDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

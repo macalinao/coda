@@ -37,9 +37,8 @@ import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const CREATE_QUARRY_V2_DISCRIMINATOR = new Uint8Array([
-  46, 84, 33, 67, 174, 252, 67, 148,
-]);
+export const CREATE_QUARRY_V2_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([46, 84, 33, 67, 174, 252, 67, 148]);
 
 export function getCreateQuarryV2DiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -50,8 +49,8 @@ export function getCreateQuarryV2DiscriminatorBytes(): ReadonlyUint8Array {
 export type CreateQuarryV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountQuarry extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
+  TAccountAuthAuthority extends string | AccountMeta = string,
+  TAccountAuthRewarder extends string | AccountMeta = string,
   TAccountTokenMint extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountSystemProgram extends
@@ -65,13 +64,13 @@ export type CreateQuarryV2Instruction<
       TAccountQuarry extends string
         ? WritableAccount<TAccountQuarry>
         : TAccountQuarry,
-      TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> &
-            AccountSignerMeta<TAccountAuthority>
-        : TAccountAuthority,
-      TAccountRewarder extends string
-        ? WritableAccount<TAccountRewarder>
-        : TAccountRewarder,
+      TAccountAuthAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthAuthority> &
+            AccountSignerMeta<TAccountAuthAuthority>
+        : TAccountAuthAuthority,
+      TAccountAuthRewarder extends string
+        ? WritableAccount<TAccountAuthRewarder>
+        : TAccountAuthRewarder,
       TAccountTokenMint extends string
         ? ReadonlyAccount<TAccountTokenMint>
         : TAccountTokenMint,
@@ -117,15 +116,15 @@ export function getCreateQuarryV2InstructionDataCodec(): FixedSizeCodec<
 
 export interface CreateQuarryV2Input<
   TAccountQuarry extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountRewarder extends string = string,
+  TAccountAuthAuthority extends string = string,
+  TAccountAuthRewarder extends string = string,
   TAccountTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
 > {
   quarry: Address<TAccountQuarry>;
-  authority: TransactionSigner<TAccountAuthority>;
-  rewarder: Address<TAccountRewarder>;
+  authAuthority: TransactionSigner<TAccountAuthAuthority>;
+  authRewarder: Address<TAccountAuthRewarder>;
   tokenMint: Address<TAccountTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -133,8 +132,8 @@ export interface CreateQuarryV2Input<
 
 export function getCreateQuarryV2Instruction<
   TAccountQuarry extends string,
-  TAccountAuthority extends string,
-  TAccountRewarder extends string,
+  TAccountAuthAuthority extends string,
+  TAccountAuthRewarder extends string,
   TAccountTokenMint extends string,
   TAccountPayer extends string,
   TAccountSystemProgram extends string,
@@ -142,8 +141,8 @@ export function getCreateQuarryV2Instruction<
 >(
   input: CreateQuarryV2Input<
     TAccountQuarry,
-    TAccountAuthority,
-    TAccountRewarder,
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
     TAccountTokenMint,
     TAccountPayer,
     TAccountSystemProgram
@@ -152,8 +151,8 @@ export function getCreateQuarryV2Instruction<
 ): CreateQuarryV2Instruction<
   TProgramAddress,
   TAccountQuarry,
-  TAccountAuthority,
-  TAccountRewarder,
+  TAccountAuthAuthority,
+  TAccountAuthRewarder,
   TAccountTokenMint,
   TAccountPayer,
   TAccountSystemProgram
@@ -164,8 +163,8 @@ export function getCreateQuarryV2Instruction<
   // Original accounts.
   const originalAccounts = {
     quarry: { value: input.quarry ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    authAuthority: { value: input.authAuthority ?? null, isWritable: false },
+    authRewarder: { value: input.authRewarder ?? null, isWritable: true },
     tokenMint: { value: input.tokenMint ?? null, isWritable: false },
     payer: { value: input.payer ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -185,8 +184,8 @@ export function getCreateQuarryV2Instruction<
   const instruction = {
     accounts: [
       getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta(accounts.authAuthority),
+      getAccountMeta(accounts.authRewarder),
       getAccountMeta(accounts.tokenMint),
       getAccountMeta(accounts.payer),
       getAccountMeta(accounts.systemProgram),
@@ -196,8 +195,8 @@ export function getCreateQuarryV2Instruction<
   } as CreateQuarryV2Instruction<
     TProgramAddress,
     TAccountQuarry,
-    TAccountAuthority,
-    TAccountRewarder,
+    TAccountAuthAuthority,
+    TAccountAuthRewarder,
     TAccountTokenMint,
     TAccountPayer,
     TAccountSystemProgram
@@ -213,8 +212,8 @@ export interface ParsedCreateQuarryV2Instruction<
   programAddress: Address<TProgram>;
   accounts: {
     quarry: TAccountMetas[0];
-    authority: TAccountMetas[1];
-    rewarder: TAccountMetas[2];
+    authAuthority: TAccountMetas[1];
+    authRewarder: TAccountMetas[2];
     tokenMint: TAccountMetas[3];
     payer: TAccountMetas[4];
     systemProgram: TAccountMetas[5];
@@ -244,8 +243,8 @@ export function parseCreateQuarryV2Instruction<
     programAddress: instruction.programAddress,
     accounts: {
       quarry: getNextAccount(),
-      authority: getNextAccount(),
-      rewarder: getNextAccount(),
+      authAuthority: getNextAccount(),
+      authRewarder: getNextAccount(),
       tokenMint: getNextAccount(),
       payer: getNextAccount(),
       systemProgram: getNextAccount(),

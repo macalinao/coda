@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  type Account,
-  type Address,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  type EncodedAccount,
-  type FetchAccountConfig,
-  type FetchAccountsConfig,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -39,19 +44,18 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  type MaybeAccount,
-  type MaybeEncodedAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
 } from "@solana/kit";
+import type {
+  ElevationGroupLendingMarket,
+  ElevationGroupLendingMarketArgs,
+} from "../types/index.js";
 import {
-  type ElevationGroupLendingMarket,
-  type ElevationGroupLendingMarketArgs,
   getElevationGroupLendingMarketDecoder,
   getElevationGroupLendingMarketEncoder,
 } from "../types/index.js";
 
-export const LENDING_MARKET_DISCRIMINATOR = new Uint8Array([
+export const LENDING_MARKET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   246, 114, 50, 98, 72, 157, 28, 120,
 ]);
 
@@ -61,7 +65,7 @@ export function getLendingMarketDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export type LendingMarket = {
+export interface LendingMarket {
   discriminator: ReadonlyUint8Array;
   version: bigint;
   bumpSeed: bigint;
@@ -90,9 +94,9 @@ export type LendingMarket = {
   individualAutodeleverageMarginCallPeriodSecs: bigint;
   minInitialDepositAmount: bigint;
   padding1: bigint[];
-};
+}
 
-export type LendingMarketArgs = {
+export interface LendingMarketArgs {
   version: number | bigint;
   bumpSeed: number | bigint;
   lendingMarketOwner: Address;
@@ -112,15 +116,15 @@ export type LendingMarketArgs = {
   riskCouncil: Address;
   reserved1: number[];
   elevationGroups: ElevationGroupLendingMarketArgs[];
-  elevationGroupPadding: Array<number | bigint>;
+  elevationGroupPadding: (number | bigint)[];
   minNetValueInObligationSf: number | bigint;
   minValueSkipLiquidationLtvChecks: number | bigint;
   name: number[];
   minValueSkipLiquidationBfChecks: number | bigint;
   individualAutodeleverageMarginCallPeriodSecs: number | bigint;
   minInitialDepositAmount: number | bigint;
-  padding1: Array<number | bigint>;
-};
+  padding1: (number | bigint)[];
+}
 
 export function getLendingMarketEncoder(): FixedSizeEncoder<LendingMarketArgs> {
   return transformEncoder(

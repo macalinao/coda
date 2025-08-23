@@ -6,36 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  type AccountMeta,
-  type Address,
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyAccount,
-  type ReadonlyUint8Array,
   transformEncoder,
-  type WritableAccount,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REFRESH_RESERVE_DISCRIMINATOR = new Uint8Array([
-  2, 218, 138, 235, 79, 201, 25, 102,
-]);
+export const REFRESH_RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
+  [2, 218, 138, 235, 79, 201, 25, 102],
+);
 
 export function getRefreshReserveDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
@@ -45,13 +45,13 @@ export function getRefreshReserveDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RefreshReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountReserve extends string | AccountMeta<string> = string,
-  TAccountLendingMarket extends string | AccountMeta<string> = string,
-  TAccountPythOracle extends string | AccountMeta<string> = string,
-  TAccountSwitchboardPriceOracle extends string | AccountMeta<string> = string,
-  TAccountSwitchboardTwapOracle extends string | AccountMeta<string> = string,
-  TAccountScopePrices extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+  TAccountReserve extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountPythOracle extends string | AccountMeta = string,
+  TAccountSwitchboardPriceOracle extends string | AccountMeta = string,
+  TAccountSwitchboardTwapOracle extends string | AccountMeta = string,
+  TAccountScopePrices extends string | AccountMeta = string,
+  TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -78,11 +78,11 @@ export type RefreshReserveInstruction<
     ]
   >;
 
-export type RefreshReserveInstructionData = {
+export interface RefreshReserveInstructionData {
   discriminator: ReadonlyUint8Array;
-};
+}
 
-export type RefreshReserveInstructionDataArgs = {};
+export interface RefreshReserveInstructionDataArgs {}
 
 export function getRefreshReserveInstructionDataEncoder(): FixedSizeEncoder<RefreshReserveInstructionDataArgs> {
   return transformEncoder(
@@ -107,21 +107,21 @@ export function getRefreshReserveInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type RefreshReserveInput<
+export interface RefreshReserveInput<
   TAccountReserve extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountPythOracle extends string = string,
   TAccountSwitchboardPriceOracle extends string = string,
   TAccountSwitchboardTwapOracle extends string = string,
   TAccountScopePrices extends string = string,
-> = {
+> {
   reserve: Address<TAccountReserve>;
   lendingMarket: Address<TAccountLendingMarket>;
   pythOracle?: Address<TAccountPythOracle>;
   switchboardPriceOracle?: Address<TAccountSwitchboardPriceOracle>;
   switchboardTwapOracle?: Address<TAccountSwitchboardTwapOracle>;
   scopePrices?: Address<TAccountScopePrices>;
-};
+}
 
 export function getRefreshReserveInstruction<
   TAccountReserve extends string,
@@ -199,10 +199,10 @@ export function getRefreshReserveInstruction<
   return instruction;
 }
 
-export type ParsedRefreshReserveInstruction<
+export interface ParsedRefreshReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> = {
+> {
   programAddress: Address<TProgram>;
   accounts: {
     reserve: TAccountMetas[0];
@@ -213,7 +213,7 @@ export type ParsedRefreshReserveInstruction<
     scopePrices?: TAccountMetas[5] | undefined;
   };
   data: RefreshReserveInstructionData;
-};
+}
 
 export function parseRefreshReserveInstruction<
   TProgram extends string,

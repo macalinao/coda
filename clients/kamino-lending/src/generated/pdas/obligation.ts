@@ -6,15 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
-  type Address,
   getAddressEncoder,
   getProgramDerivedAddress,
   getU8Encoder,
-  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export type ObligationSeeds = {
+export interface ObligationSeeds {
   tag: number;
 
   id: number;
@@ -26,7 +25,7 @@ export type ObligationSeeds = {
   seed1Account: Address;
 
   seed2Account: Address;
-};
+}
 
 export async function findObligationPda(
   seeds: ObligationSeeds,

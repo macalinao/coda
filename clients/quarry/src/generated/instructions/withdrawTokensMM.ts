@@ -36,9 +36,8 @@ import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const WITHDRAW_TOKENS_M_M_DISCRIMINATOR = new Uint8Array([
-  2, 4, 225, 61, 19, 182, 106, 170,
-]);
+export const WITHDRAW_TOKENS_M_M_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([2, 4, 225, 61, 19, 182, 106, 170]);
 
 export function getWithdrawTokensMMDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(

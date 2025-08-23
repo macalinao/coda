@@ -6,11 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
@@ -21,17 +23,17 @@ import {
   getU64Encoder,
 } from "@solana/kit";
 
-export type ReserveFees = {
+export interface ReserveFees {
   borrowFeeSf: bigint;
   flashLoanFeeSf: bigint;
   padding: number[];
-};
+}
 
-export type ReserveFeesArgs = {
+export interface ReserveFeesArgs {
   borrowFeeSf: number | bigint;
   flashLoanFeeSf: number | bigint;
   padding: number[];
-};
+}
 
 export function getReserveFeesEncoder(): FixedSizeEncoder<ReserveFeesArgs> {
   return getStructEncoder([

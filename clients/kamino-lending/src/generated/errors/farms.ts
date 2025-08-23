@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import {
-  type Address,
-  isProgramError,
-  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  type SolanaError,
+import type {
+  Address,
+  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  SolanaError,
 } from "@solana/kit";
+import { isProgramError } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** StakeZero: Cannot stake 0 amount */
@@ -271,7 +271,7 @@ if (true) {
 
 export function getFarmsErrorMessage(code: FarmsError): string {
   if (true) {
-    return (farmsErrorMessages as Record<FarmsError, string>)[code];
+    return farmsErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";
