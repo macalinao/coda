@@ -10,10 +10,10 @@
 - [Accounts](#accounts)
   - [registry](#registry)
 - [Instructions](#instructions)
-  - [newRegistry](#newRegistry-1)
-  - [syncQuarry](#syncQuarry-1)
+  - [newRegistry](#newRegistry)
+  - [syncQuarry](#syncQuarry)
 - [PDAs](#pdas)
-  - [registry](#registry-2)
+  - [registry](#registry)
 
 ## Accounts
 

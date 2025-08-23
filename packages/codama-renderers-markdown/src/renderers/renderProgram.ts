@@ -86,7 +86,7 @@ export function renderProgram(
       lines.push("- [Instructions](#instructions)");
       for (const instruction of instructions) {
         lines.push(
-          `  - [${instruction.name}](#${instruction.name.replace(/_/g, "-")}-1)`,
+          `  - [${instruction.name}](#${instruction.name.replace(/_/g, "-")})`,
         );
       }
     }
@@ -94,14 +94,14 @@ export function renderProgram(
     if (pdas.length > 0) {
       lines.push("- [PDAs](#pdas)");
       for (const pda of pdas) {
-        lines.push(`  - [${pda.name}](#${pda.name.replace(/_/g, "-")}-2)`);
+        lines.push(`  - [${pda.name}](#${pda.name.replace(/_/g, "-")})`);
       }
     }
 
     if (types.length > 0) {
       lines.push("- [Types](#types)");
       for (const type of types) {
-        lines.push(`  - [${type.name}](#${type.name.replace(/_/g, "-")}-3)`);
+        lines.push(`  - [${type.name}](#${type.name.replace(/_/g, "-")})`);
       }
     }
 

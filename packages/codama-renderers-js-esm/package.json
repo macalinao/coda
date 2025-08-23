@@ -12,7 +12,8 @@
     "solana",
     "esm",
     "typescript",
-    "code-generation"
+    "code-generation",
+    "ian-macalinao"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

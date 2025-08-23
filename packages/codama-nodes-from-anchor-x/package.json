@@ -7,7 +7,8 @@
     "codama",
     "anchor",
     "idl",
-    "ast"
+    "ast",
+    "ian-macalinao"
   ],
   "author": "Ian Macalinao <me@ianm.com>",
   "homepage": "https://github.com/macalinao/coda/tree/master/packages/codama-nodes-from-anchor-x",

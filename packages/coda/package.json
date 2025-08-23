@@ -15,7 +15,8 @@
     "client",
     "code-generation",
     "esm",
-    "typescript"
+    "typescript",
+    "ian-macalinao"
   ],
   "bin": {
     "coda": "./dist/bin/cli.js"

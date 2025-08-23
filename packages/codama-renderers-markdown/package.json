@@ -2,6 +2,9 @@
   "name": "@macalinao/codama-renderers-markdown",
   "version": "0.1.0",
   "description": "Codama visitor for rendering markdown documentation from IDL",
+  "keywords": [
+    "ian-macalinao"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

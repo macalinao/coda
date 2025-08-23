@@ -10,19 +10,19 @@
 - [Accounts](#accounts)
   - [operator](#operator)
 - [Instructions](#instructions)
-  - [createOperator](#createOperator-1)
-  - [createOperatorV2](#createOperatorV2-1)
-  - [setAdmin](#setAdmin-1)
-  - [setRateSetter](#setRateSetter-1)
-  - [setQuarryCreator](#setQuarryCreator-1)
-  - [setShareAllocator](#setShareAllocator-1)
-  - [delegateSetAnnualRewards](#delegateSetAnnualRewards-1)
-  - [delegateCreateQuarry](#delegateCreateQuarry-1)
-  - [delegateCreateQuarryV2](#delegateCreateQuarryV2-1)
-  - [delegateSetRewardsShare](#delegateSetRewardsShare-1)
-  - [delegateSetFamine](#delegateSetFamine-1)
+  - [createOperator](#createOperator)
+  - [createOperatorV2](#createOperatorV2)
+  - [setAdmin](#setAdmin)
+  - [setRateSetter](#setRateSetter)
+  - [setQuarryCreator](#setQuarryCreator)
+  - [setShareAllocator](#setShareAllocator)
+  - [delegateSetAnnualRewards](#delegateSetAnnualRewards)
+  - [delegateCreateQuarry](#delegateCreateQuarry)
+  - [delegateCreateQuarryV2](#delegateCreateQuarryV2)
+  - [delegateSetRewardsShare](#delegateSetRewardsShare)
+  - [delegateSetFamine](#delegateSetFamine)
 - [PDAs](#pdas)
-  - [operator](#operator-2)
+  - [operator](#operator)
 - [Errors](#errors)
 
 ## Accounts
@@ -155,12 +155,12 @@
 
 **Accounts:**
 
-| Account             | Type     | Description |
-| ------------------- | -------- | ----------- |
-| `operator`          | writable |             |
-| `delegate`          | signer   |             |
-| `rewarder`          | writable |             |
-| `quarryMineProgram` | readonly |             |
+| Account                                         | Type     | Description |
+| ----------------------------------------------- | -------- | ----------- |
+| `setAnnualRewardsWithDelegateOperator`          | writable |             |
+| `setAnnualRewardsWithDelegateDelegate`          | signer   |             |
+| `setAnnualRewardsWithDelegateRewarder`          | writable |             |
+| `setAnnualRewardsWithDelegateQuarryMineProgram` | readonly |             |
 
 **Arguments:**
 
@@ -173,17 +173,17 @@
 
 **Accounts:**
 
-| Account             | Type             | Description |
-| ------------------- | ---------------- | ----------- |
-| `operator`          | writable         |             |
-| `delegate`          | signer           |             |
-| `rewarder`          | writable         |             |
-| `quarryMineProgram` | readonly         |             |
-| `quarry`            | writable         |             |
-| `tokenMint`         | readonly         |             |
-| `payer`             | signer, writable |             |
-| `unusedAccount`     | readonly         |             |
-| `systemProgram`     | readonly         |             |
+| Account                                     | Type             | Description |
+| ------------------------------------------- | ---------------- | ----------- |
+| `createQuarryWithDelegateOperator`          | writable         |             |
+| `createQuarryWithDelegateDelegate`          | signer           |             |
+| `createQuarryWithDelegateRewarder`          | writable         |             |
+| `createQuarryWithDelegateQuarryMineProgram` | readonly         |             |
+| `quarry`                                    | writable         |             |
+| `tokenMint`                                 | readonly         |             |
+| `payer`                                     | signer, writable |             |
+| `unusedAccount`                             | readonly         |             |
+| `systemProgram`                             | readonly         |             |
 
 **Arguments:**
 
@@ -196,16 +196,16 @@
 
 **Accounts:**
 
-| Account             | Type             | Description |
-| ------------------- | ---------------- | ----------- |
-| `operator`          | writable         |             |
-| `delegate`          | signer           |             |
-| `rewarder`          | writable         |             |
-| `quarryMineProgram` | readonly         |             |
-| `quarry`            | writable         |             |
-| `tokenMint`         | readonly         |             |
-| `payer`             | signer, writable |             |
-| `systemProgram`     | readonly         |             |
+| Account                                       | Type             | Description |
+| --------------------------------------------- | ---------------- | ----------- |
+| `createQuarryV2WithDelegateOperator`          | writable         |             |
+| `createQuarryV2WithDelegateDelegate`          | signer           |             |
+| `createQuarryV2WithDelegateRewarder`          | writable         |             |
+| `createQuarryV2WithDelegateQuarryMineProgram` | readonly         |             |
+| `quarry`                                      | writable         |             |
+| `tokenMint`                                   | readonly         |             |
+| `payer`                                       | signer, writable |             |
+| `systemProgram`                               | readonly         |             |
 
 **Arguments:**
 
@@ -217,13 +217,13 @@
 
 **Accounts:**
 
-| Account             | Type     | Description |
-| ------------------- | -------- | ----------- |
-| `operator`          | writable |             |
-| `delegate`          | signer   |             |
-| `rewarder`          | writable |             |
-| `quarryMineProgram` | readonly |             |
-| `quarry`            | writable |             |
+| Account                                        | Type     | Description |
+| ---------------------------------------------- | -------- | ----------- |
+| `setRewardsShareWithDelegateOperator`          | writable |             |
+| `setRewardsShareWithDelegateDelegate`          | signer   |             |
+| `setRewardsShareWithDelegateRewarder`          | writable |             |
+| `setRewardsShareWithDelegateQuarryMineProgram` | readonly |             |
+| `quarry`                                       | writable |             |
 
 **Arguments:**
 
@@ -236,13 +236,13 @@
 
 **Accounts:**
 
-| Account             | Type     | Description |
-| ------------------- | -------- | ----------- |
-| `operator`          | writable |             |
-| `delegate`          | signer   |             |
-| `rewarder`          | writable |             |
-| `quarryMineProgram` | readonly |             |
-| `quarry`            | writable |             |
+| Account                                  | Type     | Description |
+| ---------------------------------------- | -------- | ----------- |
+| `setFamineWithDelegateOperator`          | writable |             |
+| `setFamineWithDelegateDelegate`          | signer   |             |
+| `setFamineWithDelegateRewarder`          | writable |             |
+| `setFamineWithDelegateQuarryMineProgram` | readonly |             |
+| `quarry`                                 | writable |             |
 
 **Arguments:**
 
@@ -264,6 +264,6 @@
 
 ## Errors
 
-- **unauthorized** (Code: 6000 / `6000` / `0x1770`) -- Signer is not authorized to perform this action.
-- **pendingAuthorityNotSet** (Code: 6001 / `6001` / `0x1771`) -- Pending authority must be set to the created operator.
-- **operatorNotRewarderAuthority** (Code: 6002 / `6002` / `0x1772`) -- Operator is not the Rewarder authority.
+- **6000 - Unauthorized**: Signer is not authorized to perform this action. _(Hex: `0x1770`)_
+- **6001 - PendingAuthorityNotSet**: Pending authority must be set to the created operator. _(Hex: `0x1771`)_
+- **6002 - OperatorNotRewarderAuthority**: Operator is not the Rewarder authority. _(Hex: `0x1772`)_

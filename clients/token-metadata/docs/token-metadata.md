@@ -23,118 +23,118 @@
   - [reservationListV1](#reservationListV1)
   - [useAuthorityRecord](#useAuthorityRecord)
 - [Instructions](#instructions)
-  - [createMetadataAccount](#createMetadataAccount-1)
-  - [updateMetadataAccount](#updateMetadataAccount-1)
-  - [deprecatedCreateMasterEdition](#deprecatedCreateMasterEdition-1)
-  - [deprecatedMintNewEditionFromMasterEditionViaPrintingToken](#deprecatedMintNewEditionFromMasterEditionViaPrintingToken-1)
-  - [updatePrimarySaleHappenedViaToken](#updatePrimarySaleHappenedViaToken-1)
-  - [deprecatedSetReservationList](#deprecatedSetReservationList-1)
-  - [deprecatedCreateReservationList](#deprecatedCreateReservationList-1)
-  - [signMetadata](#signMetadata-1)
-  - [deprecatedMintPrintingTokensViaToken](#deprecatedMintPrintingTokensViaToken-1)
-  - [deprecatedMintPrintingTokens](#deprecatedMintPrintingTokens-1)
-  - [createMasterEdition](#createMasterEdition-1)
-  - [mintNewEditionFromMasterEditionViaToken](#mintNewEditionFromMasterEditionViaToken-1)
-  - [convertMasterEditionV1ToV2](#convertMasterEditionV1ToV2-1)
-  - [mintNewEditionFromMasterEditionViaVaultProxy](#mintNewEditionFromMasterEditionViaVaultProxy-1)
-  - [puffMetadata](#puffMetadata-1)
-  - [updateMetadataAccountV2](#updateMetadataAccountV2-1)
-  - [createMetadataAccountV2](#createMetadataAccountV2-1)
-  - [createMasterEditionV3](#createMasterEditionV3-1)
-  - [verifyCollection](#verifyCollection-1)
-  - [utilize](#utilize-1)
-  - [approveUseAuthority](#approveUseAuthority-1)
-  - [revokeUseAuthority](#revokeUseAuthority-1)
-  - [unverifyCollection](#unverifyCollection-1)
-  - [approveCollectionAuthority](#approveCollectionAuthority-1)
-  - [revokeCollectionAuthority](#revokeCollectionAuthority-1)
-  - [setAndVerifyCollection](#setAndVerifyCollection-1)
-  - [freezeDelegatedAccount](#freezeDelegatedAccount-1)
-  - [thawDelegatedAccount](#thawDelegatedAccount-1)
-  - [removeCreatorVerification](#removeCreatorVerification-1)
-  - [burnNft](#burnNft-1)
-  - [verifySizedCollectionItem](#verifySizedCollectionItem-1)
-  - [unverifySizedCollectionItem](#unverifySizedCollectionItem-1)
-  - [setAndVerifySizedCollectionItem](#setAndVerifySizedCollectionItem-1)
-  - [createMetadataAccountV3](#createMetadataAccountV3-1)
-  - [setCollectionSize](#setCollectionSize-1)
-  - [setTokenStandard](#setTokenStandard-1)
-  - [bubblegumSetCollectionSize](#bubblegumSetCollectionSize-1)
-  - [burnEditionNft](#burnEditionNft-1)
-  - [createEscrowAccount](#createEscrowAccount-1)
-  - [closeEscrowAccount](#closeEscrowAccount-1)
-  - [transferOutOfEscrow](#transferOutOfEscrow-1)
-  - [burn](#burn-1)
-  - [create](#create-1)
-  - [mint](#mint-1)
-  - [delegate](#delegate-1)
-  - [revoke](#revoke-1)
-  - [lock](#lock-1)
-  - [unlock](#unlock-1)
-  - [migrate](#migrate-1)
-  - [transfer](#transfer-1)
-  - [update](#update-1)
-  - [use](#use-1)
-  - [verify](#verify-1)
-  - [unverify](#unverify-1)
-  - [collect](#collect-1)
-  - [print](#print-1)
-  - [resize](#resize-1)
-  - [closeAccounts](#closeAccounts-1)
+  - [createMetadataAccount](#createMetadataAccount)
+  - [updateMetadataAccount](#updateMetadataAccount)
+  - [deprecatedCreateMasterEdition](#deprecatedCreateMasterEdition)
+  - [deprecatedMintNewEditionFromMasterEditionViaPrintingToken](#deprecatedMintNewEditionFromMasterEditionViaPrintingToken)
+  - [updatePrimarySaleHappenedViaToken](#updatePrimarySaleHappenedViaToken)
+  - [deprecatedSetReservationList](#deprecatedSetReservationList)
+  - [deprecatedCreateReservationList](#deprecatedCreateReservationList)
+  - [signMetadata](#signMetadata)
+  - [deprecatedMintPrintingTokensViaToken](#deprecatedMintPrintingTokensViaToken)
+  - [deprecatedMintPrintingTokens](#deprecatedMintPrintingTokens)
+  - [createMasterEdition](#createMasterEdition)
+  - [mintNewEditionFromMasterEditionViaToken](#mintNewEditionFromMasterEditionViaToken)
+  - [convertMasterEditionV1ToV2](#convertMasterEditionV1ToV2)
+  - [mintNewEditionFromMasterEditionViaVaultProxy](#mintNewEditionFromMasterEditionViaVaultProxy)
+  - [puffMetadata](#puffMetadata)
+  - [updateMetadataAccountV2](#updateMetadataAccountV2)
+  - [createMetadataAccountV2](#createMetadataAccountV2)
+  - [createMasterEditionV3](#createMasterEditionV3)
+  - [verifyCollection](#verifyCollection)
+  - [utilize](#utilize)
+  - [approveUseAuthority](#approveUseAuthority)
+  - [revokeUseAuthority](#revokeUseAuthority)
+  - [unverifyCollection](#unverifyCollection)
+  - [approveCollectionAuthority](#approveCollectionAuthority)
+  - [revokeCollectionAuthority](#revokeCollectionAuthority)
+  - [setAndVerifyCollection](#setAndVerifyCollection)
+  - [freezeDelegatedAccount](#freezeDelegatedAccount)
+  - [thawDelegatedAccount](#thawDelegatedAccount)
+  - [removeCreatorVerification](#removeCreatorVerification)
+  - [burnNft](#burnNft)
+  - [verifySizedCollectionItem](#verifySizedCollectionItem)
+  - [unverifySizedCollectionItem](#unverifySizedCollectionItem)
+  - [setAndVerifySizedCollectionItem](#setAndVerifySizedCollectionItem)
+  - [createMetadataAccountV3](#createMetadataAccountV3)
+  - [setCollectionSize](#setCollectionSize)
+  - [setTokenStandard](#setTokenStandard)
+  - [bubblegumSetCollectionSize](#bubblegumSetCollectionSize)
+  - [burnEditionNft](#burnEditionNft)
+  - [createEscrowAccount](#createEscrowAccount)
+  - [closeEscrowAccount](#closeEscrowAccount)
+  - [transferOutOfEscrow](#transferOutOfEscrow)
+  - [burn](#burn)
+  - [create](#create)
+  - [mint](#mint)
+  - [delegate](#delegate)
+  - [revoke](#revoke)
+  - [lock](#lock)
+  - [unlock](#unlock)
+  - [migrate](#migrate)
+  - [transfer](#transfer)
+  - [update](#update)
+  - [use](#use)
+  - [verify](#verify)
+  - [unverify](#unverify)
+  - [collect](#collect)
+  - [print](#print)
+  - [resize](#resize)
+  - [closeAccounts](#closeAccounts)
 - [PDAs](#pdas)
-  - [metadata](#metadata-2)
+  - [metadata](#metadata)
 - [Types](#types)
-  - [setCollectionSizeArgs](#setCollectionSizeArgs-3)
-  - [createMasterEditionArgs](#createMasterEditionArgs-3)
-  - [mintNewEditionFromMasterEditionViaTokenArgs](#mintNewEditionFromMasterEditionViaTokenArgs-3)
-  - [transferOutOfEscrowArgs](#transferOutOfEscrowArgs-3)
-  - [createMetadataAccountArgsV3](#createMetadataAccountArgsV3-3)
-  - [updateMetadataAccountArgsV2](#updateMetadataAccountArgsV2-3)
-  - [approveUseAuthorityArgs](#approveUseAuthorityArgs-3)
-  - [utilizeArgs](#utilizeArgs-3)
-  - [authorizationData](#authorizationData-3)
-  - [assetData](#assetData-3)
-  - [collection](#collection-3)
-  - [creator](#creator-3)
-  - [data](#data-3)
-  - [dataV2](#dataV2-3)
-  - [reservation](#reservation-3)
-  - [reservationV1](#reservationV1-3)
-  - [seedsVec](#seedsVec-3)
-  - [proofInfo](#proofInfo-3)
-  - [payload](#payload-3)
-  - [uses](#uses-3)
-  - [burnArgs](#burnArgs-3)
-  - [delegateArgs](#delegateArgs-3)
-  - [revokeArgs](#revokeArgs-3)
-  - [metadataDelegateRole](#metadataDelegateRole-3)
-  - [holderDelegateRole](#holderDelegateRole-3)
-  - [createArgs](#createArgs-3)
-  - [mintArgs](#mintArgs-3)
-  - [transferArgs](#transferArgs-3)
-  - [updateArgs](#updateArgs-3)
-  - [collectionToggle](#collectionToggle-3)
-  - [usesToggle](#usesToggle-3)
-  - [collectionDetailsToggle](#collectionDetailsToggle-3)
-  - [ruleSetToggle](#ruleSetToggle-3)
-  - [printArgs](#printArgs-3)
-  - [lockArgs](#lockArgs-3)
-  - [unlockArgs](#unlockArgs-3)
-  - [useArgs](#useArgs-3)
-  - [verificationArgs](#verificationArgs-3)
-  - [tokenStandard](#tokenStandard-3)
-  - [key](#key-3)
-  - [collectionDetails](#collectionDetails-3)
-  - [escrowAuthority](#escrowAuthority-3)
-  - [printSupply](#printSupply-3)
-  - [programmableConfig](#programmableConfig-3)
-  - [migrationType](#migrationType-3)
-  - [tokenState](#tokenState-3)
-  - [tokenDelegateRole](#tokenDelegateRole-3)
-  - [authorityType](#authorityType-3)
-  - [payloadKey](#payloadKey-3)
-  - [payloadType](#payloadType-3)
-  - [useMethod](#useMethod-3)
+  - [setCollectionSizeArgs](#setCollectionSizeArgs)
+  - [createMasterEditionArgs](#createMasterEditionArgs)
+  - [mintNewEditionFromMasterEditionViaTokenArgs](#mintNewEditionFromMasterEditionViaTokenArgs)
+  - [transferOutOfEscrowArgs](#transferOutOfEscrowArgs)
+  - [createMetadataAccountArgsV3](#createMetadataAccountArgsV3)
+  - [updateMetadataAccountArgsV2](#updateMetadataAccountArgsV2)
+  - [approveUseAuthorityArgs](#approveUseAuthorityArgs)
+  - [utilizeArgs](#utilizeArgs)
+  - [authorizationData](#authorizationData)
+  - [assetData](#assetData)
+  - [collection](#collection)
+  - [creator](#creator)
+  - [data](#data)
+  - [dataV2](#dataV2)
+  - [reservation](#reservation)
+  - [reservationV1](#reservationV1)
+  - [seedsVec](#seedsVec)
+  - [proofInfo](#proofInfo)
+  - [payload](#payload)
+  - [uses](#uses)
+  - [burnArgs](#burnArgs)
+  - [delegateArgs](#delegateArgs)
+  - [revokeArgs](#revokeArgs)
+  - [metadataDelegateRole](#metadataDelegateRole)
+  - [holderDelegateRole](#holderDelegateRole)
+  - [createArgs](#createArgs)
+  - [mintArgs](#mintArgs)
+  - [transferArgs](#transferArgs)
+  - [updateArgs](#updateArgs)
+  - [collectionToggle](#collectionToggle)
+  - [usesToggle](#usesToggle)
+  - [collectionDetailsToggle](#collectionDetailsToggle)
+  - [ruleSetToggle](#ruleSetToggle)
+  - [printArgs](#printArgs)
+  - [lockArgs](#lockArgs)
+  - [unlockArgs](#unlockArgs)
+  - [useArgs](#useArgs)
+  - [verificationArgs](#verificationArgs)
+  - [tokenStandard](#tokenStandard)
+  - [key](#key)
+  - [collectionDetails](#collectionDetails)
+  - [escrowAuthority](#escrowAuthority)
+  - [printSupply](#printSupply)
+  - [programmableConfig](#programmableConfig)
+  - [migrationType](#migrationType)
+  - [tokenState](#tokenState)
+  - [tokenDelegateRole](#tokenDelegateRole)
+  - [authorityType](#authorityType)
+  - [payloadKey](#payloadKey)
+  - [payloadType](#payloadType)
+  - [useMethod](#useMethod)
 - [Errors](#errors)
 
 ## Accounts
@@ -2173,206 +2173,206 @@
 
 ## Errors
 
-- **instructionUnpackError** (Code: 0 / `000` / `0x0`) --
-- **instructionPackError** (Code: 1 / `001` / `0x1`) --
-- **notRentExempt** (Code: 2 / `002` / `0x2`) -- Lamport balance below rent-exempt threshold
-- **alreadyInitialized** (Code: 3 / `003` / `0x3`) -- Already initialized
-- **uninitialized** (Code: 4 / `004` / `0x4`) -- Uninitialized
-- **invalidMetadataKey** (Code: 5 / `005` / `0x5`) -- Metadata's key must match seed of ['metadata', program id, mint] provided
-- **invalidEditionKey** (Code: 6 / `006` / `0x6`) -- Edition's key must match seed of ['metadata', program id, name, 'edition'] provided
-- **updateAuthorityIncorrect** (Code: 7 / `007` / `0x7`) -- Update Authority given does not match
-- **updateAuthorityIsNotSigner** (Code: 8 / `008` / `0x8`) -- Update Authority needs to be signer to update metadata
-- **notMintAuthority** (Code: 9 / `009` / `0x9`) -- You must be the mint authority and signer on this transaction
-- **invalidMintAuthority** (Code: 10 / `010` / `0xa`) -- Mint authority provided does not match the authority on the mint
-- **nameTooLong** (Code: 11 / `011` / `0xb`) -- Name too long
-- **symbolTooLong** (Code: 12 / `012` / `0xc`) -- Symbol too long
-- **uriTooLong** (Code: 13 / `013` / `0xd`) -- URI too long
-- **updateAuthorityMustBeEqualToMetadataAuthorityAndSigner** (Code: 14 / `014` / `0xe`) --
-- **mintMismatch** (Code: 15 / `015` / `0xf`) -- Mint given does not match mint on Metadata
-- **editionsMustHaveExactlyOneToken** (Code: 16 / `016` / `0x10`) -- Editions must have exactly one token
-- **maxEditionsMintedAlready** (Code: 17 / `017` / `0x11`) --
-- **tokenMintToFailed** (Code: 18 / `018` / `0x12`) --
-- **masterRecordMismatch** (Code: 19 / `019` / `0x13`) --
-- **destinationMintMismatch** (Code: 20 / `020` / `0x14`) --
-- **editionAlreadyMinted** (Code: 21 / `021` / `0x15`) --
-- **printingMintDecimalsShouldBeZero** (Code: 22 / `022` / `0x16`) --
-- **oneTimePrintingAuthorizationMintDecimalsShouldBeZero** (Code: 23 / `023` / `0x17`) --
-- **editionMintDecimalsShouldBeZero** (Code: 24 / `024` / `0x18`) -- EditionMintDecimalsShouldBeZero
-- **tokenBurnFailed** (Code: 25 / `025` / `0x19`) --
-- **tokenAccountOneTimeAuthMintMismatch** (Code: 26 / `026` / `0x1a`) --
-- **derivedKeyInvalid** (Code: 27 / `027` / `0x1b`) -- Derived key invalid
-- **printingMintMismatch** (Code: 28 / `028` / `0x1c`) -- The Printing mint does not match that on the master edition!
-- **oneTimePrintingAuthMintMismatch** (Code: 29 / `029` / `0x1d`) -- The One Time Printing Auth mint does not match that on the master edition!
-- **tokenAccountMintMismatch** (Code: 30 / `030` / `0x1e`) -- The mint of the token account does not match the Printing mint!
-- **tokenAccountMintMismatchV2** (Code: 31 / `031` / `0x1f`) -- The mint of the token account does not match the master metadata mint!
-- **notEnoughTokens** (Code: 32 / `032` / `0x20`) -- Not enough tokens to mint a limited edition
-- **printingMintAuthorizationAccountMismatch** (Code: 33 / `033` / `0x21`) --
-- **authorizationTokenAccountOwnerMismatch** (Code: 34 / `034` / `0x22`) --
-- **disabled** (Code: 35 / `035` / `0x23`) --
-- **creatorsTooLong** (Code: 36 / `036` / `0x24`) -- Creators list too long
-- **creatorsMustBeAtleastOne** (Code: 37 / `037` / `0x25`) -- Creators must be at least one if set
-- **mustBeOneOfCreators** (Code: 38 / `038` / `0x26`) --
-- **noCreatorsPresentOnMetadata** (Code: 39 / `039` / `0x27`) -- This metadata does not have creators
-- **creatorNotFound** (Code: 40 / `040` / `0x28`) -- This creator address was not found
-- **invalidBasisPoints** (Code: 41 / `041` / `0x29`) -- Basis points cannot be more than 10000
-- **primarySaleCanOnlyBeFlippedToTrue** (Code: 42 / `042` / `0x2a`) -- Primary sale can only be flipped to true and is immutable
-- **ownerMismatch** (Code: 43 / `043` / `0x2b`) -- Owner does not match that on the account given
-- **noBalanceInAccountForAuthorization** (Code: 44 / `044` / `0x2c`) -- This account has no tokens to be used for authorization
-- **shareTotalMustBe100** (Code: 45 / `045` / `0x2d`) -- Share total must equal 100 for creator array
-- **reservationExists** (Code: 46 / `046` / `0x2e`) --
-- **reservationDoesNotExist** (Code: 47 / `047` / `0x2f`) --
-- **reservationNotSet** (Code: 48 / `048` / `0x30`) --
-- **reservationAlreadyMade** (Code: 49 / `049` / `0x31`) --
-- **beyondMaxAddressSize** (Code: 50 / `050` / `0x32`) --
-- **numericalOverflowError** (Code: 51 / `051` / `0x33`) -- NumericalOverflowError
-- **reservationBreachesMaximumSupply** (Code: 52 / `052` / `0x34`) --
-- **addressNotInReservation** (Code: 53 / `053` / `0x35`) --
-- **cannotVerifyAnotherCreator** (Code: 54 / `054` / `0x36`) -- You cannot unilaterally verify another creator, they must sign
-- **cannotUnverifyAnotherCreator** (Code: 55 / `055` / `0x37`) -- You cannot unilaterally unverify another creator
-- **spotMismatch** (Code: 56 / `056` / `0x38`) --
-- **incorrectOwner** (Code: 57 / `057` / `0x39`) -- Incorrect account owner
-- **printingWouldBreachMaximumSupply** (Code: 58 / `058` / `0x3a`) --
-- **dataIsImmutable** (Code: 59 / `059` / `0x3b`) -- Data is immutable
-- **duplicateCreatorAddress** (Code: 60 / `060` / `0x3c`) -- No duplicate creator addresses
-- **reservationSpotsRemainingShouldMatchTotalSpotsAtStart** (Code: 61 / `061` / `0x3d`) --
-- **invalidTokenProgram** (Code: 62 / `062` / `0x3e`) -- Invalid token program
-- **dataTypeMismatch** (Code: 63 / `063` / `0x3f`) -- Data type mismatch
-- **beyondAlottedAddressSize** (Code: 64 / `064` / `0x40`) --
-- **reservationNotComplete** (Code: 65 / `065` / `0x41`) --
-- **triedToReplaceAnExistingReservation** (Code: 66 / `066` / `0x42`) --
-- **invalidOperation** (Code: 67 / `067` / `0x43`) -- Invalid operation
-- **invalidOwner** (Code: 68 / `068` / `0x44`) -- Invalid Owner
-- **printingMintSupplyMustBeZeroForConversion** (Code: 69 / `069` / `0x45`) -- Printing mint supply must be zero for conversion
-- **oneTimeAuthMintSupplyMustBeZeroForConversion** (Code: 70 / `070` / `0x46`) -- One Time Auth mint supply must be zero for conversion
-- **invalidEditionIndex** (Code: 71 / `071` / `0x47`) -- You tried to insert one edition too many into an edition mark pda
-- **reservationArrayShouldBeSizeOne** (Code: 72 / `072` / `0x48`) --
-- **isMutableCanOnlyBeFlippedToFalse** (Code: 73 / `073` / `0x49`) -- Is Mutable can only be flipped to false
-- **collectionCannotBeVerifiedInThisInstruction** (Code: 74 / `074` / `0x4a`) -- Collection cannot be verified in this instruction
-- **removed** (Code: 75 / `075` / `0x4b`) -- This instruction was deprecated in a previous release and is now removed
-- **mustBeBurned** (Code: 76 / `076` / `0x4c`) --
-- **invalidUseMethod** (Code: 77 / `077` / `0x4d`) -- This use method is invalid
-- **cannotChangeUseMethodAfterFirstUse** (Code: 78 / `078` / `0x4e`) -- Cannot Change Use Method after the first use
-- **cannotChangeUsesAfterFirstUse** (Code: 79 / `079` / `0x4f`) -- Cannot Change Remaining or Available uses after the first use
-- **collectionNotFound** (Code: 80 / `080` / `0x50`) -- Collection Not Found on Metadata
-- **invalidCollectionUpdateAuthority** (Code: 81 / `081` / `0x51`) -- Collection Update Authority is invalid
-- **collectionMustBeAUniqueMasterEdition** (Code: 82 / `082` / `0x52`) -- Collection Must Be a Unique Master Edition v2
-- **useAuthorityRecordAlreadyExists** (Code: 83 / `083` / `0x53`) -- The Use Authority Record Already Exists, to modify it Revoke, then Approve
-- **useAuthorityRecordAlreadyRevoked** (Code: 84 / `084` / `0x54`) -- The Use Authority Record is empty or already revoked
-- **unusable** (Code: 85 / `085` / `0x55`) -- This token has no uses
-- **notEnoughUses** (Code: 86 / `086` / `0x56`) -- There are not enough Uses left on this token.
-- **collectionAuthorityRecordAlreadyExists** (Code: 87 / `087` / `0x57`) -- This Collection Authority Record Already Exists.
-- **collectionAuthorityDoesNotExist** (Code: 88 / `088` / `0x58`) -- This Collection Authority Record Does Not Exist.
-- **invalidUseAuthorityRecord** (Code: 89 / `089` / `0x59`) -- This Use Authority Record is invalid.
-- **invalidCollectionAuthorityRecord** (Code: 90 / `090` / `0x5a`) --
-- **invalidFreezeAuthority** (Code: 91 / `091` / `0x5b`) -- Metadata does not match the freeze authority on the mint
-- **invalidDelegate** (Code: 92 / `092` / `0x5c`) -- All tokens in this account have not been delegated to this user.
-- **cannotAdjustVerifiedCreator** (Code: 93 / `093` / `0x5d`) --
-- **cannotRemoveVerifiedCreator** (Code: 94 / `094` / `0x5e`) -- Verified creators cannot be removed.
-- **cannotWipeVerifiedCreators** (Code: 95 / `095` / `0x5f`) --
-- **notAllowedToChangeSellerFeeBasisPoints** (Code: 96 / `096` / `0x60`) --
-- **editionOverrideCannotBeZero** (Code: 97 / `097` / `0x61`) -- Edition override cannot be zero
-- **invalidUser** (Code: 98 / `098` / `0x62`) -- Invalid User
-- **revokeCollectionAuthoritySignerIncorrect** (Code: 99 / `099` / `0x63`) -- Revoke Collection Authority signer is incorrect
-- **tokenCloseFailed** (Code: 100 / `100` / `0x64`) --
-- **unsizedCollection** (Code: 101 / `101` / `0x65`) -- Can't use this function on unsized collection
-- **sizedCollection** (Code: 102 / `102` / `0x66`) -- Can't use this function on a sized collection
-- **missingCollectionMetadata** (Code: 103 / `103` / `0x67`) -- Missing collection metadata account
-- **notAMemberOfCollection** (Code: 104 / `104` / `0x68`) -- This NFT is not a member of the specified collection.
-- **notVerifiedMemberOfCollection** (Code: 105 / `105` / `0x69`) -- This NFT is not a verified member of the specified collection.
-- **notACollectionParent** (Code: 106 / `106` / `0x6a`) -- This NFT is not a collection parent NFT.
-- **couldNotDetermineTokenStandard** (Code: 107 / `107` / `0x6b`) -- Could not determine a TokenStandard type.
-- **missingEditionAccount** (Code: 108 / `108` / `0x6c`) -- This mint account has an edition but none was provided.
-- **notAMasterEdition** (Code: 109 / `109` / `0x6d`) -- This edition is not a Master Edition
-- **masterEditionHasPrints** (Code: 110 / `110` / `0x6e`) -- This Master Edition has existing prints
-- **borshDeserializationError** (Code: 111 / `111` / `0x6f`) --
-- **cannotUpdateVerifiedCollection** (Code: 112 / `112` / `0x70`) -- Cannot update a verified collection in this command
-- **collectionMasterEditionAccountInvalid** (Code: 113 / `113` / `0x71`) -- Edition account doesnt match collection
-- **alreadyVerified** (Code: 114 / `114` / `0x72`) -- Item is already verified.
-- **alreadyUnverified** (Code: 115 / `115` / `0x73`) --
-- **notAPrintEdition** (Code: 116 / `116` / `0x74`) -- This edition is not a Print Edition
-- **invalidMasterEdition** (Code: 117 / `117` / `0x75`) -- Invalid Master Edition
-- **invalidPrintEdition** (Code: 118 / `118` / `0x76`) -- Invalid Print Edition
-- **invalidEditionMarker** (Code: 119 / `119` / `0x77`) -- Invalid Edition Marker
-- **reservationListDeprecated** (Code: 120 / `120` / `0x78`) -- Reservation List is Deprecated
-- **printEditionDoesNotMatchMasterEdition** (Code: 121 / `121` / `0x79`) -- Print Edition does not match Master Edition
-- **editionNumberGreaterThanMaxSupply** (Code: 122 / `122` / `0x7a`) -- Edition Number greater than max supply
-- **mustUnverify** (Code: 123 / `123` / `0x7b`) -- Must unverify before migrating collections.
-- **invalidEscrowBumpSeed** (Code: 124 / `124` / `0x7c`) -- Invalid Escrow Account Bump Seed
-- **mustBeEscrowAuthority** (Code: 125 / `125` / `0x7d`) -- Must Escrow Authority
-- **invalidSystemProgram** (Code: 126 / `126` / `0x7e`) -- Invalid System Program
-- **mustBeNonFungible** (Code: 127 / `127` / `0x7f`) -- Must be a Non Fungible Token
-- **insufficientTokens** (Code: 128 / `128` / `0x80`) -- Insufficient tokens for transfer
-- **borshSerializationError** (Code: 129 / `129` / `0x81`) -- Borsh Serialization Error
-- **noFreezeAuthoritySet** (Code: 130 / `130` / `0x82`) -- Cannot create NFT with no Freeze Authority.
-- **invalidCollectionSizeChange** (Code: 131 / `131` / `0x83`) -- Invalid collection size change
-- **invalidBubblegumSigner** (Code: 132 / `132` / `0x84`) -- Invalid bubblegum signer
-- **escrowParentHasDelegate** (Code: 133 / `133` / `0x85`) -- Escrow parent cannot have a delegate
-- **mintIsNotSigner** (Code: 134 / `134` / `0x86`) -- Mint needs to be signer to initialize the account
-- **invalidTokenStandard** (Code: 135 / `135` / `0x87`) -- Invalid token standard
-- **invalidMintForTokenStandard** (Code: 136 / `136` / `0x88`) -- Invalid mint account for specified token standard
-- **invalidAuthorizationRules** (Code: 137 / `137` / `0x89`) -- Invalid authorization rules account
-- **missingAuthorizationRules** (Code: 138 / `138` / `0x8a`) -- Missing authorization rules account
-- **missingProgrammableConfig** (Code: 139 / `139` / `0x8b`) -- Missing programmable configuration
-- **invalidProgrammableConfig** (Code: 140 / `140` / `0x8c`) -- Invalid programmable configuration
-- **delegateAlreadyExists** (Code: 141 / `141` / `0x8d`) -- Delegate already exists
-- **delegateNotFound** (Code: 142 / `142` / `0x8e`) -- Delegate not found
-- **missingAccountInBuilder** (Code: 143 / `143` / `0x8f`) -- Required account not set in instruction builder
-- **missingArgumentInBuilder** (Code: 144 / `144` / `0x90`) -- Required argument not set in instruction builder
-- **featureNotSupported** (Code: 145 / `145` / `0x91`) -- Feature not supported currently
-- **invalidSystemWallet** (Code: 146 / `146` / `0x92`) -- Invalid system wallet
-- **onlySaleDelegateCanTransfer** (Code: 147 / `147` / `0x93`) -- Only the sale delegate can transfer while its set
-- **missingTokenAccount** (Code: 148 / `148` / `0x94`) -- Missing token account
-- **missingSplTokenProgram** (Code: 149 / `149` / `0x95`) -- Missing SPL token program
-- **missingAuthorizationRulesProgram** (Code: 150 / `150` / `0x96`) -- Missing authorization rules program
-- **invalidDelegateRoleForTransfer** (Code: 151 / `151` / `0x97`) -- Invalid delegate role for transfer
-- **invalidTransferAuthority** (Code: 152 / `152` / `0x98`) -- Invalid transfer authority
-- **instructionNotSupported** (Code: 153 / `153` / `0x99`) -- Instruction not supported for ProgrammableNonFungible assets
-- **keyMismatch** (Code: 154 / `154` / `0x9a`) -- Public key does not match expected value
-- **lockedToken** (Code: 155 / `155` / `0x9b`) -- Token is locked
-- **unlockedToken** (Code: 156 / `156` / `0x9c`) -- Token is unlocked
-- **missingDelegateRole** (Code: 157 / `157` / `0x9d`) -- Missing delegate role
-- **invalidAuthorityType** (Code: 158 / `158` / `0x9e`) -- Invalid authority type
-- **missingTokenRecord** (Code: 159 / `159` / `0x9f`) -- Missing token record account
-- **mintSupplyMustBeZero** (Code: 160 / `160` / `0xa0`) -- Mint supply must be zero for programmable assets
-- **dataIsEmptyOrZeroed** (Code: 161 / `161` / `0xa1`) -- Data is empty or zeroed
-- **missingTokenOwnerAccount** (Code: 162 / `162` / `0xa2`) -- Missing token owner
-- **invalidMasterEditionAccountLength** (Code: 163 / `163` / `0xa3`) -- Master edition account has an invalid length
-- **incorrectTokenState** (Code: 164 / `164` / `0xa4`) -- Incorrect token state
-- **invalidDelegateRole** (Code: 165 / `165` / `0xa5`) -- Invalid delegate role
-- **missingPrintSupply** (Code: 166 / `166` / `0xa6`) -- Print supply is required for non-fungibles
-- **missingMasterEditionAccount** (Code: 167 / `167` / `0xa7`) -- Missing master edition account
-- **amountMustBeGreaterThanZero** (Code: 168 / `168` / `0xa8`) -- Amount must be greater than zero
-- **invalidDelegateArgs** (Code: 169 / `169` / `0xa9`) -- Invalid delegate args
-- **missingLockedTransferAddress** (Code: 170 / `170` / `0xaa`) -- Missing address for locked transfer
-- **invalidLockedTransferAddress** (Code: 171 / `171` / `0xab`) -- Invalid destination address for locked transfer
-- **dataIncrementLimitExceeded** (Code: 172 / `172` / `0xac`) -- Exceeded account realloc increase limit
-- **cannotUpdateAssetWithDelegate** (Code: 173 / `173` / `0xad`) -- Cannot update the rule set of a programmable asset that has a delegate
-- **invalidAmount** (Code: 174 / `174` / `0xae`) -- Invalid token amount for this operation or token standard
-- **missingMasterEditionMintAccount** (Code: 175 / `175` / `0xaf`) -- Missing master edition mint account
-- **missingMasterEditionTokenAccount** (Code: 176 / `176` / `0xb0`) -- Missing master edition token account
-- **missingEditionMarkerAccount** (Code: 177 / `177` / `0xb1`) -- Missing edition marker account
-- **cannotBurnWithDelegate** (Code: 178 / `178` / `0xb2`) -- Cannot burn while persistent delegate is set
-- **missingEdition** (Code: 179 / `179` / `0xb3`) -- Missing edition account
-- **invalidAssociatedTokenAccountProgram** (Code: 180 / `180` / `0xb4`) -- Invalid Associated Token Account Program
-- **invalidInstructionsSysvar** (Code: 181 / `181` / `0xb5`) -- Invalid InstructionsSysvar
-- **invalidParentAccounts** (Code: 182 / `182` / `0xb6`) -- Invalid or Unneeded parent accounts
-- **invalidUpdateArgs** (Code: 183 / `183` / `0xb7`) -- Authority cannot apply all update args
-- **insufficientTokenBalance** (Code: 184 / `184` / `0xb8`) -- Token account does not have enough tokens
-- **missingCollectionMint** (Code: 185 / `185` / `0xb9`) -- Missing collection account
-- **missingCollectionMasterEdition** (Code: 186 / `186` / `0xba`) -- Missing collection master edition account
-- **invalidTokenRecord** (Code: 187 / `187` / `0xbb`) -- Invalid token record account
-- **invalidCloseAuthority** (Code: 188 / `188` / `0xbc`) -- The close authority needs to be revoked by the Utility Delegate
-- **invalidInstruction** (Code: 189 / `189` / `0xbd`) -- Invalid or removed instruction
-- **missingDelegateRecord** (Code: 190 / `190` / `0xbe`) -- Missing delegate record
-- **invalidFeeAccount** (Code: 191 / `191` / `0xbf`) --
-- **invalidMetadataFlags** (Code: 192 / `192` / `0xc0`) --
-- **cannotChangeUpdateAuthorityWithDelegate** (Code: 193 / `193` / `0xc1`) -- Cannot change the update authority with a delegate
-- **invalidMintExtensionType** (Code: 194 / `194` / `0xc2`) -- Invalid mint extension type
-- **invalidMintCloseAuthority** (Code: 195 / `195` / `0xc3`) -- Invalid mint close authority
-- **invalidMetadataPointer** (Code: 196 / `196` / `0xc4`) -- Invalid metadata pointer
-- **invalidTokenExtensionType** (Code: 197 / `197` / `0xc5`) -- Invalid token extension type
-- **missingImmutableOwnerExtension** (Code: 198 / `198` / `0xc6`) -- Missing immutable owner extension
-- **expectedUninitializedAccount** (Code: 199 / `199` / `0xc7`) -- Expected account to be uninitialized
-- **invalidEditionAccountLength** (Code: 200 / `200` / `0xc8`) -- Edition account has an invalid length
-- **accountAlreadyResized** (Code: 201 / `201` / `0xc9`) -- Account has already been resized
-- **conditionsForClosingNotMet** (Code: 202 / `202` / `0xca`) -- Conditions for closing not met
+- **0 - InstructionUnpackError**: _(Hex: `0x0`)_
+- **1 - InstructionPackError**: _(Hex: `0x1`)_
+- **2 - NotRentExempt**: Lamport balance below rent-exempt threshold _(Hex: `0x2`)_
+- **3 - AlreadyInitialized**: Already initialized _(Hex: `0x3`)_
+- **4 - Uninitialized**: Uninitialized _(Hex: `0x4`)_
+- **5 - InvalidMetadataKey**: Metadata's key must match seed of ['metadata', program id, mint] provided _(Hex: `0x5`)_
+- **6 - InvalidEditionKey**: Edition's key must match seed of ['metadata', program id, name, 'edition'] provided _(Hex: `0x6`)_
+- **7 - UpdateAuthorityIncorrect**: Update Authority given does not match _(Hex: `0x7`)_
+- **8 - UpdateAuthorityIsNotSigner**: Update Authority needs to be signer to update metadata _(Hex: `0x8`)_
+- **9 - NotMintAuthority**: You must be the mint authority and signer on this transaction _(Hex: `0x9`)_
+- **10 - InvalidMintAuthority**: Mint authority provided does not match the authority on the mint _(Hex: `0xa`)_
+- **11 - NameTooLong**: Name too long _(Hex: `0xb`)_
+- **12 - SymbolTooLong**: Symbol too long _(Hex: `0xc`)_
+- **13 - UriTooLong**: URI too long _(Hex: `0xd`)_
+- **14 - UpdateAuthorityMustBeEqualToMetadataAuthorityAndSigner**: _(Hex: `0xe`)_
+- **15 - MintMismatch**: Mint given does not match mint on Metadata _(Hex: `0xf`)_
+- **16 - EditionsMustHaveExactlyOneToken**: Editions must have exactly one token _(Hex: `0x10`)_
+- **17 - MaxEditionsMintedAlready**: _(Hex: `0x11`)_
+- **18 - TokenMintToFailed**: _(Hex: `0x12`)_
+- **19 - MasterRecordMismatch**: _(Hex: `0x13`)_
+- **20 - DestinationMintMismatch**: _(Hex: `0x14`)_
+- **21 - EditionAlreadyMinted**: _(Hex: `0x15`)_
+- **22 - PrintingMintDecimalsShouldBeZero**: _(Hex: `0x16`)_
+- **23 - OneTimePrintingAuthorizationMintDecimalsShouldBeZero**: _(Hex: `0x17`)_
+- **24 - EditionMintDecimalsShouldBeZero**: EditionMintDecimalsShouldBeZero _(Hex: `0x18`)_
+- **25 - TokenBurnFailed**: _(Hex: `0x19`)_
+- **26 - TokenAccountOneTimeAuthMintMismatch**: _(Hex: `0x1a`)_
+- **27 - DerivedKeyInvalid**: Derived key invalid _(Hex: `0x1b`)_
+- **28 - PrintingMintMismatch**: The Printing mint does not match that on the master edition! _(Hex: `0x1c`)_
+- **29 - OneTimePrintingAuthMintMismatch**: The One Time Printing Auth mint does not match that on the master edition! _(Hex: `0x1d`)_
+- **30 - TokenAccountMintMismatch**: The mint of the token account does not match the Printing mint! _(Hex: `0x1e`)_
+- **31 - TokenAccountMintMismatchV2**: The mint of the token account does not match the master metadata mint! _(Hex: `0x1f`)_
+- **32 - NotEnoughTokens**: Not enough tokens to mint a limited edition _(Hex: `0x20`)_
+- **33 - PrintingMintAuthorizationAccountMismatch**: _(Hex: `0x21`)_
+- **34 - AuthorizationTokenAccountOwnerMismatch**: _(Hex: `0x22`)_
+- **35 - Disabled**: _(Hex: `0x23`)_
+- **36 - CreatorsTooLong**: Creators list too long _(Hex: `0x24`)_
+- **37 - CreatorsMustBeAtleastOne**: Creators must be at least one if set _(Hex: `0x25`)_
+- **38 - MustBeOneOfCreators**: _(Hex: `0x26`)_
+- **39 - NoCreatorsPresentOnMetadata**: This metadata does not have creators _(Hex: `0x27`)_
+- **40 - CreatorNotFound**: This creator address was not found _(Hex: `0x28`)_
+- **41 - InvalidBasisPoints**: Basis points cannot be more than 10000 _(Hex: `0x29`)_
+- **42 - PrimarySaleCanOnlyBeFlippedToTrue**: Primary sale can only be flipped to true and is immutable _(Hex: `0x2a`)_
+- **43 - OwnerMismatch**: Owner does not match that on the account given _(Hex: `0x2b`)_
+- **44 - NoBalanceInAccountForAuthorization**: This account has no tokens to be used for authorization _(Hex: `0x2c`)_
+- **45 - ShareTotalMustBe100**: Share total must equal 100 for creator array _(Hex: `0x2d`)_
+- **46 - ReservationExists**: _(Hex: `0x2e`)_
+- **47 - ReservationDoesNotExist**: _(Hex: `0x2f`)_
+- **48 - ReservationNotSet**: _(Hex: `0x30`)_
+- **49 - ReservationAlreadyMade**: _(Hex: `0x31`)_
+- **50 - BeyondMaxAddressSize**: _(Hex: `0x32`)_
+- **51 - NumericalOverflowError**: NumericalOverflowError _(Hex: `0x33`)_
+- **52 - ReservationBreachesMaximumSupply**: _(Hex: `0x34`)_
+- **53 - AddressNotInReservation**: _(Hex: `0x35`)_
+- **54 - CannotVerifyAnotherCreator**: You cannot unilaterally verify another creator, they must sign _(Hex: `0x36`)_
+- **55 - CannotUnverifyAnotherCreator**: You cannot unilaterally unverify another creator _(Hex: `0x37`)_
+- **56 - SpotMismatch**: _(Hex: `0x38`)_
+- **57 - IncorrectOwner**: Incorrect account owner _(Hex: `0x39`)_
+- **58 - PrintingWouldBreachMaximumSupply**: _(Hex: `0x3a`)_
+- **59 - DataIsImmutable**: Data is immutable _(Hex: `0x3b`)_
+- **60 - DuplicateCreatorAddress**: No duplicate creator addresses _(Hex: `0x3c`)_
+- **61 - ReservationSpotsRemainingShouldMatchTotalSpotsAtStart**: _(Hex: `0x3d`)_
+- **62 - InvalidTokenProgram**: Invalid token program _(Hex: `0x3e`)_
+- **63 - DataTypeMismatch**: Data type mismatch _(Hex: `0x3f`)_
+- **64 - BeyondAlottedAddressSize**: _(Hex: `0x40`)_
+- **65 - ReservationNotComplete**: _(Hex: `0x41`)_
+- **66 - TriedToReplaceAnExistingReservation**: _(Hex: `0x42`)_
+- **67 - InvalidOperation**: Invalid operation _(Hex: `0x43`)_
+- **68 - InvalidOwner**: Invalid Owner _(Hex: `0x44`)_
+- **69 - PrintingMintSupplyMustBeZeroForConversion**: Printing mint supply must be zero for conversion _(Hex: `0x45`)_
+- **70 - OneTimeAuthMintSupplyMustBeZeroForConversion**: One Time Auth mint supply must be zero for conversion _(Hex: `0x46`)_
+- **71 - InvalidEditionIndex**: You tried to insert one edition too many into an edition mark pda _(Hex: `0x47`)_
+- **72 - ReservationArrayShouldBeSizeOne**: _(Hex: `0x48`)_
+- **73 - IsMutableCanOnlyBeFlippedToFalse**: Is Mutable can only be flipped to false _(Hex: `0x49`)_
+- **74 - CollectionCannotBeVerifiedInThisInstruction**: Collection cannot be verified in this instruction _(Hex: `0x4a`)_
+- **75 - Removed**: This instruction was deprecated in a previous release and is now removed _(Hex: `0x4b`)_
+- **76 - MustBeBurned**: _(Hex: `0x4c`)_
+- **77 - InvalidUseMethod**: This use method is invalid _(Hex: `0x4d`)_
+- **78 - CannotChangeUseMethodAfterFirstUse**: Cannot Change Use Method after the first use _(Hex: `0x4e`)_
+- **79 - CannotChangeUsesAfterFirstUse**: Cannot Change Remaining or Available uses after the first use _(Hex: `0x4f`)_
+- **80 - CollectionNotFound**: Collection Not Found on Metadata _(Hex: `0x50`)_
+- **81 - InvalidCollectionUpdateAuthority**: Collection Update Authority is invalid _(Hex: `0x51`)_
+- **82 - CollectionMustBeAUniqueMasterEdition**: Collection Must Be a Unique Master Edition v2 _(Hex: `0x52`)_
+- **83 - UseAuthorityRecordAlreadyExists**: The Use Authority Record Already Exists, to modify it Revoke, then Approve _(Hex: `0x53`)_
+- **84 - UseAuthorityRecordAlreadyRevoked**: The Use Authority Record is empty or already revoked _(Hex: `0x54`)_
+- **85 - Unusable**: This token has no uses _(Hex: `0x55`)_
+- **86 - NotEnoughUses**: There are not enough Uses left on this token. _(Hex: `0x56`)_
+- **87 - CollectionAuthorityRecordAlreadyExists**: This Collection Authority Record Already Exists. _(Hex: `0x57`)_
+- **88 - CollectionAuthorityDoesNotExist**: This Collection Authority Record Does Not Exist. _(Hex: `0x58`)_
+- **89 - InvalidUseAuthorityRecord**: This Use Authority Record is invalid. _(Hex: `0x59`)_
+- **90 - InvalidCollectionAuthorityRecord**: _(Hex: `0x5a`)_
+- **91 - InvalidFreezeAuthority**: Metadata does not match the freeze authority on the mint _(Hex: `0x5b`)_
+- **92 - InvalidDelegate**: All tokens in this account have not been delegated to this user. _(Hex: `0x5c`)_
+- **93 - CannotAdjustVerifiedCreator**: _(Hex: `0x5d`)_
+- **94 - CannotRemoveVerifiedCreator**: Verified creators cannot be removed. _(Hex: `0x5e`)_
+- **95 - CannotWipeVerifiedCreators**: _(Hex: `0x5f`)_
+- **96 - NotAllowedToChangeSellerFeeBasisPoints**: _(Hex: `0x60`)_
+- **97 - EditionOverrideCannotBeZero**: Edition override cannot be zero _(Hex: `0x61`)_
+- **98 - InvalidUser**: Invalid User _(Hex: `0x62`)_
+- **99 - RevokeCollectionAuthoritySignerIncorrect**: Revoke Collection Authority signer is incorrect _(Hex: `0x63`)_
+- **100 - TokenCloseFailed**: _(Hex: `0x64`)_
+- **101 - UnsizedCollection**: Can't use this function on unsized collection _(Hex: `0x65`)_
+- **102 - SizedCollection**: Can't use this function on a sized collection _(Hex: `0x66`)_
+- **103 - MissingCollectionMetadata**: Missing collection metadata account _(Hex: `0x67`)_
+- **104 - NotAMemberOfCollection**: This NFT is not a member of the specified collection. _(Hex: `0x68`)_
+- **105 - NotVerifiedMemberOfCollection**: This NFT is not a verified member of the specified collection. _(Hex: `0x69`)_
+- **106 - NotACollectionParent**: This NFT is not a collection parent NFT. _(Hex: `0x6a`)_
+- **107 - CouldNotDetermineTokenStandard**: Could not determine a TokenStandard type. _(Hex: `0x6b`)_
+- **108 - MissingEditionAccount**: This mint account has an edition but none was provided. _(Hex: `0x6c`)_
+- **109 - NotAMasterEdition**: This edition is not a Master Edition _(Hex: `0x6d`)_
+- **110 - MasterEditionHasPrints**: This Master Edition has existing prints _(Hex: `0x6e`)_
+- **111 - BorshDeserializationError**: _(Hex: `0x6f`)_
+- **112 - CannotUpdateVerifiedCollection**: Cannot update a verified collection in this command _(Hex: `0x70`)_
+- **113 - CollectionMasterEditionAccountInvalid**: Edition account doesnt match collection _(Hex: `0x71`)_
+- **114 - AlreadyVerified**: Item is already verified. _(Hex: `0x72`)_
+- **115 - AlreadyUnverified**: _(Hex: `0x73`)_
+- **116 - NotAPrintEdition**: This edition is not a Print Edition _(Hex: `0x74`)_
+- **117 - InvalidMasterEdition**: Invalid Master Edition _(Hex: `0x75`)_
+- **118 - InvalidPrintEdition**: Invalid Print Edition _(Hex: `0x76`)_
+- **119 - InvalidEditionMarker**: Invalid Edition Marker _(Hex: `0x77`)_
+- **120 - ReservationListDeprecated**: Reservation List is Deprecated _(Hex: `0x78`)_
+- **121 - PrintEditionDoesNotMatchMasterEdition**: Print Edition does not match Master Edition _(Hex: `0x79`)_
+- **122 - EditionNumberGreaterThanMaxSupply**: Edition Number greater than max supply _(Hex: `0x7a`)_
+- **123 - MustUnverify**: Must unverify before migrating collections. _(Hex: `0x7b`)_
+- **124 - InvalidEscrowBumpSeed**: Invalid Escrow Account Bump Seed _(Hex: `0x7c`)_
+- **125 - MustBeEscrowAuthority**: Must Escrow Authority _(Hex: `0x7d`)_
+- **126 - InvalidSystemProgram**: Invalid System Program _(Hex: `0x7e`)_
+- **127 - MustBeNonFungible**: Must be a Non Fungible Token _(Hex: `0x7f`)_
+- **128 - InsufficientTokens**: Insufficient tokens for transfer _(Hex: `0x80`)_
+- **129 - BorshSerializationError**: Borsh Serialization Error _(Hex: `0x81`)_
+- **130 - NoFreezeAuthoritySet**: Cannot create NFT with no Freeze Authority. _(Hex: `0x82`)_
+- **131 - InvalidCollectionSizeChange**: Invalid collection size change _(Hex: `0x83`)_
+- **132 - InvalidBubblegumSigner**: Invalid bubblegum signer _(Hex: `0x84`)_
+- **133 - EscrowParentHasDelegate**: Escrow parent cannot have a delegate _(Hex: `0x85`)_
+- **134 - MintIsNotSigner**: Mint needs to be signer to initialize the account _(Hex: `0x86`)_
+- **135 - InvalidTokenStandard**: Invalid token standard _(Hex: `0x87`)_
+- **136 - InvalidMintForTokenStandard**: Invalid mint account for specified token standard _(Hex: `0x88`)_
+- **137 - InvalidAuthorizationRules**: Invalid authorization rules account _(Hex: `0x89`)_
+- **138 - MissingAuthorizationRules**: Missing authorization rules account _(Hex: `0x8a`)_
+- **139 - MissingProgrammableConfig**: Missing programmable configuration _(Hex: `0x8b`)_
+- **140 - InvalidProgrammableConfig**: Invalid programmable configuration _(Hex: `0x8c`)_
+- **141 - DelegateAlreadyExists**: Delegate already exists _(Hex: `0x8d`)_
+- **142 - DelegateNotFound**: Delegate not found _(Hex: `0x8e`)_
+- **143 - MissingAccountInBuilder**: Required account not set in instruction builder _(Hex: `0x8f`)_
+- **144 - MissingArgumentInBuilder**: Required argument not set in instruction builder _(Hex: `0x90`)_
+- **145 - FeatureNotSupported**: Feature not supported currently _(Hex: `0x91`)_
+- **146 - InvalidSystemWallet**: Invalid system wallet _(Hex: `0x92`)_
+- **147 - OnlySaleDelegateCanTransfer**: Only the sale delegate can transfer while its set _(Hex: `0x93`)_
+- **148 - MissingTokenAccount**: Missing token account _(Hex: `0x94`)_
+- **149 - MissingSplTokenProgram**: Missing SPL token program _(Hex: `0x95`)_
+- **150 - MissingAuthorizationRulesProgram**: Missing authorization rules program _(Hex: `0x96`)_
+- **151 - InvalidDelegateRoleForTransfer**: Invalid delegate role for transfer _(Hex: `0x97`)_
+- **152 - InvalidTransferAuthority**: Invalid transfer authority _(Hex: `0x98`)_
+- **153 - InstructionNotSupported**: Instruction not supported for ProgrammableNonFungible assets _(Hex: `0x99`)_
+- **154 - KeyMismatch**: Public key does not match expected value _(Hex: `0x9a`)_
+- **155 - LockedToken**: Token is locked _(Hex: `0x9b`)_
+- **156 - UnlockedToken**: Token is unlocked _(Hex: `0x9c`)_
+- **157 - MissingDelegateRole**: Missing delegate role _(Hex: `0x9d`)_
+- **158 - InvalidAuthorityType**: Invalid authority type _(Hex: `0x9e`)_
+- **159 - MissingTokenRecord**: Missing token record account _(Hex: `0x9f`)_
+- **160 - MintSupplyMustBeZero**: Mint supply must be zero for programmable assets _(Hex: `0xa0`)_
+- **161 - DataIsEmptyOrZeroed**: Data is empty or zeroed _(Hex: `0xa1`)_
+- **162 - MissingTokenOwnerAccount**: Missing token owner _(Hex: `0xa2`)_
+- **163 - InvalidMasterEditionAccountLength**: Master edition account has an invalid length _(Hex: `0xa3`)_
+- **164 - IncorrectTokenState**: Incorrect token state _(Hex: `0xa4`)_
+- **165 - InvalidDelegateRole**: Invalid delegate role _(Hex: `0xa5`)_
+- **166 - MissingPrintSupply**: Print supply is required for non-fungibles _(Hex: `0xa6`)_
+- **167 - MissingMasterEditionAccount**: Missing master edition account _(Hex: `0xa7`)_
+- **168 - AmountMustBeGreaterThanZero**: Amount must be greater than zero _(Hex: `0xa8`)_
+- **169 - InvalidDelegateArgs**: Invalid delegate args _(Hex: `0xa9`)_
+- **170 - MissingLockedTransferAddress**: Missing address for locked transfer _(Hex: `0xaa`)_
+- **171 - InvalidLockedTransferAddress**: Invalid destination address for locked transfer _(Hex: `0xab`)_
+- **172 - DataIncrementLimitExceeded**: Exceeded account realloc increase limit _(Hex: `0xac`)_
+- **173 - CannotUpdateAssetWithDelegate**: Cannot update the rule set of a programmable asset that has a delegate _(Hex: `0xad`)_
+- **174 - InvalidAmount**: Invalid token amount for this operation or token standard _(Hex: `0xae`)_
+- **175 - MissingMasterEditionMintAccount**: Missing master edition mint account _(Hex: `0xaf`)_
+- **176 - MissingMasterEditionTokenAccount**: Missing master edition token account _(Hex: `0xb0`)_
+- **177 - MissingEditionMarkerAccount**: Missing edition marker account _(Hex: `0xb1`)_
+- **178 - CannotBurnWithDelegate**: Cannot burn while persistent delegate is set _(Hex: `0xb2`)_
+- **179 - MissingEdition**: Missing edition account _(Hex: `0xb3`)_
+- **180 - InvalidAssociatedTokenAccountProgram**: Invalid Associated Token Account Program _(Hex: `0xb4`)_
+- **181 - InvalidInstructionsSysvar**: Invalid InstructionsSysvar _(Hex: `0xb5`)_
+- **182 - InvalidParentAccounts**: Invalid or Unneeded parent accounts _(Hex: `0xb6`)_
+- **183 - InvalidUpdateArgs**: Authority cannot apply all update args _(Hex: `0xb7`)_
+- **184 - InsufficientTokenBalance**: Token account does not have enough tokens _(Hex: `0xb8`)_
+- **185 - MissingCollectionMint**: Missing collection account _(Hex: `0xb9`)_
+- **186 - MissingCollectionMasterEdition**: Missing collection master edition account _(Hex: `0xba`)_
+- **187 - InvalidTokenRecord**: Invalid token record account _(Hex: `0xbb`)_
+- **188 - InvalidCloseAuthority**: The close authority needs to be revoked by the Utility Delegate _(Hex: `0xbc`)_
+- **189 - InvalidInstruction**: Invalid or removed instruction _(Hex: `0xbd`)_
+- **190 - MissingDelegateRecord**: Missing delegate record _(Hex: `0xbe`)_
+- **191 - InvalidFeeAccount**: _(Hex: `0xbf`)_
+- **192 - InvalidMetadataFlags**: _(Hex: `0xc0`)_
+- **193 - CannotChangeUpdateAuthorityWithDelegate**: Cannot change the update authority with a delegate _(Hex: `0xc1`)_
+- **194 - InvalidMintExtensionType**: Invalid mint extension type _(Hex: `0xc2`)_
+- **195 - InvalidMintCloseAuthority**: Invalid mint close authority _(Hex: `0xc3`)_
+- **196 - InvalidMetadataPointer**: Invalid metadata pointer _(Hex: `0xc4`)_
+- **197 - InvalidTokenExtensionType**: Invalid token extension type _(Hex: `0xc5`)_
+- **198 - MissingImmutableOwnerExtension**: Missing immutable owner extension _(Hex: `0xc6`)_
+- **199 - ExpectedUninitializedAccount**: Expected account to be uninitialized _(Hex: `0xc7`)_
+- **200 - InvalidEditionAccountLength**: Edition account has an invalid length _(Hex: `0xc8`)_
+- **201 - AccountAlreadyResized**: Account has already been resized _(Hex: `0xc9`)_
+- **202 - ConditionsForClosingNotMet**: Conditions for closing not met _(Hex: `0xca`)_

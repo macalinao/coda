@@ -14,7 +14,8 @@
     "staking",
     "client",
     "esm",
-    "typescript"
+    "typescript",
+    "ian-macalinao"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

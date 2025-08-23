@@ -3,7 +3,16 @@
 [![npm version](https://img.shields.io/npm/v/@macalinao/codama-nodes-from-anchor-x.svg)](https://www.npmjs.com/package/@macalinao/codama-nodes-from-anchor-x)
 [![npm downloads](https://img.shields.io/npm/dm/@macalinao/codama-nodes-from-anchor-x.svg)](https://www.npmjs.com/package/@macalinao/codama-nodes-from-anchor-x)
 
-Create Codama root nodes from Anchor IDLs - supports both single and multiple IDL scenarios.
+An enhanced version of `@codama/nodes-from-anchor` with additional features for improved Anchor IDL parsing and transformation. This is the default parser used by the [Coda CLI](https://github.com/macalinao/coda) for generating TypeScript clients from Solana programs.
+
+## Features
+
+This package extends `@codama/nodes-from-anchor` with:
+
+- **Multi-IDL Support**: Parse and combine multiple Anchor IDLs into a single Codama root node
+- **Automatic Account Flattening**: Intelligently flattens nested account structures from Anchor IDLs for v0.1.0 format
+- **Program-Level Visitors**: Apply transformations at the program level for better composability
+- **Enhanced IDL Support**: Seamless handling of both v0.0.0 and v0.1.0 Anchor IDL formats
 
 ## Quick Start with Coda CLI
 
@@ -72,6 +81,15 @@ const codama = createFromRoot(root);
 codama.accept(myVisitor);
 ```
 
+### Program Node
+
+```typescript
+import { programNodeFromAnchor } from "@macalinao/codama-nodes-from-anchor-x";
+
+// Get just the program node (without root wrapper)
+const program = programNodeFromAnchor(idl);
+```
+
 ## API
 
 ### rootNodeFromAnchor
@@ -106,15 +124,46 @@ function rootNodeFromAnchorIdls(idls: AnchorIdl[]): RootNode;
 - Error if no IDL files are provided
 - Error if no program nodes could be created
 
-## Features
+### programNodeFromAnchor
 
-- Two functions for different use cases:
-  - `rootNodeFromAnchor` - Single IDL conversion
-  - `rootNodeFromAnchorIdls` - Multiple IDL conversion
-- Supports both Anchor IDL v0.0.0 and v0.1.0 formats
-- Automatically detects IDL version and uses appropriate parser
-- First IDL becomes the main program, others are additional programs
-- Converts snake_case names to camelCase for JavaScript/TypeScript
+Creates a Codama program node from a single Anchor IDL.
+
+```typescript
+function programNodeFromAnchor(idl: AnchorIdl): ProgramNode;
+```
+
+**Parameters:**
+- `idl`: An Anchor IDL object
+
+**Returns:**
+- A Codama program node (without root wrapper)
+
+## Key Improvements over @codama/nodes-from-anchor
+
+### Automatic Account Flattening
+
+Anchor IDL v0.1.0 often has nested account structures that need to be flattened for proper code generation. This package automatically handles this:
+
+```javascript
+// Anchor IDL with nested accounts:
+{
+  "name": "mint_accounts",
+  "accounts": [
+    { "name": "mint", "writable": true },
+    { "name": "metadata", "writable": true }
+  ]
+}
+
+// Automatically flattened to:
+[
+  { "name": "mintAccountsMint", "writable": true },
+  { "name": "mintAccountsMetadata", "writable": true }
+]
+```
+
+### Version Detection
+
+The package automatically detects the IDL version (v0.0.0 or v0.1.0) and applies the appropriate parsing logic, including the account flattening visitor for v0.1.0 IDLs.
 
 ## Use Cases
 
@@ -146,6 +195,10 @@ const idls = [
 const root = rootNodeFromAnchorIdls(idls);
 // Both versions available for migration tools
 ```
+
+## Integration with Coda
+
+This package is the default parser for [Coda](https://github.com/macalinao/coda), providing the foundation for generating modern, type-safe TypeScript clients for Solana programs. When you use `coda generate`, it uses this package under the hood to parse your Anchor IDLs.
 
 ## License
 

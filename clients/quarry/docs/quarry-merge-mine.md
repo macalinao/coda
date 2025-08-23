@@ -11,33 +11,33 @@
   - [mergePool](#mergePool)
   - [mergeMiner](#mergeMiner)
 - [Instructions](#instructions)
-  - [newPool](#newPool-1)
-  - [newPoolV2](#newPoolV2-1)
-  - [initMergeMiner](#initMergeMiner-1)
-  - [initMergeMinerV2](#initMergeMinerV2-1)
-  - [initMinerMM](#initMinerMM-1)
-  - [initMinerMMV2](#initMinerMMV2-1)
-  - [stakePrimaryMiner](#stakePrimaryMiner-1)
-  - [stakeReplicaMiner](#stakeReplicaMiner-1)
-  - [unstakePrimaryMiner](#unstakePrimaryMiner-1)
-  - [unstakeAllReplicaMiner](#unstakeAllReplicaMiner-1)
-  - [withdrawTokensMM](#withdrawTokensMM-1)
-  - [rescueTokensMM](#rescueTokensMM-1)
-  - [claimRewardsMM](#claimRewardsMM-1)
+  - [newPool](#newPool)
+  - [newPoolV2](#newPoolV2)
+  - [initMergeMiner](#initMergeMiner)
+  - [initMergeMinerV2](#initMergeMinerV2)
+  - [initMinerMM](#initMinerMM)
+  - [initMinerMMV2](#initMinerMMV2)
+  - [stakePrimaryMiner](#stakePrimaryMiner)
+  - [stakeReplicaMiner](#stakeReplicaMiner)
+  - [unstakePrimaryMiner](#unstakePrimaryMiner)
+  - [unstakeAllReplicaMiner](#unstakeAllReplicaMiner)
+  - [withdrawTokensMM](#withdrawTokensMM)
+  - [rescueTokensMM](#rescueTokensMM)
+  - [claimRewardsMM](#claimRewardsMM)
 - [PDAs](#pdas)
-  - [mergePool](#mergePool-2)
-  - [replicaMint](#replicaMint-2)
-  - [mergeMiner](#mergeMiner-2)
+  - [mergePool](#mergePool)
+  - [replicaMint](#replicaMint)
+  - [mergeMiner](#mergeMiner)
 - [Types](#types)
-  - [newMergePoolEvent](#newMergePoolEvent-3)
-  - [initMergeMinerEvent](#initMergeMinerEvent-3)
-  - [initMinerEvent](#initMinerEvent-3)
-  - [stakePrimaryEvent](#stakePrimaryEvent-3)
-  - [stakeReplicaEvent](#stakeReplicaEvent-3)
-  - [unstakePrimaryEvent](#unstakePrimaryEvent-3)
-  - [unstakeReplicaEvent](#unstakeReplicaEvent-3)
-  - [withdrawTokensEvent](#withdrawTokensEvent-3)
-  - [claimEventMM](#claimEventMM-3)
+  - [newMergePoolEvent](#newMergePoolEvent)
+  - [initMergeMinerEvent](#initMergeMinerEvent)
+  - [initMinerEvent](#initMinerEvent)
+  - [stakePrimaryEvent](#stakePrimaryEvent)
+  - [stakeReplicaEvent](#stakeReplicaEvent)
+  - [unstakePrimaryEvent](#unstakePrimaryEvent)
+  - [unstakeReplicaEvent](#unstakeReplicaEvent)
+  - [withdrawTokensEvent](#withdrawTokensEvent)
+  - [claimEventMM](#claimEventMM)
 - [Errors](#errors)
 
 ## Accounts
@@ -205,18 +205,18 @@
 
 **Accounts:**
 
-| Account                 | Type     | Description |
-| ----------------------- | -------- | ----------- |
-| `mmOwner`               | signer   |             |
-| `mmPrimaryTokenAccount` | writable |             |
-| `pool`                  | writable |             |
-| `mm`                    | writable |             |
-| `rewarder`              | readonly |             |
-| `quarry`                | writable |             |
-| `miner`                 | writable |             |
-| `minerVault`            | writable |             |
-| `tokenProgram`          | readonly |             |
-| `mineProgram`           | readonly |             |
+| Account                              | Type     | Description |
+| ------------------------------------ | -------- | ----------- |
+| `mmOwner`                            | signer   |             |
+| `mmPrimaryTokenAccount`              | writable |             |
+| `stakePrimaryMinerStakePool`         | writable |             |
+| `stakePrimaryMinerStakeMm`           | writable |             |
+| `stakePrimaryMinerStakeRewarder`     | readonly |             |
+| `stakePrimaryMinerStakeQuarry`       | writable |             |
+| `stakePrimaryMinerStakeMiner`        | writable |             |
+| `stakePrimaryMinerStakeMinerVault`   | writable |             |
+| `stakePrimaryMinerStakeTokenProgram` | readonly |             |
+| `stakePrimaryMinerStakeMineProgram`  | readonly |             |
 
 **Arguments:**
 
@@ -228,19 +228,19 @@
 
 **Accounts:**
 
-| Account                   | Type     | Description |
-| ------------------------- | -------- | ----------- |
-| `mmOwner`                 | signer   |             |
-| `replicaMint`             | writable |             |
-| `replicaMintTokenAccount` | writable |             |
-| `pool`                    | writable |             |
-| `mm`                      | writable |             |
-| `rewarder`                | readonly |             |
-| `quarry`                  | writable |             |
-| `miner`                   | writable |             |
-| `minerVault`              | writable |             |
-| `tokenProgram`            | readonly |             |
-| `mineProgram`             | readonly |             |
+| Account                              | Type     | Description |
+| ------------------------------------ | -------- | ----------- |
+| `mmOwner`                            | signer   |             |
+| `replicaMint`                        | writable |             |
+| `replicaMintTokenAccount`            | writable |             |
+| `stakeReplicaMinerStakePool`         | writable |             |
+| `stakeReplicaMinerStakeMm`           | writable |             |
+| `stakeReplicaMinerStakeRewarder`     | readonly |             |
+| `stakeReplicaMinerStakeQuarry`       | writable |             |
+| `stakeReplicaMinerStakeMiner`        | writable |             |
+| `stakeReplicaMinerStakeMinerVault`   | writable |             |
+| `stakeReplicaMinerStakeTokenProgram` | readonly |             |
+| `stakeReplicaMinerStakeMineProgram`  | readonly |             |
 
 **Arguments:**
 
@@ -252,18 +252,18 @@
 
 **Accounts:**
 
-| Account                 | Type     | Description |
-| ----------------------- | -------- | ----------- |
-| `mmOwner`               | signer   |             |
-| `mmPrimaryTokenAccount` | writable |             |
-| `pool`                  | writable |             |
-| `mm`                    | writable |             |
-| `rewarder`              | readonly |             |
-| `quarry`                | writable |             |
-| `miner`                 | writable |             |
-| `minerVault`            | writable |             |
-| `tokenProgram`          | readonly |             |
-| `mineProgram`           | readonly |             |
+| Account                                | Type     | Description |
+| -------------------------------------- | -------- | ----------- |
+| `mmOwner`                              | signer   |             |
+| `mmPrimaryTokenAccount`                | writable |             |
+| `unstakePrimaryMinerStakePool`         | writable |             |
+| `unstakePrimaryMinerStakeMm`           | writable |             |
+| `unstakePrimaryMinerStakeRewarder`     | readonly |             |
+| `unstakePrimaryMinerStakeQuarry`       | writable |             |
+| `unstakePrimaryMinerStakeMiner`        | writable |             |
+| `unstakePrimaryMinerStakeMinerVault`   | writable |             |
+| `unstakePrimaryMinerStakeTokenProgram` | readonly |             |
+| `unstakePrimaryMinerStakeMineProgram`  | readonly |             |
 
 **Arguments:**
 
@@ -276,19 +276,19 @@
 
 **Accounts:**
 
-| Account                   | Type     | Description |
-| ------------------------- | -------- | ----------- |
-| `mmOwner`                 | signer   |             |
-| `replicaMint`             | writable |             |
-| `replicaMintTokenAccount` | writable |             |
-| `pool`                    | writable |             |
-| `mm`                      | writable |             |
-| `rewarder`                | readonly |             |
-| `quarry`                  | writable |             |
-| `miner`                   | writable |             |
-| `minerVault`              | writable |             |
-| `tokenProgram`            | readonly |             |
-| `mineProgram`             | readonly |             |
+| Account                                   | Type     | Description |
+| ----------------------------------------- | -------- | ----------- |
+| `mmOwner`                                 | signer   |             |
+| `replicaMint`                             | writable |             |
+| `replicaMintTokenAccount`                 | writable |             |
+| `unstakeAllReplicaMinerStakePool`         | writable |             |
+| `unstakeAllReplicaMinerStakeMm`           | writable |             |
+| `unstakeAllReplicaMinerStakeRewarder`     | readonly |             |
+| `unstakeAllReplicaMinerStakeQuarry`       | writable |             |
+| `unstakeAllReplicaMinerStakeMiner`        | writable |             |
+| `unstakeAllReplicaMinerStakeMinerVault`   | writable |             |
+| `unstakeAllReplicaMinerStakeTokenProgram` | readonly |             |
+| `unstakeAllReplicaMinerStakeMineProgram`  | readonly |             |
 
 **Arguments:**
 
@@ -341,23 +341,23 @@
 
 **Accounts:**
 
-| Account                | Type     | Description |
-| ---------------------- | -------- | ----------- |
-| `mintWrapper`          | writable |             |
-| `mintWrapperProgram`   | readonly |             |
-| `minter`               | writable |             |
-| `rewardsTokenMint`     | writable |             |
-| `rewardsTokenAccount`  | writable |             |
-| `claimFeeTokenAccount` | writable |             |
-| `stakeTokenAccount`    | writable |             |
-| `pool`                 | writable |             |
-| `mm`                   | writable |             |
-| `rewarder`             | readonly |             |
-| `quarry`               | writable |             |
-| `miner`                | writable |             |
-| `minerVault`           | writable |             |
-| `tokenProgram`         | readonly |             |
-| `mineProgram`          | readonly |             |
+| Account                         | Type     | Description |
+| ------------------------------- | -------- | ----------- |
+| `mintWrapper`                   | writable |             |
+| `mintWrapperProgram`            | readonly |             |
+| `minter`                        | writable |             |
+| `rewardsTokenMint`              | writable |             |
+| `rewardsTokenAccount`           | writable |             |
+| `claimFeeTokenAccount`          | writable |             |
+| `stakeTokenAccount`             | writable |             |
+| `claimRewardsStakePool`         | writable |             |
+| `claimRewardsStakeMm`           | writable |             |
+| `claimRewardsStakeRewarder`     | readonly |             |
+| `claimRewardsStakeQuarry`       | writable |             |
+| `claimRewardsStakeMiner`        | writable |             |
+| `claimRewardsStakeMinerVault`   | writable |             |
+| `claimRewardsStakeTokenProgram` | readonly |             |
+| `claimRewardsStakeMineProgram`  | readonly |             |
 
 **Arguments:**
 
@@ -520,10 +520,10 @@
 
 ## Errors
 
-- **unauthorized** (Code: 6000 / `6000` / `0x1770`) -- Unauthorized.
-- **insufficientBalance** (Code: 6001 / `6001` / `0x1771`) -- Insufficient balance.
-- **invalidMiner** (Code: 6002 / `6002` / `0x1772`) -- Invalid miner for the given quarry.
-- **cannotWithdrawReplicaMint** (Code: 6003 / `6003` / `0x1773`) -- Cannot withdraw a replica mint.
-- **outstandingReplicaTokens** (Code: 6004 / `6004` / `0x1774`) -- User must first withdraw from all replica quarries.
-- **replicaDecimalsMismatch** (Code: 6005 / `6005` / `0x1775`) -- The replica mint must have the same number of decimals as the primary mint.
-- **replicaNonZeroSupply** (Code: 6006 / `6006` / `0x1776`) -- The replica mint must have zero supply.
+- **6000 - Unauthorized**: Unauthorized. _(Hex: `0x1770`)_
+- **6001 - InsufficientBalance**: Insufficient balance. _(Hex: `0x1771`)_
+- **6002 - InvalidMiner**: Invalid miner for the given quarry. _(Hex: `0x1772`)_
+- **6003 - CannotWithdrawReplicaMint**: Cannot withdraw a replica mint. _(Hex: `0x1773`)_
+- **6004 - OutstandingReplicaTokens**: User must first withdraw from all replica quarries. _(Hex: `0x1774`)_
+- **6005 - ReplicaDecimalsMismatch**: The replica mint must have the same number of decimals as the primary mint. _(Hex: `0x1775`)_
+- **6006 - ReplicaNonZeroSupply**: The replica mint must have zero supply. _(Hex: `0x1776`)_
