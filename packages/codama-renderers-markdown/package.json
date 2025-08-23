@@ -29,8 +29,8 @@
     "clean": "rm -fr dist/",
     "lint": "eslint --ext js,ts,tsx src",
     "lint:fix": "eslint --ext js,ts,tsx src --fix",
-    "test": "bun test",
-    "test:watch": "bun test --watch"
+    "test": "bun test src/",
+    "test:watch": "bun test src/ --watch"
   },
   "dependencies": {
     "@codama/errors": "catalog:",

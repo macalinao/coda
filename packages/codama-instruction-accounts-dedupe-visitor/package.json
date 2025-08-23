@@ -40,7 +40,8 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
-    "lint": "eslint . --cache"
+    "lint": "eslint . --cache",
+    "test": "bun test src/"
   },
   "dependencies": {
     "@codama/nodes-from-anchor": "catalog:",

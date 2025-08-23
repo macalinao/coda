@@ -33,7 +33,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
-    "test": "bun test"
+    "test": "bun test src/"
   },
   "bugs": {
     "url": "https://github.com/macalinao/coda/issues"

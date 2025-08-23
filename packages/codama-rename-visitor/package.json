@@ -42,7 +42,7 @@
     "build": "tsc",
     "clean": "rm -fr dist/",
     "lint": "eslint . --cache",
-    "test": "bun test"
+    "test": "bun test src/"
   },
   "dependencies": {
     "codama": "catalog:"
