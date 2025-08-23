@@ -1,5 +1,13 @@
 # coda-docs
 
+## 0.0.4
+
+### Patch Changes
+
+- bb9d597: Update readmes
+- 22dd624: Update docs and readmes
+- a576929: docs
+
 ## 0.0.3
 
 ### Patch Changes

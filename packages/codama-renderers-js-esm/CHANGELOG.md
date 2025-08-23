@@ -1,5 +1,13 @@
 # @macalinao/codama-renderers-js-esm
 
+## 0.2.3
+
+### Patch Changes
+
+- bb9d597: Update readmes
+- 22dd624: Update docs and readmes
+- a576929: docs
+
 ## 0.2.2
 
 ### Patch Changes
