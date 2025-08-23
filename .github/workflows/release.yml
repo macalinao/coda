@@ -45,7 +45,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build packages
-        run: bun run build
+        run: bun run build:ci
 
       - name: Setup NPM authentication
         run: |

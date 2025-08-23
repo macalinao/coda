@@ -41,6 +41,7 @@
   },
   "scripts": {
     "build": "turbo build",
+    "build:ci": "turbo build --filter='./{packages,clients}/**'",
     "build:packages": "turbo build --filter='./packages/**'",
     "build:watch": "turbo watch build",
     "build:watch:packages": "turbo watch build --filter='./packages/**'",
