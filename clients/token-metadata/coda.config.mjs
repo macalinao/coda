@@ -1,10 +1,10 @@
-import { defineConfig } from "@macalinao/coda";
 import {
   addPdasVisitor,
   constantPdaSeedNodeFromString,
+  defineConfig,
   publicKeyTypeNode,
   variablePdaSeedNode,
-} from "codama";
+} from "@macalinao/coda";
 
 const addCustomPDAsVisitor = addPdasVisitor({
   tokenMetadata: [
