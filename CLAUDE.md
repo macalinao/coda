@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Coda is an automated client generation tool for Solana programs. Built on top of [Codama](https://github.com/codama-idl/codama), Coda provides a zero-config CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
+Coda is an automated client generation tool for Solana programs. Built on top of [Codama](https://github.com/codama-idl/codama), Coda provides a CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
 
 The monorepo contains:
 - **Coda CLI** - The main tool for generating TypeScript clients from Anchor IDLs
@@ -71,7 +71,7 @@ coda/
 ## Core Packages
 
 ### 1. **@macalinao/coda** - CLI for client generation
-   - Zero-config by default (looks for `./idls/*.json`)
+   - Works out of the box (looks for `./idls/*.json` by default)
    - Configurable via `coda.config.mjs`
    - Generates TypeScript clients with full type safety
    - Built on Codama for extensibility

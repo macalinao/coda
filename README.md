@@ -11,7 +11,7 @@ Automated client generation for Solana programs.
   <a href="https://www.npmjs.com/package/@macalinao/coda"><img src="https://img.shields.io/npm/dm/@macalinao/coda?color=377CC0" /></a>
 </p>
 
-Coda automatically generates type-safe TypeScript clients from your Anchor IDLs. Built on [Codama](https://github.com/codama-idl/codama), it provides a zero-config CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
+Coda automatically generates type-safe TypeScript clients from your Anchor IDLs. Built on [Codama](https://github.com/codama-idl/codama), it provides a CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
 
 ## Documentation
 
