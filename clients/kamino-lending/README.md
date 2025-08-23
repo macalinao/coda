@@ -12,6 +12,7 @@ bun add @macalinao/clients-kamino-lending
 ```
 
 Or with npm:
+
 ```bash
 npm install @macalinao/clients-kamino-lending
 ```
@@ -24,7 +25,7 @@ npm install @macalinao/clients-kamino-lending
 ## Usage
 
 ```typescript
-import { 
+import {
   createInitializeInstruction,
   fetchLendingMarket,
   // ... other exports
