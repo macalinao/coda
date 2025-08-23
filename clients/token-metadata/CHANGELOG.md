@@ -1,5 +1,11 @@
 # @macalinao/token-metadata-client
 
+## 0.2.3
+
+### Patch Changes
+
+- b1da1c7: Update documentation
+
 ## 0.2.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.1.3
+
+### Patch Changes
+
+- b1da1c7: Update documentation
+
 ## 0.1.2
 
 ### Patch Changes
