@@ -1,5 +1,12 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
+## 0.2.2
+
+### Patch Changes
+
+- b1da1c7: Update documentation
+- fd54620: Only apply deduping if necessary
+
 ## 0.2.1
 
 ### Patch Changes
