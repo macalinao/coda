@@ -54,12 +54,14 @@ Use it in your `coda.config.mjs`:
 ```javascript
 import { defineConfig } from "@macalinao/coda";
 import { instructionAccountsDedupeVisitor } from "@macalinao/codama-instruction-accounts-dedupe-visitor";
+import fs from "fs";
 
 export default defineConfig({
   idlPath: "./idls/my_program.json",
   outputDir: "./src/generated",
-  visitors: [
-    instructionAccountsDedupeVisitor()
+  visitors: (idl) => [
+    // Pass the IDL to the visitor
+    instructionAccountsDedupeVisitor(idl)
   ]
 });
 ```
@@ -147,11 +149,11 @@ When flattening accounts, PDA seeds are also updated to reflect the new structur
 Creates a visitor that flattens nested instruction accounts:
 
 ```typescript
-function instructionAccountsDedupeVisitor(idl?: Idl): Visitor;
+function instructionAccountsDedupeVisitor(idl: AnchorIdl): Visitor;
 ```
 
 **Parameters:**
-- `idl` (optional): The Anchor IDL to use for context during transformation
+- `idl`: The Anchor IDL containing the instruction definitions with potentially nested accounts
 
 **Returns:**
 - A Codama visitor that can be applied to transform the AST

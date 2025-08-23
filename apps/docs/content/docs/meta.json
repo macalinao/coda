@@ -11,9 +11,8 @@
     "generating-clients",
     "generating-docs",
     "examples",
-    "---Packages---",
-    "packages",
     "---Reference---",
+    "packages",
     "api"
   ]
 }

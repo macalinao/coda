@@ -310,24 +310,122 @@ Use the dedupe visitor to flatten nested account structures:
 import { instructionAccountsDedupeVisitor } from "@macalinao/codama-instruction-accounts-dedupe-visitor";
 
 export default defineConfig({
-  visitors: [
-    instructionAccountsDedupeVisitor()
+  visitors: ({ idl }) => [
+    instructionAccountsDedupeVisitor(idl)
   ]
 });
 ```
 
-### Custom Renderers
+### Renaming Conflicts
 
-Use alternative renderers for different output formats:
+Resolve naming conflicts between multiple programs:
 
 ```javascript
-import { renderJavaScriptEsmVisitor } from "@macalinao/codama-renderers-js-esm";
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
 
 export default defineConfig({
-  visitors: ({ idl }) => {
-    const codama = createFromIdls([idl]);
-    codama.accept(renderJavaScriptEsmVisitor("./src/generated"));
-    return [];
-  }
+  visitors: [
+    renameVisitor({
+      programA: {
+        instructions: {
+          transfer: "transferProgramA"
+        }
+      },
+      programB: {
+        instructions: {
+          transfer: "transferProgramB"
+        }
+      }
+    })
+  ]
 });
 ```
+
+## Documentation Generation
+
+Generate markdown documentation alongside your TypeScript clients:
+
+```bash
+coda docs [options]
+
+Options:
+  -i, --idl <path>      Path to Anchor IDL file (default: "./idls/*.json")
+  -o, --output <path>   Output directory (default: "./docs")
+  -c, --config <path>   Path to config file (default: "./coda.config.mjs")
+```
+
+### Basic Usage
+
+```bash
+# Generate documentation
+coda docs
+
+# Custom output directory
+coda docs -o ./api-docs
+```
+
+### With Configuration
+
+Add documentation generation to your config:
+
+```javascript
+import { renderMarkdownVisitor } from "@macalinao/codama-renderers-markdown";
+
+export default defineConfig({
+  visitors: [
+    renderMarkdownVisitor("./docs")
+  ]
+});
+```
+
+## Best Practices
+
+1. **Keep IDLs up-to-date**: Run `anchor build` before generating clients
+2. **Use TypeScript**: The generated code provides full type safety
+3. **Add custom PDAs**: Define program-derived addresses in your config
+4. **Document your programs**: Add descriptions in your Anchor programs
+5. **Version your clients**: Generate clients for each program version
+
+## Troubleshooting
+
+### IDL Not Found
+
+If Coda can't find your IDL:
+
+1. Check the default location: `./idls/*.json`
+2. Specify explicit path: `coda generate -i path/to/idl.json`
+3. Ensure Anchor program is built: `anchor build`
+
+### Import Errors
+
+If you see module resolution errors:
+
+1. Ensure `"type": "module"` is in your package.json
+2. Check that tsconfig.json uses `"moduleResolution": "NodeNext"`
+3. Verify all local imports use `.js` extensions
+
+### Type Errors
+
+If TypeScript shows errors:
+
+1. Run `bun install` to ensure dependencies are installed
+2. Check that `@solana/web3.js` is installed
+3. Verify tsconfig includes the generated directory
+
+## Examples
+
+### Single Program
+
+See the [token-metadata client](https://github.com/macalinao/coda/tree/master/clients/token-metadata) for a complete example of a single program setup.
+
+### Multiple Programs
+
+See the [Quarry client](https://github.com/macalinao/coda/tree/master/clients/quarry) for an example with multiple programs and custom visitors.
+
+## Related Packages
+
+- [@macalinao/codama-renderers-js-esm](/docs/packages/codama-renderers-js-esm) - ESM-native TypeScript renderer
+- [@macalinao/codama-instruction-accounts-dedupe-visitor](/docs/packages/codama-instruction-accounts-dedupe-visitor) - Flatten nested accounts
+- [@macalinao/codama-rename-visitor](/docs/packages/codama-rename-visitor) - Rename instructions and accounts
+- [@macalinao/codama-renderers-markdown](/docs/packages/codama-renderers-markdown) - Generate documentation
+- [@macalinao/codama-nodes-from-anchor-x](/docs/packages/codama-nodes-from-anchor-x) - Parse multiple IDLs

@@ -12,6 +12,7 @@ bun add -D @macalinao/codama-renderers-js-esm
 ```
 
 Or with npm:
+
 ```bash
 npm install -D @macalinao/codama-renderers-js-esm
 ```
@@ -60,7 +61,7 @@ export default defineConfig({
       // Custom options if needed
     });
     return [visitor];
-  }
+  },
 });
 ```
 
@@ -71,6 +72,7 @@ export default defineConfig({
 All relative imports automatically get `.js` extensions:
 
 #### Before (Standard Renderer)
+
 ```typescript
 import { Address } from "@solana/web3.js";
 import { SomeType } from "./types";
@@ -79,6 +81,7 @@ export * from "./instructions";
 ```
 
 #### After (ESM Renderer)
+
 ```typescript
 import { Address } from "@solana/web3.js";
 import { SomeType } from "./types/index.js";
@@ -104,10 +107,14 @@ Loose equality checks are replaced with strict checks:
 
 ```typescript
 // Before
-if (value == null) { /* ... */ }
+if (value == null) {
+  /* ... */
+}
 
 // After
-if (value === null || value === undefined) { /* ... */ }
+if (value === null || value === undefined) {
+  /* ... */
+}
 ```
 
 ### 4. Universal JavaScript Compatibility
@@ -121,14 +128,14 @@ Removes Node.js-specific code for broader runtime support:
 
 ## Comparison with Standard Renderer
 
-| Feature | @codama/renderers-js | @macalinao/codama-renderers-js-esm |
-|---------|----------------------|-------------------------------------|
-| Module Format | CommonJS-compatible | Pure ESM |
-| Import Extensions | No extensions | `.js` extensions |
-| TypeScript Config | Standard | ESM-native |
-| Runtime Checks | Node.js-specific | Universal |
-| Null Checks | Loose (`==`) | Strict (`===`) |
-| Tree Shaking | Good | Excellent |
+| Feature           | @codama/renderers-js | @macalinao/codama-renderers-js-esm |
+| ----------------- | -------------------- | ---------------------------------- |
+| Module Format     | CommonJS-compatible  | Pure ESM                           |
+| Import Extensions | No extensions        | `.js` extensions                   |
+| TypeScript Config | Standard             | ESM-native                         |
+| Runtime Checks    | Node.js-specific     | Universal                          |
+| Null Checks       | Loose (`==`)         | Strict (`===`)                     |
+| Tree Shaking      | Good                 | Excellent                          |
 
 ## Configuration
 
@@ -139,12 +146,10 @@ Ensure your `tsconfig.json` is configured for ESM:
 ```json
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "target": "ES2022",
-    "allowImportingTsExtensions": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2024",
+    "lib": ["ES2024"]
   }
 }
 ```
@@ -184,6 +189,7 @@ interface RenderOptions {
 ```
 
 **Parameters:**
+
 - `outputDir`: Directory where files will be generated
 - `options`: Optional configuration for the renderer
 
@@ -236,23 +242,10 @@ If you see "Cannot find module" errors:
 2. Check that `"type": "module"` is in package.json
 3. Ensure TypeScript module resolution is correct
 
-### Type Resolution Issues
-
-For TypeScript type resolution:
-
-```json
-// tsconfig.json
-{
-  "compilerOptions": {
-    "moduleResolution": "bundler",
-    // or "node16" / "nodenext" for Node.js
-  }
-}
-```
-
 ### Build Tool Compatibility
 
 Works with modern build tools:
+
 - **Vite**: Full support out of the box
 - **esbuild**: Works with ESM configuration
 - **Rollup**: Native ESM support
