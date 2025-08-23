@@ -1,0 +1,333 @@
+---
+title: "@macalinao/coda"
+description: The main CLI tool for automated client generation from Solana IDLs
+---
+
+The core Coda package provides a zero-config CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
+
+## Installation
+
+```bash
+bun add -D @macalinao/coda
+```
+
+Or with npm:
+```bash
+npm install -D @macalinao/coda
+```
+
+## Features
+
+- 🚀 **Zero configuration** - Works out of the box with sensible defaults
+- 🔧 **Fully customizable** - Extend and transform generated code with visitors
+- 📦 **ES modules native** - Modern JavaScript with proper `.js` extensions
+- 🎯 **Type-safe** - Full TypeScript support with precise types
+- 🔄 **Anchor compatible** - Works with any Anchor IDL
+- 🏗️ **Extensible** - Add custom visitors to transform the Codama tree
+- ⚡ **Fast** - Optimized code generation pipeline
+
+## CLI Commands
+
+### Generate Command
+
+Generate TypeScript clients from an Anchor IDL:
+
+```bash
+coda generate [options]
+
+Options:
+  -i, --idl <path>      Path to Anchor IDL file (default: "./idls/*.json")
+  -o, --output <path>   Output directory (default: "./src/generated")
+  -c, --config <path>   Path to config file (default: "./coda.config.mjs")
+```
+
+### Init Command
+
+Initialize a new configuration file:
+
+```bash
+coda init [options]
+
+Options:
+  -c, --config <path>   Path for config file (default: "./coda.config.mjs")
+```
+
+## Configuration
+
+### Zero-Config (Default)
+
+Coda works without any configuration by looking for IDLs in `./idls/*.json`:
+
+```bash
+# Just place your IDL files in the idls/ directory
+coda generate
+```
+
+### Configuration File
+
+Create a `coda.config.mjs` to customize generation:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { addPdasVisitor } from "codama";
+
+export default defineConfig({
+  // Custom paths (optional)
+  idlPath: "./idls/my_program.json",
+  outputDir: "./src/clients/my_program",
+  
+  // Add visitors to customize generation
+  visitors: [
+    // Add custom PDAs
+    addPdasVisitor({
+      myAccount: [
+        {
+          name: "authority",
+          seeds: [
+            { kind: "constant", value: "authority" },
+            { kind: "variable", name: "user", type: publicKeyTypeNode() }
+          ]
+        }
+      ]
+    })
+  ]
+});
+```
+
+### Multiple IDLs
+
+Handle multiple programs with glob patterns:
+
+```javascript
+export default defineConfig({
+  // Use glob pattern to match all IDLs
+  idlPath: "./idls/*.json",
+  outputDir: "./src/generated",
+});
+```
+
+Or specify an array of paths:
+
+```javascript
+export default defineConfig({
+  idlPath: [
+    "./idls/program1.json",
+    "./idls/program2.json",
+  ],
+  outputDir: "./src/generated",
+});
+```
+
+### Dynamic Configuration
+
+Use a function to conditionally apply visitors:
+
+```javascript
+export default defineConfig({
+  visitors: ({ idl }) => {
+    const visitors = [];
+    
+    // Conditionally add visitors based on IDL content
+    if (idl.name === "my_program") {
+      visitors.push(myCustomVisitor());
+    }
+    
+    return visitors;
+  }
+});
+```
+
+## Generated Code Structure
+
+Coda generates a comprehensive client with the following structure:
+
+```
+src/generated/
+├── accounts/           # Account decoders and fetchers
+├── instructions/       # Instruction builders
+├── types/             # TypeScript type definitions  
+├── pdas/              # PDA helper functions
+├── errors/            # Typed error codes
+├── programs/          # Program ID constants
+└── index.ts           # Main exports
+```
+
+### Instructions
+
+Fully typed instruction builders with proper serialization:
+
+```typescript
+export function createTransferInstruction(
+  input: TransferInstructionInput
+): Instruction;
+
+export function getTransferInstructionDataEncoder(): Encoder<TransferArgs>;
+```
+
+### Accounts
+
+Account decoders with type safety:
+
+```typescript
+export function decodeTokenAccount(
+  encodedAccount: EncodedAccount
+): TokenAccount;
+
+export async function fetchTokenAccount(
+  rpc: Rpc,
+  address: Address
+): Promise<TokenAccount>;
+```
+
+### Types
+
+All types from your IDL with proper TypeScript definitions:
+
+```typescript
+export type TokenAccount = {
+  mint: Address;
+  owner: Address;
+  amount: bigint;
+  // ... other fields
+};
+```
+
+### PDAs
+
+Helper functions for program-derived addresses:
+
+```typescript
+export async function findAuthorityPda(
+  seeds: {
+    user: Address;
+  }
+): Promise<[Address, number]>;
+```
+
+### Errors
+
+Typed error enums for better error handling:
+
+```typescript
+export enum MyProgramError {
+  InvalidAmount = 0x1770,
+  Unauthorized = 0x1771,
+  // ...
+}
+```
+
+## API Reference
+
+### defineConfig
+
+Creates a configuration object for Coda:
+
+```typescript
+function defineConfig(config: CodaConfig): CodaConfig;
+
+interface CodaConfig {
+  idlPath?: string | string[];
+  outputDir?: string;
+  visitors?: Visitor[] | ((context: VisitorContext) => Visitor[]);
+}
+```
+
+### VisitorContext
+
+Context passed to dynamic visitor functions:
+
+```typescript
+interface VisitorContext {
+  idl: Idl;           // The parsed Anchor IDL
+  idlPath: string;    // Path to the IDL file
+  outputDir: string;  // Output directory path
+}
+```
+
+## Integration Examples
+
+### With Package.json Scripts
+
+```json
+{
+  "scripts": {
+    "codegen": "coda generate",
+    "codegen:watch": "coda generate --watch"
+  }
+}
+```
+
+### With Turborepo
+
+```json
+// turbo.json
+{
+  "tasks": {
+    "codegen": {
+      "outputs": ["./src/generated/**"],
+      "cache": false
+    }
+  }
+}
+```
+
+### With GitHub Actions
+
+```yaml
+- name: Generate clients
+  run: |
+    bun install
+    bun run codegen
+```
+
+## Advanced Features
+
+### Custom Visitors
+
+Extend generated code with Codama visitors:
+
+```javascript
+import { updateInstructionsVisitor } from "codama";
+
+const customVisitor = updateInstructionsVisitor({
+  transfer: {
+    defaults: {
+      amount: 0n
+    }
+  }
+});
+
+export default defineConfig({
+  visitors: [customVisitor]
+});
+```
+
+### Flattening Nested Accounts
+
+Use the dedupe visitor to flatten nested account structures:
+
+```javascript
+import { instructionAccountsDedupeVisitor } from "@macalinao/codama-instruction-accounts-dedupe-visitor";
+
+export default defineConfig({
+  visitors: [
+    instructionAccountsDedupeVisitor()
+  ]
+});
+```
+
+### Custom Renderers
+
+Use alternative renderers for different output formats:
+
+```javascript
+import { renderJavaScriptEsmVisitor } from "@macalinao/codama-renderers-js-esm";
+
+export default defineConfig({
+  visitors: ({ idl }) => {
+    const codama = createFromIdls([idl]);
+    codama.accept(renderJavaScriptEsmVisitor("./src/generated"));
+    return [];
+  }
+});
+```

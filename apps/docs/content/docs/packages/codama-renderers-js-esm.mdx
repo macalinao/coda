@@ -1,0 +1,265 @@
+---
+title: "@macalinao/codama-renderers-js-esm"
+description: ESM-native TypeScript renderer for Codama JavaScript code generation
+---
+
+This package extends Codama's JavaScript renderer to produce fully ESM-compatible TypeScript/JavaScript code with proper module resolution and improved type safety.
+
+## Installation
+
+```bash
+bun add -D @macalinao/codama-renderers-js-esm
+```
+
+Or with npm:
+```bash
+npm install -D @macalinao/codama-renderers-js-esm
+```
+
+## Why Use This Package?
+
+While `@codama/renderers-js` generates excellent TypeScript code, it produces CommonJS-style imports that may not work correctly in pure ESM environments. This package addresses:
+
+1. **ESM Module Resolution**: Adds `.js` extensions to all relative imports
+2. **TypeScript ESM Compatibility**: Works correctly with `"type": "module"`
+3. **Production-Ready Code**: Removes Node.js-specific environment checks
+4. **Type Safety Improvements**: Enhanced type assertions and null checks
+
+## Usage
+
+### Basic Usage
+
+Use this visitor in place of the standard Codama JavaScript renderer:
+
+```typescript
+import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
+import { rootNode, visit } from "codama";
+
+// Your Codama root node (typically from parsing an IDL)
+const root = rootNode(/* ... */);
+
+// Generate ESM-compatible TypeScript code
+const visitor = renderESMTypeScriptVisitor("./src/generated");
+visit(root, visitor);
+```
+
+### With Coda Configuration
+
+This renderer is used by default in Coda, but you can explicitly configure it:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
+
+export default defineConfig({
+  idlPath: "./idls/my_program.json",
+  outputDir: "./src/generated",
+  visitors: ({ idl }) => {
+    // Custom rendering configuration
+    const visitor = renderESMTypeScriptVisitor("./src/generated", {
+      // Custom options if needed
+    });
+    return [visitor];
+  }
+});
+```
+
+## Key Features
+
+### 1. Automatic Import Extensions
+
+All relative imports automatically get `.js` extensions:
+
+#### Before (Standard Renderer)
+```typescript
+import { Address } from "@solana/web3.js";
+import { SomeType } from "./types";
+import { decodeAccount } from "./accounts";
+export * from "./instructions";
+```
+
+#### After (ESM Renderer)
+```typescript
+import { Address } from "@solana/web3.js";
+import { SomeType } from "./types/index.js";
+import { decodeAccount } from "./accounts/index.js";
+export * from "./instructions/index.js";
+```
+
+### 2. Directory Import Resolution
+
+Bare directory imports are converted to explicit index imports:
+
+```typescript
+// Before
+import { something } from "./utils";
+
+// After
+import { something } from "./utils/index.js";
+```
+
+### 3. Strict Null Checks
+
+Loose equality checks are replaced with strict checks:
+
+```typescript
+// Before
+if (value == null) { /* ... */ }
+
+// After
+if (value === null || value === undefined) { /* ... */ }
+```
+
+### 4. Universal JavaScript Compatibility
+
+Removes Node.js-specific code for broader runtime support:
+
+```typescript
+// Removed: Node.js-specific environment checks
+// Works in: Browser, Deno, Bun, Node.js, etc.
+```
+
+## Comparison with Standard Renderer
+
+| Feature | @codama/renderers-js | @macalinao/codama-renderers-js-esm |
+|---------|----------------------|-------------------------------------|
+| Module Format | CommonJS-compatible | Pure ESM |
+| Import Extensions | No extensions | `.js` extensions |
+| TypeScript Config | Standard | ESM-native |
+| Runtime Checks | Node.js-specific | Universal |
+| Null Checks | Loose (`==`) | Strict (`===`) |
+| Tree Shaking | Good | Excellent |
+
+## Configuration
+
+### TypeScript Configuration
+
+Ensure your `tsconfig.json` is configured for ESM:
+
+```json
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "allowImportingTsExtensions": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  }
+}
+```
+
+### Package.json Configuration
+
+Your package.json should specify ESM:
+
+```json
+{
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
+}
+```
+
+## API Reference
+
+### renderESMTypeScriptVisitor
+
+Creates a visitor that renders ESM-compatible TypeScript:
+
+```typescript
+function renderESMTypeScriptVisitor(
+  outputDir: string,
+  options?: RenderOptions
+): Visitor;
+
+interface RenderOptions {
+  // Inherits all options from @codama/renderers-js
+  // Additional ESM-specific options may be added
+}
+```
+
+**Parameters:**
+- `outputDir`: Directory where files will be generated
+- `options`: Optional configuration for the renderer
+
+## How It Works
+
+The package applies a series of transformations:
+
+### 1. Custom Dependency Map
+
+Provides ESM-specific import paths:
+
+```typescript
+{
+  errors: "../errors/index.js",
+  generatedAccounts: "../accounts/index.js",
+  generatedInstructions: "../instructions/index.js",
+  generatedTypes: "../types/index.js",
+  generatedPdas: "../pdas/index.js",
+  hooked: "../../hooked/index.js",
+  shared: "../shared/index.js"
+}
+```
+
+### 2. Import Path Transformations
+
+- Adds `.js` to imports without extensions
+- Converts directory imports to `index.js`
+- Preserves external package imports
+
+### 3. Code Quality Improvements
+
+- Replaces loose equality with strict equality
+- Improves type assertions
+- Removes runtime-specific checks
+
+## Best Practices
+
+1. **Use with ESM Projects**: This renderer is designed for ESM-first projects
+2. **Configure TypeScript Properly**: Ensure your tsconfig supports ESM
+3. **Test in Target Environment**: Verify generated code works in your runtime
+4. **Combine with Other Visitors**: Works well with other Codama visitors
+
+## Troubleshooting
+
+### Import Errors
+
+If you see "Cannot find module" errors:
+
+1. Verify all imports have `.js` extensions
+2. Check that `"type": "module"` is in package.json
+3. Ensure TypeScript module resolution is correct
+
+### Type Resolution Issues
+
+For TypeScript type resolution:
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    // or "node16" / "nodenext" for Node.js
+  }
+}
+```
+
+### Build Tool Compatibility
+
+Works with modern build tools:
+- **Vite**: Full support out of the box
+- **esbuild**: Works with ESM configuration
+- **Rollup**: Native ESM support
+- **Webpack 5**: Configure for ESM output
+
+## Related Packages
+
+- [@macalinao/coda](./coda) - Main CLI using this renderer by default
+- [@codama/renderers-js](https://github.com/codama-idl/codama) - Original JavaScript renderer
+- [@macalinao/codama-renderers-markdown](./codama-renderers-markdown) - Markdown documentation renderer

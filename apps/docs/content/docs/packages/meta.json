@@ -1,0 +1,14 @@
+{
+  "title": "Packages",
+  "pages": [
+    "index",
+    "---Core Package---",
+    "coda",
+    "---Visitors---",
+    "codama-instruction-accounts-dedupe-visitor",
+    "codama-rename-visitor",
+    "---Renderers---",
+    "codama-renderers-js-esm",
+    "codama-renderers-markdown"
+  ]
+}

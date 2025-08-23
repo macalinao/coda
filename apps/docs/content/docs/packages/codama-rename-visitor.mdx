@@ -1,0 +1,299 @@
+---
+title: "@macalinao/codama-rename-visitor"
+description: Codama visitor for renaming instructions, events, and types within Solana programs
+---
+
+This package provides flexible visitors for renaming instructions, events, and defined types in your Codama AST. It's particularly useful when you want to change naming conventions without modifying the original IDL.
+
+## Installation
+
+```bash
+bun add -D @macalinao/codama-rename-visitor
+```
+
+Or with npm:
+```bash
+npm install -D @macalinao/codama-rename-visitor
+```
+
+## Why Use This Package?
+
+When working with Solana programs, you might need to:
+
+- **Avoid naming conflicts** between multiple programs
+- **Follow consistent naming conventions** across your codebase
+- **Add context** to generic instruction names
+- **Maintain backward compatibility** while improving naming
+
+This visitor allows you to rename elements at the AST level, ensuring all references are updated correctly throughout the generated code.
+
+## Usage
+
+### Program-Specific Renaming (Recommended)
+
+The most powerful way to use this visitor is to specify renames for specific programs:
+
+```typescript
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
+import { visit } from "codama";
+
+// Rename elements in specific programs
+const visitor = renameVisitor({
+  quarryMine: {
+    instructions: {
+      claimRewards: "claimRewardsMine"
+    }
+  },
+  token: {
+    instructions: {
+      transfer: "transferTokens",
+      mint: "mintNft"
+    },
+    events: {
+      tokenMinted: "nftMinted"
+    }
+  }
+});
+
+const updatedRoot = visit(root, visitor);
+```
+
+### With Coda Configuration
+
+Use it in your `coda.config.mjs`:
+
+```javascript
+import { defineConfig } from "@macalinao/coda";
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
+
+export default defineConfig({
+  idlPath: "./idls/*.json",
+  outputDir: "./src/generated",
+  visitors: [
+    renameVisitor({
+      quarryMine: {
+        instructions: {
+          // Avoid conflicts with quarryMergeMine
+          claimRewards: "claimRewardsMine",
+          claimRewardsV2: "claimRewardsMineV2"
+        }
+      },
+      quarryMergeMine: {
+        instructions: {
+          // Give these distinct names
+          claimRewards: "claimRewardsMergeMine"
+        }
+      }
+    })
+  ]
+});
+```
+
+### Renaming Specific Element Types
+
+For simpler use cases, you can rename just instructions or events across all programs:
+
+#### Rename Instructions Only
+
+```typescript
+import { renameInstructionsVisitor } from "@macalinao/codama-rename-visitor";
+
+const visitor = renameInstructionsVisitor({
+  oldInstructionName: "newInstructionName",
+  transfer: "transferTokens",
+  mint: "mintNft"
+});
+
+const updatedRoot = visit(root, visitor);
+```
+
+#### Rename Events Only
+
+```typescript
+import { renameEventsVisitor } from "@macalinao/codama-rename-visitor";
+
+const visitor = renameEventsVisitor({
+  oldEventName: "newEventName",
+  tokenMinted: "nftMinted",
+  transferComplete: "transferFinished"
+});
+
+const updatedRoot = visit(root, visitor);
+```
+
+### Legacy Single-Program Format
+
+For backward compatibility, you can use the legacy format for renaming in a single program:
+
+```typescript
+import { renameVisitor } from "@macalinao/codama-rename-visitor";
+
+// Legacy format: applies to the current program
+const visitor = renameVisitor({
+  instructions: {
+    transfer: "transferTokens",
+    mint: "mintNft"
+  },
+  events: {
+    tokenMinted: "nftMinted",
+    transferComplete: "transferFinished"
+  },
+  definedTypes: {
+    TokenMetadata: "NftMetadata"
+  }
+});
+```
+
+## API Reference
+
+### renameVisitor
+
+The main visitor for comprehensive renaming:
+
+```typescript
+function renameVisitor(
+  config: RenameConfig | LegacyRenameConfig
+): Visitor;
+
+// Program-specific renaming (recommended)
+interface RenameConfig {
+  [programName: string]: ProgramRenameOptions;
+}
+
+interface ProgramRenameOptions {
+  instructions?: Record<string, string>;
+  events?: Record<string, string>;
+  definedTypes?: Record<string, string>;
+}
+
+// Legacy single-program format
+interface LegacyRenameConfig {
+  instructions?: Record<string, string>;
+  events?: Record<string, string>;
+  definedTypes?: Record<string, string>;
+}
+```
+
+### renameInstructionsVisitor
+
+Visitor for renaming only instructions:
+
+```typescript
+function renameInstructionsVisitor(
+  mapping: Record<string, string>
+): Visitor;
+```
+
+**Parameters:**
+- `mapping`: Object mapping old instruction names to new names
+
+### renameEventsVisitor
+
+Visitor for renaming only events (defined types):
+
+```typescript
+function renameEventsVisitor(
+  mapping: Record<string, string>
+): Visitor;
+```
+
+**Parameters:**
+- `mapping`: Object mapping old event names to new names
+
+## Use Cases
+
+### Avoiding Naming Conflicts
+
+When working with multiple related programs:
+
+```typescript
+renameVisitor({
+  // Quarry Mine program
+  quarryMine: {
+    instructions: {
+      createMiner: "createQuarryMiner",
+      stake: "stakeInQuarry"
+    }
+  },
+  // Quarry Merge Mine program
+  quarryMergeMine: {
+    instructions: {
+      createMiner: "createMergeMiner",
+      stake: "stakeInMergePool"
+    }
+  }
+})
+```
+
+### Adding Context
+
+Make generic names more specific:
+
+```typescript
+renameVisitor({
+  token: {
+    instructions: {
+      transfer: "transferToken",
+      burn: "burnToken"
+    }
+  },
+  nft: {
+    instructions: {
+      transfer: "transferNft",
+      burn: "burnNft"
+    }
+  }
+})
+```
+
+### Consistent Naming Conventions
+
+Enforce naming patterns across your codebase:
+
+```typescript
+renameVisitor({
+  myProgram: {
+    instructions: {
+      // Convert to camelCase
+      create_account: "createAccount",
+      update_metadata: "updateMetadata",
+      delete_record: "deleteRecord"
+    },
+    events: {
+      // Add "Event" suffix
+      accountCreated: "accountCreatedEvent",
+      metadataUpdated: "metadataUpdatedEvent"
+    }
+  }
+})
+```
+
+## Best Practices
+
+1. **Use Program-Specific Renaming**: Always prefer the program-specific format to avoid unintended renames
+2. **Document Renames**: Comment why certain renames are necessary
+3. **Be Consistent**: Apply similar naming patterns across related programs
+4. **Test Generated Code**: Verify that renamed elements work correctly in your client code
+
+## Troubleshooting
+
+### Renames Not Applied
+
+Ensure the visitor is added to your configuration and that names match exactly:
+
+```javascript
+// Check that program names match your IDL
+console.log(idl.metadata.name); // Should match keys in renameVisitor config
+```
+
+### Type Errors After Renaming
+
+Make sure all references are updated. The visitor handles most cases, but verify:
+- Instruction builders use new names
+- Event types use new names
+- PDA derivations reference correct instruction names
+
+## Related Packages
+
+- [@macalinao/coda](./coda) - Main CLI for client generation
+- [@macalinao/codama-instruction-accounts-dedupe-visitor](./codama-instruction-accounts-dedupe-visitor) - Flatten nested accounts
