@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "Codama visitor for rendering markdown documentation from IDL",
   "keywords": [
+    "coda",
+    "codama",
+    "solana",
+    "markdown",
+    "documentation",
     "ian-macalinao"
   ],
   "exports": {
