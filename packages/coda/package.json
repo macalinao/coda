@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "@codama/nodes-from-anchor": "*",
+    "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
     "@macalinao/codama-renderers-js-esm": "workspace:*",
     "@macalinao/codama-renderers-markdown": "workspace:*",
     "codama": "*",

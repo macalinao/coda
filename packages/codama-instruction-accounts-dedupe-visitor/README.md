@@ -1,19 +1,25 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
 [![npm version](https://img.shields.io/npm/v/@macalinao/codama-instruction-accounts-dedupe-visitor.svg)](https://www.npmjs.com/package/@macalinao/codama-instruction-accounts-dedupe-visitor)
+[![npm downloads](https://img.shields.io/npm/dm/@macalinao/codama-instruction-accounts-dedupe-visitor.svg)](https://www.npmjs.com/package/@macalinao/codama-instruction-accounts-dedupe-visitor)
 
 Codama visitor for deduplicating and flattening instruction accounts from Anchor IDL. This package helps handle nested account structures in Anchor programs by flattening them into a single-level structure with properly prefixed names.
 
-## Why This Package Exists
+## Quick Start with Coda CLI
 
-Anchor IDL supports nested account structures where accounts can be grouped together. When converting these to Codama nodes, the nested structure needs to be flattened while preserving the relationship through naming conventions. This visitor:
+This visitor is best used through the [Coda CLI](https://coda.ianm.com), which provides a complete solution for Solana client generation:
 
-1. **Flattens Nested Accounts**: Converts nested account groups into flat structures
-2. **Preserves Relationships**: Uses underscore-separated naming to maintain parent-child relationships
-3. **Updates PDA Seeds**: Properly adjusts PDA seed references when accounts are flattened
-4. **Maintains Type Safety**: Ensures all account references remain valid after flattening
+```bash
+# Install Coda CLI
+bun add -D @macalinao/coda
 
-See: https://github.com/codama-idl/codama/issues/754 for the active issue in Codama on this topic.
+# Initialize configuration
+coda init
+
+# Add this visitor to your coda.config.mjs
+```
+
+Learn more about Coda's zero-config approach and powerful visitor system at [coda.ianm.com](https://coda.ianm.com).
 
 ## Installation
 

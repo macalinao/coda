@@ -1,17 +1,23 @@
 # @macalinao/codama-renderers-js-esm
 
 [![npm version](https://img.shields.io/npm/v/@macalinao/codama-renderers-js-esm.svg)](https://www.npmjs.com/package/@macalinao/codama-renderers-js-esm)
+[![npm downloads](https://img.shields.io/npm/dm/@macalinao/codama-renderers-js-esm.svg)](https://www.npmjs.com/package/@macalinao/codama-renderers-js-esm)
 
 ESM-native TypeScript renderer for [Codama](https://github.com/codama-idl/codama) JavaScript code generation. This package extends `@codama/renderers-js` to produce fully ESM-compatible TypeScript/JavaScript code.
 
-## Why This Package Exists
+## Used by Coda CLI
 
-While `@codama/renderers-js` generates excellent TypeScript code for Solana programs, the generated output uses CommonJS-style imports that may not work correctly in pure ESM environments. This package addresses several key issues:
+This renderer is the default TypeScript renderer used by the [Coda CLI](https://coda.ianm.com):
 
-1. **ESM Module Resolution**: Adds `.js` extensions to all relative imports, which is required for proper ESM module resolution
-2. **TypeScript ESM Compatibility**: Ensures generated TypeScript code works correctly with `"type": "module"` in package.json
-3. **Production-Ready Code**: Removes Node.js-specific environment checks that may not work in all JavaScript runtimes
-4. **Type Safety Improvements**: Enhances type assertions and null checks for better TypeScript strictness
+```bash
+# Install Coda CLI - includes this ESM renderer by default
+bun add -D @macalinao/coda
+
+# Generate ESM-native TypeScript clients with zero config
+coda generate
+```
+
+Coda provides the easiest way to generate type-safe Solana clients from your Anchor IDLs. Learn more at [coda.ianm.com](https://coda.ianm.com).
 
 ## Installation
 

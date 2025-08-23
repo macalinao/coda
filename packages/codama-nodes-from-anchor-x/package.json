@@ -1,0 +1,51 @@
+{
+  "name": "@macalinao/codama-nodes-from-anchor-x",
+  "version": "0.0.1",
+  "description": "Create Codama root nodes from multiple Anchor IDLs",
+  "keywords": [
+    "solana",
+    "codama",
+    "anchor",
+    "idl",
+    "ast"
+  ],
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://github.com/macalinao/coda/tree/master/packages/codama-nodes-from-anchor-x",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -fr dist/",
+    "test": "bun test"
+  },
+  "bugs": {
+    "url": "https://github.com/macalinao/coda/issues"
+  },
+  "dependencies": {
+    "@codama/nodes": "*",
+    "@codama/nodes-from-anchor": "*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "@codama/nodes": "*",
+    "@codama/nodes-from-anchor": "*"
+  }
+}

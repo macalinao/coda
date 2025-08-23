@@ -83,6 +83,7 @@
       },
       "dependencies": {
         "@codama/nodes-from-anchor": "*",
+        "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
         "@macalinao/codama-renderers-js-esm": "workspace:*",
         "@macalinao/codama-renderers-markdown": "workspace:*",
         "codama": "*",
@@ -110,6 +111,22 @@
         "@macalinao/tsconfig": "catalog:",
         "eslint": "catalog:",
         "typescript": "catalog:",
+      },
+    },
+    "packages/codama-nodes-from-anchor-x": {
+      "name": "@macalinao/codama-nodes-from-anchor-x",
+      "version": "0.0.1",
+      "dependencies": {
+        "@codama/nodes": "*",
+        "@codama/nodes-from-anchor": "*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "typescript": "^5.7.3",
+      },
+      "peerDependencies": {
+        "@codama/nodes": "*",
+        "@codama/nodes-from-anchor": "*",
       },
     },
     "packages/codama-rename-visitor": {
@@ -425,6 +442,8 @@
     "@macalinao/coda": ["@macalinao/coda@workspace:packages/coda"],
 
     "@macalinao/codama-instruction-accounts-dedupe-visitor": ["@macalinao/codama-instruction-accounts-dedupe-visitor@workspace:packages/codama-instruction-accounts-dedupe-visitor"],
+
+    "@macalinao/codama-nodes-from-anchor-x": ["@macalinao/codama-nodes-from-anchor-x@workspace:packages/codama-nodes-from-anchor-x"],
 
     "@macalinao/codama-rename-visitor": ["@macalinao/codama-rename-visitor@workspace:packages/codama-rename-visitor"],
 
@@ -1913,6 +1932,10 @@
     "@isaacs/cliui/strip-ansi": ["strip-ansi@7.1.0", "", { "dependencies": { "ansi-regex": "^6.0.1" } }, "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ=="],
 
     "@isaacs/cliui/wrap-ansi": ["wrap-ansi@8.1.0", "", { "dependencies": { "ansi-styles": "^6.1.0", "string-width": "^5.0.1", "strip-ansi": "^7.0.1" } }, "sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ=="],
+
+    "@macalinao/coda/@macalinao/eslint-config": ["@macalinao/eslint-config@5.0.1", "", { "dependencies": { "@eslint/js": "^9.33.0", "@typescript-eslint/parser": "^8.39.1", "@typescript-eslint/utils": "^8.39.1", "eslint-config-prettier": "^10.1.8", "eslint-config-turbo": "^2.5.6", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-prettier": "^5.5.4", "eslint-plugin-simple-import-sort": "^12.1.1", "eslint-plugin-unused-imports": "^4.1.4", "globals": "^16.3.0", "typescript-eslint": "^8.39.1" }, "peerDependencies": { "eslint": "^9.33.0" } }, "sha512-y2irsItbTh2+qk5ICCGiNozKEcDJzZZjZ6ohRBbwNPWnl/X5hzS/pmeFvQzcw/USM4/eWbynsayobZMCIOWjAg=="],
+
+    "@macalinao/codama-renderers-js-esm/@macalinao/eslint-config": ["@macalinao/eslint-config@5.0.1", "", { "dependencies": { "@eslint/js": "^9.33.0", "@typescript-eslint/parser": "^8.39.1", "@typescript-eslint/utils": "^8.39.1", "eslint-config-prettier": "^10.1.8", "eslint-config-turbo": "^2.5.6", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-prettier": "^5.5.4", "eslint-plugin-simple-import-sort": "^12.1.1", "eslint-plugin-unused-imports": "^4.1.4", "globals": "^16.3.0", "typescript-eslint": "^8.39.1" }, "peerDependencies": { "eslint": "^9.33.0" } }, "sha512-y2irsItbTh2+qk5ICCGiNozKEcDJzZZjZ6ohRBbwNPWnl/X5hzS/pmeFvQzcw/USM4/eWbynsayobZMCIOWjAg=="],
 
     "@macalinao/codama-renderers-markdown/@macalinao/eslint-config": ["@macalinao/eslint-config@5.0.1", "", { "dependencies": { "@eslint/js": "^9.33.0", "@typescript-eslint/parser": "^8.39.1", "@typescript-eslint/utils": "^8.39.1", "eslint-config-prettier": "^10.1.8", "eslint-config-turbo": "^2.5.6", "eslint-import-resolver-typescript": "^4.4.4", "eslint-plugin-import-x": "^4.16.1", "eslint-plugin-prettier": "^5.5.4", "eslint-plugin-simple-import-sort": "^12.1.1", "eslint-plugin-unused-imports": "^4.1.4", "globals": "^16.3.0", "typescript-eslint": "^8.39.1" }, "peerDependencies": { "eslint": "^9.33.0" } }, "sha512-y2irsItbTh2+qk5ICCGiNozKEcDJzZZjZ6ohRBbwNPWnl/X5hzS/pmeFvQzcw/USM4/eWbynsayobZMCIOWjAg=="],
 
