@@ -9,8 +9,3 @@ export interface ProgramRenameOptions {
   /** Mapping of old defined type names to new defined type names */
   definedTypes?: Record<string, string>;
 }
-
-/**
- * Options for the rename visitor (legacy interface)
- */
-export type RenameVisitorOptions = ProgramRenameOptions;

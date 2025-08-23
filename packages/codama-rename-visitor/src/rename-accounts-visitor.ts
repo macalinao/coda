@@ -1,8 +1,27 @@
-import type { AccountNode,
-  assertIsNode,
-  bottomUpTransformerVisitor,
-  camelCase,
-  type rootNodeVisitor } from "codama";
+import type { AccountNode, Node, rootNodeVisitor } from "codama";
+import { assertIsNode, bottomUpTransformerVisitor, camelCase } from "codama";
+
+/**
+ * Transform function that renames an account node based on a mapping.
+ *
+ * @param node - The node to transform
+ * @param mapping - Object mapping old account names to new account names
+ * @returns The transformed account node
+ */
+export function renameAccountTransform(
+  node: Node,
+  mapping: Record<string, string>,
+): AccountNode {
+  assertIsNode(node, "accountNode");
+  const newName = mapping[node.name];
+  if (!newName) {
+    return node;
+  }
+  return {
+    ...node,
+    name: camelCase(newName),
+  };
+}
 
 /**
  * Creates a visitor that renames accounts in a Codama IDL.
@@ -25,17 +44,7 @@ export function renameAccountsVisitor(
   return bottomUpTransformerVisitor([
     {
       select: "[accountNode]",
-      transform: (node): AccountNode => {
-        assertIsNode(node, "accountNode");
-        const newName = mapping[node.name];
-        if (!newName) {
-          return node;
-        }
-        return {
-          ...node,
-          name: camelCase(newName),
-        };
-      },
+      transform: (node) => renameAccountTransform(node, mapping),
     },
   ]);
 }

@@ -2,6 +2,28 @@ import type { InstructionNode, Node, NodeKind, Visitor } from "codama";
 import { assertIsNode, bottomUpTransformerVisitor, camelCase } from "codama";
 
 /**
+ * Transform function that renames an instruction node based on a mapping.
+ *
+ * @param node - The node to transform
+ * @param mapping - Object mapping old instruction names to new instruction names
+ * @returns The transformed instruction node
+ */
+export function renameInstructionTransform(
+  node: Node,
+  mapping: Record<string, string>,
+): InstructionNode {
+  assertIsNode(node, "instructionNode");
+  const newName = mapping[node.name];
+  if (!newName) {
+    return node;
+  }
+  return {
+    ...node,
+    name: camelCase(newName),
+  };
+}
+
+/**
  * Creates a visitor that renames instructions in a Codama IDL.
  *
  * @param mapping - Object mapping old instruction names to new instruction names
@@ -22,17 +44,7 @@ export function renameInstructionsVisitor<
   return bottomUpTransformerVisitor([
     {
       select: "[instructionNode]",
-      transform: (node) => {
-        assertIsNode(node, "instructionNode");
-        const newName = mapping[node.name];
-        if (!newName) {
-          return node;
-        }
-        return {
-          ...node,
-          name: camelCase(newName),
-        } as InstructionNode;
-      },
+      transform: (node) => renameInstructionTransform(node, mapping),
     },
   ]);
 }

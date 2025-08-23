@@ -1,20 +1,12 @@
-import type {
-  AccountNode,
-  DefinedTypeNode,
-  InstructionNode,
-  Node,
-} from "codama";
-import {
-  assertIsNode,
-  bottomUpTransformerVisitor,
-  camelCase,
-  rootNodeVisitor,
-  visit,
-} from "codama";
+import type { Node } from "codama";
+import { bottomUpTransformerVisitor, rootNodeVisitor, visit } from "codama";
+import { renameAccountTransform } from "./rename-accounts-visitor.js";
+import { renameDefinedTypeTransform } from "./rename-defined-types-visitor.js";
+import { renameInstructionTransform } from "./rename-instructions-visitor.js";
 import type { ProgramRenameOptions } from "./types.js";
 
 /**
- * Creates a visitor that renames instructions, events, and defined types in specific programs.
+ * Creates a visitor that renames accounts, instructions, and defined types in specific programs.
  * This follows the same pattern as addPdasVisitor from Codama.
  *
  * @param renamesByProgram - Object mapping program names to their rename configurations
@@ -26,6 +18,9 @@ import type { ProgramRenameOptions } from "./types.js";
  *   quarryMine: {
  *     instructions: {
  *       claimRewards: "claimRewardsMine"
+ *     },
+ *     accounts: {
+ *       miner: "minerAccount"
  *     }
  *   },
  *   token: {
@@ -33,8 +28,8 @@ import type { ProgramRenameOptions } from "./types.js";
  *       transfer: "transferTokens",
  *       mint: "mintNft"
  *     },
- *     events: {
- *       tokenMinted: "nftMinted"
+ *     definedTypes: {
+ *       tokenData: "tokenMetadata"
  *     }
  *   }
  * });
@@ -58,13 +53,8 @@ export function renameVisitor(
           ([oldName, newName]) => {
             transforms.push({
               select: `[programNode]${programName}.[instructionNode]${oldName}`,
-              transform: (node) => {
-                assertIsNode(node, "instructionNode");
-                return {
-                  ...node,
-                  name: camelCase(newName),
-                } as InstructionNode;
-              },
+              transform: (node) =>
+                renameInstructionTransform(node, { [oldName]: newName }),
             });
           },
         );
@@ -74,13 +64,8 @@ export function renameVisitor(
         Object.entries(renameOptions.accounts).forEach(([oldName, newName]) => {
           transforms.push({
             select: `[programNode]${programName}.[accountNode]${oldName}`,
-            transform: (node): AccountNode => {
-              assertIsNode(node, "accountNode");
-              return {
-                ...node,
-                name: camelCase(newName),
-              };
-            },
+            transform: (node) =>
+              renameAccountTransform(node, { [oldName]: newName }),
           });
         });
       }
@@ -91,13 +76,8 @@ export function renameVisitor(
           ([oldName, newName]) => {
             transforms.push({
               select: `[programNode]${programName}.[definedTypeNode]${oldName}`,
-              transform: (node): DefinedTypeNode => {
-                assertIsNode(node, "definedTypeNode");
-                return {
-                  ...node,
-                  name: camelCase(newName),
-                };
-              },
+              transform: (node) =>
+                renameDefinedTypeTransform(node, { [oldName]: newName }),
             });
           },
         );

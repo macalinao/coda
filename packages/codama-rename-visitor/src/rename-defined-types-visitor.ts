@@ -1,4 +1,4 @@
-import type { DefinedTypeNode } from "codama";
+import type { DefinedTypeNode, Node } from "codama";
 import {
   assertIsNode,
   bottomUpTransformerVisitor,
@@ -6,6 +6,28 @@ import {
   rootNodeVisitor,
   visit,
 } from "codama";
+
+/**
+ * Transform function that renames a defined type node based on a mapping.
+ *
+ * @param node - The node to transform
+ * @param mapping - Object mapping old defined type names to new defined type names
+ * @returns The transformed defined type node
+ */
+export function renameDefinedTypeTransform(
+  node: Node,
+  mapping: Record<string, string>,
+): DefinedTypeNode {
+  assertIsNode(node, "definedTypeNode");
+  const newName = mapping[node.name];
+  if (!newName) {
+    return node;
+  }
+  return {
+    ...node,
+    name: camelCase(newName),
+  };
+}
 
 /**
  * Creates a visitor that renames defined types in a Codama IDL.
@@ -29,17 +51,7 @@ export function renameDefinedTypesVisitor(
     const typeVisitor = bottomUpTransformerVisitor([
       {
         select: "[definedTypeNode]",
-        transform: (node) => {
-          assertIsNode(node, "definedTypeNode");
-          const newName = mapping[node.name];
-          if (!newName) {
-            return node;
-          }
-          return {
-            ...node,
-            name: camelCase(newName),
-          } as DefinedTypeNode;
-        },
+        transform: (node) => renameDefinedTypeTransform(node, mapping),
       },
     ]);
     return visit(root, typeVisitor);
