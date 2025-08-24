@@ -5,30 +5,40 @@ description: Core packages that power Coda's client generation capabilities
 
 Coda is built as a modular system of packages that work together to generate high-quality TypeScript clients from Solana IDLs. Each package serves a specific purpose in the generation pipeline.
 
-## Core Package
+## Core Packages
 
 ### [@macalinao/coda](/docs/packages/coda)
+
 The main CLI tool for generating TypeScript clients from Anchor IDLs. Works out of the box with sensible defaults and extensible configuration.
+
+### [@macalinao/create-coda](/docs/packages/create-coda)
+
+Project scaffolding tool that bootstraps new Coda client projects with TypeScript, ESLint, and all configurations pre-set.
 
 ## Parsers
 
 ### [@macalinao/codama-nodes-from-anchor-x](/docs/packages/codama-nodes-from-anchor-x)
+
 Creates Codama root nodes from multiple Anchor IDLs with enhanced support for various IDL versions.
 
 ## Visitors
 
 ### [@macalinao/codama-instruction-accounts-dedupe-visitor](/docs/packages/codama-instruction-accounts-dedupe-visitor)
+
 Flattens nested account structures from Anchor IDLs while preserving relationships through naming conventions.
 
 ### [@macalinao/codama-rename-visitor](/docs/packages/codama-rename-visitor)
+
 Renames accounts, instructions, and defined types in the Codama AST to avoid conflicts and customize naming.
 
 ## Renderers
 
 ### [@macalinao/codama-renderers-js-esm](/docs/packages/codama-renderers-js-esm)
+
 ESM-native TypeScript renderer that generates modern JavaScript modules with proper `.js` extensions.
 
 ### [@macalinao/codama-renderers-markdown](/docs/packages/codama-renderers-markdown)
+
 Generates comprehensive Markdown documentation from Codama AST nodes, perfect for API documentation.
 
 ## Package Architecture
@@ -44,18 +54,56 @@ Each package in the Coda ecosystem follows a consistent structure:
 
 Each package can be installed individually based on your needs:
 
+### Create a New Project (Recommended)
+
 ```bash
-# Install the main CLI
+# Using npm
+npm create @macalinao/create-coda@latest my-client
+
+# Using bun
+bun create @macalinao/create-coda my-client
+```
+
+### Install the Main CLI
+
+```bash
+# Using npm
+npm install -D @macalinao/coda
+
+# Using bun
 bun add -D @macalinao/coda
+```
 
-# Install parsers
+### Install Parsers
+
+```bash
+# Using npm
+npm install @macalinao/codama-nodes-from-anchor-x
+
+# Using bun
 bun add @macalinao/codama-nodes-from-anchor-x
+```
 
-# Install visitors
+### Install Visitors
+
+```bash
+# Using npm
+npm install @macalinao/codama-instruction-accounts-dedupe-visitor
+npm install @macalinao/codama-rename-visitor
+
+# Using bun
 bun add @macalinao/codama-instruction-accounts-dedupe-visitor
 bun add @macalinao/codama-rename-visitor
+```
 
-# Install renderers
+### Install Renderers
+
+```bash
+# Using npm
+npm install @macalinao/codama-renderers-js-esm
+npm install @macalinao/codama-renderers-markdown
+
+# Using bun
 bun add @macalinao/codama-renderers-js-esm
 bun add @macalinao/codama-renderers-markdown
 ```

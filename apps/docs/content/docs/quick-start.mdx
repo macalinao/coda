@@ -3,28 +3,71 @@ title: Quick Start
 description: Generate your first TypeScript client with Coda
 ---
 
-This guide walks you through generating your first TypeScript client from an Anchor IDL.
+Get started with Coda in seconds using our project scaffolding tool.
 
-## Step 1: Build Your Program
+## Option 1: Create a New Project (Recommended)
 
-First, ensure you have an Anchor IDL by building your program:
+The fastest way to start is with `create-coda`:
 
 ```bash
-anchor build
+# Using npm
+npm create @macalinao/create-coda@latest my-client
+cd my-client
+npm install
+
+# Using bun
+bun create @macalinao/create-coda my-client
+cd my-client
+bun install
 ```
 
-This creates your IDL file at `./target/idl/your_program.json`.
+This creates a complete project with:
 
-## Step 2: Generate the Client
+- TypeScript and ESLint pre-configured
+- Coda configuration ready to use
+- Example IDL to get started
+- All necessary build scripts
 
-Run Coda to generate your TypeScript client:
+Then add your IDL and generate:
 
 ```bash
-bunx @macalinao/coda generate
+# Replace example.json with your Anchor IDL
+cp path/to/your/program/target/idl/your_program.json idls/
+
+# Generate the TypeScript client
+bun run codegen
+
+# Build the project
+bun run build
+```
+
+## Option 2: Add to Existing Project
+
+If you have an existing project with an Anchor IDL:
+
+### Step 1: Install Coda
+
+```bash
+# Using npm
+npm install -D @macalinao/coda
+
+# Using bun
+bun add -D @macalinao/coda
+```
+
+### Step 2: Generate the Client
+
+```bash
+# Using npm
+npx coda generate
+
+# Using bun
+bunx coda generate
 ```
 
 Coda will:
-- Locate your IDL (defaults to `./target/idl/`)
+
+- Locate your IDL (defaults to `./idls/*.json` or `./target/idl/`)
 - Generate a complete TypeScript client
 - Output files to `./src/generated/`
 
@@ -35,10 +78,10 @@ No configuration required for standard Anchor projects.
 Import and use the generated functions in your application:
 
 ```typescript
-import { 
+import {
   createTransferInstruction,
   fetchTokenAccount,
-  findVaultPda 
+  findVaultPda,
 } from "./src/generated";
 
 // Create instructions with full type safety
@@ -46,7 +89,7 @@ const instruction = createTransferInstruction({
   source: sourceAccount,
   destination: destAccount,
   authority: signer,
-  amount: 1000n
+  amount: 1000n,
 });
 
 // Fetch and decode accounts
@@ -56,7 +99,7 @@ console.log(account.balance); // Fully typed
 // Find program-derived addresses
 const [vault] = await findVaultPda({
   user: userPubkey,
-  seed: "vault"
+  seed: "vault",
 });
 ```
 
@@ -65,18 +108,23 @@ const [vault] = await findVaultPda({
 Coda generates a comprehensive TypeScript client including:
 
 ### **Instructions**
+
 Typed builders for every program instruction with full IntelliSense support.
 
 ### **Accounts**
+
 Fetchers and decoders for all account types with automatic deserialization.
 
 ### **Types**
+
 All custom types from your IDL including enums, structs, and unions.
 
 ### **PDAs**
+
 Helper functions for program-derived address calculation.
 
 ### **Errors**
+
 Typed error definitions for proper error handling.
 
 ## File Structure

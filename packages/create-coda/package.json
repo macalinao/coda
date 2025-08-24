@@ -1,0 +1,47 @@
+{
+  "name": "@macalinao/create-coda",
+  "version": "0.0.0",
+  "description": "Create a new Coda client project",
+  "type": "module",
+  "bin": {
+    "create-coda": "./dist/bin.js"
+  },
+  "main": "./dist/bin.js",
+  "files": [
+    "dist/",
+    "template/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist/ template/node_modules template/dist template/src/generated",
+    "lint": "eslint . --cache"
+  },
+  "keywords": [
+    "coda",
+    "solana",
+    "codama",
+    "client",
+    "generator",
+    "create",
+    "template"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/macalinao/coda",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/macalinao/coda.git"
+  },
+  "bugs": {
+    "url": "https://github.com/macalinao/coda/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/tsconfig": "catalog:",
+    "@types/node": "^22.0.0",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

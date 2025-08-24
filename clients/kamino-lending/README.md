@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@macalinao/clients-kamino-lending.svg)](https://www.npmjs.com/package/@macalinao/clients-kamino-lending)
 [![npm downloads](https://img.shields.io/npm/dm/@macalinao/clients-kamino-lending.svg)](https://www.npmjs.com/package/@macalinao/clients-kamino-lending)
 
-TypeScript client for the Kamino Lending program on Solana.
+Low-level TypeScript client for the Kamino Lending and Farms programs on Solana.
 
 ## Installation
 

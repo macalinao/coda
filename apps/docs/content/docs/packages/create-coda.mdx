@@ -1,0 +1,244 @@
+---
+title: "@macalinao/create-coda"
+description: Project scaffolding tool for Coda client projects
+---
+
+## Overview
+
+`@macalinao/create-coda` is a project scaffolding tool that helps you bootstrap new TypeScript clients for Solana programs. It sets up a complete project structure with TypeScript, ESLint, and Coda pre-configured, allowing you to start generating clients immediately.
+
+## Installation
+
+The package is designed to be used with create commands from any package manager:
+
+```bash
+# Using npm
+npm create @macalinao/create-coda@latest my-project
+
+# Using bun
+bun create @macalinao/create-coda my-project
+```
+
+## Usage
+
+### Basic Usage
+
+Create a new Coda client project:
+
+```bash
+# Using npm
+npm create @macalinao/create-coda@latest my-client
+
+# Using bun
+bun create @macalinao/create-coda my-client
+```
+
+This will create a new directory called `my-client` with a complete project setup.
+
+### Custom Directory Name
+
+You can specify any name for your project:
+
+```bash
+# Using npm
+npm create @macalinao/create-coda@latest my-awesome-dex
+npm create @macalinao/create-coda@latest lending-protocol
+npm create @macalinao/create-coda@latest nft-marketplace
+
+# Using bun
+bun create @macalinao/create-coda my-awesome-dex
+bun create @macalinao/create-coda lending-protocol
+bun create @macalinao/create-coda nft-marketplace
+```
+
+## What's Included
+
+The scaffolded project includes:
+
+### Project Structure
+
+```
+my-client/
+├── idls/               # Anchor IDL files
+│   └── example.json    # Example IDL to demonstrate usage
+├── src/
+│   ├── generated/      # Generated client code (after codegen)
+│   └── index.ts        # Main entry point
+├── coda.config.mjs     # Coda configuration
+├── tsconfig.json       # TypeScript configuration
+├── eslint.config.js    # ESLint configuration
+├── package.json        # Dependencies and scripts
+├── README.md           # Project documentation
+└── .gitignore          # Git ignore patterns
+```
+
+### Pre-configured Dependencies
+
+- **@macalinao/coda** - The Coda CLI for generating clients
+- **@macalinao/eslint-config** - Consistent ESLint configuration
+- **@macalinao/tsconfig** - Shared TypeScript configuration
+- **@solana/kit** - Solana development kit
+- **TypeScript** - For type-safe development
+- **ESLint** - For code quality
+
+### NPM Scripts
+
+```json
+{
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -fr dist/ tsconfig.tsbuildinfo",
+    "codegen": "rm -fr src/generated/ && coda generate",
+    "lint": "eslint . --cache"
+  }
+}
+```
+
+### TypeScript Configuration
+
+Extends `@macalinao/tsconfig` with:
+
+- ES modules with `.js` extensions
+- Strict type checking
+- Modern ES2024 target
+- Source maps and declarations
+- Incremental compilation
+
+### ESLint Configuration
+
+Extends `@macalinao/eslint-config` with:
+
+- TypeScript-specific rules
+- Import organization
+- Special handling for generated code
+- Automatic formatting fixes
+
+### Coda Configuration
+
+Pre-configured `coda.config.mjs` with:
+
+- Automatic IDL discovery from `./idls/*.json`
+- Output to `./src/generated`
+- Ready for custom visitors and PDAs
+
+## Template Customization
+
+The template is designed to be flexible:
+
+### Single IDL Projects
+
+Default configuration works out of the box:
+
+```javascript
+// coda.config.mjs
+export default defineConfig({
+  // Automatically finds IDLs in ./idls/*.json
+  outputDir: "./src/generated",
+});
+```
+
+### Multiple IDL Projects
+
+Configure for multiple programs:
+
+```javascript
+// coda.config.mjs
+export default defineConfig({
+  idlPath: "./idls/*.json", // Process all IDLs
+  outputDir: "./src/generated",
+});
+```
+
+### Custom Visitors
+
+Add Codama visitors for enhanced functionality:
+
+```javascript
+// coda.config.mjs
+import { addPdasVisitor } from "codama";
+
+export default defineConfig({
+  outputDir: "./src/generated",
+  visitors: [
+    addPdasVisitor({
+      // Custom PDA definitions
+    }),
+  ],
+});
+```
+
+## Development Workflow
+
+After creating a project with create-coda:
+
+### 1. Install Dependencies
+
+```bash
+cd my-client
+bun install
+```
+
+### 2. Add Your IDL
+
+Replace the example IDL with your program's IDL:
+
+```bash
+rm idls/example.json
+cp path/to/your/target/idl/program.json idls/
+```
+
+### 3. Generate Client
+
+```bash
+bun run codegen
+```
+
+### 4. Build Project
+
+```bash
+bun run build
+```
+
+### 5. Use the Client
+
+```typescript
+import { createInitializeInstruction } from "./dist/index.js";
+
+const ix = createInitializeInstruction({
+  // ... parameters
+});
+```
+
+## Package Development
+
+To work on the create-coda package itself:
+
+### Building
+
+```bash
+cd packages/create-coda
+bun run build
+```
+
+### Testing Locally
+
+```bash
+node ./dist/bin.js test-project
+```
+
+### Template Files
+
+The template files are located in `packages/create-coda/template/` and are copied when creating new projects.
+
+## Source Code
+
+The create-coda package is part of the Coda monorepo:
+
+- [GitHub Repository](https://github.com/macalinao/coda/tree/master/packages/create-coda)
+- [NPM Package](https://www.npmjs.com/package/@macalinao/create-coda)
+
+## Related Packages
+
+- [**@macalinao/coda**](/docs/packages/coda) - The main Coda CLI
+- [**@macalinao/codama-renderers-js-esm**](/docs/packages/codama-renderers-js-esm) - ESM renderer for Codama
+- [**@macalinao/codama-instruction-accounts-dedupe-visitor**](/docs/packages/codama-instruction-accounts-dedupe-visitor) - Account deduplication visitor
