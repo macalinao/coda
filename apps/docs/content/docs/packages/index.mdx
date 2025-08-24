@@ -5,10 +5,13 @@ description: Core packages that power Coda's client generation capabilities
 
 Coda is built as a modular system of packages that work together to generate high-quality TypeScript clients from Solana IDLs. Each package serves a specific purpose in the generation pipeline.
 
-## Core Package
+## Core Packages
 
 ### [@macalinao/coda](/docs/packages/coda)
 The main CLI tool for generating TypeScript clients from Anchor IDLs. Works out of the box with sensible defaults and extensible configuration.
+
+### [@macalinao/create-coda](/docs/packages/create-coda)
+Project scaffolding tool that bootstraps new Coda client projects with TypeScript, ESLint, and all configurations pre-set.
 
 ## Parsers
 
@@ -45,7 +48,10 @@ Each package in the Coda ecosystem follows a consistent structure:
 Each package can be installed individually based on your needs:
 
 ```bash
-# Install the main CLI
+# Create a new project (recommended)
+bun create @macalinao/create-coda my-client
+
+# Or install the main CLI to an existing project
 bun add -D @macalinao/coda
 
 # Install parsers

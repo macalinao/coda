@@ -57,8 +57,8 @@
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
     "codegen": "turbo run codegen",
-    "docs:dev": "turbo dev --filter=@macalinao/coda-docs",
-    "docs:build": "turbo build --filter=@macalinao/coda-docs"
+    "docs:dev": "turbo dev --filter=coda-docs",
+    "docs:build": "turbo build --filter=coda-docs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",

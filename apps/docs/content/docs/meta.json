@@ -1,12 +1,12 @@
 {
-  "title": "Documentation",
+  "title": "Coda Documentation",
   "pages": [
-    "---Introduction---",
     "index",
     "why-coda",
     "installation",
     "quick-start",
     "---Using Coda---",
+    "create-coda",
     "configuration",
     "generating-clients",
     "generating-docs",

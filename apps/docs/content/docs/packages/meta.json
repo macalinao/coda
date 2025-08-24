@@ -2,8 +2,9 @@
   "title": "Packages",
   "pages": [
     "index",
-    "---Core Package---",
+    "---Core Packages---",
     "coda",
+    "create-coda",
     "---Parsers---",
     "codama-nodes-from-anchor-x",
     "---Visitors---",
