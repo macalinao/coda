@@ -9,38 +9,17 @@ Get started with Coda in seconds using our project scaffolding tool.
 
 The fastest way to start is with `create-coda`:
 
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+```bash
+# Using npm
+npm create @macalinao/create-coda@latest my-client
+cd my-client
+npm install
 
-<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
-  <Tab value="npm">
-    ```bash
-    npm create @macalinao/create-coda@latest my-client
-    cd my-client
-    npm install
-    ```
-  </Tab>
-  <Tab value="pnpm">
-    ```bash
-    pnpm create @macalinao/create-coda@latest my-client
-    cd my-client
-    pnpm install
-    ```
-  </Tab>
-  <Tab value="yarn">
-    ```bash
-    yarn create @macalinao/create-coda my-client
-    cd my-client
-    yarn install
-    ```
-  </Tab>
-  <Tab value="bun">
-    ```bash
-    bun create @macalinao/create-coda my-client
-    cd my-client
-    bun install
-    ```
-  </Tab>
-</Tabs>
+# Using bun
+bun create @macalinao/create-coda my-client
+cd my-client
+bun install
+```
 
 This creates a complete project with:
 
@@ -69,12 +48,20 @@ If you have an existing project with an Anchor IDL:
 ### Step 1: Install Coda
 
 ```bash
+# Using npm
+npm install -D @macalinao/coda
+
+# Using bun
 bun add -D @macalinao/coda
 ```
 
 ### Step 2: Generate the Client
 
 ```bash
+# Using npm
+npx coda generate
+
+# Using bun
 bunx coda generate
 ```
 

@@ -54,46 +54,59 @@ Each package in the Coda ecosystem follows a consistent structure:
 
 Each package can be installed individually based on your needs:
 
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+### Create a New Project (Recommended)
 
-<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
-    ```bash # Create a new project (recommended) npm create
-    @macalinao/create-coda@latest my-client # Or install the main CLI to an
-    existing project npm install -D @macalinao/coda ```
-  </Tab>
-  <Tab value="pnpm">
-    ```bash # Create a new project (recommended) pnpm create
-    @macalinao/create-coda@latest my-client # Or install the main CLI to an
-    existing project pnpm add -D @macalinao/coda ```
-  </Tab>
-  <Tab value="yarn">
-    ```bash # Create a new project (recommended) yarn create
-    @macalinao/create-coda my-client # Or install the main CLI to an existing
-    project yarn add -D @macalinao/coda ```
-  </Tab>
-  <Tab value="bun">
-    ```bash # Create a new project (recommended) bun create
-    @macalinao/create-coda my-client # Or install the main CLI to an existing
-    project bun add -D @macalinao/coda ```
-  </Tab>
-</Tabs>
+```bash
+# Using npm
+npm create @macalinao/create-coda@latest my-client
 
-# Install parsers
+# Using bun
+bun create @macalinao/create-coda my-client
+```
 
+### Install the Main CLI
+
+```bash
+# Using npm
+npm install -D @macalinao/coda
+
+# Using bun
+bun add -D @macalinao/coda
+```
+
+### Install Parsers
+
+```bash
+# Using npm
+npm install @macalinao/codama-nodes-from-anchor-x
+
+# Using bun
 bun add @macalinao/codama-nodes-from-anchor-x
+```
 
-# Install visitors
+### Install Visitors
 
+```bash
+# Using npm
+npm install @macalinao/codama-instruction-accounts-dedupe-visitor
+npm install @macalinao/codama-rename-visitor
+
+# Using bun
 bun add @macalinao/codama-instruction-accounts-dedupe-visitor
 bun add @macalinao/codama-rename-visitor
+```
 
-# Install renderers
+### Install Renderers
 
+```bash
+# Using npm
+npm install @macalinao/codama-renderers-js-esm
+npm install @macalinao/codama-renderers-markdown
+
+# Using bun
 bun add @macalinao/codama-renderers-js-esm
 bun add @macalinao/codama-renderers-markdown
-
-````
+```
 
 ## Contributing
 
