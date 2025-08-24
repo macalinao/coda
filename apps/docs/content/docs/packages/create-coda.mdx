@@ -9,21 +9,61 @@ description: Project scaffolding tool for Coda client projects
 
 ## Installation
 
-The package is designed to be used with `bun create` and doesn't need to be installed globally:
+The package is designed to be used with create commands from any package manager:
 
-```bash
-bun create @macalinao/create-coda my-project
-```
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tab value="npm">
+    ```bash
+    npm create @macalinao/create-coda@latest my-project
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm create @macalinao/create-coda@latest my-project
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn create @macalinao/create-coda my-project
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bun create @macalinao/create-coda my-project
+    ```
+  </Tab>
+</Tabs>
 
 ## Usage
 
 ### Basic Usage
 
-Create a new Coda client project:
+Create a new Coda client project with your preferred package manager:
 
-```bash
-bun create @macalinao/create-coda my-client
-```
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tab value="npm">
+    ```bash
+    npm create @macalinao/create-coda@latest my-client
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm create @macalinao/create-coda@latest my-client
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn create @macalinao/create-coda my-client
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bun create @macalinao/create-coda my-client
+    ```
+  </Tab>
+</Tabs>
 
 This will create a new directory called `my-client` with a complete project setup.
 
@@ -31,11 +71,36 @@ This will create a new directory called `my-client` with a complete project setu
 
 You can specify any name for your project:
 
-```bash
-bun create @macalinao/create-coda my-awesome-dex
-bun create @macalinao/create-coda lending-protocol
-bun create @macalinao/create-coda nft-marketplace
-```
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tab value="npm">
+    ```bash
+    npm create @macalinao/create-coda@latest my-awesome-dex
+    npm create @macalinao/create-coda@latest lending-protocol
+    npm create @macalinao/create-coda@latest nft-marketplace
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm create @macalinao/create-coda@latest my-awesome-dex
+    pnpm create @macalinao/create-coda@latest lending-protocol
+    pnpm create @macalinao/create-coda@latest nft-marketplace
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn create @macalinao/create-coda my-awesome-dex
+    yarn create @macalinao/create-coda lending-protocol
+    yarn create @macalinao/create-coda nft-marketplace
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bun create @macalinao/create-coda my-awesome-dex
+    bun create @macalinao/create-coda lending-protocol
+    bun create @macalinao/create-coda nft-marketplace
+    ```
+  </Tab>
+</Tabs>
 
 ## What's Included
 
@@ -83,6 +148,7 @@ my-client/
 ### TypeScript Configuration
 
 Extends `@macalinao/tsconfig` with:
+
 - ES modules with `.js` extensions
 - Strict type checking
 - Modern ES2024 target
@@ -92,6 +158,7 @@ Extends `@macalinao/tsconfig` with:
 ### ESLint Configuration
 
 Extends `@macalinao/eslint-config` with:
+
 - TypeScript-specific rules
 - Import organization
 - Special handling for generated code
@@ -100,6 +167,7 @@ Extends `@macalinao/eslint-config` with:
 ### Coda Configuration
 
 Pre-configured `coda.config.mjs` with:
+
 - Automatic IDL discovery from `./idls/*.json`
 - Output to `./src/generated`
 - Ready for custom visitors and PDAs
@@ -145,8 +213,8 @@ export default defineConfig({
   visitors: [
     addPdasVisitor({
       // Custom PDA definitions
-    })
-  ]
+    }),
+  ],
 });
 ```
 

@@ -8,30 +8,37 @@ Coda is built as a modular system of packages that work together to generate hig
 ## Core Packages
 
 ### [@macalinao/coda](/docs/packages/coda)
+
 The main CLI tool for generating TypeScript clients from Anchor IDLs. Works out of the box with sensible defaults and extensible configuration.
 
 ### [@macalinao/create-coda](/docs/packages/create-coda)
+
 Project scaffolding tool that bootstraps new Coda client projects with TypeScript, ESLint, and all configurations pre-set.
 
 ## Parsers
 
 ### [@macalinao/codama-nodes-from-anchor-x](/docs/packages/codama-nodes-from-anchor-x)
+
 Creates Codama root nodes from multiple Anchor IDLs with enhanced support for various IDL versions.
 
 ## Visitors
 
 ### [@macalinao/codama-instruction-accounts-dedupe-visitor](/docs/packages/codama-instruction-accounts-dedupe-visitor)
+
 Flattens nested account structures from Anchor IDLs while preserving relationships through naming conventions.
 
 ### [@macalinao/codama-rename-visitor](/docs/packages/codama-rename-visitor)
+
 Renames accounts, instructions, and defined types in the Codama AST to avoid conflicts and customize naming.
 
 ## Renderers
 
 ### [@macalinao/codama-renderers-js-esm](/docs/packages/codama-renderers-js-esm)
+
 ESM-native TypeScript renderer that generates modern JavaScript modules with proper `.js` extensions.
 
 ### [@macalinao/codama-renderers-markdown](/docs/packages/codama-renderers-markdown)
+
 Generates comprehensive Markdown documentation from Codama AST nodes, perfect for API documentation.
 
 ## Package Architecture
@@ -47,24 +54,46 @@ Each package in the Coda ecosystem follows a consistent structure:
 
 Each package can be installed individually based on your needs:
 
-```bash
-# Create a new project (recommended)
-bun create @macalinao/create-coda my-client
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-# Or install the main CLI to an existing project
-bun add -D @macalinao/coda
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+    ```bash # Create a new project (recommended) npm create
+    @macalinao/create-coda@latest my-client # Or install the main CLI to an
+    existing project npm install -D @macalinao/coda ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash # Create a new project (recommended) pnpm create
+    @macalinao/create-coda@latest my-client # Or install the main CLI to an
+    existing project pnpm add -D @macalinao/coda ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash # Create a new project (recommended) yarn create
+    @macalinao/create-coda my-client # Or install the main CLI to an existing
+    project yarn add -D @macalinao/coda ```
+  </Tab>
+  <Tab value="bun">
+    ```bash # Create a new project (recommended) bun create
+    @macalinao/create-coda my-client # Or install the main CLI to an existing
+    project bun add -D @macalinao/coda ```
+  </Tab>
+</Tabs>
 
 # Install parsers
+
 bun add @macalinao/codama-nodes-from-anchor-x
 
 # Install visitors
+
 bun add @macalinao/codama-instruction-accounts-dedupe-visitor
 bun add @macalinao/codama-rename-visitor
 
 # Install renderers
+
 bun add @macalinao/codama-renderers-js-esm
 bun add @macalinao/codama-renderers-markdown
-```
+
+````
 
 ## Contributing
 
@@ -79,4 +108,4 @@ bun test
 
 # Fix linting issues
 bun run lint:fix
-```
+````
