@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -24,30 +34,16 @@ import {
   getU16Encoder,
   getU128Decoder,
   getU128Encoder,
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type { WhirlpoolBumps, WhirlpoolBumpsArgs } from "../types/index.js";
 import {
   getWhirlpoolBumpsDecoder,
-  getWhirlpoolBumpsEncoder
-  
-  
+  getWhirlpoolBumpsEncoder,
 } from "../types/index.js";
-import type {WhirlpoolBumps, WhirlpoolBumpsArgs} from "../types/index.js";
 
 export const INITIALIZE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [95, 180, 10, 172, 84, 174, 232, 40],

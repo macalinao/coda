@@ -6,14 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -24,24 +35,11 @@ import {
   getStructEncoder,
   getU16Decoder,
   getU16Encoder,
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 
 export const OPEN_BUNDLED_POSITION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([169, 113, 126, 171, 213, 172, 212, 49]);
@@ -56,9 +54,7 @@ export type OpenBundledPositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountBundledPosition extends string | AccountMeta = string,
   TAccountPositionBundle extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
   TAccountPositionBundleAuthority extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountFunder extends string | AccountMeta = string,

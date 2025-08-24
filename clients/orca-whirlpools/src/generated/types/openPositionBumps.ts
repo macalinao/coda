@@ -6,19 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  
-  
-  
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
-  getU8Encoder
+  getU8Encoder,
 } from "@solana/kit";
-import type {FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder} from "@solana/kit";
 
-export interface OpenPositionBumps { positionBump: number }
+export interface OpenPositionBumps {
+  positionBump: number;
+}
 
 export type OpenPositionBumpsArgs = OpenPositionBumps;
 

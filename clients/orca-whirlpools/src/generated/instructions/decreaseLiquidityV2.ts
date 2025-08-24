@@ -6,14 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  Codec,
+  Decoder,
+  Encoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  Option,
+  OptionOrNullable,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
-  
   combineCodec,
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -26,32 +38,19 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, Codec, Decoder, Encoder, Instruction, InstructionWithAccounts, InstructionWithData, Option, OptionOrNullable, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  RemainingAccountsInfo,
+  RemainingAccountsInfoArgs,
+} from "../types/index.js";
 import {
   getRemainingAccountsInfoDecoder,
-  getRemainingAccountsInfoEncoder
-  
-  
+  getRemainingAccountsInfoEncoder,
 } from "../types/index.js";
-import type {RemainingAccountsInfo, RemainingAccountsInfoArgs} from "../types/index.js";
 
 export const DECREASE_LIQUIDITY_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([58, 127, 188, 62, 79, 82, 196, 96]);

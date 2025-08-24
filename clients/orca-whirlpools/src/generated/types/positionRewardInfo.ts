@@ -6,19 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  
-  
-  
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
   getU128Decoder,
-  getU128Encoder
+  getU128Encoder,
 } from "@solana/kit";
-import type {FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder} from "@solana/kit";
 
 export interface PositionRewardInfo {
   growthInsideCheckpoint: bigint;

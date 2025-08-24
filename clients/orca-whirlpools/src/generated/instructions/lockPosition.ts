@@ -6,45 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
-import {
-  getLockTypeDecoder,
-  getLockTypeEncoder
-  
-  
-} from "../types/index.js";
-import type {LockType, LockTypeArgs} from "../types/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type { LockType, LockTypeArgs } from "../types/index.js";
+import { getLockTypeDecoder, getLockTypeEncoder } from "../types/index.js";
 
 export const LOCK_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   227, 62, 2, 252, 247, 10, 171, 185,
@@ -110,7 +103,9 @@ export interface LockPositionInstructionData {
   lockType: LockType;
 }
 
-export interface LockPositionInstructionDataArgs { lockType: LockTypeArgs }
+export interface LockPositionInstructionDataArgs {
+  lockType: LockTypeArgs;
+}
 
 export function getLockPositionInstructionDataEncoder(): FixedSizeEncoder<LockPositionInstructionDataArgs> {
   return transformEncoder(

@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  
-  
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  
-  
-  
-  
-  
-  
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -29,12 +34,8 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  
-  
-  
-  transformEncoder
+  transformEncoder,
 } from "@solana/kit";
-import type {Account, Address, EncodedAccount, FetchAccountConfig, FetchAccountsConfig, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, MaybeAccount, MaybeEncodedAccount, ReadonlyUint8Array} from "@solana/kit";
 
 export const TOKEN_BADGE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   116, 219, 204, 229, 249, 116, 255, 150,
@@ -50,7 +51,10 @@ export interface TokenBadge {
   tokenMint: Address;
 }
 
-export interface TokenBadgeArgs { whirlpoolsConfig: Address; tokenMint: Address }
+export interface TokenBadgeArgs {
+  whirlpoolsConfig: Address;
+  tokenMint: Address;
+}
 
 export function getTokenBadgeEncoder(): FixedSizeEncoder<TokenBadgeArgs> {
   return transformEncoder(

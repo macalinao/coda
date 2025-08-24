@@ -6,11 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  
-  
-  
   getArrayDecoder,
   getArrayEncoder,
   getBooleanDecoder,
@@ -20,9 +22,8 @@ import {
   getStructDecoder,
   getStructEncoder,
   getU128Decoder,
-  getU128Encoder
+  getU128Encoder,
 } from "@solana/kit";
-import type {FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder} from "@solana/kit";
 
 export interface Tick {
   initialized: boolean;

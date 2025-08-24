@@ -6,14 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  Codec,
+  Decoder,
+  Encoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  Option,
+  OptionOrNullable,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
-  
   combineCodec,
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,32 +34,19 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, Codec, Decoder, Encoder, Instruction, InstructionWithAccounts, InstructionWithData, Option, OptionOrNullable, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  RemainingAccountsInfo,
+  RemainingAccountsInfoArgs,
+} from "../types/index.js";
 import {
   getRemainingAccountsInfoDecoder,
-  getRemainingAccountsInfoEncoder
-  
-  
+  getRemainingAccountsInfoEncoder,
 } from "../types/index.js";
-import type {RemainingAccountsInfo, RemainingAccountsInfoArgs} from "../types/index.js";
 
 export const COLLECT_PROTOCOL_FEES_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([103, 128, 222, 134, 114, 200, 22, 200]);
@@ -62,9 +61,7 @@ export type CollectProtocolFeesV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountCollectProtocolFeesAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountCollectProtocolFeesAuthority extends string | AccountMeta = string,
   TAccountTokenMintA extends string | AccountMeta = string,
   TAccountTokenMintB extends string | AccountMeta = string,
   TAccountTokenVaultA extends string | AccountMeta = string,

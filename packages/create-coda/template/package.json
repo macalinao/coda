@@ -4,7 +4,7 @@
   "description": "TypeScript client for Solana program",
   "type": "module",
   "sideEffects": false,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "coda",
     "solana",

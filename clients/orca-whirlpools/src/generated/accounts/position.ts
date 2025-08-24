@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  
-  
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  
-  
-  
-  
-  
-  
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -37,19 +42,16 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  
-  
-  
-  transformEncoder
+  transformEncoder,
 } from "@solana/kit";
-import type {Account, Address, EncodedAccount, FetchAccountConfig, FetchAccountsConfig, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, MaybeAccount, MaybeEncodedAccount, ReadonlyUint8Array} from "@solana/kit";
+import type {
+  PositionRewardInfo,
+  PositionRewardInfoArgs,
+} from "../types/index.js";
 import {
   getPositionRewardInfoDecoder,
-  getPositionRewardInfoEncoder
-  
-  
+  getPositionRewardInfoEncoder,
 } from "../types/index.js";
-import type {PositionRewardInfo, PositionRewardInfoArgs} from "../types/index.js";
 
 export const POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   170, 188, 143, 228, 122, 64, 247, 208,

@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  
-  
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  
-  
-  
-  
-  
-  
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -33,19 +38,10 @@ import {
   getI32Encoder,
   getStructDecoder,
   getStructEncoder,
-  
-  
-  
-  transformEncoder
+  transformEncoder,
 } from "@solana/kit";
-import type {Account, Address, EncodedAccount, FetchAccountConfig, FetchAccountsConfig, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, MaybeAccount, MaybeEncodedAccount, ReadonlyUint8Array} from "@solana/kit";
-import {
-  getTickDecoder,
-  getTickEncoder
-  
-  
-} from "../types/index.js";
-import type {Tick, TickArgs} from "../types/index.js";
+import type { Tick, TickArgs } from "../types/index.js";
+import { getTickDecoder, getTickEncoder } from "../types/index.js";
 
 export const TICK_ARRAY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   69, 97, 189, 190, 110, 7, 66, 187,

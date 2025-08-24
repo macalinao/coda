@@ -6,24 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
 import {
   combineCodec,
-  
-  
-  
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
-  getU8Encoder
+  getU8Encoder,
 } from "@solana/kit";
-import type {FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder} from "@solana/kit";
-import {
-  
-  
-  getAccountsTypeDecoder,
-  getAccountsTypeEncoder
-} from "./index.js";
-import type {AccountsType, AccountsTypeArgs} from "./index.js";
+import type { AccountsType, AccountsTypeArgs } from "./index.js";
+import { getAccountsTypeDecoder, getAccountsTypeEncoder } from "./index.js";
 
 export interface RemainingAccountsSlice {
   accountsType: AccountsType;

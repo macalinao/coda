@@ -6,14 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  ReadonlyAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
   combineCodec,
-  
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBytesDecoder,
@@ -22,30 +32,19 @@ import {
   getI32Encoder,
   getStructDecoder,
   getStructEncoder,
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, Instruction, InstructionWithAccounts, InstructionWithData, ReadonlyAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount, WritableSignerAccount} from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  OpenPositionWithMetadataBumps,
+  OpenPositionWithMetadataBumpsArgs,
+} from "../types/index.js";
 import {
   getOpenPositionWithMetadataBumpsDecoder,
-  getOpenPositionWithMetadataBumpsEncoder
-  
-  
+  getOpenPositionWithMetadataBumpsEncoder,
 } from "../types/index.js";
-import type {OpenPositionWithMetadataBumps, OpenPositionWithMetadataBumpsArgs} from "../types/index.js";
 
 export const OPEN_POSITION_WITH_METADATA_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([242, 29, 134, 48, 58, 110, 14, 60]);

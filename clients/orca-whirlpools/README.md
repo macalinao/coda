@@ -1,63 +1,45 @@
-# My Coda Client
+# @macalinao/clients-orca-whirlpools
 
-TypeScript client for Solana program generated with [Coda](https://github.com/macalinao/coda).
+[![npm version](https://img.shields.io/npm/v/@macalinao/clients-orca-whirlpools.svg)](https://www.npmjs.com/package/@macalinao/clients-orca-whirlpools)
 
-## Getting Started
+TypeScript client for the Orca Whirlpools program, generated using Coda CLI with full ESM support.
 
-1. **Add your IDL file(s)**
-   - Place your Anchor IDL JSON file(s) in the `idls/` directory
-   - Remove the example.json file
+## Installation
 
-2. **Generate the client code**
-   ```bash
-   bun run codegen
-   ```
-
-3. **Build the project**
-   ```bash
-   bun run build
-   ```
-
-## Project Structure
-
-```
-.
-├── idls/               # Anchor IDL files
-├── src/
-│   ├── generated/      # Generated client code (do not edit)
-│   └── index.ts        # Main entry point
-├── coda.config.mjs     # Coda configuration
-└── package.json
+```bash
+bun add @macalinao/clients-orca-whirlpools
 ```
 
-## Available Scripts
+## About Orca Whirlpools
 
-- `bun run codegen` - Generate TypeScript client from IDL
-- `bun run build` - Build the TypeScript project
-- `bun run clean` - Clean build artifacts
-- `bun run lint` - Run ESLint
-- `bun test` - Run tests
+Orca Whirlpools is a concentrated liquidity AMM (CLMM) protocol on Solana that enables efficient token swaps with capital-efficient liquidity provision. The protocol allows liquidity providers to concentrate their capital within custom price ranges.
 
-## Configuration
+## Development
 
-Edit `coda.config.mjs` to customize:
-- IDL discovery patterns
-- Output directory
-- Custom PDAs and visitors
+This client is generated from the Orca Whirlpools IDL using Coda CLI:
+
+```bash
+# Generate the client from idls/
+bun run codegen
+
+# Build the TypeScript
+bun run build
+```
+
+### Configuration
+
+The `coda.config.mjs` file can be customized to add PDAs and other Codama visitors for enhanced client functionality.
 
 ## Usage
 
 ```typescript
-import { createInitializeInstruction } from "./dist/index.js";
+import {} from /* generated exports */ "@macalinao/clients-orca-whirlpools";
 
-// Use the generated client
-const instruction = createInitializeInstruction({
-  // ... instruction parameters
-});
+// Use the generated client functions
 ```
 
-## Learn More
+## License
 
-- [Coda Documentation](https://github.com/macalinao/coda)
-- [Codama Documentation](https://github.com/codama-idl/codama)
-- [Anchor Framework](https://www.anchor-lang.com/)
+Copyright © 2025 Ian Macalinao
+
+Licensed under the Apache License, Version 2.0

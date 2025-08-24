@@ -6,14 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  AccountMeta,
+  AccountSignerMeta,
+  Address,
+  Codec,
+  Decoder,
+  Encoder,
+  Instruction,
+  InstructionWithAccounts,
+  InstructionWithData,
+  Option,
+  OptionOrNullable,
+  ReadonlyAccount,
+  ReadonlySignerAccount,
+  ReadonlyUint8Array,
+  TransactionSigner,
+  WritableAccount,
+} from "@solana/kit";
 import {
-  
-  
-  
-  
   combineCodec,
-  
-  
   fixDecoderSize,
   fixEncoderSize,
   getBooleanDecoder,
@@ -28,32 +40,19 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  transformEncoder
-  
+  transformEncoder,
 } from "@solana/kit";
-import type {AccountMeta, AccountSignerMeta, Address, Codec, Decoder, Encoder, Instruction, InstructionWithAccounts, InstructionWithData, Option, OptionOrNullable, ReadonlyAccount, ReadonlySignerAccount, ReadonlyUint8Array, TransactionSigner, WritableAccount} from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getAccountMetaFactory
-  
-} from "../shared/index.js";
-import type {ResolvedAccount} from "../shared/index.js";
+import type { ResolvedAccount } from "../shared/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
+import type {
+  RemainingAccountsInfo,
+  RemainingAccountsInfoArgs,
+} from "../types/index.js";
 import {
   getRemainingAccountsInfoDecoder,
-  getRemainingAccountsInfoEncoder
-  
-  
+  getRemainingAccountsInfoEncoder,
 } from "../types/index.js";
-import type {RemainingAccountsInfo, RemainingAccountsInfoArgs} from "../types/index.js";
 
 export const TWO_HOP_SWAP_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [186, 143, 209, 29, 254, 2, 194, 117],
@@ -73,18 +72,12 @@ export type TwoHopSwapV2Instruction<
   TAccountTokenMintIntermediate extends string | AccountMeta = string,
   TAccountTokenMintOutput extends string | AccountMeta = string,
   TAccountTokenProgramInput extends string | AccountMeta = string,
-  TAccountTokenProgramIntermediate extends
-    | string
-    | AccountMeta = string,
+  TAccountTokenProgramIntermediate extends string | AccountMeta = string,
   TAccountTokenProgramOutput extends string | AccountMeta = string,
   TAccountTokenOwnerAccountInput extends string | AccountMeta = string,
   TAccountTokenVaultOneInput extends string | AccountMeta = string,
-  TAccountTokenVaultOneIntermediate extends
-    | string
-    | AccountMeta = string,
-  TAccountTokenVaultTwoIntermediate extends
-    | string
-    | AccountMeta = string,
+  TAccountTokenVaultOneIntermediate extends string | AccountMeta = string,
+  TAccountTokenVaultTwoIntermediate extends string | AccountMeta = string,
   TAccountTokenVaultTwoOutput extends string | AccountMeta = string,
   TAccountTokenOwnerAccountOutput extends string | AccountMeta = string,
   TAccountTokenAuthority extends string | AccountMeta = string,

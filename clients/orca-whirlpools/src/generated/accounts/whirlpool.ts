@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  
-  
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  
-  
-  
-  
-  
-  
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -41,19 +46,16 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
-  
-  
-  
-  transformEncoder
+  transformEncoder,
 } from "@solana/kit";
-import type {Account, Address, EncodedAccount, FetchAccountConfig, FetchAccountsConfig, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, MaybeAccount, MaybeEncodedAccount, ReadonlyUint8Array} from "@solana/kit";
+import type {
+  WhirlpoolRewardInfo,
+  WhirlpoolRewardInfoArgs,
+} from "../types/index.js";
 import {
   getWhirlpoolRewardInfoDecoder,
-  getWhirlpoolRewardInfoEncoder
-  
-  
+  getWhirlpoolRewardInfoEncoder,
 } from "../types/index.js";
-import type {WhirlpoolRewardInfo, WhirlpoolRewardInfoArgs} from "../types/index.js";
 
 export const WHIRLPOOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   63, 149, 209, 12, 225, 128, 99, 9,

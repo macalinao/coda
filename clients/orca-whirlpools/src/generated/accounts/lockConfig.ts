@@ -6,19 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import type {
+  Account,
+  Address,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 import {
-  
-  
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
   decodeAccount,
-  
-  
-  
-  
-  
-  
   fetchEncodedAccount,
   fetchEncodedAccounts,
   fixDecoderSize,
@@ -31,19 +36,13 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-  
-  
-  
-  transformEncoder
+  transformEncoder,
 } from "@solana/kit";
-import type {Account, Address, EncodedAccount, FetchAccountConfig, FetchAccountsConfig, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder, MaybeAccount, MaybeEncodedAccount, ReadonlyUint8Array} from "@solana/kit";
+import type { LockTypeLabel, LockTypeLabelArgs } from "../types/index.js";
 import {
   getLockTypeLabelDecoder,
-  getLockTypeLabelEncoder
-  
-  
+  getLockTypeLabelEncoder,
 } from "../types/index.js";
-import type {LockTypeLabel, LockTypeLabelArgs} from "../types/index.js";
 
 export const LOCK_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   106, 47, 238, 159, 124, 12, 160, 192,
