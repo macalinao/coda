@@ -1,0 +1,55 @@
+{
+  "name": "@macalinao/clients-orca-whirlpools",
+  "version": "0.1.0",
+  "description": "TypeScript client for Orca Whirlpools program",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "keywords": [
+    "coda",
+    "solana",
+    "orca",
+    "whirlpools",
+    "dex",
+    "amm",
+    "client",
+    "typescript"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -fr dist/ tsconfig.tsbuildinfo",
+    "codegen": "rm -fr src/generated/ && coda generate",
+    "lint": "eslint . --cache"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*"
+  },
+  "devDependencies": {
+    "@macalinao/coda": "workspace:*",
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "*",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/orca-whirlpools"
+  }
+}

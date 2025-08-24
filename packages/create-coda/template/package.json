@@ -1,0 +1,44 @@
+{
+  "name": "my-coda-client",
+  "version": "0.1.0",
+  "description": "TypeScript client for Solana program",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "keywords": [
+    "coda",
+    "solana",
+    "client",
+    "typescript"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -fr dist/ tsconfig.tsbuildinfo",
+    "codegen": "rm -fr src/generated/ && coda generate",
+    "lint": "eslint . --cache"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*"
+  },
+  "devDependencies": {
+    "@macalinao/coda": "^0.2.3",
+    "@macalinao/eslint-config": "^5",
+    "@macalinao/tsconfig": "^3.2.3",
+    "@solana/kit": "*",
+    "@types/bun": "latest",
+    "eslint": "^9.0.0",
+    "typescript": "^5.0.0"
+  }
+}
