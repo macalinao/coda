@@ -27,8 +27,10 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -37,7 +39,7 @@ import {
 } from "@solana/kit";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_MINER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   126, 23, 157, 1, 147, 94, 245, 69,
@@ -136,6 +138,145 @@ export function getCreateMinerInstructionDataCodec(): FixedSizeCodec<
     getCreateMinerInstructionDataEncoder(),
     getCreateMinerInstructionDataDecoder(),
   );
+}
+
+export interface CreateMinerAsyncInput<
+  TAccountAuthority extends string = string,
+  TAccountMiner extends string = string,
+  TAccountQuarry extends string = string,
+  TAccountRewarder extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountPayer extends string = string,
+  TAccountTokenMint extends string = string,
+  TAccountMinerVault extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  authority: TransactionSigner<TAccountAuthority>;
+  miner?: Address<TAccountMiner>;
+  quarry: Address<TAccountQuarry>;
+  rewarder: Address<TAccountRewarder>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  payer: TransactionSigner<TAccountPayer>;
+  tokenMint: Address<TAccountTokenMint>;
+  minerVault: Address<TAccountMinerVault>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  bump: CreateMinerInstructionDataArgs["bump"];
+}
+
+export async function getCreateMinerInstructionAsync<
+  TAccountAuthority extends string,
+  TAccountMiner extends string,
+  TAccountQuarry extends string,
+  TAccountRewarder extends string,
+  TAccountSystemProgram extends string,
+  TAccountPayer extends string,
+  TAccountTokenMint extends string,
+  TAccountMinerVault extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
+>(
+  input: CreateMinerAsyncInput<
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountRewarder,
+    TAccountSystemProgram,
+    TAccountPayer,
+    TAccountTokenMint,
+    TAccountMinerVault,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CreateMinerInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountRewarder,
+    TAccountSystemProgram,
+    TAccountPayer,
+    TAccountTokenMint,
+    TAccountMinerVault,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    authority: { value: input.authority ?? null, isWritable: false },
+    miner: { value: input.miner ?? null, isWritable: true },
+    quarry: { value: input.quarry ?? null, isWritable: true },
+    rewarder: { value: input.rewarder ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
+    minerVault: { value: input.minerVault ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.miner.value) {
+    accounts.miner.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([34, 77, 105, 110, 101, 114, 34]),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.quarry.value)),
+        getAddressEncoder().encode(expectAddress(accounts.authority.value)),
+      ],
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.miner),
+      getAccountMeta(accounts.quarry),
+      getAccountMeta(accounts.rewarder),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.tokenMint),
+      getAccountMeta(accounts.minerVault),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    programAddress,
+    data: getCreateMinerInstructionDataEncoder().encode(
+      args as CreateMinerInstructionDataArgs,
+    ),
+  } as CreateMinerInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountRewarder,
+    TAccountSystemProgram,
+    TAccountPayer,
+    TAccountTokenMint,
+    TAccountMinerVault,
+    TAccountTokenProgram
+  >;
+
+  return instruction;
 }
 
 export interface CreateMinerInput<

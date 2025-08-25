@@ -52,8 +52,8 @@ export function getCreateQuarryDiscriminatorBytes(): ReadonlyUint8Array {
 export type CreateQuarryInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountQuarry extends string | AccountMeta = string,
-  TAccountAuthAuthority extends string | AccountMeta = string,
-  TAccountAuthRewarder extends string | AccountMeta = string,
+  TAccountAuthority extends string | AccountMeta = string,
+  TAccountRewarder extends string | AccountMeta = string,
   TAccountTokenMint extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountUnusedAccount extends string | AccountMeta = string,
@@ -68,13 +68,13 @@ export type CreateQuarryInstruction<
       TAccountQuarry extends string
         ? WritableAccount<TAccountQuarry>
         : TAccountQuarry,
-      TAccountAuthAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthAuthority> &
-            AccountSignerMeta<TAccountAuthAuthority>
-        : TAccountAuthAuthority,
-      TAccountAuthRewarder extends string
-        ? WritableAccount<TAccountAuthRewarder>
-        : TAccountAuthRewarder,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
+      TAccountRewarder extends string
+        ? WritableAccount<TAccountRewarder>
+        : TAccountRewarder,
       TAccountTokenMint extends string
         ? ReadonlyAccount<TAccountTokenMint>
         : TAccountTokenMint,
@@ -130,16 +130,16 @@ export function getCreateQuarryInstructionDataCodec(): FixedSizeCodec<
 
 export interface CreateQuarryInput<
   TAccountQuarry extends string = string,
-  TAccountAuthAuthority extends string = string,
-  TAccountAuthRewarder extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountRewarder extends string = string,
   TAccountTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountUnusedAccount extends string = string,
   TAccountSystemProgram extends string = string,
 > {
   quarry: Address<TAccountQuarry>;
-  authAuthority: TransactionSigner<TAccountAuthAuthority>;
-  authRewarder: Address<TAccountAuthRewarder>;
+  authority: TransactionSigner<TAccountAuthority>;
+  rewarder: Address<TAccountRewarder>;
   tokenMint: Address<TAccountTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   unusedAccount: Address<TAccountUnusedAccount>;
@@ -149,8 +149,8 @@ export interface CreateQuarryInput<
 
 export function getCreateQuarryInstruction<
   TAccountQuarry extends string,
-  TAccountAuthAuthority extends string,
-  TAccountAuthRewarder extends string,
+  TAccountAuthority extends string,
+  TAccountRewarder extends string,
   TAccountTokenMint extends string,
   TAccountPayer extends string,
   TAccountUnusedAccount extends string,
@@ -159,8 +159,8 @@ export function getCreateQuarryInstruction<
 >(
   input: CreateQuarryInput<
     TAccountQuarry,
-    TAccountAuthAuthority,
-    TAccountAuthRewarder,
+    TAccountAuthority,
+    TAccountRewarder,
     TAccountTokenMint,
     TAccountPayer,
     TAccountUnusedAccount,
@@ -170,8 +170,8 @@ export function getCreateQuarryInstruction<
 ): CreateQuarryInstruction<
   TProgramAddress,
   TAccountQuarry,
-  TAccountAuthAuthority,
-  TAccountAuthRewarder,
+  TAccountAuthority,
+  TAccountRewarder,
   TAccountTokenMint,
   TAccountPayer,
   TAccountUnusedAccount,
@@ -183,8 +183,8 @@ export function getCreateQuarryInstruction<
   // Original accounts.
   const originalAccounts = {
     quarry: { value: input.quarry ?? null, isWritable: true },
-    authAuthority: { value: input.authAuthority ?? null, isWritable: false },
-    authRewarder: { value: input.authRewarder ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    rewarder: { value: input.rewarder ?? null, isWritable: true },
     tokenMint: { value: input.tokenMint ?? null, isWritable: false },
     payer: { value: input.payer ?? null, isWritable: true },
     unusedAccount: { value: input.unusedAccount ?? null, isWritable: false },
@@ -208,8 +208,8 @@ export function getCreateQuarryInstruction<
   const instruction = {
     accounts: [
       getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.authAuthority),
-      getAccountMeta(accounts.authRewarder),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.rewarder),
       getAccountMeta(accounts.tokenMint),
       getAccountMeta(accounts.payer),
       getAccountMeta(accounts.unusedAccount),
@@ -222,8 +222,8 @@ export function getCreateQuarryInstruction<
   } as CreateQuarryInstruction<
     TProgramAddress,
     TAccountQuarry,
-    TAccountAuthAuthority,
-    TAccountAuthRewarder,
+    TAccountAuthority,
+    TAccountRewarder,
     TAccountTokenMint,
     TAccountPayer,
     TAccountUnusedAccount,
@@ -240,8 +240,8 @@ export interface ParsedCreateQuarryInstruction<
   programAddress: Address<TProgram>;
   accounts: {
     quarry: TAccountMetas[0];
-    authAuthority: TAccountMetas[1];
-    authRewarder: TAccountMetas[2];
+    authority: TAccountMetas[1];
+    rewarder: TAccountMetas[2];
     tokenMint: TAccountMetas[3];
     payer: TAccountMetas[4];
     unusedAccount: TAccountMetas[5];
@@ -272,8 +272,8 @@ export function parseCreateQuarryInstruction<
     programAddress: instruction.programAddress,
     accounts: {
       quarry: getNextAccount(),
-      authAuthority: getNextAccount(),
-      authRewarder: getNextAccount(),
+      authority: getNextAccount(),
+      rewarder: getNextAccount(),
       tokenMint: getNextAccount(),
       payer: getNextAccount(),
       unusedAccount: getNextAccount(),

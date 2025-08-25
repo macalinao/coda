@@ -20,6 +20,7 @@
       "cache": false
     },
     "codegen": {
+      "dependsOn": ["^build"],
       "outputs": ["./src/generated/**"],
       "cache": false
     },

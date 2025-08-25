@@ -49,67 +49,59 @@ export function getWithdrawObligationCollateralV2DiscriminatorBytes(): ReadonlyU
 
 export type WithdrawObligationCollateralV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
-  TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
-  TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
-  TAccountWithdrawAccountsLendingMarketAuthority extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsWithdrawReserve extends string | AccountMeta = string,
-  TAccountWithdrawAccountsReserveSourceCollateral extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsUserDestinationCollateral extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsTokenProgram extends string | AccountMeta = string,
-  TAccountWithdrawAccountsInstructionSysvarAccount extends
+  TAccountOwner extends string | AccountMeta = string,
+  TAccountObligation extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta = string,
+  TAccountWithdrawReserve extends string | AccountMeta = string,
+  TAccountReserveSourceCollateral extends string | AccountMeta = string,
+  TAccountUserDestinationCollateral extends string | AccountMeta = string,
+  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountFarmsAccountsObligationFarmUserState extends
-    | string
-    | AccountMeta = string,
-  TAccountFarmsAccountsReserveFarmState extends string | AccountMeta = string,
+  TAccountObligationFarmUserState extends string | AccountMeta = string,
+  TAccountReserveFarmState extends string | AccountMeta = string,
   TAccountFarmsProgram extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountWithdrawAccountsOwner extends string
-        ? ReadonlySignerAccount<TAccountWithdrawAccountsOwner> &
-            AccountSignerMeta<TAccountWithdrawAccountsOwner>
-        : TAccountWithdrawAccountsOwner,
-      TAccountWithdrawAccountsObligation extends string
-        ? WritableAccount<TAccountWithdrawAccountsObligation>
-        : TAccountWithdrawAccountsObligation,
-      TAccountWithdrawAccountsLendingMarket extends string
-        ? ReadonlyAccount<TAccountWithdrawAccountsLendingMarket>
-        : TAccountWithdrawAccountsLendingMarket,
-      TAccountWithdrawAccountsLendingMarketAuthority extends string
-        ? ReadonlyAccount<TAccountWithdrawAccountsLendingMarketAuthority>
-        : TAccountWithdrawAccountsLendingMarketAuthority,
-      TAccountWithdrawAccountsWithdrawReserve extends string
-        ? WritableAccount<TAccountWithdrawAccountsWithdrawReserve>
-        : TAccountWithdrawAccountsWithdrawReserve,
-      TAccountWithdrawAccountsReserveSourceCollateral extends string
-        ? WritableAccount<TAccountWithdrawAccountsReserveSourceCollateral>
-        : TAccountWithdrawAccountsReserveSourceCollateral,
-      TAccountWithdrawAccountsUserDestinationCollateral extends string
-        ? WritableAccount<TAccountWithdrawAccountsUserDestinationCollateral>
-        : TAccountWithdrawAccountsUserDestinationCollateral,
-      TAccountWithdrawAccountsTokenProgram extends string
-        ? ReadonlyAccount<TAccountWithdrawAccountsTokenProgram>
-        : TAccountWithdrawAccountsTokenProgram,
-      TAccountWithdrawAccountsInstructionSysvarAccount extends string
-        ? ReadonlyAccount<TAccountWithdrawAccountsInstructionSysvarAccount>
-        : TAccountWithdrawAccountsInstructionSysvarAccount,
-      TAccountFarmsAccountsObligationFarmUserState extends string
-        ? WritableAccount<TAccountFarmsAccountsObligationFarmUserState>
-        : TAccountFarmsAccountsObligationFarmUserState,
-      TAccountFarmsAccountsReserveFarmState extends string
-        ? WritableAccount<TAccountFarmsAccountsReserveFarmState>
-        : TAccountFarmsAccountsReserveFarmState,
+      TAccountOwner extends string
+        ? ReadonlySignerAccount<TAccountOwner> &
+            AccountSignerMeta<TAccountOwner>
+        : TAccountOwner,
+      TAccountObligation extends string
+        ? WritableAccount<TAccountObligation>
+        : TAccountObligation,
+      TAccountLendingMarket extends string
+        ? ReadonlyAccount<TAccountLendingMarket>
+        : TAccountLendingMarket,
+      TAccountLendingMarketAuthority extends string
+        ? ReadonlyAccount<TAccountLendingMarketAuthority>
+        : TAccountLendingMarketAuthority,
+      TAccountWithdrawReserve extends string
+        ? WritableAccount<TAccountWithdrawReserve>
+        : TAccountWithdrawReserve,
+      TAccountReserveSourceCollateral extends string
+        ? WritableAccount<TAccountReserveSourceCollateral>
+        : TAccountReserveSourceCollateral,
+      TAccountUserDestinationCollateral extends string
+        ? WritableAccount<TAccountUserDestinationCollateral>
+        : TAccountUserDestinationCollateral,
+      TAccountTokenProgram extends string
+        ? ReadonlyAccount<TAccountTokenProgram>
+        : TAccountTokenProgram,
+      TAccountInstructionSysvarAccount extends string
+        ? ReadonlyAccount<TAccountInstructionSysvarAccount>
+        : TAccountInstructionSysvarAccount,
+      TAccountObligationFarmUserState extends string
+        ? WritableAccount<TAccountObligationFarmUserState>
+        : TAccountObligationFarmUserState,
+      TAccountReserveFarmState extends string
+        ? WritableAccount<TAccountReserveFarmState>
+        : TAccountReserveFarmState,
       TAccountFarmsProgram extends string
         ? ReadonlyAccount<TAccountFarmsProgram>
         : TAccountFarmsProgram,
@@ -157,77 +149,77 @@ export function getWithdrawObligationCollateralV2InstructionDataCodec(): FixedSi
 }
 
 export interface WithdrawObligationCollateralV2Input<
-  TAccountWithdrawAccountsOwner extends string = string,
-  TAccountWithdrawAccountsObligation extends string = string,
-  TAccountWithdrawAccountsLendingMarket extends string = string,
-  TAccountWithdrawAccountsLendingMarketAuthority extends string = string,
-  TAccountWithdrawAccountsWithdrawReserve extends string = string,
-  TAccountWithdrawAccountsReserveSourceCollateral extends string = string,
-  TAccountWithdrawAccountsUserDestinationCollateral extends string = string,
-  TAccountWithdrawAccountsTokenProgram extends string = string,
-  TAccountWithdrawAccountsInstructionSysvarAccount extends string = string,
-  TAccountFarmsAccountsObligationFarmUserState extends string = string,
-  TAccountFarmsAccountsReserveFarmState extends string = string,
+  TAccountOwner extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountWithdrawReserve extends string = string,
+  TAccountReserveSourceCollateral extends string = string,
+  TAccountUserDestinationCollateral extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountInstructionSysvarAccount extends string = string,
+  TAccountObligationFarmUserState extends string = string,
+  TAccountReserveFarmState extends string = string,
   TAccountFarmsProgram extends string = string,
 > {
-  withdrawAccountsOwner: TransactionSigner<TAccountWithdrawAccountsOwner>;
-  withdrawAccountsObligation: Address<TAccountWithdrawAccountsObligation>;
-  withdrawAccountsLendingMarket: Address<TAccountWithdrawAccountsLendingMarket>;
-  withdrawAccountsLendingMarketAuthority: Address<TAccountWithdrawAccountsLendingMarketAuthority>;
-  withdrawAccountsWithdrawReserve: Address<TAccountWithdrawAccountsWithdrawReserve>;
-  withdrawAccountsReserveSourceCollateral: Address<TAccountWithdrawAccountsReserveSourceCollateral>;
-  withdrawAccountsUserDestinationCollateral: Address<TAccountWithdrawAccountsUserDestinationCollateral>;
-  withdrawAccountsTokenProgram: Address<TAccountWithdrawAccountsTokenProgram>;
-  withdrawAccountsInstructionSysvarAccount?: Address<TAccountWithdrawAccountsInstructionSysvarAccount>;
-  farmsAccountsObligationFarmUserState?: Address<TAccountFarmsAccountsObligationFarmUserState>;
-  farmsAccountsReserveFarmState?: Address<TAccountFarmsAccountsReserveFarmState>;
+  owner: TransactionSigner<TAccountOwner>;
+  obligation: Address<TAccountObligation>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
+  withdrawReserve: Address<TAccountWithdrawReserve>;
+  reserveSourceCollateral: Address<TAccountReserveSourceCollateral>;
+  userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
+  tokenProgram: Address<TAccountTokenProgram>;
+  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
+  reserveFarmState?: Address<TAccountReserveFarmState>;
   farmsProgram: Address<TAccountFarmsProgram>;
   collateralAmount: WithdrawObligationCollateralV2InstructionDataArgs["collateralAmount"];
 }
 
 export function getWithdrawObligationCollateralV2Instruction<
-  TAccountWithdrawAccountsOwner extends string,
-  TAccountWithdrawAccountsObligation extends string,
-  TAccountWithdrawAccountsLendingMarket extends string,
-  TAccountWithdrawAccountsLendingMarketAuthority extends string,
-  TAccountWithdrawAccountsWithdrawReserve extends string,
-  TAccountWithdrawAccountsReserveSourceCollateral extends string,
-  TAccountWithdrawAccountsUserDestinationCollateral extends string,
-  TAccountWithdrawAccountsTokenProgram extends string,
-  TAccountWithdrawAccountsInstructionSysvarAccount extends string,
-  TAccountFarmsAccountsObligationFarmUserState extends string,
-  TAccountFarmsAccountsReserveFarmState extends string,
+  TAccountOwner extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountWithdrawReserve extends string,
+  TAccountReserveSourceCollateral extends string,
+  TAccountUserDestinationCollateral extends string,
+  TAccountTokenProgram extends string,
+  TAccountInstructionSysvarAccount extends string,
+  TAccountObligationFarmUserState extends string,
+  TAccountReserveFarmState extends string,
   TAccountFarmsProgram extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: WithdrawObligationCollateralV2Input<
-    TAccountWithdrawAccountsOwner,
-    TAccountWithdrawAccountsObligation,
-    TAccountWithdrawAccountsLendingMarket,
-    TAccountWithdrawAccountsLendingMarketAuthority,
-    TAccountWithdrawAccountsWithdrawReserve,
-    TAccountWithdrawAccountsReserveSourceCollateral,
-    TAccountWithdrawAccountsUserDestinationCollateral,
-    TAccountWithdrawAccountsTokenProgram,
-    TAccountWithdrawAccountsInstructionSysvarAccount,
-    TAccountFarmsAccountsObligationFarmUserState,
-    TAccountFarmsAccountsReserveFarmState,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountWithdrawReserve,
+    TAccountReserveSourceCollateral,
+    TAccountUserDestinationCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
     TAccountFarmsProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): WithdrawObligationCollateralV2Instruction<
   TProgramAddress,
-  TAccountWithdrawAccountsOwner,
-  TAccountWithdrawAccountsObligation,
-  TAccountWithdrawAccountsLendingMarket,
-  TAccountWithdrawAccountsLendingMarketAuthority,
-  TAccountWithdrawAccountsWithdrawReserve,
-  TAccountWithdrawAccountsReserveSourceCollateral,
-  TAccountWithdrawAccountsUserDestinationCollateral,
-  TAccountWithdrawAccountsTokenProgram,
-  TAccountWithdrawAccountsInstructionSysvarAccount,
-  TAccountFarmsAccountsObligationFarmUserState,
-  TAccountFarmsAccountsReserveFarmState,
+  TAccountOwner,
+  TAccountObligation,
+  TAccountLendingMarket,
+  TAccountLendingMarketAuthority,
+  TAccountWithdrawReserve,
+  TAccountReserveSourceCollateral,
+  TAccountUserDestinationCollateral,
+  TAccountTokenProgram,
+  TAccountInstructionSysvarAccount,
+  TAccountObligationFarmUserState,
+  TAccountReserveFarmState,
   TAccountFarmsProgram
 > {
   // Program address.
@@ -236,48 +228,33 @@ export function getWithdrawObligationCollateralV2Instruction<
 
   // Original accounts.
   const originalAccounts = {
-    withdrawAccountsOwner: {
-      value: input.withdrawAccountsOwner ?? null,
+    owner: { value: input.owner ?? null, isWritable: false },
+    obligation: { value: input.obligation ?? null, isWritable: true },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
       isWritable: false,
     },
-    withdrawAccountsObligation: {
-      value: input.withdrawAccountsObligation ?? null,
+    withdrawReserve: { value: input.withdrawReserve ?? null, isWritable: true },
+    reserveSourceCollateral: {
+      value: input.reserveSourceCollateral ?? null,
       isWritable: true,
     },
-    withdrawAccountsLendingMarket: {
-      value: input.withdrawAccountsLendingMarket ?? null,
+    userDestinationCollateral: {
+      value: input.userDestinationCollateral ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    instructionSysvarAccount: {
+      value: input.instructionSysvarAccount ?? null,
       isWritable: false,
     },
-    withdrawAccountsLendingMarketAuthority: {
-      value: input.withdrawAccountsLendingMarketAuthority ?? null,
-      isWritable: false,
-    },
-    withdrawAccountsWithdrawReserve: {
-      value: input.withdrawAccountsWithdrawReserve ?? null,
+    obligationFarmUserState: {
+      value: input.obligationFarmUserState ?? null,
       isWritable: true,
     },
-    withdrawAccountsReserveSourceCollateral: {
-      value: input.withdrawAccountsReserveSourceCollateral ?? null,
-      isWritable: true,
-    },
-    withdrawAccountsUserDestinationCollateral: {
-      value: input.withdrawAccountsUserDestinationCollateral ?? null,
-      isWritable: true,
-    },
-    withdrawAccountsTokenProgram: {
-      value: input.withdrawAccountsTokenProgram ?? null,
-      isWritable: false,
-    },
-    withdrawAccountsInstructionSysvarAccount: {
-      value: input.withdrawAccountsInstructionSysvarAccount ?? null,
-      isWritable: false,
-    },
-    farmsAccountsObligationFarmUserState: {
-      value: input.farmsAccountsObligationFarmUserState ?? null,
-      isWritable: true,
-    },
-    farmsAccountsReserveFarmState: {
-      value: input.farmsAccountsReserveFarmState ?? null,
+    reserveFarmState: {
+      value: input.reserveFarmState ?? null,
       isWritable: true,
     },
     farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
@@ -291,25 +268,25 @@ export function getWithdrawObligationCollateralV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.withdrawAccountsInstructionSysvarAccount.value) {
-    accounts.withdrawAccountsInstructionSysvarAccount.value =
+  if (!accounts.instructionSysvarAccount.value) {
+    accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.withdrawAccountsOwner),
-      getAccountMeta(accounts.withdrawAccountsObligation),
-      getAccountMeta(accounts.withdrawAccountsLendingMarket),
-      getAccountMeta(accounts.withdrawAccountsLendingMarketAuthority),
-      getAccountMeta(accounts.withdrawAccountsWithdrawReserve),
-      getAccountMeta(accounts.withdrawAccountsReserveSourceCollateral),
-      getAccountMeta(accounts.withdrawAccountsUserDestinationCollateral),
-      getAccountMeta(accounts.withdrawAccountsTokenProgram),
-      getAccountMeta(accounts.withdrawAccountsInstructionSysvarAccount),
-      getAccountMeta(accounts.farmsAccountsObligationFarmUserState),
-      getAccountMeta(accounts.farmsAccountsReserveFarmState),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.withdrawReserve),
+      getAccountMeta(accounts.reserveSourceCollateral),
+      getAccountMeta(accounts.userDestinationCollateral),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta(accounts.obligationFarmUserState),
+      getAccountMeta(accounts.reserveFarmState),
       getAccountMeta(accounts.farmsProgram),
     ],
     programAddress,
@@ -318,17 +295,17 @@ export function getWithdrawObligationCollateralV2Instruction<
     ),
   } as WithdrawObligationCollateralV2Instruction<
     TProgramAddress,
-    TAccountWithdrawAccountsOwner,
-    TAccountWithdrawAccountsObligation,
-    TAccountWithdrawAccountsLendingMarket,
-    TAccountWithdrawAccountsLendingMarketAuthority,
-    TAccountWithdrawAccountsWithdrawReserve,
-    TAccountWithdrawAccountsReserveSourceCollateral,
-    TAccountWithdrawAccountsUserDestinationCollateral,
-    TAccountWithdrawAccountsTokenProgram,
-    TAccountWithdrawAccountsInstructionSysvarAccount,
-    TAccountFarmsAccountsObligationFarmUserState,
-    TAccountFarmsAccountsReserveFarmState,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountWithdrawReserve,
+    TAccountReserveSourceCollateral,
+    TAccountUserDestinationCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
     TAccountFarmsProgram
   >;
 
@@ -341,17 +318,17 @@ export interface ParsedWithdrawObligationCollateralV2Instruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    withdrawAccountsOwner: TAccountMetas[0];
-    withdrawAccountsObligation: TAccountMetas[1];
-    withdrawAccountsLendingMarket: TAccountMetas[2];
-    withdrawAccountsLendingMarketAuthority: TAccountMetas[3];
-    withdrawAccountsWithdrawReserve: TAccountMetas[4];
-    withdrawAccountsReserveSourceCollateral: TAccountMetas[5];
-    withdrawAccountsUserDestinationCollateral: TAccountMetas[6];
-    withdrawAccountsTokenProgram: TAccountMetas[7];
-    withdrawAccountsInstructionSysvarAccount: TAccountMetas[8];
-    farmsAccountsObligationFarmUserState?: TAccountMetas[9] | undefined;
-    farmsAccountsReserveFarmState?: TAccountMetas[10] | undefined;
+    owner: TAccountMetas[0];
+    obligation: TAccountMetas[1];
+    lendingMarket: TAccountMetas[2];
+    lendingMarketAuthority: TAccountMetas[3];
+    withdrawReserve: TAccountMetas[4];
+    reserveSourceCollateral: TAccountMetas[5];
+    userDestinationCollateral: TAccountMetas[6];
+    tokenProgram: TAccountMetas[7];
+    instructionSysvarAccount: TAccountMetas[8];
+    obligationFarmUserState?: TAccountMetas[9] | undefined;
+    reserveFarmState?: TAccountMetas[10] | undefined;
     farmsProgram: TAccountMetas[11];
   };
   data: WithdrawObligationCollateralV2InstructionData;
@@ -384,17 +361,17 @@ export function parseWithdrawObligationCollateralV2Instruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      withdrawAccountsOwner: getNextAccount(),
-      withdrawAccountsObligation: getNextAccount(),
-      withdrawAccountsLendingMarket: getNextAccount(),
-      withdrawAccountsLendingMarketAuthority: getNextAccount(),
-      withdrawAccountsWithdrawReserve: getNextAccount(),
-      withdrawAccountsReserveSourceCollateral: getNextAccount(),
-      withdrawAccountsUserDestinationCollateral: getNextAccount(),
-      withdrawAccountsTokenProgram: getNextAccount(),
-      withdrawAccountsInstructionSysvarAccount: getNextAccount(),
-      farmsAccountsObligationFarmUserState: getNextOptionalAccount(),
-      farmsAccountsReserveFarmState: getNextOptionalAccount(),
+      owner: getNextAccount(),
+      obligation: getNextAccount(),
+      lendingMarket: getNextAccount(),
+      lendingMarketAuthority: getNextAccount(),
+      withdrawReserve: getNextAccount(),
+      reserveSourceCollateral: getNextAccount(),
+      userDestinationCollateral: getNextAccount(),
+      tokenProgram: getNextAccount(),
+      instructionSysvarAccount: getNextAccount(),
+      obligationFarmUserState: getNextOptionalAccount(),
+      reserveFarmState: getNextOptionalAccount(),
       farmsProgram: getNextAccount(),
     },
     data: getWithdrawObligationCollateralV2InstructionDataDecoder().decode(

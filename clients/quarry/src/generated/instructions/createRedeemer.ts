@@ -26,8 +26,10 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -36,7 +38,7 @@ import {
 } from "@solana/kit";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_REDEEMER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [137, 228, 81, 63, 209, 33, 131, 195],
@@ -116,6 +118,112 @@ export function getCreateRedeemerInstructionDataCodec(): FixedSizeCodec<
     getCreateRedeemerInstructionDataEncoder(),
     getCreateRedeemerInstructionDataDecoder(),
   );
+}
+
+export interface CreateRedeemerAsyncInput<
+  TAccountRedeemer extends string = string,
+  TAccountIouMint extends string = string,
+  TAccountRedemptionMint extends string = string,
+  TAccountPayer extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  redeemer?: Address<TAccountRedeemer>;
+  iouMint: Address<TAccountIouMint>;
+  redemptionMint: Address<TAccountRedemptionMint>;
+  payer: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  bump: CreateRedeemerInstructionDataArgs["bump"];
+}
+
+export async function getCreateRedeemerInstructionAsync<
+  TAccountRedeemer extends string,
+  TAccountIouMint extends string,
+  TAccountRedemptionMint extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
+>(
+  input: CreateRedeemerAsyncInput<
+    TAccountRedeemer,
+    TAccountIouMint,
+    TAccountRedemptionMint,
+    TAccountPayer,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CreateRedeemerInstruction<
+    TProgramAddress,
+    TAccountRedeemer,
+    TAccountIouMint,
+    TAccountRedemptionMint,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? QUARRY_REDEEMER_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    redeemer: { value: input.redeemer ?? null, isWritable: true },
+    iouMint: { value: input.iouMint ?? null, isWritable: false },
+    redemptionMint: { value: input.redemptionMint ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.redeemer.value) {
+    accounts.redeemer.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([34, 82, 101, 100, 101, 101, 109, 101, 114, 34]),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.iouMint.value)),
+        getAddressEncoder().encode(
+          expectAddress(accounts.redemptionMint.value),
+        ),
+      ],
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.redeemer),
+      getAccountMeta(accounts.iouMint),
+      getAccountMeta(accounts.redemptionMint),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getCreateRedeemerInstructionDataEncoder().encode(
+      args as CreateRedeemerInstructionDataArgs,
+    ),
+  } as CreateRedeemerInstruction<
+    TProgramAddress,
+    TAccountRedeemer,
+    TAccountIouMint,
+    TAccountRedemptionMint,
+    TAccountPayer,
+    TAccountSystemProgram
+  >;
+
+  return instruction;
 }
 
 export interface CreateRedeemerInput<

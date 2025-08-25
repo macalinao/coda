@@ -48,20 +48,20 @@ export function getSetAnnualRewardsDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetAnnualRewardsInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountAuthAuthority extends string | AccountMeta = string,
-  TAccountAuthRewarder extends string | AccountMeta = string,
+  TAccountAuthority extends string | AccountMeta = string,
+  TAccountRewarder extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountAuthAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthAuthority> &
-            AccountSignerMeta<TAccountAuthAuthority>
-        : TAccountAuthAuthority,
-      TAccountAuthRewarder extends string
-        ? WritableAccount<TAccountAuthRewarder>
-        : TAccountAuthRewarder,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
+      TAccountRewarder extends string
+        ? WritableAccount<TAccountRewarder>
+        : TAccountRewarder,
       ...TRemainingAccounts,
     ]
   >;
@@ -103,33 +103,33 @@ export function getSetAnnualRewardsInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface SetAnnualRewardsInput<
-  TAccountAuthAuthority extends string = string,
-  TAccountAuthRewarder extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountRewarder extends string = string,
 > {
-  authAuthority: TransactionSigner<TAccountAuthAuthority>;
-  authRewarder: Address<TAccountAuthRewarder>;
+  authority: TransactionSigner<TAccountAuthority>;
+  rewarder: Address<TAccountRewarder>;
   newRate: SetAnnualRewardsInstructionDataArgs["newRate"];
 }
 
 export function getSetAnnualRewardsInstruction<
-  TAccountAuthAuthority extends string,
-  TAccountAuthRewarder extends string,
+  TAccountAuthority extends string,
+  TAccountRewarder extends string,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
-  input: SetAnnualRewardsInput<TAccountAuthAuthority, TAccountAuthRewarder>,
+  input: SetAnnualRewardsInput<TAccountAuthority, TAccountRewarder>,
   config?: { programAddress?: TProgramAddress },
 ): SetAnnualRewardsInstruction<
   TProgramAddress,
-  TAccountAuthAuthority,
-  TAccountAuthRewarder
+  TAccountAuthority,
+  TAccountRewarder
 > {
   // Program address.
   const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    authAuthority: { value: input.authAuthority ?? null, isWritable: false },
-    authRewarder: { value: input.authRewarder ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    rewarder: { value: input.rewarder ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -142,8 +142,8 @@ export function getSetAnnualRewardsInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   const instruction = {
     accounts: [
-      getAccountMeta(accounts.authAuthority),
-      getAccountMeta(accounts.authRewarder),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.rewarder),
     ],
     programAddress,
     data: getSetAnnualRewardsInstructionDataEncoder().encode(
@@ -151,8 +151,8 @@ export function getSetAnnualRewardsInstruction<
     ),
   } as SetAnnualRewardsInstruction<
     TProgramAddress,
-    TAccountAuthAuthority,
-    TAccountAuthRewarder
+    TAccountAuthority,
+    TAccountRewarder
   >;
 
   return instruction;
@@ -164,8 +164,8 @@ export interface ParsedSetAnnualRewardsInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    authAuthority: TAccountMetas[0];
-    authRewarder: TAccountMetas[1];
+    authority: TAccountMetas[0];
+    rewarder: TAccountMetas[1];
   };
   data: SetAnnualRewardsInstructionData;
 }
@@ -191,8 +191,8 @@ export function parseSetAnnualRewardsInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      authAuthority: getNextAccount(),
-      authRewarder: getNextAccount(),
+      authority: getNextAccount(),
+      rewarder: getNextAccount(),
     },
     data: getSetAnnualRewardsInstructionDataDecoder().decode(instruction.data),
   };

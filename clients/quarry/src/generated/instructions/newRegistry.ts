@@ -26,8 +26,10 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -38,7 +40,7 @@ import {
 } from "@solana/kit";
 import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const NEW_REGISTRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   237, 187, 50, 70, 74, 26, 144, 230,
@@ -118,6 +120,105 @@ export function getNewRegistryInstructionDataCodec(): FixedSizeCodec<
     getNewRegistryInstructionDataEncoder(),
     getNewRegistryInstructionDataDecoder(),
   );
+}
+
+export interface NewRegistryAsyncInput<
+  TAccountRewarder extends string = string,
+  TAccountRegistry extends string = string,
+  TAccountPayer extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  rewarder: Address<TAccountRewarder>;
+  registry?: Address<TAccountRegistry>;
+  payer: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  maxQuarries: NewRegistryInstructionDataArgs["maxQuarries"];
+  bump: NewRegistryInstructionDataArgs["bump"];
+}
+
+export async function getNewRegistryInstructionAsync<
+  TAccountRewarder extends string,
+  TAccountRegistry extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_REGISTRY_PROGRAM_ADDRESS,
+>(
+  input: NewRegistryAsyncInput<
+    TAccountRewarder,
+    TAccountRegistry,
+    TAccountPayer,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  NewRegistryInstruction<
+    TProgramAddress,
+    TAccountRewarder,
+    TAccountRegistry,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? QUARRY_REGISTRY_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    rewarder: { value: input.rewarder ?? null, isWritable: false },
+    registry: { value: input.registry ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.registry.value) {
+    accounts.registry.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([
+            34, 81, 117, 97, 114, 114, 121, 82, 101, 103, 105, 115, 116, 114,
+            121, 34,
+          ]),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.rewarder.value)),
+      ],
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.rewarder),
+      getAccountMeta(accounts.registry),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getNewRegistryInstructionDataEncoder().encode(
+      args as NewRegistryInstructionDataArgs,
+    ),
+  } as NewRegistryInstruction<
+    TProgramAddress,
+    TAccountRewarder,
+    TAccountRegistry,
+    TAccountPayer,
+    TAccountSystemProgram
+  >;
+
+  return instruction;
 }
 
 export interface NewRegistryInput<
