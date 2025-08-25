@@ -50,16 +50,12 @@ export function getRefreshObligationFarmsForReserveDiscriminatorBytes(): Readonl
 export type RefreshObligationFarmsForReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountCrank extends string | AccountMeta = string,
-  TAccountBaseAccountsObligation extends string | AccountMeta = string,
-  TAccountBaseAccountsLendingMarketAuthority extends
-    | string
-    | AccountMeta = string,
-  TAccountBaseAccountsReserve extends string | AccountMeta = string,
-  TAccountBaseAccountsReserveFarmState extends string | AccountMeta = string,
-  TAccountBaseAccountsObligationFarmUserState extends
-    | string
-    | AccountMeta = string,
-  TAccountBaseAccountsLendingMarket extends string | AccountMeta = string,
+  TAccountObligation extends string | AccountMeta = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta = string,
+  TAccountReserve extends string | AccountMeta = string,
+  TAccountReserveFarmState extends string | AccountMeta = string,
+  TAccountObligationFarmUserState extends string | AccountMeta = string,
+  TAccountLendingMarket extends string | AccountMeta = string,
   TAccountFarmsProgram extends string | AccountMeta = string,
   TAccountRent extends string | AccountMeta = string,
   TAccountSystemProgram extends string | AccountMeta = string,
@@ -72,24 +68,24 @@ export type RefreshObligationFarmsForReserveInstruction<
         ? ReadonlySignerAccount<TAccountCrank> &
             AccountSignerMeta<TAccountCrank>
         : TAccountCrank,
-      TAccountBaseAccountsObligation extends string
-        ? ReadonlyAccount<TAccountBaseAccountsObligation>
-        : TAccountBaseAccountsObligation,
-      TAccountBaseAccountsLendingMarketAuthority extends string
-        ? ReadonlyAccount<TAccountBaseAccountsLendingMarketAuthority>
-        : TAccountBaseAccountsLendingMarketAuthority,
-      TAccountBaseAccountsReserve extends string
-        ? ReadonlyAccount<TAccountBaseAccountsReserve>
-        : TAccountBaseAccountsReserve,
-      TAccountBaseAccountsReserveFarmState extends string
-        ? WritableAccount<TAccountBaseAccountsReserveFarmState>
-        : TAccountBaseAccountsReserveFarmState,
-      TAccountBaseAccountsObligationFarmUserState extends string
-        ? WritableAccount<TAccountBaseAccountsObligationFarmUserState>
-        : TAccountBaseAccountsObligationFarmUserState,
-      TAccountBaseAccountsLendingMarket extends string
-        ? ReadonlyAccount<TAccountBaseAccountsLendingMarket>
-        : TAccountBaseAccountsLendingMarket,
+      TAccountObligation extends string
+        ? ReadonlyAccount<TAccountObligation>
+        : TAccountObligation,
+      TAccountLendingMarketAuthority extends string
+        ? ReadonlyAccount<TAccountLendingMarketAuthority>
+        : TAccountLendingMarketAuthority,
+      TAccountReserve extends string
+        ? ReadonlyAccount<TAccountReserve>
+        : TAccountReserve,
+      TAccountReserveFarmState extends string
+        ? WritableAccount<TAccountReserveFarmState>
+        : TAccountReserveFarmState,
+      TAccountObligationFarmUserState extends string
+        ? WritableAccount<TAccountObligationFarmUserState>
+        : TAccountObligationFarmUserState,
+      TAccountLendingMarket extends string
+        ? ReadonlyAccount<TAccountLendingMarket>
+        : TAccountLendingMarket,
       TAccountFarmsProgram extends string
         ? ReadonlyAccount<TAccountFarmsProgram>
         : TAccountFarmsProgram,
@@ -144,23 +140,23 @@ export function getRefreshObligationFarmsForReserveInstructionDataCodec(): Fixed
 
 export interface RefreshObligationFarmsForReserveInput<
   TAccountCrank extends string = string,
-  TAccountBaseAccountsObligation extends string = string,
-  TAccountBaseAccountsLendingMarketAuthority extends string = string,
-  TAccountBaseAccountsReserve extends string = string,
-  TAccountBaseAccountsReserveFarmState extends string = string,
-  TAccountBaseAccountsObligationFarmUserState extends string = string,
-  TAccountBaseAccountsLendingMarket extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountReserve extends string = string,
+  TAccountReserveFarmState extends string = string,
+  TAccountObligationFarmUserState extends string = string,
+  TAccountLendingMarket extends string = string,
   TAccountFarmsProgram extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
 > {
   crank: TransactionSigner<TAccountCrank>;
-  baseAccountsObligation: Address<TAccountBaseAccountsObligation>;
-  baseAccountsLendingMarketAuthority: Address<TAccountBaseAccountsLendingMarketAuthority>;
-  baseAccountsReserve: Address<TAccountBaseAccountsReserve>;
-  baseAccountsReserveFarmState: Address<TAccountBaseAccountsReserveFarmState>;
-  baseAccountsObligationFarmUserState: Address<TAccountBaseAccountsObligationFarmUserState>;
-  baseAccountsLendingMarket: Address<TAccountBaseAccountsLendingMarket>;
+  obligation: Address<TAccountObligation>;
+  lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
+  reserve: Address<TAccountReserve>;
+  reserveFarmState: Address<TAccountReserveFarmState>;
+  obligationFarmUserState: Address<TAccountObligationFarmUserState>;
+  lendingMarket: Address<TAccountLendingMarket>;
   farmsProgram: Address<TAccountFarmsProgram>;
   rent: Address<TAccountRent>;
   systemProgram: Address<TAccountSystemProgram>;
@@ -169,12 +165,12 @@ export interface RefreshObligationFarmsForReserveInput<
 
 export function getRefreshObligationFarmsForReserveInstruction<
   TAccountCrank extends string,
-  TAccountBaseAccountsObligation extends string,
-  TAccountBaseAccountsLendingMarketAuthority extends string,
-  TAccountBaseAccountsReserve extends string,
-  TAccountBaseAccountsReserveFarmState extends string,
-  TAccountBaseAccountsObligationFarmUserState extends string,
-  TAccountBaseAccountsLendingMarket extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountReserve extends string,
+  TAccountReserveFarmState extends string,
+  TAccountObligationFarmUserState extends string,
+  TAccountLendingMarket extends string,
   TAccountFarmsProgram extends string,
   TAccountRent extends string,
   TAccountSystemProgram extends string,
@@ -182,12 +178,12 @@ export function getRefreshObligationFarmsForReserveInstruction<
 >(
   input: RefreshObligationFarmsForReserveInput<
     TAccountCrank,
-    TAccountBaseAccountsObligation,
-    TAccountBaseAccountsLendingMarketAuthority,
-    TAccountBaseAccountsReserve,
-    TAccountBaseAccountsReserveFarmState,
-    TAccountBaseAccountsObligationFarmUserState,
-    TAccountBaseAccountsLendingMarket,
+    TAccountObligation,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveFarmState,
+    TAccountObligationFarmUserState,
+    TAccountLendingMarket,
     TAccountFarmsProgram,
     TAccountRent,
     TAccountSystemProgram
@@ -196,12 +192,12 @@ export function getRefreshObligationFarmsForReserveInstruction<
 ): RefreshObligationFarmsForReserveInstruction<
   TProgramAddress,
   TAccountCrank,
-  TAccountBaseAccountsObligation,
-  TAccountBaseAccountsLendingMarketAuthority,
-  TAccountBaseAccountsReserve,
-  TAccountBaseAccountsReserveFarmState,
-  TAccountBaseAccountsObligationFarmUserState,
-  TAccountBaseAccountsLendingMarket,
+  TAccountObligation,
+  TAccountLendingMarketAuthority,
+  TAccountReserve,
+  TAccountReserveFarmState,
+  TAccountObligationFarmUserState,
+  TAccountLendingMarket,
   TAccountFarmsProgram,
   TAccountRent,
   TAccountSystemProgram
@@ -213,30 +209,21 @@ export function getRefreshObligationFarmsForReserveInstruction<
   // Original accounts.
   const originalAccounts = {
     crank: { value: input.crank ?? null, isWritable: false },
-    baseAccountsObligation: {
-      value: input.baseAccountsObligation ?? null,
+    obligation: { value: input.obligation ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
       isWritable: false,
     },
-    baseAccountsLendingMarketAuthority: {
-      value: input.baseAccountsLendingMarketAuthority ?? null,
-      isWritable: false,
-    },
-    baseAccountsReserve: {
-      value: input.baseAccountsReserve ?? null,
-      isWritable: false,
-    },
-    baseAccountsReserveFarmState: {
-      value: input.baseAccountsReserveFarmState ?? null,
+    reserve: { value: input.reserve ?? null, isWritable: false },
+    reserveFarmState: {
+      value: input.reserveFarmState ?? null,
       isWritable: true,
     },
-    baseAccountsObligationFarmUserState: {
-      value: input.baseAccountsObligationFarmUserState ?? null,
+    obligationFarmUserState: {
+      value: input.obligationFarmUserState ?? null,
       isWritable: true,
     },
-    baseAccountsLendingMarket: {
-      value: input.baseAccountsLendingMarket ?? null,
-      isWritable: false,
-    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
     farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
     rent: { value: input.rent ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -253,12 +240,12 @@ export function getRefreshObligationFarmsForReserveInstruction<
   const instruction = {
     accounts: [
       getAccountMeta(accounts.crank),
-      getAccountMeta(accounts.baseAccountsObligation),
-      getAccountMeta(accounts.baseAccountsLendingMarketAuthority),
-      getAccountMeta(accounts.baseAccountsReserve),
-      getAccountMeta(accounts.baseAccountsReserveFarmState),
-      getAccountMeta(accounts.baseAccountsObligationFarmUserState),
-      getAccountMeta(accounts.baseAccountsLendingMarket),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.obligationFarmUserState),
+      getAccountMeta(accounts.lendingMarket),
       getAccountMeta(accounts.farmsProgram),
       getAccountMeta(accounts.rent),
       getAccountMeta(accounts.systemProgram),
@@ -270,12 +257,12 @@ export function getRefreshObligationFarmsForReserveInstruction<
   } as RefreshObligationFarmsForReserveInstruction<
     TProgramAddress,
     TAccountCrank,
-    TAccountBaseAccountsObligation,
-    TAccountBaseAccountsLendingMarketAuthority,
-    TAccountBaseAccountsReserve,
-    TAccountBaseAccountsReserveFarmState,
-    TAccountBaseAccountsObligationFarmUserState,
-    TAccountBaseAccountsLendingMarket,
+    TAccountObligation,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveFarmState,
+    TAccountObligationFarmUserState,
+    TAccountLendingMarket,
     TAccountFarmsProgram,
     TAccountRent,
     TAccountSystemProgram
@@ -291,12 +278,12 @@ export interface ParsedRefreshObligationFarmsForReserveInstruction<
   programAddress: Address<TProgram>;
   accounts: {
     crank: TAccountMetas[0];
-    baseAccountsObligation: TAccountMetas[1];
-    baseAccountsLendingMarketAuthority: TAccountMetas[2];
-    baseAccountsReserve: TAccountMetas[3];
-    baseAccountsReserveFarmState: TAccountMetas[4];
-    baseAccountsObligationFarmUserState: TAccountMetas[5];
-    baseAccountsLendingMarket: TAccountMetas[6];
+    obligation: TAccountMetas[1];
+    lendingMarketAuthority: TAccountMetas[2];
+    reserve: TAccountMetas[3];
+    reserveFarmState: TAccountMetas[4];
+    obligationFarmUserState: TAccountMetas[5];
+    lendingMarket: TAccountMetas[6];
     farmsProgram: TAccountMetas[7];
     rent: TAccountMetas[8];
     systemProgram: TAccountMetas[9];
@@ -326,12 +313,12 @@ export function parseRefreshObligationFarmsForReserveInstruction<
     programAddress: instruction.programAddress,
     accounts: {
       crank: getNextAccount(),
-      baseAccountsObligation: getNextAccount(),
-      baseAccountsLendingMarketAuthority: getNextAccount(),
-      baseAccountsReserve: getNextAccount(),
-      baseAccountsReserveFarmState: getNextAccount(),
-      baseAccountsObligationFarmUserState: getNextAccount(),
-      baseAccountsLendingMarket: getNextAccount(),
+      obligation: getNextAccount(),
+      lendingMarketAuthority: getNextAccount(),
+      reserve: getNextAccount(),
+      reserveFarmState: getNextAccount(),
+      obligationFarmUserState: getNextAccount(),
+      lendingMarket: getNextAccount(),
       farmsProgram: getNextAccount(),
       rent: getNextAccount(),
       systemProgram: getNextAccount(),

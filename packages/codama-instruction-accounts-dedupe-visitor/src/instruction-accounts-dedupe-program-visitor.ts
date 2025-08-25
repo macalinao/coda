@@ -55,14 +55,22 @@ export function instructionAccountsDedupeProgramVisitor(
             `Instruction ${instructionNode.name} not found in IDL`,
           );
         }
+        const hasDuplicates = instructionNode.accounts.some((account) =>
+          instructionNode.accounts.some(
+            (otherAccount) =>
+              otherAccount.name === account.name && otherAccount !== account,
+          ),
+        );
         // Always use the flattening visitor to handle nested accounts
         return {
           ...instructionNode,
-          accounts: instructionAccountNodesFromAnchorV01(
-            accountNodes,
-            instructionNode.arguments,
-            idlIx.accounts,
-          ),
+          accounts: hasDuplicates
+            ? instructionAccountNodesFromAnchorV01(
+                accountNodes,
+                instructionNode.arguments,
+                idlIx.accounts,
+              )
+            : instructionNode.accounts,
         };
       },
     },

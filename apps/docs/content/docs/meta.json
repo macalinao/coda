@@ -12,7 +12,6 @@
     "generating-docs",
     "examples",
     "---Reference---",
-    "packages",
-    "api"
+    "packages"
   ]
 }

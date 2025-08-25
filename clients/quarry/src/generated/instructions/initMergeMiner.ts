@@ -26,8 +26,10 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -36,7 +38,7 @@ import {
 } from "@solana/kit";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_MERGE_MINER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([23, 22, 142, 134, 78, 63, 147, 161]);
@@ -113,6 +115,112 @@ export function getInitMergeMinerInstructionDataCodec(): FixedSizeCodec<
     getInitMergeMinerInstructionDataEncoder(),
     getInitMergeMinerInstructionDataDecoder(),
   );
+}
+
+export interface InitMergeMinerAsyncInput<
+  TAccountPool extends string = string,
+  TAccountOwner extends string = string,
+  TAccountMm extends string = string,
+  TAccountPayer extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  pool: Address<TAccountPool>;
+  owner: Address<TAccountOwner>;
+  mm?: Address<TAccountMm>;
+  payer: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  bump: InitMergeMinerInstructionDataArgs["bump"];
+}
+
+export async function getInitMergeMinerInstructionAsync<
+  TAccountPool extends string,
+  TAccountOwner extends string,
+  TAccountMm extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+>(
+  input: InitMergeMinerAsyncInput<
+    TAccountPool,
+    TAccountOwner,
+    TAccountMm,
+    TAccountPayer,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitMergeMinerInstruction<
+    TProgramAddress,
+    TAccountPool,
+    TAccountOwner,
+    TAccountMm,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    pool: { value: input.pool ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isWritable: false },
+    mm: { value: input.mm ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.mm.value) {
+    accounts.mm.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([
+            34, 77, 101, 114, 103, 101, 77, 105, 110, 101, 114, 34,
+          ]),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.pool.value)),
+        getAddressEncoder().encode(expectAddress(accounts.owner.value)),
+      ],
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.pool),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.mm),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getInitMergeMinerInstructionDataEncoder().encode(
+      args as InitMergeMinerInstructionDataArgs,
+    ),
+  } as InitMergeMinerInstruction<
+    TProgramAddress,
+    TAccountPool,
+    TAccountOwner,
+    TAccountMm,
+    TAccountPayer,
+    TAccountSystemProgram
+  >;
+
+  return instruction;
 }
 
 export interface InitMergeMinerInput<
