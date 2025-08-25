@@ -1,5 +1,11 @@
 # coda-docs
 
+## 0.0.5
+
+### Patch Changes
+
+- 74221c5: Docs
+
 ## 0.0.4
 
 ### Patch Changes

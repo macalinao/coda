@@ -1,5 +1,11 @@
 # @macalinao/clients-kamino-lending
 
+## 0.1.1
+
+### Patch Changes
+
+- 74221c5: Docs
+
 ## 0.1.0
 
 ### Minor Changes
