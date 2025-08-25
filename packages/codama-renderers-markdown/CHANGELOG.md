@@ -1,5 +1,11 @@
 # @macalinao/codama-renderers-markdown
 
+## 0.2.2
+
+### Patch Changes
+
+- 2d0ba5c: Dependency cleanup
+
 ## 0.2.1
 
 ### Patch Changes

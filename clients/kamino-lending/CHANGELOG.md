@@ -1,5 +1,11 @@
 # @macalinao/clients-kamino-lending
 
+## 0.2.1
+
+### Patch Changes
+
+- 2d0ba5c: Dependency cleanup
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @macalinao/codama-nodes-from-anchor-x
 
+## 0.0.5
+
+### Patch Changes
+
+- 2d0ba5c: Dependency cleanup
+- Updated dependencies [2d0ba5c]
+  - @macalinao/codama-instruction-accounts-dedupe-visitor@0.3.1
+
 ## 0.0.4
 
 ### Patch Changes
