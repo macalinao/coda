@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.2.0
+
+### Minor Changes
+
+- 7d24ee5: Only prefix instruction accounts if there are duplicates
+
 ## 0.1.3
 
 ### Patch Changes

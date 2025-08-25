@@ -1,5 +1,11 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
+## 0.3.0
+
+### Minor Changes
+
+- 7d24ee5: Only prefix instruction accounts if there are duplicates
+
 ## 0.2.3
 
 ### Patch Changes

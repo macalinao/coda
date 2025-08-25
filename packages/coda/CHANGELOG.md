@@ -1,5 +1,11 @@
 # @macalinao/grill-cli
 
+## 0.2.5
+
+### Patch Changes
+
+- @macalinao/codama-nodes-from-anchor-x@0.0.4
+
 ## 0.2.4
 
 ### Patch Changes
