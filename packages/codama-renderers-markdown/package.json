@@ -44,6 +44,7 @@
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@types/bun": "catalog:",
+    "eslint": "catalog:",
     "typescript": "catalog:"
   },
   "repository": {

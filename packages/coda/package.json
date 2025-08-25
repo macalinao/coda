@@ -60,16 +60,8 @@
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
-    "@types/bun": "catalog:",
     "@types/node": "^24.3.0",
     "eslint": "catalog:",
     "typescript": "catalog:"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts}": [
-      "biome check --write --no-errors-on-unmatched",
-      "eslint --fix --cache"
-    ],
-    "*.{json,jsonc,html}": "biome format --write --no-errors-on-unmatched"
   }
 }
