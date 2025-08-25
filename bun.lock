@@ -145,7 +145,7 @@
       "dependencies": {
         "@codama/nodes": "catalog:",
         "@codama/nodes-from-anchor": "catalog:",
-        "@macalinao/codama-instruction-accounts-dedupe-visitor": "^0.3.0",
+        "@macalinao/codama-instruction-accounts-dedupe-visitor": "workspace:^",
         "codama": "catalog:",
       },
       "devDependencies": {
