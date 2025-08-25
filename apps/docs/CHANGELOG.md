@@ -1,5 +1,11 @@
 # coda-docs
 
+## 0.1.0
+
+### Minor Changes
+
+- 7d24ee5: Only prefix instruction accounts if there are duplicates
+
 ## 0.0.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/codama-nodes-from-anchor-x",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Create Codama root nodes from multiple Anchor IDLs",
   "keywords": [
     "solana",
@@ -41,7 +41,7 @@
   "dependencies": {
     "@codama/nodes": "catalog:",
     "@codama/nodes-from-anchor": "catalog:",
-    "@macalinao/codama-instruction-accounts-dedupe-visitor": "^0.2.3",
+    "@macalinao/codama-instruction-accounts-dedupe-visitor": "^0.3.0",
     "codama": "catalog:"
   },
   "devDependencies": {
