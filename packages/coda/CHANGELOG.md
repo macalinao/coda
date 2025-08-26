@@ -1,5 +1,11 @@
 # @macalinao/grill-cli
 
+## 0.2.7
+
+### Patch Changes
+
+- 2de0764: Support generation of Rust clients
+
 ## 0.2.6
 
 ### Patch Changes
