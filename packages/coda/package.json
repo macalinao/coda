@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@codama/nodes-from-anchor": "catalog:",
+    "@codama/renderers-rust": "^1.0.0-rc.5",
     "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
     "@macalinao/codama-renderers-js-esm": "workspace:*",
     "@macalinao/codama-renderers-markdown": "workspace:*",

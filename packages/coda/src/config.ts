@@ -35,6 +35,12 @@ export interface CodaConfig {
   outputDir?: string;
 
   /**
+   * Output directory for the generated Rust client.
+   * @default "./rust"
+   */
+  rustOutputDir?: string;
+
+  /**
    * Documentation generation options.
    */
   docs?: {
