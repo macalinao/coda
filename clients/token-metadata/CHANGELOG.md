@@ -1,5 +1,11 @@
 # @macalinao/token-metadata-client
 
+## 0.2.4
+
+### Patch Changes
+
+- 2d0ba5c: Dependency cleanup
+
 ## 0.2.3
 
 ### Patch Changes
