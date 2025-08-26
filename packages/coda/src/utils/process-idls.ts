@@ -17,14 +17,13 @@ import { resolveIdlPaths } from "./resolve-idl-paths.js";
  * 5. Apply custom visitors
  */
 export async function processIdls(options: {
-  idl: string;
   config: string;
 }): Promise<{ codama: Codama; config: CodaConfig; idls: AnchorIdl[] }> {
   const configPath = resolve(options.config);
   const config = await loadConfig(configPath);
 
   // Determine IDL paths - use config if provided, otherwise use command line option
-  const idlPathInput = config.idlPath ?? options.idl;
+  const idlPathInput = config.idlPath ?? "./idls/*.json";
   const resolvedPaths = await resolveIdlPaths(idlPathInput);
 
   if (resolvedPaths.length === 0) {
