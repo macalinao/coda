@@ -98,7 +98,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
