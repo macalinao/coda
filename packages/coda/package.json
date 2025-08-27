@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/coda",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "CLI for generating clients for Solana programs",
   "type": "module",
   "sideEffects": false,
