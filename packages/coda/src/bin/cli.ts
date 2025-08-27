@@ -130,4 +130,23 @@ program
     }
   });
 
+program
+  .command("idl")
+  .description("Print the Codama IDL to stdout")
+  .option(
+    "-c, --config <path>",
+    "Path to coda.config.mjs file",
+    "./coda.config.mjs",
+  )
+  .action(async (options: { config: string }) => {
+    try {
+      const { codama } = await processIdls(options);
+      const root = codama.getRoot();
+      console.log(JSON.stringify(root, null, 2));
+    } catch (error) {
+      console.error("Error printing IDL:", error);
+      process.exit(1);
+    }
+  });
+
 program.parse();
