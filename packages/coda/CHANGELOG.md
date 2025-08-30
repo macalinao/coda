@@ -1,5 +1,11 @@
 # @macalinao/grill-cli
 
+## 0.2.8
+
+### Patch Changes
+
+- 0f83101: Add coda idl command for printing the underlying codama IDL
+
 ## 0.2.7
 
 ### Patch Changes
