@@ -1,5 +1,15 @@
 # @macalinao/grill-cli
 
+## 0.2.9
+
+### Patch Changes
+
+- 44307ce: Dependency updates
+- Updated dependencies [44307ce]
+  - @macalinao/codama-nodes-from-anchor-x@0.0.6
+  - @macalinao/codama-renderers-markdown@0.2.3
+  - @macalinao/codama-rename-visitor@0.2.3
+
 ## 0.2.8
 
 ### Patch Changes

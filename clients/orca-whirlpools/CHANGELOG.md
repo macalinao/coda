@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.2.1
+
+### Patch Changes
+
+- 44307ce: Dependency updates
+
 ## 0.2.0
 
 ### Minor Changes

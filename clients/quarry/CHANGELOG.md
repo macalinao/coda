@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.2.2
+
+### Patch Changes
+
+- 44307ce: Dependency updates
+
 ## 0.2.1
 
 ### Patch Changes
