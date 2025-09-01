@@ -1,5 +1,11 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
+## 0.3.2
+
+### Patch Changes
+
+- 44307ce: Dependency updates
+
 ## 0.3.1
 
 ### Patch Changes

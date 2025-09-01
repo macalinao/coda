@@ -1,5 +1,13 @@
 # @macalinao/codama-nodes-from-anchor-x
 
+## 0.0.6
+
+### Patch Changes
+
+- 44307ce: Dependency updates
+- Updated dependencies [44307ce]
+  - @macalinao/codama-instruction-accounts-dedupe-visitor@0.3.2
+
 ## 0.0.5
 
 ### Patch Changes

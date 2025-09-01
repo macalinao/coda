@@ -1,5 +1,11 @@
 # @macalinao/token-metadata-client
 
+## 0.2.5
+
+### Patch Changes
+
+- 44307ce: Dependency updates
+
 ## 0.2.4
 
 ### Patch Changes
