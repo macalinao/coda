@@ -22,19 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import {
-  combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
-  getStructDecoder,
-  getStructEncoder,
-  transformEncoder,
-} from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import type { ResolvedAccount } from "../shared/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import type {
   AssetTier,
   AssetTierArgs,
@@ -51,6 +39,18 @@ import type {
   UpdateLendingMarketMode,
   UpdateLendingMarketModeArgs,
 } from "../types/index.js";
+import {
+  combineCodec,
+  fixDecoderSize,
+  fixEncoderSize,
+  getBytesDecoder,
+  getBytesEncoder,
+  getStructDecoder,
+  getStructEncoder,
+  transformEncoder,
+} from "@solana/kit";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getAssetTierDecoder,
   getAssetTierEncoder,

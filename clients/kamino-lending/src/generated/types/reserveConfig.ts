@@ -11,6 +11,16 @@ import type {
   FixedSizeDecoder,
   FixedSizeEncoder,
 } from "@solana/kit";
+import type {
+  BorrowRateCurve,
+  BorrowRateCurveArgs,
+  ReserveFees,
+  ReserveFeesArgs,
+  TokenInfo,
+  TokenInfoArgs,
+  WithdrawalCaps,
+  WithdrawalCapsArgs,
+} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -24,16 +34,6 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
-import type {
-  BorrowRateCurve,
-  BorrowRateCurveArgs,
-  ReserveFees,
-  ReserveFeesArgs,
-  TokenInfo,
-  TokenInfoArgs,
-  WithdrawalCaps,
-  WithdrawalCapsArgs,
-} from "./index.js";
 import {
   getBorrowRateCurveDecoder,
   getBorrowRateCurveEncoder,

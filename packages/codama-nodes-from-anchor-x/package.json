@@ -44,7 +44,10 @@
     "@macalinao/codama-instruction-accounts-dedupe-visitor": "workspace:^"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5.9.2"
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/tsconfig": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "@types/bun": "latest"
   }
 }

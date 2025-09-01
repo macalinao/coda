@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { DatedPrice, DatedPriceArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,7 +39,6 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
-import type { DatedPrice, DatedPriceArgs } from "../types/index.js";
 import { getDatedPriceDecoder, getDatedPriceEncoder } from "../types/index.js";
 
 export const ORACLE_PRICES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([

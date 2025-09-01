@@ -14,6 +14,18 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type {
+  Collection,
+  CollectionArgs,
+  CollectionDetails,
+  CollectionDetailsArgs,
+  Creator,
+  CreatorArgs,
+  TokenStandard,
+  TokenStandardArgs,
+  Uses,
+  UsesArgs,
+} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -35,18 +47,6 @@ import {
   getUtf8Decoder,
   getUtf8Encoder,
 } from "@solana/kit";
-import type {
-  Collection,
-  CollectionArgs,
-  CollectionDetails,
-  CollectionDetailsArgs,
-  Creator,
-  CreatorArgs,
-  TokenStandard,
-  TokenStandardArgs,
-  Uses,
-  UsesArgs,
-} from "./index.js";
 import {
   getCollectionDecoder,
   getCollectionDetailsDecoder,

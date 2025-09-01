@@ -13,6 +13,7 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type { Creator, CreatorArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -30,7 +31,6 @@ import {
   getUtf8Decoder,
   getUtf8Encoder,
 } from "@solana/kit";
-import type { Creator, CreatorArgs } from "./index.js";
 import { getCreatorDecoder, getCreatorEncoder } from "./index.js";
 
 export interface Data {

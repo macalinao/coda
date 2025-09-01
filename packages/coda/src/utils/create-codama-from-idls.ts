@@ -1,6 +1,6 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
-import { rootNodeFromAnchorIdls } from "@macalinao/codama-nodes-from-anchor-x";
 import type { Codama } from "codama";
+import { rootNodeFromAnchorIdls } from "@macalinao/codama-nodes-from-anchor-x";
 import { createFromRoot } from "codama";
 
 /**

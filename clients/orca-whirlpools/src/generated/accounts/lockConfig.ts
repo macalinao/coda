@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { LockTypeLabel, LockTypeLabelArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,7 +39,6 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import type { LockTypeLabel, LockTypeLabelArgs } from "../types/index.js";
 import {
   getLockTypeLabelDecoder,
   getLockTypeLabelEncoder,

@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedBorrowObligationLiquidityInstruction,
   ParsedBorrowObligationLiquidityV2Instruction,
@@ -54,6 +53,7 @@ import type {
   ParsedWithdrawProtocolFeeInstruction,
   ParsedWithdrawReferrerFeesInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const KAMINO_LENDING_PROGRAM_ADDRESS =
   "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD" as Address<"KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD">;

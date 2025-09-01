@@ -7,6 +7,7 @@
  */
 
 import type { Codec, Decoder, Encoder } from "@solana/kit";
+import type { PayloadType, PayloadTypeArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -20,7 +21,6 @@ import {
   getUtf8Decoder,
   getUtf8Encoder,
 } from "@solana/kit";
-import type { PayloadType, PayloadTypeArgs } from "./index.js";
 import { getPayloadTypeDecoder, getPayloadTypeEncoder } from "./index.js";
 
 export interface Payload {

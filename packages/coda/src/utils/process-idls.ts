@@ -1,7 +1,7 @@
-import { resolve } from "node:path";
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import type { Codama } from "codama";
 import type { CodaConfig } from "../config.js";
+import { resolve } from "node:path";
 import { applyCustomVisitors } from "./apply-custom-visitors.js";
 import { createCodamaFromIdls } from "./create-codama-from-idls.js";
 import { loadConfig } from "./load-config.js";

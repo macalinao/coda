@@ -11,6 +11,10 @@ import type {
   FixedSizeDecoder,
   FixedSizeEncoder,
 } from "@solana/kit";
+import type {
+  RewardPerTimeUnitPoint,
+  RewardPerTimeUnitPointArgs,
+} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -18,10 +22,6 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from "@solana/kit";
-import type {
-  RewardPerTimeUnitPoint,
-  RewardPerTimeUnitPointArgs,
-} from "./index.js";
 import {
   getRewardPerTimeUnitPointDecoder,
   getRewardPerTimeUnitPointEncoder,

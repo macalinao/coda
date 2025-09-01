@@ -16,19 +16,6 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
-import {
-  combineCodec,
-  getAddressDecoder,
-  getAddressEncoder,
-  getBooleanDecoder,
-  getBooleanEncoder,
-  getDiscriminatedUnionDecoder,
-  getDiscriminatedUnionEncoder,
-  getOptionDecoder,
-  getOptionEncoder,
-  getStructDecoder,
-  getStructEncoder,
-} from "@solana/kit";
 import type {
   AuthorizationData,
   AuthorizationDataArgs,
@@ -45,6 +32,19 @@ import type {
   UsesToggle,
   UsesToggleArgs,
 } from "./index.js";
+import {
+  combineCodec,
+  getAddressDecoder,
+  getAddressEncoder,
+  getBooleanDecoder,
+  getBooleanEncoder,
+  getDiscriminatedUnionDecoder,
+  getDiscriminatedUnionEncoder,
+  getOptionDecoder,
+  getOptionEncoder,
+  getStructDecoder,
+  getStructEncoder,
+} from "@solana/kit";
 import {
   getAuthorizationDataDecoder,
   getAuthorizationDataEncoder,

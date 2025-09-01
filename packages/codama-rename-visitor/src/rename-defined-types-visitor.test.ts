@@ -1,6 +1,7 @@
 /// <reference types="bun-types" />
-import { describe, expect, it } from "bun:test";
+
 import type { ProgramNode, RootNode } from "codama";
+import { describe, expect, it } from "bun:test";
 import {
   camelCase,
   definedTypeNode,

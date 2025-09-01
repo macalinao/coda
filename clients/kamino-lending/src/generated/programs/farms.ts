@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedAddRewardsInstruction,
   ParsedDepositToFarmVaultInstruction,
@@ -35,6 +34,7 @@ import type {
   ParsedWithdrawTreasuryInstruction,
   ParsedWithdrawUnstakedDepositsInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const FARMS_PROGRAM_ADDRESS =
   "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr" as Address<"FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr">;

@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedAcceptAuthorityInstruction,
   ParsedClaimRewardsInstruction,
@@ -31,6 +30,7 @@ import type {
   ParsedUpdateQuarryRewardsInstruction,
   ParsedWithdrawTokensInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const QUARRY_MINE_PROGRAM_ADDRESS =
   "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;

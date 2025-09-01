@@ -14,6 +14,7 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type { DataV2, DataV2Args } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -25,7 +26,6 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from "@solana/kit";
-import type { DataV2, DataV2Args } from "./index.js";
 import { getDataV2Decoder, getDataV2Encoder } from "./index.js";
 
 export interface UpdateMetadataAccountArgsV2 {

@@ -11,6 +11,7 @@ import type {
   FixedSizeDecoder,
   FixedSizeEncoder,
 } from "@solana/kit";
+import type { Price, PriceArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -22,7 +23,6 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
-import type { Price, PriceArgs } from "./index.js";
 import { getPriceDecoder, getPriceEncoder } from "./index.js";
 
 export interface DatedPrice {

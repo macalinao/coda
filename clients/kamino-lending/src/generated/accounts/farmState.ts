@@ -19,6 +19,12 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type {
+  RewardInfo,
+  RewardInfoArgs,
+  TokenInfo,
+  TokenInfoArgs,
+} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -46,12 +52,6 @@ import {
   getU128Encoder,
   transformEncoder,
 } from "@solana/kit";
-import type {
-  RewardInfo,
-  RewardInfoArgs,
-  TokenInfo,
-  TokenInfoArgs,
-} from "../types/index.js";
 import {
   getRewardInfoDecoder,
   getRewardInfoEncoder,

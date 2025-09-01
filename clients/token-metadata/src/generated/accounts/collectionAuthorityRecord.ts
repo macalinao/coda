@@ -20,6 +20,7 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,7 +37,6 @@ import {
   getU8Decoder,
   getU8Encoder,
 } from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
 
 export interface CollectionAuthorityRecord {

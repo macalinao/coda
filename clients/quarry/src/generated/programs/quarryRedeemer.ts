@@ -7,12 +7,12 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedCreateRedeemerInstruction,
   ParsedRedeemAllTokensInstruction,
   ParsedRedeemTokensInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const QUARRY_REDEEMER_PROGRAM_ADDRESS =
   "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9" as Address<"QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9">;

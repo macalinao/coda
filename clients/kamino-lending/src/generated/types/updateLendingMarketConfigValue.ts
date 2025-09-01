@@ -14,6 +14,7 @@ import type {
   GetDiscriminatedUnionVariant,
   GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
+import type { ElevationGroup, ElevationGroupArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -37,7 +38,6 @@ import {
   getU128Decoder,
   getU128Encoder,
 } from "@solana/kit";
-import type { ElevationGroup, ElevationGroupArgs } from "./index.js";
 import { getElevationGroupDecoder, getElevationGroupEncoder } from "./index.js";
 
 export type UpdateLendingMarketConfigValue =

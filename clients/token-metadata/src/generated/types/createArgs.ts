@@ -15,6 +15,12 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type {
+  AssetData,
+  AssetDataArgs,
+  PrintSupply,
+  PrintSupplyArgs,
+} from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -26,12 +32,6 @@ import {
   getU8Decoder,
   getU8Encoder,
 } from "@solana/kit";
-import type {
-  AssetData,
-  AssetDataArgs,
-  PrintSupply,
-  PrintSupplyArgs,
-} from "./index.js";
 import {
   getAssetDataDecoder,
   getAssetDataEncoder,

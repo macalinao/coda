@@ -7,6 +7,10 @@
  */
 
 import type { Codec, Decoder, Encoder } from "@solana/kit";
+import type {
+  RemainingAccountsSlice,
+  RemainingAccountsSliceArgs,
+} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -14,10 +18,6 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from "@solana/kit";
-import type {
-  RemainingAccountsSlice,
-  RemainingAccountsSliceArgs,
-} from "./index.js";
 import {
   getRemainingAccountsSliceDecoder,
   getRemainingAccountsSliceEncoder,

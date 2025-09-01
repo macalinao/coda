@@ -1,5 +1,5 @@
-import { describe, expect, it } from "bun:test";
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
+import { describe, expect, it } from "bun:test";
 import { rootNodeFromAnchor } from "./root-node-from-anchor.js";
 
 describe("rootNodeFromAnchor", () => {

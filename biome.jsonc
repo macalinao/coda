@@ -23,15 +23,16 @@
   },
   "linter": {
     "enabled": true,
-    // "domains": {
-    //   "project": "recommended"
-    // },
+    "domains": {
+      "project": "recommended"
+    },
     "rules": {
       "recommended": true,
-      // this thing lags super hard
-      // "nursery": {
-      //   "noFloatingPromises": "error"
-      // },
+      "nursery": {
+        "useConsistentTypeDefinitions": "error",
+        "noFloatingPromises": "error",
+        "noUnnecessaryConditions": "error"
+      },
       "complexity": {
         "useSimplifiedLogicExpression": "error"
       },
@@ -40,7 +41,12 @@
         "noDoubleEquals": "error"
       },
       "style": {
-        "useImportType": "error",
+        "useImportType": {
+          "level": "error",
+          "options": {
+            "style": "separatedType"
+          }
+        },
         "noNonNullAssertion": "off",
         "noParameterAssign": "error",
         "useAsConstAssertion": "error",
@@ -64,14 +70,27 @@
       },
       "correctness": {
         "noUnusedVariables": "warn",
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "noUndeclaredDependencies": "error",
+        "useImportExtensions": {
+          "level": "error",
+          "options": {
+            "forceJsExtensions": true
+          }
+        }
       }
     }
   },
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on"
+        // Organizes imports and splits out type imports into a separate line
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [{ "type": true }]
+          }
+        }
       }
     }
   },
@@ -92,6 +111,9 @@
       "includes": ["clients/*/src/generated/**"],
       "linter": {
         "rules": {
+          "nursery": {
+            "noUnnecessaryConditions": "off"
+          },
           "suspicious": {
             "noEmptyInterface": "off"
           },

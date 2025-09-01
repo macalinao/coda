@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { Key, KeyArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -35,7 +36,6 @@ import {
   getU32Decoder,
   getU32Encoder,
 } from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
 
 export interface EditionMarkerV2 {

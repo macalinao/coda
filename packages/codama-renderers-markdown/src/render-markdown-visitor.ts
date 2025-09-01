@@ -1,4 +1,5 @@
 import type { RootNode } from "@codama/nodes";
+import type { RenderMarkdownOptions } from "./types.js";
 import { getAllPrograms } from "@codama/nodes";
 import { RenderMap } from "@codama/renderers-core";
 import {
@@ -9,7 +10,6 @@ import {
 } from "@codama/visitors-core";
 import * as prettier from "prettier";
 import { renderProgram } from "./renderers/renderProgram.js";
-import type { RenderMarkdownOptions } from "./types.js";
 
 export function renderMarkdownVisitor(
   outputDir: string,

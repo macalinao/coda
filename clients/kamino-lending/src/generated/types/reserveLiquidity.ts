@@ -12,6 +12,7 @@ import type {
   FixedSizeDecoder,
   FixedSizeEncoder,
 } from "@solana/kit";
+import type { BigFractionBytes, BigFractionBytesArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -25,7 +26,6 @@ import {
   getU128Decoder,
   getU128Encoder,
 } from "@solana/kit";
-import type { BigFractionBytes, BigFractionBytesArgs } from "./index.js";
 import {
   getBigFractionBytesDecoder,
   getBigFractionBytesEncoder,

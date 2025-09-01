@@ -1,4 +1,6 @@
 /// <reference types="bun-types" />
+
+import type { RenderContext } from "../types.js";
 import { describe, expect, test } from "bun:test";
 import {
   instructionAccountNode,
@@ -8,7 +10,6 @@ import {
 } from "@codama/nodes";
 import { LinkableDictionary } from "@codama/visitors-core";
 import * as prettier from "prettier";
-import type { RenderContext } from "../types.js";
 import { renderInstruction } from "./renderInstruction.js";
 
 const mockContext: RenderContext = {

@@ -3,8 +3,8 @@ import type {
   InstructionArgumentNode,
   InstructionNode,
 } from "@codama/nodes";
-import { isNode } from "@codama/nodes";
 import type { RenderContext } from "../types.js";
+import { isNode } from "@codama/nodes";
 import { renderTypeNode } from "./renderType.js";
 
 export function renderInstruction(

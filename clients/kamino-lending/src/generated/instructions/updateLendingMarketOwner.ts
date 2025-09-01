@@ -21,6 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
+import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,7 +33,6 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_LENDING_MARKET_OWNER_DISCRIMINATOR: ReadonlyUint8Array =
