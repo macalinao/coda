@@ -1,8 +1,9 @@
 /// <reference types="bun-types" />
-import { describe, expect, it } from "bun:test";
+
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
-import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
 import type { RootNode } from "codama";
+import { describe, expect, it } from "bun:test";
+import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
 import { camelCase, visit } from "codama";
 import { instructionAccountsDedupeVisitor } from "./instruction-accounts-dedupe-visitor.js";
 

@@ -7,6 +7,12 @@
  */
 
 import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
+import type {
+  RewardScheduleCurve,
+  RewardScheduleCurveArgs,
+  TokenInfo,
+  TokenInfoArgs,
+} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,12 +28,6 @@ import {
   getU128Decoder,
   getU128Encoder,
 } from "@solana/kit";
-import type {
-  RewardScheduleCurve,
-  RewardScheduleCurveArgs,
-  TokenInfo,
-  TokenInfoArgs,
-} from "./index.js";
 import {
   getRewardScheduleCurveDecoder,
   getRewardScheduleCurveEncoder,

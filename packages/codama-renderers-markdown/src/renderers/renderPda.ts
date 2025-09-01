@@ -1,6 +1,6 @@
 import type { PdaNode } from "@codama/nodes";
-import { isNode } from "@codama/nodes";
 import type { RenderContext } from "../types.js";
+import { isNode } from "@codama/nodes";
 import { renderTypeNode } from "./renderType.js";
 
 export function renderPda(pda: PdaNode, context: RenderContext): string {

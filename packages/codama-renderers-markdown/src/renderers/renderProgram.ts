@@ -1,4 +1,5 @@
 import type { ProgramNode } from "@codama/nodes";
+import type { RenderContext } from "../types.js";
 import {
   getAllAccounts,
   getAllDefinedTypes,
@@ -6,7 +7,6 @@ import {
   getAllInstructionsWithSubs,
   getAllPdas,
 } from "@codama/nodes";
-import type { RenderContext } from "../types.js";
 import { renderAccount } from "./renderAccount.js";
 import { renderError } from "./renderError.js";
 import { renderInstruction } from "./renderInstruction.js";

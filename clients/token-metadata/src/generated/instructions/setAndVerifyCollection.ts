@@ -22,6 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
+import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,7 +32,6 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_AND_VERIFY_COLLECTION_DISCRIMINATOR = 25;

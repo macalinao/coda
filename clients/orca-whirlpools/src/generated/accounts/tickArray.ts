@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { Tick, TickArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,7 +41,6 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
-import type { Tick, TickArgs } from "../types/index.js";
 import { getTickDecoder, getTickEncoder } from "../types/index.js";
 
 export const TICK_ARRAY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([

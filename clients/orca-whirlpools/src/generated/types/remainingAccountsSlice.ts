@@ -11,6 +11,7 @@ import type {
   FixedSizeDecoder,
   FixedSizeEncoder,
 } from "@solana/kit";
+import type { AccountsType, AccountsTypeArgs } from "./index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -18,7 +19,6 @@ import {
   getU8Decoder,
   getU8Encoder,
 } from "@solana/kit";
-import type { AccountsType, AccountsTypeArgs } from "./index.js";
 import { getAccountsTypeDecoder, getAccountsTypeEncoder } from "./index.js";
 
 export interface RemainingAccountsSlice {

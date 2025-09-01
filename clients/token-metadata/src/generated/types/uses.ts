@@ -11,6 +11,7 @@ import type {
   FixedSizeDecoder,
   FixedSizeEncoder,
 } from "@solana/kit";
+import type { UseMethod, UseMethodArgs } from "./index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -18,7 +19,6 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
-import type { UseMethod, UseMethodArgs } from "./index.js";
 import { getUseMethodDecoder, getUseMethodEncoder } from "./index.js";
 
 export interface Uses {

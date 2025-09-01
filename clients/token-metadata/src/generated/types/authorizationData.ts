@@ -7,8 +7,8 @@
  */
 
 import type { Codec, Decoder, Encoder } from "@solana/kit";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 import type { Payload, PayloadArgs } from "./index.js";
+import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 import { getPayloadDecoder, getPayloadEncoder } from "./index.js";
 
 export interface AuthorizationData {

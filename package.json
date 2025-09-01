@@ -13,7 +13,7 @@
     "catalog": {
       "eslint": "^9.33.0",
       "typescript": "^5.9.2",
-      "@macalinao/eslint-config": "^5",
+      "@macalinao/eslint-config": "^6",
       "@macalinao/tsconfig": "^3.2.3",
       "@solana/kit": "^2.3.0",
       "tslib": "^2.8.1",
@@ -67,7 +67,7 @@
     "lint-staged": "^16.1.5",
     "turbo": "^2.5.6"
   },
-  "packageManager": "bun@1.2.20",
+  "packageManager": "bun@1.2.21",
   "lint-staged": {
     "*.{json,jsonc,html}": "biome format --write --no-errors-on-unmatched"
   },

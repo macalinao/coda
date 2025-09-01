@@ -13,6 +13,12 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type {
+  CollectionDetails,
+  CollectionDetailsArgs,
+  DataV2,
+  DataV2Args,
+} from "./index.js";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -22,12 +28,6 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from "@solana/kit";
-import type {
-  CollectionDetails,
-  CollectionDetailsArgs,
-  DataV2,
-  DataV2Args,
-} from "./index.js";
 import {
   getCollectionDetailsDecoder,
   getCollectionDetailsEncoder,

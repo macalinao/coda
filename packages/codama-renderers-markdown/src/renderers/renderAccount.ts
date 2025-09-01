@@ -1,6 +1,6 @@
 import type { AccountNode } from "@codama/nodes";
-import { isNode, resolveNestedTypeNode } from "@codama/nodes";
 import type { RenderContext } from "../types.js";
+import { isNode, resolveNestedTypeNode } from "@codama/nodes";
 import { renderTypeNode } from "./renderType.js";
 
 export function renderAccount(

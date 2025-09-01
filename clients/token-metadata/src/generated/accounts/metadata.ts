@@ -20,6 +20,22 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type {
+  Collection,
+  CollectionArgs,
+  CollectionDetails,
+  CollectionDetailsArgs,
+  Data,
+  DataArgs,
+  Key,
+  KeyArgs,
+  ProgrammableConfig,
+  ProgrammableConfigArgs,
+  TokenStandard,
+  TokenStandardArgs,
+  Uses,
+  UsesArgs,
+} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,22 +54,6 @@ import {
   getU8Decoder,
   getU8Encoder,
 } from "@solana/kit";
-import type {
-  Collection,
-  CollectionArgs,
-  CollectionDetails,
-  CollectionDetailsArgs,
-  Data,
-  DataArgs,
-  Key,
-  KeyArgs,
-  ProgrammableConfig,
-  ProgrammableConfigArgs,
-  TokenStandard,
-  TokenStandardArgs,
-  Uses,
-  UsesArgs,
-} from "../types/index.js";
 import {
   getCollectionDecoder,
   getCollectionDetailsDecoder,

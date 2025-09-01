@@ -51,9 +51,9 @@
     "@codama/nodes-from-anchor": "catalog:",
     "@codama/renderers-rust": "^1.2.2",
     "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
+    "@macalinao/codama-rename-visitor": "workspace:*",
     "@macalinao/codama-renderers-js-esm": "workspace:*",
     "@macalinao/codama-renderers-markdown": "workspace:*",
-    "@macalinao/codama-rename-visitor": "workspace:*",
     "codama": "catalog:",
     "commander": "^14.0.0",
     "glob": "^11.0.3"

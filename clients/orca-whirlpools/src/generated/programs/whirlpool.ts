@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedCloseBundledPositionInstruction,
   ParsedClosePositionInstruction,
@@ -59,6 +58,7 @@ import type {
   ParsedTwoHopSwapV2Instruction,
   ParsedUpdateFeesAndRewardsInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const WHIRLPOOL_PROGRAM_ADDRESS =
   "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc" as Address<"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc">;

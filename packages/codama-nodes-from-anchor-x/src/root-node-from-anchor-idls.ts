@@ -1,6 +1,6 @@
 import type { RootNode } from "@codama/nodes";
-import { rootNode } from "@codama/nodes";
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
+import { rootNode } from "@codama/nodes";
 import { programNodeFromAnchor } from "./program-node-from-anchor.js";
 
 /**

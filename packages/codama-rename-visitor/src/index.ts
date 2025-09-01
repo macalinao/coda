@@ -1,3 +1,4 @@
+export type { ProgramRenameOptions } from "./types.js";
 export {
   renameAccountsVisitor,
   renameAccountTransform,
@@ -11,4 +12,3 @@ export {
   renameInstructionTransform,
 } from "./rename-instructions-visitor.js";
 export { renameVisitor } from "./rename-visitor.js";
-export type { ProgramRenameOptions } from "./types.js";

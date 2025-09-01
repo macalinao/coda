@@ -19,6 +19,16 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type {
+  LastUpdate,
+  LastUpdateArgs,
+  ReserveCollateral,
+  ReserveCollateralArgs,
+  ReserveConfig,
+  ReserveConfigArgs,
+  ReserveLiquidity,
+  ReserveLiquidityArgs,
+} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,16 +50,6 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import type {
-  LastUpdate,
-  LastUpdateArgs,
-  ReserveCollateral,
-  ReserveCollateralArgs,
-  ReserveConfig,
-  ReserveConfigArgs,
-  ReserveLiquidity,
-  ReserveLiquidityArgs,
-} from "../types/index.js";
 import {
   getLastUpdateDecoder,
   getLastUpdateEncoder,

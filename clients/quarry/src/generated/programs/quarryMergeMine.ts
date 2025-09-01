@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedClaimRewardsMMInstruction,
   ParsedInitMergeMinerInstruction,
@@ -23,6 +22,7 @@ import type {
   ParsedUnstakePrimaryMinerInstruction,
   ParsedWithdrawTokensMMInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;

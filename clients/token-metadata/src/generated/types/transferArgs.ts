@@ -15,6 +15,7 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type { AuthorizationData, AuthorizationDataArgs } from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -26,7 +27,6 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
-import type { AuthorizationData, AuthorizationDataArgs } from "./index.js";
 import {
   getAuthorizationDataDecoder,
   getAuthorizationDataEncoder,

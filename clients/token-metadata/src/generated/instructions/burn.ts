@@ -22,6 +22,8 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
+import type { ResolvedAccount } from "../shared/index.js";
+import type { BurnArgs, BurnArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,9 +33,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
-import type { BurnArgs, BurnArgsArgs } from "../types/index.js";
 import { getBurnArgsDecoder, getBurnArgsEncoder } from "../types/index.js";
 
 export const BURN_DISCRIMINATOR = 41;

@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedAcceptAdminInstruction,
   ParsedMinterUpdateInstruction,
@@ -18,6 +17,7 @@ import type {
   ParsedPerformMintInstruction,
   ParsedTransferAdminInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS =
   "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV" as Address<"QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV">;

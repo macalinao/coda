@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, getU8Encoder } from "@solana/kit";
 import type {
   ParsedApproveCollectionAuthorityInstruction,
   ParsedApproveUseAuthorityInstruction,
@@ -68,6 +67,7 @@ import type {
   ParsedVerifyInstruction,
   ParsedVerifySizedCollectionItemInstruction,
 } from "../instructions/index.js";
+import { containsBytes, getU8Encoder } from "@solana/kit";
 
 export const TOKEN_METADATA_PROGRAM_ADDRESS =
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;

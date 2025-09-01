@@ -20,6 +20,12 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type {
+  Key,
+  KeyArgs,
+  Reservation,
+  ReservationArgs,
+} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,12 +44,6 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
-import type {
-  Key,
-  KeyArgs,
-  Reservation,
-  ReservationArgs,
-} from "../types/index.js";
 import {
   getKeyDecoder,
   getKeyEncoder,

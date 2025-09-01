@@ -13,6 +13,7 @@ import type {
   GetDiscriminatedUnionVariant,
   GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
+import type { Uses, UsesArgs } from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -24,7 +25,6 @@ import {
   getUnitDecoder,
   getUnitEncoder,
 } from "@solana/kit";
-import type { Uses, UsesArgs } from "./index.js";
 import { getUsesDecoder, getUsesEncoder } from "./index.js";
 
 export type UsesToggle =

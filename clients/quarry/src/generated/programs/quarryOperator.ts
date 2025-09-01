@@ -7,7 +7,6 @@
  */
 
 import type { Address, ReadonlyUint8Array } from "@solana/kit";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 import type {
   ParsedCreateOperatorInstruction,
   ParsedCreateOperatorV2Instruction,
@@ -21,6 +20,7 @@ import type {
   ParsedSetRateSetterInstruction,
   ParsedSetShareAllocatorInstruction,
 } from "../instructions/index.js";
+import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
 
 export const QUARRY_OPERATOR_PROGRAM_ADDRESS =
   "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz" as Address<"QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz">;

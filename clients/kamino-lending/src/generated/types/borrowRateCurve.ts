@@ -11,6 +11,7 @@ import type {
   FixedSizeDecoder,
   FixedSizeEncoder,
 } from "@solana/kit";
+import type { CurvePoint, CurvePointArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -18,7 +19,6 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from "@solana/kit";
-import type { CurvePoint, CurvePointArgs } from "./index.js";
 import { getCurvePointDecoder, getCurvePointEncoder } from "./index.js";
 
 export interface BorrowRateCurve {

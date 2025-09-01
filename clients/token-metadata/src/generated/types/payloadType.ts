@@ -14,6 +14,12 @@ import type {
   GetDiscriminatedUnionVariant,
   GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
+import type {
+  ProofInfo,
+  ProofInfoArgs,
+  SeedsVec,
+  SeedsVecArgs,
+} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -27,12 +33,6 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from "@solana/kit";
-import type {
-  ProofInfo,
-  ProofInfoArgs,
-  SeedsVec,
-  SeedsVecArgs,
-} from "./index.js";
 import {
   getProofInfoDecoder,
   getProofInfoEncoder,

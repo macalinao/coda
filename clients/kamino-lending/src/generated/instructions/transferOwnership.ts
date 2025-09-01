@@ -21,6 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
+import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,7 +35,6 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import type { ResolvedAccount } from "../shared/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const TRANSFER_OWNERSHIP_DISCRIMINATOR: ReadonlyUint8Array =

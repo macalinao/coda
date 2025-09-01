@@ -1,10 +1,10 @@
 import type { IdlV01InstructionAccountItem } from "@codama/nodes-from-anchor";
-import { instructionAccountNodeFromAnchorV01 } from "@codama/nodes-from-anchor";
 import type {
   AccountNode,
   InstructionAccountNode,
   InstructionArgumentNode,
 } from "codama";
+import { instructionAccountNodeFromAnchorV01 } from "@codama/nodes-from-anchor";
 
 /**
  * Recursively flattens nested instruction account structures from Anchor IDL v0.1.0 format.

@@ -18,6 +18,12 @@ import type {
   MaybeAccount,
   MaybeEncodedAccount,
 } from "@solana/kit";
+import type {
+  EscrowAuthority,
+  EscrowAuthorityArgs,
+  Key,
+  KeyArgs,
+} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -32,12 +38,6 @@ import {
   getU8Decoder,
   getU8Encoder,
 } from "@solana/kit";
-import type {
-  EscrowAuthority,
-  EscrowAuthorityArgs,
-  Key,
-  KeyArgs,
-} from "../types/index.js";
 import {
   getEscrowAuthorityDecoder,
   getEscrowAuthorityEncoder,
