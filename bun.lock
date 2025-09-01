@@ -184,7 +184,6 @@
       "name": "@macalinao/codama-renderers-markdown",
       "version": "0.2.2",
       "dependencies": {
-        "@codama/errors": "catalog:",
         "@codama/nodes": "catalog:",
         "@codama/renderers-core": "catalog:",
         "@codama/visitors-core": "catalog:",
@@ -219,14 +218,10 @@
     "react-dom": "^19.1.1",
   },
   "catalog": {
-    "@codama/errors": "^1.1.3",
-    "@codama/node-types": "^1.1.3",
     "@codama/nodes": "^1.3.3",
     "@codama/nodes-from-anchor": "^1.2.5",
     "@codama/renderers-core": "^1.0.19",
     "@codama/renderers-js": "^1.3.4",
-    "@codama/validators": "^1.1.3",
-    "@codama/visitors": "^1.1.3",
     "@codama/visitors-core": "^1.3.3",
     "@macalinao/eslint-config": "^6",
     "@macalinao/tsconfig": "^3.2.3",

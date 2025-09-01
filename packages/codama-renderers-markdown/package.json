@@ -33,7 +33,6 @@
     "test:watch": "bun test src/ --watch"
   },
   "dependencies": {
-    "@codama/errors": "catalog:",
     "@codama/nodes": "catalog:",
     "@codama/renderers-core": "catalog:",
     "@codama/visitors-core": "catalog:",
