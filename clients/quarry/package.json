@@ -53,7 +53,7 @@
     "@macalinao/codama-rename-visitor": "workspace:*",
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
-    "@solana/kit": "*",
+    "@solana/kit": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:"
   }
