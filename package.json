@@ -57,10 +57,10 @@
     "docs:build": "turbo build --filter=coda-docs"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.2",
+    "@biomejs/biome": "^2.2.3",
     "@changesets/cli": "^2.29.6",
     "husky": "^9.1.7",
-    "lint-staged": "^16.1.5",
+    "lint-staged": "^16.1.6",
     "turbo": "^2.5.6"
   },
   "packageManager": "bun@1.2.21",
