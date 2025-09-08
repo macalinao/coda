@@ -1,7 +1,11 @@
 import type { RootNode } from "@codama/nodes";
 import type { RenderMarkdownOptions } from "./types.js";
 import { getAllPrograms } from "@codama/nodes";
-import { RenderMap } from "@codama/renderers-core";
+import {
+  addToRenderMap,
+  renderMap,
+  writeRenderMap,
+} from "@codama/renderers-core";
 import {
   getRecordLinkablesVisitor,
   LinkableDictionary,
@@ -21,7 +25,7 @@ export function renderMarkdownVisitor(
     // Record linkables using getRecordLinkablesVisitor
     visit(root, getRecordLinkablesVisitor(linkables));
 
-    const map = new RenderMap();
+    let map = renderMap();
     const programs = getAllPrograms(root as unknown as RootNode);
 
     // Generate markdown for each program
@@ -46,9 +50,9 @@ export function renderMarkdownVisitor(
         .toLowerCase()
         .replace(/^-/, ""); // Remove leading dash if present
       const filename = `${kebabCase}.md`;
-      map.add(filename, markdown);
+      map = addToRenderMap(map, filename, markdown);
     }
 
-    map.write(outputDir);
+    writeRenderMap(map, outputDir);
   });
 }

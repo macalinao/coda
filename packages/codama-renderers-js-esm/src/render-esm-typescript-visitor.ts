@@ -1,3 +1,8 @@
+import {
+  addToRenderMap,
+  mapRenderMapContent,
+  writeRenderMap,
+} from "@codama/renderers-core";
 import { getRenderMapVisitor } from "@codama/renderers-js";
 import { rootNodeVisitor, visit } from "codama";
 import { ESM_DEPENDENCY_MAP } from "./constants.js";
@@ -12,7 +17,7 @@ export function renderESMTypeScriptVisitor(
 ): ReturnType<typeof rootNodeVisitor> {
   return rootNodeVisitor((root) => {
     // Render the new files.
-    const renderMap = visit(
+    let renderMap = visit(
       root,
       getRenderMapVisitor({
         dependencyMap: ESM_DEPENDENCY_MAP,
@@ -20,7 +25,11 @@ export function renderESMTypeScriptVisitor(
     );
 
     const index = renderMap.get("index.ts");
-    renderMap.add(
+    if (!index) {
+      throw new Error("Index file not found");
+    }
+    renderMap = addToRenderMap(
+      renderMap,
       "index.ts",
       index.replace(
         /(export\s+\*\s+from\s+['"])(\.\/[^'"]+)(['"])/g,
@@ -29,7 +38,7 @@ export function renderESMTypeScriptVisitor(
       ),
     );
 
-    renderMap.mapContent((code) => {
+    renderMap = mapRenderMapContent(renderMap, (code) => {
       const updated = code
         // .replace(/= 0x([\da-f]+), \/\//g, "= 0x$1; //")
         .replaceAll("process.env.NODE_ENV !== 'production'", "true")
@@ -52,6 +61,6 @@ export function renderESMTypeScriptVisitor(
       return updated;
     });
 
-    renderMap.write(path);
+    writeRenderMap(renderMap, path);
   });
 }
