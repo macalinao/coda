@@ -24,6 +24,23 @@ const addCustomPDAsVisitor = addPdasVisitor({
         ),
       ],
     },
+    {
+      name: "masterEdition",
+      seeds: [
+        constantPdaSeedNodeFromString("utf8", "metadata"),
+        variablePdaSeedNode(
+          "programId",
+          publicKeyTypeNode(),
+          "The address of the program",
+        ),
+        variablePdaSeedNode(
+          "mint",
+          publicKeyTypeNode(),
+          "The address of the mint account",
+        ),
+        constantPdaSeedNodeFromString("utf8", "edition"),
+      ],
+    },
   ],
 });
 

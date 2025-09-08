@@ -6,4 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
+export * from "./masterEdition.js";
 export * from "./metadata.js";
