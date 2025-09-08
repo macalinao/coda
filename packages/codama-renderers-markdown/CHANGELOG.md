@@ -1,5 +1,11 @@
 # @macalinao/codama-renderers-markdown
 
+## 0.3.0
+
+### Minor Changes
+
+- 05ba138: Update all dependencies
+
 ## 0.2.3
 
 ### Patch Changes
