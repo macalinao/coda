@@ -32,12 +32,9 @@ export function renderESMTypeScriptVisitor(
       renderMap,
       "index.ts",
       index.replace(
-        "index.ts",
-        index.replace(
-          /(export\s+\*\s+from\s+['"])(\.\/[^'"]+)(['"])/g,
-          (_: string, prefix: string, path: string, quote: string) =>
-            `${prefix}${path}/index.js${quote}`,
-        ),
+        /(export\s+\*\s+from\s+['"])(\.\/[^'"]+)(['"])/g,
+        (_: string, prefix: string, path: string, quote: string) =>
+          `${prefix}${path}/index.js${quote}`,
       ),
     );
 

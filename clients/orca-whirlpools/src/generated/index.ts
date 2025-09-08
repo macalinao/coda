@@ -6,8 +6,8 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./accounts.js";
-export * from "./errors.js";
-export * from "./instructions.js";
-export * from "./programs.js";
-export * from "./types.js";
+export * from "./accounts/index.js";
+export * from "./errors/index.js";
+export * from "./instructions/index.js";
+export * from "./programs/index.js";
+export * from "./types/index.js";
