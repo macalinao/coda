@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-token-metadata",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "TypeScript client for the Metaplex Token Metadata program",
   "type": "module",
   "sideEffects": false,

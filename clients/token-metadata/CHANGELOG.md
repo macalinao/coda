@@ -1,5 +1,11 @@
 # @macalinao/token-metadata-client
 
+## 0.2.6
+
+### Patch Changes
+
+- d2351f4: Add master edition PDA
+
 ## 0.2.5
 
 ### Patch Changes
