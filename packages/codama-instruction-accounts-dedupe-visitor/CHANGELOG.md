@@ -1,5 +1,11 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
+## 0.4.0
+
+### Minor Changes
+
+- 05ba138: Update all dependencies
+
 ## 0.3.2
 
 ### Patch Changes

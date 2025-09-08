@@ -1,5 +1,16 @@
 # @macalinao/codama-nodes-from-anchor-x
 
+## 0.1.0
+
+### Minor Changes
+
+- 05ba138: Update all dependencies
+
+### Patch Changes
+
+- Updated dependencies [05ba138]
+  - @macalinao/codama-instruction-accounts-dedupe-visitor@0.4.0
+
 ## 0.0.6
 
 ### Patch Changes
