@@ -1,5 +1,17 @@
 # @macalinao/grill-cli
 
+## 0.4.0
+
+### Minor Changes
+
+- 5750530: Update Codama to latest
+
+### Patch Changes
+
+- Updated dependencies [5750530]
+  - @macalinao/codama-renderers-markdown@0.4.0
+  - @macalinao/codama-renderers-js-esm@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
