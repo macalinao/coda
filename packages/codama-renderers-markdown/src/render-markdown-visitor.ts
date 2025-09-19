@@ -3,7 +3,7 @@ import type { RenderMarkdownOptions } from "./types.js";
 import { getAllPrograms } from "@codama/nodes";
 import {
   addToRenderMap,
-  renderMap,
+  createRenderMap,
   writeRenderMap,
 } from "@codama/renderers-core";
 import {
@@ -25,7 +25,7 @@ export function renderMarkdownVisitor(
     // Record linkables using getRecordLinkablesVisitor
     visit(root, getRecordLinkablesVisitor(linkables));
 
-    let map = renderMap();
+    let map = createRenderMap();
     const programs = getAllPrograms(root as unknown as RootNode);
 
     // Generate markdown for each program

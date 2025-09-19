@@ -33,7 +33,7 @@
     "@solana/kit": "*"
   },
   "devDependencies": {
-    "@macalinao/coda": "^0.2.9",
+    "@macalinao/coda": "^0.3.0",
     "@macalinao/eslint-config": "^6.0.0",
     "@macalinao/tsconfig": "^3.2.3",
     "@solana/kit": "*",
