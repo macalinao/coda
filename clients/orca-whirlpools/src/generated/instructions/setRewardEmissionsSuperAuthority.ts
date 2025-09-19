@@ -48,9 +48,7 @@ export function getSetRewardEmissionsSuperAuthorityDiscriminatorBytes(): Readonl
 export type SetRewardEmissionsSuperAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountRewardEmissionsSuperAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountRewardEmissionsSuperAuthority extends string | AccountMeta = string,
   TAccountNewRewardEmissionsSuperAuthority extends
     | string
     | AccountMeta = string,

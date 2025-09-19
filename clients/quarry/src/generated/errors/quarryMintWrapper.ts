@@ -43,9 +43,7 @@ export function getQuarryMintWrapperErrorMessage(
   code: QuarryMintWrapperError,
 ): string {
   if (true) {
-    return (
-      quarryMintWrapperErrorMessages!
-    )[code];
+    return quarryMintWrapperErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

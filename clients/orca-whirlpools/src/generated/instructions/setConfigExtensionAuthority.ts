@@ -48,15 +48,9 @@ export function getSetConfigExtensionAuthorityDiscriminatorBytes(): ReadonlyUint
 export type SetConfigExtensionAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpoolsConfigExtension extends
-    | string
-    | AccountMeta = string,
-  TAccountConfigExtensionAuthority extends
-    | string
-    | AccountMeta = string,
-  TAccountNewConfigExtensionAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountWhirlpoolsConfigExtension extends string | AccountMeta = string,
+  TAccountConfigExtensionAuthority extends string | AccountMeta = string,
+  TAccountNewConfigExtensionAuthority extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

@@ -46,9 +46,7 @@ export function getUpdateLendingMarketOwnerDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type UpdateLendingMarketOwnerInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwnerCached extends
-    | string
-    | AccountMeta = string,
+  TAccountLendingMarketOwnerCached extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

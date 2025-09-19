@@ -63,10 +63,7 @@ export type TransferOutOfEscrowInstruction<
   TAccountAtaProgram extends string | AccountMeta = string,
   TAccountTokenProgram extends string | AccountMeta = string,
   TAccountSysvarInstructions extends string | AccountMeta = string,
-  TAccountAuthority extends
-    | string
-    | AccountMeta
-    | undefined = undefined,
+  TAccountAuthority extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

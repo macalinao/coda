@@ -58,9 +58,7 @@ export type WithdrawObligationCollateralAndRedeemReserveCollateralInstruction<
   TAccountReserveSourceCollateral extends string | AccountMeta = string,
   TAccountReserveCollateralMint extends string | AccountMeta = string,
   TAccountReserveLiquiditySupply extends string | AccountMeta = string,
-  TAccountUserDestinationLiquidity extends
-    | string
-    | AccountMeta = string,
+  TAccountUserDestinationLiquidity extends string | AccountMeta = string,
   TAccountPlaceholderUserDestinationCollateral extends
     | string
     | AccountMeta = string,

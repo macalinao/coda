@@ -42,9 +42,7 @@ export function getRevokeCollectionAuthorityDiscriminatorBytes(): ReadonlyUint8A
 
 export type RevokeCollectionAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountCollectionAuthorityRecord extends
-    | string
-    | AccountMeta = string,
+  TAccountCollectionAuthorityRecord extends string | AccountMeta = string,
   TAccountDelegateAuthority extends string | AccountMeta = string,
   TAccountRevokeAuthority extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,

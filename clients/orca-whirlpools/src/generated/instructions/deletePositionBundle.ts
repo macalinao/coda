@@ -49,9 +49,7 @@ export type DeletePositionBundleInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountPositionBundle extends string | AccountMeta = string,
   TAccountPositionBundleMint extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
   TAccountPositionBundleOwner extends string | AccountMeta = string,
   TAccountReceiver extends string | AccountMeta = string,
   TAccountTokenProgram extends string | AccountMeta = string,

@@ -32,9 +32,7 @@ export function getQuarryRedeemerErrorMessage(
   code: QuarryRedeemerError,
 ): string {
   if (true) {
-    return (quarryRedeemerErrorMessages!)[
-      code
-    ];
+    return quarryRedeemerErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

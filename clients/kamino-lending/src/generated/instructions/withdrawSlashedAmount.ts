@@ -49,9 +49,7 @@ export type WithdrawSlashedAmountInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountCrank extends string | AccountMeta = string,
   TAccountFarmState extends string | AccountMeta = string,
-  TAccountSlashedAmountSpillAddress extends
-    | string
-    | AccountMeta = string,
+  TAccountSlashedAmountSpillAddress extends string | AccountMeta = string,
   TAccountFarmVault extends string | AccountMeta = string,
   TAccountFarmVaultsAuthority extends string | AccountMeta = string,
   TAccountTokenProgram extends string | AccountMeta = string,

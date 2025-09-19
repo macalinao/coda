@@ -64,9 +64,7 @@ export type MintNewEditionFromMasterEditionViaVaultProxyInstruction<
   TAccountSafetyDepositStore extends string | AccountMeta = string,
   TAccountSafetyDepositBox extends string | AccountMeta = string,
   TAccountVault extends string | AccountMeta = string,
-  TAccountNewMetadataUpdateAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountNewMetadataUpdateAuthority extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
   TAccountTokenProgram extends string | AccountMeta = string,
   TAccountTokenVaultProgram extends string | AccountMeta = string,

@@ -72,18 +72,12 @@ export type TwoHopSwapV2Instruction<
   TAccountTokenMintIntermediate extends string | AccountMeta = string,
   TAccountTokenMintOutput extends string | AccountMeta = string,
   TAccountTokenProgramInput extends string | AccountMeta = string,
-  TAccountTokenProgramIntermediate extends
-    | string
-    | AccountMeta = string,
+  TAccountTokenProgramIntermediate extends string | AccountMeta = string,
   TAccountTokenProgramOutput extends string | AccountMeta = string,
   TAccountTokenOwnerAccountInput extends string | AccountMeta = string,
   TAccountTokenVaultOneInput extends string | AccountMeta = string,
-  TAccountTokenVaultOneIntermediate extends
-    | string
-    | AccountMeta = string,
-  TAccountTokenVaultTwoIntermediate extends
-    | string
-    | AccountMeta = string,
+  TAccountTokenVaultOneIntermediate extends string | AccountMeta = string,
+  TAccountTokenVaultTwoIntermediate extends string | AccountMeta = string,
   TAccountTokenVaultTwoOutput extends string | AccountMeta = string,
   TAccountTokenOwnerAccountOutput extends string | AccountMeta = string,
   TAccountTokenAuthority extends string | AccountMeta = string,

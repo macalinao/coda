@@ -54,9 +54,7 @@ export type OpenBundledPositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountBundledPosition extends string | AccountMeta = string,
   TAccountPositionBundle extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
   TAccountPositionBundleAuthority extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountFunder extends string | AccountMeta = string,

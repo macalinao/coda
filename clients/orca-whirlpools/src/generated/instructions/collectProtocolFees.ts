@@ -49,9 +49,7 @@ export type CollectProtocolFeesInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountCollectProtocolFeesAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountCollectProtocolFeesAuthority extends string | AccountMeta = string,
   TAccountTokenVaultA extends string | AccountMeta = string,
   TAccountTokenVaultB extends string | AccountMeta = string,
   TAccountTokenDestinationA extends string | AccountMeta = string,

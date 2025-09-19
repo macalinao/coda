@@ -46,12 +46,8 @@ export type BurnEditionNftInstruction<
   TAccountOwner extends string | AccountMeta = string,
   TAccountPrintEditionMint extends string | AccountMeta = string,
   TAccountMasterEditionMint extends string | AccountMeta = string,
-  TAccountPrintEditionTokenAccount extends
-    | string
-    | AccountMeta = string,
-  TAccountMasterEditionTokenAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountPrintEditionTokenAccount extends string | AccountMeta = string,
+  TAccountMasterEditionTokenAccount extends string | AccountMeta = string,
   TAccountMasterEditionAccount extends string | AccountMeta = string,
   TAccountPrintEditionAccount extends string | AccountMeta = string,
   TAccountEditionMarkerAccount extends string | AccountMeta = string,

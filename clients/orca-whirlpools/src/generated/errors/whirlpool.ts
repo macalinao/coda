@@ -300,7 +300,7 @@ if (true) {
 
 export function getWhirlpoolErrorMessage(code: WhirlpoolError): string {
   if (true) {
-    return (whirlpoolErrorMessages!)[code];
+    return whirlpoolErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

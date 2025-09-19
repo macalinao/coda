@@ -48,9 +48,7 @@ export function getDeleteTokenBadgeDiscriminatorBytes(): ReadonlyUint8Array {
 export type DeleteTokenBadgeInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpoolsConfigExtension extends
-    | string
-    | AccountMeta = string,
+  TAccountWhirlpoolsConfigExtension extends string | AccountMeta = string,
   TAccountTokenBadgeAuthority extends string | AccountMeta = string,
   TAccountTokenMint extends string | AccountMeta = string,
   TAccountTokenBadge extends string | AccountMeta = string,

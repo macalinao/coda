@@ -54,42 +54,22 @@ export type LiquidateObligationAndRedeemReserveCollateralInstruction<
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountRepayReserve extends string | AccountMeta = string,
-  TAccountRepayReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
-  TAccountRepayReserveLiquiditySupply extends
-    | string
-    | AccountMeta = string,
+  TAccountRepayReserveLiquidityMint extends string | AccountMeta = string,
+  TAccountRepayReserveLiquiditySupply extends string | AccountMeta = string,
   TAccountWithdrawReserve extends string | AccountMeta = string,
-  TAccountWithdrawReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawReserveCollateralMint extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawReserveCollateralSupply extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawReserveLiquiditySupply extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawReserveLiquidityMint extends string | AccountMeta = string,
+  TAccountWithdrawReserveCollateralMint extends string | AccountMeta = string,
+  TAccountWithdrawReserveCollateralSupply extends string | AccountMeta = string,
+  TAccountWithdrawReserveLiquiditySupply extends string | AccountMeta = string,
   TAccountWithdrawReserveLiquidityFeeReceiver extends
     | string
     | AccountMeta = string,
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
-  TAccountUserDestinationCollateral extends
-    | string
-    | AccountMeta = string,
-  TAccountUserDestinationLiquidity extends
-    | string
-    | AccountMeta = string,
+  TAccountUserDestinationCollateral extends string | AccountMeta = string,
+  TAccountUserDestinationLiquidity extends string | AccountMeta = string,
   TAccountCollateralTokenProgram extends string | AccountMeta = string,
-  TAccountRepayLiquidityTokenProgram extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawLiquidityTokenProgram extends
-    | string
-    | AccountMeta = string,
+  TAccountRepayLiquidityTokenProgram extends string | AccountMeta = string,
+  TAccountWithdrawLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",

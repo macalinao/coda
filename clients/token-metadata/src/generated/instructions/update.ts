@@ -54,9 +54,7 @@ export type UpdateInstruction<
   TAccountPayer extends string | AccountMeta = string,
   TAccountSystemProgram extends string | AccountMeta = string,
   TAccountSysvarInstructions extends string | AccountMeta = string,
-  TAccountAuthorizationRulesProgram extends
-    | string
-    | AccountMeta = string,
+  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
   TAccountAuthorizationRules extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

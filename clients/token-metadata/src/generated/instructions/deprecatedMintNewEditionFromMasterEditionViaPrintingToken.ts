@@ -59,10 +59,7 @@ export type DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction
   TAccountTokenProgram extends string | AccountMeta = string,
   TAccountSystemProgram extends string | AccountMeta = string,
   TAccountRent extends string | AccountMeta = string,
-  TAccountReservationList extends
-    | string
-    | AccountMeta
-    | undefined = undefined,
+  TAccountReservationList extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

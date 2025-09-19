@@ -54,16 +54,12 @@ export type BorrowObligationLiquidityInstruction<
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountBorrowReserve extends string | AccountMeta = string,
-  TAccountBorrowReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
+  TAccountBorrowReserveLiquidityMint extends string | AccountMeta = string,
   TAccountReserveSourceLiquidity extends string | AccountMeta = string,
   TAccountBorrowReserveLiquidityFeeReceiver extends
     | string
     | AccountMeta = string,
-  TAccountUserDestinationLiquidity extends
-    | string
-    | AccountMeta = string,
+  TAccountUserDestinationLiquidity extends string | AccountMeta = string,
   TAccountReferrerTokenState extends string | AccountMeta = string,
   TAccountTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends

@@ -62,9 +62,7 @@ export type MintNewEditionFromMasterEditionViaTokenInstruction<
   TAccountPayer extends string | AccountMeta = string,
   TAccountTokenAccountOwner extends string | AccountMeta = string,
   TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountNewMetadataUpdateAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountNewMetadataUpdateAuthority extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
   TAccountTokenProgram extends string | AccountMeta = string,
   TAccountSystemProgram extends string | AccountMeta = string,

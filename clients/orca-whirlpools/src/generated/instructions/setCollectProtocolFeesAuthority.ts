@@ -48,12 +48,8 @@ export function getSetCollectProtocolFeesAuthorityDiscriminatorBytes(): Readonly
 export type SetCollectProtocolFeesAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountCollectProtocolFeesAuthority extends
-    | string
-    | AccountMeta = string,
-  TAccountNewCollectProtocolFeesAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountCollectProtocolFeesAuthority extends string | AccountMeta = string,
+  TAccountNewCollectProtocolFeesAuthority extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

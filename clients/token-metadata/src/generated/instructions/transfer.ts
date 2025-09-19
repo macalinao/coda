@@ -63,9 +63,7 @@ export type TransferInstruction<
   TAccountSysvarInstructions extends string | AccountMeta = string,
   TAccountSplTokenProgram extends string | AccountMeta = string,
   TAccountSplAtaProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRulesProgram extends
-    | string
-    | AccountMeta = string,
+  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
   TAccountAuthorizationRules extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

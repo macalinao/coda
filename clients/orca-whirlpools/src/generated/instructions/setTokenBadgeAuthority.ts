@@ -48,12 +48,8 @@ export function getSetTokenBadgeAuthorityDiscriminatorBytes(): ReadonlyUint8Arra
 export type SetTokenBadgeAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpoolsConfigExtension extends
-    | string
-    | AccountMeta = string,
-  TAccountConfigExtensionAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountWhirlpoolsConfigExtension extends string | AccountMeta = string,
+  TAccountConfigExtensionAuthority extends string | AccountMeta = string,
   TAccountNewTokenBadgeAuthority extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

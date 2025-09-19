@@ -55,9 +55,7 @@ export type WithdrawObligationCollateralInstruction<
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountWithdrawReserve extends string | AccountMeta = string,
   TAccountReserveSourceCollateral extends string | AccountMeta = string,
-  TAccountUserDestinationCollateral extends
-    | string
-    | AccountMeta = string,
+  TAccountUserDestinationCollateral extends string | AccountMeta = string,
   TAccountTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends
     | string

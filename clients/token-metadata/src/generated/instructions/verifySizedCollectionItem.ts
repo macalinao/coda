@@ -48,9 +48,7 @@ export type VerifySizedCollectionItemInstruction<
   TAccountPayer extends string | AccountMeta = string,
   TAccountCollectionMint extends string | AccountMeta = string,
   TAccountCollection extends string | AccountMeta = string,
-  TAccountCollectionMasterEditionAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountCollectionMasterEditionAccount extends string | AccountMeta = string,
   TAccountCollectionAuthorityRecord extends
     | string
     | AccountMeta

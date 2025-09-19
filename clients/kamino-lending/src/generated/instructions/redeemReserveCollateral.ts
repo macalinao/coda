@@ -57,9 +57,7 @@ export type RedeemReserveCollateralInstruction<
   TAccountReserveCollateralMint extends string | AccountMeta = string,
   TAccountReserveLiquiditySupply extends string | AccountMeta = string,
   TAccountUserSourceCollateral extends string | AccountMeta = string,
-  TAccountUserDestinationLiquidity extends
-    | string
-    | AccountMeta = string,
+  TAccountUserDestinationLiquidity extends string | AccountMeta = string,
   TAccountCollateralTokenProgram extends string | AccountMeta = string,
   TAccountLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends

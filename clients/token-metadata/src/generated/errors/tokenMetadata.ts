@@ -960,9 +960,7 @@ if (true) {
 
 export function getTokenMetadataErrorMessage(code: TokenMetadataError): string {
   if (true) {
-    return (tokenMetadataErrorMessages!)[
-      code
-    ];
+    return tokenMetadataErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

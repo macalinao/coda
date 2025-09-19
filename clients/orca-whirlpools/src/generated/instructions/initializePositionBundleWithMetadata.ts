@@ -50,9 +50,7 @@ export type InitializePositionBundleWithMetadataInstruction<
   TAccountPositionBundle extends string | AccountMeta = string,
   TAccountPositionBundleMint extends string | AccountMeta = string,
   TAccountPositionBundleMetadata extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
   TAccountPositionBundleOwner extends string | AccountMeta = string,
   TAccountFunder extends string | AccountMeta = string,
   TAccountMetadataUpdateAuth extends string | AccountMeta = string,

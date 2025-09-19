@@ -48,9 +48,7 @@ export type PrintInstruction<
   TAccountEditionMetadata extends string | AccountMeta = string,
   TAccountEdition extends string | AccountMeta = string,
   TAccountEditionMint extends string | AccountMeta = string,
-  TAccountEditionTokenAccountOwner extends
-    | string
-    | AccountMeta = string,
+  TAccountEditionTokenAccountOwner extends string | AccountMeta = string,
   TAccountEditionTokenAccount extends string | AccountMeta = string,
   TAccountEditionMintAuthority extends string | AccountMeta = string,
   TAccountEditionTokenRecord extends string | AccountMeta = string,

@@ -51,9 +51,7 @@ export type CloseBundledPositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountBundledPosition extends string | AccountMeta = string,
   TAccountPositionBundle extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
   TAccountPositionBundleAuthority extends string | AccountMeta = string,
   TAccountReceiver extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],

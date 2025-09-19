@@ -51,9 +51,7 @@ export type SetRewardAuthorityBySuperAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpoolsConfig extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountRewardEmissionsSuperAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountRewardEmissionsSuperAuthority extends string | AccountMeta = string,
   TAccountNewRewardAuthority extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

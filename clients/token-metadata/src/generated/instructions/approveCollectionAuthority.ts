@@ -42,9 +42,7 @@ export function getApproveCollectionAuthorityDiscriminatorBytes(): ReadonlyUint8
 
 export type ApproveCollectionAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountCollectionAuthorityRecord extends
-    | string
-    | AccountMeta = string,
+  TAccountCollectionAuthorityRecord extends string | AccountMeta = string,
   TAccountNewCollectionAuthority extends string | AccountMeta = string,
   TAccountUpdateAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,

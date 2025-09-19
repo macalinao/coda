@@ -52,12 +52,8 @@ export type RepayAndWithdrawAndRedeemInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountRepayAccountsOwner extends string | AccountMeta = string,
   TAccountRepayAccountsObligation extends string | AccountMeta = string,
-  TAccountRepayAccountsLendingMarket extends
-    | string
-    | AccountMeta = string,
-  TAccountRepayAccountsRepayReserve extends
-    | string
-    | AccountMeta = string,
+  TAccountRepayAccountsLendingMarket extends string | AccountMeta = string,
+  TAccountRepayAccountsRepayReserve extends string | AccountMeta = string,
   TAccountRepayAccountsReserveLiquidityMint extends
     | string
     | AccountMeta = string,
@@ -67,25 +63,17 @@ export type RepayAndWithdrawAndRedeemInstruction<
   TAccountRepayAccountsUserSourceLiquidity extends
     | string
     | AccountMeta = string,
-  TAccountRepayAccountsTokenProgram extends
-    | string
-    | AccountMeta = string,
+  TAccountRepayAccountsTokenProgram extends string | AccountMeta = string,
   TAccountRepayAccountsInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
-  TAccountWithdrawAccountsObligation extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsLendingMarket extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
+  TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarketAuthority extends
     | string
     | AccountMeta = string,
-  TAccountWithdrawAccountsWithdrawReserve extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawAccountsWithdrawReserve extends string | AccountMeta = string,
   TAccountWithdrawAccountsReserveLiquidityMint extends
     | string
     | AccountMeta = string,
