@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import type { Visitor } from "codama";
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { renderVisitor as renderRustVisitor } from "@codama/renderers-rust";
@@ -89,7 +90,9 @@ program
 
       // Apply the Rust visitor
       console.log(`Generating Rust client to ${outputPath}...`);
-      codama.accept(renderRustVisitor(outputPath));
+      codama.accept(
+        renderRustVisitor(outputPath) as unknown as Visitor<void, "rootNode">,
+      );
 
       console.log("✅ Rust client generated successfully!");
     } catch (error) {

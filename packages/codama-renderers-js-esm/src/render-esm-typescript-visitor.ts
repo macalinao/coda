@@ -1,3 +1,5 @@
+import type { RenderMap } from "@codama/renderers-core";
+import type { Visitor } from "codama";
 import {
   addToRenderMap,
   mapRenderMapContent,
@@ -21,7 +23,16 @@ export function renderESMTypeScriptVisitor(
       root,
       getRenderMapVisitor({
         dependencyMap: ESM_DEPENDENCY_MAP,
-      }),
+        // TOOD(igm): this is not typed correctly; breaking changes in patch versions
+      }) as unknown as Visitor<
+        RenderMap,
+        | "definedTypeNode"
+        | "accountNode"
+        | "instructionNode"
+        | "pdaNode"
+        | "programNode"
+        | "rootNode"
+      >,
     );
 
     const index = renderMap.get("index.ts");
