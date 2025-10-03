@@ -17,6 +17,7 @@ export interface MintWrapperSeeds {
   base: Address;
 }
 
+/** Mint wrapper that controls minting of wrapped tokens */
 export async function findMintWrapperPda(
   seeds: MintWrapperSeeds,
   config: { programAddress?: Address | undefined } = {},

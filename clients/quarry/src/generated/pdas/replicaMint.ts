@@ -17,6 +17,7 @@ export interface ReplicaMintSeeds {
   pool: Address;
 }
 
+/** Replica mint token for the merge pool */
 export async function findReplicaMintPda(
   seeds: ReplicaMintSeeds,
   config: { programAddress?: Address | undefined } = {},

@@ -17,6 +17,7 @@ export interface RegistrySeeds {
   rewarder: Address;
 }
 
+/** Registry tracking all quarries for a rewarder */
 export async function findRegistryPda(
   seeds: RegistrySeeds,
   config: { programAddress?: Address | undefined } = {},

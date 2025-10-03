@@ -17,6 +17,7 @@ export interface OperatorSeeds {
   base: Address;
 }
 
+/** Operator account with delegated authority to manage quarries */
 export async function findOperatorPda(
   seeds: OperatorSeeds,
   config: { programAddress?: Address | undefined } = {},

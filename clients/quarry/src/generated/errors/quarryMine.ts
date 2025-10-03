@@ -76,7 +76,7 @@ if (true) {
 
 export function getQuarryMineErrorMessage(code: QuarryMineError): string {
   if (true) {
-    return quarryMineErrorMessages![code];
+    return (quarryMineErrorMessages!)[code];
   }
 
   return "Error message not available in production bundles.";

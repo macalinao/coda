@@ -24,17 +24,21 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMinerPda, findMinterPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CLAIM_REWARDS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   4, 144, 132, 71, 116, 23, 151, 80,
@@ -141,6 +145,202 @@ export function getClaimRewardsInstructionDataCodec(): FixedSizeCodec<
     getClaimRewardsInstructionDataEncoder(),
     getClaimRewardsInstructionDataDecoder(),
   );
+}
+
+export interface ClaimRewardsAsyncInput<
+  TAccountMintWrapper extends string = string,
+  TAccountMintWrapperProgram extends string = string,
+  TAccountMinter extends string = string,
+  TAccountRewardsTokenMint extends string = string,
+  TAccountRewardsTokenAccount extends string = string,
+  TAccountClaimFeeTokenAccount extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountMiner extends string = string,
+  TAccountQuarry extends string = string,
+  TAccountUnusedMinerVault extends string = string,
+  TAccountUnusedTokenAccount extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountRewarder extends string = string,
+> {
+  mintWrapper: Address<TAccountMintWrapper>;
+  mintWrapperProgram?: Address<TAccountMintWrapperProgram>;
+  minter?: Address<TAccountMinter>;
+  rewardsTokenMint: Address<TAccountRewardsTokenMint>;
+  rewardsTokenAccount: Address<TAccountRewardsTokenAccount>;
+  claimFeeTokenAccount?: Address<TAccountClaimFeeTokenAccount>;
+  authority: TransactionSigner<TAccountAuthority>;
+  miner?: Address<TAccountMiner>;
+  quarry: Address<TAccountQuarry>;
+  unusedMinerVault: Address<TAccountUnusedMinerVault>;
+  unusedTokenAccount: Address<TAccountUnusedTokenAccount>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  rewarder: Address<TAccountRewarder>;
+}
+
+export async function getClaimRewardsInstructionAsync<
+  TAccountMintWrapper extends string,
+  TAccountMintWrapperProgram extends string,
+  TAccountMinter extends string,
+  TAccountRewardsTokenMint extends string,
+  TAccountRewardsTokenAccount extends string,
+  TAccountClaimFeeTokenAccount extends string,
+  TAccountAuthority extends string,
+  TAccountMiner extends string,
+  TAccountQuarry extends string,
+  TAccountUnusedMinerVault extends string,
+  TAccountUnusedTokenAccount extends string,
+  TAccountTokenProgram extends string,
+  TAccountRewarder extends string,
+  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
+>(
+  input: ClaimRewardsAsyncInput<
+    TAccountMintWrapper,
+    TAccountMintWrapperProgram,
+    TAccountMinter,
+    TAccountRewardsTokenMint,
+    TAccountRewardsTokenAccount,
+    TAccountClaimFeeTokenAccount,
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountUnusedMinerVault,
+    TAccountUnusedTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  ClaimRewardsInstruction<
+    TProgramAddress,
+    TAccountMintWrapper,
+    TAccountMintWrapperProgram,
+    TAccountMinter,
+    TAccountRewardsTokenMint,
+    TAccountRewardsTokenAccount,
+    TAccountClaimFeeTokenAccount,
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountUnusedMinerVault,
+    TAccountUnusedTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
+    mintWrapperProgram: {
+      value: input.mintWrapperProgram ?? null,
+      isWritable: false,
+    },
+    minter: { value: input.minter ?? null, isWritable: true },
+    rewardsTokenMint: {
+      value: input.rewardsTokenMint ?? null,
+      isWritable: true,
+    },
+    rewardsTokenAccount: {
+      value: input.rewardsTokenAccount ?? null,
+      isWritable: true,
+    },
+    claimFeeTokenAccount: {
+      value: input.claimFeeTokenAccount ?? null,
+      isWritable: true,
+    },
+    authority: { value: input.authority ?? null, isWritable: false },
+    miner: { value: input.miner ?? null, isWritable: true },
+    quarry: { value: input.quarry ?? null, isWritable: true },
+    unusedMinerVault: {
+      value: input.unusedMinerVault ?? null,
+      isWritable: false,
+    },
+    unusedTokenAccount: {
+      value: input.unusedTokenAccount ?? null,
+      isWritable: false,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    rewarder: { value: input.rewarder ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.mintWrapperProgram.value) {
+    accounts.mintWrapperProgram.value =
+      "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV" as Address<"QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV">;
+  }
+  if (!accounts.minter.value) {
+    accounts.minter.value = await findMinterPda({
+      wrapper: expectAddress(accounts.mintWrapper.value),
+      authority: expectAddress(accounts.rewarder.value),
+    });
+  }
+  if (!accounts.claimFeeTokenAccount.value) {
+    accounts.claimFeeTokenAccount.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(expectAddress(accounts.rewarder.value)),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(
+          expectAddress(accounts.rewardsTokenMint.value),
+        ),
+      ],
+    });
+  }
+  if (!accounts.miner.value) {
+    accounts.miner.value = await findMinerPda({
+      quarry: expectAddress(accounts.quarry.value),
+      authority: expectAddress(accounts.authority.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.mintWrapper),
+      getAccountMeta(accounts.mintWrapperProgram),
+      getAccountMeta(accounts.minter),
+      getAccountMeta(accounts.rewardsTokenMint),
+      getAccountMeta(accounts.rewardsTokenAccount),
+      getAccountMeta(accounts.claimFeeTokenAccount),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.miner),
+      getAccountMeta(accounts.quarry),
+      getAccountMeta(accounts.unusedMinerVault),
+      getAccountMeta(accounts.unusedTokenAccount),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.rewarder),
+    ],
+    data: getClaimRewardsInstructionDataEncoder().encode({}),
+    programAddress,
+  } as ClaimRewardsInstruction<
+    TProgramAddress,
+    TAccountMintWrapper,
+    TAccountMintWrapperProgram,
+    TAccountMinter,
+    TAccountRewardsTokenMint,
+    TAccountRewardsTokenAccount,
+    TAccountClaimFeeTokenAccount,
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountUnusedMinerVault,
+    TAccountUnusedTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
+  >);
 }
 
 export interface ClaimRewardsInput<

@@ -24,17 +24,21 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMergeMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_TOKENS_M_M_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([2, 4, 225, 61, 19, 182, 106, 170]);
@@ -112,6 +116,128 @@ export function getWithdrawTokensMMInstructionDataCodec(): FixedSizeCodec<
     getWithdrawTokensMMInstructionDataEncoder(),
     getWithdrawTokensMMInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawTokensMMAsyncInput<
+  TAccountOwner extends string = string,
+  TAccountPool extends string = string,
+  TAccountMm extends string = string,
+  TAccountWithdrawMint extends string = string,
+  TAccountMmTokenAccount extends string = string,
+  TAccountTokenDestination extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  owner: TransactionSigner<TAccountOwner>;
+  pool: Address<TAccountPool>;
+  mm?: Address<TAccountMm>;
+  withdrawMint: Address<TAccountWithdrawMint>;
+  mmTokenAccount?: Address<TAccountMmTokenAccount>;
+  tokenDestination: Address<TAccountTokenDestination>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+}
+
+export async function getWithdrawTokensMMInstructionAsync<
+  TAccountOwner extends string,
+  TAccountPool extends string,
+  TAccountMm extends string,
+  TAccountWithdrawMint extends string,
+  TAccountMmTokenAccount extends string,
+  TAccountTokenDestination extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
+>(
+  input: WithdrawTokensMMAsyncInput<
+    TAccountOwner,
+    TAccountPool,
+    TAccountMm,
+    TAccountWithdrawMint,
+    TAccountMmTokenAccount,
+    TAccountTokenDestination,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawTokensMMInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountPool,
+    TAccountMm,
+    TAccountWithdrawMint,
+    TAccountMmTokenAccount,
+    TAccountTokenDestination,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    owner: { value: input.owner ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isWritable: false },
+    mm: { value: input.mm ?? null, isWritable: true },
+    withdrawMint: { value: input.withdrawMint ?? null, isWritable: false },
+    mmTokenAccount: { value: input.mmTokenAccount ?? null, isWritable: true },
+    tokenDestination: {
+      value: input.tokenDestination ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.mm.value) {
+    accounts.mm.value = await findMergeMinerPda({
+      pool: expectAddress(accounts.pool.value),
+      owner: expectAddress(accounts.owner.value),
+    });
+  }
+  if (!accounts.mmTokenAccount.value) {
+    accounts.mmTokenAccount.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(expectAddress(accounts.mm.value)),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.withdrawMint.value)),
+      ],
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.pool),
+      getAccountMeta(accounts.mm),
+      getAccountMeta(accounts.withdrawMint),
+      getAccountMeta(accounts.mmTokenAccount),
+      getAccountMeta(accounts.tokenDestination),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getWithdrawTokensMMInstructionDataEncoder().encode({}),
+    programAddress,
+  } as WithdrawTokensMMInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountPool,
+    TAccountMm,
+    TAccountWithdrawMint,
+    TAccountMmTokenAccount,
+    TAccountTokenDestination,
+    TAccountTokenProgram
+  >);
 }
 
 export interface WithdrawTokensMMInput<

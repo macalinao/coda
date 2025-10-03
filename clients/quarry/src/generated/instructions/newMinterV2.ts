@@ -34,8 +34,13 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMinterPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  expectTransactionSigner,
+  getAccountMetaFactory,
+} from "../shared/index.js";
 
 export const NEW_MINTER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   7, 93, 245, 202, 126, 212, 61, 195,
@@ -115,6 +120,112 @@ export function getNewMinterV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
+export interface NewMinterV2AsyncInput<
+  TAccountMintWrapper extends string = string,
+  TAccountAdmin extends string = string,
+  TAccountNewMinterAuthority extends string = string,
+  TAccountMinter extends string = string,
+  TAccountPayer extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  mintWrapper: Address<TAccountMintWrapper>;
+  admin: TransactionSigner<TAccountAdmin>;
+  newMinterAuthority?: Address<TAccountNewMinterAuthority>;
+  minter?: Address<TAccountMinter>;
+  payer: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+}
+
+export async function getNewMinterV2InstructionAsync<
+  TAccountMintWrapper extends string,
+  TAccountAdmin extends string,
+  TAccountNewMinterAuthority extends string,
+  TAccountMinter extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
+>(
+  input: NewMinterV2AsyncInput<
+    TAccountMintWrapper,
+    TAccountAdmin,
+    TAccountNewMinterAuthority,
+    TAccountMinter,
+    TAccountPayer,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  NewMinterV2Instruction<
+    TProgramAddress,
+    TAccountMintWrapper,
+    TAccountAdmin,
+    TAccountNewMinterAuthority,
+    TAccountMinter,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
+    admin: { value: input.admin ?? null, isWritable: false },
+    newMinterAuthority: {
+      value: input.newMinterAuthority ?? null,
+      isWritable: false,
+    },
+    minter: { value: input.minter ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.newMinterAuthority.value) {
+    accounts.newMinterAuthority.value = expectTransactionSigner(
+      accounts.payer.value,
+    ).address;
+  }
+  if (!accounts.minter.value) {
+    accounts.minter.value = await findMinterPda({
+      wrapper: expectAddress(accounts.mintWrapper.value),
+      authority: expectAddress(accounts.newMinterAuthority.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.mintWrapper),
+      getAccountMeta(accounts.admin),
+      getAccountMeta(accounts.newMinterAuthority),
+      getAccountMeta(accounts.minter),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    data: getNewMinterV2InstructionDataEncoder().encode({}),
+    programAddress,
+  } as NewMinterV2Instruction<
+    TProgramAddress,
+    TAccountMintWrapper,
+    TAccountAdmin,
+    TAccountNewMinterAuthority,
+    TAccountMinter,
+    TAccountPayer,
+    TAccountSystemProgram
+  >);
+}
+
 export interface NewMinterV2Input<
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
@@ -125,7 +236,7 @@ export interface NewMinterV2Input<
 > {
   mintWrapper: Address<TAccountMintWrapper>;
   admin: TransactionSigner<TAccountAdmin>;
-  newMinterAuthority: Address<TAccountNewMinterAuthority>;
+  newMinterAuthority?: Address<TAccountNewMinterAuthority>;
   minter: Address<TAccountMinter>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -180,6 +291,11 @@ export function getNewMinterV2Instruction<
   >;
 
   // Resolve default values.
+  if (!accounts.newMinterAuthority.value) {
+    accounts.newMinterAuthority.value = expectTransactionSigner(
+      accounts.payer.value,
+    ).address;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

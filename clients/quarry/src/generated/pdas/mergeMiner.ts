@@ -18,6 +18,7 @@ export interface MergeMinerSeeds {
   owner: Address;
 }
 
+/** Merge miner account for a user in a merge pool */
 export async function findMergeMinerPda(
   seeds: MergeMinerSeeds,
   config: { programAddress?: Address | undefined } = {},

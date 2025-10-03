@@ -18,6 +18,7 @@ export interface MinterSeeds {
   authority: Address;
 }
 
+/** Minter authority for a specific mint wrapper */
 export async function findMinterPda(
   seeds: MinterSeeds,
   config: { programAddress?: Address | undefined } = {},

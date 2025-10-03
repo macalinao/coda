@@ -18,6 +18,7 @@ export interface RedeemerSeeds {
   redemptionMint: Address;
 }
 
+/** Redeemer account for exchanging IOU tokens for redemption tokens */
 export async function findRedeemerPda(
   seeds: RedeemerSeeds,
   config: { programAddress?: Address | undefined } = {},
