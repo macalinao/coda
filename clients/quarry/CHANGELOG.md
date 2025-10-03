@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.4.1
+
+### Patch Changes
+
+- 9bddb41: Add more defaults to Quarry client
+
 ## 0.4.0
 
 ### Minor Changes
