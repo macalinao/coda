@@ -2,7 +2,9 @@ import {
   addPdasVisitor,
   constantPdaSeedNodeFromString,
   defineConfig,
+  pdaLinkNode,
   publicKeyTypeNode,
+  updateAccountsVisitor,
   variablePdaSeedNode,
 } from "@macalinao/coda";
 import { renameVisitor } from "@macalinao/codama-rename-visitor";
@@ -14,6 +16,49 @@ export default defineConfig({
   },
 
   visitors: [
+    updateAccountsVisitor({
+      // quarryMine accounts
+      rewarder: {
+        pda: pdaLinkNode("rewarder"),
+      },
+      quarry: {
+        pda: pdaLinkNode("quarry"),
+      },
+      miner: {
+        pda: pdaLinkNode("miner"),
+      },
+
+      // quarryMergeMine accounts
+      mergePool: {
+        pda: pdaLinkNode("mergePool"),
+      },
+      mergeMiner: {
+        pda: pdaLinkNode("mergeMiner"),
+      },
+
+      // quarryMintWrapper accounts
+      mintWrapper: {
+        pda: pdaLinkNode("mintWrapper"),
+      },
+      minter: {
+        pda: pdaLinkNode("minter"),
+      },
+
+      // quarryOperator accounts
+      operator: {
+        pda: pdaLinkNode("operator"),
+      },
+
+      // quarryRedeemer accounts
+      redeemer: {
+        pda: pdaLinkNode("redeemer"),
+      },
+
+      // quarryRegistry accounts
+      registry: {
+        pda: pdaLinkNode("registry"),
+      },
+    }),
     addPdasVisitor({
       quarryMine: [
         {

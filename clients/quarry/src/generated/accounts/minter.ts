@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { MinterSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,6 +41,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMinterPda } from "../pdas/index.js";
 
 export const MINTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   28, 69, 107, 166, 41, 139, 205, 247,
@@ -150,4 +152,24 @@ export async function fetchAllMaybeMinter(
 ): Promise<MaybeAccount<Minter>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeMinter(maybeAccount));
+}
+
+export async function fetchMinterFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MinterSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Minter>> {
+  const maybeAccount = await fetchMaybeMinterFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeMinterFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MinterSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Minter>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findMinterPda(seeds, { programAddress });
+  return await fetchMaybeMinter(rpc, address, fetchConfig);
 }

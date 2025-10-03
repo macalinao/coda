@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { OperatorSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,6 +43,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findOperatorPda } from "../pdas/index.js";
 
 export const OPERATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   219, 31, 188, 145, 69, 139, 204, 117,
@@ -164,4 +166,24 @@ export async function fetchAllMaybeOperator(
 ): Promise<MaybeAccount<Operator>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeOperator(maybeAccount));
+}
+
+export async function fetchOperatorFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: OperatorSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Operator>> {
+  const maybeAccount = await fetchMaybeOperatorFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeOperatorFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: OperatorSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Operator>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findOperatorPda(seeds, { programAddress });
+  return await fetchMaybeOperator(rpc, address, fetchConfig);
 }

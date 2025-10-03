@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { MergeMinerSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,6 +41,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMergeMinerPda } from "../pdas/index.js";
 
 export const MERGE_MINER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 97, 253, 80, 19, 210, 148, 120,
@@ -153,4 +155,24 @@ export async function fetchAllMaybeMergeMiner(
 ): Promise<MaybeAccount<MergeMiner>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeMergeMiner(maybeAccount));
+}
+
+export async function fetchMergeMinerFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MergeMinerSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<MergeMiner>> {
+  const maybeAccount = await fetchMaybeMergeMinerFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeMergeMinerFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MergeMinerSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<MergeMiner>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findMergeMinerPda(seeds, { programAddress });
+  return await fetchMaybeMergeMiner(rpc, address, fetchConfig);
 }

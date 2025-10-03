@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { RegistrySeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,6 +41,7 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findRegistryPda } from "../pdas/index.js";
 
 export const REGISTRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   47, 174, 110, 246, 184, 182, 252, 218,
@@ -138,4 +140,24 @@ export async function fetchAllMaybeRegistry(
 ): Promise<MaybeAccount<Registry>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeRegistry(maybeAccount));
+}
+
+export async function fetchRegistryFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: RegistrySeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Registry>> {
+  const maybeAccount = await fetchMaybeRegistryFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeRegistryFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: RegistrySeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Registry>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findRegistryPda(seeds, { programAddress });
+  return await fetchMaybeRegistry(rpc, address, fetchConfig);
 }

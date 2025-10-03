@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { RewarderSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -44,6 +45,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findRewarderPda } from "../pdas/index.js";
 
 export const REWARDER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   83, 3, 203, 174, 244, 30, 172, 198,
@@ -182,4 +184,24 @@ export async function fetchAllMaybeRewarder(
 ): Promise<MaybeAccount<Rewarder>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeRewarder(maybeAccount));
+}
+
+export async function fetchRewarderFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: RewarderSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Rewarder>> {
+  const maybeAccount = await fetchMaybeRewarderFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeRewarderFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: RewarderSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Rewarder>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findRewarderPda(seeds, { programAddress });
+  return await fetchMaybeRewarder(rpc, address, fetchConfig);
 }

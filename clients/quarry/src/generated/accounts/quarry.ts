@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { QuarrySeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -46,6 +47,7 @@ import {
   getU128Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findQuarryPda } from "../pdas/index.js";
 
 export const QUARRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 248, 54, 182, 240, 85, 9, 77,
@@ -180,4 +182,24 @@ export async function fetchAllMaybeQuarry(
 ): Promise<MaybeAccount<Quarry>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeQuarry(maybeAccount));
+}
+
+export async function fetchQuarryFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: QuarrySeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Quarry>> {
+  const maybeAccount = await fetchMaybeQuarryFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeQuarryFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: QuarrySeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Quarry>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findQuarryPda(seeds, { programAddress });
+  return await fetchMaybeQuarry(rpc, address, fetchConfig);
 }
