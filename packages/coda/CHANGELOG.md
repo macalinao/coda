@@ -1,5 +1,12 @@
 # @macalinao/grill-cli
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [9bddb41]
+  - @macalinao/coda-visitors@0.1.2
+
 ## 0.4.1
 
 ### Patch Changes
