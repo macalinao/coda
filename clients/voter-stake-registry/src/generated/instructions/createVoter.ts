@@ -36,8 +36,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findVoterPda, findVoterWeightRecordPda } from "../pdas/index.js";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_VOTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   6, 24, 245, 52, 243, 255, 148, 25,
@@ -138,6 +139,144 @@ export function getCreateVoterInstructionDataCodec(): FixedSizeCodec<
     getCreateVoterInstructionDataEncoder(),
     getCreateVoterInstructionDataDecoder(),
   );
+}
+
+export interface CreateVoterAsyncInput<
+  TAccountRegistrar extends string = string,
+  TAccountVoter extends string = string,
+  TAccountVoterAuthority extends string = string,
+  TAccountVoterWeightRecord extends string = string,
+  TAccountPayer extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+  TAccountInstructions extends string = string,
+> {
+  registrar: Address<TAccountRegistrar>;
+  voter?: Address<TAccountVoter>;
+  voterAuthority: TransactionSigner<TAccountVoterAuthority>;
+  voterWeightRecord?: Address<TAccountVoterWeightRecord>;
+  payer: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+  instructions?: Address<TAccountInstructions>;
+  voterBump: CreateVoterInstructionDataArgs["voterBump"];
+  voterWeightRecordBump: CreateVoterInstructionDataArgs["voterWeightRecordBump"];
+}
+
+export async function getCreateVoterInstructionAsync<
+  TAccountRegistrar extends string,
+  TAccountVoter extends string,
+  TAccountVoterAuthority extends string,
+  TAccountVoterWeightRecord extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TAccountInstructions extends string,
+  TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
+>(
+  input: CreateVoterAsyncInput<
+    TAccountRegistrar,
+    TAccountVoter,
+    TAccountVoterAuthority,
+    TAccountVoterWeightRecord,
+    TAccountPayer,
+    TAccountSystemProgram,
+    TAccountRent,
+    TAccountInstructions
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CreateVoterInstruction<
+    TProgramAddress,
+    TAccountRegistrar,
+    TAccountVoter,
+    TAccountVoterAuthority,
+    TAccountVoterWeightRecord,
+    TAccountPayer,
+    TAccountSystemProgram,
+    TAccountRent,
+    TAccountInstructions
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    registrar: { value: input.registrar ?? null, isWritable: false },
+    voter: { value: input.voter ?? null, isWritable: true },
+    voterAuthority: { value: input.voterAuthority ?? null, isWritable: false },
+    voterWeightRecord: {
+      value: input.voterWeightRecord ?? null,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+    instructions: { value: input.instructions ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.voter.value) {
+    accounts.voter.value = await findVoterPda({
+      registrar: expectAddress(accounts.registrar.value),
+      voterAuthority: expectAddress(accounts.voterAuthority.value),
+    });
+  }
+  if (!accounts.voterWeightRecord.value) {
+    accounts.voterWeightRecord.value = await findVoterWeightRecordPda({
+      registrar: expectAddress(accounts.registrar.value),
+      voterAuthority: expectAddress(accounts.voterAuthority.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.instructions.value) {
+    accounts.instructions.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.registrar),
+      getAccountMeta(accounts.voter),
+      getAccountMeta(accounts.voterAuthority),
+      getAccountMeta(accounts.voterWeightRecord),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+      getAccountMeta(accounts.instructions),
+    ],
+    data: getCreateVoterInstructionDataEncoder().encode(
+      args as CreateVoterInstructionDataArgs,
+    ),
+    programAddress,
+  } as CreateVoterInstruction<
+    TProgramAddress,
+    TAccountRegistrar,
+    TAccountVoter,
+    TAccountVoterAuthority,
+    TAccountVoterWeightRecord,
+    TAccountPayer,
+    TAccountSystemProgram,
+    TAccountRent,
+    TAccountInstructions
+  >);
 }
 
 export interface CreateVoterInput<

@@ -1,11 +1,11 @@
 {
   "name": "@macalinao/coda-visitors",
   "version": "0.1.0",
-  "description": "Various additional visitors for Codama provided by Coda",
+  "description": "Additional Codama visitors for enhanced code generation with Coda",
   "type": "module",
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
-  "homepage": "https://github.com/macalinao/coda",
+  "homepage": "https://coda.ianm.com",
   "license": "Apache-2.0",
   "keywords": [
     "codama",
@@ -13,8 +13,9 @@
     "solana",
     "anchor",
     "idl",
-    "rename",
     "visitor",
+    "ast",
+    "nodes",
     "typescript",
     "ian-macalinao"
   ],
@@ -36,13 +37,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
-    "directory": "packages/codama-rename-visitor"
+    "directory": "packages/coda-visitors"
   },
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
-    "lint": "eslint . --cache",
-    "test": "bun test src/"
+    "lint": "eslint . --cache"
   },
   "dependencies": {
     "codama": "catalog:"

@@ -1,5 +1,6 @@
 import {
   accountNode,
+  accountValueNode,
   addNodesVisitor,
   addPdasVisitor,
   bytesTypeNode,
@@ -10,7 +11,10 @@ import {
   fixedSizeTypeNode,
   numberTypeNode,
   optionTypeNode,
+  payerValueNode,
   pdaLinkNode,
+  pdaSeedValueNode,
+  pdaValueNode,
   publicKeyTypeNode,
   publicKeyValueNode,
   setInstructionAccountDefaultValuesVisitor,
@@ -159,6 +163,33 @@ export default defineConfig({
         defaultValue: publicKeyValueNode(
           "Sysvar1nstructions1111111111111111111111111",
         ),
+      },
+      {
+        account: "payer",
+        defaultValue: payerValueNode(),
+      },
+
+      {
+        account: "voter",
+        instruction: "createVoter",
+        defaultValue: pdaValueNode(pdaLinkNode("voter"), [
+          pdaSeedValueNode("registrar", accountValueNode("registrar")),
+          pdaSeedValueNode(
+            "voterAuthority",
+            accountValueNode("voterAuthority"),
+          ),
+        ]),
+      },
+      {
+        account: "voterWeightRecord",
+        instruction: "createVoter",
+        defaultValue: pdaValueNode(pdaLinkNode("voterWeightRecord"), [
+          pdaSeedValueNode("registrar", accountValueNode("registrar")),
+          pdaSeedValueNode(
+            "voterAuthority",
+            accountValueNode("voterAuthority"),
+          ),
+        ]),
       },
     ]),
     addCustomPDAsVisitor,
