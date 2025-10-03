@@ -1,110 +1,9 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true,
-    "defaultBranch": "master"
-  },
+  "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+  "extends": ["@macalinao/biome-config/base"],
   "files": {
     "ignoreUnknown": false,
     "includes": ["**", "!docs/.next", "!out", "!**/bun.lock", "!vendor"]
-  },
-  "formatter": {
-    "enabled": true,
-    "useEditorconfig": true,
-    "formatWithErrors": false,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 80,
-    "attributePosition": "auto",
-    "bracketSpacing": true
-  },
-  "linter": {
-    "enabled": true,
-    "domains": {
-      "project": "recommended"
-    },
-    "rules": {
-      "recommended": true,
-      "nursery": {
-        "useConsistentTypeDefinitions": "error",
-        "noFloatingPromises": "error",
-        "noUnnecessaryConditions": "error"
-      },
-      "complexity": {
-        "useSimplifiedLogicExpression": "error"
-      },
-      "suspicious": {
-        "noUnknownAtRules": "off",
-        "noDoubleEquals": "error"
-      },
-      "style": {
-        "useImportType": {
-          "level": "error",
-          "options": {
-            "style": "separatedType"
-          }
-        },
-        "noNonNullAssertion": "off",
-        "noParameterAssign": "error",
-        "useAsConstAssertion": "error",
-        "useDefaultParameterLast": "error",
-        "useEnumInitializers": "error",
-        "useSelfClosingElements": "error",
-        "useSingleVarDeclarator": "error",
-        "noUnusedTemplateLiteral": "error",
-        "useNumberNamespace": "error",
-        "noInferrableTypes": "error",
-        "noUselessElse": "error",
-        "useBlockStatements": "error",
-        "useCollapsedElseIf": "error",
-        "useConsistentArrayType": {
-          "level": "error",
-          "options": {
-            "syntax": "shorthand"
-          }
-        },
-        "useShorthandAssign": "error"
-      },
-      "correctness": {
-        "noUnusedVariables": "warn",
-        "noUnusedImports": "error",
-        "noUndeclaredDependencies": "error",
-        "useImportExtensions": {
-          "level": "error",
-          "options": {
-            "forceJsExtensions": true
-          }
-        }
-      }
-    }
-  },
-  "assist": {
-    "actions": {
-      "source": {
-        // Organizes imports and splits out type imports into a separate line
-        "organizeImports": {
-          "level": "on",
-          "options": {
-            "groups": [{ "type": true }]
-          }
-        }
-      }
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double",
-      "jsxQuoteStyle": "double",
-      "quoteProperties": "asNeeded",
-      "trailingCommas": "all",
-      "semicolons": "always",
-      "arrowParentheses": "always",
-      "bracketSameLine": false,
-      "bracketSpacing": true
-    }
   },
   "overrides": [
     {
@@ -113,6 +12,9 @@
         "rules": {
           "nursery": {
             "noUnnecessaryConditions": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
           },
           "suspicious": {
             "noEmptyInterface": "off"
