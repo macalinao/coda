@@ -1,0 +1,11 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Coda by Ian Macalinao",
+  "out": "docs",
+  "entryPoints": ["clients/*", "packages/*"],
+  "entryPointStrategy": "packages",
+  "packageOptions": {
+    "entryPoints": ["src/index.ts"]
+  },
+  "cname": "coda-typedocs.ianm.com"
+}
