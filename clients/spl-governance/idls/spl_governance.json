@@ -1,0 +1,4018 @@
+{
+  "address": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  "metadata": {
+    "name": "spl_governance",
+    "version": "3.1.1",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "create_realm",
+      "discriminator": [0, 147, 95, 250, 91, 1, 118, 220],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "docs": ["Governance Realm account"],
+          "writable": true
+        },
+        {
+          "name": "realm_authority",
+          "docs": ["The authority of the Realm"]
+        },
+        {
+          "name": "community_token_mint",
+          "docs": [
+            "The mint address of the token to be used as the community mint"
+          ]
+        },
+        {
+          "name": "community_token_holding_account",
+          "docs": [
+            "The account to hold the community tokens.\n    PDA seeds=['governance', realm, community_mint]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "docs": ["the payer of this transaction"],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "docs": ["System Program"]
+        },
+        {
+          "name": "token_program",
+          "docs": ["SPL Token Program"]
+        },
+        {
+          "name": "rent",
+          "docs": ["SysVar Rent"]
+        },
+        {
+          "name": "council_token_mint",
+          "docs": [
+            "The mint address of the token to be used as the council mint"
+          ],
+          "optional": true
+        },
+        {
+          "name": "council_token_holding_account",
+          "docs": [
+            "The account to hold the council tokens.\n    PDA seeds: ['governance',realm,council_mint]\n    "
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "realm_config",
+          "docs": ["Realm Config account"],
+          "writable": true
+        },
+        {
+          "name": "community_voter_weight_addin",
+          "docs": ["Optional Community Voter Weight Addin Program Id"],
+          "optional": true
+        },
+        {
+          "name": "max_community_voter_weight_addin",
+          "docs": ["Optional Max Community Voter Weight Addin Program Id"],
+          "optional": true
+        },
+        {
+          "name": "council_voter_weight_addin",
+          "docs": ["Optional Council Voter Weight Addin Program Id"],
+          "optional": true
+        },
+        {
+          "name": "max_council_voter_weight_addin",
+          "docs": ["Optional Max Council Voter Weight Addin Program Id"],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "config_args",
+          "type": {
+            "defined": {
+              "name": "RealmConfigParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "deposit_governing_tokens",
+      "discriminator": [80, 227, 56, 9, 82, 30, 79, 235],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governing_token_holding_account",
+          "docs": ["seeds=['governance', realm, governing_token_mint]"],
+          "writable": true
+        },
+        {
+          "name": "governing_token_source_account",
+          "docs": [
+            "It can either be spl-token TokenAccount or MintAccount. Tokens will be transferred or minted to the holding account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governing_token_owner_account",
+          "signer": true
+        },
+        {
+          "name": "governing_token_source_account_authority",
+          "docs": [
+            "It should be owner for TokenAccount and mint_authority for MintAccount"
+          ],
+          "signer": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": [
+            "seeds=['governance', realm, governing_token_mint, governing_token_owner]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "realm_config_account",
+          "docs": ["seeds=['realm-config', realm]"]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw_governing_tokens",
+      "discriminator": [203, 71, 255, 130, 236, 41, 93, 103],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governing_token_holding_account",
+          "docs": ["seeds=['governance', realm, governing_token_mint]"],
+          "writable": true
+        },
+        {
+          "name": "governing_token_destination_account",
+          "docs": ["All tokens will be transferred to this account"],
+          "writable": true
+        },
+        {
+          "name": "governing_token_owner_account",
+          "signer": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": [
+            "seeds=['governance',realm, governing_token_mint, governing_token_owner]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "realm_config_account",
+          "docs": ["seeds=['realm-config', realm]"]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_governance_delegate",
+      "discriminator": [89, 7, 44, 62, 31, 17, 147, 223],
+      "accounts": [
+        {
+          "name": "current_delegate_or_owner",
+          "docs": ["Current governance delegate or governing token owner"],
+          "signer": true
+        },
+        {
+          "name": "token_owner_record",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_governance_delegate",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_governance",
+      "discriminator": [134, 46, 105, 91, 27, 91, 99, 157],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "docs": ["Realm account the created governance belongs to"]
+        },
+        {
+          "name": "governance_account",
+          "docs": ["seeds=['account-governance', realm, governed_account]"],
+          "writable": true
+        },
+        {
+          "name": "governed_account",
+          "docs": [
+            "Account governed by this Governance (governing_account). \n        Note: the account doesn't have to exist and can be used only as a unique identified for the Governance account"
+          ]
+        },
+        {
+          "name": "governing_token_owner_record",
+          "docs": ["Used only if not signed by RealmAuthority"]
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        },
+        {
+          "name": "realm_config_account",
+          "docs": ["seeds=['realm-config', realm]"]
+        },
+        {
+          "name": "voter_weight_record",
+          "docs": ["Optional Voter Weight Record"],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "GovernanceConfig"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_program_governance",
+      "discriminator": [231, 18, 5, 95, 19, 219, 203, 48],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "docs": ["Realm account the created Governance belongs to"]
+        },
+        {
+          "name": "program_governance_account",
+          "docs": [
+            "Program Governance account. seeds: ['program-governance', realm, governed_program]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governed_program",
+          "docs": ["Program governed by this Governance account"]
+        },
+        {
+          "name": "program_data",
+          "docs": [
+            "Program Data account of the Program governed by this Governance account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "current_upgrade_authority",
+          "docs": [
+            "Current Upgrade Authority account of the Program governed by this Governance account"
+          ],
+          "signer": true
+        },
+        {
+          "name": "governing_token_owner_record",
+          "docs": [
+            "Governing TokenOwnerRecord account (Used only if not signed by RealmAuthority)"
+          ]
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "bpf_upgradeable_loader_program",
+          "docs": ["bpf_upgradeable_loader_program program"]
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        },
+        {
+          "name": "realm_config",
+          "docs": ["RealmConfig account. seeds=['realm-config', realm]"]
+        },
+        {
+          "name": "voter_weight_record",
+          "docs": ["Optional Voter Weight Record"],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "GovernanceConfig"
+            }
+          }
+        },
+        {
+          "name": "transfer_upgrade_authority",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "create_proposal",
+      "discriminator": [132, 116, 68, 174, 216, 160, 198, 22],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "docs": ["Realm account the created Proposal belongs to"]
+        },
+        {
+          "name": "proposal_account",
+          "docs": [
+            "Proposal account. PDA seeds ['governance',governance, governing_token_mint, proposal_index]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governance_account",
+          "docs": ["Governance account"],
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord account of the Proposal owner"],
+          "writable": true
+        },
+        {
+          "name": "governing_token_mint",
+          "docs": ["Token Mint the Proposal is created for"]
+        },
+        {
+          "name": "governance_authority",
+          "docs": ["Governance Authority (Token Owner or Governance Delegate)"],
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "realm_config",
+          "docs": ["RealmConfig account. PDA seeds: ['realm-config', realm]"]
+        },
+        {
+          "name": "voter_weight_record",
+          "docs": ["Optional Voter Weight Record"],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "proposal_deposit_account",
+          "docs": [
+            "Optional Proposal deposit is required when there are more active \n        proposals than the configured deposit exempt amount. \n        PDA seeds: ['proposal-deposit', proposal, deposit payer]"
+          ],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "description_link",
+          "type": "string"
+        },
+        {
+          "name": "vote_type",
+          "type": {
+            "defined": {
+              "name": "VoteType"
+            }
+          }
+        },
+        {
+          "name": "options",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "use_deny_option",
+          "type": "bool"
+        },
+        {
+          "name": "proposal_seed",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "add_signatory",
+      "discriminator": [210, 233, 221, 216, 216, 181, 115, 56],
+      "accounts": [
+        {
+          "name": "proposal_account",
+          "docs": ["Proposal Account associated with the governance"],
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord account of the Proposal owner"]
+        },
+        {
+          "name": "governance_authority",
+          "docs": ["Governance Authority (Token Owner or Governance Delegate)"],
+          "signer": true
+        },
+        {
+          "name": "signatory_record_account",
+          "docs": ["Signatory Record Account"],
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "signatory",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "legacy1",
+      "discriminator": [177, 194, 70, 247, 183, 2, 255, 118],
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "insert_transaction",
+      "discriminator": [106, 8, 35, 192, 19, 26, 140, 38],
+      "accounts": [
+        {
+          "name": "governance_account"
+        },
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord account of the Proposal owner"]
+        },
+        {
+          "name": "governance_authority",
+          "docs": ["Governance Authority (Token Owner or Governance Delegate)"],
+          "signer": true
+        },
+        {
+          "name": "proposal_transaction_account",
+          "docs": [
+            "ProposalTransaction, account. PDA seeds: ['governance', proposal, option_index, index]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "rent"
+        }
+      ],
+      "args": [
+        {
+          "name": "option_index",
+          "type": "u8"
+        },
+        {
+          "name": "index",
+          "type": "u16"
+        },
+        {
+          "name": "hold_up_time",
+          "type": "u32"
+        },
+        {
+          "name": "instructions",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "InstructionData"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "remove_transaction",
+      "discriminator": [11, 129, 185, 56, 38, 17, 111, 190],
+      "accounts": [
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord account of the Proposal owner"]
+        },
+        {
+          "name": "governance_authority",
+          "docs": ["Governance Authority (Token Owner or Governance Delegate)"],
+          "signer": true
+        },
+        {
+          "name": "proposal_transaction_account",
+          "writable": true
+        },
+        {
+          "name": "beneficiary_account",
+          "docs": [
+            "Beneficiary Account which would receive lamports from the disposed ProposalTransaction account"
+          ],
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancel_proposal",
+      "discriminator": [106, 74, 128, 146, 19, 65, 39, 23],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "writable": true
+        },
+        {
+          "name": "governance_account",
+          "writable": true
+        },
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord account of the Proposal owner"],
+          "writable": true
+        },
+        {
+          "name": "governance_authority",
+          "docs": ["Governance authority (Token Owner or Governance Delegate)"],
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "sign_off_proposal",
+      "discriminator": [129, 155, 109, 27, 119, 75, 170, 65],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governance_account"
+        },
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "signatory_account",
+          "docs": [
+            "Signatory account signing off the Proposal.\n    Or Proposal owner if the owner hasn't appointed any signatories"
+          ],
+          "signer": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": [
+            "TokenOwnerRecord for the Proposal owner, required when the owner signs off the Proposal.\n        Or `[writable]` SignatoryRecord account, required when non owner signs off the Proposal"
+          ],
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cast_vote",
+      "discriminator": [20, 212, 15, 189, 69, 180, 69, 151],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governance_account",
+          "writable": true
+        },
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "proposal_token_owner_record",
+          "docs": ["TokenOwnerRecord of the Proposal owner"],
+          "writable": true
+        },
+        {
+          "name": "voter_token_owner_record",
+          "docs": [
+            "TokenOwnerRecord of the voter. PDA seeds: ['governance',realm, vote_governing_token_mint, governing_token_owner]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governance_authority",
+          "docs": ["Governance Authority (Token Owner or Governance Delegate)"],
+          "signer": true
+        },
+        {
+          "name": "proposal_vote_record",
+          "docs": [
+            "Proposal VoteRecord account. PDA seeds: ['governance',proposal,token_owner_record]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governing_token_mint",
+          "docs": [
+            "The Governing Token Mint which is used to cast the vote (vote_governing_token_mint).\n    The voting token mint is the governing_token_mint of the Proposal for Approve, Deny and Abstain votes.\n    For Veto vote the voting token mint is the mint of the opposite voting population.\n    Council mint to veto Community proposals and Community mint to veto Council proposals\n    Note: In the current version only Council veto is supported"
+          ]
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "realm_config_account",
+          "docs": ["RealmConfig account. PDA seeds: ['realm-config', realm]"]
+        },
+        {
+          "name": "voter_weight_record",
+          "docs": ["Optional Voter Weight Record"],
+          "optional": true
+        },
+        {
+          "name": "max_voter_weight_record",
+          "docs": ["Optional Max Voter Weight Record"],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "vote",
+          "type": {
+            "defined": {
+              "name": "Vote"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "finalize_vote",
+      "discriminator": [181, 176, 6, 248, 249, 134, 146, 56],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governance_account",
+          "writable": true
+        },
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord of the Proposal owner"],
+          "writable": true
+        },
+        {
+          "name": "governing_token_mint"
+        },
+        {
+          "name": "realm_config",
+          "docs": ["RealmConfig account. PDA seeds: ['realm-config', realm]"]
+        },
+        {
+          "name": "max_voter_weight_record",
+          "docs": ["Optional Max Voter Weight Record"],
+          "optional": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "relinquish_vote",
+      "discriminator": [39, 15, 192, 13, 10, 156, 182, 135],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governance_account"
+        },
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": [
+            "TokenOwnerRecord account. PDA seeds: ['governance',realm, vote_governing_token_mint, governing_token_owner]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "proposal_vote_record",
+          "docs": [
+            "Proposal VoteRecord account. PDA seeds: ['governance',proposal, token_owner_record]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governing_token_mint",
+          "docs": [
+            "The Governing Token Mint which was used to cast the vote (vote_governing_token_mint)"
+          ]
+        },
+        {
+          "name": "governance_authority",
+          "signer": true,
+          "optional": true
+        },
+        {
+          "name": "beneficiary_account",
+          "docs": [
+            "Optional Beneficiary account which would receive lamports when VoteRecord Account is disposed.\n    It's required only when Proposal is still being voted on"
+          ],
+          "writable": true,
+          "optional": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "execute_transaction",
+      "discriminator": [231, 173, 49, 91, 235, 24, 68, 19],
+      "accounts": [
+        {
+          "name": "governance_account"
+        },
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "proposal_transaction_account",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_mint_governance",
+      "discriminator": [246, 126, 79, 244, 242, 122, 116, 208],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "docs": ["Realm account the created Governance belongs to"]
+        },
+        {
+          "name": "mint_governance_account",
+          "docs": [
+            "Mint Governance account. seeds=['mint-governance', realm, governed_mint]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governed_mint",
+          "docs": ["Mint governed by this Governance account"],
+          "writable": true
+        },
+        {
+          "name": "mint_authority",
+          "docs": [
+            "Current Mint authority (MintTokens and optionally FreezeAccount)"
+          ],
+          "signer": true
+        },
+        {
+          "name": "governing_token_owner_record",
+          "docs": [
+            "Governing TokenOwnerRecord account (Used only if not signed by RealmAuthority)"
+          ]
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        },
+        {
+          "name": "realm_config",
+          "docs": ["RealmConfig account. seeds=['realm-config', realm]"]
+        },
+        {
+          "name": "voter_weight_record",
+          "docs": ["Optional Voter Weight Record"],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "GovernanceConfig"
+            }
+          }
+        },
+        {
+          "name": "transfer_mint_authorities",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "create_token_governance",
+      "discriminator": [110, 228, 177, 222, 178, 221, 96, 138],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "docs": ["Realm account the created Governance belongs to"]
+        },
+        {
+          "name": "token_governance_account",
+          "docs": [
+            "Token Governance account. seeds=['token-governance', realm, governed_token]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_account",
+          "docs": ["Token account governed by this Governance account"],
+          "writable": true
+        },
+        {
+          "name": "token_account_authority",
+          "docs": [
+            "Current token account authority (AccountOwner and optionally CloseAccount"
+          ],
+          "signer": true
+        },
+        {
+          "name": "governing_token_owner_record",
+          "docs": [
+            "Governing TokenOwnerRecord account (Used only if not signed by RealmAuthority"
+          ]
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        },
+        {
+          "name": "realm_config",
+          "docs": ["seeds=['realm-config', realm]"]
+        },
+        {
+          "name": "voter_weight_record",
+          "docs": ["Optional Voter Weight Record"],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "GovernanceConfig"
+            }
+          }
+        },
+        {
+          "name": "transfer_account_authorities",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "set_governance_config",
+      "discriminator": [7, 85, 201, 96, 219, 241, 95, 58],
+      "accounts": [
+        {
+          "name": "governance_account",
+          "docs": ["The governance account the config is for"],
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "GovernanceConfig"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "flag_transaction_error",
+      "discriminator": [166, 7, 179, 64, 49, 129, 181, 5],
+      "accounts": [
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord account of the Proposal owner"]
+        },
+        {
+          "name": "governance_authority",
+          "docs": ["Governance Authority (Token Owner or Governance Delegate)"],
+          "signer": true
+        },
+        {
+          "name": "proposal_transaction_account",
+          "docs": ["ProposalTransaction account to flag"],
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_realm_authority",
+      "discriminator": [91, 76, 56, 99, 3, 85, 157, 154],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "writable": true
+        },
+        {
+          "name": "realm_authority",
+          "signer": true
+        },
+        {
+          "name": "new_realm_authority",
+          "docs": ["Must be one of the realm governances when set"],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "action",
+          "type": {
+            "defined": {
+              "name": "SetRealmAuthorityAction"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_realm_config",
+      "discriminator": [0, 167, 208, 103, 24, 172, 112, 232],
+      "accounts": [
+        {
+          "name": "realm_account",
+          "writable": true
+        },
+        {
+          "name": "realm_authority",
+          "signer": true
+        },
+        {
+          "name": "council_token_mint",
+          "docs": [
+            "Council Token Mint - optional. \n        Note: In the current version it's only possible to remove council mint (set it to None)\n        After setting council to None it won't be possible to withdraw the tokens from the Realm any longer. \n        If that's required then it must be done before executing this instruction"
+          ],
+          "optional": true
+        },
+        {
+          "name": "council_token_holding_account",
+          "docs": [
+            "Optional unless council is used. seeds=['governance', realm, council_mint]"
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "realm_config",
+          "docs": ["RealmConfig account. seeds=['realm-config', realm]"],
+          "writable": true
+        },
+        {
+          "name": "community_voter_weight_addin_program_id",
+          "docs": ["Optional Community Voter Weight Addin Program Id"],
+          "optional": true
+        },
+        {
+          "name": "max_community_voter_weight_addin_program_id",
+          "docs": ["Optional Max Community Voter Weight Addin Program Id"],
+          "optional": true
+        },
+        {
+          "name": "council_voter_weight_addin_program_id",
+          "docs": ["Optional Council Voter Weight Adding Program Id"],
+          "optional": true
+        },
+        {
+          "name": "max_council_voter_weight_addin_program_id",
+          "docs": ["Optional Max Council Voter Weight Addin Program Id"],
+          "optional": true
+        },
+        {
+          "name": "payer",
+          "docs": [
+            "Optional Payer. Required if RealmConfig doesn't exist and needs to be created"
+          ],
+          "signer": true,
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "config_args",
+          "type": {
+            "defined": {
+              "name": "RealmConfigParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_token_owner_record",
+      "discriminator": [47, 45, 190, 114, 133, 246, 163, 222],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governing_token_owner_account"
+        },
+        {
+          "name": "token_owner_record",
+          "docs": [
+            "seeds=['governance', realm, governing_token_mint, governing_token_owner]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governing_token_mint"
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_program_metadata",
+      "discriminator": [140, 19, 75, 78, 235, 229, 180, 114],
+      "accounts": [
+        {
+          "name": "program_metadata_account",
+          "docs": ["seeds=['metadata']"],
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_native_treasury",
+      "discriminator": [206, 91, 231, 66, 73, 164, 213, 110],
+      "accounts": [
+        {
+          "name": "governance_account",
+          "docs": ["Governance account the treasury account is for"]
+        },
+        {
+          "name": "native_treasury_account",
+          "docs": ["seeds=['native-treasury', governance]"],
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "revoke_governing_tokens",
+      "discriminator": [32, 197, 228, 228, 34, 131, 105, 133],
+      "accounts": [
+        {
+          "name": "realm_account"
+        },
+        {
+          "name": "governing_token_holding_account",
+          "docs": ["seeds=['governance', realm, governing_token_mint]"],
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": [
+            "seeds=['governance', realm, governing_token_mint, governing_token_owner]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "governing_token_mint",
+          "writable": true
+        },
+        {
+          "name": "governing_token_mint_authority_or_token_owner",
+          "docs": ["GoverningTokenMint mint_authority"],
+          "signer": true
+        },
+        {
+          "name": "realm_config_account",
+          "docs": ["seeds=['realm-config', realm]"]
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "refund_proposal_deposit",
+      "discriminator": [213, 201, 11, 99, 38, 148, 163, 155],
+      "accounts": [
+        {
+          "name": "proposal_account"
+        },
+        {
+          "name": "proposal_deposit_account",
+          "docs": ["PDA Seeds: ['proposal-deposit', proposal, deposit payer]"],
+          "writable": true
+        },
+        {
+          "name": "proposal_deposit_payer",
+          "docs": ["Proposal Deposit Payer (beneficiary) account"],
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "complete_proposal",
+      "discriminator": [3, 48, 26, 135, 144, 239, 5, 169],
+      "accounts": [
+        {
+          "name": "proposal_account",
+          "writable": true
+        },
+        {
+          "name": "token_owner_record",
+          "docs": ["TokenOwnerRecord account of the Proposal owner"]
+        },
+        {
+          "name": "complete_proposal_authority",
+          "docs": ["Token Owner or Delegate"],
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "add_required_signatory",
+      "discriminator": [193, 75, 49, 70, 90, 15, 114, 200],
+      "accounts": [
+        {
+          "name": "governance_account",
+          "docs": ["The Governance account the config is for"],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "required_signatory_account",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "signatory",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "remove_required_signatory",
+      "discriminator": [21, 156, 139, 89, 244, 230, 204, 130],
+      "accounts": [
+        {
+          "name": "governance_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "required_signatory_account",
+          "writable": true
+        },
+        {
+          "name": "beneficiary_account",
+          "docs": [
+            "Beneficiary Account which would receive lamports from the disposed RequiredSignatory Account"
+          ],
+          "writable": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "governanceV2",
+      "discriminator": [170, 81, 148, 6, 240, 242, 22, 251]
+    },
+    {
+      "name": "realmV1",
+      "discriminator": [129, 90, 21, 174, 119, 136, 214, 93]
+    },
+    {
+      "name": "tokenOwnerRecordV1",
+      "discriminator": [124, 65, 45, 193, 39, 176, 56, 7]
+    },
+    {
+      "name": "governanceV1",
+      "discriminator": [49, 251, 55, 156, 61, 96, 92, 180]
+    },
+    {
+      "name": "proposalV1",
+      "discriminator": [233, 93, 74, 144, 204, 23, 162, 229]
+    },
+    {
+      "name": "signatoryRecordV1",
+      "discriminator": [24, 32, 149, 3, 147, 254, 107, 100]
+    },
+    {
+      "name": "proposalInstructionV1",
+      "discriminator": [252, 191, 144, 217, 179, 141, 202, 181]
+    },
+    {
+      "name": "voteRecordV1",
+      "discriminator": [255, 129, 8, 10, 31, 22, 240, 178]
+    },
+    {
+      "name": "programMetadata",
+      "discriminator": [247, 19, 251, 54, 185, 115, 178, 108]
+    },
+    {
+      "name": "proposalV2",
+      "discriminator": [30, 68, 195, 218, 88, 123, 211, 172]
+    },
+    {
+      "name": "proposalDeposit",
+      "discriminator": [189, 70, 125, 55, 15, 185, 171, 24]
+    },
+    {
+      "name": "proposalTransactionV2",
+      "discriminator": [77, 73, 87, 166, 206, 61, 96, 217]
+    },
+    {
+      "name": "realmV2",
+      "discriminator": [53, 32, 114, 21, 48, 170, 3, 180]
+    },
+    {
+      "name": "realmConfigAccount",
+      "discriminator": [13, 244, 36, 40, 108, 112, 111, 60]
+    },
+    {
+      "name": "requiredSignatory",
+      "discriminator": [112, 254, 199, 24, 189, 242, 178, 123]
+    },
+    {
+      "name": "signatoryRecordV2",
+      "discriminator": [46, 66, 186, 240, 53, 184, 250, 20]
+    },
+    {
+      "name": "tokenOwnerRecordV2",
+      "discriminator": [87, 244, 129, 164, 125, 243, 201, 246]
+    },
+    {
+      "name": "legacyTokenOwnerRecord",
+      "discriminator": [69, 242, 131, 13, 167, 170, 255, 38]
+    },
+    {
+      "name": "voteRecordV2",
+      "discriminator": [170, 196, 210, 20, 98, 64, 155, 142]
+    }
+  ],
+  "errors": [
+    {
+      "code": 500,
+      "name": "InvalidInstruction",
+      "msg": "Invalid instruction passed to program"
+    },
+    {
+      "code": 501,
+      "name": "RealmAlreadyExists",
+      "msg": "Realm with the given name and governing mints already exists"
+    },
+    {
+      "code": 502,
+      "name": "InvalidRealm",
+      "msg": "Invalid realm"
+    },
+    {
+      "code": 503,
+      "name": "InvalidGoverningTokenMint",
+      "msg": "Invalid Governing Token Mint"
+    },
+    {
+      "code": 504,
+      "name": "GoverningTokenOwnerMustSign",
+      "msg": "Governing Token Owner must sign transaction"
+    },
+    {
+      "code": 505,
+      "name": "GoverningTokenOwnerOrDelegateMustSign",
+      "msg": "Governing Token Owner or Delegate  must sign transaction"
+    },
+    {
+      "code": 506,
+      "name": "AllVotesMustBeRelinquishedToWithdrawGoverningTokens",
+      "msg": "All votes must be relinquished to withdraw governing tokens"
+    },
+    {
+      "code": 507,
+      "name": "InvalidTokenOwnerRecordAccountAddress",
+      "msg": "Invalid Token Owner Record account address"
+    },
+    {
+      "code": 508,
+      "name": "InvalidGoverningMintForTokenOwnerRecord",
+      "msg": "Invalid GoverningMint for TokenOwnerRecord"
+    },
+    {
+      "code": 509,
+      "name": "InvalidRealmForTokenOwnerRecord",
+      "msg": "Invalid Realm for TokenOwnerRecord"
+    },
+    {
+      "code": 510,
+      "name": "InvalidProposalForProposalTransaction",
+      "msg": "Invalid Proposal for ProposalTransaction,"
+    },
+    {
+      "code": 511,
+      "name": "InvalidSignatoryAddress",
+      "msg": "Invalid Signatory account address"
+    },
+    {
+      "code": 512,
+      "name": "SignatoryAlreadySignedOff",
+      "msg": "Signatory already signed off"
+    },
+    {
+      "code": 513,
+      "name": "SignatoryMustSign",
+      "msg": "Signatory must sign"
+    },
+    {
+      "code": 514,
+      "name": "InvalidProposalOwnerAccount",
+      "msg": "Invalid Proposal Owner"
+    },
+    {
+      "code": 515,
+      "name": "InvalidProposalForVoterRecord",
+      "msg": "Invalid Proposal for VoterRecord"
+    },
+    {
+      "code": 516,
+      "name": "InvalidGoverningTokenOwnerForVoteRecord",
+      "msg": "Invalid GoverningTokenOwner for VoteRecord"
+    },
+    {
+      "code": 517,
+      "name": "InvalidVoteThresholdPercentage",
+      "msg": "Invalid Governance config: Vote threshold percentage out of range"
+    },
+    {
+      "code": 518,
+      "name": "ProposalAlreadyExists",
+      "msg": "Proposal for the given Governance, Governing Token Mint and index already exists"
+    },
+    {
+      "code": 519,
+      "name": "VoteAlreadyExists",
+      "msg": "Token Owner already voted on the Proposal"
+    },
+    {
+      "code": 520,
+      "name": "NotEnoughTokensToCreateProposal",
+      "msg": "Owner doesn't have enough governing tokens to create Proposal"
+    },
+    {
+      "code": 521,
+      "name": "InvalidStateCannotEditSignatories",
+      "msg": "Invalid State: Can't edit Signatories"
+    },
+    {
+      "code": 522,
+      "name": "InvalidProposalState",
+      "msg": "Invalid Proposal state"
+    },
+    {
+      "code": 523,
+      "name": "InvalidStateCannotEditTransactions",
+      "msg": "Invalid State: Can't edit transactions"
+    },
+    {
+      "code": 524,
+      "name": "InvalidStateCannotExecuteTransaction",
+      "msg": "Invalid State: Can't execute transaction"
+    },
+    {
+      "code": 525,
+      "name": "CannotExecuteTransactionWithinHoldUpTime",
+      "msg": "Can't execute transaction within its hold up time"
+    },
+    {
+      "code": 526,
+      "name": "TransactionAlreadyExecuted",
+      "msg": "Transaction already executed"
+    },
+    {
+      "code": 527,
+      "name": "InvalidTransactionIndex",
+      "msg": "Invalid Transaction index"
+    },
+    {
+      "code": 528,
+      "name": "TransactionHoldUpTimeBelowRequiredMin",
+      "msg": "Transaction hold up time is below the min specified by Governance"
+    },
+    {
+      "code": 529,
+      "name": "TransactionAlreadyExists",
+      "msg": "Transaction at the given index for the Proposal already exists"
+    },
+    {
+      "code": 530,
+      "name": "InvalidStateCannotSignOff",
+      "msg": "Invalid State: Can't sign off"
+    },
+    {
+      "code": 531,
+      "name": "InvalidStateCannotVote",
+      "msg": "Invalid State: Can't vote"
+    },
+    {
+      "code": 532,
+      "name": "InvalidStateCannotFinalize",
+      "msg": "Invalid State: Can't finalize vote"
+    },
+    {
+      "code": 533,
+      "name": "InvalidStateCannotCancelProposal",
+      "msg": "Invalid State: Can't cancel Proposal"
+    },
+    {
+      "code": 534,
+      "name": "VoteAlreadyRelinquished",
+      "msg": "Vote already relinquished"
+    },
+    {
+      "code": 535,
+      "name": "CannotFinalizeVotingInProgress",
+      "msg": "Can't finalize vote. Voting still in progress"
+    },
+    {
+      "code": 536,
+      "name": "ProposalVotingTimeExpired",
+      "msg": "Proposal voting time expired"
+    },
+    {
+      "code": 537,
+      "name": "InvalidSignatoryMint",
+      "msg": "Invalid Signatory Mint"
+    },
+    {
+      "code": 538,
+      "name": "InvalidGovernanceForProposal",
+      "msg": "Proposal does not belong to the given Governance"
+    },
+    {
+      "code": 539,
+      "name": "InvalidGoverningMintForProposal",
+      "msg": "Proposal does not belong to given Governing Mint"
+    },
+    {
+      "code": 540,
+      "name": "MintAuthorityMustSign",
+      "msg": "Current mint authority must sign transaction"
+    },
+    {
+      "code": 541,
+      "name": "InvalidMintAuthority",
+      "msg": "Invalid mint authority"
+    },
+    {
+      "code": 542,
+      "name": "MintHasNoAuthority",
+      "msg": "Mint has no authority"
+    },
+    {
+      "code": 543,
+      "name": "SplTokenAccountWithInvalidOwner",
+      "msg": "Invalid Token account owner"
+    },
+    {
+      "code": 544,
+      "name": "SplTokenMintWithInvalidOwner",
+      "msg": "Invalid Mint account owner"
+    },
+    {
+      "code": 545,
+      "name": "SplTokenAccountNotInitialized",
+      "msg": "Token Account is not initialized"
+    },
+    {
+      "code": 546,
+      "name": "SplTokenAccountDoesNotExist",
+      "msg": "Token Account doesn't exist"
+    },
+    {
+      "code": 547,
+      "name": "SplTokenInvalidTokenAccountData",
+      "msg": "Token account data is invalid"
+    },
+    {
+      "code": 548,
+      "name": "SplTokenInvalidMintAccountData",
+      "msg": "Token mint account data is invalid"
+    },
+    {
+      "code": 549,
+      "name": "SplTokenMintNotInitialized",
+      "msg": "Token Mint account is not initialized"
+    },
+    {
+      "code": 550,
+      "name": "SplTokenMintDoesNotExist",
+      "msg": "Token Mint account doesn't exist"
+    },
+    {
+      "code": 551,
+      "name": "InvalidProgramDataAccountAddress",
+      "msg": "Invalid ProgramData account address"
+    },
+    {
+      "code": 552,
+      "name": "InvalidProgramDataAccountData",
+      "msg": "Invalid ProgramData account Data"
+    },
+    {
+      "code": 553,
+      "name": "InvalidUpgradeAuthority",
+      "msg": "Provided upgrade authority doesn't match current program upgrade authority"
+    },
+    {
+      "code": 554,
+      "name": "UpgradeAuthorityMustSign",
+      "msg": "Current program upgrade authority must sign transaction"
+    },
+    {
+      "code": 555,
+      "name": "ProgramNotUpgradable",
+      "msg": "Given program is not upgradable"
+    },
+    {
+      "code": 556,
+      "name": "InvalidTokenOwner",
+      "msg": "Invalid token owner"
+    },
+    {
+      "code": 557,
+      "name": "TokenOwnerMustSign",
+      "msg": "Current token owner must sign transaction"
+    },
+    {
+      "code": 558,
+      "name": "VoteThresholdTypeNotSupported",
+      "msg": "Given VoteThresholdType is not supported"
+    },
+    {
+      "code": 559,
+      "name": "VoteWeightSourceNotSupported",
+      "msg": "Given VoteWeightSource is not supported"
+    },
+    {
+      "code": 560,
+      "name": "Legacy1",
+      "msg": "Legacy1"
+    },
+    {
+      "code": 561,
+      "name": "GovernancePdaMustSign",
+      "msg": "Governance PDA must sign"
+    },
+    {
+      "code": 562,
+      "name": "TransactionAlreadyFlaggedWithError",
+      "msg": "Transaction already flagged with error"
+    },
+    {
+      "code": 563,
+      "name": "InvalidRealmForGovernance",
+      "msg": "Invalid Realm for Governance"
+    },
+    {
+      "code": 564,
+      "name": "InvalidAuthorityForRealm",
+      "msg": "Invalid Authority for Realm"
+    },
+    {
+      "code": 565,
+      "name": "RealmHasNoAuthority",
+      "msg": "Realm has no authority"
+    },
+    {
+      "code": 566,
+      "name": "RealmAuthorityMustSign",
+      "msg": "Realm authority must sign"
+    },
+    {
+      "code": 567,
+      "name": "InvalidGoverningTokenHoldingAccount",
+      "msg": "Invalid governing token holding account"
+    },
+    {
+      "code": 568,
+      "name": "RealmCouncilMintChangeIsNotSupported",
+      "msg": "Realm council mint change is not supported"
+    },
+    {
+      "code": 569,
+      "name": "InvalidMaxVoterWeightAbsoluteValue",
+      "msg": "Invalid max voter weight absolute value"
+    },
+    {
+      "code": 570,
+      "name": "InvalidMaxVoterWeightSupplyFraction",
+      "msg": "Invalid max voter weight supply fraction"
+    },
+    {
+      "code": 571,
+      "name": "NotEnoughTokensToCreateGovernance",
+      "msg": "Owner doesn't have enough governing tokens to create Governance"
+    },
+    {
+      "code": 572,
+      "name": "TooManyOutstandingProposals",
+      "msg": "Too many outstanding proposals"
+    },
+    {
+      "code": 573,
+      "name": "AllProposalsMustBeFinalisedToWithdrawGoverningTokens",
+      "msg": "All proposals must be finalized to withdraw governing tokens"
+    },
+    {
+      "code": 574,
+      "name": "InvalidVoterWeightRecordForRealm",
+      "msg": "Invalid VoterWeightRecord for Realm"
+    },
+    {
+      "code": 575,
+      "name": "InvalidVoterWeightRecordForGoverningTokenMint",
+      "msg": "Invalid VoterWeightRecord for GoverningTokenMint"
+    },
+    {
+      "code": 576,
+      "name": "InvalidVoterWeightRecordForTokenOwner",
+      "msg": "Invalid VoterWeightRecord for TokenOwner"
+    },
+    {
+      "code": 577,
+      "name": "VoterWeightRecordExpired",
+      "msg": "VoterWeightRecord expired"
+    },
+    {
+      "code": 578,
+      "name": "InvalidRealmConfigForRealm",
+      "msg": "Invalid RealmConfig for Realm"
+    },
+    {
+      "code": 579,
+      "name": "TokenOwnerRecordAlreadyExists",
+      "msg": "TokenOwnerRecord already exists"
+    },
+    {
+      "code": 580,
+      "name": "GoverningTokenDepositsNotAllowed",
+      "msg": "Governing token deposits not allowed"
+    },
+    {
+      "code": 581,
+      "name": "InvalidVoteChoiceWeightPercentage",
+      "msg": "Invalid vote choice weight percentage"
+    },
+    {
+      "code": 582,
+      "name": "VoteTypeNotSupported",
+      "msg": "Vote type not supported"
+    },
+    {
+      "code": 583,
+      "name": "InvalidProposalOptions",
+      "msg": "Invalid proposal options"
+    },
+    {
+      "code": 584,
+      "name": "ProposalIsNotExecutable",
+      "msg": "Proposal is not not executable"
+    },
+    {
+      "code": 585,
+      "name": "DenyVoteIsNotAllowed",
+      "msg": "Deny vote is not allowed"
+    },
+    {
+      "code": 586,
+      "name": "CannotExecuteDefeatedOption",
+      "msg": "Cannot execute defeated option"
+    },
+    {
+      "code": 587,
+      "name": "VoterWeightRecordInvalidAction",
+      "msg": "VoterWeightRecord invalid action"
+    },
+    {
+      "code": 588,
+      "name": "VoterWeightRecordInvalidActionTarget",
+      "msg": "VoterWeightRecord invalid action target"
+    },
+    {
+      "code": 589,
+      "name": "InvalidMaxVoterWeightRecordForRealm",
+      "msg": "Invalid MaxVoterWeightRecord for Realm"
+    },
+    {
+      "code": 590,
+      "name": "InvalidMaxVoterWeightRecordForGoverningTokenMint",
+      "msg": "Invalid MaxVoterWeightRecord for GoverningTokenMint"
+    },
+    {
+      "code": 591,
+      "name": "MaxVoterWeightRecordExpired",
+      "msg": "MaxVoterWeightRecord expired"
+    },
+    {
+      "code": 592,
+      "name": "NotSupportedVoteType",
+      "msg": "Not supported VoteType"
+    },
+    {
+      "code": 593,
+      "name": "RealmConfigChangeNotAllowed",
+      "msg": "RealmConfig change not allowed"
+    },
+    {
+      "code": 594,
+      "name": "GovernanceConfigChangeNotAllowed",
+      "msg": "GovernanceConfig change not allowed"
+    },
+    {
+      "code": 595,
+      "name": "AtLeastOneVoteThresholdRequired",
+      "msg": "At least one VoteThreshold is required"
+    },
+    {
+      "code": 596,
+      "name": "ReservedBufferMustBeEmpty",
+      "msg": "Reserved buffer must be empty"
+    },
+    {
+      "code": 597,
+      "name": "CannotRelinquishInFinalizingState",
+      "msg": "Cannot Relinquish in Finalizing state"
+    },
+    {
+      "code": 598,
+      "name": "InvalidRealmConfigAddress",
+      "msg": "Invalid RealmConfig account address"
+    },
+    {
+      "code": 599,
+      "name": "CannotDepositDormantTokens",
+      "msg": "Cannot deposit dormant tokens"
+    },
+    {
+      "code": 600,
+      "name": "CannotWithdrawMembershipTokens",
+      "msg": "Cannot withdraw membership tokens"
+    },
+    {
+      "code": 601,
+      "name": "CannotRevokeGoverningTokens",
+      "msg": "Cannot revoke GoverningTokens"
+    },
+    {
+      "code": 602,
+      "name": "InvalidRevokeAmount",
+      "msg": "Invalid Revoke amount"
+    },
+    {
+      "code": 603,
+      "name": "InvalidGoverningTokenSource",
+      "msg": "Invalid GoverningToken source"
+    },
+    {
+      "code": 604,
+      "name": "CannotChangeCommunityTokenTypeToMembership",
+      "msg": "Cannot change community TokenType to Membership"
+    },
+    {
+      "code": 605,
+      "name": "VoterWeightThresholdDisabled",
+      "msg": "Voter weight threshold disabled"
+    },
+    {
+      "code": 606,
+      "name": "VoteNotAllowedInCoolOffTime",
+      "msg": "Vote not allowed in cool off time"
+    },
+    {
+      "code": 607,
+      "name": "CannotRefundProposalDeposit",
+      "msg": "Cannot refund ProposalDeposit"
+    },
+    {
+      "code": 608,
+      "name": "InvalidProposalForProposalDeposit",
+      "msg": "Invalid Proposal for ProposalDeposit"
+    },
+    {
+      "code": 609,
+      "name": "InvalidDepositExemptProposalCount",
+      "msg": "Invalid deposit_exempt_proposal_count"
+    },
+    {
+      "code": 610,
+      "name": "GoverningTokenMintNotAllowedToVote",
+      "msg": "GoverningTokenMint not allowed to vote"
+    },
+    {
+      "code": 611,
+      "name": "InvalidDepositPayerForProposalDeposit",
+      "msg": "Invalid deposit Payer for ProposalDeposit"
+    },
+    {
+      "code": 612,
+      "name": "InvalidStateNotFinal",
+      "msg": "Invalid State: Proposal is not in final state"
+    },
+    {
+      "code": 613,
+      "name": "InvalidStateToCompleteProposal",
+      "msg": "Invalid state for proposal state transition to Completed"
+    },
+    {
+      "code": 614,
+      "name": "InvalidNumberOfVoteChoices",
+      "msg": "Invalid number of vote choices"
+    },
+    {
+      "code": 615,
+      "name": "RankedVoteIsNotSupported",
+      "msg": "Ranked vote is not supported"
+    },
+    {
+      "code": 616,
+      "name": "ChoiceWeightMustBe100Percent",
+      "msg": "Choice weight must be 100%"
+    },
+    {
+      "code": 617,
+      "name": "SingleChoiceOnlyIsAllowed",
+      "msg": "Single choice only is allowed"
+    },
+    {
+      "code": 618,
+      "name": "AtLeastSingleChoiceIsRequired",
+      "msg": "At least single choice is required"
+    },
+    {
+      "code": 619,
+      "name": "TotalVoteWeightMustBe100Percent",
+      "msg": "Total vote weight must be 100%"
+    },
+    {
+      "code": 620,
+      "name": "InvalidMultiChoiceProposalParameters",
+      "msg": "Invalid multi choice proposal parameters"
+    },
+    {
+      "code": 621,
+      "name": "InvalidGovernanceForRequiredSignatory",
+      "msg": "Invalid Governance for RequiredSignatory"
+    },
+    {
+      "code": 622,
+      "name": "SignatoryRecordAlreadyExists",
+      "msg": "Signatory Record has already been created"
+    },
+    {
+      "code": 623,
+      "name": "InstructionDeprecated",
+      "msg": "Instruction has been removed"
+    },
+    {
+      "code": 624,
+      "name": "MissingRequiredSignatories",
+      "msg": "Proposal is missing required signatories"
+    }
+  ],
+  "types": [
+    {
+      "name": "GovernanceConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "community_vote_threshold",
+            "type": {
+              "defined": {
+                "name": "VoteThreshold"
+              }
+            }
+          },
+          {
+            "name": "min_community_weight_to_create_proposal",
+            "type": "u64"
+          },
+          {
+            "name": "min_transaction_hold_up_time",
+            "type": "u32"
+          },
+          {
+            "name": "voting_base_time",
+            "type": "u32"
+          },
+          {
+            "name": "community_vote_tipping",
+            "type": {
+              "defined": {
+                "name": "VoteTipping"
+              }
+            }
+          },
+          {
+            "name": "council_vote_threshold",
+            "type": {
+              "defined": {
+                "name": "VoteThreshold"
+              }
+            }
+          },
+          {
+            "name": "council_veto_vote_threshold",
+            "type": {
+              "defined": {
+                "name": "VoteThreshold"
+              }
+            }
+          },
+          {
+            "name": "min_council_weight_to_create_proposal",
+            "type": "u64"
+          },
+          {
+            "name": "council_vote_tipping",
+            "type": {
+              "defined": {
+                "name": "VoteTipping"
+              }
+            }
+          },
+          {
+            "name": "community_veto_vote_threshold",
+            "type": {
+              "defined": {
+                "name": "VoteThreshold"
+              }
+            }
+          },
+          {
+            "name": "voting_cool_off_time",
+            "type": "u32"
+          },
+          {
+            "name": "deposit_exempt_proposal_count",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NativeTreasury",
+      "type": {
+        "kind": "struct"
+      }
+    },
+    {
+      "name": "ProposalOption",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "label",
+            "type": "string"
+          },
+          {
+            "name": "vote_weight",
+            "type": "u64"
+          },
+          {
+            "name": "vote_result",
+            "type": {
+              "defined": {
+                "name": "OptionVoteResult"
+              }
+            }
+          },
+          {
+            "name": "transactions_executed_count",
+            "type": "u16"
+          },
+          {
+            "name": "transactions_count",
+            "type": "u16"
+          },
+          {
+            "name": "transactions_next_index",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InstructionData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "program_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AccountMetaData"
+                }
+              }
+            }
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccountMetaData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_signer",
+            "type": "bool"
+          },
+          {
+            "name": "is_writable",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RealmConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "use_council_mint",
+            "type": "bool"
+          },
+          {
+            "name": "min_community_weight_to_create_governance",
+            "type": "u64"
+          },
+          {
+            "name": "community_mint_max_voter_weight_source",
+            "type": {
+              "defined": {
+                "name": "MintMaxVoterWeightSource"
+              }
+            }
+          },
+          {
+            "name": "community_token_config_args",
+            "type": {
+              "defined": {
+                "name": "GoverningTokenConfigParams"
+              }
+            }
+          },
+          {
+            "name": "council_token_config_args",
+            "type": {
+              "defined": {
+                "name": "GoverningTokenConfigParams"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GoverningTokenConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "use_voter_weight_addin",
+            "type": "bool"
+          },
+          {
+            "name": "use_max_voter_weight_addin",
+            "type": "bool"
+          },
+          {
+            "name": "token_type",
+            "type": {
+              "defined": {
+                "name": "GoverningTokenType"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GoverningTokenConfigAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "voter_weight_addin",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "max_voter_weight_addin",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "token_type",
+            "type": {
+              "defined": {
+                "name": "GoverningTokenType"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RealmConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "legacy1",
+            "type": "u8"
+          },
+          {
+            "name": "legacy2",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 6]
+            }
+          },
+          {
+            "name": "min_community_weight_to_create_governance",
+            "type": "u64"
+          },
+          {
+            "name": "community_mint_max_voter_weight_source",
+            "type": {
+              "defined": {
+                "name": "MintMaxVoterWeightSource"
+              }
+            }
+          },
+          {
+            "name": "council_mint",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RealmConfigParamsV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "use_council_mint",
+            "type": "bool"
+          },
+          {
+            "name": "min_community_weight_to_create_governance",
+            "type": "u64"
+          },
+          {
+            "name": "community_mint_max_voter_weight_source",
+            "type": {
+              "defined": {
+                "name": "MintMaxVoterWeightSource"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GoverningTokenConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "voter_weight_addin",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "max_voter_weight_addin",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "token_type",
+            "type": {
+              "defined": {
+                "name": "GoverningTokenType"
+              }
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 8]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteChoice",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rank",
+            "type": "u8"
+          },
+          {
+            "name": "weight_percentage",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reserved110",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reserved64",
+            "type": {
+              "array": ["u8", 64]
+            }
+          },
+          {
+            "name": "reserved32",
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "reserved14",
+            "type": {
+              "array": ["u8", 14]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reserved119",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reserved64",
+            "type": {
+              "array": ["u8", 64]
+            }
+          },
+          {
+            "name": "reserved32",
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "reserved23",
+            "type": {
+              "array": ["u8", 23]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GovernanceAccountType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "RealmV1"
+          },
+          {
+            "name": "TokenOwnerRecordV1"
+          },
+          {
+            "name": "GovernanceV1"
+          },
+          {
+            "name": "ProgramGovernanceV1"
+          },
+          {
+            "name": "ProposalV1"
+          },
+          {
+            "name": "SignatoryRecordV1"
+          },
+          {
+            "name": "VoteRecordV1"
+          },
+          {
+            "name": "ProposalInstructionV1"
+          },
+          {
+            "name": "MintGovernanceV1"
+          },
+          {
+            "name": "TokenGovernanceV1"
+          },
+          {
+            "name": "RealmConfig"
+          },
+          {
+            "name": "VoteRecordV2"
+          },
+          {
+            "name": "ProposalTransactionV2"
+          },
+          {
+            "name": "ProposalV2"
+          },
+          {
+            "name": "ProgramMetadata"
+          },
+          {
+            "name": "RealmV2"
+          },
+          {
+            "name": "TokenOwnerRecordV2"
+          },
+          {
+            "name": "GovernanceV2"
+          },
+          {
+            "name": "ProgramGovernanceV2"
+          },
+          {
+            "name": "MintGovernanceV2"
+          },
+          {
+            "name": "TokenGovernanceV2"
+          },
+          {
+            "name": "SignatoryRecordV2"
+          },
+          {
+            "name": "ProposalDeposit"
+          },
+          {
+            "name": "RequiredSignatory"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProposalState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Draft"
+          },
+          {
+            "name": "SigningOff"
+          },
+          {
+            "name": "Voting"
+          },
+          {
+            "name": "Succeeded"
+          },
+          {
+            "name": "Executing"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Cancelled"
+          },
+          {
+            "name": "Defeated"
+          },
+          {
+            "name": "ExecutingWithErrors"
+          },
+          {
+            "name": "Vetoed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteThreshold",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "YesVotePercentage",
+            "fields": ["u8"]
+          },
+          {
+            "name": "QuorumPercentage",
+            "fields": ["u8"]
+          },
+          {
+            "name": "Disabled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteTipping",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Strict"
+          },
+          {
+            "name": "Early"
+          },
+          {
+            "name": "Disabled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransactionExecutionStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Success"
+          },
+          {
+            "name": "Error"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InstructionExecutionFlags",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Ordered"
+          },
+          {
+            "name": "UseTransaction"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintMaxVoterWeightSource",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SupplyFraction",
+            "fields": ["u64"]
+          },
+          {
+            "name": "Absolute",
+            "fields": ["u64"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteWeightV1",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Yes",
+            "fields": ["u64"]
+          },
+          {
+            "name": "No",
+            "fields": ["u64"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "OptionVoteResult",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Succeeded"
+          },
+          {
+            "name": "Defeated"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SingleChoice"
+          },
+          {
+            "name": "MultiChoice",
+            "fields": [
+              {
+                "name": "choice_type",
+                "type": {
+                  "defined": {
+                    "name": "MultiChoiceType"
+                  }
+                }
+              },
+              {
+                "name": "min_voter_options",
+                "type": "u8"
+              },
+              {
+                "name": "max_voter_options",
+                "type": "u8"
+              },
+              {
+                "name": "max_winning_options",
+                "type": "u8"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MultiChoiceType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FullWeight"
+          },
+          {
+            "name": "Weighted"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetRealmAuthorityAction",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SetUnchecked"
+          },
+          {
+            "name": "SetChecked"
+          },
+          {
+            "name": "Remove"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GovernanceInstructionV1",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CreateRealm",
+            "fields": [
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "config_args",
+                "type": {
+                  "defined": {
+                    "name": "RealmConfigParamsV1"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "DepositGoverningTokens",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "GoverningTokenType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Liquid"
+          },
+          {
+            "name": "Membership"
+          },
+          {
+            "name": "Dormant"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vote",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Approve",
+            "fields": [
+              {
+                "vec": {
+                  "defined": {
+                    "name": "VoteChoice"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "Deny"
+          },
+          {
+            "name": "Abstain"
+          },
+          {
+            "name": "Veto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Electorate"
+          },
+          {
+            "name": "Veto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnixTimestamp",
+      "type": "i64"
+    },
+    {
+      "name": "Slot",
+      "type": "u64"
+    },
+    {
+      "name": "governanceV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "realm",
+            "type": "pubkey"
+          },
+          {
+            "name": "governed_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "reserved1",
+            "type": "u32"
+          },
+          {
+            "name": "config",
+            "type": {
+              "defined": {
+                "name": "GovernanceConfig"
+              }
+            }
+          },
+          {
+            "name": "reserved_v2",
+            "type": {
+              "defined": {
+                "name": "Reserved119"
+              }
+            }
+          },
+          {
+            "name": "required_signatories_count",
+            "type": "u8"
+          },
+          {
+            "name": "active_proposal_count",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "realmV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "community_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "config",
+            "type": {
+              "defined": {
+                "name": "RealmConfig"
+              }
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 6]
+            }
+          },
+          {
+            "name": "voting_proposal_count",
+            "type": "u16"
+          },
+          {
+            "name": "authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "tokenOwnerRecordV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "realm",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_deposit_amount",
+            "type": "u64"
+          },
+          {
+            "name": "unrelinquished_votes_count",
+            "type": "u64"
+          },
+          {
+            "name": "outstanding_proposal_count",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 6]
+            }
+          },
+          {
+            "name": "governance_delegate",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "governanceV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "realm",
+            "type": "pubkey"
+          },
+          {
+            "name": "governed_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "proposals_count",
+            "type": "u32"
+          },
+          {
+            "name": "config",
+            "type": {
+              "defined": {
+                "name": "GovernanceConfig"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "proposalV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "governance",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "ProposalState"
+              }
+            }
+          },
+          {
+            "name": "token_owner_record",
+            "type": "pubkey"
+          },
+          {
+            "name": "signatories_count",
+            "type": "u8"
+          },
+          {
+            "name": "signatories_signed_off_count",
+            "type": "u8"
+          },
+          {
+            "name": "yes_votes_count",
+            "type": "u64"
+          },
+          {
+            "name": "no_votes_count",
+            "type": "u64"
+          },
+          {
+            "name": "instructions_executed_count",
+            "type": "u16"
+          },
+          {
+            "name": "instructions_count",
+            "type": "u16"
+          },
+          {
+            "name": "instructions_next_index",
+            "type": "u16"
+          },
+          {
+            "name": "draft_at",
+            "type": {
+              "defined": {
+                "name": "UnixTimestamp"
+              }
+            }
+          },
+          {
+            "name": "signing_off_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "voting_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "voting_at_slot",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Slot"
+                }
+              }
+            }
+          },
+          {
+            "name": "voting_completed_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "executing_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "closed_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "execution_flags",
+            "type": {
+              "defined": {
+                "name": "InstructionExecutionFlags"
+              }
+            }
+          },
+          {
+            "name": "max_vote_weight",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "vote_threshold",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "VoteThreshold"
+                }
+              }
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description_link",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "signatoryRecordV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "proposal",
+            "type": "pubkey"
+          },
+          {
+            "name": "signatory",
+            "type": "pubkey"
+          },
+          {
+            "name": "signed_off",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "proposalInstructionV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "proposal",
+            "type": "pubkey"
+          },
+          {
+            "name": "instruction_index",
+            "type": "u16"
+          },
+          {
+            "name": "hold_up_time",
+            "type": "u32"
+          },
+          {
+            "name": "instruction",
+            "type": {
+              "defined": {
+                "name": "InstructionData"
+              }
+            }
+          },
+          {
+            "name": "executed_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "execution_status",
+            "type": {
+              "defined": {
+                "name": "TransactionExecutionStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "voteRecordV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "proposal",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_relinquished",
+            "type": "bool"
+          },
+          {
+            "name": "vote_weight",
+            "type": {
+              "defined": {
+                "name": "VoteWeightV1"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "programMetadata",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "updated_at",
+            "type": {
+              "defined": {
+                "name": "Slot"
+              }
+            }
+          },
+          {
+            "name": "version",
+            "type": "string"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 64]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "proposalV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "governance",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "ProposalState"
+              }
+            }
+          },
+          {
+            "name": "token_owner_record",
+            "type": "pubkey"
+          },
+          {
+            "name": "signatories_count",
+            "type": "u8"
+          },
+          {
+            "name": "signatories_signed_off_count",
+            "type": "u8"
+          },
+          {
+            "name": "vote_type",
+            "type": {
+              "defined": {
+                "name": "VoteType"
+              }
+            }
+          },
+          {
+            "name": "options",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ProposalOption"
+                }
+              }
+            }
+          },
+          {
+            "name": "deny_vote_weight",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "reserved1",
+            "type": "u8"
+          },
+          {
+            "name": "abstain_vote_weight",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "start_voting_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "draft_at",
+            "type": {
+              "defined": {
+                "name": "UnixTimestamp"
+              }
+            }
+          },
+          {
+            "name": "signing_off_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "voting_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "voting_at_slot",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Slot"
+                }
+              }
+            }
+          },
+          {
+            "name": "voting_completed_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "executing_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "closed_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "execution_flags",
+            "type": {
+              "defined": {
+                "name": "InstructionExecutionFlags"
+              }
+            }
+          },
+          {
+            "name": "max_vote_weight",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "max_voting_time",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "vote_threshold",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "VoteThreshold"
+                }
+              }
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 64]
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description_link",
+            "type": "string"
+          },
+          {
+            "name": "veto_vote_weight",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "proposalDeposit",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "proposal",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_payer",
+            "type": "pubkey"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 64]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "proposalTransactionV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "proposal",
+            "type": "pubkey"
+          },
+          {
+            "name": "option_index",
+            "type": "u8"
+          },
+          {
+            "name": "transaction_index",
+            "type": "u16"
+          },
+          {
+            "name": "hold_up_time",
+            "type": "u32"
+          },
+          {
+            "name": "instructions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "InstructionData"
+                }
+              }
+            }
+          },
+          {
+            "name": "executed_at",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnixTimestamp"
+                }
+              }
+            }
+          },
+          {
+            "name": "execution_status",
+            "type": {
+              "defined": {
+                "name": "TransactionExecutionStatus"
+              }
+            }
+          },
+          {
+            "name": "reserved_v2",
+            "type": {
+              "array": ["u8", 8]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "realmV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "community_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "config",
+            "type": {
+              "defined": {
+                "name": "RealmConfig"
+              }
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 6]
+            }
+          },
+          {
+            "name": "legacy1",
+            "type": "u16"
+          },
+          {
+            "name": "authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "reserved_v2",
+            "type": {
+              "array": ["u8", 128]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "realmConfigAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "realm",
+            "type": "pubkey"
+          },
+          {
+            "name": "community_token_config",
+            "type": {
+              "defined": {
+                "name": "GoverningTokenConfig"
+              }
+            }
+          },
+          {
+            "name": "council_token_config",
+            "type": {
+              "defined": {
+                "name": "GoverningTokenConfig"
+              }
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "defined": {
+                "name": "Reserved110"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "requiredSignatory",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "account_version",
+            "type": "u8"
+          },
+          {
+            "name": "governance",
+            "type": "pubkey"
+          },
+          {
+            "name": "signatory",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "signatoryRecordV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "proposal",
+            "type": "pubkey"
+          },
+          {
+            "name": "signatory",
+            "type": "pubkey"
+          },
+          {
+            "name": "signed_off",
+            "type": "bool"
+          },
+          {
+            "name": "reserved_v2",
+            "type": {
+              "array": ["u8", 8]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "tokenOwnerRecordV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "realm",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_deposit_amount",
+            "type": "u64"
+          },
+          {
+            "name": "unrelinquished_votes_count",
+            "type": "u64"
+          },
+          {
+            "name": "outstanding_proposal_count",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 6]
+            }
+          },
+          {
+            "name": "governance_delegate",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "reserved_v2",
+            "type": {
+              "array": ["u8", 128]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "legacyTokenOwnerRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "realm",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_deposit_amount",
+            "type": "u64"
+          },
+          {
+            "name": "unrelinquished_votes_count",
+            "type": "u32"
+          },
+          {
+            "name": "total_votes_count",
+            "type": "u32"
+          },
+          {
+            "name": "outstanding_proposal_count",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": ["u8", 7]
+            }
+          },
+          {
+            "name": "governance_delegate",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "reserved_v2",
+            "type": {
+              "array": ["u8", 128]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "voteRecordV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "account_type",
+            "type": {
+              "defined": {
+                "name": "GovernanceAccountType"
+              }
+            }
+          },
+          {
+            "name": "proposal",
+            "type": "pubkey"
+          },
+          {
+            "name": "governing_token_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_relinquished",
+            "type": "bool"
+          },
+          {
+            "name": "voter_weight",
+            "type": "u64"
+          },
+          {
+            "name": "vote",
+            "type": {
+              "defined": {
+                "name": "Vote"
+              }
+            }
+          },
+          {
+            "name": "reserved_v2",
+            "type": {
+              "array": ["u8", 8]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
