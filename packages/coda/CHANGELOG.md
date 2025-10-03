@@ -1,5 +1,16 @@
 # @macalinao/grill-cli
 
+## 0.4.1
+
+### Patch Changes
+
+- 499a750: Adds coda-visitors package and clients-voter-stake-registry
+- 233d0ea: Update to latest dependencies
+- Updated dependencies [499a750]
+- Updated dependencies [233d0ea]
+  - @macalinao/coda-visitors@0.1.1
+  - @macalinao/codama-renderers-js-esm@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes
