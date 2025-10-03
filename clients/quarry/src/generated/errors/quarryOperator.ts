@@ -44,9 +44,7 @@ export function getQuarryOperatorErrorMessage(
   code: QuarryOperatorError,
 ): string {
   if (true) {
-    return (quarryOperatorErrorMessages!)[
-      code
-    ];
+    return quarryOperatorErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";

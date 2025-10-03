@@ -62,9 +62,7 @@ export function getQuarryMergeMineErrorMessage(
   code: QuarryMergeMineError,
 ): string {
   if (true) {
-    return (
-      quarryMergeMineErrorMessages!
-    )[code];
+    return quarryMergeMineErrorMessages![code];
   }
 
   return "Error message not available in production bundles.";
