@@ -70,7 +70,7 @@
     },
     "clients/quarry": {
       "name": "@macalinao/clients-quarry",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "devDependencies": {
         "@macalinao/coda": "workspace:*",
         "@macalinao/codama-rename-visitor": "workspace:*",
@@ -131,7 +131,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -157,7 +157,7 @@
     },
     "packages/coda-visitors": {
       "name": "@macalinao/coda-visitors",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "codama": "catalog:",
       },
