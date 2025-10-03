@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 jobs:
-  version:
+  typedoc:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
