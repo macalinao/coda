@@ -53,7 +53,7 @@
     "lint-staged": "^16.2.3",
     "turbo": "^2.5.8"
   },
-  "packageManager": "bun@1.2.21",
+  "packageManager": "bun@1.2.23",
   "lint-staged": {
     "*.{json,jsonc,html}": "biome format --write --no-errors-on-unmatched"
   },
