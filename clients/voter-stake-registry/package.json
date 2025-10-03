@@ -1,7 +1,7 @@
 {
-  "name": "@macalinao/coda",
-  "version": "0.4.0",
-  "description": "CLI for generating clients for Solana programs",
+  "name": "@macalinao/clients-voter-stake-registry",
+  "version": "0.1.0",
+  "description": "TypeScript client for the SPL Governance Voter Stake Registry program",
   "type": "module",
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
@@ -9,18 +9,19 @@
   "license": "Apache-2.0",
   "keywords": [
     "coda",
-    "codama",
     "solana",
-    "cli",
+    "spl",
+    "governance",
+    "voter-stake-registry",
+    "dao",
+    "voting",
+    "staking",
+    "realm",
     "client",
-    "code-generation",
     "esm",
     "typescript",
     "ian-macalinao"
   ],
-  "bin": {
-    "coda": "./dist/bin/cli.js"
-  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -39,30 +40,22 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
-    "directory": "packages/coda"
+    "directory": "clients/voter-stake-registry"
   },
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
     "lint": "eslint . --cache",
-    "test": "echo 'No tests yet'"
+    "codegen": "coda generate"
   },
-  "dependencies": {
-    "@codama/nodes-from-anchor": "catalog:",
-    "@codama/renderers-rust": "^1.2.7",
-    "@macalinao/coda-visitors": "workspace:*",
-    "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
-    "@macalinao/codama-rename-visitor": "workspace:*",
-    "@macalinao/codama-renderers-js-esm": "workspace:*",
-    "@macalinao/codama-renderers-markdown": "workspace:*",
-    "codama": "catalog:",
-    "commander": "^14.0.0",
-    "glob": "^11.0.3"
+  "peerDependencies": {
+    "@solana/kit": "*"
   },
   "devDependencies": {
+    "@macalinao/coda": "workspace:*",
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
-    "@types/node": "^24.6.2",
+    "@solana/kit": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:"
   }

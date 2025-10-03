@@ -113,6 +113,21 @@
         "@solana/kit": "*",
       },
     },
+    "clients/voter-stake-registry": {
+      "name": "@macalinao/clients-voter-stake-registry",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:*",
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "@solana/kit": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@solana/kit": "*",
+      },
+    },
     "packages/coda": {
       "name": "@macalinao/coda",
       "version": "0.4.0",
@@ -122,6 +137,7 @@
       "dependencies": {
         "@codama/nodes-from-anchor": "catalog:",
         "@codama/renderers-rust": "^1.2.7",
+        "@macalinao/coda-visitors": "workspace:*",
         "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
         "@macalinao/codama-rename-visitor": "workspace:*",
         "@macalinao/codama-renderers-js-esm": "workspace:*",
@@ -134,6 +150,19 @@
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@types/node": "^24.6.2",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/coda-visitors": {
+      "name": "@macalinao/coda-visitors",
+      "version": "0.1.0",
+      "dependencies": {
+        "codama": "catalog:",
+      },
+      "devDependencies": {
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
         "eslint": "catalog:",
         "typescript": "catalog:",
       },
@@ -495,7 +524,11 @@
 
     "@macalinao/clients-token-metadata": ["@macalinao/clients-token-metadata@workspace:clients/token-metadata"],
 
+    "@macalinao/clients-voter-stake-registry": ["@macalinao/clients-voter-stake-registry@workspace:clients/voter-stake-registry"],
+
     "@macalinao/coda": ["@macalinao/coda@workspace:packages/coda"],
+
+    "@macalinao/coda-visitors": ["@macalinao/coda-visitors@workspace:packages/coda-visitors"],
 
     "@macalinao/codama-instruction-accounts-dedupe-visitor": ["@macalinao/codama-instruction-accounts-dedupe-visitor@workspace:packages/codama-instruction-accounts-dedupe-visitor"],
 
@@ -1929,11 +1962,19 @@
 
     "@isaacs/cliui/wrap-ansi": ["wrap-ansi@8.1.0", "", { "dependencies": { "ansi-styles": "^6.1.0", "string-width": "^5.0.1", "strip-ansi": "^7.0.1" } }, "sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ=="],
 
+    "@macalinao/clients-voter-stake-registry/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "@macalinao/coda/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "@macalinao/coda-visitors/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
     "@macalinao/codama-instruction-accounts-dedupe-visitor/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "@macalinao/codama-nodes-from-anchor-x/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "@macalinao/codama-rename-visitor/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "@macalinao/codama-renderers-js-esm/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "@macalinao/codama-renderers-markdown/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
