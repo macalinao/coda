@@ -1,5 +1,11 @@
 # @macalinao/codama-renderers-js-esm
 
+## 0.4.1
+
+### Patch Changes
+
+- 233d0ea: Update to latest dependencies
+
 ## 0.4.0
 
 ### Minor Changes

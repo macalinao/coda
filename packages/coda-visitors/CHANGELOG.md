@@ -1,0 +1,7 @@
+# @macalinao/coda-visitors
+
+## 0.1.1
+
+### Patch Changes
+
+- 499a750: Adds coda-visitors package and clients-voter-stake-registry
