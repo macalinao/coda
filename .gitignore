@@ -52,3 +52,5 @@ coverage/
 .devenv.flake.nix
 /nix
 /.devenv
+
+docs/
