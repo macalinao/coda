@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import type { Visitor } from "codama";
-import { writeFile } from "node:fs/promises";
+import { rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { renderVisitor as renderRustVisitor } from "@codama/renderers-rust";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
@@ -29,6 +29,12 @@ program
     try {
       const { codama, config } = await processIdls(options);
       const outputPath = resolve(config.outputDir ?? "./src/generated/");
+
+      // Delete the existing directory if it exists
+      if (await fileExists(outputPath)) {
+        console.log(`Removing existing directory: ${outputPath}`);
+        await rm(outputPath, { recursive: true, force: true });
+      }
 
       // Apply the ESM TypeScript visitor
       console.log(`Generating client to ${outputPath}...`);
@@ -88,6 +94,12 @@ program
       const { codama, config } = await processIdls(options);
       const outputPath = resolve(config.rustOutputDir ?? "./rust");
 
+      // Delete the existing directory if it exists
+      if (await fileExists(outputPath)) {
+        console.log(`Removing existing directory: ${outputPath}`);
+        await rm(outputPath, { recursive: true, force: true });
+      }
+
       // Apply the Rust visitor
       console.log(`Generating Rust client to ${outputPath}...`);
       codama.accept(
@@ -118,6 +130,12 @@ program
     try {
       const { codama, config } = await processIdls(options);
       const outputPath = resolve(config.docs?.path ?? "./docs");
+
+      // Delete the existing directory if it exists
+      if (await fileExists(outputPath)) {
+        console.log(`Removing existing directory: ${outputPath}`);
+        await rm(outputPath, { recursive: true, force: true });
+      }
 
       // Apply the markdown visitor with options from config
       console.log(`Generating documentation to ${outputPath}...`);

@@ -1,26 +1,24 @@
 {
-  "name": "@macalinao/coda",
-  "version": "0.4.0",
-  "description": "CLI for generating clients for Solana programs",
+  "name": "@macalinao/coda-visitors",
+  "version": "0.1.0",
+  "description": "Additional Codama visitors for enhanced code generation with Coda",
   "type": "module",
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
   "homepage": "https://coda.ianm.com",
   "license": "Apache-2.0",
   "keywords": [
-    "coda",
     "codama",
+    "coda",
     "solana",
-    "cli",
-    "client",
-    "code-generation",
-    "esm",
+    "anchor",
+    "idl",
+    "visitor",
+    "ast",
+    "nodes",
     "typescript",
     "ian-macalinao"
   ],
-  "bin": {
-    "coda": "./dist/bin/cli.js"
-  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -39,30 +37,19 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
-    "directory": "packages/coda"
+    "directory": "packages/coda-visitors"
   },
   "scripts": {
     "build": "tsc",
     "clean": "rm -fr dist/",
-    "lint": "eslint . --cache",
-    "test": "echo 'No tests yet'"
+    "lint": "eslint . --cache"
   },
   "dependencies": {
-    "@codama/nodes-from-anchor": "catalog:",
-    "@codama/renderers-rust": "^1.2.7",
-    "@macalinao/coda-visitors": "workspace:*",
-    "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
-    "@macalinao/codama-rename-visitor": "workspace:*",
-    "@macalinao/codama-renderers-js-esm": "workspace:*",
-    "@macalinao/codama-renderers-markdown": "workspace:*",
-    "codama": "catalog:",
-    "commander": "^14.0.0",
-    "glob": "^11.0.3"
+    "codama": "catalog:"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
-    "@types/node": "^24.6.2",
     "eslint": "catalog:",
     "typescript": "catalog:"
   }
