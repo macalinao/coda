@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { GovernanceSeeds } from "../pdas/index.js";
 import type {
   GovernanceAccountType,
   GovernanceAccountTypeArgs,
@@ -50,6 +51,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findGovernancePda } from "../pdas/index.js";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -178,4 +180,28 @@ export async function fetchAllMaybeGovernanceV2(
 ): Promise<MaybeAccount<GovernanceV2>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeGovernanceV2(maybeAccount));
+}
+
+export async function fetchGovernanceV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: GovernanceSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<GovernanceV2>> {
+  const maybeAccount = await fetchMaybeGovernanceV2FromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeGovernanceV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: GovernanceSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<GovernanceV2>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findGovernancePda(seeds, { programAddress });
+  return await fetchMaybeGovernanceV2(rpc, address, fetchConfig);
 }

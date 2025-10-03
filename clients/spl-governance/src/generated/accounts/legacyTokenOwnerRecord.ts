@@ -21,6 +21,7 @@ import type {
   OptionOrNullable,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { TokenOwnerRecordSeeds } from "../pdas/index.js";
 import type {
   GovernanceAccountType,
   GovernanceAccountTypeArgs,
@@ -52,6 +53,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -212,4 +214,28 @@ export async function fetchAllMaybeLegacyTokenOwnerRecord(
   return maybeAccounts.map((maybeAccount) =>
     decodeLegacyTokenOwnerRecord(maybeAccount),
   );
+}
+
+export async function fetchLegacyTokenOwnerRecordFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: TokenOwnerRecordSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<LegacyTokenOwnerRecord>> {
+  const maybeAccount = await fetchMaybeLegacyTokenOwnerRecordFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeLegacyTokenOwnerRecordFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: TokenOwnerRecordSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<LegacyTokenOwnerRecord>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findTokenOwnerRecordPda(seeds, { programAddress });
+  return await fetchMaybeLegacyTokenOwnerRecord(rpc, address, fetchConfig);
 }

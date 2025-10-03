@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { VoteRecordSeeds } from "../pdas/index.js";
 import type {
   GovernanceAccountType,
   GovernanceAccountTypeArgs,
@@ -44,6 +45,7 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findVoteRecordPda } from "../pdas/index.js";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -161,4 +163,28 @@ export async function fetchAllMaybeVoteRecordV1(
 ): Promise<MaybeAccount<VoteRecordV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeVoteRecordV1(maybeAccount));
+}
+
+export async function fetchVoteRecordV1FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: VoteRecordSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<VoteRecordV1>> {
+  const maybeAccount = await fetchMaybeVoteRecordV1FromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeVoteRecordV1FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: VoteRecordSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<VoteRecordV1>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findVoteRecordPda(seeds, { programAddress });
+  return await fetchMaybeVoteRecordV1(rpc, address, fetchConfig);
 }

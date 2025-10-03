@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { RequiredSignatorySeeds } from "../pdas/index.js";
 import type {
   GovernanceAccountType,
   GovernanceAccountTypeArgs,
@@ -42,6 +43,7 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findRequiredSignatoryPda } from "../pdas/index.js";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -165,4 +167,28 @@ export async function fetchAllMaybeRequiredSignatory(
   return maybeAccounts.map((maybeAccount) =>
     decodeRequiredSignatory(maybeAccount),
   );
+}
+
+export async function fetchRequiredSignatoryFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: RequiredSignatorySeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<RequiredSignatory>> {
+  const maybeAccount = await fetchMaybeRequiredSignatoryFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeRequiredSignatoryFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: RequiredSignatorySeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<RequiredSignatory>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findRequiredSignatoryPda(seeds, { programAddress });
+  return await fetchMaybeRequiredSignatory(rpc, address, fetchConfig);
 }

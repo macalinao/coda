@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { ProposalDepositSeeds } from "../pdas/index.js";
 import type {
   GovernanceAccountType,
   GovernanceAccountTypeArgs,
@@ -44,6 +45,7 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findProposalDepositPda } from "../pdas/index.js";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -164,4 +166,28 @@ export async function fetchAllMaybeProposalDeposit(
   return maybeAccounts.map((maybeAccount) =>
     decodeProposalDeposit(maybeAccount),
   );
+}
+
+export async function fetchProposalDepositFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ProposalDepositSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<ProposalDeposit>> {
+  const maybeAccount = await fetchMaybeProposalDepositFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeProposalDepositFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ProposalDepositSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<ProposalDeposit>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findProposalDepositPda(seeds, { programAddress });
+  return await fetchMaybeProposalDeposit(rpc, address, fetchConfig);
 }

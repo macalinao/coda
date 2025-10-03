@@ -169,6 +169,7 @@ export default defineConfig({
   },
   visitors: [
     updateAccountsVisitor({
+      // Realm accounts
       realmV1: {
         pda: pdaLinkNode("realm"),
       },
@@ -178,17 +179,60 @@ export default defineConfig({
       realmConfigAccount: {
         pda: pdaLinkNode("realmConfig"),
       },
+
+      // Governance accounts
+      governanceV1: {
+        pda: pdaLinkNode("governance"),
+      },
+      governanceV2: {
+        pda: pdaLinkNode("governance"),
+      },
+
+      // Proposal accounts
       proposalV1: {
         pda: pdaLinkNode("proposal"),
       },
       proposalV2: {
         pda: pdaLinkNode("proposal"),
       },
+      proposalDeposit: {
+        pda: pdaLinkNode("proposalDeposit"),
+      },
+      proposalInstructionV1: {
+        pda: pdaLinkNode("proposalTransaction"),
+      },
+      proposalTransactionV2: {
+        pda: pdaLinkNode("proposalTransaction"),
+      },
+
+      // Token owner records
       tokenOwnerRecordV1: {
         pda: pdaLinkNode("tokenOwnerRecord"),
       },
       tokenOwnerRecordV2: {
         pda: pdaLinkNode("tokenOwnerRecord"),
+      },
+      legacyTokenOwnerRecord: {
+        pda: pdaLinkNode("tokenOwnerRecord"),
+      },
+
+      // Signatory records
+      signatoryRecordV1: {
+        pda: pdaLinkNode("signatoryRecord"),
+      },
+      signatoryRecordV2: {
+        pda: pdaLinkNode("signatoryRecord"),
+      },
+      requiredSignatory: {
+        pda: pdaLinkNode("requiredSignatory"),
+      },
+
+      // Vote records
+      voteRecordV1: {
+        pda: pdaLinkNode("voteRecord"),
+      },
+      voteRecordV2: {
+        pda: pdaLinkNode("voteRecord"),
       },
     }),
 

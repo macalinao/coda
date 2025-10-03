@@ -21,6 +21,7 @@ import type {
   OptionOrNullable,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { ProposalTransactionSeeds } from "../pdas/index.js";
 import type {
   GovernanceAccountType,
   GovernanceAccountTypeArgs,
@@ -58,6 +59,7 @@ import {
   getU32Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findProposalTransactionPda } from "../pdas/index.js";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -216,4 +218,28 @@ export async function fetchAllMaybeProposalTransactionV2(
   return maybeAccounts.map((maybeAccount) =>
     decodeProposalTransactionV2(maybeAccount),
   );
+}
+
+export async function fetchProposalTransactionV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ProposalTransactionSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<ProposalTransactionV2>> {
+  const maybeAccount = await fetchMaybeProposalTransactionV2FromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeProposalTransactionV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ProposalTransactionSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<ProposalTransactionV2>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findProposalTransactionPda(seeds, { programAddress });
+  return await fetchMaybeProposalTransactionV2(rpc, address, fetchConfig);
 }

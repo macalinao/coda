@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { SignatoryRecordSeeds } from "../pdas/index.js";
 import type {
   GovernanceAccountType,
   GovernanceAccountTypeArgs,
@@ -46,6 +47,7 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findSignatoryRecordPda } from "../pdas/index.js";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -173,4 +175,28 @@ export async function fetchAllMaybeSignatoryRecordV2(
   return maybeAccounts.map((maybeAccount) =>
     decodeSignatoryRecordV2(maybeAccount),
   );
+}
+
+export async function fetchSignatoryRecordV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: SignatoryRecordSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<SignatoryRecordV2>> {
+  const maybeAccount = await fetchMaybeSignatoryRecordV2FromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeSignatoryRecordV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: SignatoryRecordSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<SignatoryRecordV2>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findSignatoryRecordPda(seeds, { programAddress });
+  return await fetchMaybeSignatoryRecordV2(rpc, address, fetchConfig);
 }
