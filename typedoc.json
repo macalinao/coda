@@ -7,5 +7,6 @@
   "packageOptions": {
     "entryPoints": ["src/index.ts"]
   },
-  "cname": "coda-typedocs.ianm.com"
+  "cname": "coda-typedocs.ianm.com",
+  "hostedBaseUrl": "https://coda-typedocs.ianm.com"
 }
