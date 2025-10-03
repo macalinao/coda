@@ -18,6 +18,7 @@ export interface QuarrySeeds {
   tokenMint: Address;
 }
 
+/** Individual quarry (staking pool) for a specific token mint */
 export async function findQuarryPda(
   seeds: QuarrySeeds,
   config: { programAddress?: Address | undefined } = {},

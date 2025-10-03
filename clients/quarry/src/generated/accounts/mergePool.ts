@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { MergePoolSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,6 +43,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMergePoolPda } from "../pdas/index.js";
 
 export const MERGE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   15, 189, 242, 87, 188, 75, 64, 244,
@@ -156,4 +158,24 @@ export async function fetchAllMaybeMergePool(
 ): Promise<MaybeAccount<MergePool>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeMergePool(maybeAccount));
+}
+
+export async function fetchMergePoolFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MergePoolSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<MergePool>> {
+  const maybeAccount = await fetchMaybeMergePoolFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeMergePoolFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MergePoolSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<MergePool>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findMergePoolPda(seeds, { programAddress });
+  return await fetchMaybeMergePool(rpc, address, fetchConfig);
 }

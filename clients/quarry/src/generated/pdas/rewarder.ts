@@ -17,6 +17,7 @@ export interface RewarderSeeds {
   base: Address;
 }
 
+/** Rewarder account that manages reward distribution for quarries */
 export async function findRewarderPda(
   seeds: RewarderSeeds,
   config: { programAddress?: Address | undefined } = {},

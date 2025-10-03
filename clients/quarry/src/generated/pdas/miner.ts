@@ -18,6 +18,7 @@ export interface MinerSeeds {
   authority: Address;
 }
 
+/** Miner account representing a user's staking position in a quarry */
 export async function findMinerPda(
   seeds: MinerSeeds,
   config: { programAddress?: Address | undefined } = {},

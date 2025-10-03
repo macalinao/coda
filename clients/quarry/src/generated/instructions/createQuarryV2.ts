@@ -34,8 +34,9 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findQuarryPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_QUARRY_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([46, 84, 33, 67, 174, 252, 67, 148]);
@@ -112,6 +113,103 @@ export function getCreateQuarryV2InstructionDataCodec(): FixedSizeCodec<
     getCreateQuarryV2InstructionDataEncoder(),
     getCreateQuarryV2InstructionDataDecoder(),
   );
+}
+
+export interface CreateQuarryV2AsyncInput<
+  TAccountQuarry extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountRewarder extends string = string,
+  TAccountTokenMint extends string = string,
+  TAccountPayer extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  quarry?: Address<TAccountQuarry>;
+  authority: TransactionSigner<TAccountAuthority>;
+  rewarder: Address<TAccountRewarder>;
+  tokenMint: Address<TAccountTokenMint>;
+  payer: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+}
+
+export async function getCreateQuarryV2InstructionAsync<
+  TAccountQuarry extends string,
+  TAccountAuthority extends string,
+  TAccountRewarder extends string,
+  TAccountTokenMint extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
+>(
+  input: CreateQuarryV2AsyncInput<
+    TAccountQuarry,
+    TAccountAuthority,
+    TAccountRewarder,
+    TAccountTokenMint,
+    TAccountPayer,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CreateQuarryV2Instruction<
+    TProgramAddress,
+    TAccountQuarry,
+    TAccountAuthority,
+    TAccountRewarder,
+    TAccountTokenMint,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    quarry: { value: input.quarry ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.quarry.value) {
+    accounts.quarry.value = await findQuarryPda({
+      rewarder: expectAddress(accounts.rewarder.value),
+      tokenMint: expectAddress(accounts.tokenMint.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.quarry),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.rewarder),
+      getAccountMeta(accounts.tokenMint),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    data: getCreateQuarryV2InstructionDataEncoder().encode({}),
+    programAddress,
+  } as CreateQuarryV2Instruction<
+    TProgramAddress,
+    TAccountQuarry,
+    TAccountAuthority,
+    TAccountRewarder,
+    TAccountTokenMint,
+    TAccountPayer,
+    TAccountSystemProgram
+  >);
 }
 
 export interface CreateQuarryV2Input<

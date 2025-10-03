@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { MintWrapperSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,6 +41,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMintWrapperPda } from "../pdas/index.js";
 
 export const MINT_WRAPPER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   154, 166, 64, 239, 170, 99, 74, 158,
@@ -167,4 +169,24 @@ export async function fetchAllMaybeMintWrapper(
 ): Promise<MaybeAccount<MintWrapper>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeMintWrapper(maybeAccount));
+}
+
+export async function fetchMintWrapperFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MintWrapperSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<MintWrapper>> {
+  const maybeAccount = await fetchMaybeMintWrapperFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeMintWrapperFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MintWrapperSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<MintWrapper>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findMintWrapperPda(seeds, { programAddress });
+  return await fetchMaybeMintWrapper(rpc, address, fetchConfig);
 }

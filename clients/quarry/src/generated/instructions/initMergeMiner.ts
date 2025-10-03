@@ -27,16 +27,15 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMergeMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -180,17 +179,9 @@ export async function getInitMergeMinerInstructionAsync<
 
   // Resolve default values.
   if (!accounts.mm.value) {
-    accounts.mm.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            34, 77, 101, 114, 103, 101, 77, 105, 110, 101, 114, 34,
-          ]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.pool.value)),
-        getAddressEncoder().encode(expectAddress(accounts.owner.value)),
-      ],
+    accounts.mm.value = await findMergeMinerPda({
+      pool: expectAddress(accounts.pool.value),
+      owner: expectAddress(accounts.owner.value),
     });
   }
   if (!accounts.systemProgram.value) {

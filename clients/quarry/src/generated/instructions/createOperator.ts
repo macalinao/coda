@@ -28,16 +28,15 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findOperatorPda } from "../pdas/index.js";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -209,14 +208,8 @@ export async function getCreateOperatorInstructionAsync<
 
   // Resolve default values.
   if (!accounts.operator.value) {
-    accounts.operator.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([34, 79, 112, 101, 114, 97, 116, 111, 114, 34]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.base.value)),
-      ],
+    accounts.operator.value = await findOperatorPda({
+      base: expectAddress(accounts.base.value),
     });
   }
   if (!accounts.systemProgram.value) {

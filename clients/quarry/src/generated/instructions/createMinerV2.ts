@@ -28,14 +28,13 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMinerPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -213,15 +212,9 @@ export async function getCreateMinerV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.miner.value) {
-    accounts.miner.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([34, 77, 105, 110, 101, 114, 34]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.quarry.value)),
-        getAddressEncoder().encode(expectAddress(accounts.authority.value)),
-      ],
+    accounts.miner.value = await findMinerPda({
+      quarry: expectAddress(accounts.quarry.value),
+      authority: expectAddress(accounts.authority.value),
     });
   }
   if (!accounts.systemProgram.value) {

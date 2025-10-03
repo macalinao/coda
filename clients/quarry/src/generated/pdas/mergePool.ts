@@ -17,6 +17,7 @@ export interface MergePoolSeeds {
   primaryMint: Address;
 }
 
+/** Merge pool that allows staking multiple quarry rewards as one */
 export async function findMergePoolPda(
   seeds: MergePoolSeeds,
   config: { programAddress?: Address | undefined } = {},

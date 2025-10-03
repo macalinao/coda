@@ -28,18 +28,21 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findRewarderPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  expectTransactionSigner,
+  getAccountMetaFactory,
+} from "../shared/index.js";
 
 export const NEW_REWARDER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   1, 115, 16, 244, 109, 74, 67, 209,
@@ -150,7 +153,7 @@ export interface NewRewarderAsyncInput<
 > {
   base: TransactionSigner<TAccountBase>;
   rewarder?: Address<TAccountRewarder>;
-  initialAuthority: Address<TAccountInitialAuthority>;
+  initialAuthority?: Address<TAccountInitialAuthority>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   unusedAccount: Address<TAccountUnusedAccount>;
@@ -232,15 +235,14 @@ export async function getNewRewarderInstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewarder.value) {
-    accounts.rewarder.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([34, 82, 101, 119, 97, 114, 100, 101, 114, 34]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.base.value)),
-      ],
+    accounts.rewarder.value = await findRewarderPda({
+      base: expectAddress(accounts.base.value),
     });
+  }
+  if (!accounts.initialAuthority.value) {
+    accounts.initialAuthority.value = expectTransactionSigner(
+      accounts.payer.value,
+    ).address;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
@@ -291,7 +293,7 @@ export interface NewRewarderInput<
 > {
   base: TransactionSigner<TAccountBase>;
   rewarder: Address<TAccountRewarder>;
-  initialAuthority: Address<TAccountInitialAuthority>;
+  initialAuthority?: Address<TAccountInitialAuthority>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   unusedAccount: Address<TAccountUnusedAccount>;
@@ -370,6 +372,11 @@ export function getNewRewarderInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.initialAuthority.value) {
+    accounts.initialAuthority.value = expectTransactionSigner(
+      accounts.payer.value,
+    ).address;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

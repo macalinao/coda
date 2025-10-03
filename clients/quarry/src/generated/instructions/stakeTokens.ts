@@ -35,8 +35,9 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMinerPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const STAKE_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   136, 126, 91, 162, 40, 131, 13, 127,
@@ -124,6 +125,117 @@ export function getStakeTokensInstructionDataCodec(): FixedSizeCodec<
     getStakeTokensInstructionDataEncoder(),
     getStakeTokensInstructionDataDecoder(),
   );
+}
+
+export interface StakeTokensAsyncInput<
+  TAccountAuthority extends string = string,
+  TAccountMiner extends string = string,
+  TAccountQuarry extends string = string,
+  TAccountMinerVault extends string = string,
+  TAccountTokenAccount extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountRewarder extends string = string,
+> {
+  authority: TransactionSigner<TAccountAuthority>;
+  miner?: Address<TAccountMiner>;
+  quarry: Address<TAccountQuarry>;
+  minerVault: Address<TAccountMinerVault>;
+  tokenAccount: Address<TAccountTokenAccount>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  rewarder: Address<TAccountRewarder>;
+  amount: StakeTokensInstructionDataArgs["amount"];
+}
+
+export async function getStakeTokensInstructionAsync<
+  TAccountAuthority extends string,
+  TAccountMiner extends string,
+  TAccountQuarry extends string,
+  TAccountMinerVault extends string,
+  TAccountTokenAccount extends string,
+  TAccountTokenProgram extends string,
+  TAccountRewarder extends string,
+  TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
+>(
+  input: StakeTokensAsyncInput<
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountMinerVault,
+    TAccountTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  StakeTokensInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountMinerVault,
+    TAccountTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    authority: { value: input.authority ?? null, isWritable: false },
+    miner: { value: input.miner ?? null, isWritable: true },
+    quarry: { value: input.quarry ?? null, isWritable: true },
+    minerVault: { value: input.minerVault ?? null, isWritable: true },
+    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    rewarder: { value: input.rewarder ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.miner.value) {
+    accounts.miner.value = await findMinerPda({
+      quarry: expectAddress(accounts.quarry.value),
+      authority: expectAddress(accounts.authority.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.miner),
+      getAccountMeta(accounts.quarry),
+      getAccountMeta(accounts.minerVault),
+      getAccountMeta(accounts.tokenAccount),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.rewarder),
+    ],
+    data: getStakeTokensInstructionDataEncoder().encode(
+      args as StakeTokensInstructionDataArgs,
+    ),
+    programAddress,
+  } as StakeTokensInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountMiner,
+    TAccountQuarry,
+    TAccountMinerVault,
+    TAccountTokenAccount,
+    TAccountTokenProgram,
+    TAccountRewarder
+  >);
 }
 
 export interface StakeTokensInput<

@@ -24,11 +24,14 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
@@ -36,7 +39,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REDEEM_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   246, 98, 134, 41, 152, 33, 120, 69,
@@ -124,6 +127,133 @@ export function getRedeemTokensInstructionDataCodec(): FixedSizeCodec<
     getRedeemTokensInstructionDataEncoder(),
     getRedeemTokensInstructionDataDecoder(),
   );
+}
+
+export interface RedeemTokensAsyncInput<
+  TAccountRedeemer extends string = string,
+  TAccountSourceAuthority extends string = string,
+  TAccountIouMint extends string = string,
+  TAccountIouSource extends string = string,
+  TAccountRedemptionVault extends string = string,
+  TAccountRedemptionDestination extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  redeemer: Address<TAccountRedeemer>;
+  sourceAuthority: TransactionSigner<TAccountSourceAuthority>;
+  iouMint: Address<TAccountIouMint>;
+  iouSource?: Address<TAccountIouSource>;
+  redemptionVault: Address<TAccountRedemptionVault>;
+  redemptionDestination: Address<TAccountRedemptionDestination>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  amount: RedeemTokensInstructionDataArgs["amount"];
+}
+
+export async function getRedeemTokensInstructionAsync<
+  TAccountRedeemer extends string,
+  TAccountSourceAuthority extends string,
+  TAccountIouMint extends string,
+  TAccountIouSource extends string,
+  TAccountRedemptionVault extends string,
+  TAccountRedemptionDestination extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
+>(
+  input: RedeemTokensAsyncInput<
+    TAccountRedeemer,
+    TAccountSourceAuthority,
+    TAccountIouMint,
+    TAccountIouSource,
+    TAccountRedemptionVault,
+    TAccountRedemptionDestination,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  RedeemTokensInstruction<
+    TProgramAddress,
+    TAccountRedeemer,
+    TAccountSourceAuthority,
+    TAccountIouMint,
+    TAccountIouSource,
+    TAccountRedemptionVault,
+    TAccountRedemptionDestination,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? QUARRY_REDEEMER_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    redeemer: { value: input.redeemer ?? null, isWritable: true },
+    sourceAuthority: {
+      value: input.sourceAuthority ?? null,
+      isWritable: false,
+    },
+    iouMint: { value: input.iouMint ?? null, isWritable: true },
+    iouSource: { value: input.iouSource ?? null, isWritable: true },
+    redemptionVault: { value: input.redemptionVault ?? null, isWritable: true },
+    redemptionDestination: {
+      value: input.redemptionDestination ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.iouSource.value) {
+    accounts.iouSource.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(
+          expectAddress(accounts.sourceAuthority.value),
+        ),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.iouMint.value)),
+      ],
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.redeemer),
+      getAccountMeta(accounts.sourceAuthority),
+      getAccountMeta(accounts.iouMint),
+      getAccountMeta(accounts.iouSource),
+      getAccountMeta(accounts.redemptionVault),
+      getAccountMeta(accounts.redemptionDestination),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getRedeemTokensInstructionDataEncoder().encode(
+      args as RedeemTokensInstructionDataArgs,
+    ),
+    programAddress,
+  } as RedeemTokensInstruction<
+    TProgramAddress,
+    TAccountRedeemer,
+    TAccountSourceAuthority,
+    TAccountIouMint,
+    TAccountIouSource,
+    TAccountRedemptionVault,
+    TAccountRedemptionDestination,
+    TAccountTokenProgram
+  >);
 }
 
 export interface RedeemTokensInput<

@@ -28,18 +28,21 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMintWrapperPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  expectTransactionSigner,
+  getAccountMetaFactory,
+} from "../shared/index.js";
 
 export const NEW_WRAPPER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   140, 106, 205, 202, 15, 176, 85, 19,
@@ -142,7 +145,7 @@ export interface NewWrapperV2AsyncInput<
 > {
   base: TransactionSigner<TAccountBase>;
   mintWrapper?: Address<TAccountMintWrapper>;
-  admin: Address<TAccountAdmin>;
+  admin?: Address<TAccountAdmin>;
   tokenMint: Address<TAccountTokenMint>;
   tokenProgram?: Address<TAccountTokenProgram>;
   payer: TransactionSigner<TAccountPayer>;
@@ -206,17 +209,14 @@ export async function getNewWrapperV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.mintWrapper.value) {
-    accounts.mintWrapper.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            34, 77, 105, 110, 116, 87, 114, 97, 112, 112, 101, 114, 34,
-          ]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.base.value)),
-      ],
+    accounts.mintWrapper.value = await findMintWrapperPda({
+      base: expectAddress(accounts.base.value),
     });
+  }
+  if (!accounts.admin.value) {
+    accounts.admin.value = expectTransactionSigner(
+      accounts.payer.value,
+    ).address;
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
@@ -265,7 +265,7 @@ export interface NewWrapperV2Input<
 > {
   base: TransactionSigner<TAccountBase>;
   mintWrapper: Address<TAccountMintWrapper>;
-  admin: Address<TAccountAdmin>;
+  admin?: Address<TAccountAdmin>;
   tokenMint: Address<TAccountTokenMint>;
   tokenProgram?: Address<TAccountTokenProgram>;
   payer: TransactionSigner<TAccountPayer>;
@@ -326,6 +326,11 @@ export function getNewWrapperV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.admin.value) {
+    accounts.admin.value = expectTransactionSigner(
+      accounts.payer.value,
+    ).address;
+  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
