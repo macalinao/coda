@@ -29,12 +29,10 @@ import type {
 } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -44,13 +42,10 @@ import {
   getRealmConfigParamsEncoder,
 } from "../types/index.js";
 
-export const SET_REALM_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([0, 167, 208, 103, 24, 172, 112, 232]);
+export const SET_REALM_CONFIG_DISCRIMINATOR = 22;
 
 export function getSetRealmConfigDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SET_REALM_CONFIG_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(SET_REALM_CONFIG_DISCRIMINATOR);
 }
 
 export type SetRealmConfigInstruction<
@@ -121,7 +116,7 @@ export type SetRealmConfigInstruction<
   >;
 
 export interface SetRealmConfigInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   configArgs: RealmConfigParams;
 }
 
@@ -132,7 +127,7 @@ export interface SetRealmConfigInstructionDataArgs {
 export function getSetRealmConfigInstructionDataEncoder(): FixedSizeEncoder<SetRealmConfigInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["configArgs", getRealmConfigParamsEncoder()],
     ]),
     (value) => ({ ...value, discriminator: SET_REALM_CONFIG_DISCRIMINATOR }),
@@ -141,7 +136,7 @@ export function getSetRealmConfigInstructionDataEncoder(): FixedSizeEncoder<SetR
 
 export function getSetRealmConfigInstructionDataDecoder(): FixedSizeDecoder<SetRealmConfigInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["configArgs", getRealmConfigParamsDecoder()],
   ]);
 }

@@ -26,28 +26,23 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SET_GOVERNANCE_DELEGATE_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([89, 7, 44, 62, 31, 17, 147, 223]);
+export const SET_GOVERNANCE_DELEGATE_DISCRIMINATOR = 3;
 
 export function getSetGovernanceDelegateDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SET_GOVERNANCE_DELEGATE_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(SET_GOVERNANCE_DELEGATE_DISCRIMINATOR);
 }
 
 export type SetGovernanceDelegateInstruction<
@@ -71,7 +66,7 @@ export type SetGovernanceDelegateInstruction<
   >;
 
 export interface SetGovernanceDelegateInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   newGovernanceDelegate: Option<Address>;
 }
 
@@ -82,7 +77,7 @@ export interface SetGovernanceDelegateInstructionDataArgs {
 export function getSetGovernanceDelegateInstructionDataEncoder(): Encoder<SetGovernanceDelegateInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["newGovernanceDelegate", getOptionEncoder(getAddressEncoder())],
     ]),
     (value) => ({
@@ -94,7 +89,7 @@ export function getSetGovernanceDelegateInstructionDataEncoder(): Encoder<SetGov
 
 export function getSetGovernanceDelegateInstructionDataDecoder(): Decoder<SetGovernanceDelegateInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["newGovernanceDelegate", getOptionDecoder(getAddressDecoder())],
   ]);
 }

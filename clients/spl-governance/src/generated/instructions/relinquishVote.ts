@@ -25,25 +25,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const RELINQUISH_VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
-  [39, 15, 192, 13, 10, 156, 182, 135],
-);
+export const RELINQUISH_VOTE_DISCRIMINATOR = 15;
 
 export function getRelinquishVoteDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    RELINQUISH_VOTE_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(RELINQUISH_VOTE_DISCRIMINATOR);
 }
 
 export type RelinquishVoteInstruction<
@@ -91,22 +85,20 @@ export type RelinquishVoteInstruction<
   >;
 
 export interface RelinquishVoteInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface RelinquishVoteInstructionDataArgs {}
 
 export function getRelinquishVoteInstructionDataEncoder(): FixedSizeEncoder<RelinquishVoteInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({ ...value, discriminator: RELINQUISH_VOTE_DISCRIMINATOR }),
   );
 }
 
 export function getRelinquishVoteInstructionDataDecoder(): FixedSizeDecoder<RelinquishVoteInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getRelinquishVoteInstructionDataCodec(): FixedSizeCodec<

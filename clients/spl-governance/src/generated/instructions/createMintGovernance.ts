@@ -26,14 +26,12 @@ import type { ResolvedAccount } from "../shared/index.js";
 import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
   getBooleanDecoder,
   getBooleanEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -43,13 +41,10 @@ import {
   getGovernanceConfigEncoder,
 } from "../types/index.js";
 
-export const CREATE_MINT_GOVERNANCE_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([246, 126, 79, 244, 242, 122, 116, 208]);
+export const CREATE_MINT_GOVERNANCE_DISCRIMINATOR = 17;
 
 export function getCreateMintGovernanceDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_MINT_GOVERNANCE_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CREATE_MINT_GOVERNANCE_DISCRIMINATOR);
 }
 
 export type CreateMintGovernanceInstruction<
@@ -113,7 +108,7 @@ export type CreateMintGovernanceInstruction<
   >;
 
 export interface CreateMintGovernanceInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   config: GovernanceConfig;
   transferMintAuthorities: boolean;
 }
@@ -126,7 +121,7 @@ export interface CreateMintGovernanceInstructionDataArgs {
 export function getCreateMintGovernanceInstructionDataEncoder(): Encoder<CreateMintGovernanceInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["config", getGovernanceConfigEncoder()],
       ["transferMintAuthorities", getBooleanEncoder()],
     ]),
@@ -139,7 +134,7 @@ export function getCreateMintGovernanceInstructionDataEncoder(): Encoder<CreateM
 
 export function getCreateMintGovernanceInstructionDataDecoder(): Decoder<CreateMintGovernanceInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["config", getGovernanceConfigDecoder()],
     ["transferMintAuthorities", getBooleanDecoder()],
   ]);

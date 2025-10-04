@@ -25,12 +25,10 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
   transformEncoder,
@@ -38,13 +36,10 @@ import {
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REVOKE_GOVERNING_TOKENS_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([32, 197, 228, 228, 34, 131, 105, 133]);
+export const REVOKE_GOVERNING_TOKENS_DISCRIMINATOR = 26;
 
 export function getRevokeGoverningTokensDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    REVOKE_GOVERNING_TOKENS_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(REVOKE_GOVERNING_TOKENS_DISCRIMINATOR);
 }
 
 export type RevokeGoverningTokensInstruction<
@@ -90,7 +85,7 @@ export type RevokeGoverningTokensInstruction<
   >;
 
 export interface RevokeGoverningTokensInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   amount: bigint;
 }
 
@@ -101,7 +96,7 @@ export interface RevokeGoverningTokensInstructionDataArgs {
 export function getRevokeGoverningTokensInstructionDataEncoder(): FixedSizeEncoder<RevokeGoverningTokensInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["amount", getU64Encoder()],
     ]),
     (value) => ({
@@ -113,7 +108,7 @@ export function getRevokeGoverningTokensInstructionDataEncoder(): FixedSizeEncod
 
 export function getRevokeGoverningTokensInstructionDataDecoder(): FixedSizeDecoder<RevokeGoverningTokensInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["amount", getU64Decoder()],
   ]);
 }

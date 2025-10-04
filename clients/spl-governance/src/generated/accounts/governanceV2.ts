@@ -17,7 +17,6 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { GovernanceSeeds } from "../pdas/index.js";
 import type {
@@ -35,12 +34,8 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -49,7 +44,6 @@ import {
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findGovernancePda } from "../pdas/index.js";
 import {
@@ -61,18 +55,7 @@ import {
   getReserved119Encoder,
 } from "../types/index.js";
 
-export const GOVERNANCE_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  170, 81, 148, 6, 240, 242, 22, 251,
-]);
-
-export function getGovernanceV2DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    GOVERNANCE_V2_DISCRIMINATOR,
-  );
-}
-
 export interface GovernanceV2 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   realm: Address;
   governedAccount: Address;
@@ -95,25 +78,20 @@ export interface GovernanceV2Args {
 }
 
 export function getGovernanceV2Encoder(): Encoder<GovernanceV2Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["realm", getAddressEncoder()],
-      ["governedAccount", getAddressEncoder()],
-      ["reserved1", getU32Encoder()],
-      ["config", getGovernanceConfigEncoder()],
-      ["reservedV2", getReserved119Encoder()],
-      ["requiredSignatoriesCount", getU8Encoder()],
-      ["activeProposalCount", getU64Encoder()],
-    ]),
-    (value) => ({ ...value, discriminator: GOVERNANCE_V2_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["realm", getAddressEncoder()],
+    ["governedAccount", getAddressEncoder()],
+    ["reserved1", getU32Encoder()],
+    ["config", getGovernanceConfigEncoder()],
+    ["reservedV2", getReserved119Encoder()],
+    ["requiredSignatoriesCount", getU8Encoder()],
+    ["activeProposalCount", getU64Encoder()],
+  ]);
 }
 
 export function getGovernanceV2Decoder(): Decoder<GovernanceV2> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["realm", getAddressDecoder()],
     ["governedAccount", getAddressDecoder()],

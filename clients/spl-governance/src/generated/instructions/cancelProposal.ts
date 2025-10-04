@@ -24,25 +24,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const CANCEL_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
-  [106, 74, 128, 146, 19, 65, 39, 23],
-);
+export const CANCEL_PROPOSAL_DISCRIMINATOR = 11;
 
 export function getCancelProposalDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CANCEL_PROPOSAL_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CANCEL_PROPOSAL_DISCRIMINATOR);
 }
 
 export type CancelProposalInstruction<
@@ -78,22 +72,20 @@ export type CancelProposalInstruction<
   >;
 
 export interface CancelProposalInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface CancelProposalInstructionDataArgs {}
 
 export function getCancelProposalInstructionDataEncoder(): FixedSizeEncoder<CancelProposalInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({ ...value, discriminator: CANCEL_PROPOSAL_DISCRIMINATOR }),
   );
 }
 
 export function getCancelProposalInstructionDataDecoder(): FixedSizeDecoder<CancelProposalInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getCancelProposalInstructionDataCodec(): FixedSizeCodec<

@@ -17,7 +17,6 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { RealmConfigSeeds } from "../pdas/index.js";
 import type {
@@ -35,15 +34,10 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findRealmConfigPda } from "../pdas/index.js";
 import {
@@ -55,17 +49,7 @@ import {
   getReserved110Encoder,
 } from "../types/index.js";
 
-export const REALM_CONFIG_ACCOUNT_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([13, 244, 36, 40, 108, 112, 111, 60]);
-
-export function getRealmConfigAccountDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    REALM_CONFIG_ACCOUNT_DISCRIMINATOR,
-  );
-}
-
 export interface RealmConfigAccount {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   realm: Address;
   communityTokenConfig: GoverningTokenConfig;
@@ -82,25 +66,17 @@ export interface RealmConfigAccountArgs {
 }
 
 export function getRealmConfigAccountEncoder(): Encoder<RealmConfigAccountArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["realm", getAddressEncoder()],
-      ["communityTokenConfig", getGoverningTokenConfigEncoder()],
-      ["councilTokenConfig", getGoverningTokenConfigEncoder()],
-      ["reserved", getReserved110Encoder()],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: REALM_CONFIG_ACCOUNT_DISCRIMINATOR,
-    }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["realm", getAddressEncoder()],
+    ["communityTokenConfig", getGoverningTokenConfigEncoder()],
+    ["councilTokenConfig", getGoverningTokenConfigEncoder()],
+    ["reserved", getReserved110Encoder()],
+  ]);
 }
 
 export function getRealmConfigAccountDecoder(): Decoder<RealmConfigAccount> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["realm", getAddressDecoder()],
     ["communityTokenConfig", getGoverningTokenConfigDecoder()],

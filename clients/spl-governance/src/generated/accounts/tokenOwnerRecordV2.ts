@@ -19,7 +19,6 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { TokenOwnerRecordSeeds } from "../pdas/index.js";
 import type {
@@ -33,14 +32,10 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
@@ -49,7 +44,6 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import {
@@ -57,17 +51,7 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const TOKEN_OWNER_RECORD_V2_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([87, 244, 129, 164, 125, 243, 201, 246]);
-
-export function getTokenOwnerRecordV2DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    TOKEN_OWNER_RECORD_V2_DISCRIMINATOR,
-  );
-}
-
 export interface TokenOwnerRecordV2 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   realm: Address;
   governingTokenMint: Address;
@@ -96,31 +80,23 @@ export interface TokenOwnerRecordV2Args {
 }
 
 export function getTokenOwnerRecordV2Encoder(): Encoder<TokenOwnerRecordV2Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["realm", getAddressEncoder()],
-      ["governingTokenMint", getAddressEncoder()],
-      ["governingTokenOwner", getAddressEncoder()],
-      ["governingTokenDepositAmount", getU64Encoder()],
-      ["unrelinquishedVotesCount", getU64Encoder()],
-      ["outstandingProposalCount", getU8Encoder()],
-      ["version", getU8Encoder()],
-      ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
-      ["governanceDelegate", getOptionEncoder(getAddressEncoder())],
-      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: TOKEN_OWNER_RECORD_V2_DISCRIMINATOR,
-    }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["realm", getAddressEncoder()],
+    ["governingTokenMint", getAddressEncoder()],
+    ["governingTokenOwner", getAddressEncoder()],
+    ["governingTokenDepositAmount", getU64Encoder()],
+    ["unrelinquishedVotesCount", getU64Encoder()],
+    ["outstandingProposalCount", getU8Encoder()],
+    ["version", getU8Encoder()],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
+    ["governanceDelegate", getOptionEncoder(getAddressEncoder())],
+    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
+  ]);
 }
 
 export function getTokenOwnerRecordV2Decoder(): Decoder<TokenOwnerRecordV2> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["realm", getAddressDecoder()],
     ["governingTokenMint", getAddressDecoder()],

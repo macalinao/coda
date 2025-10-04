@@ -26,12 +26,10 @@ import type { ResolvedAccount } from "../shared/index.js";
 import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -41,13 +39,10 @@ import {
   getGovernanceConfigEncoder,
 } from "../types/index.js";
 
-export const CREATE_GOVERNANCE_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([134, 46, 105, 91, 27, 91, 99, 157]);
+export const CREATE_GOVERNANCE_DISCRIMINATOR = 4;
 
 export function getCreateGovernanceDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_GOVERNANCE_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CREATE_GOVERNANCE_DISCRIMINATOR);
 }
 
 export type CreateGovernanceInstruction<
@@ -102,7 +97,7 @@ export type CreateGovernanceInstruction<
   >;
 
 export interface CreateGovernanceInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   config: GovernanceConfig;
 }
 
@@ -113,7 +108,7 @@ export interface CreateGovernanceInstructionDataArgs {
 export function getCreateGovernanceInstructionDataEncoder(): Encoder<CreateGovernanceInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["config", getGovernanceConfigEncoder()],
     ]),
     (value) => ({ ...value, discriminator: CREATE_GOVERNANCE_DISCRIMINATOR }),
@@ -122,7 +117,7 @@ export function getCreateGovernanceInstructionDataEncoder(): Encoder<CreateGover
 
 export function getCreateGovernanceInstructionDataDecoder(): Decoder<CreateGovernanceInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["config", getGovernanceConfigDecoder()],
   ]);
 }

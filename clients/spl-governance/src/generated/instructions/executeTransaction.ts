@@ -22,24 +22,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const EXECUTE_TRANSACTION_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([231, 173, 49, 91, 235, 24, 68, 19]);
+export const EXECUTE_TRANSACTION_DISCRIMINATOR = 16;
 
 export function getExecuteTransactionDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    EXECUTE_TRANSACTION_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(EXECUTE_TRANSACTION_DISCRIMINATOR);
 }
 
 export type ExecuteTransactionInstruction<
@@ -66,22 +61,20 @@ export type ExecuteTransactionInstruction<
   >;
 
 export interface ExecuteTransactionInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface ExecuteTransactionInstructionDataArgs {}
 
 export function getExecuteTransactionInstructionDataEncoder(): FixedSizeEncoder<ExecuteTransactionInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({ ...value, discriminator: EXECUTE_TRANSACTION_DISCRIMINATOR }),
   );
 }
 
 export function getExecuteTransactionInstructionDataDecoder(): FixedSizeDecoder<ExecuteTransactionInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getExecuteTransactionInstructionDataCodec(): FixedSizeCodec<

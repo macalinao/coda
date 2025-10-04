@@ -26,12 +26,8 @@ import type { ResolvedAccount } from "../shared/index.js";
 import type { InstructionData, InstructionDataArgs } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -49,13 +45,10 @@ import {
   getInstructionDataEncoder,
 } from "../types/index.js";
 
-export const INSERT_TRANSACTION_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([106, 8, 35, 192, 19, 26, 140, 38]);
+export const INSERT_TRANSACTION_DISCRIMINATOR = 9;
 
 export function getInsertTransactionDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    INSERT_TRANSACTION_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(INSERT_TRANSACTION_DISCRIMINATOR);
 }
 
 export type InsertTransactionInstruction<
@@ -106,7 +99,7 @@ export type InsertTransactionInstruction<
   >;
 
 export interface InsertTransactionInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   optionIndex: number;
   index: number;
   holdUpTime: number;
@@ -123,7 +116,7 @@ export interface InsertTransactionInstructionDataArgs {
 export function getInsertTransactionInstructionDataEncoder(): Encoder<InsertTransactionInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["optionIndex", getU8Encoder()],
       ["index", getU16Encoder()],
       ["holdUpTime", getU32Encoder()],
@@ -135,7 +128,7 @@ export function getInsertTransactionInstructionDataEncoder(): Encoder<InsertTran
 
 export function getInsertTransactionInstructionDataDecoder(): Decoder<InsertTransactionInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["optionIndex", getU8Decoder()],
     ["index", getU16Decoder()],
     ["holdUpTime", getU32Decoder()],

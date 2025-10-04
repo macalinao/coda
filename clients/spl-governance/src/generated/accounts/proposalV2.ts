@@ -19,7 +19,6 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { ProposalSeeds } from "../pdas/index.js";
 import type {
@@ -49,14 +48,10 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
@@ -69,7 +64,6 @@ import {
   getU64Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findProposalPda } from "../pdas/index.js";
 import {
@@ -91,16 +85,7 @@ import {
   getVoteTypeEncoder,
 } from "../types/index.js";
 
-export const PROPOSAL_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  30, 68, 195, 218, 88, 123, 211, 172,
-]);
-
-export function getProposalV2DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(PROPOSAL_V2_DISCRIMINATOR);
-}
-
 export interface ProposalV2 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   governance: Address;
   governingTokenMint: Address;
@@ -163,48 +148,43 @@ export interface ProposalV2Args {
 }
 
 export function getProposalV2Encoder(): Encoder<ProposalV2Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["governance", getAddressEncoder()],
-      ["governingTokenMint", getAddressEncoder()],
-      ["state", getProposalStateEncoder()],
-      ["tokenOwnerRecord", getAddressEncoder()],
-      ["signatoriesCount", getU8Encoder()],
-      ["signatoriesSignedOffCount", getU8Encoder()],
-      ["voteType", getVoteTypeEncoder()],
-      ["options", getArrayEncoder(getProposalOptionEncoder())],
-      ["denyVoteWeight", getOptionEncoder(getU64Encoder())],
-      ["reserved1", getU8Encoder()],
-      ["abstainVoteWeight", getOptionEncoder(getU64Encoder())],
-      ["startVotingAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["draftAt", getUnixTimestampEncoder()],
-      ["signingOffAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["votingAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["votingAtSlot", getOptionEncoder(getSlotEncoder())],
-      ["votingCompletedAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["executingAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["closedAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["executionFlags", getInstructionExecutionFlagsEncoder()],
-      ["maxVoteWeight", getOptionEncoder(getU64Encoder())],
-      ["maxVotingTime", getOptionEncoder(getU32Encoder())],
-      ["voteThreshold", getOptionEncoder(getVoteThresholdEncoder())],
-      ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
-      ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
-      [
-        "descriptionLink",
-        addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
-      ],
-      ["vetoVoteWeight", getU64Encoder()],
-    ]),
-    (value) => ({ ...value, discriminator: PROPOSAL_V2_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["governance", getAddressEncoder()],
+    ["governingTokenMint", getAddressEncoder()],
+    ["state", getProposalStateEncoder()],
+    ["tokenOwnerRecord", getAddressEncoder()],
+    ["signatoriesCount", getU8Encoder()],
+    ["signatoriesSignedOffCount", getU8Encoder()],
+    ["voteType", getVoteTypeEncoder()],
+    ["options", getArrayEncoder(getProposalOptionEncoder())],
+    ["denyVoteWeight", getOptionEncoder(getU64Encoder())],
+    ["reserved1", getU8Encoder()],
+    ["abstainVoteWeight", getOptionEncoder(getU64Encoder())],
+    ["startVotingAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["draftAt", getUnixTimestampEncoder()],
+    ["signingOffAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["votingAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["votingAtSlot", getOptionEncoder(getSlotEncoder())],
+    ["votingCompletedAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["executingAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["closedAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["executionFlags", getInstructionExecutionFlagsEncoder()],
+    ["maxVoteWeight", getOptionEncoder(getU64Encoder())],
+    ["maxVotingTime", getOptionEncoder(getU32Encoder())],
+    ["voteThreshold", getOptionEncoder(getVoteThresholdEncoder())],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
+    ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+    [
+      "descriptionLink",
+      addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
+    ],
+    ["vetoVoteWeight", getU64Encoder()],
+  ]);
 }
 
 export function getProposalV2Decoder(): Decoder<ProposalV2> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["governance", getAddressDecoder()],
     ["governingTokenMint", getAddressDecoder()],

@@ -17,7 +17,6 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type {
   GovernanceAccountType,
@@ -34,12 +33,8 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -48,7 +43,6 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import {
   getGovernanceAccountTypeDecoder,
@@ -57,17 +51,7 @@ import {
   getSlotEncoder,
 } from "../types/index.js";
 
-export const PROGRAM_METADATA_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([247, 19, 251, 54, 185, 115, 178, 108]);
-
-export function getProgramMetadataDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    PROGRAM_METADATA_DISCRIMINATOR,
-  );
-}
-
 export interface ProgramMetadata {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   updatedAt: Slot;
   version: string;
@@ -82,21 +66,16 @@ export interface ProgramMetadataArgs {
 }
 
 export function getProgramMetadataEncoder(): Encoder<ProgramMetadataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["updatedAt", getSlotEncoder()],
-      ["version", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
-      ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
-    ]),
-    (value) => ({ ...value, discriminator: PROGRAM_METADATA_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["updatedAt", getSlotEncoder()],
+    ["version", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
+  ]);
 }
 
 export function getProgramMetadataDecoder(): Decoder<ProgramMetadata> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["updatedAt", getSlotDecoder()],
     ["version", addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],

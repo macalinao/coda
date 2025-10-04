@@ -26,26 +26,21 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const ADD_REQUIRED_SIGNATORY_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([193, 75, 49, 70, 90, 15, 114, 200]);
+export const ADD_REQUIRED_SIGNATORY_DISCRIMINATOR = 29;
 
 export function getAddRequiredSignatoryDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    ADD_REQUIRED_SIGNATORY_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(ADD_REQUIRED_SIGNATORY_DISCRIMINATOR);
 }
 
 export type AddRequiredSignatoryInstruction<
@@ -80,7 +75,7 @@ export type AddRequiredSignatoryInstruction<
   >;
 
 export interface AddRequiredSignatoryInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   signatory: Address;
 }
 
@@ -91,7 +86,7 @@ export interface AddRequiredSignatoryInstructionDataArgs {
 export function getAddRequiredSignatoryInstructionDataEncoder(): FixedSizeEncoder<AddRequiredSignatoryInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["signatory", getAddressEncoder()],
     ]),
     (value) => ({
@@ -103,7 +98,7 @@ export function getAddRequiredSignatoryInstructionDataEncoder(): FixedSizeEncode
 
 export function getAddRequiredSignatoryInstructionDataDecoder(): FixedSizeDecoder<AddRequiredSignatoryInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["signatory", getAddressDecoder()],
   ]);
 }

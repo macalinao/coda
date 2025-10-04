@@ -17,7 +17,6 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { VoteRecordSeeds } from "../pdas/index.js";
 import type {
@@ -33,17 +32,12 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getBooleanDecoder,
   getBooleanEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findVoteRecordPda } from "../pdas/index.js";
 import {
@@ -53,18 +47,7 @@ import {
   getVoteWeightV1Encoder,
 } from "../types/index.js";
 
-export const VOTE_RECORD_V1_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  255, 129, 8, 10, 31, 22, 240, 178,
-]);
-
-export function getVoteRecordV1DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    VOTE_RECORD_V1_DISCRIMINATOR,
-  );
-}
-
 export interface VoteRecordV1 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   proposal: Address;
   governingTokenOwner: Address;
@@ -81,22 +64,17 @@ export interface VoteRecordV1Args {
 }
 
 export function getVoteRecordV1Encoder(): FixedSizeEncoder<VoteRecordV1Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["proposal", getAddressEncoder()],
-      ["governingTokenOwner", getAddressEncoder()],
-      ["isRelinquished", getBooleanEncoder()],
-      ["voteWeight", getVoteWeightV1Encoder()],
-    ]),
-    (value) => ({ ...value, discriminator: VOTE_RECORD_V1_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["proposal", getAddressEncoder()],
+    ["governingTokenOwner", getAddressEncoder()],
+    ["isRelinquished", getBooleanEncoder()],
+    ["voteWeight", getVoteWeightV1Encoder()],
+  ]);
 }
 
 export function getVoteRecordV1Decoder(): FixedSizeDecoder<VoteRecordV1> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["proposal", getAddressDecoder()],
     ["governingTokenOwner", getAddressDecoder()],

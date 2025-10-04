@@ -25,24 +25,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const CREATE_NATIVE_TREASURY_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([206, 91, 231, 66, 73, 164, 213, 110]);
+export const CREATE_NATIVE_TREASURY_DISCRIMINATOR = 25;
 
 export function getCreateNativeTreasuryDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_NATIVE_TREASURY_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CREATE_NATIVE_TREASURY_DISCRIMINATOR);
 }
 
 export type CreateNativeTreasuryInstruction<
@@ -76,14 +71,14 @@ export type CreateNativeTreasuryInstruction<
   >;
 
 export interface CreateNativeTreasuryInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface CreateNativeTreasuryInstructionDataArgs {}
 
 export function getCreateNativeTreasuryInstructionDataEncoder(): FixedSizeEncoder<CreateNativeTreasuryInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({
       ...value,
       discriminator: CREATE_NATIVE_TREASURY_DISCRIMINATOR,
@@ -92,9 +87,7 @@ export function getCreateNativeTreasuryInstructionDataEncoder(): FixedSizeEncode
 }
 
 export function getCreateNativeTreasuryInstructionDataDecoder(): FixedSizeDecoder<CreateNativeTreasuryInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getCreateNativeTreasuryInstructionDataCodec(): FixedSizeCodec<

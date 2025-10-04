@@ -25,24 +25,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const COMPLETE_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([3, 48, 26, 135, 144, 239, 5, 169]);
+export const COMPLETE_PROPOSAL_DISCRIMINATOR = 28;
 
 export function getCompleteProposalDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    COMPLETE_PROPOSAL_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(COMPLETE_PROPOSAL_DISCRIMINATOR);
 }
 
 export type CompleteProposalInstruction<
@@ -70,22 +65,20 @@ export type CompleteProposalInstruction<
   >;
 
 export interface CompleteProposalInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface CompleteProposalInstructionDataArgs {}
 
 export function getCompleteProposalInstructionDataEncoder(): FixedSizeEncoder<CompleteProposalInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({ ...value, discriminator: COMPLETE_PROPOSAL_DISCRIMINATOR }),
   );
 }
 
 export function getCompleteProposalInstructionDataDecoder(): FixedSizeDecoder<CompleteProposalInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getCompleteProposalInstructionDataCodec(): FixedSizeCodec<

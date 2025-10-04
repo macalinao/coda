@@ -25,27 +25,21 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const ADD_SIGNATORY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  210, 233, 221, 216, 216, 181, 115, 56,
-]);
+export const ADD_SIGNATORY_DISCRIMINATOR = 7;
 
 export function getAddSignatoryDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    ADD_SIGNATORY_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(ADD_SIGNATORY_DISCRIMINATOR);
 }
 
 export type AddSignatoryInstruction<
@@ -88,7 +82,7 @@ export type AddSignatoryInstruction<
   >;
 
 export interface AddSignatoryInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   signatory: Address;
 }
 
@@ -99,7 +93,7 @@ export interface AddSignatoryInstructionDataArgs {
 export function getAddSignatoryInstructionDataEncoder(): FixedSizeEncoder<AddSignatoryInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["signatory", getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: ADD_SIGNATORY_DISCRIMINATOR }),
@@ -108,7 +102,7 @@ export function getAddSignatoryInstructionDataEncoder(): FixedSizeEncoder<AddSig
 
 export function getAddSignatoryInstructionDataDecoder(): FixedSizeDecoder<AddSignatoryInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["signatory", getAddressDecoder()],
   ]);
 }

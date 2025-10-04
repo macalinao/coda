@@ -26,24 +26,20 @@ import type { ResolvedAccount } from "../shared/index.js";
 import type { Vote, VoteArgs } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 import { getVoteDecoder, getVoteEncoder } from "../types/index.js";
 
-export const CAST_VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  20, 212, 15, 189, 69, 180, 69, 151,
-]);
+export const CAST_VOTE_DISCRIMINATOR = 13;
 
 export function getCastVoteDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(CAST_VOTE_DISCRIMINATOR);
+  return getU8Encoder().encode(CAST_VOTE_DISCRIMINATOR);
 }
 
 export type CastVoteInstruction<
@@ -114,7 +110,7 @@ export type CastVoteInstruction<
   >;
 
 export interface CastVoteInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   vote: Vote;
 }
 
@@ -125,7 +121,7 @@ export interface CastVoteInstructionDataArgs {
 export function getCastVoteInstructionDataEncoder(): Encoder<CastVoteInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["vote", getVoteEncoder()],
     ]),
     (value) => ({ ...value, discriminator: CAST_VOTE_DISCRIMINATOR }),
@@ -134,7 +130,7 @@ export function getCastVoteInstructionDataEncoder(): Encoder<CastVoteInstruction
 
 export function getCastVoteInstructionDataDecoder(): Decoder<CastVoteInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["vote", getVoteDecoder()],
   ]);
 }

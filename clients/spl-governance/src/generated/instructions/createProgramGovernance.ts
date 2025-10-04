@@ -26,14 +26,12 @@ import type { ResolvedAccount } from "../shared/index.js";
 import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
   getBooleanDecoder,
   getBooleanEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -43,13 +41,10 @@ import {
   getGovernanceConfigEncoder,
 } from "../types/index.js";
 
-export const CREATE_PROGRAM_GOVERNANCE_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([231, 18, 5, 95, 19, 219, 203, 48]);
+export const CREATE_PROGRAM_GOVERNANCE_DISCRIMINATOR = 5;
 
 export function getCreateProgramGovernanceDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_PROGRAM_GOVERNANCE_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CREATE_PROGRAM_GOVERNANCE_DISCRIMINATOR);
 }
 
 export type CreateProgramGovernanceInstruction<
@@ -117,7 +112,7 @@ export type CreateProgramGovernanceInstruction<
   >;
 
 export interface CreateProgramGovernanceInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   config: GovernanceConfig;
   transferUpgradeAuthority: boolean;
 }
@@ -130,7 +125,7 @@ export interface CreateProgramGovernanceInstructionDataArgs {
 export function getCreateProgramGovernanceInstructionDataEncoder(): Encoder<CreateProgramGovernanceInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["config", getGovernanceConfigEncoder()],
       ["transferUpgradeAuthority", getBooleanEncoder()],
     ]),
@@ -143,7 +138,7 @@ export function getCreateProgramGovernanceInstructionDataEncoder(): Encoder<Crea
 
 export function getCreateProgramGovernanceInstructionDataDecoder(): Decoder<CreateProgramGovernanceInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["config", getGovernanceConfigDecoder()],
     ["transferUpgradeAuthority", getBooleanDecoder()],
   ]);

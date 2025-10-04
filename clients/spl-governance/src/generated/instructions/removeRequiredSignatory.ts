@@ -24,24 +24,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REMOVE_REQUIRED_SIGNATORY_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([21, 156, 139, 89, 244, 230, 204, 130]);
+export const REMOVE_REQUIRED_SIGNATORY_DISCRIMINATOR = 30;
 
 export function getRemoveRequiredSignatoryDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    REMOVE_REQUIRED_SIGNATORY_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(REMOVE_REQUIRED_SIGNATORY_DISCRIMINATOR);
 }
 
 export type RemoveRequiredSignatoryInstruction<
@@ -69,14 +64,14 @@ export type RemoveRequiredSignatoryInstruction<
   >;
 
 export interface RemoveRequiredSignatoryInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface RemoveRequiredSignatoryInstructionDataArgs {}
 
 export function getRemoveRequiredSignatoryInstructionDataEncoder(): FixedSizeEncoder<RemoveRequiredSignatoryInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({
       ...value,
       discriminator: REMOVE_REQUIRED_SIGNATORY_DISCRIMINATOR,
@@ -85,9 +80,7 @@ export function getRemoveRequiredSignatoryInstructionDataEncoder(): FixedSizeEnc
 }
 
 export function getRemoveRequiredSignatoryInstructionDataDecoder(): FixedSizeDecoder<RemoveRequiredSignatoryInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getRemoveRequiredSignatoryInstructionDataCodec(): FixedSizeCodec<

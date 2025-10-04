@@ -19,7 +19,6 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { ProposalTransactionSeeds } from "../pdas/index.js";
 import type {
@@ -39,14 +38,10 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
@@ -57,7 +52,6 @@ import {
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findProposalTransactionPda } from "../pdas/index.js";
 import {
@@ -71,17 +65,7 @@ import {
   getUnixTimestampEncoder,
 } from "../types/index.js";
 
-export const PROPOSAL_TRANSACTION_V2_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([77, 73, 87, 166, 206, 61, 96, 217]);
-
-export function getProposalTransactionV2DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    PROPOSAL_TRANSACTION_V2_DISCRIMINATOR,
-  );
-}
-
 export interface ProposalTransactionV2 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   proposal: Address;
   optionIndex: number;
@@ -106,29 +90,21 @@ export interface ProposalTransactionV2Args {
 }
 
 export function getProposalTransactionV2Encoder(): Encoder<ProposalTransactionV2Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["proposal", getAddressEncoder()],
-      ["optionIndex", getU8Encoder()],
-      ["transactionIndex", getU16Encoder()],
-      ["holdUpTime", getU32Encoder()],
-      ["instructions", getArrayEncoder(getInstructionDataEncoder())],
-      ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["executionStatus", getTransactionExecutionStatusEncoder()],
-      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: PROPOSAL_TRANSACTION_V2_DISCRIMINATOR,
-    }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["proposal", getAddressEncoder()],
+    ["optionIndex", getU8Encoder()],
+    ["transactionIndex", getU16Encoder()],
+    ["holdUpTime", getU32Encoder()],
+    ["instructions", getArrayEncoder(getInstructionDataEncoder())],
+    ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["executionStatus", getTransactionExecutionStatusEncoder()],
+    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
+  ]);
 }
 
 export function getProposalTransactionV2Decoder(): Decoder<ProposalTransactionV2> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["proposal", getAddressDecoder()],
     ["optionIndex", getU8Decoder()],
