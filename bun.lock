@@ -70,7 +70,7 @@
     },
     "clients/quarry": {
       "name": "@macalinao/clients-quarry",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:*",
         "@macalinao/codama-rename-visitor": "workspace:*",
@@ -86,7 +86,7 @@
     },
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:*",
         "@macalinao/eslint-config": "catalog:",

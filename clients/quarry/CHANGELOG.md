@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.4.2
+
+### Patch Changes
+
+- 4ada168: Add defaults for merge miner operations
+
 ## 0.4.1
 
 ### Patch Changes
