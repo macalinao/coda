@@ -35,6 +35,7 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findReplicaMintPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -203,16 +204,8 @@ export async function getNewPoolV2InstructionAsync<
     });
   }
   if (!accounts.replicaMint.value) {
-    accounts.replicaMint.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            34, 82, 101, 112, 108, 105, 99, 97, 77, 105, 110, 116, 34,
-          ]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.pool.value)),
-      ],
+    accounts.replicaMint.value = await findReplicaMintPda({
+      pool: expectAddress(accounts.pool.value),
     });
   }
   if (!accounts.tokenProgram.value) {

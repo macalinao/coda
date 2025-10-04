@@ -24,16 +24,24 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
-import { findMergeMinerPda, findMinerPda } from "../pdas/index.js";
+import {
+  findMergeMinerPda,
+  findMinerPda,
+  findQuarryPda,
+  findReplicaMintPda,
+} from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -147,14 +155,14 @@ export interface StakeReplicaMinerAsyncInput<
   TAccountMineProgram extends string = string,
 > {
   mmOwner: TransactionSigner<TAccountMmOwner>;
-  replicaMint: Address<TAccountReplicaMint>;
-  replicaMintTokenAccount: Address<TAccountReplicaMintTokenAccount>;
+  replicaMint?: Address<TAccountReplicaMint>;
+  replicaMintTokenAccount?: Address<TAccountReplicaMintTokenAccount>;
   pool: Address<TAccountPool>;
   mm?: Address<TAccountMm>;
   rewarder: Address<TAccountRewarder>;
-  quarry: Address<TAccountQuarry>;
+  quarry?: Address<TAccountQuarry>;
   miner?: Address<TAccountMiner>;
-  minerVault: Address<TAccountMinerVault>;
+  minerVault?: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
 }
@@ -230,16 +238,53 @@ export async function getStakeReplicaMinerInstructionAsync<
   >;
 
   // Resolve default values.
+  if (!accounts.replicaMint.value) {
+    accounts.replicaMint.value = await findReplicaMintPda({
+      pool: expectAddress(accounts.pool.value),
+    });
+  }
   if (!accounts.mm.value) {
     accounts.mm.value = await findMergeMinerPda({
       pool: expectAddress(accounts.pool.value),
       owner: expectAddress(accounts.mmOwner.value),
     });
   }
+  if (!accounts.replicaMintTokenAccount.value) {
+    accounts.replicaMintTokenAccount.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(expectAddress(accounts.mm.value)),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.replicaMint.value)),
+      ],
+    });
+  }
+  if (!accounts.quarry.value) {
+    accounts.quarry.value = await findQuarryPda({
+      rewarder: expectAddress(accounts.rewarder.value),
+      tokenMint: expectAddress(accounts.replicaMint.value),
+    });
+  }
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({
       quarry: expectAddress(accounts.quarry.value),
       authority: expectAddress(accounts.mm.value),
+    });
+  }
+  if (!accounts.minerVault.value) {
+    accounts.minerVault.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(expectAddress(accounts.miner.value)),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(expectAddress(accounts.replicaMint.value)),
+      ],
     });
   }
   if (!accounts.tokenProgram.value) {

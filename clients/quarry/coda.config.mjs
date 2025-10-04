@@ -290,7 +290,12 @@ export default defineConfig({
         },
       ]),
 
-      ...["stakePrimaryMiner", "stakeReplicaMiner"].flatMap((instruction) => [
+      ...[
+        "stakePrimaryMiner",
+        "stakeReplicaMiner",
+        "unstakePrimaryMiner",
+        "unstakeAllReplicaMiner",
+      ].flatMap((instruction) => [
         {
           account: "mm",
           instruction,
@@ -349,6 +354,50 @@ export default defineConfig({
           defaultValue: accountValueNode("payer"),
         },
       ]),
+
+      ...[
+        "newPool",
+        "newPoolV2",
+        "stakeReplicaMiner",
+        "unstakeAllReplicaMiner",
+      ].flatMap((instruction) => [
+        {
+          account: "replicaMint",
+          instruction,
+          defaultValue: pdaValueNode(pdaLinkNode("replicaMint"), [
+            pdaSeedValueNode("pool", accountValueNode("pool")),
+          ]),
+        },
+      ]),
+
+      ...["stakeReplicaMiner", "unstakeAllReplicaMiner"].flatMap(
+        (instruction) => [
+          {
+            account: "replicaMintTokenAccount",
+            instruction,
+            defaultValue: associatedTokenAccountValueNode({
+              owner: accountValueNode("mm"),
+              mint: accountValueNode("replicaMint"),
+            }),
+          },
+          {
+            account: "quarry",
+            instruction,
+            defaultValue: pdaValueNode(pdaLinkNode("quarry"), [
+              pdaSeedValueNode("rewarder", accountValueNode("rewarder")),
+              pdaSeedValueNode("tokenMint", accountValueNode("replicaMint")),
+            ]),
+          },
+          {
+            account: "minerVault",
+            instruction,
+            defaultValue: associatedTokenAccountValueNode({
+              owner: accountValueNode("miner"),
+              mint: accountValueNode("replicaMint"),
+            }),
+          },
+        ],
+      ),
 
       ...["newMinter", "newMinterV2"].flatMap((instruction) => [
         {
