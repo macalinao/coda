@@ -17,7 +17,6 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { ProposalDepositSeeds } from "../pdas/index.js";
 import type {
@@ -31,19 +30,14 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findProposalDepositPda } from "../pdas/index.js";
 import {
@@ -51,17 +45,7 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const PROPOSAL_DEPOSIT_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([189, 70, 125, 55, 15, 185, 171, 24]);
-
-export function getProposalDepositDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    PROPOSAL_DEPOSIT_DISCRIMINATOR,
-  );
-}
-
 export interface ProposalDeposit {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   proposal: Address;
   depositPayer: Address;
@@ -76,21 +60,16 @@ export interface ProposalDepositArgs {
 }
 
 export function getProposalDepositEncoder(): FixedSizeEncoder<ProposalDepositArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["proposal", getAddressEncoder()],
-      ["depositPayer", getAddressEncoder()],
-      ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
-    ]),
-    (value) => ({ ...value, discriminator: PROPOSAL_DEPOSIT_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["proposal", getAddressEncoder()],
+    ["depositPayer", getAddressEncoder()],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
+  ]);
 }
 
 export function getProposalDepositDecoder(): FixedSizeDecoder<ProposalDeposit> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["proposal", getAddressDecoder()],
     ["depositPayer", getAddressDecoder()],

@@ -24,12 +24,10 @@ import type { ResolvedAccount } from "../shared/index.js";
 import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -39,13 +37,10 @@ import {
   getGovernanceConfigEncoder,
 } from "../types/index.js";
 
-export const SET_GOVERNANCE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([7, 85, 201, 96, 219, 241, 95, 58]);
+export const SET_GOVERNANCE_CONFIG_DISCRIMINATOR = 19;
 
 export function getSetGovernanceConfigDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SET_GOVERNANCE_CONFIG_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(SET_GOVERNANCE_CONFIG_DISCRIMINATOR);
 }
 
 export type SetGovernanceConfigInstruction<
@@ -65,7 +60,7 @@ export type SetGovernanceConfigInstruction<
   >;
 
 export interface SetGovernanceConfigInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   config: GovernanceConfig;
 }
 
@@ -76,7 +71,7 @@ export interface SetGovernanceConfigInstructionDataArgs {
 export function getSetGovernanceConfigInstructionDataEncoder(): Encoder<SetGovernanceConfigInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["config", getGovernanceConfigEncoder()],
     ]),
     (value) => ({
@@ -88,7 +83,7 @@ export function getSetGovernanceConfigInstructionDataEncoder(): Encoder<SetGover
 
 export function getSetGovernanceConfigInstructionDataDecoder(): Decoder<SetGovernanceConfigInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["config", getGovernanceConfigDecoder()],
   ]);
 }

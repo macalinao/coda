@@ -17,7 +17,6 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { GovernanceSeeds } from "../pdas/index.js";
 import type {
@@ -33,17 +32,12 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findGovernancePda } from "../pdas/index.js";
 import {
@@ -53,18 +47,7 @@ import {
   getGovernanceConfigEncoder,
 } from "../types/index.js";
 
-export const GOVERNANCE_V1_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  49, 251, 55, 156, 61, 96, 92, 180,
-]);
-
-export function getGovernanceV1DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    GOVERNANCE_V1_DISCRIMINATOR,
-  );
-}
-
 export interface GovernanceV1 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   realm: Address;
   governedAccount: Address;
@@ -81,22 +64,17 @@ export interface GovernanceV1Args {
 }
 
 export function getGovernanceV1Encoder(): Encoder<GovernanceV1Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["realm", getAddressEncoder()],
-      ["governedAccount", getAddressEncoder()],
-      ["proposalsCount", getU32Encoder()],
-      ["config", getGovernanceConfigEncoder()],
-    ]),
-    (value) => ({ ...value, discriminator: GOVERNANCE_V1_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["realm", getAddressEncoder()],
+    ["governedAccount", getAddressEncoder()],
+    ["proposalsCount", getU32Encoder()],
+    ["config", getGovernanceConfigEncoder()],
+  ]);
 }
 
 export function getGovernanceV1Decoder(): Decoder<GovernanceV1> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["realm", getAddressDecoder()],
     ["governedAccount", getAddressDecoder()],

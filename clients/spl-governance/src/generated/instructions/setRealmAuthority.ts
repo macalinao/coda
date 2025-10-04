@@ -29,12 +29,10 @@ import type {
 } from "../types/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -44,13 +42,10 @@ import {
   getSetRealmAuthorityActionEncoder,
 } from "../types/index.js";
 
-export const SET_REALM_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([91, 76, 56, 99, 3, 85, 157, 154]);
+export const SET_REALM_AUTHORITY_DISCRIMINATOR = 21;
 
 export function getSetRealmAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SET_REALM_AUTHORITY_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(SET_REALM_AUTHORITY_DISCRIMINATOR);
 }
 
 export type SetRealmAuthorityInstruction<
@@ -78,7 +73,7 @@ export type SetRealmAuthorityInstruction<
   >;
 
 export interface SetRealmAuthorityInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   action: SetRealmAuthorityAction;
 }
 
@@ -89,7 +84,7 @@ export interface SetRealmAuthorityInstructionDataArgs {
 export function getSetRealmAuthorityInstructionDataEncoder(): FixedSizeEncoder<SetRealmAuthorityInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["action", getSetRealmAuthorityActionEncoder()],
     ]),
     (value) => ({ ...value, discriminator: SET_REALM_AUTHORITY_DISCRIMINATOR }),
@@ -98,7 +93,7 @@ export function getSetRealmAuthorityInstructionDataEncoder(): FixedSizeEncoder<S
 
 export function getSetRealmAuthorityInstructionDataDecoder(): FixedSizeDecoder<SetRealmAuthorityInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["action", getSetRealmAuthorityActionDecoder()],
   ]);
 }

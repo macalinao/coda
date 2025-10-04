@@ -31,12 +31,10 @@ import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getUtf8Decoder,
@@ -50,14 +48,10 @@ import {
   getRealmConfigParamsEncoder,
 } from "../types/index.js";
 
-export const CREATE_REALM_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  0, 147, 95, 250, 91, 1, 118, 220,
-]);
+export const CREATE_REALM_DISCRIMINATOR = 0;
 
 export function getCreateRealmDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_REALM_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CREATE_REALM_DISCRIMINATOR);
 }
 
 export type CreateRealmInstruction<
@@ -135,7 +129,7 @@ export type CreateRealmInstruction<
   >;
 
 export interface CreateRealmInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   name: string;
   configArgs: RealmConfigParams;
 }
@@ -148,7 +142,7 @@ export interface CreateRealmInstructionDataArgs {
 export function getCreateRealmInstructionDataEncoder(): Encoder<CreateRealmInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
       ["configArgs", getRealmConfigParamsEncoder()],
     ]),
@@ -158,7 +152,7 @@ export function getCreateRealmInstructionDataEncoder(): Encoder<CreateRealmInstr
 
 export function getCreateRealmInstructionDataDecoder(): Decoder<CreateRealmInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["name", addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
     ["configArgs", getRealmConfigParamsDecoder()],
   ]);

@@ -17,7 +17,6 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { RequiredSignatorySeeds } from "../pdas/index.js";
 import type {
@@ -31,17 +30,12 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findRequiredSignatoryPda } from "../pdas/index.js";
 import {
@@ -49,17 +43,7 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const REQUIRED_SIGNATORY_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([112, 254, 199, 24, 189, 242, 178, 123]);
-
-export function getRequiredSignatoryDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    REQUIRED_SIGNATORY_DISCRIMINATOR,
-  );
-}
-
 export interface RequiredSignatory {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   accountVersion: number;
   governance: Address;
@@ -74,21 +58,16 @@ export interface RequiredSignatoryArgs {
 }
 
 export function getRequiredSignatoryEncoder(): FixedSizeEncoder<RequiredSignatoryArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["accountVersion", getU8Encoder()],
-      ["governance", getAddressEncoder()],
-      ["signatory", getAddressEncoder()],
-    ]),
-    (value) => ({ ...value, discriminator: REQUIRED_SIGNATORY_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["accountVersion", getU8Encoder()],
+    ["governance", getAddressEncoder()],
+    ["signatory", getAddressEncoder()],
+  ]);
 }
 
 export function getRequiredSignatoryDecoder(): FixedSizeDecoder<RequiredSignatory> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["accountVersion", getU8Decoder()],
     ["governance", getAddressDecoder()],

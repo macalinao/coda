@@ -25,24 +25,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const UPDATE_PROGRAM_METADATA_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([140, 19, 75, 78, 235, 229, 180, 114]);
+export const UPDATE_PROGRAM_METADATA_DISCRIMINATOR = 24;
 
 export function getUpdateProgramMetadataDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    UPDATE_PROGRAM_METADATA_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(UPDATE_PROGRAM_METADATA_DISCRIMINATOR);
 }
 
 export type UpdateProgramMetadataInstruction<
@@ -72,14 +67,14 @@ export type UpdateProgramMetadataInstruction<
   >;
 
 export interface UpdateProgramMetadataInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface UpdateProgramMetadataInstructionDataArgs {}
 
 export function getUpdateProgramMetadataInstructionDataEncoder(): FixedSizeEncoder<UpdateProgramMetadataInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({
       ...value,
       discriminator: UPDATE_PROGRAM_METADATA_DISCRIMINATOR,
@@ -88,9 +83,7 @@ export function getUpdateProgramMetadataInstructionDataEncoder(): FixedSizeEncod
 }
 
 export function getUpdateProgramMetadataInstructionDataDecoder(): FixedSizeDecoder<UpdateProgramMetadataInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getUpdateProgramMetadataInstructionDataCodec(): FixedSizeCodec<

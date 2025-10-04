@@ -22,24 +22,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const REFUND_PROPOSAL_DEPOSIT_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([213, 201, 11, 99, 38, 148, 163, 155]);
+export const REFUND_PROPOSAL_DEPOSIT_DISCRIMINATOR = 27;
 
 export function getRefundProposalDepositDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    REFUND_PROPOSAL_DEPOSIT_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(REFUND_PROPOSAL_DEPOSIT_DISCRIMINATOR);
 }
 
 export type RefundProposalDepositInstruction<
@@ -66,14 +61,14 @@ export type RefundProposalDepositInstruction<
   >;
 
 export interface RefundProposalDepositInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface RefundProposalDepositInstructionDataArgs {}
 
 export function getRefundProposalDepositInstructionDataEncoder(): FixedSizeEncoder<RefundProposalDepositInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({
       ...value,
       discriminator: REFUND_PROPOSAL_DEPOSIT_DISCRIMINATOR,
@@ -82,9 +77,7 @@ export function getRefundProposalDepositInstructionDataEncoder(): FixedSizeEncod
 }
 
 export function getRefundProposalDepositInstructionDataDecoder(): FixedSizeDecoder<RefundProposalDepositInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getRefundProposalDepositInstructionDataCodec(): FixedSizeCodec<

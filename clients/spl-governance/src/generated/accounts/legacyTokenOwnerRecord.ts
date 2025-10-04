@@ -19,7 +19,6 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { TokenOwnerRecordSeeds } from "../pdas/index.js";
 import type {
@@ -33,14 +32,10 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
@@ -51,7 +46,6 @@ import {
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import {
@@ -59,17 +53,7 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const LEGACY_TOKEN_OWNER_RECORD_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([69, 242, 131, 13, 167, 170, 255, 38]);
-
-export function getLegacyTokenOwnerRecordDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    LEGACY_TOKEN_OWNER_RECORD_DISCRIMINATOR,
-  );
-}
-
 export interface LegacyTokenOwnerRecord {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   realm: Address;
   governingTokenMint: Address;
@@ -98,31 +82,23 @@ export interface LegacyTokenOwnerRecordArgs {
 }
 
 export function getLegacyTokenOwnerRecordEncoder(): Encoder<LegacyTokenOwnerRecordArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["realm", getAddressEncoder()],
-      ["governingTokenMint", getAddressEncoder()],
-      ["governingTokenOwner", getAddressEncoder()],
-      ["governingTokenDepositAmount", getU64Encoder()],
-      ["unrelinquishedVotesCount", getU32Encoder()],
-      ["totalVotesCount", getU32Encoder()],
-      ["outstandingProposalCount", getU8Encoder()],
-      ["reserved", getArrayEncoder(getU8Encoder(), { size: 7 })],
-      ["governanceDelegate", getOptionEncoder(getAddressEncoder())],
-      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: LEGACY_TOKEN_OWNER_RECORD_DISCRIMINATOR,
-    }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["realm", getAddressEncoder()],
+    ["governingTokenMint", getAddressEncoder()],
+    ["governingTokenOwner", getAddressEncoder()],
+    ["governingTokenDepositAmount", getU64Encoder()],
+    ["unrelinquishedVotesCount", getU32Encoder()],
+    ["totalVotesCount", getU32Encoder()],
+    ["outstandingProposalCount", getU8Encoder()],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 7 })],
+    ["governanceDelegate", getOptionEncoder(getAddressEncoder())],
+    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
+  ]);
 }
 
 export function getLegacyTokenOwnerRecordDecoder(): Decoder<LegacyTokenOwnerRecord> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["realm", getAddressDecoder()],
     ["governingTokenMint", getAddressDecoder()],

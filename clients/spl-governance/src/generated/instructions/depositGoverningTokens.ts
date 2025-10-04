@@ -26,12 +26,10 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
   transformEncoder,
@@ -39,13 +37,10 @@ import {
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const DEPOSIT_GOVERNING_TOKENS_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([80, 227, 56, 9, 82, 30, 79, 235]);
+export const DEPOSIT_GOVERNING_TOKENS_DISCRIMINATOR = 1;
 
 export function getDepositGoverningTokensDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    DEPOSIT_GOVERNING_TOKENS_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(DEPOSIT_GOVERNING_TOKENS_DISCRIMINATOR);
 }
 
 export type DepositGoverningTokensInstruction<
@@ -107,7 +102,7 @@ export type DepositGoverningTokensInstruction<
   >;
 
 export interface DepositGoverningTokensInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   amount: bigint;
 }
 
@@ -118,7 +113,7 @@ export interface DepositGoverningTokensInstructionDataArgs {
 export function getDepositGoverningTokensInstructionDataEncoder(): FixedSizeEncoder<DepositGoverningTokensInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["amount", getU64Encoder()],
     ]),
     (value) => ({
@@ -130,7 +125,7 @@ export function getDepositGoverningTokensInstructionDataEncoder(): FixedSizeEnco
 
 export function getDepositGoverningTokensInstructionDataDecoder(): FixedSizeDecoder<DepositGoverningTokensInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["amount", getU64Decoder()],
   ]);
 }

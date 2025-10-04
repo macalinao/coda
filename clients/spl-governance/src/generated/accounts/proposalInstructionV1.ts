@@ -19,7 +19,6 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { ProposalTransactionSeeds } from "../pdas/index.js";
 import type {
@@ -39,12 +38,8 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
@@ -53,7 +48,6 @@ import {
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findProposalTransactionPda } from "../pdas/index.js";
 import {
@@ -67,17 +61,7 @@ import {
   getUnixTimestampEncoder,
 } from "../types/index.js";
 
-export const PROPOSAL_INSTRUCTION_V1_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([252, 191, 144, 217, 179, 141, 202, 181]);
-
-export function getProposalInstructionV1DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    PROPOSAL_INSTRUCTION_V1_DISCRIMINATOR,
-  );
-}
-
 export interface ProposalInstructionV1 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   proposal: Address;
   instructionIndex: number;
@@ -98,27 +82,19 @@ export interface ProposalInstructionV1Args {
 }
 
 export function getProposalInstructionV1Encoder(): Encoder<ProposalInstructionV1Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["proposal", getAddressEncoder()],
-      ["instructionIndex", getU16Encoder()],
-      ["holdUpTime", getU32Encoder()],
-      ["instruction", getInstructionDataEncoder()],
-      ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
-      ["executionStatus", getTransactionExecutionStatusEncoder()],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: PROPOSAL_INSTRUCTION_V1_DISCRIMINATOR,
-    }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["proposal", getAddressEncoder()],
+    ["instructionIndex", getU16Encoder()],
+    ["holdUpTime", getU32Encoder()],
+    ["instruction", getInstructionDataEncoder()],
+    ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
+    ["executionStatus", getTransactionExecutionStatusEncoder()],
+  ]);
 }
 
 export function getProposalInstructionV1Decoder(): Decoder<ProposalInstructionV1> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["proposal", getAddressDecoder()],
     ["instructionIndex", getU16Decoder()],

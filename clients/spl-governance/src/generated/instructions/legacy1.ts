@@ -19,22 +19,18 @@ import type {
 } from "@solana/kit";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
-export const LEGACY1_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  177, 194, 70, 247, 183, 2, 255, 118,
-]);
+export const LEGACY1_DISCRIMINATOR = 8;
 
 export function getLegacy1DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(LEGACY1_DISCRIMINATOR);
+  return getU8Encoder().encode(LEGACY1_DISCRIMINATOR);
 }
 
 export type Legacy1Instruction<
@@ -45,22 +41,20 @@ export type Legacy1Instruction<
   InstructionWithAccounts<TRemainingAccounts>;
 
 export interface Legacy1InstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface Legacy1InstructionDataArgs {}
 
 export function getLegacy1InstructionDataEncoder(): FixedSizeEncoder<Legacy1InstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({ ...value, discriminator: LEGACY1_DISCRIMINATOR }),
   );
 }
 
 export function getLegacy1InstructionDataDecoder(): FixedSizeDecoder<Legacy1InstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getLegacy1InstructionDataCodec(): FixedSizeCodec<

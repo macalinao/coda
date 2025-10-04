@@ -25,24 +25,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const WITHDRAW_GOVERNING_TOKENS_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([203, 71, 255, 130, 236, 41, 93, 103]);
+export const WITHDRAW_GOVERNING_TOKENS_DISCRIMINATOR = 2;
 
 export function getWithdrawGoverningTokensDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    WITHDRAW_GOVERNING_TOKENS_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(WITHDRAW_GOVERNING_TOKENS_DISCRIMINATOR);
 }
 
 export type WithdrawGoverningTokensInstruction<
@@ -88,14 +83,14 @@ export type WithdrawGoverningTokensInstruction<
   >;
 
 export interface WithdrawGoverningTokensInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface WithdrawGoverningTokensInstructionDataArgs {}
 
 export function getWithdrawGoverningTokensInstructionDataEncoder(): FixedSizeEncoder<WithdrawGoverningTokensInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({
       ...value,
       discriminator: WITHDRAW_GOVERNING_TOKENS_DISCRIMINATOR,
@@ -104,9 +99,7 @@ export function getWithdrawGoverningTokensInstructionDataEncoder(): FixedSizeEnc
 }
 
 export function getWithdrawGoverningTokensInstructionDataDecoder(): FixedSizeDecoder<WithdrawGoverningTokensInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getWithdrawGoverningTokensInstructionDataCodec(): FixedSizeCodec<

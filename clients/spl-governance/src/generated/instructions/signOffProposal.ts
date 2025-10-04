@@ -25,24 +25,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const SIGN_OFF_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([129, 155, 109, 27, 119, 75, 170, 65]);
+export const SIGN_OFF_PROPOSAL_DISCRIMINATOR = 12;
 
 export function getSignOffProposalDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SIGN_OFF_PROPOSAL_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(SIGN_OFF_PROPOSAL_DISCRIMINATOR);
 }
 
 export type SignOffProposalInstruction<
@@ -78,22 +73,20 @@ export type SignOffProposalInstruction<
   >;
 
 export interface SignOffProposalInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface SignOffProposalInstructionDataArgs {}
 
 export function getSignOffProposalInstructionDataEncoder(): FixedSizeEncoder<SignOffProposalInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({ ...value, discriminator: SIGN_OFF_PROPOSAL_DISCRIMINATOR }),
   );
 }
 
 export function getSignOffProposalInstructionDataDecoder(): FixedSizeDecoder<SignOffProposalInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getSignOffProposalInstructionDataCodec(): FixedSizeCodec<

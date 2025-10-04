@@ -25,25 +25,20 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
-export const CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([47, 45, 190, 114, 133, 246, 163, 222]);
+export const CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR = 23;
 
 export function getCreateTokenOwnerRecordDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR);
 }
 
 export type CreateTokenOwnerRecordInstruction<
@@ -85,14 +80,14 @@ export type CreateTokenOwnerRecordInstruction<
   >;
 
 export interface CreateTokenOwnerRecordInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface CreateTokenOwnerRecordInstructionDataArgs {}
 
 export function getCreateTokenOwnerRecordInstructionDataEncoder(): FixedSizeEncoder<CreateTokenOwnerRecordInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({
       ...value,
       discriminator: CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR,
@@ -101,9 +96,7 @@ export function getCreateTokenOwnerRecordInstructionDataEncoder(): FixedSizeEnco
 }
 
 export function getCreateTokenOwnerRecordInstructionDataDecoder(): FixedSizeDecoder<CreateTokenOwnerRecordInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getCreateTokenOwnerRecordInstructionDataCodec(): FixedSizeCodec<

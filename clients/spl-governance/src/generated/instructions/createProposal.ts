@@ -28,18 +28,16 @@ import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
   getBooleanDecoder,
   getBooleanEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getUtf8Decoder,
@@ -50,14 +48,10 @@ import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 import { getVoteTypeDecoder, getVoteTypeEncoder } from "../types/index.js";
 
-export const CREATE_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
-  [132, 116, 68, 174, 216, 160, 198, 22],
-);
+export const CREATE_PROPOSAL_DISCRIMINATOR = 6;
 
 export function getCreateProposalDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_PROPOSAL_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(CREATE_PROPOSAL_DISCRIMINATOR);
 }
 
 export type CreateProposalInstruction<
@@ -120,7 +114,7 @@ export type CreateProposalInstruction<
   >;
 
 export interface CreateProposalInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
   name: string;
   descriptionLink: string;
   voteType: VoteType;
@@ -141,7 +135,7 @@ export interface CreateProposalInstructionDataArgs {
 export function getCreateProposalInstructionDataEncoder(): Encoder<CreateProposalInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["discriminator", getU8Encoder()],
       ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
       [
         "descriptionLink",
@@ -163,7 +157,7 @@ export function getCreateProposalInstructionDataEncoder(): Encoder<CreateProposa
 
 export function getCreateProposalInstructionDataDecoder(): Decoder<CreateProposalInstructionData> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["discriminator", getU8Decoder()],
     ["name", addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
     [
       "descriptionLink",

@@ -17,7 +17,6 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { SignatoryRecordSeeds } from "../pdas/index.js";
 import type {
@@ -31,17 +30,12 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getBooleanDecoder,
   getBooleanEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findSignatoryRecordPda } from "../pdas/index.js";
 import {
@@ -49,17 +43,7 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const SIGNATORY_RECORD_V1_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([24, 32, 149, 3, 147, 254, 107, 100]);
-
-export function getSignatoryRecordV1DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    SIGNATORY_RECORD_V1_DISCRIMINATOR,
-  );
-}
-
 export interface SignatoryRecordV1 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   proposal: Address;
   signatory: Address;
@@ -74,21 +58,16 @@ export interface SignatoryRecordV1Args {
 }
 
 export function getSignatoryRecordV1Encoder(): FixedSizeEncoder<SignatoryRecordV1Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["proposal", getAddressEncoder()],
-      ["signatory", getAddressEncoder()],
-      ["signedOff", getBooleanEncoder()],
-    ]),
-    (value) => ({ ...value, discriminator: SIGNATORY_RECORD_V1_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["proposal", getAddressEncoder()],
+    ["signatory", getAddressEncoder()],
+    ["signedOff", getBooleanEncoder()],
+  ]);
 }
 
 export function getSignatoryRecordV1Decoder(): FixedSizeDecoder<SignatoryRecordV1> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["proposal", getAddressDecoder()],
     ["signatory", getAddressDecoder()],

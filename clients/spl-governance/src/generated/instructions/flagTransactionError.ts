@@ -25,24 +25,19 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import {
   combineCodec,
-  fixDecoderSize,
-  fixEncoderSize,
-  getBytesDecoder,
-  getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const FLAG_TRANSACTION_ERROR_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([166, 7, 179, 64, 49, 129, 181, 5]);
+export const FLAG_TRANSACTION_ERROR_DISCRIMINATOR = 20;
 
 export function getFlagTransactionErrorDiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    FLAG_TRANSACTION_ERROR_DISCRIMINATOR,
-  );
+  return getU8Encoder().encode(FLAG_TRANSACTION_ERROR_DISCRIMINATOR);
 }
 
 export type FlagTransactionErrorInstruction<
@@ -74,14 +69,14 @@ export type FlagTransactionErrorInstruction<
   >;
 
 export interface FlagTransactionErrorInstructionData {
-  discriminator: ReadonlyUint8Array;
+  discriminator: number;
 }
 
 export interface FlagTransactionErrorInstructionDataArgs {}
 
 export function getFlagTransactionErrorInstructionDataEncoder(): FixedSizeEncoder<FlagTransactionErrorInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([["discriminator", getU8Encoder()]]),
     (value) => ({
       ...value,
       discriminator: FLAG_TRANSACTION_ERROR_DISCRIMINATOR,
@@ -90,9 +85,7 @@ export function getFlagTransactionErrorInstructionDataEncoder(): FixedSizeEncode
 }
 
 export function getFlagTransactionErrorInstructionDataDecoder(): FixedSizeDecoder<FlagTransactionErrorInstructionData> {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-  ]);
+  return getStructDecoder([["discriminator", getU8Decoder()]]);
 }
 
 export function getFlagTransactionErrorInstructionDataCodec(): FixedSizeCodec<

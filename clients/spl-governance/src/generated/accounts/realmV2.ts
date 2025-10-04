@@ -19,7 +19,6 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
-  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { RealmSeeds } from "../pdas/index.js";
 import type {
@@ -37,14 +36,10 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-  fixDecoderSize,
-  fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
-  getBytesDecoder,
-  getBytesEncoder,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
@@ -57,7 +52,6 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
-  transformEncoder,
 } from "@solana/kit";
 import { findRealmPda } from "../pdas/index.js";
 import {
@@ -67,16 +61,7 @@ import {
   getRealmConfigEncoder,
 } from "../types/index.js";
 
-export const REALM_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  53, 32, 114, 21, 48, 170, 3, 180,
-]);
-
-export function getRealmV2DiscriminatorBytes(): ReadonlyUint8Array {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(REALM_V2_DISCRIMINATOR);
-}
-
 export interface RealmV2 {
-  discriminator: ReadonlyUint8Array;
   accountType: GovernanceAccountType;
   communityMint: Address;
   config: RealmConfig;
@@ -99,25 +84,20 @@ export interface RealmV2Args {
 }
 
 export function getRealmV2Encoder(): Encoder<RealmV2Args> {
-  return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["accountType", getGovernanceAccountTypeEncoder()],
-      ["communityMint", getAddressEncoder()],
-      ["config", getRealmConfigEncoder()],
-      ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
-      ["legacy1", getU16Encoder()],
-      ["authority", getOptionEncoder(getAddressEncoder())],
-      ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
-      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
-    ]),
-    (value) => ({ ...value, discriminator: REALM_V2_DISCRIMINATOR }),
-  );
+  return getStructEncoder([
+    ["accountType", getGovernanceAccountTypeEncoder()],
+    ["communityMint", getAddressEncoder()],
+    ["config", getRealmConfigEncoder()],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
+    ["legacy1", getU16Encoder()],
+    ["authority", getOptionEncoder(getAddressEncoder())],
+    ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
+  ]);
 }
 
 export function getRealmV2Decoder(): Decoder<RealmV2> {
   return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["accountType", getGovernanceAccountTypeDecoder()],
     ["communityMint", getAddressDecoder()],
     ["config", getRealmConfigDecoder()],
