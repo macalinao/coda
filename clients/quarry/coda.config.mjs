@@ -350,6 +350,16 @@ export default defineConfig({
         },
       ]),
 
+      ...["newPool", "newPoolV2"].flatMap((instruction) => [
+        {
+          account: "replicaMint",
+          instruction,
+          defaultValue: pdaValueNode(pdaLinkNode("replicaMint"), [
+            pdaSeedValueNode("pool", accountValueNode("pool")),
+          ]),
+        },
+      ]),
+
       ...["newMinter", "newMinterV2"].flatMap((instruction) => [
         {
           account: "minter",
