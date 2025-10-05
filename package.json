@@ -11,12 +11,12 @@
       "clients/*"
     ],
     "catalog": {
-      "eslint": "^9.35.0",
-      "typescript": "^5.9.2",
-      "@macalinao/eslint-config": "^6",
+      "eslint": "^9.37.0",
+      "typescript": "^5.9.3",
+      "@macalinao/eslint-config": "^6.0.2",
       "@macalinao/tsconfig": "^3.2.3",
-      "@solana/kit": "^3",
-      "@types/bun": "^1.2.20",
+      "@solana/kit": "^3.0.3",
+      "@types/bun": "^1.2.23",
       "codama": "^1.3.7",
       "@codama/nodes": "^1.3.7",
       "@codama/nodes-from-anchor": "^1.2.9",
@@ -59,7 +59,7 @@
     "*.{json,jsonc,html}": "biome format --write --no-errors-on-unmatched"
   },
   "overrides": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   }
 }

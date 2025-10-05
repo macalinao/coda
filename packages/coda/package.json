@@ -56,7 +56,7 @@
     "@macalinao/codama-renderers-js-esm": "workspace:*",
     "@macalinao/codama-renderers-markdown": "workspace:*",
     "codama": "catalog:",
-    "commander": "^14.0.0",
+    "commander": "^14.0.1",
     "glob": "^11.0.3"
   },
   "devDependencies": {
