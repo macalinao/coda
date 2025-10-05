@@ -13,7 +13,7 @@
     "catalog": {
       "eslint": "^9.37.0",
       "typescript": "^5.9.3",
-      "@macalinao/eslint-config": "^6.0.2",
+      "@macalinao/eslint-config": "^6.0.3",
       "@macalinao/tsconfig": "^3.2.3",
       "@solana/kit": "^3.0.3",
       "@types/bun": "^1.2.23",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.2.5",
     "@changesets/cli": "^2.29.7",
-    "@macalinao/biome-config": "^0.1.1",
+    "@macalinao/biome-config": "^0.1.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
     "turbo": "^2.5.8",
