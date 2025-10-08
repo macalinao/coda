@@ -1,5 +1,12 @@
 # @macalinao/grill-cli
 
+## 0.4.3
+
+### Patch Changes
+
+- c688299: Version bumps
+- ddbbb20: Use ^ for workspace versions
+
 ## 0.4.2
 
 ### Patch Changes

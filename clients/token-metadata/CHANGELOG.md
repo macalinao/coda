@@ -1,5 +1,12 @@
 # @macalinao/token-metadata-client
 
+## 0.4.1
+
+### Patch Changes
+
+- ddbbb20: Use ^ for workspace versions
+- be1681a: Instruction account defaults
+
 ## 0.4.0
 
 ### Minor Changes

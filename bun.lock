@@ -15,7 +15,7 @@
     },
     "apps/docs": {
       "name": "coda-docs",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "fumadocs-core": "15.7.0",
         "fumadocs-mdx": "11.8.0",
@@ -40,9 +40,9 @@
     },
     "clients/kamino-lending": {
       "name": "@macalinao/clients-kamino-lending",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "devDependencies": {
-        "@macalinao/coda": "workspace:*",
+        "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@solana/kit": "catalog:",
@@ -55,9 +55,9 @@
     },
     "clients/orca-whirlpools": {
       "name": "@macalinao/clients-orca-whirlpools",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "devDependencies": {
-        "@macalinao/coda": "workspace:*",
+        "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@solana/kit": "catalog:",
@@ -70,10 +70,10 @@
     },
     "clients/quarry": {
       "name": "@macalinao/clients-quarry",
-      "version": "0.4.2",
+      "version": "0.4.3",
       "devDependencies": {
-        "@macalinao/coda": "workspace:*",
-        "@macalinao/codama-rename-visitor": "workspace:*",
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/codama-rename-visitor": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@solana/kit": "catalog:",
@@ -86,9 +86,9 @@
     },
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "devDependencies": {
-        "@macalinao/coda": "workspace:*",
+        "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@solana/kit": "catalog:",
@@ -101,9 +101,9 @@
     },
     "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "devDependencies": {
-        "@macalinao/coda": "workspace:*",
+        "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@solana/kit": "catalog:",
@@ -116,9 +116,9 @@
     },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "devDependencies": {
-        "@macalinao/coda": "workspace:*",
+        "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
         "@solana/kit": "catalog:",
@@ -131,18 +131,18 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.2",
+      "version": "0.4.3",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
       "dependencies": {
         "@codama/nodes-from-anchor": "catalog:",
         "@codama/renderers-rust": "^1.2.7",
-        "@macalinao/coda-visitors": "workspace:*",
-        "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
-        "@macalinao/codama-rename-visitor": "workspace:*",
-        "@macalinao/codama-renderers-js-esm": "workspace:*",
-        "@macalinao/codama-renderers-markdown": "workspace:*",
+        "@macalinao/coda-visitors": "workspace:^",
+        "@macalinao/codama-nodes-from-anchor-x": "workspace:^",
+        "@macalinao/codama-rename-visitor": "workspace:^",
+        "@macalinao/codama-renderers-js-esm": "workspace:^",
+        "@macalinao/codama-renderers-markdown": "workspace:^",
         "codama": "catalog:",
         "commander": "^14.0.1",
         "glob": "^11.0.3",
@@ -246,7 +246,7 @@
     },
     "packages/create-coda": {
       "name": "@macalinao/create-coda",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "bin": {
         "create-coda": "./dist/bin.js",
       },
