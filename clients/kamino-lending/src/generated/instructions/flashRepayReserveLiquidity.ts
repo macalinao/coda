@@ -64,7 +64,9 @@ export type FlashRepayReserveLiquidityInstruction<
   TAccountSysvarInfo extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -179,7 +181,7 @@ export interface FlashRepayReserveLiquidityInput<
   referrerTokenState?: Address<TAccountReferrerTokenState>;
   referrerAccount?: Address<TAccountReferrerAccount>;
   sysvarInfo?: Address<TAccountSysvarInfo>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   liquidityAmount: FlashRepayReserveLiquidityInstructionDataArgs["liquidityAmount"];
   borrowInstructionIndex: FlashRepayReserveLiquidityInstructionDataArgs["borrowInstructionIndex"];
 }
@@ -281,6 +283,10 @@ export function getFlashRepayReserveLiquidityInstruction<
   if (!accounts.sysvarInfo.value) {
     accounts.sysvarInfo.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

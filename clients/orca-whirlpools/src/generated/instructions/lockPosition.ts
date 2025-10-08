@@ -59,7 +59,9 @@ export type LockPositionInstruction<
   TAccountLockConfig extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountToken2022Program extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -153,7 +155,7 @@ export interface LockPositionInput<
   lockConfig: Address<TAccountLockConfig>;
   whirlpool: Address<TAccountWhirlpool>;
   token2022Program: Address<TAccountToken2022Program>;
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
   lockType: LockPositionInstructionDataArgs["lockType"];
 }
 
@@ -224,6 +226,12 @@ export function getLockPositionInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

@@ -54,8 +54,12 @@ export type InitUserMetadataInstruction<
   TAccountFeePayer extends string | AccountMeta = string,
   TAccountUserMetadata extends string | AccountMeta = string,
   TAccountReferrerUserMetadata extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -133,8 +137,8 @@ export interface InitUserMetadataInput<
   feePayer: TransactionSigner<TAccountFeePayer>;
   userMetadata: Address<TAccountUserMetadata>;
   referrerUserMetadata?: Address<TAccountReferrerUserMetadata>;
-  rent: Address<TAccountRent>;
-  systemProgram: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
   userLookupTable: InitUserMetadataInstructionDataArgs["userLookupTable"];
 }
 
@@ -188,6 +192,16 @@ export function getInitUserMetadataInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

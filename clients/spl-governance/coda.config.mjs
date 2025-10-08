@@ -8,7 +8,7 @@ import {
   pdaSeedValueNode,
   pdaValueNode,
   publicKeyTypeNode,
-  publicKeyValueNode,
+  SYSTEM_PROGRAM_VALUE_NODE,
   setInstructionAccountDefaultValuesVisitor,
   stringTypeNode,
   updateAccountsVisitor,
@@ -239,7 +239,7 @@ export default defineConfig({
     setInstructionAccountDefaultValuesVisitor([
       {
         account: "systemProgram",
-        defaultValue: publicKeyValueNode("11111111111111111111111111111111"),
+        defaultValue: SYSTEM_PROGRAM_VALUE_NODE,
       },
       // Create token owner record defaults
       {

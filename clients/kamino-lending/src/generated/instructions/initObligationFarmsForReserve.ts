@@ -58,8 +58,12 @@ export type InitObligationFarmsForReserveInstruction<
   TAccountObligationFarm extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountFarmsProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -164,8 +168,8 @@ export interface InitObligationFarmsForReserveInput<
   obligationFarm: Address<TAccountObligationFarm>;
   lendingMarket: Address<TAccountLendingMarket>;
   farmsProgram: Address<TAccountFarmsProgram>;
-  rent: Address<TAccountRent>;
-  systemProgram: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
   mode: InitObligationFarmsForReserveInstructionDataArgs["mode"];
 }
 
@@ -242,6 +246,16 @@ export function getInitObligationFarmsForReserveInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

@@ -56,7 +56,9 @@ export type WithdrawObligationCollateralV2Instruction<
   TAccountWithdrawReserve extends string | AccountMeta = string,
   TAccountReserveSourceCollateral extends string | AccountMeta = string,
   TAccountUserDestinationCollateral extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
@@ -169,7 +171,7 @@ export interface WithdrawObligationCollateralV2Input<
   withdrawReserve: Address<TAccountWithdrawReserve>;
   reserveSourceCollateral: Address<TAccountReserveSourceCollateral>;
   userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
   reserveFarmState?: Address<TAccountReserveFarmState>;
@@ -268,6 +270,10 @@ export function getWithdrawObligationCollateralV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;

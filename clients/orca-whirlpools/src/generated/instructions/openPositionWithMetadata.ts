@@ -64,9 +64,15 @@ export type OpenPositionWithMetadataInstruction<
   TAccountPositionMetadataAccount extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TAccountAssociatedTokenProgram extends string | AccountMeta = string,
   TAccountMetadataProgram extends string | AccountMeta = string,
   TAccountMetadataUpdateAuth extends string | AccountMeta = string,
@@ -189,9 +195,9 @@ export interface OpenPositionWithMetadataInput<
   positionMetadataAccount: Address<TAccountPositionMetadataAccount>;
   positionTokenAccount: Address<TAccountPositionTokenAccount>;
   whirlpool: Address<TAccountWhirlpool>;
-  tokenProgram: Address<TAccountTokenProgram>;
-  systemProgram: Address<TAccountSystemProgram>;
-  rent: Address<TAccountRent>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
   associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
   metadataProgram: Address<TAccountMetadataProgram>;
   metadataUpdateAuth: Address<TAccountMetadataUpdateAuth>;
@@ -289,6 +295,20 @@ export function getOpenPositionWithMetadataInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

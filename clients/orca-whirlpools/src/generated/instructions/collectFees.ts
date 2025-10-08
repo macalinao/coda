@@ -56,7 +56,9 @@ export type CollectFeesInstruction<
   TAccountTokenVaultA extends string | AccountMeta = string,
   TAccountTokenOwnerAccountB extends string | AccountMeta = string,
   TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -142,7 +144,7 @@ export interface CollectFeesInput<
   tokenVaultA: Address<TAccountTokenVaultA>;
   tokenOwnerAccountB: Address<TAccountTokenOwnerAccountB>;
   tokenVaultB: Address<TAccountTokenVaultB>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
 }
 
 export function getCollectFeesInstruction<
@@ -212,6 +214,12 @@ export function getCollectFeesInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

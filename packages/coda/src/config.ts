@@ -1,5 +1,5 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
-import type { Node, Visitor } from "codama";
+import type { InstructionAccountDefaultRule, Node, Visitor } from "codama";
 
 /**
  * Context provided to visitor functions
@@ -57,6 +57,11 @@ export interface CodaConfig {
      */
     npmPackageName?: string;
   };
+
+  /**
+   * Default values for instruction accounts, if applicable.
+   */
+  instructionAccountDefaultValues?: InstructionAccountDefaultRule[];
 
   /**
    * Additional root node visitors to apply to the Codama nodes before generating code.

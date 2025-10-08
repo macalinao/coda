@@ -52,7 +52,9 @@ export type InitializeConfigInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountConfig extends string | AccountMeta = string,
   TAccountFunder extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -128,7 +130,7 @@ export interface InitializeConfigInput<
 > {
   config: TransactionSigner<TAccountConfig>;
   funder: TransactionSigner<TAccountFunder>;
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
   feeAuthority: InitializeConfigInstructionDataArgs["feeAuthority"];
   collectProtocolFeesAuthority: InitializeConfigInstructionDataArgs["collectProtocolFeesAuthority"];
   rewardEmissionsSuperAuthority: InitializeConfigInstructionDataArgs["rewardEmissionsSuperAuthority"];
@@ -169,6 +171,12 @@ export function getInitializeConfigInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

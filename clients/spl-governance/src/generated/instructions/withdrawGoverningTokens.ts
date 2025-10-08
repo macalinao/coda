@@ -49,7 +49,9 @@ export type WithdrawGoverningTokensInstruction<
     | AccountMeta = string,
   TAccountGoverningTokenOwnerAccount extends string | AccountMeta = string,
   TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRealmConfigAccount extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -129,7 +131,7 @@ export interface WithdrawGoverningTokensInput<
   governingTokenOwnerAccount: TransactionSigner<TAccountGoverningTokenOwnerAccount>;
   /** seeds=['governance',realm, governing_token_mint, governing_token_owner] */
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   /** seeds=['realm-config', realm] */
   realmConfigAccount: Address<TAccountRealmConfigAccount>;
 }
@@ -197,6 +199,12 @@ export function getWithdrawGoverningTokensInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

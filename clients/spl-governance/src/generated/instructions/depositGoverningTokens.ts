@@ -57,7 +57,9 @@ export type DepositGoverningTokensInstruction<
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRealmConfigAccount extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -164,7 +166,7 @@ export interface DepositGoverningTokensInput<
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   /** seeds=['realm-config', realm] */
   realmConfigAccount: Address<TAccountRealmConfigAccount>;
   amount: DepositGoverningTokensInstructionDataArgs["amount"];
@@ -256,6 +258,10 @@ export function getDepositGoverningTokensInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

@@ -53,8 +53,12 @@ export type InitializeFarmDelegatedInstruction<
   TAccountFarmState extends string | AccountMeta = string,
   TAccountGlobalConfig extends string | AccountMeta = string,
   TAccountFarmVaultsAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -133,8 +137,8 @@ export interface InitializeFarmDelegatedInput<
   farmState: Address<TAccountFarmState>;
   globalConfig: Address<TAccountGlobalConfig>;
   farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
-  systemProgram: Address<TAccountSystemProgram>;
-  rent: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
 }
 
 export function getInitializeFarmDelegatedInstruction<
@@ -187,6 +191,16 @@ export function getInitializeFarmDelegatedInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

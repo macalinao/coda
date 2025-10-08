@@ -52,8 +52,12 @@ export type InitReferrerTokenStateInstruction<
   TAccountReserve extends string | AccountMeta = string,
   TAccountReferrer extends string | AccountMeta = string,
   TAccountReferrerTokenState extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -131,8 +135,8 @@ export interface InitReferrerTokenStateInput<
   reserve: Address<TAccountReserve>;
   referrer: Address<TAccountReferrer>;
   referrerTokenState: Address<TAccountReferrerTokenState>;
-  rent: Address<TAccountRent>;
-  systemProgram: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
 }
 
 export function getInitReferrerTokenStateInstruction<
@@ -186,6 +190,16 @@ export function getInitReferrerTokenStateInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

@@ -54,7 +54,9 @@ export type InitializeFeeTierInstruction<
   TAccountFeeTier extends string | AccountMeta = string,
   TAccountFunder extends string | AccountMeta = string,
   TAccountFeeAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -132,7 +134,7 @@ export interface InitializeFeeTierInput<
   feeTier: Address<TAccountFeeTier>;
   funder: TransactionSigner<TAccountFunder>;
   feeAuthority: TransactionSigner<TAccountFeeAuthority>;
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
   tickSpacing: InitializeFeeTierInstructionDataArgs["tickSpacing"];
   defaultFeeRate: InitializeFeeTierInstructionDataArgs["defaultFeeRate"];
 }
@@ -179,6 +181,12 @@ export function getInitializeFeeTierInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

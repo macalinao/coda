@@ -52,7 +52,9 @@ export type WithdrawSlashedAmountInstruction<
   TAccountSlashedAmountSpillAddress extends string | AccountMeta = string,
   TAccountFarmVault extends string | AccountMeta = string,
   TAccountFarmVaultsAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -126,7 +128,7 @@ export interface WithdrawSlashedAmountInput<
   slashedAmountSpillAddress: Address<TAccountSlashedAmountSpillAddress>;
   farmVault: Address<TAccountFarmVault>;
   farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
 }
 
 export function getWithdrawSlashedAmountInstruction<
@@ -178,6 +180,12 @@ export function getWithdrawSlashedAmountInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

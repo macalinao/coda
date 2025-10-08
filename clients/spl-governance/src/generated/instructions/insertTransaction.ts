@@ -62,7 +62,9 @@ export type InsertTransactionInstruction<
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta = string,
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -166,7 +168,7 @@ export interface InsertTransactionInput<
   proposalTransactionAccount: Address<TAccountProposalTransactionAccount>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-  rent: Address<TAccountRent>;
+  rent?: Address<TAccountRent>;
   optionIndex: InsertTransactionInstructionDataArgs["optionIndex"];
   index: InsertTransactionInstructionDataArgs["index"];
   holdUpTime: InsertTransactionInstructionDataArgs["holdUpTime"];
@@ -245,6 +247,10 @@ export function getInsertTransactionInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

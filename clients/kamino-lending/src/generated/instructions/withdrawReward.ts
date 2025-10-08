@@ -57,7 +57,9 @@ export type WithdrawRewardInstruction<
   TAccountFarmVaultsAuthority extends string | AccountMeta = string,
   TAccountAdminRewardTokenAta extends string | AccountMeta = string,
   TAccountScopePrices extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -149,7 +151,7 @@ export interface WithdrawRewardInput<
   farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
   adminRewardTokenAta: Address<TAccountAdminRewardTokenAta>;
   scopePrices?: Address<TAccountScopePrices>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   amount: WithdrawRewardInstructionDataArgs["amount"];
   rewardIndex: WithdrawRewardInstructionDataArgs["rewardIndex"];
 }
@@ -214,6 +216,12 @@ export function getWithdrawRewardInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

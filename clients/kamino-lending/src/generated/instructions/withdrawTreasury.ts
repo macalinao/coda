@@ -55,7 +55,9 @@ export type WithdrawTreasuryInstruction<
   TAccountRewardTreasuryVault extends string | AccountMeta = string,
   TAccountTreasuryVaultAuthority extends string | AccountMeta = string,
   TAccountWithdrawDestinationTokenAccount extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -138,7 +140,7 @@ export interface WithdrawTreasuryInput<
   rewardTreasuryVault: Address<TAccountRewardTreasuryVault>;
   treasuryVaultAuthority: Address<TAccountTreasuryVaultAuthority>;
   withdrawDestinationTokenAccount: Address<TAccountWithdrawDestinationTokenAccount>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   amount: WithdrawTreasuryInstructionDataArgs["amount"];
 }
 
@@ -201,6 +203,12 @@ export function getWithdrawTreasuryInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
