@@ -55,7 +55,9 @@ export type CreateTokenGovernanceInstruction<
   TAccountTokenAccountAuthority extends string | AccountMeta = string,
   TAccountGoverningTokenOwnerRecord extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
@@ -174,7 +176,7 @@ export interface CreateTokenGovernanceInput<
   /** Governing TokenOwnerRecord account (Used only if not signed by RealmAuthority */
   governingTokenOwnerRecord: Address<TAccountGoverningTokenOwnerRecord>;
   payer: TransactionSigner<TAccountPayer>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
   /** seeds=['realm-config', realm] */
@@ -269,6 +271,10 @@ export function getCreateTokenGovernanceInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

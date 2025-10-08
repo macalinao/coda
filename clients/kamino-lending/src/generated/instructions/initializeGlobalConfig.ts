@@ -50,7 +50,9 @@ export type InitializeGlobalConfigInstruction<
   TAccountGlobalAdmin extends string | AccountMeta = string,
   TAccountGlobalConfig extends string | AccountMeta = string,
   TAccountTreasuryVaultsAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -114,7 +116,7 @@ export interface InitializeGlobalConfigInput<
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
   treasuryVaultsAuthority: Address<TAccountTreasuryVaultsAuthority>;
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
 }
 
 export function getInitializeGlobalConfigInstruction<
@@ -155,6 +157,12 @@ export function getInitializeGlobalConfigInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

@@ -52,7 +52,9 @@ export function getIncreaseLiquidityDiscriminatorBytes(): ReadonlyUint8Array {
 export type IncreaseLiquidityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountPositionAuthority extends string | AccountMeta = string,
   TAccountPosition extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
@@ -163,7 +165,7 @@ export interface IncreaseLiquidityInput<
   TAccountTickArrayUpper extends string = string,
 > {
   whirlpool: Address<TAccountWhirlpool>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   positionAuthority: TransactionSigner<TAccountPositionAuthority>;
   position: Address<TAccountPosition>;
   positionTokenAccount: Address<TAccountPositionTokenAccount>;
@@ -256,6 +258,12 @@ export function getIncreaseLiquidityInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

@@ -1,10 +1,14 @@
 import {
+  ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
   addPdasVisitor,
   constantPdaSeedNodeFromString,
   defineConfig,
   publicKeyTypeNode,
-  publicKeyValueNode,
+  SYSTEM_PROGRAM_VALUE_NODE,
+  SYSVAR_INSTRUCTIONS_VALUE_NODE,
+  SYSVAR_RENT_VALUE_NODE,
   setInstructionAccountDefaultValuesVisitor,
+  TOKEN_PROGRAM_VALUE_NODE,
   variablePdaSeedNode,
 } from "@macalinao/coda";
 
@@ -51,48 +55,42 @@ export default defineConfig({
   docs: {
     npmPackageName: "@macalinao/clients-token-metadata",
   },
+  instructionAccountDefaultValues: [
+    {
+      account: "associatedTokenProgram",
+      defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
+    },
+  ],
   visitors: [
     addCustomPDAsVisitor,
     setInstructionAccountDefaultValuesVisitor([
       {
         account: "systemProgram",
-        defaultValue: publicKeyValueNode("11111111111111111111111111111111"),
+        defaultValue: SYSTEM_PROGRAM_VALUE_NODE,
       },
       {
         account: "sysvarInstructions",
-        defaultValue: publicKeyValueNode(
-          "Sysvar1nstructions1111111111111111111111111",
-        ),
+        defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
       },
       {
         account: "tokenProgram",
-        defaultValue: publicKeyValueNode(
-          "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-        ),
+        defaultValue: TOKEN_PROGRAM_VALUE_NODE,
       },
       {
         account: "splTokenProgram",
-        defaultValue: publicKeyValueNode(
-          "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-        ),
+        defaultValue: TOKEN_PROGRAM_VALUE_NODE,
       },
       {
         account: "ataProgram",
-        defaultValue: publicKeyValueNode(
-          "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-        ),
+        defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
       },
       {
         account: "splAtaProgram",
-        defaultValue: publicKeyValueNode(
-          "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-        ),
+        defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
       },
       {
         account: "rent",
-        defaultValue: publicKeyValueNode(
-          "SysvarRent111111111111111111111111111111111",
-        ),
+        defaultValue: SYSVAR_RENT_VALUE_NODE,
       },
     ]),
   ],

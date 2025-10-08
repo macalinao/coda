@@ -54,7 +54,9 @@ export function getTwoHopSwapDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type TwoHopSwapInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenAuthority extends string | AccountMeta = string,
   TAccountWhirlpoolOne extends string | AccountMeta = string,
   TAccountWhirlpoolTwo extends string | AccountMeta = string,
@@ -226,7 +228,7 @@ export interface TwoHopSwapInput<
   TAccountOracleOne extends string = string,
   TAccountOracleTwo extends string = string,
 > {
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   tokenAuthority: TransactionSigner<TAccountTokenAuthority>;
   whirlpoolOne: Address<TAccountWhirlpoolOne>;
   whirlpoolTwo: Address<TAccountWhirlpoolTwo>;
@@ -369,6 +371,12 @@ export function getTwoHopSwapInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

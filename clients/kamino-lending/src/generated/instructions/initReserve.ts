@@ -58,10 +58,14 @@ export type InitReserveInstruction<
   TAccountReserveCollateralMint extends string | AccountMeta = string,
   TAccountReserveCollateralSupply extends string | AccountMeta = string,
   TAccountInitialLiquiditySource extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TAccountLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountCollateralTokenProgram extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -169,10 +173,10 @@ export interface InitReserveInput<
   reserveCollateralMint: Address<TAccountReserveCollateralMint>;
   reserveCollateralSupply: Address<TAccountReserveCollateralSupply>;
   initialLiquiditySource: Address<TAccountInitialLiquiditySource>;
-  rent: Address<TAccountRent>;
+  rent?: Address<TAccountRent>;
   liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
   collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
 }
 
 export function getInitReserveInstruction<
@@ -278,6 +282,16 @@ export function getInitReserveInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

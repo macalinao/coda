@@ -64,8 +64,12 @@ export type CreateRealmInstruction<
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TAccountCouncilTokenMint extends string | AccountMeta = string,
   TAccountCouncilTokenHoldingAccount extends string | AccountMeta = string,
   TAccountRealmConfig extends string | AccountMeta = string,
@@ -199,9 +203,9 @@ export interface CreateRealmInput<
   /** System Program */
   systemProgram?: Address<TAccountSystemProgram>;
   /** SPL Token Program */
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   /** SysVar Rent */
-  rent: Address<TAccountRent>;
+  rent?: Address<TAccountRent>;
   /** The mint address of the token to be used as the council mint */
   councilTokenMint?: Address<TAccountCouncilTokenMint>;
   /** The account to hold the council tokens.
@@ -334,6 +338,14 @@ export function getCreateRealmInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

@@ -52,7 +52,9 @@ export type InitializeConfigExtensionInstruction<
   TAccountConfigExtension extends string | AccountMeta = string,
   TAccountFunder extends string | AccountMeta = string,
   TAccountFeeAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -122,7 +124,7 @@ export interface InitializeConfigExtensionInput<
   configExtension: Address<TAccountConfigExtension>;
   funder: TransactionSigner<TAccountFunder>;
   feeAuthority: TransactionSigner<TAccountFeeAuthority>;
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
 }
 
 export function getInitializeConfigExtensionInstruction<
@@ -164,6 +166,12 @@ export function getInitializeConfigExtensionInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

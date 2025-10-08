@@ -35,7 +35,10 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  FARMS_PROGRAM_ADDRESS,
+  KAMINO_LENDING_PROGRAM_ADDRESS,
+} from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REFRESH_OBLIGATION_FARMS_FOR_RESERVE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -56,9 +59,15 @@ export type RefreshObligationFarmsForReserveInstruction<
   TAccountReserveFarmState extends string | AccountMeta = string,
   TAccountObligationFarmUserState extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountFarmsProgram extends
+    | string
+    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -157,9 +166,9 @@ export interface RefreshObligationFarmsForReserveInput<
   reserveFarmState: Address<TAccountReserveFarmState>;
   obligationFarmUserState: Address<TAccountObligationFarmUserState>;
   lendingMarket: Address<TAccountLendingMarket>;
-  farmsProgram: Address<TAccountFarmsProgram>;
-  rent: Address<TAccountRent>;
-  systemProgram: Address<TAccountSystemProgram>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
   mode: RefreshObligationFarmsForReserveInstructionDataArgs["mode"];
 }
 
@@ -235,6 +244,20 @@ export function getRefreshObligationFarmsForReserveInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

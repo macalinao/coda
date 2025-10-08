@@ -50,8 +50,12 @@ export type DeleteReferrerStateAndShortUrlInstruction<
   TAccountReferrer extends string | AccountMeta = string,
   TAccountReferrerState extends string | AccountMeta = string,
   TAccountShortUrl extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -119,8 +123,8 @@ export interface DeleteReferrerStateAndShortUrlInput<
   referrer: TransactionSigner<TAccountReferrer>;
   referrerState: Address<TAccountReferrerState>;
   shortUrl: Address<TAccountShortUrl>;
-  rent: Address<TAccountRent>;
-  systemProgram: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
 }
 
 export function getDeleteReferrerStateAndShortUrlInstruction<
@@ -163,6 +167,16 @@ export function getDeleteReferrerStateAndShortUrlInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

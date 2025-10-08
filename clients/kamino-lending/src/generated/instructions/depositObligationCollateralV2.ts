@@ -35,7 +35,10 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  FARMS_PROGRAM_ADDRESS,
+  KAMINO_LENDING_PROGRAM_ADDRESS,
+} from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_OBLIGATION_COLLATERAL_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -55,14 +58,18 @@ export type DepositObligationCollateralV2Instruction<
   TAccountDepositReserve extends string | AccountMeta = string,
   TAccountReserveDestinationCollateral extends string | AccountMeta = string,
   TAccountUserSourceCollateral extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountObligationFarmUserState extends string | AccountMeta = string,
   TAccountReserveFarmState extends string | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta = string,
+  TAccountFarmsProgram extends
+    | string
+    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -168,12 +175,12 @@ export interface DepositObligationCollateralV2Input<
   depositReserve: Address<TAccountDepositReserve>;
   reserveDestinationCollateral: Address<TAccountReserveDestinationCollateral>;
   userSourceCollateral: Address<TAccountUserSourceCollateral>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
   reserveFarmState?: Address<TAccountReserveFarmState>;
-  farmsProgram: Address<TAccountFarmsProgram>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
   collateralAmount: DepositObligationCollateralV2InstructionDataArgs["collateralAmount"];
 }
 
@@ -268,9 +275,17 @@ export function getDepositObligationCollateralV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

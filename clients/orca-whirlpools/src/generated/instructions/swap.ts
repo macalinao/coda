@@ -52,7 +52,9 @@ export function getSwapDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SwapInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenAuthority extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountTokenOwnerAccountA extends string | AccountMeta = string,
@@ -171,7 +173,7 @@ export interface SwapInput<
   TAccountTickArray2 extends string = string,
   TAccountOracle extends string = string,
 > {
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   tokenAuthority: TransactionSigner<TAccountTokenAuthority>;
   whirlpool: Address<TAccountWhirlpool>;
   tokenOwnerAccountA: Address<TAccountTokenOwnerAccountA>;
@@ -261,6 +263,12 @@ export function getSwapInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

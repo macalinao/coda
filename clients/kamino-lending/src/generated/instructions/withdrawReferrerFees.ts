@@ -55,7 +55,9 @@ export type WithdrawReferrerFeesInstruction<
   TAccountReferrerTokenAccount extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -144,7 +146,7 @@ export interface WithdrawReferrerFeesInput<
   referrerTokenAccount: Address<TAccountReferrerTokenAccount>;
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
 }
 
 export function getWithdrawReferrerFeesInstruction<
@@ -218,6 +220,12 @@ export function getWithdrawReferrerFeesInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

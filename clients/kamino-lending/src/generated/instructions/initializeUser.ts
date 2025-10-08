@@ -55,8 +55,12 @@ export type InitializeUserInstruction<
   TAccountDelegatee extends string | AccountMeta = string,
   TAccountUserState extends string | AccountMeta = string,
   TAccountFarmState extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -137,8 +141,8 @@ export interface InitializeUserInput<
   delegatee: Address<TAccountDelegatee>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
-  systemProgram: Address<TAccountSystemProgram>;
-  rent: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
 }
 
 export function getInitializeUserInstruction<
@@ -192,6 +196,16 @@ export function getInitializeUserInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

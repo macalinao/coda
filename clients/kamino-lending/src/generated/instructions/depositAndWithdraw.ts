@@ -35,7 +35,10 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  FARMS_PROGRAM_ADDRESS,
+  KAMINO_LENDING_PROGRAM_ADDRESS,
+} from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_AND_WITHDRAW_DISCRIMINATOR: ReadonlyUint8Array =
@@ -129,7 +132,9 @@ export type DepositAndWithdrawInstruction<
   TAccountWithdrawFarmsAccountsReserveFarmState extends
     | string
     | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta = string,
+  TAccountFarmsProgram extends
+    | string
+    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -353,7 +358,7 @@ export interface DepositAndWithdrawInput<
   depositFarmsAccountsReserveFarmState?: Address<TAccountDepositFarmsAccountsReserveFarmState>;
   withdrawFarmsAccountsObligationFarmUserState?: Address<TAccountWithdrawFarmsAccountsObligationFarmUserState>;
   withdrawFarmsAccountsReserveFarmState?: Address<TAccountWithdrawFarmsAccountsReserveFarmState>;
-  farmsProgram: Address<TAccountFarmsProgram>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
   liquidityAmount: DepositAndWithdrawInstructionDataArgs["liquidityAmount"];
   withdrawCollateralAmount: DepositAndWithdrawInstructionDataArgs["withdrawCollateralAmount"];
 }
@@ -618,6 +623,10 @@ export function getDepositAndWithdrawInstruction<
   if (!accounts.withdrawAccountsInstructionSysvarAccount.value) {
     accounts.withdrawAccountsInstructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

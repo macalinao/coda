@@ -756,6 +756,10 @@
   "types": [
     {
       "name": "DepositEntry",
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c"
+      },
       "type": {
         "kind": "struct",
         "fields": [
@@ -798,6 +802,10 @@
     },
     {
       "name": "Lockup",
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c"
+      },
       "type": {
         "kind": "struct",
         "fields": [
@@ -828,6 +836,10 @@
     },
     {
       "name": "VotingMintConfig",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
       "type": {
         "kind": "struct",
         "fields": [
@@ -889,6 +901,10 @@
     },
     {
       "name": "Registrar",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
       "type": {
         "kind": "struct",
         "fields": [
@@ -946,6 +962,10 @@
     },
     {
       "name": "Voter",
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c"
+      },
       "type": {
         "kind": "struct",
         "fields": [

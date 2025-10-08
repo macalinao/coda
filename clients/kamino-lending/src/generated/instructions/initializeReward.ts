@@ -55,9 +55,15 @@ export type InitializeRewardInstruction<
   TAccountRewardTreasuryVault extends string | AccountMeta = string,
   TAccountFarmVaultsAuthority extends string | AccountMeta = string,
   TAccountTreasuryVaultsAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -151,9 +157,9 @@ export interface InitializeRewardInput<
   rewardTreasuryVault: Address<TAccountRewardTreasuryVault>;
   farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
   treasuryVaultsAuthority: Address<TAccountTreasuryVaultsAuthority>;
-  tokenProgram: Address<TAccountTokenProgram>;
-  systemProgram: Address<TAccountSystemProgram>;
-  rent: Address<TAccountRent>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
 }
 
 export function getInitializeRewardInstruction<
@@ -228,6 +234,20 @@ export function getInitializeRewardInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
