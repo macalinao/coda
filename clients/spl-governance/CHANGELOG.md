@@ -1,5 +1,11 @@
 # @macalinao/clients-spl-governance
 
+## 0.2.2
+
+### Patch Changes
+
+- 2b7c11f: Add default instruction account values for many programs
+
 ## 0.2.1
 
 ### Patch Changes

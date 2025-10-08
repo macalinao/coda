@@ -1,5 +1,12 @@
 # @macalinao/clients-kamino-lending
 
+## 0.4.2
+
+### Patch Changes
+
+- d5b3e07: Set default for farms program
+- 2b7c11f: Add default instruction account values for many programs
+
 ## 0.4.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @macalinao/clients-voter-stake-registry
 
+## 0.1.3
+
+### Patch Changes
+
+- 0405121: Update VSR idl with bytemuck info
+- 2b7c11f: Add default instruction account values for many programs
+
 ## 0.1.2
 
 ### Patch Changes
