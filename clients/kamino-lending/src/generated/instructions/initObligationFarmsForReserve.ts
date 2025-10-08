@@ -35,7 +35,10 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  FARMS_PROGRAM_ADDRESS,
+  KAMINO_LENDING_PROGRAM_ADDRESS,
+} from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_OBLIGATION_FARMS_FOR_RESERVE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -57,7 +60,9 @@ export type InitObligationFarmsForReserveInstruction<
   TAccountReserveFarmState extends string | AccountMeta = string,
   TAccountObligationFarm extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta = string,
+  TAccountFarmsProgram extends
+    | string
+    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
@@ -167,7 +172,7 @@ export interface InitObligationFarmsForReserveInput<
   reserveFarmState: Address<TAccountReserveFarmState>;
   obligationFarm: Address<TAccountObligationFarm>;
   lendingMarket: Address<TAccountLendingMarket>;
-  farmsProgram: Address<TAccountFarmsProgram>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
   rent?: Address<TAccountRent>;
   systemProgram?: Address<TAccountSystemProgram>;
   mode: InitObligationFarmsForReserveInstructionDataArgs["mode"];
@@ -248,6 +253,10 @@ export function getInitObligationFarmsForReserveInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
+  }
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;

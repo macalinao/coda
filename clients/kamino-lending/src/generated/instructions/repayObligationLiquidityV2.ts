@@ -35,7 +35,10 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  FARMS_PROGRAM_ADDRESS,
+  KAMINO_LENDING_PROGRAM_ADDRESS,
+} from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REPAY_OBLIGATION_LIQUIDITY_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -65,7 +68,9 @@ export type RepayObligationLiquidityV2Instruction<
   TAccountObligationFarmUserState extends string | AccountMeta = string,
   TAccountReserveFarmState extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta = string,
+  TAccountFarmsProgram extends
+    | string
+    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -181,7 +186,7 @@ export interface RepayObligationLiquidityV2Input<
   obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
   reserveFarmState?: Address<TAccountReserveFarmState>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
-  farmsProgram: Address<TAccountFarmsProgram>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
   liquidityAmount: RepayObligationLiquidityV2InstructionDataArgs["liquidityAmount"];
 }
 
@@ -290,6 +295,10 @@ export function getRepayObligationLiquidityV2Instruction<
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

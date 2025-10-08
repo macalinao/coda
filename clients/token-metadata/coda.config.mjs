@@ -55,6 +55,12 @@ export default defineConfig({
   docs: {
     npmPackageName: "@macalinao/clients-token-metadata",
   },
+  instructionAccountDefaultValues: [
+    {
+      account: "associatedTokenProgram",
+      defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
+    },
+  ],
   visitors: [
     addCustomPDAsVisitor,
     setInstructionAccountDefaultValuesVisitor([

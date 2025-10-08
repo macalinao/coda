@@ -35,7 +35,10 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import {
+  FARMS_PROGRAM_ADDRESS,
+  KAMINO_LENDING_PROGRAM_ADDRESS,
+} from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const LIQUIDATE_OBLIGATION_AND_REDEEM_RESERVE_COLLATERAL_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -115,7 +118,9 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
   TAccountDebtFarmsAccountsReserveFarmState extends
     | string
     | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta = string,
+  TAccountFarmsProgram extends
+    | string
+    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -308,7 +313,7 @@ export interface LiquidateObligationAndRedeemReserveCollateralV2Input<
   collateralFarmsAccountsV2ReserveFarmState?: Address<TAccountCollateralFarmsAccountsV2ReserveFarmState>;
   debtFarmsAccountsObligationFarmUserState?: Address<TAccountDebtFarmsAccountsObligationFarmUserState>;
   debtFarmsAccountsReserveFarmState?: Address<TAccountDebtFarmsAccountsReserveFarmState>;
-  farmsProgram: Address<TAccountFarmsProgram>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
   liquidityAmount: LiquidateObligationAndRedeemReserveCollateralV2InstructionDataArgs["liquidityAmount"];
   minAcceptableReceivedLiquidityAmount: LiquidateObligationAndRedeemReserveCollateralV2InstructionDataArgs["minAcceptableReceivedLiquidityAmount"];
   maxAllowedLtvOverridePercent: LiquidateObligationAndRedeemReserveCollateralV2InstructionDataArgs["maxAllowedLtvOverridePercent"];
@@ -515,6 +520,10 @@ export function getLiquidateObligationAndRedeemReserveCollateralV2Instruction<
   if (!accounts.liquidationAccountsInstructionSysvarAccount.value) {
     accounts.liquidationAccountsInstructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

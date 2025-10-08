@@ -3,6 +3,7 @@ import {
   constantPdaSeedNodeFromString,
   defineConfig,
   numberTypeNode,
+  programLinkNode,
   publicKeyTypeNode,
   renameVisitor,
   stringTypeNode,
@@ -16,6 +17,12 @@ export default defineConfig({
   docs: {
     npmPackageName: "@macalinao/clients-kamino-lending",
   },
+  instructionAccountDefaultValues: [
+    {
+      account: "farmsProgram",
+      defaultValue: programLinkNode("farms"),
+    },
+  ],
   // We can add custom visitors here later if needed
   visitors: [
     addPdasVisitor({
