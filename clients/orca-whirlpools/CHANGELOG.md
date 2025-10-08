@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.4.2
+
+### Patch Changes
+
+- 2b7c11f: Add default instruction account values for many programs
+
 ## 0.4.1
 
 ### Patch Changes

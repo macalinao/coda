@@ -1,5 +1,13 @@
 # @macalinao/grill-cli
 
+## 0.4.4
+
+### Patch Changes
+
+- 2b7c11f: Add default instruction account values for many programs
+- Updated dependencies [2b7c11f]
+  - @macalinao/coda-visitors@0.1.3
+
 ## 0.4.3
 
 ### Patch Changes

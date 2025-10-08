@@ -40,7 +40,7 @@
     },
     "clients/kamino-lending": {
       "name": "@macalinao/clients-kamino-lending",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -55,7 +55,7 @@
     },
     "clients/orca-whirlpools": {
       "name": "@macalinao/clients-orca-whirlpools",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -86,7 +86,7 @@
     },
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -101,7 +101,7 @@
     },
     "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -116,7 +116,7 @@
     },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -131,7 +131,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -157,7 +157,7 @@
     },
     "packages/coda-visitors": {
       "name": "@macalinao/coda-visitors",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "dependencies": {
         "@solana-program/system": "^0.8.1",
         "@solana-program/token": "^0.6.0",
