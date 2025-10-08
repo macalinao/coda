@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.4.1
+
+### Patch Changes
+
+- ddbbb20: Use ^ for workspace versions
+
 ## 0.4.0
 
 ### Minor Changes
