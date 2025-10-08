@@ -50,11 +50,11 @@
   "dependencies": {
     "@codama/nodes-from-anchor": "catalog:",
     "@codama/renderers-rust": "^1.2.7",
-    "@macalinao/coda-visitors": "workspace:*",
-    "@macalinao/codama-nodes-from-anchor-x": "workspace:*",
-    "@macalinao/codama-rename-visitor": "workspace:*",
-    "@macalinao/codama-renderers-js-esm": "workspace:*",
-    "@macalinao/codama-renderers-markdown": "workspace:*",
+    "@macalinao/coda-visitors": "workspace:^",
+    "@macalinao/codama-nodes-from-anchor-x": "workspace:^",
+    "@macalinao/codama-rename-visitor": "workspace:^",
+    "@macalinao/codama-renderers-js-esm": "workspace:^",
+    "@macalinao/codama-renderers-markdown": "workspace:^",
     "codama": "catalog:",
     "commander": "^14.0.1",
     "glob": "^11.0.3"
