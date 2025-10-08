@@ -47,7 +47,9 @@ export type BurnNftInstruction<
   TAccountMint extends string | AccountMeta = string,
   TAccountTokenAccount extends string | AccountMeta = string,
   TAccountMasterEditionAccount extends string | AccountMeta = string,
-  TAccountSplTokenProgram extends string | AccountMeta = string,
+  TAccountSplTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountCollectionMetadata extends
     | string
     | AccountMeta
@@ -134,7 +136,7 @@ export interface BurnNftInput<
   /** MasterEdition2 of the NFT */
   masterEditionAccount: Address<TAccountMasterEditionAccount>;
   /** SPL Token Program */
-  splTokenProgram: Address<TAccountSplTokenProgram>;
+  splTokenProgram?: Address<TAccountSplTokenProgram>;
   /** Metadata of the Collection */
   collectionMetadata?: Address<TAccountCollectionMetadata>;
 }
@@ -196,6 +198,12 @@ export function getBurnNftInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.splTokenProgram.value) {
+    accounts.splTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({

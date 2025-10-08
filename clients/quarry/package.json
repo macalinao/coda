@@ -49,8 +49,8 @@
     "@solana/kit": "*"
   },
   "devDependencies": {
-    "@macalinao/coda": "workspace:*",
-    "@macalinao/codama-rename-visitor": "workspace:*",
+    "@macalinao/coda": "workspace:^",
+    "@macalinao/codama-rename-visitor": "workspace:^",
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "catalog:",

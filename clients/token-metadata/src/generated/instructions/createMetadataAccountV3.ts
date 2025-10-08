@@ -56,7 +56,9 @@ export type CreateMetadataAccountV3Instruction<
   TAccountMintAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TAccountRent extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -155,7 +157,7 @@ export interface CreateMetadataAccountV3Input<
     | Address<TAccountUpdateAuthority>
     | TransactionSigner<TAccountUpdateAuthority>;
   /** System program */
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
   createMetadataAccountArgsV3: CreateMetadataAccountV3InstructionDataArgs["createMetadataAccountArgsV3"];
@@ -218,6 +220,16 @@ export function getCreateMetadataAccountV3Instruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({

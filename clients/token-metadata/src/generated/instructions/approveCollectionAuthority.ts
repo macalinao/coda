@@ -48,7 +48,9 @@ export type ApproveCollectionAuthorityInstruction<
   TAccountPayer extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
   TAccountMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TAccountRent extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -142,7 +144,7 @@ export interface ApproveCollectionAuthorityInput<
   /** Mint of Collection Metadata */
   mint: Address<TAccountMint>;
   /** System program */
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
 }
@@ -205,6 +207,16 @@ export function getApproveCollectionAuthorityInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
