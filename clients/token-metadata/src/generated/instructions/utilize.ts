@@ -52,10 +52,18 @@ export type UtilizeInstruction<
   TAccountMint extends string | AccountMeta = string,
   TAccountUseAuthority extends string | AccountMeta = string,
   TAccountOwner extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta = string,
-  TAccountAtaProgram extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta = string,
+  TAccountTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountAtaProgram extends
+    | string
+    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends
+    | string
+    | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TAccountUseAuthorityRecord extends
     | string
     | AccountMeta
@@ -172,13 +180,13 @@ export interface UtilizeInput<
   /** Owner */
   owner: Address<TAccountOwner>;
   /** Token program */
-  tokenProgram: Address<TAccountTokenProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
   /** Associated Token program */
-  ataProgram: Address<TAccountAtaProgram>;
+  ataProgram?: Address<TAccountAtaProgram>;
   /** System program */
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
-  rent: Address<TAccountRent>;
+  rent?: Address<TAccountRent>;
   /** Use Authority Record PDA If present the program Assumes a delegated use authority */
   useAuthorityRecord?: Address<TAccountUseAuthorityRecord>;
   /** Program As Signer (Burner) */
@@ -256,6 +264,24 @@ export function getUtilizeInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.ataProgram.value) {
+    accounts.ataProgram.value =
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({

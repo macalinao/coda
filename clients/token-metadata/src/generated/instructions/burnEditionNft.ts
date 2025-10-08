@@ -51,7 +51,9 @@ export type BurnEditionNftInstruction<
   TAccountMasterEditionAccount extends string | AccountMeta = string,
   TAccountPrintEditionAccount extends string | AccountMeta = string,
   TAccountEditionMarkerAccount extends string | AccountMeta = string,
-  TAccountSplTokenProgram extends string | AccountMeta = string,
+  TAccountSplTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -150,7 +152,7 @@ export interface BurnEditionNftInput<
   /** Edition Marker PDA of the NFT */
   editionMarkerAccount: Address<TAccountEditionMarkerAccount>;
   /** SPL Token Program */
-  splTokenProgram: Address<TAccountSplTokenProgram>;
+  splTokenProgram?: Address<TAccountSplTokenProgram>;
 }
 
 export function getBurnEditionNftInstruction<
@@ -237,6 +239,12 @@ export function getBurnEditionNftInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.splTokenProgram.value) {
+    accounts.splTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

@@ -49,7 +49,9 @@ export type ResizeInstruction<
   TAccountPayer extends string | AccountMeta = string,
   TAccountAuthority extends string | AccountMeta = string,
   TAccountToken extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta = string,
+  TAccountSystemProgram extends
+    | string
+    | AccountMeta = "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -130,7 +132,7 @@ export interface ResizeInput<
   /** Token or Associated Token account */
   token?: Address<TAccountToken>;
   /** System program */
-  systemProgram: Address<TAccountSystemProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
 }
 
 export function getResizeInstruction<
@@ -183,6 +185,12 @@ export function getResizeInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
