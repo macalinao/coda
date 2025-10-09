@@ -166,10 +166,12 @@ export interface SetRealmConfigInput<
 > {
   realmAccount: Address<TAccountRealmAccount>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
-  /** Council Token Mint - optional. 
-        Note: In the current version it's only possible to remove council mint (set it to None)
-        After setting council to None it won't be possible to withdraw the tokens from the Realm any longer. 
-        If that's required then it must be done before executing this instruction */
+  /**
+   * Council Token Mint - optional.
+   *         Note: In the current version it's only possible to remove council mint (set it to None)
+   *         After setting council to None it won't be possible to withdraw the tokens from the Realm any longer.
+   *         If that's required then it must be done before executing this instruction
+   */
   councilTokenMint?: Address<TAccountCouncilTokenMint>;
   /** Optional unless council is used. seeds=['governance', realm, council_mint] */
   councilTokenHoldingAccount?: Address<TAccountCouncilTokenHoldingAccount>;
@@ -324,10 +326,12 @@ export interface ParsedSetRealmConfigInstruction<
   accounts: {
     realmAccount: TAccountMetas[0];
     realmAuthority: TAccountMetas[1];
-    /** Council Token Mint - optional. 
-        Note: In the current version it's only possible to remove council mint (set it to None)
-        After setting council to None it won't be possible to withdraw the tokens from the Realm any longer. 
-        If that's required then it must be done before executing this instruction */
+    /**
+     * Council Token Mint - optional.
+     *         Note: In the current version it's only possible to remove council mint (set it to None)
+     *         After setting council to None it won't be possible to withdraw the tokens from the Realm any longer.
+     *         If that's required then it must be done before executing this instruction
+     */
     councilTokenMint?: TAccountMetas[2] | undefined;
     /** Optional unless council is used. seeds=['governance', realm, council_mint] */
     councilTokenHoldingAccount?: TAccountMetas[3] | undefined;

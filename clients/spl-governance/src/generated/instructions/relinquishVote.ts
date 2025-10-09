@@ -131,8 +131,10 @@ export interface RelinquishVoteInput<
   /** The Governing Token Mint which was used to cast the vote (vote_governing_token_mint) */
   governingTokenMint: Address<TAccountGoverningTokenMint>;
   governanceAuthority?: TransactionSigner<TAccountGovernanceAuthority>;
-  /** Optional Beneficiary account which would receive lamports when VoteRecord Account is disposed.
-    It's required only when Proposal is still being voted on */
+  /**
+   * Optional Beneficiary account which would receive lamports when VoteRecord Account is disposed.
+   *     It's required only when Proposal is still being voted on
+   */
   beneficiaryAccount?: Address<TAccountBeneficiaryAccount>;
 }
 
@@ -250,8 +252,10 @@ export interface ParsedRelinquishVoteInstruction<
     /** The Governing Token Mint which was used to cast the vote (vote_governing_token_mint) */
     governingTokenMint: TAccountMetas[5];
     governanceAuthority?: TAccountMetas[6] | undefined;
-    /** Optional Beneficiary account which would receive lamports when VoteRecord Account is disposed.
-    It's required only when Proposal is still being voted on */
+    /**
+     * Optional Beneficiary account which would receive lamports when VoteRecord Account is disposed.
+     *     It's required only when Proposal is still being voted on
+     */
     beneficiaryAccount?: TAccountMetas[7] | undefined;
   };
   data: RelinquishVoteInstructionData;

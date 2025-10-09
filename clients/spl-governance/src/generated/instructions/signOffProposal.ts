@@ -109,11 +109,15 @@ export interface SignOffProposalInput<
   realmAccount: Address<TAccountRealmAccount>;
   governanceAccount: Address<TAccountGovernanceAccount>;
   proposalAccount: Address<TAccountProposalAccount>;
-  /** Signatory account signing off the Proposal.
-    Or Proposal owner if the owner hasn't appointed any signatories */
+  /**
+   * Signatory account signing off the Proposal.
+   *     Or Proposal owner if the owner hasn't appointed any signatories
+   */
   signatoryAccount: TransactionSigner<TAccountSignatoryAccount>;
-  /** TokenOwnerRecord for the Proposal owner, required when the owner signs off the Proposal.
-        Or `[writable]` SignatoryRecord account, required when non owner signs off the Proposal */
+  /**
+   * TokenOwnerRecord for the Proposal owner, required when the owner signs off the Proposal.
+   *         Or `[writable]` SignatoryRecord account, required when non owner signs off the Proposal
+   */
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
 }
 
@@ -197,11 +201,15 @@ export interface ParsedSignOffProposalInstruction<
     realmAccount: TAccountMetas[0];
     governanceAccount: TAccountMetas[1];
     proposalAccount: TAccountMetas[2];
-    /** Signatory account signing off the Proposal.
-    Or Proposal owner if the owner hasn't appointed any signatories */
+    /**
+     * Signatory account signing off the Proposal.
+     *     Or Proposal owner if the owner hasn't appointed any signatories
+     */
     signatoryAccount: TAccountMetas[3];
-    /** TokenOwnerRecord for the Proposal owner, required when the owner signs off the Proposal.
-        Or `[writable]` SignatoryRecord account, required when non owner signs off the Proposal */
+    /**
+     * TokenOwnerRecord for the Proposal owner, required when the owner signs off the Proposal.
+     *         Or `[writable]` SignatoryRecord account, required when non owner signs off the Proposal
+     */
     tokenOwnerRecord: TAccountMetas[4];
   };
   data: SignOffProposalInstructionData;

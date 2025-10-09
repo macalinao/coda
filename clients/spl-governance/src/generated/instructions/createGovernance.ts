@@ -147,8 +147,10 @@ export interface CreateGovernanceInput<
   realmAccount: Address<TAccountRealmAccount>;
   /** seeds=['account-governance', realm, governed_account] */
   governanceAccount: Address<TAccountGovernanceAccount>;
-  /** Account governed by this Governance (governing_account). 
-        Note: the account doesn't have to exist and can be used only as a unique identified for the Governance account */
+  /**
+   * Account governed by this Governance (governing_account).
+   *         Note: the account doesn't have to exist and can be used only as a unique identified for the Governance account
+   */
   governedAccount: Address<TAccountGovernedAccount>;
   /** Used only if not signed by RealmAuthority */
   governingTokenOwnerRecord: Address<TAccountGoverningTokenOwnerRecord>;
@@ -287,8 +289,10 @@ export interface ParsedCreateGovernanceInstruction<
     realmAccount: TAccountMetas[0];
     /** seeds=['account-governance', realm, governed_account] */
     governanceAccount: TAccountMetas[1];
-    /** Account governed by this Governance (governing_account). 
-        Note: the account doesn't have to exist and can be used only as a unique identified for the Governance account */
+    /**
+     * Account governed by this Governance (governing_account).
+     *         Note: the account doesn't have to exist and can be used only as a unique identified for the Governance account
+     */
     governedAccount: TAccountMetas[2];
     /** Used only if not signed by RealmAuthority */
     governingTokenOwnerRecord: TAccountMetas[3];

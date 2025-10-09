@@ -171,11 +171,13 @@ export interface CastVoteInput<
   governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
   /** Proposal VoteRecord account. PDA seeds: ['governance',proposal,token_owner_record] */
   proposalVoteRecord: Address<TAccountProposalVoteRecord>;
-  /** The Governing Token Mint which is used to cast the vote (vote_governing_token_mint).
-    The voting token mint is the governing_token_mint of the Proposal for Approve, Deny and Abstain votes.
-    For Veto vote the voting token mint is the mint of the opposite voting population.
-    Council mint to veto Community proposals and Community mint to veto Council proposals
-    Note: In the current version only Council veto is supported */
+  /**
+   * The Governing Token Mint which is used to cast the vote (vote_governing_token_mint).
+   *     The voting token mint is the governing_token_mint of the Proposal for Approve, Deny and Abstain votes.
+   *     For Veto vote the voting token mint is the mint of the opposite voting population.
+   *     Council mint to veto Community proposals and Community mint to veto Council proposals
+   *     Note: In the current version only Council veto is supported
+   */
   governingTokenMint: Address<TAccountGoverningTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -353,11 +355,13 @@ export interface ParsedCastVoteInstruction<
     governanceAuthority: TAccountMetas[5];
     /** Proposal VoteRecord account. PDA seeds: ['governance',proposal,token_owner_record] */
     proposalVoteRecord: TAccountMetas[6];
-    /** The Governing Token Mint which is used to cast the vote (vote_governing_token_mint).
-    The voting token mint is the governing_token_mint of the Proposal for Approve, Deny and Abstain votes.
-    For Veto vote the voting token mint is the mint of the opposite voting population.
-    Council mint to veto Community proposals and Community mint to veto Council proposals
-    Note: In the current version only Council veto is supported */
+    /**
+     * The Governing Token Mint which is used to cast the vote (vote_governing_token_mint).
+     *     The voting token mint is the governing_token_mint of the Proposal for Approve, Deny and Abstain votes.
+     *     For Veto vote the voting token mint is the mint of the opposite voting population.
+     *     Council mint to veto Community proposals and Community mint to veto Council proposals
+     *     Note: In the current version only Council veto is supported
+     */
     governingTokenMint: TAccountMetas[7];
     payer: TAccountMetas[8];
     systemProgram: TAccountMetas[9];
