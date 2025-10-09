@@ -214,9 +214,11 @@ export interface CreateProposalInput<
   realmConfig: Address<TAccountRealmConfig>;
   /** Optional Voter Weight Record */
   voterWeightRecord?: Address<TAccountVoterWeightRecord>;
-  /** Optional Proposal deposit is required when there are more active 
-        proposals than the configured deposit exempt amount. 
-        PDA seeds: ['proposal-deposit', proposal, deposit payer] */
+  /**
+   * Optional Proposal deposit is required when there are more active
+   *         proposals than the configured deposit exempt amount.
+   *         PDA seeds: ['proposal-deposit', proposal, deposit payer]
+   */
   proposalDepositAccount?: Address<TAccountProposalDepositAccount>;
   name: CreateProposalInstructionDataArgs["name"];
   descriptionLink: CreateProposalInstructionDataArgs["descriptionLink"];
@@ -377,9 +379,11 @@ export interface ParsedCreateProposalInstruction<
     realmConfig: TAccountMetas[8];
     /** Optional Voter Weight Record */
     voterWeightRecord?: TAccountMetas[9] | undefined;
-    /** Optional Proposal deposit is required when there are more active 
-        proposals than the configured deposit exempt amount. 
-        PDA seeds: ['proposal-deposit', proposal, deposit payer] */
+    /**
+     * Optional Proposal deposit is required when there are more active
+     *         proposals than the configured deposit exempt amount.
+     *         PDA seeds: ['proposal-deposit', proposal, deposit payer]
+     */
     proposalDepositAccount?: TAccountMetas[10] | undefined;
   };
   data: CreateProposalInstructionData;
