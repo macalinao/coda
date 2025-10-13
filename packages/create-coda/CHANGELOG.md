@@ -1,5 +1,11 @@
 # @macalinao/create-coda
 
+## 0.2.3
+
+### Patch Changes
+
+- 95bbbdc: Make sure everything has @types/bun dev dependency
+
 ## 0.2.2
 
 ### Patch Changes

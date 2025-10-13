@@ -1,5 +1,11 @@
 # @macalinao/clients-spl-governance
 
+## 0.2.3
+
+### Patch Changes
+
+- ef2b16c: Add discriminators for SPL governance account types
+
 ## 0.2.2
 
 ### Patch Changes

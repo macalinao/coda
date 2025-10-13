@@ -1,5 +1,15 @@
 # @macalinao/codama-nodes-from-anchor-x
 
+## 0.1.1
+
+### Patch Changes
+
+- a5d0028: Fix references to bun types
+- 95bbbdc: Make sure everything has @types/bun dev dependency
+- Updated dependencies [a5d0028]
+- Updated dependencies [95bbbdc]
+  - @macalinao/codama-instruction-accounts-dedupe-visitor@0.4.1
+
 ## 0.1.0
 
 ### Minor Changes

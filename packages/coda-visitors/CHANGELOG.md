@@ -1,5 +1,12 @@
 # @macalinao/coda-visitors
 
+## 0.1.4
+
+### Patch Changes
+
+- a5d0028: Fix references to bun types
+- 95bbbdc: Make sure everything has @types/bun dev dependency
+
 ## 0.1.3
 
 ### Patch Changes
