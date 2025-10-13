@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@macalinao/clients-voter-stake-registry.svg)](https://www.npmjs.com/package/@macalinao/clients-voter-stake-registry)
 
-TypeScript client for the SPL Governance Voter Stake Registry program, generated using Coda with full ESM support.
+TypeScript client for the Realms [Voter Stake Registry program](https://github.com/Grape-Labs/voter-stake-registry/) by Grape, generated using Coda with full ESM support.
 
 ## Installation
 
@@ -33,14 +33,14 @@ The `coda.config.mjs` file defines custom PDAs for the Voter Stake Registry prog
 ## Usage
 
 ```typescript
-import { 
-  findRegistrarPda, 
-  findVoterPda, 
-  findVoterWeightRecordPda 
+import {
+  findRegistrarPda,
+  findVoterPda,
+  findVoterWeightRecordPda,
 } from "@macalinao/clients-voter-stake-registry";
 
 // Get the registrar PDA
-const registrarPda = await findRegistrarPda({ 
+const registrarPda = await findRegistrarPda({
   realm: realmPublicKey,
   realmGoverningTokenMint: mintPublicKey,
 });
