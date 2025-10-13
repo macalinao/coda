@@ -22,8 +22,6 @@ import type {
 } from "@solana/kit";
 import type { ProposalTransactionSeeds } from "../pdas/index.js";
 import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
   InstructionData,
   InstructionDataArgs,
   TransactionExecutionStatus,
@@ -48,9 +46,11 @@ import {
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findProposalTransactionPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getInstructionDataDecoder,
@@ -60,6 +60,15 @@ import {
   getUnixTimestampDecoder,
   getUnixTimestampEncoder,
 } from "../types/index.js";
+
+export const PROPOSAL_INSTRUCTION_V1_ACCOUNT_TYPE =
+  GovernanceAccountType.ProposalInstructionV1;
+
+export function getProposalInstructionV1AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    PROPOSAL_INSTRUCTION_V1_ACCOUNT_TYPE,
+  );
+}
 
 export interface ProposalInstructionV1 {
   accountType: GovernanceAccountType;
@@ -72,7 +81,6 @@ export interface ProposalInstructionV1 {
 }
 
 export interface ProposalInstructionV1Args {
-  accountType: GovernanceAccountTypeArgs;
   proposal: Address;
   instructionIndex: number;
   holdUpTime: number;
@@ -82,15 +90,21 @@ export interface ProposalInstructionV1Args {
 }
 
 export function getProposalInstructionV1Encoder(): Encoder<ProposalInstructionV1Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["proposal", getAddressEncoder()],
-    ["instructionIndex", getU16Encoder()],
-    ["holdUpTime", getU32Encoder()],
-    ["instruction", getInstructionDataEncoder()],
-    ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
-    ["executionStatus", getTransactionExecutionStatusEncoder()],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["proposal", getAddressEncoder()],
+      ["instructionIndex", getU16Encoder()],
+      ["holdUpTime", getU32Encoder()],
+      ["instruction", getInstructionDataEncoder()],
+      ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
+      ["executionStatus", getTransactionExecutionStatusEncoder()],
+    ]),
+    (value) => ({
+      ...value,
+      accountType: PROPOSAL_INSTRUCTION_V1_ACCOUNT_TYPE,
+    }),
+  );
 }
 
 export function getProposalInstructionV1Decoder(): Decoder<ProposalInstructionV1> {

@@ -3,12 +3,15 @@ import {
   addPdasVisitor,
   constantPdaSeedNodeFromString,
   defineConfig,
+  definedTypeLinkNode,
+  enumValueNode,
   numberTypeNode,
   pdaLinkNode,
   pdaSeedValueNode,
   pdaValueNode,
   publicKeyTypeNode,
   SYSTEM_PROGRAM_VALUE_NODE,
+  setAccountDiscriminatorFromFieldVisitor,
   setInstructionAccountDefaultValuesVisitor,
   stringTypeNode,
   updateAccountsVisitor,
@@ -258,6 +261,154 @@ export default defineConfig({
         ]),
       },
     ]),
+    setAccountDiscriminatorFromFieldVisitor({
+      // Realm accounts
+      realmV1: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "RealmV1",
+        ),
+      },
+      realmV2: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "RealmV2",
+        ),
+      },
+      realmConfigAccount: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "RealmConfig",
+        ),
+      },
+
+      // Governance accounts
+      governanceV1: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "GovernanceV1",
+        ),
+      },
+      governanceV2: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "GovernanceV2",
+        ),
+      },
+
+      // Token Owner Record accounts
+      tokenOwnerRecordV1: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "TokenOwnerRecordV1",
+        ),
+      },
+      tokenOwnerRecordV2: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "TokenOwnerRecordV2",
+        ),
+      },
+      legacyTokenOwnerRecord: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "TokenOwnerRecordV1",
+        ),
+      },
+
+      // Proposal accounts
+      proposalV1: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "ProposalV1",
+        ),
+      },
+      proposalV2: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "ProposalV2",
+        ),
+      },
+      proposalDeposit: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "ProposalDeposit",
+        ),
+      },
+      proposalInstructionV1: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "ProposalInstructionV1",
+        ),
+      },
+      proposalTransactionV2: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "ProposalTransactionV2",
+        ),
+      },
+
+      // Signatory Record accounts
+      signatoryRecordV1: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "SignatoryRecordV1",
+        ),
+      },
+      signatoryRecordV2: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "SignatoryRecordV2",
+        ),
+      },
+      requiredSignatory: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "RequiredSignatory",
+        ),
+      },
+
+      // Vote Record accounts
+      voteRecordV1: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "VoteRecordV1",
+        ),
+      },
+      voteRecordV2: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "VoteRecordV2",
+        ),
+      },
+
+      // Program Metadata
+      programMetadata: {
+        field: "accountType",
+        value: enumValueNode(
+          definedTypeLinkNode("governanceAccountType"),
+          "ProgramMetadata",
+        ),
+      },
+    }),
     addCustomPDAsVisitor,
   ],
 });

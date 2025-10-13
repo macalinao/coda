@@ -19,12 +19,7 @@ import type {
   MaybeEncodedAccount,
 } from "@solana/kit";
 import type { VoteRecordSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-  Vote,
-  VoteArgs,
-} from "../types/index.js";
+import type { Vote, VoteArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -44,14 +39,22 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findVoteRecordPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getVoteDecoder,
   getVoteEncoder,
 } from "../types/index.js";
+
+export const VOTE_RECORD_V2_ACCOUNT_TYPE = GovernanceAccountType.VoteRecordV2;
+
+export function getVoteRecordV2AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(VOTE_RECORD_V2_ACCOUNT_TYPE);
+}
 
 export interface VoteRecordV2 {
   accountType: GovernanceAccountType;
@@ -64,7 +67,6 @@ export interface VoteRecordV2 {
 }
 
 export interface VoteRecordV2Args {
-  accountType: GovernanceAccountTypeArgs;
   proposal: Address;
   governingTokenOwner: Address;
   isRelinquished: boolean;
@@ -74,15 +76,18 @@ export interface VoteRecordV2Args {
 }
 
 export function getVoteRecordV2Encoder(): Encoder<VoteRecordV2Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["proposal", getAddressEncoder()],
-    ["governingTokenOwner", getAddressEncoder()],
-    ["isRelinquished", getBooleanEncoder()],
-    ["voterWeight", getU64Encoder()],
-    ["vote", getVoteEncoder()],
-    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["proposal", getAddressEncoder()],
+      ["governingTokenOwner", getAddressEncoder()],
+      ["isRelinquished", getBooleanEncoder()],
+      ["voterWeight", getU64Encoder()],
+      ["vote", getVoteEncoder()],
+      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
+    ]),
+    (value) => ({ ...value, accountType: VOTE_RECORD_V2_ACCOUNT_TYPE }),
+  );
 }
 
 export function getVoteRecordV2Decoder(): Decoder<VoteRecordV2> {

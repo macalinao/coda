@@ -19,10 +19,6 @@ import type {
   MaybeEncodedAccount,
 } from "@solana/kit";
 import type { ProposalDepositSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,12 +34,23 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findProposalDepositPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
+
+export const PROPOSAL_DEPOSIT_ACCOUNT_TYPE =
+  GovernanceAccountType.ProposalDeposit;
+
+export function getProposalDepositAccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    PROPOSAL_DEPOSIT_ACCOUNT_TYPE,
+  );
+}
 
 export interface ProposalDeposit {
   accountType: GovernanceAccountType;
@@ -53,19 +60,21 @@ export interface ProposalDeposit {
 }
 
 export interface ProposalDepositArgs {
-  accountType: GovernanceAccountTypeArgs;
   proposal: Address;
   depositPayer: Address;
   reserved: number[];
 }
 
 export function getProposalDepositEncoder(): FixedSizeEncoder<ProposalDepositArgs> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["proposal", getAddressEncoder()],
-    ["depositPayer", getAddressEncoder()],
-    ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["proposal", getAddressEncoder()],
+      ["depositPayer", getAddressEncoder()],
+      ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
+    ]),
+    (value) => ({ ...value, accountType: PROPOSAL_DEPOSIT_ACCOUNT_TYPE }),
+  );
 }
 
 export function getProposalDepositDecoder(): FixedSizeDecoder<ProposalDeposit> {

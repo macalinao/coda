@@ -41,6 +41,10 @@ import type {
   ParsedWithdrawGoverningTokensInstruction,
 } from "../instructions/index.js";
 import { containsBytes, getU8Encoder } from "@solana/kit";
+import {
+  GovernanceAccountType,
+  getGovernanceAccountTypeEncoder,
+} from "../types/index.js";
 
 export const SPL_GOVERNANCE_PROGRAM_ADDRESS =
   "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">;
@@ -65,6 +69,220 @@ export enum SplGovernanceAccount {
   TokenOwnerRecordV2 = 16,
   LegacyTokenOwnerRecord = 17,
   VoteRecordV2 = 18,
+}
+
+export function identifySplGovernanceAccount(
+  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
+): SplGovernanceAccount {
+  const data = "data" in account ? account.data : account;
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.GovernanceV2,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.GovernanceV2;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(GovernanceAccountType.RealmV1),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.RealmV1;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.TokenOwnerRecordV1,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.TokenOwnerRecordV1;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.GovernanceV1,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.GovernanceV1;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.ProposalV1,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.ProposalV1;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.SignatoryRecordV1,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.SignatoryRecordV1;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.ProposalInstructionV1,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.ProposalInstructionV1;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.VoteRecordV1,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.VoteRecordV1;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.ProgramMetadata,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.ProgramMetadata;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.ProposalV2,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.ProposalV2;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.ProposalDeposit,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.ProposalDeposit;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.ProposalTransactionV2,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.ProposalTransactionV2;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(GovernanceAccountType.RealmV2),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.RealmV2;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.RealmConfig,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.RealmConfigAccount;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.RequiredSignatory,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.RequiredSignatory;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.SignatoryRecordV2,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.SignatoryRecordV2;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.TokenOwnerRecordV2,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.TokenOwnerRecordV2;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.TokenOwnerRecordV1,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.LegacyTokenOwnerRecord;
+  }
+  if (
+    containsBytes(
+      data,
+      getGovernanceAccountTypeEncoder().encode(
+        GovernanceAccountType.VoteRecordV2,
+      ),
+      0,
+    )
+  ) {
+    return SplGovernanceAccount.VoteRecordV2;
+  }
+  throw new Error(
+    "The provided account could not be identified as a splGovernance account.",
+  );
 }
 
 export enum SplGovernanceInstruction {

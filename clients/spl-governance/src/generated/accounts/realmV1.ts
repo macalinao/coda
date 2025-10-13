@@ -21,12 +21,7 @@ import type {
   OptionOrNullable,
 } from "@solana/kit";
 import type { RealmSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-  RealmConfig,
-  RealmConfigArgs,
-} from "../types/index.js";
+import type { RealmConfig, RealmConfigArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -52,14 +47,22 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findRealmPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getRealmConfigDecoder,
   getRealmConfigEncoder,
 } from "../types/index.js";
+
+export const REALM_V1_ACCOUNT_TYPE = GovernanceAccountType.RealmV1;
+
+export function getRealmV1AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(REALM_V1_ACCOUNT_TYPE);
+}
 
 export interface RealmV1 {
   accountType: GovernanceAccountType;
@@ -72,7 +75,6 @@ export interface RealmV1 {
 }
 
 export interface RealmV1Args {
-  accountType: GovernanceAccountTypeArgs;
   communityMint: Address;
   config: RealmConfigArgs;
   reserved: number[];
@@ -82,15 +84,18 @@ export interface RealmV1Args {
 }
 
 export function getRealmV1Encoder(): Encoder<RealmV1Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["communityMint", getAddressEncoder()],
-    ["config", getRealmConfigEncoder()],
-    ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
-    ["votingProposalCount", getU16Encoder()],
-    ["authority", getOptionEncoder(getAddressEncoder())],
-    ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["communityMint", getAddressEncoder()],
+      ["config", getRealmConfigEncoder()],
+      ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
+      ["votingProposalCount", getU16Encoder()],
+      ["authority", getOptionEncoder(getAddressEncoder())],
+      ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+    ]),
+    (value) => ({ ...value, accountType: REALM_V1_ACCOUNT_TYPE }),
+  );
 }
 
 export function getRealmV1Decoder(): Decoder<RealmV1> {

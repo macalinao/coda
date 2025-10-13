@@ -19,10 +19,6 @@ import type {
   MaybeEncodedAccount,
 } from "@solana/kit";
 import type { SignatoryRecordSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,12 +36,23 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findSignatoryRecordPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
+
+export const SIGNATORY_RECORD_V2_ACCOUNT_TYPE =
+  GovernanceAccountType.SignatoryRecordV2;
+
+export function getSignatoryRecordV2AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    SIGNATORY_RECORD_V2_ACCOUNT_TYPE,
+  );
+}
 
 export interface SignatoryRecordV2 {
   accountType: GovernanceAccountType;
@@ -56,7 +63,6 @@ export interface SignatoryRecordV2 {
 }
 
 export interface SignatoryRecordV2Args {
-  accountType: GovernanceAccountTypeArgs;
   proposal: Address;
   signatory: Address;
   signedOff: boolean;
@@ -64,13 +70,16 @@ export interface SignatoryRecordV2Args {
 }
 
 export function getSignatoryRecordV2Encoder(): FixedSizeEncoder<SignatoryRecordV2Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["proposal", getAddressEncoder()],
-    ["signatory", getAddressEncoder()],
-    ["signedOff", getBooleanEncoder()],
-    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["proposal", getAddressEncoder()],
+      ["signatory", getAddressEncoder()],
+      ["signedOff", getBooleanEncoder()],
+      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
+    ]),
+    (value) => ({ ...value, accountType: SIGNATORY_RECORD_V2_ACCOUNT_TYPE }),
+  );
 }
 
 export function getSignatoryRecordV2Decoder(): FixedSizeDecoder<SignatoryRecordV2> {

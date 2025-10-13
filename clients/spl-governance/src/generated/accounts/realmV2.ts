@@ -21,12 +21,7 @@ import type {
   OptionOrNullable,
 } from "@solana/kit";
 import type { RealmSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-  RealmConfig,
-  RealmConfigArgs,
-} from "../types/index.js";
+import type { RealmConfig, RealmConfigArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -52,14 +47,22 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findRealmPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getRealmConfigDecoder,
   getRealmConfigEncoder,
 } from "../types/index.js";
+
+export const REALM_V2_ACCOUNT_TYPE = GovernanceAccountType.RealmV2;
+
+export function getRealmV2AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(REALM_V2_ACCOUNT_TYPE);
+}
 
 export interface RealmV2 {
   accountType: GovernanceAccountType;
@@ -73,7 +76,6 @@ export interface RealmV2 {
 }
 
 export interface RealmV2Args {
-  accountType: GovernanceAccountTypeArgs;
   communityMint: Address;
   config: RealmConfigArgs;
   reserved: number[];
@@ -84,16 +86,19 @@ export interface RealmV2Args {
 }
 
 export function getRealmV2Encoder(): Encoder<RealmV2Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["communityMint", getAddressEncoder()],
-    ["config", getRealmConfigEncoder()],
-    ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
-    ["legacy1", getU16Encoder()],
-    ["authority", getOptionEncoder(getAddressEncoder())],
-    ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
-    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["communityMint", getAddressEncoder()],
+      ["config", getRealmConfigEncoder()],
+      ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
+      ["legacy1", getU16Encoder()],
+      ["authority", getOptionEncoder(getAddressEncoder())],
+      ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 128 })],
+    ]),
+    (value) => ({ ...value, accountType: REALM_V2_ACCOUNT_TYPE }),
+  );
 }
 
 export function getRealmV2Decoder(): Decoder<RealmV2> {

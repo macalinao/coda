@@ -21,10 +21,6 @@ import type {
   OptionOrNullable,
 } from "@solana/kit";
 import type { TokenOwnerRecordSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -44,12 +40,23 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
+
+export const TOKEN_OWNER_RECORD_V1_ACCOUNT_TYPE =
+  GovernanceAccountType.TokenOwnerRecordV1;
+
+export function getTokenOwnerRecordV1AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    TOKEN_OWNER_RECORD_V1_ACCOUNT_TYPE,
+  );
+}
 
 export interface TokenOwnerRecordV1 {
   accountType: GovernanceAccountType;
@@ -65,7 +72,6 @@ export interface TokenOwnerRecordV1 {
 }
 
 export interface TokenOwnerRecordV1Args {
-  accountType: GovernanceAccountTypeArgs;
   realm: Address;
   governingTokenMint: Address;
   governingTokenOwner: Address;
@@ -78,18 +84,21 @@ export interface TokenOwnerRecordV1Args {
 }
 
 export function getTokenOwnerRecordV1Encoder(): Encoder<TokenOwnerRecordV1Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["realm", getAddressEncoder()],
-    ["governingTokenMint", getAddressEncoder()],
-    ["governingTokenOwner", getAddressEncoder()],
-    ["governingTokenDepositAmount", getU64Encoder()],
-    ["unrelinquishedVotesCount", getU64Encoder()],
-    ["outstandingProposalCount", getU8Encoder()],
-    ["version", getU8Encoder()],
-    ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
-    ["governanceDelegate", getOptionEncoder(getAddressEncoder())],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["realm", getAddressEncoder()],
+      ["governingTokenMint", getAddressEncoder()],
+      ["governingTokenOwner", getAddressEncoder()],
+      ["governingTokenDepositAmount", getU64Encoder()],
+      ["unrelinquishedVotesCount", getU64Encoder()],
+      ["outstandingProposalCount", getU8Encoder()],
+      ["version", getU8Encoder()],
+      ["reserved", getArrayEncoder(getU8Encoder(), { size: 6 })],
+      ["governanceDelegate", getOptionEncoder(getAddressEncoder())],
+    ]),
+    (value) => ({ ...value, accountType: TOKEN_OWNER_RECORD_V1_ACCOUNT_TYPE }),
+  );
 }
 
 export function getTokenOwnerRecordV1Decoder(): Decoder<TokenOwnerRecordV1> {
