@@ -1,4 +1,4 @@
-/// <reference types="bun-types" />
+/// <reference types="bun" />
 
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import type { RootNode } from "codama";

@@ -51,7 +51,7 @@
     "url": "https://github.com/macalinao/coda.git"
   },
   "author": "Ian Macalinao <me@ian.pw>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   }

@@ -13,10 +13,10 @@
     "catalog": {
       "eslint": "^9.37.0",
       "typescript": "^5.9.3",
-      "@macalinao/eslint-config": "^6.0.3",
+      "@macalinao/eslint-config": "^7",
       "@macalinao/tsconfig": "^3.2.3",
       "@solana/kit": "^3.0.3",
-      "@types/bun": "^1.2.23",
+      "@types/bun": "^1.3",
       "codama": "^1.3.7",
       "@codama/nodes": "^1.3.7",
       "@codama/nodes-from-anchor": "^1.2.9",
@@ -54,7 +54,7 @@
     "turbo": "^2.5.8",
     "typedoc": "^0.28.13"
   },
-  "packageManager": "bun@1.2.23",
+  "packageManager": "bun@1.3.0",
   "lint-staged": {
     "*.{json,jsonc,html}": "biome format --write --no-errors-on-unmatched"
   },

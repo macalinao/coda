@@ -55,6 +55,7 @@
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "eslint": "catalog:",
+    "@types/bun": "catalog:",
     "typescript": "catalog:"
   }
 }

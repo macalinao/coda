@@ -33,14 +33,14 @@ The `coda.config.mjs` file defines custom PDAs for the Voter Stake Registry prog
 ## Usage
 
 ```typescript
-import { 
-  findRegistrarPda, 
-  findVoterPda, 
-  findVoterWeightRecordPda 
+import {
+  findRegistrarPda,
+  findVoterPda,
+  findVoterWeightRecordPda,
 } from "@macalinao/clients-voter-stake-registry";
 
 // Get the registrar PDA
-const registrarPda = await findRegistrarPda({ 
+const registrarPda = await findRegistrarPda({
   realm: realmPublicKey,
   realmGoverningTokenMint: mintPublicKey,
 });

@@ -1,4 +1,4 @@
-/// <reference types="bun-types" />
+/// <reference types="bun" />
 
 import type { RenderContext } from "../types.js";
 import { describe, expect, test } from "bun:test";
