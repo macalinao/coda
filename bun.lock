@@ -168,6 +168,7 @@
       "devDependencies": {
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
+        "@types/bun": "catalog:",
         "eslint": "catalog:",
         "typescript": "catalog:",
       },
@@ -197,7 +198,7 @@
       "devDependencies": {
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
-        "@types/bun": "latest",
+        "@types/bun": "catalog:",
         "eslint": "catalog:",
         "typescript": "catalog:",
       },
@@ -211,6 +212,7 @@
       "devDependencies": {
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
+        "@types/bun": "catalog:",
         "eslint": "catalog:",
         "typescript": "catalog:",
       },
@@ -226,6 +228,7 @@
       "devDependencies": {
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
+        "@types/bun": "catalog:",
         "eslint": "catalog:",
         "typescript": "catalog:",
       },

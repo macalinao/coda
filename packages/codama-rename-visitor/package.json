@@ -48,6 +48,7 @@
     "codama": "catalog:"
   },
   "devDependencies": {
+    "@types/bun": "catalog:",
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "eslint": "catalog:",
