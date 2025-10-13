@@ -70,6 +70,7 @@ export default defineConfig({
     npmPackageName: "@macalinao/clients-voter-stake-registry",
   },
   visitors: [
+    addCustomPDAsVisitor,
     addNodesVisitor({
       voterStakeRegistry: {
         accounts: [
@@ -164,6 +165,5 @@ export default defineConfig({
         ]),
       },
     ]),
-    addCustomPDAsVisitor,
   ],
 });
