@@ -1,5 +1,12 @@
 # @macalinao/codama-renderers-js-esm
 
+## 0.4.2
+
+### Patch Changes
+
+- a5d0028: Fix references to bun types
+- 95bbbdc: Make sure everything has @types/bun dev dependency
+
 ## 0.4.1
 
 ### Patch Changes
