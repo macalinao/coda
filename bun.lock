@@ -86,7 +86,7 @@
     },
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -116,7 +116,7 @@
     },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
-      "version": "0.1.3",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -157,7 +157,7 @@
     },
     "packages/coda-visitors": {
       "name": "@macalinao/coda-visitors",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "dependencies": {
         "@solana-program/system": "^0.8.1",
         "@solana-program/token": "^0.6.0",
@@ -175,7 +175,7 @@
     },
     "packages/codama-instruction-accounts-dedupe-visitor": {
       "name": "@macalinao/codama-instruction-accounts-dedupe-visitor",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "dependencies": {
         "@codama/nodes-from-anchor": "catalog:",
         "codama": "catalog:",
@@ -190,7 +190,7 @@
     },
     "packages/codama-nodes-from-anchor-x": {
       "name": "@macalinao/codama-nodes-from-anchor-x",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@codama/nodes": "catalog:",
         "@codama/nodes-from-anchor": "catalog:",
@@ -206,7 +206,7 @@
     },
     "packages/codama-rename-visitor": {
       "name": "@macalinao/codama-rename-visitor",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "dependencies": {
         "codama": "catalog:",
       },
@@ -220,7 +220,7 @@
     },
     "packages/codama-renderers-js-esm": {
       "name": "@macalinao/codama-renderers-js-esm",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "dependencies": {
         "@codama/renderers-core": "catalog:",
         "@codama/renderers-js": "^1.4.2",
@@ -236,7 +236,7 @@
     },
     "packages/codama-renderers-markdown": {
       "name": "@macalinao/codama-renderers-markdown",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "dependencies": {
         "@codama/nodes": "catalog:",
         "@codama/renderers-core": "catalog:",
@@ -254,7 +254,7 @@
     },
     "packages/create-coda": {
       "name": "@macalinao/create-coda",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "bin": {
         "create-coda": "./dist/bin.js",
       },
@@ -1415,7 +1415,7 @@
 
     "linkify-it": ["linkify-it@5.0.0", "", { "dependencies": { "uc.micro": "^2.0.0" } }, "sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ=="],
 
-    "lint-staged": ["lint-staged@16.2.3", "", { "dependencies": { "commander": "^14.0.1", "listr2": "^9.0.4", "micromatch": "^4.0.8", "nano-spawn": "^1.0.3", "pidtree": "^0.6.0", "string-argv": "^0.3.2", "yaml": "^2.8.1" }, "bin": { "lint-staged": "bin/lint-staged.js" } }, "sha512-1OnJEESB9zZqsp61XHH2fvpS1es3hRCxMplF/AJUDa8Ho8VrscYDIuxGrj3m8KPXbcWZ8fT9XTMUhEQmOVKpKw=="],
+    "lint-staged": ["lint-staged@16.2.4", "", { "dependencies": { "commander": "^14.0.1", "listr2": "^9.0.4", "micromatch": "^4.0.8", "nano-spawn": "^2.0.0", "pidtree": "^0.6.0", "string-argv": "^0.3.2", "yaml": "^2.8.1" }, "bin": { "lint-staged": "bin/lint-staged.js" } }, "sha512-Pkyr/wd90oAyXk98i/2KwfkIhoYQUMtss769FIT9hFM5ogYZwrk+GRE46yKXSg2ZGhcJ1p38Gf5gmI5Ohjg2yg=="],
 
     "listr2": ["listr2@9.0.4", "", { "dependencies": { "cli-truncate": "^5.0.0", "colorette": "^2.0.20", "eventemitter3": "^5.0.1", "log-update": "^6.1.0", "rfdc": "^1.4.1", "wrap-ansi": "^9.0.0" } }, "sha512-1wd/kpAdKRLwv7/3OKC8zZ5U8e/fajCfWMxacUvB79S5nLrYGPtUI/8chMQhn3LQjsRVErTb9i1ECAwW0ZIHnQ=="],
 
@@ -1567,7 +1567,7 @@
 
     "ms": ["ms@2.1.3", "", {}, "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="],
 
-    "nano-spawn": ["nano-spawn@1.0.3", "", {}, "sha512-jtpsQDetTnvS2Ts1fiRdci5rx0VYws5jGyC+4IYOTnIQ/wwdf6JdomlHBwqC3bJYOvaKu0C2GSZ1A60anrYpaA=="],
+    "nano-spawn": ["nano-spawn@2.0.0", "", {}, "sha512-tacvGzUY5o2D8CBh2rrwxyNojUsZNU2zjNTzKQrkgGJQTbGAfArVWXSKMBokBeeg6C7OLRGUEyoFlYbfeWQIqw=="],
 
     "nanoid": ["nanoid@3.3.11", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w=="],
 
@@ -1887,7 +1887,7 @@
 
     "typed-array-length": ["typed-array-length@1.0.7", "", { "dependencies": { "call-bind": "^1.0.7", "for-each": "^0.3.3", "gopd": "^1.0.1", "is-typed-array": "^1.1.13", "possible-typed-array-names": "^1.0.0", "reflect.getprototypeof": "^1.0.6" } }, "sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg=="],
 
-    "typedoc": ["typedoc@0.28.13", "", { "dependencies": { "@gerrit0/mini-shiki": "^3.12.0", "lunr": "^2.3.9", "markdown-it": "^14.1.0", "minimatch": "^9.0.5", "yaml": "^2.8.1" }, "peerDependencies": { "typescript": "5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x" }, "bin": { "typedoc": "bin/typedoc" } }, "sha512-dNWY8msnYB2a+7Audha+aTF1Pu3euiE7ySp53w8kEsXoYw7dMouV5A1UsTUY345aB152RHnmRMDiovuBi7BD+w=="],
+    "typedoc": ["typedoc@0.28.14", "", { "dependencies": { "@gerrit0/mini-shiki": "^3.12.0", "lunr": "^2.3.9", "markdown-it": "^14.1.0", "minimatch": "^9.0.5", "yaml": "^2.8.1" }, "peerDependencies": { "typescript": "5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x" }, "bin": { "typedoc": "bin/typedoc" } }, "sha512-ftJYPvpVfQvFzpkoSfHLkJybdA/geDJ8BGQt/ZnkkhnBYoYW6lBgPQXu6vqLxO4X75dA55hX8Af847H5KXlEFA=="],
 
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
