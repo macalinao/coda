@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@macalinao/clients-voter-stake-registry.svg)](https://www.npmjs.com/package/@macalinao/clients-voter-stake-registry)
 
-TypeScript client for the SPL Governance Voter Stake Registry program, generated using Coda with full ESM support.
+TypeScript client for the Realms [Voter Stake Registry program](https://github.com/Grape-Labs/voter-stake-registry/) by Grape, generated using Coda with full ESM support.
 
 ## Installation
 

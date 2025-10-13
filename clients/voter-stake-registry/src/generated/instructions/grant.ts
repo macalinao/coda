@@ -67,7 +67,8 @@ export type GrantInstruction<
   TAccountVoterWeightRecord extends string | AccountMeta = string,
   TAccountVault extends string | AccountMeta = string,
   TAccountDepositToken extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
+  TAccountTokenAuthority extends string | AccountMeta = string,
+  TAccountGrantAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountDepositMint extends string | AccountMeta = string,
   TAccountSystemProgram extends
@@ -76,9 +77,7 @@ export type GrantInstruction<
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountAssociatedTokenProgram extends string | AccountMeta = string,
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
@@ -105,10 +104,14 @@ export type GrantInstruction<
       TAccountDepositToken extends string
         ? WritableAccount<TAccountDepositToken>
         : TAccountDepositToken,
-      TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> &
-            AccountSignerMeta<TAccountAuthority>
-        : TAccountAuthority,
+      TAccountTokenAuthority extends string
+        ? ReadonlySignerAccount<TAccountTokenAuthority> &
+            AccountSignerMeta<TAccountTokenAuthority>
+        : TAccountTokenAuthority,
+      TAccountGrantAuthority extends string
+        ? ReadonlySignerAccount<TAccountGrantAuthority> &
+            AccountSignerMeta<TAccountGrantAuthority>
+        : TAccountGrantAuthority,
       TAccountPayer extends string
         ? WritableSignerAccount<TAccountPayer> &
             AccountSignerMeta<TAccountPayer>
@@ -199,7 +202,8 @@ export interface GrantInput<
   TAccountVoterWeightRecord extends string = string,
   TAccountVault extends string = string,
   TAccountDepositToken extends string = string,
-  TAccountAuthority extends string = string,
+  TAccountTokenAuthority extends string = string,
+  TAccountGrantAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountDepositMint extends string = string,
   TAccountSystemProgram extends string = string,
@@ -213,12 +217,13 @@ export interface GrantInput<
   voterWeightRecord: Address<TAccountVoterWeightRecord>;
   vault: Address<TAccountVault>;
   depositToken: Address<TAccountDepositToken>;
-  authority: TransactionSigner<TAccountAuthority>;
+  tokenAuthority: TransactionSigner<TAccountTokenAuthority>;
+  grantAuthority: TransactionSigner<TAccountGrantAuthority>;
   payer: TransactionSigner<TAccountPayer>;
   depositMint: Address<TAccountDepositMint>;
   systemProgram?: Address<TAccountSystemProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
   rent?: Address<TAccountRent>;
   voterBump: GrantInstructionDataArgs["voterBump"];
   voterWeightRecordBump: GrantInstructionDataArgs["voterWeightRecordBump"];
@@ -236,7 +241,8 @@ export function getGrantInstruction<
   TAccountVoterWeightRecord extends string,
   TAccountVault extends string,
   TAccountDepositToken extends string,
-  TAccountAuthority extends string,
+  TAccountTokenAuthority extends string,
+  TAccountGrantAuthority extends string,
   TAccountPayer extends string,
   TAccountDepositMint extends string,
   TAccountSystemProgram extends string,
@@ -252,7 +258,8 @@ export function getGrantInstruction<
     TAccountVoterWeightRecord,
     TAccountVault,
     TAccountDepositToken,
-    TAccountAuthority,
+    TAccountTokenAuthority,
+    TAccountGrantAuthority,
     TAccountPayer,
     TAccountDepositMint,
     TAccountSystemProgram,
@@ -269,7 +276,8 @@ export function getGrantInstruction<
   TAccountVoterWeightRecord,
   TAccountVault,
   TAccountDepositToken,
-  TAccountAuthority,
+  TAccountTokenAuthority,
+  TAccountGrantAuthority,
   TAccountPayer,
   TAccountDepositMint,
   TAccountSystemProgram,
@@ -292,7 +300,8 @@ export function getGrantInstruction<
     },
     vault: { value: input.vault ?? null, isWritable: true },
     depositToken: { value: input.depositToken ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
+    tokenAuthority: { value: input.tokenAuthority ?? null, isWritable: false },
+    grantAuthority: { value: input.grantAuthority ?? null, isWritable: false },
     payer: { value: input.payer ?? null, isWritable: true },
     depositMint: { value: input.depositMint ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -320,10 +329,6 @@ export function getGrantInstruction<
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
-  if (!accounts.associatedTokenProgram.value) {
-    accounts.associatedTokenProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
@@ -338,7 +343,8 @@ export function getGrantInstruction<
       getAccountMeta(accounts.voterWeightRecord),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.depositToken),
-      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.tokenAuthority),
+      getAccountMeta(accounts.grantAuthority),
       getAccountMeta(accounts.payer),
       getAccountMeta(accounts.depositMint),
       getAccountMeta(accounts.systemProgram),
@@ -358,7 +364,8 @@ export function getGrantInstruction<
     TAccountVoterWeightRecord,
     TAccountVault,
     TAccountDepositToken,
-    TAccountAuthority,
+    TAccountTokenAuthority,
+    TAccountGrantAuthority,
     TAccountPayer,
     TAccountDepositMint,
     TAccountSystemProgram,
@@ -380,13 +387,14 @@ export interface ParsedGrantInstruction<
     voterWeightRecord: TAccountMetas[3];
     vault: TAccountMetas[4];
     depositToken: TAccountMetas[5];
-    authority: TAccountMetas[6];
-    payer: TAccountMetas[7];
-    depositMint: TAccountMetas[8];
-    systemProgram: TAccountMetas[9];
-    tokenProgram: TAccountMetas[10];
-    associatedTokenProgram: TAccountMetas[11];
-    rent: TAccountMetas[12];
+    tokenAuthority: TAccountMetas[6];
+    grantAuthority: TAccountMetas[7];
+    payer: TAccountMetas[8];
+    depositMint: TAccountMetas[9];
+    systemProgram: TAccountMetas[10];
+    tokenProgram: TAccountMetas[11];
+    associatedTokenProgram: TAccountMetas[12];
+    rent: TAccountMetas[13];
   };
   data: GrantInstructionData;
 }
@@ -399,7 +407,7 @@ export function parseGrantInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedGrantInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 13) {
+  if (instruction.accounts.length < 14) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -418,7 +426,8 @@ export function parseGrantInstruction<
       voterWeightRecord: getNextAccount(),
       vault: getNextAccount(),
       depositToken: getNextAccount(),
-      authority: getNextAccount(),
+      tokenAuthority: getNextAccount(),
+      grantAuthority: getNextAccount(),
       payer: getNextAccount(),
       depositMint: getNextAccount(),
       systemProgram: getNextAccount(),

@@ -63,9 +63,7 @@ export type CreateVoterInstruction<
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountInstructions extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -158,7 +156,7 @@ export interface CreateVoterAsyncInput<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-  instructions?: Address<TAccountInstructions>;
+  instructions: Address<TAccountInstructions>;
   voterBump: CreateVoterInstructionDataArgs["voterBump"];
   voterWeightRecordBump: CreateVoterInstructionDataArgs["voterWeightRecordBump"];
 }
@@ -245,10 +243,6 @@ export async function getCreateVoterInstructionAsync<
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
-  if (!accounts.instructions.value) {
-    accounts.instructions.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
@@ -296,7 +290,7 @@ export interface CreateVoterInput<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-  instructions?: Address<TAccountInstructions>;
+  instructions: Address<TAccountInstructions>;
   voterBump: CreateVoterInstructionDataArgs["voterBump"];
   voterWeightRecordBump: CreateVoterInstructionDataArgs["voterWeightRecordBump"];
 }
@@ -368,10 +362,6 @@ export function getCreateVoterInstruction<
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
-  }
-  if (!accounts.instructions.value) {
-    accounts.instructions.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

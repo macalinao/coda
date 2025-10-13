@@ -29,14 +29,14 @@ export interface Lockup {
   startTs: bigint;
   endTs: bigint;
   kind: LockupKind;
-  padding: number[];
+  reserved: number[];
 }
 
 export interface LockupArgs {
   startTs: number | bigint;
   endTs: number | bigint;
   kind: LockupKindArgs;
-  padding: number[];
+  reserved: number[];
 }
 
 export function getLockupEncoder(): FixedSizeEncoder<LockupArgs> {
@@ -44,7 +44,7 @@ export function getLockupEncoder(): FixedSizeEncoder<LockupArgs> {
     ["startTs", getI64Encoder()],
     ["endTs", getI64Encoder()],
     ["kind", getLockupKindEncoder()],
-    ["padding", getArrayEncoder(getU8Encoder(), { size: 15 })],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 15 })],
   ]);
 }
 
@@ -53,7 +53,7 @@ export function getLockupDecoder(): FixedSizeDecoder<Lockup> {
     ["startTs", getI64Decoder()],
     ["endTs", getI64Decoder()],
     ["kind", getLockupKindDecoder()],
-    ["padding", getArrayDecoder(getU8Decoder(), { size: 15 })],
+    ["reserved", getArrayDecoder(getU8Decoder(), { size: 15 })],
   ]);
 }
 

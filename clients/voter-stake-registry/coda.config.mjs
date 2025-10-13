@@ -11,7 +11,6 @@ import {
   fixedSizeTypeNode,
   numberTypeNode,
   optionTypeNode,
-  payerValueNode,
   pdaLinkNode,
   pdaSeedValueNode,
   pdaValueNode,
@@ -71,6 +70,7 @@ export default defineConfig({
     npmPackageName: "@macalinao/clients-voter-stake-registry",
   },
   visitors: [
+    addCustomPDAsVisitor,
     addNodesVisitor({
       voterStakeRegistry: {
         accounts: [
@@ -137,38 +137,11 @@ export default defineConfig({
 
     setInstructionAccountDefaultValuesVisitor([
       {
-        account: "tokenProgram",
+        account: "governanceProgramId",
         defaultValue: publicKeyValueNode(
-          "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
         ),
       },
-      {
-        account: "associatedTokenProgram",
-        defaultValue: publicKeyValueNode(
-          "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-        ),
-      },
-      {
-        account: "systemProgram",
-        defaultValue: publicKeyValueNode("11111111111111111111111111111111"),
-      },
-      {
-        account: "rent",
-        defaultValue: publicKeyValueNode(
-          "SysvarRent111111111111111111111111111111111",
-        ),
-      },
-      {
-        account: "instructions",
-        defaultValue: publicKeyValueNode(
-          "Sysvar1nstructions1111111111111111111111111",
-        ),
-      },
-      {
-        account: "payer",
-        defaultValue: payerValueNode(),
-      },
-
       {
         account: "voter",
         instruction: "createVoter",
@@ -192,6 +165,5 @@ export default defineConfig({
         ]),
       },
     ]),
-    addCustomPDAsVisitor,
   ],
 });

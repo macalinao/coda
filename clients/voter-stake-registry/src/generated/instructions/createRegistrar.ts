@@ -52,7 +52,9 @@ export type CreateRegistrarInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountRegistrar extends string | AccountMeta = string,
   TAccountRealm extends string | AccountMeta = string,
-  TAccountGovernanceProgramId extends string | AccountMeta = string,
+  TAccountGovernanceProgramId extends
+    | string
+    | AccountMeta = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
   TAccountRealmGoverningTokenMint extends string | AccountMeta = string,
   TAccountRealmAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
@@ -145,7 +147,7 @@ export interface CreateRegistrarInput<
 > {
   registrar: Address<TAccountRegistrar>;
   realm: Address<TAccountRealm>;
-  governanceProgramId: Address<TAccountGovernanceProgramId>;
+  governanceProgramId?: Address<TAccountGovernanceProgramId>;
   realmGoverningTokenMint: Address<TAccountRealmGoverningTokenMint>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
   payer: TransactionSigner<TAccountPayer>;
@@ -217,6 +219,10 @@ export function getCreateRegistrarInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.governanceProgramId.value) {
+    accounts.governanceProgramId.value =
+      "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

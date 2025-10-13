@@ -85,8 +85,8 @@ export interface ConfigureVotingMintInstructionData {
   discriminator: ReadonlyUint8Array;
   idx: number;
   digitShift: number;
-  depositScaledFactor: bigint;
-  lockupScaledFactor: bigint;
+  baselineVoteWeightScaledFactor: bigint;
+  maxExtraLockupVoteWeightScaledFactor: bigint;
   lockupSaturationSecs: bigint;
   grantAuthority: Option<Address>;
 }
@@ -94,8 +94,8 @@ export interface ConfigureVotingMintInstructionData {
 export interface ConfigureVotingMintInstructionDataArgs {
   idx: number;
   digitShift: number;
-  depositScaledFactor: number | bigint;
-  lockupScaledFactor: number | bigint;
+  baselineVoteWeightScaledFactor: number | bigint;
+  maxExtraLockupVoteWeightScaledFactor: number | bigint;
   lockupSaturationSecs: number | bigint;
   grantAuthority: OptionOrNullable<Address>;
 }
@@ -106,8 +106,8 @@ export function getConfigureVotingMintInstructionDataEncoder(): Encoder<Configur
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
       ["idx", getU16Encoder()],
       ["digitShift", getI8Encoder()],
-      ["depositScaledFactor", getU64Encoder()],
-      ["lockupScaledFactor", getU64Encoder()],
+      ["baselineVoteWeightScaledFactor", getU64Encoder()],
+      ["maxExtraLockupVoteWeightScaledFactor", getU64Encoder()],
       ["lockupSaturationSecs", getU64Encoder()],
       ["grantAuthority", getOptionEncoder(getAddressEncoder())],
     ]),
@@ -123,8 +123,8 @@ export function getConfigureVotingMintInstructionDataDecoder(): Decoder<Configur
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["idx", getU16Decoder()],
     ["digitShift", getI8Decoder()],
-    ["depositScaledFactor", getU64Decoder()],
-    ["lockupScaledFactor", getU64Decoder()],
+    ["baselineVoteWeightScaledFactor", getU64Decoder()],
+    ["maxExtraLockupVoteWeightScaledFactor", getU64Decoder()],
     ["lockupSaturationSecs", getU64Decoder()],
     ["grantAuthority", getOptionDecoder(getAddressDecoder())],
   ]);
@@ -150,8 +150,8 @@ export interface ConfigureVotingMintInput<
   mint: Address<TAccountMint>;
   idx: ConfigureVotingMintInstructionDataArgs["idx"];
   digitShift: ConfigureVotingMintInstructionDataArgs["digitShift"];
-  depositScaledFactor: ConfigureVotingMintInstructionDataArgs["depositScaledFactor"];
-  lockupScaledFactor: ConfigureVotingMintInstructionDataArgs["lockupScaledFactor"];
+  baselineVoteWeightScaledFactor: ConfigureVotingMintInstructionDataArgs["baselineVoteWeightScaledFactor"];
+  maxExtraLockupVoteWeightScaledFactor: ConfigureVotingMintInstructionDataArgs["maxExtraLockupVoteWeightScaledFactor"];
   lockupSaturationSecs: ConfigureVotingMintInstructionDataArgs["lockupSaturationSecs"];
   grantAuthority: ConfigureVotingMintInstructionDataArgs["grantAuthority"];
 }
