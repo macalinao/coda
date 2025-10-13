@@ -1,4 +1,4 @@
-/// <reference types="bun-types" />
+/// <reference types="bun" />
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";

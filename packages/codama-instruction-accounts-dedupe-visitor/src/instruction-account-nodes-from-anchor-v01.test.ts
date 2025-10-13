@@ -1,4 +1,4 @@
-/// <reference types="bun-types" />
+/// <reference types="bun" />
 
 import type { IdlV01InstructionAccountItem } from "@codama/nodes-from-anchor";
 import type { AccountNode, InstructionArgumentNode } from "codama";

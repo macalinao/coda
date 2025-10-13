@@ -1,4 +1,4 @@
-/// <reference types="bun-types" />
+/// <reference types="bun" />
 
 import type { ProgramNode, RootNode } from "codama";
 import { describe, expect, it } from "bun:test";
