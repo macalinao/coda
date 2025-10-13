@@ -195,8 +195,10 @@ export interface CreateRealmInput<
   realmAuthority: Address<TAccountRealmAuthority>;
   /** The mint address of the token to be used as the community mint */
   communityTokenMint: Address<TAccountCommunityTokenMint>;
-  /** The account to hold the community tokens.
-    PDA seeds=['governance', realm, community_mint] */
+  /**
+   * The account to hold the community tokens.
+   *     PDA seeds=['governance', realm, community_mint]
+   */
   communityTokenHoldingAccount: Address<TAccountCommunityTokenHoldingAccount>;
   /** the payer of this transaction */
   payer: TransactionSigner<TAccountPayer>;
@@ -208,9 +210,11 @@ export interface CreateRealmInput<
   rent?: Address<TAccountRent>;
   /** The mint address of the token to be used as the council mint */
   councilTokenMint?: Address<TAccountCouncilTokenMint>;
-  /** The account to hold the council tokens.
-    PDA seeds: ['governance',realm,council_mint]
-     */
+  /**
+   * The account to hold the council tokens.
+   *     PDA seeds: ['governance',realm,council_mint]
+   *
+   */
   councilTokenHoldingAccount?: Address<TAccountCouncilTokenHoldingAccount>;
   /** Realm Config account */
   realmConfig: Address<TAccountRealmConfig>;
@@ -403,8 +407,10 @@ export interface ParsedCreateRealmInstruction<
     realmAuthority: TAccountMetas[1];
     /** The mint address of the token to be used as the community mint */
     communityTokenMint: TAccountMetas[2];
-    /** The account to hold the community tokens.
-    PDA seeds=['governance', realm, community_mint] */
+    /**
+     * The account to hold the community tokens.
+     *     PDA seeds=['governance', realm, community_mint]
+     */
     communityTokenHoldingAccount: TAccountMetas[3];
     /** the payer of this transaction */
     payer: TAccountMetas[4];
@@ -416,8 +422,10 @@ export interface ParsedCreateRealmInstruction<
     rent: TAccountMetas[7];
     /** The mint address of the token to be used as the council mint */
     councilTokenMint?: TAccountMetas[8] | undefined;
-    /** The account to hold the council tokens.
-    PDA seeds: ['governance',realm,council_mint]
+    /**
+     * The account to hold the council tokens.
+     *     PDA seeds: ['governance',realm,council_mint]
+     *
      */
     councilTokenHoldingAccount?: TAccountMetas[9] | undefined;
     /** Realm Config account */

@@ -2,6 +2,7 @@ import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import type { Codama } from "codama";
 import type { CodaConfig } from "../config.js";
 import { resolve } from "node:path";
+import { fixDocsVisitor } from "@macalinao/coda-visitors";
 import {
   getCommonInstructionAccountDefaultRules,
   setInstructionAccountDefaultValuesVisitor,
@@ -42,6 +43,8 @@ export async function processIdls(options: {
 
   // Create Codama instance
   const codama = createCodamaFromIdls(idls);
+
+  codama.update(fixDocsVisitor());
 
   // Default instruction accounts
   codama.update(
