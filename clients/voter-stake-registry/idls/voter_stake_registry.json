@@ -2,7 +2,7 @@
   "address": "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ",
   "metadata": {
     "name": "voter_stake_registry",
-    "version": "0.1.3",
+    "version": "0.2.1",
     "spec": "0.1.0"
   },
   "instructions": [
@@ -72,11 +72,11 @@
           "type": "i8"
         },
         {
-          "name": "deposit_scaled_factor",
+          "name": "baseline_vote_weight_scaled_factor",
           "type": "u64"
         },
         {
-          "name": "lockup_scaled_factor",
+          "name": "max_extra_lockup_vote_weight_scaled_factor",
           "type": "u64"
         },
         {
@@ -315,7 +315,11 @@
           "writable": true
         },
         {
-          "name": "authority",
+          "name": "token_authority",
+          "signer": true
+        },
+        {
+          "name": "grant_authority",
           "signer": true
         },
         {
@@ -392,9 +396,6 @@
           "writable": true
         },
         {
-          "name": "token_owner_record"
-        },
-        {
           "name": "vault",
           "writable": true
         },
@@ -469,8 +470,39 @@
       ]
     },
     {
-      "name": "internal_transfer",
-      "discriminator": [56, 217, 60, 137, 252, 221, 185, 114],
+      "name": "internal_transfer_locked",
+      "discriminator": [246, 200, 90, 231, 133, 22, 25, 220],
+      "accounts": [
+        {
+          "name": "registrar"
+        },
+        {
+          "name": "voter",
+          "writable": true
+        },
+        {
+          "name": "voter_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "source_deposit_entry_index",
+          "type": "u8"
+        },
+        {
+          "name": "target_deposit_entry_index",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "internal_transfer_unlocked",
+      "discriminator": [95, 95, 252, 26, 102, 114, 142, 193],
       "accounts": [
         {
           "name": "registrar"
@@ -537,6 +569,9 @@
       "discriminator": [117, 35, 234, 247, 206, 131, 182, 149],
       "accounts": [
         {
+          "name": "registrar"
+        },
+        {
           "name": "voter",
           "writable": true
         },
@@ -545,10 +580,36 @@
           "signer": true
         },
         {
-          "name": "sol_destination"
+          "name": "sol_destination",
+          "writable": true
+        },
+        {
+          "name": "token_program"
         }
       ],
       "args": []
+    },
+    {
+      "name": "log_voter_info",
+      "discriminator": [171, 72, 233, 90, 143, 151, 113, 51],
+      "accounts": [
+        {
+          "name": "registrar"
+        },
+        {
+          "name": "voter"
+        }
+      ],
+      "args": [
+        {
+          "name": "deposit_entry_begin",
+          "type": "u8"
+        },
+        {
+          "name": "deposit_entry_count",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "set_time_offset",
@@ -624,7 +685,7 @@
     },
     {
       "code": 6008,
-      "name": "InsufficientVestedTokens",
+      "name": "InsufficientUnlockedTokens",
       "msg": ""
     },
     {
@@ -751,6 +812,26 @@
       "code": 6033,
       "name": "InvalidChangeToClawbackDepositEntry",
       "msg": ""
+    },
+    {
+      "code": 6034,
+      "name": "InternalErrorBadLockupVoteWeight",
+      "msg": ""
+    },
+    {
+      "code": 6035,
+      "name": "DepositStartTooFarInFuture",
+      "msg": ""
+    },
+    {
+      "code": 6036,
+      "name": "VaultTokenNonZero",
+      "msg": ""
+    },
+    {
+      "code": 6037,
+      "name": "InvalidTimestampArguments",
+      "msg": ""
     }
   ],
   "types": [
@@ -792,9 +873,53 @@
             "type": "u8"
           },
           {
-            "name": "padding",
+            "name": "reserved",
             "type": {
-              "array": ["u8", 13]
+              "array": ["u8", 29]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VestingInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rate",
+            "type": "u64"
+          },
+          {
+            "name": "next_timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LockingInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "end_timestamp",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "vesting",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "VestingInfo"
+                }
+              }
             }
           }
         ]
@@ -826,7 +951,7 @@
             }
           },
           {
-            "name": "padding",
+            "name": "reserved",
             "type": {
               "array": ["u8", 15]
             }
@@ -852,11 +977,11 @@
             "type": "pubkey"
           },
           {
-            "name": "deposit_scaled_factor",
+            "name": "baseline_vote_weight_scaled_factor",
             "type": "u64"
           },
           {
-            "name": "lockup_scaled_factor",
+            "name": "max_extra_lockup_vote_weight_scaled_factor",
             "type": "u64"
           },
           {
@@ -868,9 +993,15 @@
             "type": "i8"
           },
           {
-            "name": "padding",
+            "name": "reserved1",
             "type": {
-              "array": ["u8", 31]
+              "array": ["u8", 7]
+            }
+          },
+          {
+            "name": "reserved2",
+            "type": {
+              "array": ["u64", 7]
             }
           }
         ]
@@ -925,7 +1056,7 @@
             "type": "pubkey"
           },
           {
-            "name": "padding1",
+            "name": "reserved1",
             "type": {
               "array": ["u8", 32]
             }
@@ -952,9 +1083,15 @@
             "type": "u8"
           },
           {
-            "name": "padding2",
+            "name": "reserved2",
             "type": {
-              "array": ["u8", 31]
+              "array": ["u8", 7]
+            }
+          },
+          {
+            "name": "reserved3",
+            "type": {
+              "array": ["u64", 11]
             }
           }
         ]
@@ -999,9 +1136,63 @@
             "type": "u8"
           },
           {
-            "name": "padding",
+            "name": "reserved",
             "type": {
-              "array": ["u8", 30]
+              "array": ["u8", 94]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoterInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "voting_power",
+            "type": "u64"
+          },
+          {
+            "name": "voting_power_baseline",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DepositEntryInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "deposit_entry_index",
+            "type": "u8"
+          },
+          {
+            "name": "voting_mint_config_index",
+            "type": "u8"
+          },
+          {
+            "name": "unlocked",
+            "type": "u64"
+          },
+          {
+            "name": "voting_power",
+            "type": "u64"
+          },
+          {
+            "name": "voting_power_baseline",
+            "type": "u64"
+          },
+          {
+            "name": "locking",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "LockingInfo"
+                }
+              }
             }
           }
         ]

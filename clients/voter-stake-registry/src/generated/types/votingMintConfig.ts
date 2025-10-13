@@ -31,32 +31,35 @@ import {
 export interface VotingMintConfig {
   mint: Address;
   grantAuthority: Address;
-  depositScaledFactor: bigint;
-  lockupScaledFactor: bigint;
+  baselineVoteWeightScaledFactor: bigint;
+  maxExtraLockupVoteWeightScaledFactor: bigint;
   lockupSaturationSecs: bigint;
   digitShift: number;
-  padding: number[];
+  reserved1: number[];
+  reserved2: bigint[];
 }
 
 export interface VotingMintConfigArgs {
   mint: Address;
   grantAuthority: Address;
-  depositScaledFactor: number | bigint;
-  lockupScaledFactor: number | bigint;
+  baselineVoteWeightScaledFactor: number | bigint;
+  maxExtraLockupVoteWeightScaledFactor: number | bigint;
   lockupSaturationSecs: number | bigint;
   digitShift: number;
-  padding: number[];
+  reserved1: number[];
+  reserved2: (number | bigint)[];
 }
 
 export function getVotingMintConfigEncoder(): FixedSizeEncoder<VotingMintConfigArgs> {
   return getStructEncoder([
     ["mint", getAddressEncoder()],
     ["grantAuthority", getAddressEncoder()],
-    ["depositScaledFactor", getU64Encoder()],
-    ["lockupScaledFactor", getU64Encoder()],
+    ["baselineVoteWeightScaledFactor", getU64Encoder()],
+    ["maxExtraLockupVoteWeightScaledFactor", getU64Encoder()],
     ["lockupSaturationSecs", getU64Encoder()],
     ["digitShift", getI8Encoder()],
-    ["padding", getArrayEncoder(getU8Encoder(), { size: 31 })],
+    ["reserved1", getArrayEncoder(getU8Encoder(), { size: 7 })],
+    ["reserved2", getArrayEncoder(getU64Encoder(), { size: 7 })],
   ]);
 }
 
@@ -64,11 +67,12 @@ export function getVotingMintConfigDecoder(): FixedSizeDecoder<VotingMintConfig>
   return getStructDecoder([
     ["mint", getAddressDecoder()],
     ["grantAuthority", getAddressDecoder()],
-    ["depositScaledFactor", getU64Decoder()],
-    ["lockupScaledFactor", getU64Decoder()],
+    ["baselineVoteWeightScaledFactor", getU64Decoder()],
+    ["maxExtraLockupVoteWeightScaledFactor", getU64Decoder()],
     ["lockupSaturationSecs", getU64Decoder()],
     ["digitShift", getI8Decoder()],
-    ["padding", getArrayDecoder(getU8Decoder(), { size: 31 })],
+    ["reserved1", getArrayDecoder(getU8Decoder(), { size: 7 })],
+    ["reserved2", getArrayDecoder(getU64Decoder(), { size: 7 })],
   ]);
 }
 

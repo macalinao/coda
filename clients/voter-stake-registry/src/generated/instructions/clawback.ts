@@ -51,7 +51,6 @@ export type ClawbackInstruction<
   TAccountRegistrar extends string | AccountMeta = string,
   TAccountRealmAuthority extends string | AccountMeta = string,
   TAccountVoter extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
   TAccountVault extends string | AccountMeta = string,
   TAccountDestination extends string | AccountMeta = string,
   TAccountTokenProgram extends
@@ -72,9 +71,6 @@ export type ClawbackInstruction<
       TAccountVoter extends string
         ? WritableAccount<TAccountVoter>
         : TAccountVoter,
-      TAccountTokenOwnerRecord extends string
-        ? ReadonlyAccount<TAccountTokenOwnerRecord>
-        : TAccountTokenOwnerRecord,
       TAccountVault extends string
         ? WritableAccount<TAccountVault>
         : TAccountVault,
@@ -128,7 +124,6 @@ export interface ClawbackInput<
   TAccountRegistrar extends string = string,
   TAccountRealmAuthority extends string = string,
   TAccountVoter extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
   TAccountVault extends string = string,
   TAccountDestination extends string = string,
   TAccountTokenProgram extends string = string,
@@ -136,7 +131,6 @@ export interface ClawbackInput<
   registrar: Address<TAccountRegistrar>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
   voter: Address<TAccountVoter>;
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
   vault: Address<TAccountVault>;
   destination: Address<TAccountDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
@@ -147,7 +141,6 @@ export function getClawbackInstruction<
   TAccountRegistrar extends string,
   TAccountRealmAuthority extends string,
   TAccountVoter extends string,
-  TAccountTokenOwnerRecord extends string,
   TAccountVault extends string,
   TAccountDestination extends string,
   TAccountTokenProgram extends string,
@@ -157,7 +150,6 @@ export function getClawbackInstruction<
     TAccountRegistrar,
     TAccountRealmAuthority,
     TAccountVoter,
-    TAccountTokenOwnerRecord,
     TAccountVault,
     TAccountDestination,
     TAccountTokenProgram
@@ -168,7 +160,6 @@ export function getClawbackInstruction<
   TAccountRegistrar,
   TAccountRealmAuthority,
   TAccountVoter,
-  TAccountTokenOwnerRecord,
   TAccountVault,
   TAccountDestination,
   TAccountTokenProgram
@@ -182,10 +173,6 @@ export function getClawbackInstruction<
     registrar: { value: input.registrar ?? null, isWritable: false },
     realmAuthority: { value: input.realmAuthority ?? null, isWritable: false },
     voter: { value: input.voter ?? null, isWritable: true },
-    tokenOwnerRecord: {
-      value: input.tokenOwnerRecord ?? null,
-      isWritable: false,
-    },
     vault: { value: input.vault ?? null, isWritable: true },
     destination: { value: input.destination ?? null, isWritable: true },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
@@ -210,7 +197,6 @@ export function getClawbackInstruction<
       getAccountMeta(accounts.registrar),
       getAccountMeta(accounts.realmAuthority),
       getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.tokenOwnerRecord),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.destination),
       getAccountMeta(accounts.tokenProgram),
@@ -224,7 +210,6 @@ export function getClawbackInstruction<
     TAccountRegistrar,
     TAccountRealmAuthority,
     TAccountVoter,
-    TAccountTokenOwnerRecord,
     TAccountVault,
     TAccountDestination,
     TAccountTokenProgram
@@ -240,10 +225,9 @@ export interface ParsedClawbackInstruction<
     registrar: TAccountMetas[0];
     realmAuthority: TAccountMetas[1];
     voter: TAccountMetas[2];
-    tokenOwnerRecord: TAccountMetas[3];
-    vault: TAccountMetas[4];
-    destination: TAccountMetas[5];
-    tokenProgram: TAccountMetas[6];
+    vault: TAccountMetas[3];
+    destination: TAccountMetas[4];
+    tokenProgram: TAccountMetas[5];
   };
   data: ClawbackInstructionData;
 }
@@ -256,7 +240,7 @@ export function parseClawbackInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClawbackInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 7) {
+  if (instruction.accounts.length < 6) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -272,7 +256,6 @@ export function parseClawbackInstruction<
       registrar: getNextAccount(),
       realmAuthority: getNextAccount(),
       voter: getNextAccount(),
-      tokenOwnerRecord: getNextAccount(),
       vault: getNextAccount(),
       destination: getNextAccount(),
       tokenProgram: getNextAccount(),

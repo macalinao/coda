@@ -7,6 +7,10 @@
  */
 
 export * from "./depositEntry.js";
+export * from "./depositEntryInfo.js";
+export * from "./lockingInfo.js";
 export * from "./lockup.js";
 export * from "./lockupKind.js";
+export * from "./vestingInfo.js";
+export * from "./voterInfo.js";
 export * from "./votingMintConfig.js";

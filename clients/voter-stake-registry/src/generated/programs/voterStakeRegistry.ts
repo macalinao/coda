@@ -17,7 +17,9 @@ import type {
   ParsedCreateVoterInstruction,
   ParsedDepositInstruction,
   ParsedGrantInstruction,
-  ParsedInternalTransferInstruction,
+  ParsedInternalTransferLockedInstruction,
+  ParsedInternalTransferUnlockedInstruction,
+  ParsedLogVoterInfoInstruction,
   ParsedResetLockupInstruction,
   ParsedSetTimeOffsetInstruction,
   ParsedUpdateMaxVoteWeightInstruction,
@@ -88,11 +90,13 @@ export enum VoterStakeRegistryInstruction {
   Clawback = 7,
   CloseDepositEntry = 8,
   ResetLockup = 9,
-  InternalTransfer = 10,
-  UpdateVoterWeightRecord = 11,
-  UpdateMaxVoteWeight = 12,
-  CloseVoter = 13,
-  SetTimeOffset = 14,
+  InternalTransferLocked = 10,
+  InternalTransferUnlocked = 11,
+  UpdateVoterWeightRecord = 12,
+  UpdateMaxVoteWeight = 13,
+  CloseVoter = 14,
+  LogVoterInfo = 15,
+  SetTimeOffset = 16,
 }
 
 export function identifyVoterStakeRegistryInstruction(
@@ -213,12 +217,23 @@ export function identifyVoterStakeRegistryInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([56, 217, 60, 137, 252, 221, 185, 114]),
+        new Uint8Array([246, 200, 90, 231, 133, 22, 25, 220]),
       ),
       0,
     )
   ) {
-    return VoterStakeRegistryInstruction.InternalTransfer;
+    return VoterStakeRegistryInstruction.InternalTransferLocked;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([95, 95, 252, 26, 102, 114, 142, 193]),
+      ),
+      0,
+    )
+  ) {
+    return VoterStakeRegistryInstruction.InternalTransferUnlocked;
   }
   if (
     containsBytes(
@@ -252,6 +267,17 @@ export function identifyVoterStakeRegistryInstruction(
     )
   ) {
     return VoterStakeRegistryInstruction.CloseVoter;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([171, 72, 233, 90, 143, 151, 113, 51]),
+      ),
+      0,
+    )
+  ) {
+    return VoterStakeRegistryInstruction.LogVoterInfo;
   }
   if (
     containsBytes(
@@ -303,8 +329,11 @@ export type ParsedVoterStakeRegistryInstruction<
       instructionType: VoterStakeRegistryInstruction.ResetLockup;
     } & ParsedResetLockupInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.InternalTransfer;
-    } & ParsedInternalTransferInstruction<TProgram>)
+      instructionType: VoterStakeRegistryInstruction.InternalTransferLocked;
+    } & ParsedInternalTransferLockedInstruction<TProgram>)
+  | ({
+      instructionType: VoterStakeRegistryInstruction.InternalTransferUnlocked;
+    } & ParsedInternalTransferUnlockedInstruction<TProgram>)
   | ({
       instructionType: VoterStakeRegistryInstruction.UpdateVoterWeightRecord;
     } & ParsedUpdateVoterWeightRecordInstruction<TProgram>)
@@ -314,6 +343,9 @@ export type ParsedVoterStakeRegistryInstruction<
   | ({
       instructionType: VoterStakeRegistryInstruction.CloseVoter;
     } & ParsedCloseVoterInstruction<TProgram>)
+  | ({
+      instructionType: VoterStakeRegistryInstruction.LogVoterInfo;
+    } & ParsedLogVoterInfoInstruction<TProgram>)
   | ({
       instructionType: VoterStakeRegistryInstruction.SetTimeOffset;
     } & ParsedSetTimeOffsetInstruction<TProgram>);

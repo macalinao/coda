@@ -42,6 +42,8 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  getU64Decoder,
+  getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { findRegistrarPda } from "../pdas/index.js";
@@ -64,11 +66,12 @@ export interface Registrar {
   realm: Address;
   realmGoverningTokenMint: Address;
   realmAuthority: Address;
-  padding1: number[];
+  reserved1: number[];
   votingMints: VotingMintConfig[];
   timeOffset: bigint;
   bump: number;
-  padding2: number[];
+  reserved2: number[];
+  reserved3: bigint[];
 }
 
 export interface RegistrarArgs {
@@ -76,11 +79,12 @@ export interface RegistrarArgs {
   realm: Address;
   realmGoverningTokenMint: Address;
   realmAuthority: Address;
-  padding1: number[];
+  reserved1: number[];
   votingMints: VotingMintConfigArgs[];
   timeOffset: number | bigint;
   bump: number;
-  padding2: number[];
+  reserved2: number[];
+  reserved3: (number | bigint)[];
 }
 
 export function getRegistrarEncoder(): FixedSizeEncoder<RegistrarArgs> {
@@ -91,14 +95,15 @@ export function getRegistrarEncoder(): FixedSizeEncoder<RegistrarArgs> {
       ["realm", getAddressEncoder()],
       ["realmGoverningTokenMint", getAddressEncoder()],
       ["realmAuthority", getAddressEncoder()],
-      ["padding1", getArrayEncoder(getU8Encoder(), { size: 32 })],
+      ["reserved1", getArrayEncoder(getU8Encoder(), { size: 32 })],
       [
         "votingMints",
         getArrayEncoder(getVotingMintConfigEncoder(), { size: 4 }),
       ],
       ["timeOffset", getI64Encoder()],
       ["bump", getU8Encoder()],
-      ["padding2", getArrayEncoder(getU8Encoder(), { size: 31 })],
+      ["reserved2", getArrayEncoder(getU8Encoder(), { size: 7 })],
+      ["reserved3", getArrayEncoder(getU64Encoder(), { size: 11 })],
     ]),
     (value) => ({ ...value, discriminator: REGISTRAR_DISCRIMINATOR }),
   );
@@ -111,11 +116,12 @@ export function getRegistrarDecoder(): FixedSizeDecoder<Registrar> {
     ["realm", getAddressDecoder()],
     ["realmGoverningTokenMint", getAddressDecoder()],
     ["realmAuthority", getAddressDecoder()],
-    ["padding1", getArrayDecoder(getU8Decoder(), { size: 32 })],
+    ["reserved1", getArrayDecoder(getU8Decoder(), { size: 32 })],
     ["votingMints", getArrayDecoder(getVotingMintConfigDecoder(), { size: 4 })],
     ["timeOffset", getI64Decoder()],
     ["bump", getU8Decoder()],
-    ["padding2", getArrayDecoder(getU8Decoder(), { size: 31 })],
+    ["reserved2", getArrayDecoder(getU8Decoder(), { size: 7 })],
+    ["reserved3", getArrayDecoder(getU64Decoder(), { size: 11 })],
   ]);
 }
 

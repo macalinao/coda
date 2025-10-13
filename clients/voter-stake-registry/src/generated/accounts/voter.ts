@@ -63,7 +63,7 @@ export interface Voter {
   deposits: DepositEntry[];
   voterBump: number;
   voterWeightRecordBump: number;
-  padding: number[];
+  reserved: number[];
 }
 
 export interface VoterArgs {
@@ -72,7 +72,7 @@ export interface VoterArgs {
   deposits: DepositEntryArgs[];
   voterBump: number;
   voterWeightRecordBump: number;
-  padding: number[];
+  reserved: number[];
 }
 
 export function getVoterEncoder(): FixedSizeEncoder<VoterArgs> {
@@ -84,7 +84,7 @@ export function getVoterEncoder(): FixedSizeEncoder<VoterArgs> {
       ["deposits", getArrayEncoder(getDepositEntryEncoder(), { size: 32 })],
       ["voterBump", getU8Encoder()],
       ["voterWeightRecordBump", getU8Encoder()],
-      ["padding", getArrayEncoder(getU8Encoder(), { size: 30 })],
+      ["reserved", getArrayEncoder(getU8Encoder(), { size: 94 })],
     ]),
     (value) => ({ ...value, discriminator: VOTER_DISCRIMINATOR }),
   );
@@ -98,7 +98,7 @@ export function getVoterDecoder(): FixedSizeDecoder<Voter> {
     ["deposits", getArrayDecoder(getDepositEntryDecoder(), { size: 32 })],
     ["voterBump", getU8Decoder()],
     ["voterWeightRecordBump", getU8Decoder()],
-    ["padding", getArrayDecoder(getU8Decoder(), { size: 30 })],
+    ["reserved", getArrayDecoder(getU8Decoder(), { size: 94 })],
   ]);
 }
 

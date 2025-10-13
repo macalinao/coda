@@ -34,7 +34,7 @@ export interface DepositEntry {
   isUsed: boolean;
   allowClawback: boolean;
   votingMintConfigIdx: number;
-  padding: number[];
+  reserved: number[];
 }
 
 export interface DepositEntryArgs {
@@ -44,7 +44,7 @@ export interface DepositEntryArgs {
   isUsed: boolean;
   allowClawback: boolean;
   votingMintConfigIdx: number;
-  padding: number[];
+  reserved: number[];
 }
 
 export function getDepositEntryEncoder(): FixedSizeEncoder<DepositEntryArgs> {
@@ -55,7 +55,7 @@ export function getDepositEntryEncoder(): FixedSizeEncoder<DepositEntryArgs> {
     ["isUsed", getBooleanEncoder()],
     ["allowClawback", getBooleanEncoder()],
     ["votingMintConfigIdx", getU8Encoder()],
-    ["padding", getArrayEncoder(getU8Encoder(), { size: 13 })],
+    ["reserved", getArrayEncoder(getU8Encoder(), { size: 29 })],
   ]);
 }
 
@@ -67,7 +67,7 @@ export function getDepositEntryDecoder(): FixedSizeDecoder<DepositEntry> {
     ["isUsed", getBooleanDecoder()],
     ["allowClawback", getBooleanDecoder()],
     ["votingMintConfigIdx", getU8Decoder()],
-    ["padding", getArrayDecoder(getU8Decoder(), { size: 13 })],
+    ["reserved", getArrayDecoder(getU8Decoder(), { size: 29 })],
   ]);
 }
 

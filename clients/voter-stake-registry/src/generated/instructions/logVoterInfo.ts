@@ -8,7 +8,6 @@
 
 import type {
   AccountMeta,
-  AccountSignerMeta,
   Address,
   FixedSizeCodec,
   FixedSizeDecoder,
@@ -17,10 +16,7 @@ import type {
   InstructionWithAccounts,
   InstructionWithData,
   ReadonlyAccount,
-  ReadonlySignerAccount,
   ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
@@ -33,27 +29,25 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
-export const INTERNAL_TRANSFER_DISCRIMINATOR: ReadonlyUint8Array =
-  new Uint8Array([56, 217, 60, 137, 252, 221, 185, 114]);
+export const LOG_VOTER_INFO_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
+  171, 72, 233, 90, 143, 151, 113, 51,
+]);
 
-export function getInternalTransferDiscriminatorBytes(): ReadonlyUint8Array {
+export function getLogVoterInfoDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    INTERNAL_TRANSFER_DISCRIMINATOR,
+    LOG_VOTER_INFO_DISCRIMINATOR,
   );
 }
 
-export type InternalTransferInstruction<
+export type LogVoterInfoInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountRegistrar extends string | AccountMeta = string,
   TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -63,91 +57,70 @@ export type InternalTransferInstruction<
         ? ReadonlyAccount<TAccountRegistrar>
         : TAccountRegistrar,
       TAccountVoter extends string
-        ? WritableAccount<TAccountVoter>
+        ? ReadonlyAccount<TAccountVoter>
         : TAccountVoter,
-      TAccountVoterAuthority extends string
-        ? ReadonlySignerAccount<TAccountVoterAuthority> &
-            AccountSignerMeta<TAccountVoterAuthority>
-        : TAccountVoterAuthority,
       ...TRemainingAccounts,
     ]
   >;
 
-export interface InternalTransferInstructionData {
+export interface LogVoterInfoInstructionData {
   discriminator: ReadonlyUint8Array;
-  sourceDepositEntryIndex: number;
-  targetDepositEntryIndex: number;
-  amount: bigint;
+  depositEntryBegin: number;
+  depositEntryCount: number;
 }
 
-export interface InternalTransferInstructionDataArgs {
-  sourceDepositEntryIndex: number;
-  targetDepositEntryIndex: number;
-  amount: number | bigint;
+export interface LogVoterInfoInstructionDataArgs {
+  depositEntryBegin: number;
+  depositEntryCount: number;
 }
 
-export function getInternalTransferInstructionDataEncoder(): FixedSizeEncoder<InternalTransferInstructionDataArgs> {
+export function getLogVoterInfoInstructionDataEncoder(): FixedSizeEncoder<LogVoterInfoInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["sourceDepositEntryIndex", getU8Encoder()],
-      ["targetDepositEntryIndex", getU8Encoder()],
-      ["amount", getU64Encoder()],
+      ["depositEntryBegin", getU8Encoder()],
+      ["depositEntryCount", getU8Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: INTERNAL_TRANSFER_DISCRIMINATOR }),
+    (value) => ({ ...value, discriminator: LOG_VOTER_INFO_DISCRIMINATOR }),
   );
 }
 
-export function getInternalTransferInstructionDataDecoder(): FixedSizeDecoder<InternalTransferInstructionData> {
+export function getLogVoterInfoInstructionDataDecoder(): FixedSizeDecoder<LogVoterInfoInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["sourceDepositEntryIndex", getU8Decoder()],
-    ["targetDepositEntryIndex", getU8Decoder()],
-    ["amount", getU64Decoder()],
+    ["depositEntryBegin", getU8Decoder()],
+    ["depositEntryCount", getU8Decoder()],
   ]);
 }
 
-export function getInternalTransferInstructionDataCodec(): FixedSizeCodec<
-  InternalTransferInstructionDataArgs,
-  InternalTransferInstructionData
+export function getLogVoterInfoInstructionDataCodec(): FixedSizeCodec<
+  LogVoterInfoInstructionDataArgs,
+  LogVoterInfoInstructionData
 > {
   return combineCodec(
-    getInternalTransferInstructionDataEncoder(),
-    getInternalTransferInstructionDataDecoder(),
+    getLogVoterInfoInstructionDataEncoder(),
+    getLogVoterInfoInstructionDataDecoder(),
   );
 }
 
-export interface InternalTransferInput<
+export interface LogVoterInfoInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
-  TAccountVoterAuthority extends string = string,
 > {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
-  voterAuthority: TransactionSigner<TAccountVoterAuthority>;
-  sourceDepositEntryIndex: InternalTransferInstructionDataArgs["sourceDepositEntryIndex"];
-  targetDepositEntryIndex: InternalTransferInstructionDataArgs["targetDepositEntryIndex"];
-  amount: InternalTransferInstructionDataArgs["amount"];
+  depositEntryBegin: LogVoterInfoInstructionDataArgs["depositEntryBegin"];
+  depositEntryCount: LogVoterInfoInstructionDataArgs["depositEntryCount"];
 }
 
-export function getInternalTransferInstruction<
+export function getLogVoterInfoInstruction<
   TAccountRegistrar extends string,
   TAccountVoter extends string,
-  TAccountVoterAuthority extends string,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
-  input: InternalTransferInput<
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVoterAuthority
-  >,
+  input: LogVoterInfoInput<TAccountRegistrar, TAccountVoter>,
   config?: { programAddress?: TProgramAddress },
-): InternalTransferInstruction<
-  TProgramAddress,
-  TAccountRegistrar,
-  TAccountVoter,
-  TAccountVoterAuthority
-> {
+): LogVoterInfoInstruction<TProgramAddress, TAccountRegistrar, TAccountVoter> {
   // Program address.
   const programAddress =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
@@ -155,8 +128,7 @@ export function getInternalTransferInstruction<
   // Original accounts.
   const originalAccounts = {
     registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: true },
-    voterAuthority: { value: input.voterAuthority ?? null, isWritable: false },
+    voter: { value: input.voter ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -171,21 +143,19 @@ export function getInternalTransferInstruction<
     accounts: [
       getAccountMeta(accounts.registrar),
       getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.voterAuthority),
     ],
-    data: getInternalTransferInstructionDataEncoder().encode(
-      args as InternalTransferInstructionDataArgs,
+    data: getLogVoterInfoInstructionDataEncoder().encode(
+      args as LogVoterInfoInstructionDataArgs,
     ),
     programAddress,
-  } as InternalTransferInstruction<
+  } as LogVoterInfoInstruction<
     TProgramAddress,
     TAccountRegistrar,
-    TAccountVoter,
-    TAccountVoterAuthority
+    TAccountVoter
   >);
 }
 
-export interface ParsedInternalTransferInstruction<
+export interface ParsedLogVoterInfoInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
@@ -193,20 +163,19 @@ export interface ParsedInternalTransferInstruction<
   accounts: {
     registrar: TAccountMetas[0];
     voter: TAccountMetas[1];
-    voterAuthority: TAccountMetas[2];
   };
-  data: InternalTransferInstructionData;
+  data: LogVoterInfoInstructionData;
 }
 
-export function parseInternalTransferInstruction<
+export function parseLogVoterInfoInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedInternalTransferInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 3) {
+): ParsedLogVoterInfoInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 2) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -218,11 +187,7 @@ export function parseInternalTransferInstruction<
   };
   return {
     programAddress: instruction.programAddress,
-    accounts: {
-      registrar: getNextAccount(),
-      voter: getNextAccount(),
-      voterAuthority: getNextAccount(),
-    },
-    data: getInternalTransferInstructionDataDecoder().decode(instruction.data),
+    accounts: { registrar: getNextAccount(), voter: getNextAccount() },
+    data: getLogVoterInfoInstructionDataDecoder().decode(instruction.data),
   };
 }
