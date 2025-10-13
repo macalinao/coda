@@ -19,12 +19,7 @@ import type {
   MaybeEncodedAccount,
 } from "@solana/kit";
 import type { VoteRecordSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-  VoteWeightV1,
-  VoteWeightV1Args,
-} from "../types/index.js";
+import type { VoteWeightV1, VoteWeightV1Args } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,14 +33,22 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findVoteRecordPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getVoteWeightV1Decoder,
   getVoteWeightV1Encoder,
 } from "../types/index.js";
+
+export const VOTE_RECORD_V1_ACCOUNT_TYPE = GovernanceAccountType.VoteRecordV1;
+
+export function getVoteRecordV1AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(VOTE_RECORD_V1_ACCOUNT_TYPE);
+}
 
 export interface VoteRecordV1 {
   accountType: GovernanceAccountType;
@@ -56,7 +59,6 @@ export interface VoteRecordV1 {
 }
 
 export interface VoteRecordV1Args {
-  accountType: GovernanceAccountTypeArgs;
   proposal: Address;
   governingTokenOwner: Address;
   isRelinquished: boolean;
@@ -64,13 +66,16 @@ export interface VoteRecordV1Args {
 }
 
 export function getVoteRecordV1Encoder(): FixedSizeEncoder<VoteRecordV1Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["proposal", getAddressEncoder()],
-    ["governingTokenOwner", getAddressEncoder()],
-    ["isRelinquished", getBooleanEncoder()],
-    ["voteWeight", getVoteWeightV1Encoder()],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["proposal", getAddressEncoder()],
+      ["governingTokenOwner", getAddressEncoder()],
+      ["isRelinquished", getBooleanEncoder()],
+      ["voteWeight", getVoteWeightV1Encoder()],
+    ]),
+    (value) => ({ ...value, accountType: VOTE_RECORD_V1_ACCOUNT_TYPE }),
+  );
 }
 
 export function getVoteRecordV1Decoder(): FixedSizeDecoder<VoteRecordV1> {

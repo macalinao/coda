@@ -19,12 +19,7 @@ import type {
   MaybeEncodedAccount,
 } from "@solana/kit";
 import type { GovernanceSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-  GovernanceConfig,
-  GovernanceConfigArgs,
-} from "../types/index.js";
+import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,14 +33,22 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findGovernancePda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
 } from "../types/index.js";
+
+export const GOVERNANCE_V1_ACCOUNT_TYPE = GovernanceAccountType.GovernanceV1;
+
+export function getGovernanceV1AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(GOVERNANCE_V1_ACCOUNT_TYPE);
+}
 
 export interface GovernanceV1 {
   accountType: GovernanceAccountType;
@@ -56,7 +59,6 @@ export interface GovernanceV1 {
 }
 
 export interface GovernanceV1Args {
-  accountType: GovernanceAccountTypeArgs;
   realm: Address;
   governedAccount: Address;
   proposalsCount: number;
@@ -64,13 +66,16 @@ export interface GovernanceV1Args {
 }
 
 export function getGovernanceV1Encoder(): Encoder<GovernanceV1Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["realm", getAddressEncoder()],
-    ["governedAccount", getAddressEncoder()],
-    ["proposalsCount", getU32Encoder()],
-    ["config", getGovernanceConfigEncoder()],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["realm", getAddressEncoder()],
+      ["governedAccount", getAddressEncoder()],
+      ["proposalsCount", getU32Encoder()],
+      ["config", getGovernanceConfigEncoder()],
+    ]),
+    (value) => ({ ...value, accountType: GOVERNANCE_V1_ACCOUNT_TYPE }),
+  );
 }
 
 export function getGovernanceV1Decoder(): Decoder<GovernanceV1> {

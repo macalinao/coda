@@ -18,12 +18,7 @@ import type {
   MaybeAccount,
   MaybeEncodedAccount,
 } from "@solana/kit";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-  Slot,
-  SlotArgs,
-} from "../types/index.js";
+import type { Slot, SlotArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -43,13 +38,24 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getSlotDecoder,
   getSlotEncoder,
 } from "../types/index.js";
+
+export const PROGRAM_METADATA_ACCOUNT_TYPE =
+  GovernanceAccountType.ProgramMetadata;
+
+export function getProgramMetadataAccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    PROGRAM_METADATA_ACCOUNT_TYPE,
+  );
+}
 
 export interface ProgramMetadata {
   accountType: GovernanceAccountType;
@@ -59,19 +65,21 @@ export interface ProgramMetadata {
 }
 
 export interface ProgramMetadataArgs {
-  accountType: GovernanceAccountTypeArgs;
   updatedAt: SlotArgs;
   version: string;
   reserved: number[];
 }
 
 export function getProgramMetadataEncoder(): Encoder<ProgramMetadataArgs> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["updatedAt", getSlotEncoder()],
-    ["version", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
-    ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["updatedAt", getSlotEncoder()],
+      ["version", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+      ["reserved", getArrayEncoder(getU8Encoder(), { size: 64 })],
+    ]),
+    (value) => ({ ...value, accountType: PROGRAM_METADATA_ACCOUNT_TYPE }),
+  );
 }
 
 export function getProgramMetadataDecoder(): Decoder<ProgramMetadata> {

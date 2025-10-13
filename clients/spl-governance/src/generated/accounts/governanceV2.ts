@@ -20,8 +20,6 @@ import type {
 } from "@solana/kit";
 import type { GovernanceSeeds } from "../pdas/index.js";
 import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
   GovernanceConfig,
   GovernanceConfigArgs,
   Reserved119,
@@ -44,9 +42,11 @@ import {
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findGovernancePda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getGovernanceConfigDecoder,
@@ -54,6 +54,12 @@ import {
   getReserved119Decoder,
   getReserved119Encoder,
 } from "../types/index.js";
+
+export const GOVERNANCE_V2_ACCOUNT_TYPE = GovernanceAccountType.GovernanceV2;
+
+export function getGovernanceV2AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(GOVERNANCE_V2_ACCOUNT_TYPE);
+}
 
 export interface GovernanceV2 {
   accountType: GovernanceAccountType;
@@ -67,7 +73,6 @@ export interface GovernanceV2 {
 }
 
 export interface GovernanceV2Args {
-  accountType: GovernanceAccountTypeArgs;
   realm: Address;
   governedAccount: Address;
   reserved1: number;
@@ -78,16 +83,19 @@ export interface GovernanceV2Args {
 }
 
 export function getGovernanceV2Encoder(): Encoder<GovernanceV2Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["realm", getAddressEncoder()],
-    ["governedAccount", getAddressEncoder()],
-    ["reserved1", getU32Encoder()],
-    ["config", getGovernanceConfigEncoder()],
-    ["reservedV2", getReserved119Encoder()],
-    ["requiredSignatoriesCount", getU8Encoder()],
-    ["activeProposalCount", getU64Encoder()],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["realm", getAddressEncoder()],
+      ["governedAccount", getAddressEncoder()],
+      ["reserved1", getU32Encoder()],
+      ["config", getGovernanceConfigEncoder()],
+      ["reservedV2", getReserved119Encoder()],
+      ["requiredSignatoriesCount", getU8Encoder()],
+      ["activeProposalCount", getU64Encoder()],
+    ]),
+    (value) => ({ ...value, accountType: GOVERNANCE_V2_ACCOUNT_TYPE }),
+  );
 }
 
 export function getGovernanceV2Decoder(): Decoder<GovernanceV2> {

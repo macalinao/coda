@@ -20,8 +20,6 @@ import type {
 } from "@solana/kit";
 import type { RealmConfigSeeds } from "../pdas/index.js";
 import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
   GoverningTokenConfig,
   GoverningTokenConfigArgs,
   Reserved110,
@@ -38,9 +36,11 @@ import {
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findRealmConfigPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getGoverningTokenConfigDecoder,
@@ -48,6 +48,15 @@ import {
   getReserved110Decoder,
   getReserved110Encoder,
 } from "../types/index.js";
+
+export const REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE =
+  GovernanceAccountType.RealmConfig;
+
+export function getRealmConfigAccountAccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE,
+  );
+}
 
 export interface RealmConfigAccount {
   accountType: GovernanceAccountType;
@@ -58,7 +67,6 @@ export interface RealmConfigAccount {
 }
 
 export interface RealmConfigAccountArgs {
-  accountType: GovernanceAccountTypeArgs;
   realm: Address;
   communityTokenConfig: GoverningTokenConfigArgs;
   councilTokenConfig: GoverningTokenConfigArgs;
@@ -66,13 +74,16 @@ export interface RealmConfigAccountArgs {
 }
 
 export function getRealmConfigAccountEncoder(): Encoder<RealmConfigAccountArgs> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["realm", getAddressEncoder()],
-    ["communityTokenConfig", getGoverningTokenConfigEncoder()],
-    ["councilTokenConfig", getGoverningTokenConfigEncoder()],
-    ["reserved", getReserved110Encoder()],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["realm", getAddressEncoder()],
+      ["communityTokenConfig", getGoverningTokenConfigEncoder()],
+      ["councilTokenConfig", getGoverningTokenConfigEncoder()],
+      ["reserved", getReserved110Encoder()],
+    ]),
+    (value) => ({ ...value, accountType: REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE }),
+  );
 }
 
 export function getRealmConfigAccountDecoder(): Decoder<RealmConfigAccount> {

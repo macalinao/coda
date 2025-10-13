@@ -19,10 +19,6 @@ import type {
   MaybeEncodedAccount,
 } from "@solana/kit";
 import type { SignatoryRecordSeeds } from "../pdas/index.js";
-import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,12 +32,23 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findSignatoryRecordPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
+
+export const SIGNATORY_RECORD_V1_ACCOUNT_TYPE =
+  GovernanceAccountType.SignatoryRecordV1;
+
+export function getSignatoryRecordV1AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    SIGNATORY_RECORD_V1_ACCOUNT_TYPE,
+  );
+}
 
 export interface SignatoryRecordV1 {
   accountType: GovernanceAccountType;
@@ -51,19 +58,21 @@ export interface SignatoryRecordV1 {
 }
 
 export interface SignatoryRecordV1Args {
-  accountType: GovernanceAccountTypeArgs;
   proposal: Address;
   signatory: Address;
   signedOff: boolean;
 }
 
 export function getSignatoryRecordV1Encoder(): FixedSizeEncoder<SignatoryRecordV1Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["proposal", getAddressEncoder()],
-    ["signatory", getAddressEncoder()],
-    ["signedOff", getBooleanEncoder()],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["proposal", getAddressEncoder()],
+      ["signatory", getAddressEncoder()],
+      ["signedOff", getBooleanEncoder()],
+    ]),
+    (value) => ({ ...value, accountType: SIGNATORY_RECORD_V1_ACCOUNT_TYPE }),
+  );
 }
 
 export function getSignatoryRecordV1Decoder(): FixedSizeDecoder<SignatoryRecordV1> {

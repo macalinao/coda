@@ -22,8 +22,6 @@ import type {
 } from "@solana/kit";
 import type { ProposalTransactionSeeds } from "../pdas/index.js";
 import type {
-  GovernanceAccountType,
-  GovernanceAccountTypeArgs,
   InstructionData,
   InstructionDataArgs,
   TransactionExecutionStatus,
@@ -52,9 +50,11 @@ import {
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  transformEncoder,
 } from "@solana/kit";
 import { findProposalTransactionPda } from "../pdas/index.js";
 import {
+  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getInstructionDataDecoder,
@@ -64,6 +64,15 @@ import {
   getUnixTimestampDecoder,
   getUnixTimestampEncoder,
 } from "../types/index.js";
+
+export const PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE =
+  GovernanceAccountType.ProposalTransactionV2;
+
+export function getProposalTransactionV2AccountTypeBytes() {
+  return getGovernanceAccountTypeEncoder().encode(
+    PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE,
+  );
+}
 
 export interface ProposalTransactionV2 {
   accountType: GovernanceAccountType;
@@ -78,7 +87,6 @@ export interface ProposalTransactionV2 {
 }
 
 export interface ProposalTransactionV2Args {
-  accountType: GovernanceAccountTypeArgs;
   proposal: Address;
   optionIndex: number;
   transactionIndex: number;
@@ -90,17 +98,23 @@ export interface ProposalTransactionV2Args {
 }
 
 export function getProposalTransactionV2Encoder(): Encoder<ProposalTransactionV2Args> {
-  return getStructEncoder([
-    ["accountType", getGovernanceAccountTypeEncoder()],
-    ["proposal", getAddressEncoder()],
-    ["optionIndex", getU8Encoder()],
-    ["transactionIndex", getU16Encoder()],
-    ["holdUpTime", getU32Encoder()],
-    ["instructions", getArrayEncoder(getInstructionDataEncoder())],
-    ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
-    ["executionStatus", getTransactionExecutionStatusEncoder()],
-    ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
-  ]);
+  return transformEncoder(
+    getStructEncoder([
+      ["accountType", getGovernanceAccountTypeEncoder()],
+      ["proposal", getAddressEncoder()],
+      ["optionIndex", getU8Encoder()],
+      ["transactionIndex", getU16Encoder()],
+      ["holdUpTime", getU32Encoder()],
+      ["instructions", getArrayEncoder(getInstructionDataEncoder())],
+      ["executedAt", getOptionEncoder(getUnixTimestampEncoder())],
+      ["executionStatus", getTransactionExecutionStatusEncoder()],
+      ["reservedV2", getArrayEncoder(getU8Encoder(), { size: 8 })],
+    ]),
+    (value) => ({
+      ...value,
+      accountType: PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE,
+    }),
+  );
 }
 
 export function getProposalTransactionV2Decoder(): Decoder<ProposalTransactionV2> {
