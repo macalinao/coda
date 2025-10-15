@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-spl-stake-pool",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript client for the SPL Stake Pool program",
   "type": "module",
   "sideEffects": false,

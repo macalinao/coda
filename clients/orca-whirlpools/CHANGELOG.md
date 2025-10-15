@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.4.3
+
+### Patch Changes
+
+- 43b1550: Update docs
+
 ## 0.4.2
 
 ### Patch Changes
