@@ -1,0 +1,3312 @@
+{
+  "version": "2.0.1",
+  "name": "spl_stake_pool",
+  "instructions": [
+    {
+      "name": "Initialize",
+      "docs": [
+        "Initializes a new `StakePool`.",
+        "0. `[w]` New `StakePool` to create.",
+        "1. `[s]` Manager",
+        "2. `[]` Staker",
+        "3. `[]` Stake pool withdraw authority",
+        "4. `[w]` Uninitialized validator stake list storage account",
+        "5. `[]` Reserve stake account must be initialized, have zero balance,",
+        "and staker / withdrawer authority set to pool withdraw authority.",
+        "6. `[]` Pool token mint. Must have zero supply, owned by withdraw",
+        "authority.",
+        "7. `[]` Pool account to deposit the generated fee for manager.",
+        "8. `[]` Token program id",
+        "9. `[]` (Optional) Deposit authority that must sign all deposits.",
+        "Defaults to the program address generated using",
+        "`find_deposit_authority_program_address`, making deposits",
+        "permissionless."
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "depositAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptionalSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": {
+            "defined": "Fee"
+          }
+        },
+        {
+          "name": "withdrawalFee",
+          "type": {
+            "defined": "Fee"
+          }
+        },
+        {
+          "name": "depositFee",
+          "type": {
+            "defined": "Fee"
+          }
+        },
+        {
+          "name": "referralFee",
+          "type": "u8"
+        },
+        {
+          "name": "maxValidators",
+          "type": "u32"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 0
+      }
+    },
+    {
+      "name": "AddValidatorToPool",
+      "docs": [
+        "(Staker only) Adds stake account delegated to validator to the pool's",
+        "list of managed validators.",
+        "The stake account will have the rent-exempt amount plus",
+        "`max(",
+        "crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation()",
+        ")`.",
+        "It is funded from the stake pool reserve.",
+        "0. `[w]` Stake pool",
+        "1. `[s]` Staker",
+        "2. `[w]` Reserve stake account",
+        "3. `[]` Stake pool withdraw authority",
+        "4. `[w]` Validator stake list storage account",
+        "5. `[w]` Stake account to add to the pool",
+        "6. `[]` Validator this stake account will be delegated to",
+        "7. `[]` Rent sysvar",
+        "8. `[]` Clock sysvar",
+        "9. '[]' Stake history sysvar",
+        "10. '[]' Stake config sysvar",
+        "11. `[]` System program",
+        "12. `[]` Stake program",
+        "User data: optional non-zero `u32` seed used for generating the",
+        "validator stake address"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["Staker"]
+        },
+        {
+          "name": "reserveStakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Reserve stake account"]
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake pool withdraw authority"]
+        },
+        {
+          "name": "validatorStakeList",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Validator stake list storage account"]
+        },
+        {
+          "name": "newStakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake account to add to the pool"]
+        },
+        {
+          "name": "validatorVoteAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Validator this stake account will be delegated to"]
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Rent sysvar"]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Clock sysvar"]
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake history sysvar"]
+        },
+        {
+          "name": "stakeConfigSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake config sysvar"]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["System program"]
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake program"]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": "u32"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 1
+      }
+    },
+    {
+      "name": "RemoveValidatorFromPool",
+      "docs": [
+        "(Staker only) Removes validator from the pool, deactivating its stake",
+        "Only succeeds if the validator stake account has the minimum of",
+        "`max(crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation())`.   plus the",
+        "rent-exempt amount.",
+        "0. `[w]` Stake pool",
+        "1. `[s]` Staker",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator stake list storage account",
+        "4. `[w]` Stake account to remove from the pool",
+        "5. `[w]` Transient stake account, to deactivate if necessary",
+        "6. `[]` Sysvar clock",
+        "7. `[]` Stake program id,"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["Staker"]
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake pool withdraw authority"]
+        },
+        {
+          "name": "validatorStakeList",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Validator stake list storage account"]
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake account to remove from the pool"]
+        },
+        {
+          "name": "transientStakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Transient stake account, to deactivate if necessary"]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Sysvar clock"]
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake program id"]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 2
+      }
+    },
+    {
+      "name": "DecreaseValidatorStake",
+      "docs": [
+        "NOTE: This instruction has been deprecated since version 0.7.0. Please",
+        "use `DecreaseValidatorStakeWithReserve` instead.",
+        "(Staker only) Decrease active stake on a validator, eventually moving it",
+        "to the reserve",
+        "Internally, this instruction splits a validator stake account into its",
+        "corresponding transient stake account and deactivates it.",
+        "In order to rebalance the pool without taking custody, the staker needs",
+        "a way of reducing the stake on a stake account. This instruction splits",
+        "some amount of stake, up to the total activated stake, from the",
+        "canonical validator stake account, into its \"transient\" stake",
+        "account.",
+        "The instruction only succeeds if the transient stake account does not",
+        "exist. The amount of lamports to move must be at least rent-exemption",
+        "plus `max(crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation())`.",
+        "0. `[]` Stake pool",
+        "1. `[s]` Stake pool staker",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator list",
+        "4. `[w]` Canonical stake account to split from",
+        "5. `[w]` Transient stake account to receive split",
+        "6. `[]` Clock sysvar",
+        "7. `[]` Rent sysvar",
+        "8. `[]` System program",
+        "9. `[]` Stake program"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transientStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "transientStakeSeed",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 3
+      }
+    },
+    {
+      "name": "IncreaseValidatorStake",
+      "docs": [
+        "(Staker only) Increase stake on a validator from the reserve account",
+        "Internally, this instruction splits reserve stake into a transient stake",
+        "account and delegate to the appropriate validator.",
+        "`UpdateValidatorListBalance` will do the work of merging once it's",
+        "ready.",
+        "This instruction only succeeds if the transient stake account does not",
+        "exist. The minimum amount to move is rent-exemption plus",
+        "`max(crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation())`.",
+        "0. `[]` Stake pool",
+        "1. `[s]` Stake pool staker",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator list",
+        "4. `[w]` Stake pool reserve stake",
+        "5. `[w]` Transient stake account",
+        "6. `[]` Validator stake account",
+        "7. `[]` Validator vote account to delegate to",
+        "8. '[]' Clock sysvar",
+        "9. '[]' Rent sysvar",
+        "10. `[]` Stake History sysvar",
+        "11. `[]` Stake Config sysvar",
+        "12. `[]` System program",
+        "13. `[]` Stake program",
+        "User data: amount of lamports to increase on the given validator.",
+        "The actual amount split into the transient stake account is:",
+        "`lamports + stake_rent_exemption`.",
+        "The rent-exemption of the stake account is withdrawn back to the",
+        "reserve after it is merged."
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transientStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validatorStakeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorVoteAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeConfigSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "transientStakeSeed",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 4
+      }
+    },
+    {
+      "name": "SetPreferredValidator",
+      "docs": [
+        "(Staker only) Set the preferred deposit or withdraw stake account for",
+        "the stake pool",
+        "In order to avoid users abusing the stake pool as a free conversion",
+        "between SOL staked on different validators, the staker can force all",
+        "deposits and/or withdraws to go to one chosen account, or unset that",
+        "account.",
+        "0. `[w]` Stake pool",
+        "1. `[s]` Stake pool staker",
+        "2. `[]` Validator list",
+        "Fails if the validator is not part of the stake pool."
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "validatorList",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "validatorType",
+          "type": {
+            "defined": "PreferredValidatorType"
+          }
+        },
+        {
+          "name": "validatorVoteAddress",
+          "type": {
+            "option": "publicKey"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 5
+      }
+    },
+    {
+      "name": "UpdateValidatorListBalance",
+      "docs": [
+        "Updates balances of validator and transient stake accounts in the pool",
+        "While going through the pairs of validator and transient stake",
+        "accounts, if the transient stake is inactive, it is merged into the",
+        "reserve stake account. If the transient stake is active and has",
+        "matching credits observed, it is merged into the canonical",
+        "validator stake account. In all other states, nothing is done, and",
+        "the balance is simply added to the canonical stake account balance.",
+        "0. `[]` Stake pool",
+        "1. `[]` Stake pool withdraw authority",
+        "2. `[w]` Validator stake list storage account",
+        "3. `[w]` Reserve stake account",
+        "4. `[]` Sysvar clock",
+        "5. `[]` Sysvar stake history",
+        "6. `[]` Stake program",
+        "7. `..7+2N` [] N pairs of validator and transient stake accounts"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "startIndex",
+          "type": "u32"
+        },
+        {
+          "name": "noMerge",
+          "type": "bool"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 6
+      }
+    },
+    {
+      "name": "UpdateStakePoolBalance",
+      "docs": [
+        "Updates total pool balance based on balances in the reserve and",
+        "validator list",
+        "0. `[w]` Stake pool",
+        "1. `[]` Stake pool withdraw authority",
+        "2. `[w]` Validator stake list storage account",
+        "3. `[]` Reserve stake account",
+        "4. `[w]` Account to receive pool fee tokens",
+        "5. `[w]` Pool mint account",
+        "6. `[]` Pool token program"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 7
+      }
+    },
+    {
+      "name": "CleanupRemovedValidatorEntries",
+      "docs": [
+        "Cleans up validator stake account entries marked as `ReadyForRemoval`",
+        "0. `[]` Stake pool",
+        "1. `[w]` Validator stake list storage account"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 8
+      }
+    },
+    {
+      "name": "DepositStake",
+      "docs": [
+        "Deposit some stake into the pool. The output is a \"pool\" token",
+        "representing ownership into the pool. Inputs are converted to the",
+        "current ratio.",
+        "0. `[w]` Stake pool",
+        "1. `[w]` Validator stake list storage account",
+        "2. `[s]/[]` Stake pool deposit authority",
+        "3. `[]` Stake pool withdraw authority",
+        "4. `[w]` Stake account to join the pool (withdraw authority for the",
+        "stake account should be first set to the stake pool deposit",
+        "authority)",
+        "5. `[w]` Validator stake account for the stake account to be merged",
+        "with",
+        "6. `[w]` Reserve stake account, to withdraw rent exempt reserve",
+        "7. `[w]` User account to receive pool tokens",
+        "8. `[w]` Account to receive pool fee tokens",
+        "9. `[w]` Account to receive a portion of pool fee tokens as referral",
+        "fees",
+        "10. `[w]` Pool token mint account",
+        "11. '[]' Sysvar clock account",
+        "12. '[]' Sysvar stake history account",
+        "13. `[]` Pool token program id,",
+        "14. `[]` Stake program id,"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptionalSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeToMerge",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validatorStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referralFeeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 9
+      }
+    },
+    {
+      "name": "WithdrawStake",
+      "docs": [
+        "Withdraw the token from the pool at the current ratio.",
+        "Succeeds if the stake account has enough SOL to cover the desired",
+        "amount of pool tokens, and if the withdrawal keeps the total",
+        "staked amount above the minimum of rent-exempt amount plus `max(",
+        "crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation()",
+        ")`.",
+        "When allowing withdrawals, the order of priority goes:",
+        "* preferred withdraw validator stake account (if set)",
+        "* validator stake accounts",
+        "* transient stake accounts",
+        "* reserve stake account OR totally remove validator stake accounts",
+        "A user can freely withdraw from a validator stake account, and if they",
+        "are all at the minimum, then they can withdraw from transient stake",
+        "accounts, and if they are all at minimum, then they can withdraw from",
+        "the reserve or remove any validator from the pool.",
+        "0. `[w]` Stake pool",
+        "1. `[w]` Validator stake list storage account",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator or reserve stake account to split",
+        "4. `[w]` Uninitialized stake account to receive withdrawal",
+        "5. `[]` User account to set as a new withdraw authority",
+        "6. `[s]` User transfer authority, for pool token account",
+        "7. `[w]` User account with pool tokens to burn from",
+        "8. `[w]` Account to receive pool fee tokens",
+        "9. `[w]` Pool token mint account",
+        "10. `[]` Sysvar clock account (required)",
+        "11. `[]` Pool token program id",
+        "12. `[]` Stake program id,",
+        "User data: amount of pool tokens to withdraw"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Validator list"]
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Withdraw authority"]
+        },
+        {
+          "name": "sourceStakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Source stake account"]
+        },
+        {
+          "name": "destinationStakeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Destination stake account"]
+        },
+        {
+          "name": "newWithdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["New withdraw authority"]
+        },
+        {
+          "name": "userTransferAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["User transfer authority"]
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["User pool token account"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Fee account"]
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Pool mint"]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Clock sysvar"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Token program"]
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake program"]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 10
+      }
+    },
+    {
+      "name": "SetManager",
+      "docs": [
+        "(Manager only) Update manager",
+        "0. `[w]` Stake pool",
+        "1. `[s]` Manager",
+        "2. `[s]` New manager",
+        "3. `[]` New manager fee account"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["Manager"]
+        },
+        {
+          "name": "newManager",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["New manager"]
+        },
+        {
+          "name": "newManagerFeeAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["New manager fee account"]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 11
+      }
+    },
+    {
+      "name": "SetFee",
+      "docs": [
+        "(Manager only) Update fee",
+        "0. `[w]` Stake pool",
+        "1. `[s]` Manager"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["Manager"]
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": {
+            "defined": "FeeType"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 12
+      }
+    },
+    {
+      "name": "SetStaker",
+      "docs": [
+        "(Manager or staker only) Update staker",
+        "0. `[w]` Stake pool",
+        "1. `[s]` Manager or current staker",
+        "2. '[]` New staker pubkey"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["Manager or current staker"]
+        },
+        {
+          "name": "newStakerPubkey",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["New staker pubkey"]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 13
+      }
+    },
+    {
+      "name": "DepositSol",
+      "docs": [
+        "Deposit SOL directly into the pool's reserve account. The output is a",
+        "\"pool\" token representing ownership into the pool. Inputs are",
+        "converted to the current ratio.",
+        "0. `[w]` Stake pool",
+        "1. `[]` Stake pool withdraw authority",
+        "2. `[w]` Reserve stake account, to deposit SOL",
+        "3. `[s]` Account providing the lamports to be deposited into the pool",
+        "4. `[w]` User account to receive pool tokens",
+        "5. `[w]` Account to receive fee tokens",
+        "6. `[w]` Account to receive a portion of fee as referral fees",
+        "7. `[w]` Pool token mint account",
+        "8. `[]` System program account",
+        "9. `[]` Token program id",
+        "10. `[s]` (Optional) Stake pool sol deposit authority."
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake pool withdraw authority"]
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Reserve stake account, to deposit SOL"]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Account providing the lamports to be deposited into the pool"
+          ]
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["User account to receive pool tokens"]
+        },
+        {
+          "name": "managerFeeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Account to receive fee tokens"]
+        },
+        {
+          "name": "referralPoolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Account to receive a portion of fee as referral fees"]
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Pool token mint account"]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["System program account"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Token program id"]
+        },
+        {
+          "name": "depositAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": ["(Optional) Stake pool sol deposit authority."]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 14
+      }
+    },
+    {
+      "name": "SetFundingAuthority",
+      "docs": [
+        "(Manager only) Update SOL deposit, stake deposit, or SOL withdrawal",
+        "authority.",
+        "0. `[w]` Stake pool",
+        "1. `[s]` Manager",
+        "2. '[]` New authority pubkey or none"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["Manager"]
+        },
+        {
+          "name": "newAuthorityPubkey",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["New authority pubkey"]
+        }
+      ],
+      "args": [
+        {
+          "name": "fundingType",
+          "type": {
+            "defined": "FundingType"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 15
+      }
+    },
+    {
+      "name": "WithdrawSol",
+      "docs": [
+        "Withdraw SOL directly from the pool's reserve account. Fails if the",
+        "reserve does not have enough SOL.",
+        "0. `[w]` Stake pool",
+        "1. `[]` Stake pool withdraw authority",
+        "2. `[s]` User transfer authority, for pool token account",
+        "3. `[w]` User account to burn pool tokens",
+        "4. `[w]` Reserve stake account, to withdraw SOL",
+        "5. `[w]` Account receiving the lamports from the reserve, must be a",
+        "system account",
+        "6. `[w]` Account to receive pool fee tokens",
+        "7. `[w]` Pool token mint account",
+        "8. '[]' Clock sysvar",
+        "9. '[]' Stake history sysvar",
+        "10. `[]` Stake program account",
+        "11. `[]` Token program id",
+        "12. `[s]` (Optional) Stake pool sol withdraw authority"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Withdraw authority"]
+        },
+        {
+          "name": "userTransferAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["User transfer authority"]
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["User pool token account"]
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Reserve stake"]
+        },
+        {
+          "name": "destinationSystemAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Destination system account"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Fee account"]
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Pool mint"]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Clock sysvar"]
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake history sysvar"]
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake program"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Token program"]
+        },
+        {
+          "name": "solWithdrawAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": ["Sol withdraw authority"]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 16
+      }
+    },
+    {
+      "name": "CreateTokenMetadata",
+      "docs": [
+        "Create token metadata for the stake-pool token in the",
+        "metaplex-token program",
+        "0. `[]` Stake pool",
+        "1. `[s]` Manager",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[]` Pool token mint account",
+        "4. `[s, w]` Payer for creation of token metadata account",
+        "5. `[w]` Token metadata account",
+        "6. `[]` Metadata program id",
+        "7. `[]` System program id"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 17
+      }
+    },
+    {
+      "name": "UpdateTokenMetadata",
+      "docs": [
+        "Update token metadata for the stake-pool token in the",
+        "metaplex-token program",
+        "0. `[]` Stake pool",
+        "1. `[s]` Manager",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Token metadata account",
+        "4. `[]` Metadata program id"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 18
+      }
+    },
+    {
+      "name": "IncreaseAdditionalValidatorStake",
+      "docs": [
+        "(Staker only) Increase stake on a validator again in an epoch.",
+        "Works regardless if the transient stake account exists.",
+        "Internally, this instruction splits reserve stake into an ephemeral",
+        "stake account, activates it, then merges or splits it into the",
+        "transient stake account delegated to the appropriate validator.",
+        "`UpdateValidatorListBalance` will do the work of merging once it's",
+        "ready.",
+        "The minimum amount to move is rent-exemption plus",
+        "`max(crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation())`.",
+        "0. `[]` Stake pool",
+        "1. `[s]` Stake pool staker",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator list",
+        "4. `[w]` Stake pool reserve stake",
+        "5. `[w]` Uninitialized ephemeral stake account to receive stake",
+        "6. `[w]` Transient stake account",
+        "7. `[]` Validator stake account",
+        "8. `[]` Validator vote account to delegate to",
+        "9. '[]' Clock sysvar",
+        "10. `[]` Stake History sysvar",
+        "11. `[]` Stake Config sysvar",
+        "12. `[]` System program",
+        "13. `[]` Stake program",
+        "User data: amount of lamports to increase on the given validator.",
+        "The actual amount split into the transient stake account is:",
+        "`lamports + stake_rent_exemption`.",
+        "The rent-exemption of the stake account is withdrawn back to the",
+        "reserve after it is merged."
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ephemeralStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transientStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validatorStake",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorVote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeConfigSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "transientStakeSeed",
+          "type": "u64"
+        },
+        {
+          "name": "ephemeralStakeSeed",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 19
+      }
+    },
+    {
+      "name": "DecreaseAdditionalValidatorStake",
+      "docs": [
+        "(Staker only) Decrease active stake again from a validator, eventually",
+        "moving it to the reserve",
+        "Works regardless if the transient stake account already exists.",
+        "Internally, this instruction:",
+        "* withdraws rent-exempt reserve lamports from the reserve into the",
+        "ephemeral stake",
+        "* splits a validator stake account into an ephemeral stake account",
+        "* deactivates the ephemeral account",
+        "* merges or splits the ephemeral account into the transient stake",
+        "account delegated to the appropriate validator",
+        "The amount of lamports to move must be at least",
+        "`max(crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation())`.",
+        "0. `[]` Stake pool",
+        "1. `[s]` Stake pool staker",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator list",
+        "4. `[w]` Reserve stake account, to fund rent exempt reserve",
+        "5. `[w]` Canonical stake account to split from",
+        "6. `[w]` Uninitialized ephemeral stake account to receive stake",
+        "7. `[w]` Transient stake account",
+        "8. `[]` Clock sysvar",
+        "9. '[]' Stake history sysvar",
+        "10. `[]` System program",
+        "11. `[]` Stake program"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "canonicalStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ephemeralStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transientStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "transientStakeSeed",
+          "type": "u64"
+        },
+        {
+          "name": "ephemeralStakeSeed",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 20
+      }
+    },
+    {
+      "name": "DecreaseValidatorStakeWithReserve",
+      "docs": [
+        "(Staker only) Decrease active stake on a validator, eventually moving it",
+        "to the reserve",
+        "Internally, this instruction:",
+        "* withdraws enough lamports to make the transient account rent-exempt",
+        "* splits from a validator stake account into a transient stake account",
+        "* deactivates the transient stake account",
+        "In order to rebalance the pool without taking custody, the staker needs",
+        "a way of reducing the stake on a stake account. This instruction splits",
+        "some amount of stake, up to the total activated stake, from the",
+        "canonical validator stake account, into its \"transient\" stake",
+        "account.",
+        "The instruction only succeeds if the transient stake account does not",
+        "exist. The amount of lamports to move must be at least rent-exemption",
+        "plus `max(crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation())`.",
+        "0. `[]` Stake pool",
+        "1. `[s]` Stake pool staker",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator list",
+        "4. `[w]` Reserve stake account, to fund rent exempt reserve",
+        "5. `[w]` Canonical stake account to split from",
+        "6. `[w]` Transient stake account to receive split",
+        "7. `[]` Clock sysvar",
+        "8. '[]' Stake history sysvar",
+        "9. `[]` System program",
+        "10. `[]` Stake program"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "canonicalStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transientStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "transientStakeSeed",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 21
+      }
+    },
+    {
+      "name": "Redelegate",
+      "docs": [
+        "(Staker only) Redelegate active stake on a validator, eventually moving",
+        "it to another",
+        "Internally, this instruction splits a validator stake account into its",
+        "corresponding transient stake account, redelegates it to an ephemeral",
+        "stake account, then merges that stake into the destination transient",
+        "stake account.",
+        "In order to rebalance the pool without taking custody, the staker needs",
+        "a way of reducing the stake on a stake account. This instruction splits",
+        "some amount of stake, up to the total activated stake, from the",
+        "canonical validator stake account, into its \"transient\" stake",
+        "account.",
+        "The instruction only succeeds if the source transient stake account and",
+        "ephemeral stake account do not exist.",
+        "The amount of lamports to move must be at least rent-exemption plus the",
+        "minimum delegation amount. Rent-exemption plus minimum delegation",
+        "is required for the destination ephemeral stake account.",
+        "The rent-exemption for the source transient account comes from the stake",
+        "pool reserve, if needed.",
+        "The amount that arrives at the destination validator in the end is",
+        "`redelegate_lamports - rent_exemption` if the destination transient",
+        "account does *not* exist, and `redelegate_lamports` if the destination",
+        "transient account already exists. The `rent_exemption` is not activated",
+        "when creating the destination transient stake account, but if it already",
+        "exists, then the full amount is delegated.",
+        "0. `[]` Stake pool",
+        "1. `[s]` Stake pool staker",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator list",
+        "4. `[w]` Reserve stake account, to withdraw rent exempt reserve",
+        "5. `[w]` Source canonical stake account to split from",
+        "6. `[w]` Source transient stake account to receive split and be",
+        "redelegated",
+        "7. `[w]` Uninitialized ephemeral stake account to receive redelegation",
+        "8. `[w]` Destination transient stake account to receive ephemeral stake",
+        "by merge",
+        "9. `[]` Destination stake account to receive transient stake after",
+        "activation",
+        "10. `[]` Destination validator vote account",
+        "11. `[]` Clock sysvar",
+        "12. `[]` Stake History sysvar",
+        "13. `[]` Stake Config sysvar",
+        "14. `[]` System program",
+        "15. `[]` Stake program"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "staker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sourceCanonicalStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sourceTransientStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ephemeralStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destinationTransientStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destinationStake",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destinationVote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeConfigSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "sourceTransientStakeSeed",
+          "type": "u64"
+        },
+        {
+          "name": "ephemeralStakeSeed",
+          "type": "u64"
+        },
+        {
+          "name": "destinationTransientStakeSeed",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 22
+      }
+    },
+    {
+      "name": "DepositStakeWithSlippage",
+      "docs": [
+        "Deposit some stake into the pool, with a specified slippage",
+        "constraint. The output is a \"pool\" token representing ownership",
+        "into the pool. Inputs are converted at the current ratio.",
+        "0. `[w]` Stake pool",
+        "1. `[w]` Validator stake list storage account",
+        "2. `[s]/[]` Stake pool deposit authority",
+        "3. `[]` Stake pool withdraw authority",
+        "4. `[w]` Stake account to join the pool (withdraw authority for the",
+        "stake account should be first set to the stake pool deposit",
+        "authority)",
+        "5. `[w]` Validator stake account for the stake account to be merged",
+        "with",
+        "6. `[w]` Reserve stake account, to withdraw rent exempt reserve",
+        "7. `[w]` User account to receive pool tokens",
+        "8. `[w]` Account to receive pool fee tokens",
+        "9. `[w]` Account to receive a portion of pool fee tokens as referral",
+        "fees",
+        "10. `[w]` Pool token mint account",
+        "11. '[]' Sysvar clock account",
+        "12. '[]' Sysvar stake history account",
+        "13. `[]` Pool token program id,",
+        "14. `[]` Stake program id,"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptionalSigner": true
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeToMerge",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validatorStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referralFeeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "minimumPoolTokensOut",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 23
+      }
+    },
+    {
+      "name": "WithdrawStakeWithSlippage",
+      "docs": [
+        "Withdraw the token from the pool at the current ratio, specifying a",
+        "minimum expected output lamport amount.",
+        "Succeeds if the stake account has enough SOL to cover the desired",
+        "amount of pool tokens, and if the withdrawal keeps the total",
+        "staked amount above the minimum of rent-exempt amount plus `max(",
+        "crate::MINIMUM_ACTIVE_STAKE,",
+        "solana_program::stake::tools::get_minimum_delegation()",
+        ")`.",
+        "0. `[w]` Stake pool",
+        "1. `[w]` Validator stake list storage account",
+        "2. `[]` Stake pool withdraw authority",
+        "3. `[w]` Validator or reserve stake account to split",
+        "4. `[w]` Uninitialized stake account to receive withdrawal",
+        "5. `[]` User account to set as a new withdraw authority",
+        "6. `[s]` User transfer authority, for pool token account",
+        "7. `[w]` User account with pool tokens to burn from",
+        "8. `[w]` Account to receive pool fee tokens",
+        "9. `[w]` Pool token mint account",
+        "10. `[]` Sysvar clock account (required)",
+        "11. `[]` Pool token program id",
+        "12. `[]` Stake program id,",
+        "User data: amount of pool tokens to withdraw"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validatorList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sourceStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destinationStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newWithdrawAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userTransferAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "poolTokensIn",
+          "type": "u64"
+        },
+        {
+          "name": "minimumLamportsOut",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 24
+      }
+    },
+    {
+      "name": "DepositSolWithSlippage",
+      "docs": [
+        "Deposit SOL directly into the pool's reserve account, with a",
+        "specified slippage constraint. The output is a \"pool\" token",
+        "representing ownership into the pool. Inputs are converted at the",
+        "current ratio.",
+        "0. `[w]` Stake pool",
+        "1. `[]` Stake pool withdraw authority",
+        "2. `[w]` Reserve stake account, to deposit SOL",
+        "3. `[s]` Account providing the lamports to be deposited into the pool",
+        "4. `[w]` User account to receive pool tokens",
+        "5. `[w]` Account to receive fee tokens",
+        "6. `[w]` Account to receive a portion of fee as referral fees",
+        "7. `[w]` Pool token mint account",
+        "8. `[]` System program account",
+        "9. `[]` Token program id",
+        "10. `[s]` (Optional) Stake pool sol deposit authority."
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake pool withdraw authority"]
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Reserve stake"]
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["Payer"]
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["User pool token account"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Fee account"]
+        },
+        {
+          "name": "referralFeeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Referral fee account"]
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Pool mint"]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["System program"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Token program"]
+        },
+        {
+          "name": "solDepositAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptionalSigner": true,
+          "docs": ["Stake pool sol deposit authority"]
+        }
+      ],
+      "args": [
+        {
+          "name": "lamportsIn",
+          "type": "u64"
+        },
+        {
+          "name": "minimumPoolTokensOut",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 25
+      }
+    },
+    {
+      "name": "WithdrawSolWithSlippage",
+      "docs": [
+        "Withdraw SOL directly from the pool's reserve account. Fails if the",
+        "reserve does not have enough SOL or if the slippage constraint is not",
+        "met.",
+        "0. `[w]` Stake pool",
+        "1. `[]` Stake pool withdraw authority",
+        "2. `[s]` User transfer authority, for pool token account",
+        "3. `[w]` User account to burn pool tokens",
+        "4. `[w]` Reserve stake account, to withdraw SOL",
+        "5. `[w]` Account receiving the lamports from the reserve, must be a",
+        "system account",
+        "6. `[w]` Account to receive pool fee tokens",
+        "7. `[w]` Pool token mint account",
+        "8. '[]' Clock sysvar",
+        "9. '[]' Stake history sysvar",
+        "10. `[]` Stake program account",
+        "11. `[]` Token program id",
+        "12. `[s]` (Optional) Stake pool sol withdraw authority"
+      ],
+      "accounts": [
+        {
+          "name": "stakePool",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Stake pool"]
+        },
+        {
+          "name": "withdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake pool withdraw authority"]
+        },
+        {
+          "name": "userTransferAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": ["User transfer authority"]
+        },
+        {
+          "name": "userPoolTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["User pool token account"]
+        },
+        {
+          "name": "reserveStake",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Reserve stake"]
+        },
+        {
+          "name": "destinationSystemAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Destination system account"]
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Fee account"]
+        },
+        {
+          "name": "poolMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Pool mint"]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Clock sysvar"]
+        },
+        {
+          "name": "stakeHistorySysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake history sysvar"]
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Stake program"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": ["Token program"]
+        },
+        {
+          "name": "solWithdrawAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptionalSigner": true,
+          "docs": ["Stake pool sol withdraw authority"]
+        }
+      ],
+      "args": [
+        {
+          "name": "poolTokensIn",
+          "type": "u64"
+        },
+        {
+          "name": "minimumLamportsOut",
+          "type": "u64"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 26
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "name": "StakePool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "accountType",
+            "type": {
+              "defined": "AccountType"
+            },
+            "docs": ["Account type, must be `StakePool` currently"]
+          },
+          {
+            "name": "manager",
+            "type": "publicKey",
+            "docs": [
+              "Manager authority, allows for updating the staker, manager, and fee",
+              "account"
+            ]
+          },
+          {
+            "name": "staker",
+            "type": "publicKey",
+            "docs": [
+              "Staker authority, allows for adding and removing validators, and",
+              "managing stake distribution"
+            ]
+          },
+          {
+            "name": "stakeDepositAuthority",
+            "type": "publicKey",
+            "docs": [
+              "Stake deposit authority",
+              "If a depositor pubkey is specified on initialization, then deposits must",
+              "be signed by this authority. If no deposit authority is specified,",
+              "then the stake pool will default to the result of:",
+              "`Pubkey::find_program_address(",
+              "&[&stake_pool_address.as_ref(), b\"deposit\"],",
+              "program_id,",
+              ")`"
+            ]
+          },
+          {
+            "name": "stakeWithdrawBumpSeed",
+            "type": "u8",
+            "docs": [
+              "Stake withdrawal authority bump seed",
+              "for `create_program_address(&[state::StakePool account, \"withdrawal\"])`"
+            ]
+          },
+          {
+            "name": "validatorList",
+            "type": "publicKey",
+            "docs": ["Validator stake list storage account"]
+          },
+          {
+            "name": "reserveStake",
+            "type": "publicKey",
+            "docs": ["Reserve stake account, holds deactivated stake"]
+          },
+          {
+            "name": "poolMint",
+            "type": "publicKey",
+            "docs": ["Pool Mint"]
+          },
+          {
+            "name": "managerFeeAccount",
+            "type": "publicKey",
+            "docs": ["Manager fee account"]
+          },
+          {
+            "name": "tokenProgramId",
+            "type": "publicKey",
+            "docs": ["Pool token program id"]
+          },
+          {
+            "name": "totalLamports",
+            "type": "u64",
+            "docs": [
+              "Total stake under management.",
+              "Note that if `last_update_epoch` does not match the current epoch then",
+              "this field may not be accurate"
+            ]
+          },
+          {
+            "name": "poolTokenSupply",
+            "type": "u64",
+            "docs": [
+              "Total supply of pool tokens (should always match the supply in the Pool",
+              "Mint)"
+            ]
+          },
+          {
+            "name": "lastUpdateEpoch",
+            "type": "u64",
+            "docs": ["Last epoch the `total_lamports` field was updated"]
+          },
+          {
+            "name": "lockup",
+            "type": {
+              "defined": "Lockup"
+            },
+            "docs": ["Lockup that all stakes in the pool must have"]
+          },
+          {
+            "name": "epochFee",
+            "type": {
+              "defined": "Fee"
+            },
+            "docs": ["Fee taken as a proportion of rewards each epoch"]
+          },
+          {
+            "name": "nextEpochFee",
+            "type": {
+              "defined": "FutureEpoch"
+            },
+            "docs": ["Fee for next epoch"]
+          },
+          {
+            "name": "preferredDepositValidatorVoteAddress",
+            "type": {
+              "option": "publicKey"
+            },
+            "docs": ["Preferred deposit validator vote account pubkey"]
+          },
+          {
+            "name": "preferredWithdrawValidatorVoteAddress",
+            "type": {
+              "option": "publicKey"
+            },
+            "docs": ["Preferred withdraw validator vote account pubkey"]
+          },
+          {
+            "name": "stakeDepositFee",
+            "type": {
+              "defined": "Fee"
+            },
+            "docs": ["Fee assessed on stake deposits"]
+          },
+          {
+            "name": "stakeWithdrawalFee",
+            "type": {
+              "defined": "Fee"
+            },
+            "docs": ["Fee assessed on withdrawals"]
+          },
+          {
+            "name": "nextStakeWithdrawalFee",
+            "type": {
+              "defined": "FutureEpoch"
+            },
+            "docs": [
+              "Future stake withdrawal fee, to be set for the following epoch"
+            ]
+          },
+          {
+            "name": "stakeReferralFee",
+            "type": "u8",
+            "docs": [
+              "Fees paid out to referrers on referred stake deposits.",
+              "Expressed as a percentage (0 - 100) of deposit fees.",
+              "i.e. `stake_deposit_fee`% of stake deposited is collected as deposit",
+              "fees for every deposit and `stake_referral_fee`% of the collected",
+              "stake deposit fees is paid out to the referrer"
+            ]
+          },
+          {
+            "name": "solDepositAuthority",
+            "type": {
+              "option": "publicKey"
+            },
+            "docs": [
+              "Toggles whether the `DepositSol` instruction requires a signature from",
+              "this `sol_deposit_authority`"
+            ]
+          },
+          {
+            "name": "solDepositFee",
+            "type": {
+              "defined": "Fee"
+            },
+            "docs": ["Fee assessed on SOL deposits"]
+          },
+          {
+            "name": "solReferralFee",
+            "type": "u8",
+            "docs": [
+              "Fees paid out to referrers on referred SOL deposits.",
+              "Expressed as a percentage (0 - 100) of SOL deposit fees.",
+              "i.e. `sol_deposit_fee`% of SOL deposited is collected as deposit fees",
+              "for every deposit and `sol_referral_fee`% of the collected SOL",
+              "deposit fees is paid out to the referrer"
+            ]
+          },
+          {
+            "name": "solWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
+            },
+            "docs": [
+              "Toggles whether the `WithdrawSol` instruction requires a signature from",
+              "the `deposit_authority`"
+            ]
+          },
+          {
+            "name": "solWithdrawalFee",
+            "type": {
+              "defined": "Fee"
+            },
+            "docs": ["Fee assessed on SOL withdrawals"]
+          },
+          {
+            "name": "nextSolWithdrawalFee",
+            "type": {
+              "defined": "FutureEpoch"
+            },
+            "docs": [
+              "Future SOL withdrawal fee, to be set for the following epoch"
+            ]
+          },
+          {
+            "name": "lastEpochPoolTokenSupply",
+            "type": "u64",
+            "docs": [
+              "Last epoch's total pool tokens, used only for APR estimation"
+            ]
+          },
+          {
+            "name": "lastEpochTotalLamports",
+            "type": "u64",
+            "docs": [
+              "Last epoch's total lamports, used only for APR estimation"
+            ]
+          }
+        ]
+      },
+      "docs": ["Initialized program details."]
+    },
+    {
+      "name": "ValidatorList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "accountType",
+            "type": {
+              "defined": "AccountType"
+            },
+            "docs": ["Account type, must be `ValidatorList` currently"]
+          },
+          {
+            "name": "maxValidators",
+            "type": "u32",
+            "docs": ["Maximum allowable number of validators"]
+          },
+          {
+            "name": "validators",
+            "type": {
+              "vec": {
+                "defined": "ValidatorStakeInfo"
+              }
+            },
+            "docs": ["List of stake info for each validator in the pool"]
+          }
+        ]
+      },
+      "docs": ["Storage list for all validator stake accounts in the pool."]
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateMetadataAccountArgsV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
+            "type": {
+              "defined": "DataV2"
+            },
+            "docs": ["Note that unique metadata is disabled for now."]
+          },
+          {
+            "name": "isMutable",
+            "type": "bool",
+            "docs": [
+              "Whether you want your metadata to be changeable in the future."
+            ]
+          },
+          {
+            "name": "collectionDetails",
+            "type": {
+              "option": "u8"
+            },
+            "docs": ["UNUSED If this is a collection parent NFT."]
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateMetadataAccountArgsV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
+            "type": {
+              "option": {
+                "defined": "DataV2"
+              }
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "primarySaleHappened",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "isMutable",
+            "type": {
+              "option": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "docs": ["The name of the asset"]
+          },
+          {
+            "name": "symbol",
+            "type": "string",
+            "docs": ["The symbol for the asset"]
+          },
+          {
+            "name": "uri",
+            "type": "string",
+            "docs": ["URI pointing to JSON representing the asset"]
+          },
+          {
+            "name": "sellerFeeBasisPoints",
+            "type": "u16",
+            "docs": [
+              "Royalty basis points that goes to creators in secondary sales",
+              "(0-10000)"
+            ]
+          },
+          {
+            "name": "creators",
+            "type": {
+              "option": "u8"
+            },
+            "docs": ["UNUSED Array of creators, optional"]
+          },
+          {
+            "name": "collection",
+            "type": {
+              "option": "u8"
+            },
+            "docs": ["UNUSED Collection"]
+          },
+          {
+            "name": "uses",
+            "type": {
+              "option": "u8"
+            },
+            "docs": ["UNUSED Uses"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PodStakeStatus",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "status",
+            "type": "u8",
+            "docs": ["Pod stake status"]
+          }
+        ]
+      },
+      "docs": [
+        "Wrapper struct that can be `Pod`, containing a byte that *should* be a valid",
+        "`StakeStatus` underneath."
+      ]
+    },
+    {
+      "name": "Lockup",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "unixTimestamp",
+            "type": "i64",
+            "docs": [
+              "UnixTimestamp at which this stake will allow withdrawal, unless the",
+              "transaction is signed by the custodian"
+            ]
+          },
+          {
+            "name": "epoch",
+            "type": "u64",
+            "docs": [
+              "epoch height at which this stake will allow withdrawal, unless the",
+              "transaction is signed by the custodian"
+            ]
+          },
+          {
+            "name": "custodian",
+            "type": "publicKey",
+            "docs": [
+              "custodian signature on a transaction exempts the operation from",
+              "lockup constraints"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ValidatorStakeInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "activeStakeLamports",
+            "type": "u64",
+            "attrs": ["idl-type"],
+            "docs": [
+              "Amount of lamports on the validator stake account, including rent",
+              "Note that if `last_update_epoch` does not match the current epoch then",
+              "this field may not be accurate"
+            ]
+          },
+          {
+            "name": "transientStakeLamports",
+            "type": "u64",
+            "attrs": ["idl-type"],
+            "docs": [
+              "Amount of transient stake delegated to this validator",
+              "Note that if `last_update_epoch` does not match the current epoch then",
+              "this field may not be accurate"
+            ]
+          },
+          {
+            "name": "lastUpdateEpoch",
+            "type": "u64",
+            "attrs": ["idl-type"],
+            "docs": [
+              "Last epoch the active and transient stake lamports fields were updated"
+            ]
+          },
+          {
+            "name": "transientSeedSuffix",
+            "type": "u64",
+            "attrs": ["idl-type"],
+            "docs": [
+              "Transient account seed suffix, used to derive the transient stake",
+              "account address"
+            ]
+          },
+          {
+            "name": "unused",
+            "type": "u32",
+            "attrs": ["idl-type"],
+            "docs": [
+              "Unused space, initially meant to specify the end of seed suffixes"
+            ]
+          },
+          {
+            "name": "validatorSeedSuffix",
+            "type": "u32",
+            "attrs": ["idl-type"],
+            "docs": ["Validator account seed suffix"]
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "PodStakeStatus"
+            },
+            "docs": ["Status of the validator stake account"]
+          },
+          {
+            "name": "voteAccountAddress",
+            "type": "publicKey",
+            "docs": ["Validator vote account address"]
+          }
+        ]
+      },
+      "docs": [
+        "Information about a validator in the pool",
+        "NOTE: ORDER IS VERY IMPORTANT HERE, PLEASE DO NOT RE-ORDER THE FIELDS UNLESS",
+        "THERE'S AN EXTREMELY GOOD REASON.",
+        "To save on BPF instructions, the serialized bytes are reinterpreted with a",
+        "`bytemuck` transmute, which means that this structure cannot have any",
+        "undeclared alignment-padding in its representation."
+      ]
+    },
+    {
+      "name": "Fee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "denominator",
+            "type": "u64",
+            "docs": ["denominator of the fee ratio"]
+          },
+          {
+            "name": "numerator",
+            "type": "u64",
+            "docs": ["numerator of the fee ratio"]
+          }
+        ]
+      },
+      "docs": [
+        "Fee rate as a ratio, minted on `UpdateStakePoolBalance` as a proportion of",
+        "the rewards",
+        "If either the numerator or the denominator is 0, the fee is considered to be",
+        "0"
+      ]
+    },
+    {
+      "name": "PreferredValidatorType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Deposit"
+          },
+          {
+            "name": "Withdraw"
+          }
+        ]
+      },
+      "docs": [
+        "Defines which validator vote account is set during the",
+        "`SetPreferredValidator` instruction"
+      ]
+    },
+    {
+      "name": "FundingType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "StakeDeposit"
+          },
+          {
+            "name": "SolDeposit"
+          },
+          {
+            "name": "SolWithdraw"
+          }
+        ]
+      },
+      "docs": [
+        "Defines which authority to update in the `SetFundingAuthority`",
+        "instruction"
+      ]
+    },
+    {
+      "name": "AccountType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "StakePool"
+          },
+          {
+            "name": "ValidatorList"
+          }
+        ]
+      },
+      "docs": ["Enum representing the account type managed by the program"]
+    },
+    {
+      "name": "StakeStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "DeactivatingTransient"
+          },
+          {
+            "name": "ReadyForRemoval"
+          },
+          {
+            "name": "DeactivatingValidator"
+          },
+          {
+            "name": "DeactivatingAll"
+          }
+        ]
+      },
+      "docs": [
+        "Status of the stake account in the validator list, for accounting"
+      ]
+    },
+    {
+      "name": "FutureEpoch",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "One",
+            "fields": [
+              {
+                "defined": "Fee"
+              }
+            ]
+          },
+          {
+            "name": "Two",
+            "fields": [
+              {
+                "defined": "Fee"
+              }
+            ]
+          }
+        ]
+      },
+      "docs": [
+        "Wrapper type that \"counts down\" epochs, which is Borsh-compatible with the",
+        "native `Option`"
+      ]
+    },
+    {
+      "name": "FeeType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SolReferral",
+            "fields": ["u8"]
+          },
+          {
+            "name": "StakeReferral",
+            "fields": ["u8"]
+          },
+          {
+            "name": "Epoch",
+            "fields": [
+              {
+                "defined": "Fee"
+              }
+            ]
+          },
+          {
+            "name": "StakeWithdrawal",
+            "fields": [
+              {
+                "defined": "Fee"
+              }
+            ]
+          },
+          {
+            "name": "SolDeposit",
+            "fields": [
+              {
+                "defined": "Fee"
+              }
+            ]
+          },
+          {
+            "name": "StakeDeposit",
+            "fields": [
+              {
+                "defined": "Fee"
+              }
+            ]
+          },
+          {
+            "name": "SolWithdrawal",
+            "fields": [
+              {
+                "defined": "Fee"
+              }
+            ]
+          }
+        ]
+      },
+      "docs": ["The type of fees that can be set on the stake pool"]
+    }
+  ],
+  "errors": [
+    {
+      "code": 0,
+      "name": "AlreadyInUse",
+      "msg": "AlreadyInUse"
+    },
+    {
+      "code": 1,
+      "name": "InvalidProgramAddress",
+      "msg": "InvalidProgramAddress"
+    },
+    {
+      "code": 2,
+      "name": "InvalidState",
+      "msg": "InvalidState"
+    },
+    {
+      "code": 3,
+      "name": "CalculationFailure",
+      "msg": "CalculationFailure"
+    },
+    {
+      "code": 4,
+      "name": "FeeTooHigh",
+      "msg": "FeeTooHigh"
+    },
+    {
+      "code": 5,
+      "name": "WrongAccountMint",
+      "msg": "WrongAccountMint"
+    },
+    {
+      "code": 6,
+      "name": "WrongManager",
+      "msg": "WrongManager"
+    },
+    {
+      "code": 7,
+      "name": "SignatureMissing",
+      "msg": "SignatureMissing"
+    },
+    {
+      "code": 8,
+      "name": "InvalidValidatorStakeList",
+      "msg": "InvalidValidatorStakeList"
+    },
+    {
+      "code": 9,
+      "name": "InvalidFeeAccount",
+      "msg": "InvalidFeeAccount"
+    },
+    {
+      "code": 10,
+      "name": "WrongPoolMint",
+      "msg": "WrongPoolMint"
+    },
+    {
+      "code": 11,
+      "name": "WrongStakeStake",
+      "msg": "WrongStakeStake"
+    },
+    {
+      "code": 12,
+      "name": "UserStakeNotActive",
+      "msg": "UserStakeNotActive"
+    },
+    {
+      "code": 13,
+      "name": "ValidatorAlreadyAdded",
+      "msg": "ValidatorAlreadyAdded"
+    },
+    {
+      "code": 14,
+      "name": "ValidatorNotFound",
+      "msg": "ValidatorNotFound"
+    },
+    {
+      "code": 15,
+      "name": "InvalidStakeAccountAddress",
+      "msg": "InvalidStakeAccountAddress"
+    },
+    {
+      "code": 16,
+      "name": "StakeListOutOfDate",
+      "msg": "StakeListOutOfDate"
+    },
+    {
+      "code": 17,
+      "name": "StakeListAndPoolOutOfDate",
+      "msg": "StakeListAndPoolOutOfDate"
+    },
+    {
+      "code": 18,
+      "name": "UnknownValidatorStakeAccount",
+      "msg": "UnknownValidatorStakeAccount"
+    },
+    {
+      "code": 19,
+      "name": "WrongMintingAuthority",
+      "msg": "WrongMintingAuthority"
+    },
+    {
+      "code": 20,
+      "name": "UnexpectedValidatorListAccountSize",
+      "msg": "UnexpectedValidatorListAccountSize"
+    },
+    {
+      "code": 21,
+      "name": "WrongStaker",
+      "msg": "WrongStaker"
+    },
+    {
+      "code": 22,
+      "name": "NonZeroPoolTokenSupply",
+      "msg": "NonZeroPoolTokenSupply"
+    },
+    {
+      "code": 23,
+      "name": "StakeLamportsNotEqualToMinimum",
+      "msg": "StakeLamportsNotEqualToMinimum"
+    },
+    {
+      "code": 24,
+      "name": "IncorrectDepositVoteAddress",
+      "msg": "IncorrectDepositVoteAddress"
+    },
+    {
+      "code": 25,
+      "name": "IncorrectWithdrawVoteAddress",
+      "msg": "IncorrectWithdrawVoteAddress"
+    },
+    {
+      "code": 26,
+      "name": "InvalidMintFreezeAuthority",
+      "msg": "InvalidMintFreezeAuthority"
+    },
+    {
+      "code": 27,
+      "name": "FeeIncreaseTooHigh",
+      "msg": "FeeIncreaseTooHigh"
+    },
+    {
+      "code": 28,
+      "name": "WithdrawalTooSmall",
+      "msg": "WithdrawalTooSmall"
+    },
+    {
+      "code": 29,
+      "name": "DepositTooSmall",
+      "msg": "DepositTooSmall"
+    },
+    {
+      "code": 30,
+      "name": "InvalidStakeDepositAuthority",
+      "msg": "InvalidStakeDepositAuthority"
+    },
+    {
+      "code": 31,
+      "name": "InvalidSolDepositAuthority",
+      "msg": "InvalidSolDepositAuthority"
+    },
+    {
+      "code": 32,
+      "name": "InvalidPreferredValidator",
+      "msg": "InvalidPreferredValidator"
+    },
+    {
+      "code": 33,
+      "name": "TransientAccountInUse",
+      "msg": "TransientAccountInUse"
+    },
+    {
+      "code": 34,
+      "name": "InvalidSolWithdrawAuthority",
+      "msg": "InvalidSolWithdrawAuthority"
+    },
+    {
+      "code": 35,
+      "name": "SolWithdrawalTooLarge",
+      "msg": "SolWithdrawalTooLarge"
+    },
+    {
+      "code": 36,
+      "name": "InvalidMetadataAccount",
+      "msg": "InvalidMetadataAccount"
+    },
+    {
+      "code": 37,
+      "name": "UnsupportedMintExtension",
+      "msg": "UnsupportedMintExtension"
+    },
+    {
+      "code": 38,
+      "name": "UnsupportedFeeAccountExtension",
+      "msg": "UnsupportedFeeAccountExtension"
+    },
+    {
+      "code": 39,
+      "name": "ExceededSlippage",
+      "msg": "Instruction exceeds desired slippage limit"
+    },
+    {
+      "code": 40,
+      "name": "IncorrectMintDecimals",
+      "msg": "IncorrectMintDecimals"
+    },
+    {
+      "code": 41,
+      "name": "ReserveDepleted",
+      "msg": "ReserveDepleted"
+    },
+    {
+      "code": 42,
+      "name": "MissingRequiredSysvar",
+      "msg": "Missing required sysvar account"
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy"
+  }
+}

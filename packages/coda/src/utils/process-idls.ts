@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { fixDocsVisitor } from "@macalinao/coda-visitors";
 import {
   getCommonInstructionAccountDefaultRules,
+  publicKeyValueNode,
   setInstructionAccountDefaultValuesVisitor,
 } from "codama";
 import { applyCustomVisitors } from "./apply-custom-visitors.js";
@@ -50,6 +51,12 @@ export async function processIdls(options: {
   codama.update(
     setInstructionAccountDefaultValuesVisitor([
       ...getCommonInstructionAccountDefaultRules(),
+      {
+        account: "stakeConfigSysvar",
+        defaultValue: publicKeyValueNode(
+          "StakeConfig11111111111111111111111111111111",
+        ),
+      },
       ...(config.instructionAccountDefaultValues ?? []),
     ]),
   );
