@@ -8,9 +8,10 @@
         "@changesets/cli": "^2.29.7",
         "@macalinao/biome-config": "^0.1.2",
         "husky": "^9.1.7",
-        "lint-staged": "^16.2.3",
+        "lint-staged": "^16.2.4",
         "turbo": "^2.5.8",
-        "typedoc": "^0.28.13",
+        "typedoc": "^0.28.14",
+        "typescript": "catalog:",
       },
     },
     "apps/docs": {
@@ -87,6 +88,21 @@
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
       "version": "0.2.3",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "@solana/kit": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@solana/kit": "*",
+      },
+    },
+    "clients/spl-stake-pool": {
+      "name": "@macalinao/clients-spl-stake-pool",
+      "version": "0.1.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -532,6 +548,8 @@
     "@macalinao/clients-quarry": ["@macalinao/clients-quarry@workspace:clients/quarry"],
 
     "@macalinao/clients-spl-governance": ["@macalinao/clients-spl-governance@workspace:clients/spl-governance"],
+
+    "@macalinao/clients-spl-stake-pool": ["@macalinao/clients-spl-stake-pool@workspace:clients/spl-stake-pool"],
 
     "@macalinao/clients-token-metadata": ["@macalinao/clients-token-metadata@workspace:clients/token-metadata"],
 

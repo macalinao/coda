@@ -40,9 +40,18 @@ The `coda.config.mjs` file is configured to load all Quarry protocol IDLs and ge
 ## Usage
 
 ```typescript
-import {} from /* generated exports */ "@macalinao/clients-quarry";
+import {
+  getCreateMinerInstruction,
+  fetchMiner,
+} from "@macalinao/clients-quarry";
 
-// Use the generated client functions for any Quarry program
+// Fetch miner account
+const miner = await fetchMiner(rpc, minerAddress);
+
+// Create miner instruction
+const instruction = getCreateMinerInstruction({
+  // ... instruction parameters
+});
 ```
 
 ## License

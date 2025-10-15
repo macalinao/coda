@@ -40,10 +40,10 @@ The `coda.config.mjs` file defines custom PDAs for the SPL Governance program, i
 ## Usage
 
 ```typescript
-import { createRealm, getRealmPda } from "@macalinao/clients-spl-governance";
+import { getCreateRealmInstruction, findRealmPda } from "@macalinao/clients-spl-governance";
 
 // Create a new realm
-const realmPda = getRealmPda({ name: "my-dao" });
+const realmPda = await findRealmPda({ name: "my-dao" });
 
 // Use the generated client functions
 ```

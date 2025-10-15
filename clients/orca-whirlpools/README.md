@@ -33,9 +33,18 @@ The `coda.config.mjs` file can be customized to add PDAs and other Codama visito
 ## Usage
 
 ```typescript
-import {} from /* generated exports */ "@macalinao/clients-orca-whirlpools";
+import {
+  getSwapInstruction,
+  fetchWhirlpool,
+} from "@macalinao/clients-orca-whirlpools";
 
-// Use the generated client functions
+// Fetch whirlpool account
+const whirlpool = await fetchWhirlpool(rpc, whirlpoolAddress);
+
+// Create swap instruction
+const instruction = getSwapInstruction({
+  // ... instruction parameters
+});
 ```
 
 ## License

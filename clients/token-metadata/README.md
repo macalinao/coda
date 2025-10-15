@@ -29,9 +29,18 @@ The `coda.config.mjs` file adds custom PDAs to the generated client, including t
 ## Usage
 
 ```typescript
-import {} from /* generated exports */ "@macalinao/clients-token-metadata";
+import {
+  getCreateMetadataAccountInstruction,
+  fetchMetadata,
+} from "@macalinao/clients-token-metadata";
 
-// Use the generated client functions
+// Fetch metadata account
+const metadata = await fetchMetadata(rpc, metadataAddress);
+
+// Create metadata account instruction
+const instruction = getCreateMetadataAccountInstruction({
+  // ... instruction parameters
+});
 ```
 
 ## License
