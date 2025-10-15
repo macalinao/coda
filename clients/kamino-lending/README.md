@@ -26,7 +26,7 @@ npm install @macalinao/clients-kamino-lending
 
 ```typescript
 import {
-  createInitializeInstruction,
+  getInitLendingMarketInstruction,
   fetchLendingMarket,
   // ... other exports
 } from "@macalinao/clients-kamino-lending";
@@ -39,7 +39,7 @@ const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
 const lendingMarket = await fetchLendingMarket(rpc, marketAddress);
 
 // Create instructions
-const instruction = createInitializeInstruction({
+const instruction = getInitLendingMarketInstruction({
   // ... instruction parameters
 });
 ```
