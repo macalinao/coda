@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.4.4
+
+### Patch Changes
+
+- 43b1550: Update docs
+
 ## 0.4.3
 
 ### Patch Changes

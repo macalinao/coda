@@ -1,5 +1,11 @@
 # @macalinao/grill-cli
 
+## 0.4.5
+
+### Patch Changes
+
+- 43b1550: Update docs
+
 ## 0.4.4
 
 ### Patch Changes
