@@ -46,14 +46,14 @@
     "docs:build": "turbo build --filter=coda-docs"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.5",
+    "@biomejs/biome": "^2.2.6",
     "@changesets/cli": "^2.29.7",
     "@macalinao/biome-config": "^0.1.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.4",
     "turbo": "^2.5.8",
     "typedoc": "^0.28.14",
-    "typescript": "catalog:"
+    "typescript": "^5.9.3"
   },
   "packageManager": "bun@1.3.0",
   "lint-staged": {
