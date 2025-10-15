@@ -33,9 +33,16 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { findWithdrawAuthorityPda } from "../pdas/index.js";
+import {
+  findTransientStakePda,
+  findWithdrawAuthorityPda,
+} from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  expectSome,
+  getAccountMetaFactory,
+} from "../shared/index.js";
 
 export const INCREASE_VALIDATOR_STAKE_DISCRIMINATOR = 4;
 
@@ -187,7 +194,7 @@ export interface IncreaseValidatorStakeAsyncInput<
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
   validatorList: Address<TAccountValidatorList>;
   reserveStake: Address<TAccountReserveStake>;
-  transientStakeAccount: Address<TAccountTransientStakeAccount>;
+  transientStakeAccount?: Address<TAccountTransientStakeAccount>;
   validatorStakeAccount: Address<TAccountValidatorStakeAccount>;
   validatorVoteAccount: Address<TAccountValidatorVoteAccount>;
   clockSysvar?: Address<TAccountClockSysvar>;
@@ -304,6 +311,13 @@ export async function getIncreaseValidatorStakeInstructionAsync<
   if (!accounts.withdrawAuthority.value) {
     accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
       stakePoolAddress: expectAddress(accounts.stakePool.value),
+    });
+  }
+  if (!accounts.transientStakeAccount.value) {
+    accounts.transientStakeAccount.value = await findTransientStakePda({
+      voteAccountAddress: expectAddress(accounts.validatorVoteAccount.value),
+      stakePoolAddress: expectAddress(accounts.stakePool.value),
+      seed: expectSome(args.transientStakeSeed),
     });
   }
   if (!accounts.clockSysvar.value) {

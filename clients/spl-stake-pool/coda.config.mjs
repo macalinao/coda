@@ -1,6 +1,7 @@
 import {
   accountValueNode,
   addPdasVisitor,
+  argumentValueNode,
   constantPdaSeedNodeFromString,
   defineConfig,
   definedTypeLinkNode,
@@ -11,6 +12,7 @@ import {
   pdaValueNode,
   publicKeyTypeNode,
   publicKeyValueNode,
+  remainderOptionTypeNode,
   setAccountDiscriminatorFromFieldVisitor,
   setInstructionAccountDefaultValuesVisitor,
   variablePdaSeedNode,
@@ -52,14 +54,10 @@ export default defineConfig({
           seeds: [
             variablePdaSeedNode("voteAccountAddress", publicKeyTypeNode()),
             variablePdaSeedNode("stakePoolAddress", publicKeyTypeNode()),
-          ],
-        },
-        {
-          name: "stakeWithSeed",
-          seeds: [
-            variablePdaSeedNode("voteAccountAddress", publicKeyTypeNode()),
-            variablePdaSeedNode("stakePoolAddress", publicKeyTypeNode()),
-            variablePdaSeedNode("seed", numberTypeNode("u32", "le")),
+            variablePdaSeedNode(
+              "seed",
+              remainderOptionTypeNode(numberTypeNode("u32", "le")),
+            ),
           ],
         },
         {
@@ -92,6 +90,17 @@ export default defineConfig({
         account: "withdrawAuthority",
         defaultValue: pdaValueNode(pdaLinkNode("withdrawAuthority"), [
           pdaSeedValueNode("stakePoolAddress", accountValueNode("stakePool")),
+        ]),
+      },
+      {
+        account: "transientStakeAccount",
+        defaultValue: pdaValueNode(pdaLinkNode("transientStake"), [
+          pdaSeedValueNode(
+            "voteAccountAddress",
+            accountValueNode("validatorVoteAccount"),
+          ),
+          pdaSeedValueNode("stakePoolAddress", accountValueNode("stakePool")),
+          pdaSeedValueNode("seed", argumentValueNode("transientStakeSeed")),
         ]),
       },
     ]),

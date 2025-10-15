@@ -6,12 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
-import { getAddressEncoder, getProgramDerivedAddress } from "@solana/kit";
+import type {
+  Address,
+  OptionOrNullable,
+  ProgramDerivedAddress,
+} from "@solana/kit";
+import {
+  getAddressEncoder,
+  getOptionEncoder,
+  getProgramDerivedAddress,
+  getU32Encoder,
+} from "@solana/kit";
 
 export interface StakeSeeds {
   voteAccountAddress: Address;
   stakePoolAddress: Address;
+  seed: OptionOrNullable<number>;
 }
 
 export async function findStakePda(
@@ -26,6 +36,7 @@ export async function findStakePda(
     seeds: [
       getAddressEncoder().encode(seeds.voteAccountAddress),
       getAddressEncoder().encode(seeds.stakePoolAddress),
+      getOptionEncoder(getU32Encoder(), { prefix: null }).encode(seeds.seed),
     ],
   });
 }

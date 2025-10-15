@@ -8,6 +8,5 @@
 
 export * from "./ephemeralStake.js";
 export * from "./stake.js";
-export * from "./stakeWithSeed.js";
 export * from "./transientStake.js";
 export * from "./withdrawAuthority.js";
