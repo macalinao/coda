@@ -55,18 +55,26 @@ export function getUserMetadataDiscriminatorBytes(): ReadonlyUint8Array {
 
 export interface UserMetadata {
   discriminator: ReadonlyUint8Array;
+  /** Pubkey of the referrer/owner - pubkey::default if no referrer */
   referrer: Address;
+  /** Bump used for validation of account address */
   bump: bigint;
+  /** User lookup table - used to store all user accounts - atas for each reserve mint, each obligation PDA, UserMetadata itself and all referrer_token_states if there is a referrer */
   userLookupTable: Address;
+  /** User metadata account owner */
   owner: Address;
   padding1: bigint[];
   padding2: bigint[];
 }
 
 export interface UserMetadataArgs {
+  /** Pubkey of the referrer/owner - pubkey::default if no referrer */
   referrer: Address;
+  /** Bump used for validation of account address */
   bump: number | bigint;
+  /** User lookup table - used to store all user accounts - atas for each reserve mint, each obligation PDA, UserMetadata itself and all referrer_token_states if there is a referrer */
   userLookupTable: Address;
+  /** User metadata account owner */
   owner: Address;
   padding1: (number | bigint)[];
   padding2: (number | bigint)[];

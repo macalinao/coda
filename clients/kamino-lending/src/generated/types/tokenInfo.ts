@@ -44,13 +44,19 @@ import {
 } from "./index.js";
 
 export interface TokenInfo {
+  /** UTF-8 encoded name of the token (null-terminated) */
   name: number[];
+  /** Heuristics limits of acceptable price */
   heuristic: PriceHeuristic;
+  /** Max divergence between twap and price in bps */
   maxTwapDivergenceBps: bigint;
   maxAgePriceSeconds: bigint;
   maxAgeTwapSeconds: bigint;
+  /** Scope price configuration */
   scopeConfiguration: ScopeConfiguration;
+  /** Switchboard configuration */
   switchboardConfiguration: SwitchboardConfiguration;
+  /** Pyth configuration */
   pythConfiguration: PythConfiguration;
   blockPriceUsage: number;
   reserved: number[];
@@ -58,13 +64,19 @@ export interface TokenInfo {
 }
 
 export interface TokenInfoArgs {
+  /** UTF-8 encoded name of the token (null-terminated) */
   name: number[];
+  /** Heuristics limits of acceptable price */
   heuristic: PriceHeuristicArgs;
+  /** Max divergence between twap and price in bps */
   maxTwapDivergenceBps: number | bigint;
   maxAgePriceSeconds: number | bigint;
   maxAgeTwapSeconds: number | bigint;
+  /** Scope price configuration */
   scopeConfiguration: ScopeConfigurationArgs;
+  /** Switchboard configuration */
   switchboardConfiguration: SwitchboardConfigurationArgs;
+  /** Pyth configuration */
   pythConfiguration: PythConfigurationArgs;
   blockPriceUsage: number;
   reserved: number[];

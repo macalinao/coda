@@ -79,7 +79,8 @@ export function getIdlMissingTypesDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type IdlMissingTypesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta = string,
+  TAccountSigner extends string | AccountMeta = string,
+  TAccountGlobalConfig extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountReserve extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -87,10 +88,13 @@ export type IdlMissingTypesInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountLendingMarketOwner extends string
-        ? ReadonlySignerAccount<TAccountLendingMarketOwner> &
-            AccountSignerMeta<TAccountLendingMarketOwner>
-        : TAccountLendingMarketOwner,
+      TAccountSigner extends string
+        ? ReadonlySignerAccount<TAccountSigner> &
+            AccountSignerMeta<TAccountSigner>
+        : TAccountSigner,
+      TAccountGlobalConfig extends string
+        ? ReadonlyAccount<TAccountGlobalConfig>
+        : TAccountGlobalConfig,
       TAccountLendingMarket extends string
         ? ReadonlyAccount<TAccountLendingMarket>
         : TAccountLendingMarket,
@@ -168,11 +172,13 @@ export function getIdlMissingTypesInstructionDataCodec(): Codec<
 }
 
 export interface IdlMissingTypesInput<
-  TAccountLendingMarketOwner extends string = string,
+  TAccountSigner extends string = string,
+  TAccountGlobalConfig extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
 > {
-  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  signer: TransactionSigner<TAccountSigner>;
+  globalConfig: Address<TAccountGlobalConfig>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
   reserveFarmKind: IdlMissingTypesInstructionDataArgs["reserveFarmKind"];
@@ -185,20 +191,23 @@ export interface IdlMissingTypesInput<
 }
 
 export function getIdlMissingTypesInstruction<
-  TAccountLendingMarketOwner extends string,
+  TAccountSigner extends string,
+  TAccountGlobalConfig extends string,
   TAccountLendingMarket extends string,
   TAccountReserve extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: IdlMissingTypesInput<
-    TAccountLendingMarketOwner,
+    TAccountSigner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve
   >,
   config?: { programAddress?: TProgramAddress },
 ): IdlMissingTypesInstruction<
   TProgramAddress,
-  TAccountLendingMarketOwner,
+  TAccountSigner,
+  TAccountGlobalConfig,
   TAccountLendingMarket,
   TAccountReserve
 > {
@@ -208,10 +217,8 @@ export function getIdlMissingTypesInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    lendingMarketOwner: {
-      value: input.lendingMarketOwner ?? null,
-      isWritable: false,
-    },
+    signer: { value: input.signer ?? null, isWritable: false },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
     lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
     reserve: { value: input.reserve ?? null, isWritable: true },
   };
@@ -226,7 +233,8 @@ export function getIdlMissingTypesInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.signer),
+      getAccountMeta(accounts.globalConfig),
       getAccountMeta(accounts.lendingMarket),
       getAccountMeta(accounts.reserve),
     ],
@@ -236,7 +244,8 @@ export function getIdlMissingTypesInstruction<
     programAddress,
   } as IdlMissingTypesInstruction<
     TProgramAddress,
-    TAccountLendingMarketOwner,
+    TAccountSigner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve
   >);
@@ -248,9 +257,10 @@ export interface ParsedIdlMissingTypesInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    lendingMarketOwner: TAccountMetas[0];
-    lendingMarket: TAccountMetas[1];
-    reserve: TAccountMetas[2];
+    signer: TAccountMetas[0];
+    globalConfig: TAccountMetas[1];
+    lendingMarket: TAccountMetas[2];
+    reserve: TAccountMetas[3];
   };
   data: IdlMissingTypesInstructionData;
 }
@@ -263,7 +273,7 @@ export function parseIdlMissingTypesInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedIdlMissingTypesInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 3) {
+  if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -276,7 +286,8 @@ export function parseIdlMissingTypesInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      lendingMarketOwner: getNextAccount(),
+      signer: getNextAccount(),
+      globalConfig: getNextAccount(),
       lendingMarket: getNextAccount(),
       reserve: getNextAccount(),
     },

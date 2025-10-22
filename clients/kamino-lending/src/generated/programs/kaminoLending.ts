@@ -21,6 +21,7 @@ import type {
   ParsedFlashRepayReserveLiquidityInstruction,
   ParsedIdlMissingTypesInstruction,
   ParsedInitFarmsForReserveInstruction,
+  ParsedInitGlobalConfigInstruction,
   ParsedInitLendingMarketInstruction,
   ParsedInitObligationFarmsForReserveInstruction,
   ParsedInitObligationInstruction,
@@ -41,8 +42,11 @@ import type {
   ParsedRepayObligationLiquidityInstruction,
   ParsedRepayObligationLiquidityV2Instruction,
   ParsedRequestElevationGroupInstruction,
+  ParsedSetObligationOrderInstruction,
   ParsedSocializeLossInstruction,
   ParsedSocializeLossV2Instruction,
+  ParsedUpdateGlobalConfigAdminInstruction,
+  ParsedUpdateGlobalConfigInstruction,
   ParsedUpdateLendingMarketInstruction,
   ParsedUpdateLendingMarketOwnerInstruction,
   ParsedUpdateReserveConfigInstruction,
@@ -190,8 +194,8 @@ export enum KaminoLendingInstruction {
   SocializeLoss = 8,
   SocializeLossV2 = 9,
   MarkObligationForDeleveraging = 10,
-  RefreshReservesBatch = 11,
-  RefreshReserve = 12,
+  RefreshReserve = 11,
+  RefreshReservesBatch = 12,
   DepositReserveLiquidity = 13,
   RedeemReserveCollateral = 14,
   InitObligation = 15,
@@ -222,7 +226,11 @@ export enum KaminoLendingInstruction {
   WithdrawReferrerFees = 40,
   InitReferrerStateAndShortUrl = 41,
   DeleteReferrerStateAndShortUrl = 42,
-  IdlMissingTypes = 43,
+  SetObligationOrder = 43,
+  InitGlobalConfig = 44,
+  UpdateGlobalConfig = 45,
+  UpdateGlobalConfigAdmin = 46,
+  IdlMissingTypes = 47,
 }
 
 export function identifyKaminoLendingInstruction(
@@ -354,23 +362,23 @@ export function identifyKaminoLendingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([144, 110, 26, 103, 162, 204, 252, 147]),
-      ),
-      0,
-    )
-  ) {
-    return KaminoLendingInstruction.RefreshReservesBatch;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([2, 218, 138, 235, 79, 201, 25, 102]),
       ),
       0,
     )
   ) {
     return KaminoLendingInstruction.RefreshReserve;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([144, 110, 26, 103, 162, 204, 252, 147]),
+      ),
+      0,
+    )
+  ) {
+    return KaminoLendingInstruction.RefreshReservesBatch;
   }
   if (
     containsBytes(
@@ -706,6 +714,50 @@ export function identifyKaminoLendingInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([81, 1, 99, 156, 211, 83, 78, 46]),
+      ),
+      0,
+    )
+  ) {
+    return KaminoLendingInstruction.SetObligationOrder;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([140, 136, 214, 48, 87, 0, 120, 255]),
+      ),
+      0,
+    )
+  ) {
+    return KaminoLendingInstruction.InitGlobalConfig;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([164, 84, 130, 189, 111, 58, 250, 200]),
+      ),
+      0,
+    )
+  ) {
+    return KaminoLendingInstruction.UpdateGlobalConfig;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([184, 87, 23, 193, 156, 238, 175, 119]),
+      ),
+      0,
+    )
+  ) {
+    return KaminoLendingInstruction.UpdateGlobalConfigAdmin;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([130, 80, 38, 153, 80, 212, 182, 253]),
       ),
       0,
@@ -755,11 +807,11 @@ export type ParsedKaminoLendingInstruction<
       instructionType: KaminoLendingInstruction.MarkObligationForDeleveraging;
     } & ParsedMarkObligationForDeleveragingInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RefreshReservesBatch;
-    } & ParsedRefreshReservesBatchInstruction<TProgram>)
-  | ({
       instructionType: KaminoLendingInstruction.RefreshReserve;
     } & ParsedRefreshReserveInstruction<TProgram>)
+  | ({
+      instructionType: KaminoLendingInstruction.RefreshReservesBatch;
+    } & ParsedRefreshReservesBatchInstruction<TProgram>)
   | ({
       instructionType: KaminoLendingInstruction.DepositReserveLiquidity;
     } & ParsedDepositReserveLiquidityInstruction<TProgram>)
@@ -850,6 +902,18 @@ export type ParsedKaminoLendingInstruction<
   | ({
       instructionType: KaminoLendingInstruction.DeleteReferrerStateAndShortUrl;
     } & ParsedDeleteReferrerStateAndShortUrlInstruction<TProgram>)
+  | ({
+      instructionType: KaminoLendingInstruction.SetObligationOrder;
+    } & ParsedSetObligationOrderInstruction<TProgram>)
+  | ({
+      instructionType: KaminoLendingInstruction.InitGlobalConfig;
+    } & ParsedInitGlobalConfigInstruction<TProgram>)
+  | ({
+      instructionType: KaminoLendingInstruction.UpdateGlobalConfig;
+    } & ParsedUpdateGlobalConfigInstruction<TProgram>)
+  | ({
+      instructionType: KaminoLendingInstruction.UpdateGlobalConfigAdmin;
+    } & ParsedUpdateGlobalConfigAdminInstruction<TProgram>)
   | ({
       instructionType: KaminoLendingInstruction.IdlMissingTypes;
     } & ParsedIdlMissingTypesInstruction<TProgram>);

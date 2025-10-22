@@ -13,6 +13,7 @@ import type {
 } from "@solana/kit";
 import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/** Calculate fees exlusive or inclusive of an amount */
 export enum FeeCalculation {
   Exclusive = 0,
   Inclusive = 1,

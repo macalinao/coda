@@ -56,19 +56,29 @@ export function getReferrerTokenStateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export interface ReferrerTokenState {
   discriminator: ReadonlyUint8Array;
+  /** Pubkey of the referrer/owner */
   referrer: Address;
+  /** Token mint for the account */
   mint: Address;
+  /** Amount that has been accumulated and not claimed yet -> available to claim (scaled fraction) */
   amountUnclaimedSf: bigint;
+  /** Amount that has been accumulated in total -> both already claimed and unclaimed (scaled fraction) */
   amountCumulativeSf: bigint;
+  /** Referrer token state bump, used for address validation */
   bump: bigint;
   padding: bigint[];
 }
 
 export interface ReferrerTokenStateArgs {
+  /** Pubkey of the referrer/owner */
   referrer: Address;
+  /** Token mint for the account */
   mint: Address;
+  /** Amount that has been accumulated and not claimed yet -> available to claim (scaled fraction) */
   amountUnclaimedSf: number | bigint;
+  /** Amount that has been accumulated in total -> both already claimed and unclaimed (scaled fraction) */
   amountCumulativeSf: number | bigint;
+  /** Referrer token state bump, used for address validation */
   bump: number | bigint;
   padding: (number | bigint)[];
 }

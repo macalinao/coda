@@ -31,24 +31,37 @@ import {
   getBigFractionBytesEncoder,
 } from "./index.js";
 
+/** Obligation liquidity state */
 export interface ObligationLiquidity {
+  /** Reserve liquidity is borrowed from */
   borrowReserve: Address;
+  /** Borrow rate used for calculating interest (big scaled fraction) */
   cumulativeBorrowRateBsf: BigFractionBytes;
   padding: bigint;
+  /** Amount of liquidity borrowed plus interest (scaled fraction) */
   borrowedAmountSf: bigint;
+  /** Liquidity market value in quote currency (scaled fraction) */
   marketValueSf: bigint;
+  /** Risk adjusted liquidity market value in quote currency - DEBUG ONLY - use market_value instead */
   borrowFactorAdjustedMarketValueSf: bigint;
+  /** Amount of liquidity borrowed outside of an elevation group */
   borrowedAmountOutsideElevationGroups: bigint;
   padding2: bigint[];
 }
 
 export interface ObligationLiquidityArgs {
+  /** Reserve liquidity is borrowed from */
   borrowReserve: Address;
+  /** Borrow rate used for calculating interest (big scaled fraction) */
   cumulativeBorrowRateBsf: BigFractionBytesArgs;
   padding: number | bigint;
+  /** Amount of liquidity borrowed plus interest (scaled fraction) */
   borrowedAmountSf: number | bigint;
+  /** Liquidity market value in quote currency (scaled fraction) */
   marketValueSf: number | bigint;
+  /** Risk adjusted liquidity market value in quote currency - DEBUG ONLY - use market_value instead */
   borrowFactorAdjustedMarketValueSf: number | bigint;
+  /** Amount of liquidity borrowed outside of an elevation group */
   borrowedAmountOutsideElevationGroups: number | bigint;
   padding2: (number | bigint)[];
 }

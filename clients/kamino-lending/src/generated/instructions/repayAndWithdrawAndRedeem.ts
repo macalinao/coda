@@ -69,7 +69,7 @@ export type RepayAndWithdrawAndRedeemInstruction<
   TAccountRepayAccountsTokenProgram extends string | AccountMeta = string,
   TAccountRepayAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = string,
   TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
   TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
@@ -103,7 +103,7 @@ export type RepayAndWithdrawAndRedeemInstruction<
     | AccountMeta = string,
   TAccountWithdrawAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = string,
   TAccountCollateralFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
@@ -297,7 +297,7 @@ export interface RepayAndWithdrawAndRedeemInput<
   repayAccountsReserveDestinationLiquidity: Address<TAccountRepayAccountsReserveDestinationLiquidity>;
   repayAccountsUserSourceLiquidity: Address<TAccountRepayAccountsUserSourceLiquidity>;
   repayAccountsTokenProgram: Address<TAccountRepayAccountsTokenProgram>;
-  repayAccountsInstructionSysvarAccount?: Address<TAccountRepayAccountsInstructionSysvarAccount>;
+  repayAccountsInstructionSysvarAccount: Address<TAccountRepayAccountsInstructionSysvarAccount>;
   withdrawAccountsOwner: TransactionSigner<TAccountWithdrawAccountsOwner>;
   withdrawAccountsObligation: Address<TAccountWithdrawAccountsObligation>;
   withdrawAccountsLendingMarket: Address<TAccountWithdrawAccountsLendingMarket>;
@@ -311,7 +311,7 @@ export interface RepayAndWithdrawAndRedeemInput<
   withdrawAccountsPlaceholderUserDestinationCollateral?: Address<TAccountWithdrawAccountsPlaceholderUserDestinationCollateral>;
   withdrawAccountsCollateralTokenProgram: Address<TAccountWithdrawAccountsCollateralTokenProgram>;
   withdrawAccountsLiquidityTokenProgram: Address<TAccountWithdrawAccountsLiquidityTokenProgram>;
-  withdrawAccountsInstructionSysvarAccount?: Address<TAccountWithdrawAccountsInstructionSysvarAccount>;
+  withdrawAccountsInstructionSysvarAccount: Address<TAccountWithdrawAccountsInstructionSysvarAccount>;
   collateralFarmsAccountsObligationFarmUserState?: Address<TAccountCollateralFarmsAccountsObligationFarmUserState>;
   collateralFarmsAccountsReserveFarmState?: Address<TAccountCollateralFarmsAccountsReserveFarmState>;
   repayDebtFarmsAccountsObligationFarmUserState?: Address<TAccountRepayDebtFarmsAccountsObligationFarmUserState>;
@@ -539,14 +539,6 @@ export function getRepayAndWithdrawAndRedeemInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.repayAccountsInstructionSysvarAccount.value) {
-    accounts.repayAccountsInstructionSysvarAccount.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
-  if (!accounts.withdrawAccountsInstructionSysvarAccount.value) {
-    accounts.withdrawAccountsInstructionSysvarAccount.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
   if (!accounts.farmsProgram.value) {
     accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
     accounts.farmsProgram.isWritable = false;

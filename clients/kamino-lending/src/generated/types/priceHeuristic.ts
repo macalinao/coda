@@ -20,14 +20,20 @@ import {
 } from "@solana/kit";
 
 export interface PriceHeuristic {
+  /** Lower value of acceptable price */
   lower: bigint;
+  /** Upper value of acceptable price */
   upper: bigint;
+  /** Number of decimals of the previously defined values */
   exp: bigint;
 }
 
 export interface PriceHeuristicArgs {
+  /** Lower value of acceptable price */
   lower: number | bigint;
+  /** Upper value of acceptable price */
   upper: number | bigint;
+  /** Number of decimals of the previously defined values */
   exp: number | bigint;
 }
 

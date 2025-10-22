@@ -23,6 +23,7 @@ import type {
   WritableAccount,
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
+import type { UpdateConfigMode, UpdateConfigModeArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -37,12 +38,14 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
-  getU64Decoder,
-  getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getUpdateConfigModeDecoder,
+  getUpdateConfigModeEncoder,
+} from "../types/index.js";
 
 export const UPDATE_RESERVE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([61, 148, 100, 70, 143, 107, 17, 13]);
@@ -55,7 +58,8 @@ export function getUpdateReserveConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateReserveConfigInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta = string,
+  TAccountSigner extends string | AccountMeta = string,
+  TAccountGlobalConfig extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountReserve extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -63,10 +67,13 @@ export type UpdateReserveConfigInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountLendingMarketOwner extends string
-        ? ReadonlySignerAccount<TAccountLendingMarketOwner> &
-            AccountSignerMeta<TAccountLendingMarketOwner>
-        : TAccountLendingMarketOwner,
+      TAccountSigner extends string
+        ? ReadonlySignerAccount<TAccountSigner> &
+            AccountSignerMeta<TAccountSigner>
+        : TAccountSigner,
+      TAccountGlobalConfig extends string
+        ? ReadonlyAccount<TAccountGlobalConfig>
+        : TAccountGlobalConfig,
       TAccountLendingMarket extends string
         ? ReadonlyAccount<TAccountLendingMarket>
         : TAccountLendingMarket,
@@ -79,24 +86,24 @@ export type UpdateReserveConfigInstruction<
 
 export interface UpdateReserveConfigInstructionData {
   discriminator: ReadonlyUint8Array;
-  mode: bigint;
+  mode: UpdateConfigMode;
   value: ReadonlyUint8Array;
-  skipValidation: boolean;
+  skipConfigIntegrityValidation: boolean;
 }
 
 export interface UpdateReserveConfigInstructionDataArgs {
-  mode: number | bigint;
+  mode: UpdateConfigModeArgs;
   value: ReadonlyUint8Array;
-  skipValidation: boolean;
+  skipConfigIntegrityValidation: boolean;
 }
 
 export function getUpdateReserveConfigInstructionDataEncoder(): Encoder<UpdateReserveConfigInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["mode", getU64Encoder()],
+      ["mode", getUpdateConfigModeEncoder()],
       ["value", addEncoderSizePrefix(getBytesEncoder(), getU32Encoder())],
-      ["skipValidation", getBooleanEncoder()],
+      ["skipConfigIntegrityValidation", getBooleanEncoder()],
     ]),
     (value) => ({
       ...value,
@@ -108,9 +115,9 @@ export function getUpdateReserveConfigInstructionDataEncoder(): Encoder<UpdateRe
 export function getUpdateReserveConfigInstructionDataDecoder(): Decoder<UpdateReserveConfigInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["mode", getU64Decoder()],
+    ["mode", getUpdateConfigModeDecoder()],
     ["value", addDecoderSizePrefix(getBytesDecoder(), getU32Decoder())],
-    ["skipValidation", getBooleanDecoder()],
+    ["skipConfigIntegrityValidation", getBooleanDecoder()],
   ]);
 }
 
@@ -125,33 +132,38 @@ export function getUpdateReserveConfigInstructionDataCodec(): Codec<
 }
 
 export interface UpdateReserveConfigInput<
-  TAccountLendingMarketOwner extends string = string,
+  TAccountSigner extends string = string,
+  TAccountGlobalConfig extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
 > {
-  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  signer: TransactionSigner<TAccountSigner>;
+  globalConfig: Address<TAccountGlobalConfig>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
   mode: UpdateReserveConfigInstructionDataArgs["mode"];
   value: UpdateReserveConfigInstructionDataArgs["value"];
-  skipValidation: UpdateReserveConfigInstructionDataArgs["skipValidation"];
+  skipConfigIntegrityValidation: UpdateReserveConfigInstructionDataArgs["skipConfigIntegrityValidation"];
 }
 
 export function getUpdateReserveConfigInstruction<
-  TAccountLendingMarketOwner extends string,
+  TAccountSigner extends string,
+  TAccountGlobalConfig extends string,
   TAccountLendingMarket extends string,
   TAccountReserve extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: UpdateReserveConfigInput<
-    TAccountLendingMarketOwner,
+    TAccountSigner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve
   >,
   config?: { programAddress?: TProgramAddress },
 ): UpdateReserveConfigInstruction<
   TProgramAddress,
-  TAccountLendingMarketOwner,
+  TAccountSigner,
+  TAccountGlobalConfig,
   TAccountLendingMarket,
   TAccountReserve
 > {
@@ -161,10 +173,8 @@ export function getUpdateReserveConfigInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    lendingMarketOwner: {
-      value: input.lendingMarketOwner ?? null,
-      isWritable: false,
-    },
+    signer: { value: input.signer ?? null, isWritable: false },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
     lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
     reserve: { value: input.reserve ?? null, isWritable: true },
   };
@@ -179,7 +189,8 @@ export function getUpdateReserveConfigInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.signer),
+      getAccountMeta(accounts.globalConfig),
       getAccountMeta(accounts.lendingMarket),
       getAccountMeta(accounts.reserve),
     ],
@@ -189,7 +200,8 @@ export function getUpdateReserveConfigInstruction<
     programAddress,
   } as UpdateReserveConfigInstruction<
     TProgramAddress,
-    TAccountLendingMarketOwner,
+    TAccountSigner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve
   >);
@@ -201,9 +213,10 @@ export interface ParsedUpdateReserveConfigInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    lendingMarketOwner: TAccountMetas[0];
-    lendingMarket: TAccountMetas[1];
-    reserve: TAccountMetas[2];
+    signer: TAccountMetas[0];
+    globalConfig: TAccountMetas[1];
+    lendingMarket: TAccountMetas[2];
+    reserve: TAccountMetas[3];
   };
   data: UpdateReserveConfigInstructionData;
 }
@@ -216,7 +229,7 @@ export function parseUpdateReserveConfigInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateReserveConfigInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 3) {
+  if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -229,7 +242,8 @@ export function parseUpdateReserveConfigInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      lendingMarketOwner: getNextAccount(),
+      signer: getNextAccount(),
+      globalConfig: getNextAccount(),
       lendingMarket: getNextAccount(),
       reserve: getNextAccount(),
     },

@@ -21,6 +21,7 @@ import {
 } from "@solana/kit";
 
 export interface PythConfiguration {
+  /** Pubkey of the base price feed (disabled if `null` or `default`) */
   price: Address;
 }
 

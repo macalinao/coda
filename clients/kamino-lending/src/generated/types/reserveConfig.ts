@@ -45,69 +45,190 @@ import {
   getWithdrawalCapsEncoder,
 } from "./index.js";
 
+/** Reserve configuration values */
 export interface ReserveConfig {
+  /** Status of the reserve Active/Obsolete/Hidden */
   status: number;
+  /** Asset tier -> 0 - regular (collateral & debt), 1 - isolated collateral, 2 - isolated debt */
   assetTier: number;
+  /** Flat rate that goes to the host */
   hostFixedInterestRateBps: number;
+  /**
+   * [DEPRECATED] Space that used to hold 2 fields:
+   * - Boost for side (debt or collateral)
+   * - Reward points multiplier per obligation type
+   * Can be re-used after making sure all underlying production account data is zeroed.
+   */
   reserved2: number[];
-  reserved3: number[];
+  /** Cut of the order execution bonus that the protocol receives, as a percentage */
+  protocolOrderExecutionFeePct: number;
+  /** Protocol take rate is the amount borrowed interest protocol receives, as a percentage */
   protocolTakeRatePct: number;
+  /** Cut of the liquidation bonus that the protocol receives, as a percentage */
   protocolLiquidationFeePct: number;
+  /**
+   * Target ratio of the value of borrows to deposits, as a percentage
+   * 0 if use as collateral is disabled
+   */
   loanToValuePct: number;
+  /** Loan to value ratio at which an obligation can be liquidated, as percentage */
   liquidationThresholdPct: number;
+  /** Minimum bonus a liquidator receives when repaying part of an unhealthy obligation, as bps */
   minLiquidationBonusBps: number;
+  /** Maximum bonus a liquidator receives when repaying part of an unhealthy obligation, as bps */
   maxLiquidationBonusBps: number;
+  /** Bad debt liquidation bonus for an undercollateralized obligation, as bps */
   badDebtLiquidationBonusBps: number;
+  /**
+   * Time in seconds that must pass before redemptions are enabled after the deposit limit is
+   * crossed.
+   * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
+   */
   deleveragingMarginCallPeriodSecs: bigint;
+  /**
+   * The rate at which the deleveraging threshold decreases, in bps per day.
+   * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
+   */
   deleveragingThresholdDecreaseBpsPerDay: bigint;
+  /** Program owner fees assessed, separate from gains due to interest accrual */
   fees: ReserveFees;
+  /** Borrow rate curve based on utilization */
   borrowRateCurve: BorrowRateCurve;
+  /** Borrow factor in percentage - used for risk adjustment */
   borrowFactorPct: bigint;
+  /** Maximum deposit limit of liquidity in native units, u64::MAX for inf */
   depositLimit: bigint;
+  /** Maximum amount borrowed, u64::MAX for inf, 0 to disable borrows (protected deposits) */
   borrowLimit: bigint;
+  /** Token id from TokenInfos struct */
   tokenInfo: TokenInfo;
+  /** Deposit withdrawal caps - deposit & redeem */
   depositWithdrawalCap: WithdrawalCaps;
+  /** Debt withdrawal caps - borrow & repay */
   debtWithdrawalCap: WithdrawalCaps;
   elevationGroups: number[];
   disableUsageAsCollOutsideEmode: number;
+  /** Utilization (in percentage) above which borrowing is blocked. 0 to disable. */
   utilizationLimitBlockBorrowingAbovePct: number;
+  /**
+   * Whether this reserve should be subject to auto-deleveraging after deposit or borrow limit is
+   * crossed.
+   * Besides this flag, the lending market's flag also needs to be enabled (logical `AND`).
+   * **NOTE:** the manual "target LTV" deleveraging (enabled by the risk council for individual
+   * obligations) is NOT affected by this flag.
+   */
   autodeleverageEnabled: number;
   reserved1: number[];
+  /**
+   * Maximum amount liquidity of this reserve borrowed outside all elevation groups
+   * - u64::MAX for inf
+   * - 0 to disable borrows outside elevation groups
+   */
   borrowLimitOutsideElevationGroup: bigint;
+  /**
+   * Defines the maximum amount (in lamports of elevation group debt asset)
+   * that can be borrowed when this reserve is used as collateral.
+   * - u64::MAX for inf
+   * - 0 to disable borrows in this elevation group (expected value for the debt asset)
+   */
   borrowLimitAgainstThisCollateralInElevationGroup: bigint[];
+  /**
+   * The rate at which the deleveraging-related liquidation bonus increases, in bps per day.
+   * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
+   */
   deleveragingBonusIncreaseBpsPerDay: bigint;
 }
 
 export interface ReserveConfigArgs {
+  /** Status of the reserve Active/Obsolete/Hidden */
   status: number;
+  /** Asset tier -> 0 - regular (collateral & debt), 1 - isolated collateral, 2 - isolated debt */
   assetTier: number;
+  /** Flat rate that goes to the host */
   hostFixedInterestRateBps: number;
+  /**
+   * [DEPRECATED] Space that used to hold 2 fields:
+   * - Boost for side (debt or collateral)
+   * - Reward points multiplier per obligation type
+   * Can be re-used after making sure all underlying production account data is zeroed.
+   */
   reserved2: number[];
-  reserved3: number[];
+  /** Cut of the order execution bonus that the protocol receives, as a percentage */
+  protocolOrderExecutionFeePct: number;
+  /** Protocol take rate is the amount borrowed interest protocol receives, as a percentage */
   protocolTakeRatePct: number;
+  /** Cut of the liquidation bonus that the protocol receives, as a percentage */
   protocolLiquidationFeePct: number;
+  /**
+   * Target ratio of the value of borrows to deposits, as a percentage
+   * 0 if use as collateral is disabled
+   */
   loanToValuePct: number;
+  /** Loan to value ratio at which an obligation can be liquidated, as percentage */
   liquidationThresholdPct: number;
+  /** Minimum bonus a liquidator receives when repaying part of an unhealthy obligation, as bps */
   minLiquidationBonusBps: number;
+  /** Maximum bonus a liquidator receives when repaying part of an unhealthy obligation, as bps */
   maxLiquidationBonusBps: number;
+  /** Bad debt liquidation bonus for an undercollateralized obligation, as bps */
   badDebtLiquidationBonusBps: number;
+  /**
+   * Time in seconds that must pass before redemptions are enabled after the deposit limit is
+   * crossed.
+   * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
+   */
   deleveragingMarginCallPeriodSecs: number | bigint;
+  /**
+   * The rate at which the deleveraging threshold decreases, in bps per day.
+   * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
+   */
   deleveragingThresholdDecreaseBpsPerDay: number | bigint;
+  /** Program owner fees assessed, separate from gains due to interest accrual */
   fees: ReserveFeesArgs;
+  /** Borrow rate curve based on utilization */
   borrowRateCurve: BorrowRateCurveArgs;
+  /** Borrow factor in percentage - used for risk adjustment */
   borrowFactorPct: number | bigint;
+  /** Maximum deposit limit of liquidity in native units, u64::MAX for inf */
   depositLimit: number | bigint;
+  /** Maximum amount borrowed, u64::MAX for inf, 0 to disable borrows (protected deposits) */
   borrowLimit: number | bigint;
+  /** Token id from TokenInfos struct */
   tokenInfo: TokenInfoArgs;
+  /** Deposit withdrawal caps - deposit & redeem */
   depositWithdrawalCap: WithdrawalCapsArgs;
+  /** Debt withdrawal caps - borrow & repay */
   debtWithdrawalCap: WithdrawalCapsArgs;
   elevationGroups: number[];
   disableUsageAsCollOutsideEmode: number;
+  /** Utilization (in percentage) above which borrowing is blocked. 0 to disable. */
   utilizationLimitBlockBorrowingAbovePct: number;
+  /**
+   * Whether this reserve should be subject to auto-deleveraging after deposit or borrow limit is
+   * crossed.
+   * Besides this flag, the lending market's flag also needs to be enabled (logical `AND`).
+   * **NOTE:** the manual "target LTV" deleveraging (enabled by the risk council for individual
+   * obligations) is NOT affected by this flag.
+   */
   autodeleverageEnabled: number;
   reserved1: number[];
+  /**
+   * Maximum amount liquidity of this reserve borrowed outside all elevation groups
+   * - u64::MAX for inf
+   * - 0 to disable borrows outside elevation groups
+   */
   borrowLimitOutsideElevationGroup: number | bigint;
+  /**
+   * Defines the maximum amount (in lamports of elevation group debt asset)
+   * that can be borrowed when this reserve is used as collateral.
+   * - u64::MAX for inf
+   * - 0 to disable borrows in this elevation group (expected value for the debt asset)
+   */
   borrowLimitAgainstThisCollateralInElevationGroup: (number | bigint)[];
+  /**
+   * The rate at which the deleveraging-related liquidation bonus increases, in bps per day.
+   * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
+   */
   deleveragingBonusIncreaseBpsPerDay: number | bigint;
 }
 
@@ -116,8 +237,8 @@ export function getReserveConfigEncoder(): FixedSizeEncoder<ReserveConfigArgs> {
     ["status", getU8Encoder()],
     ["assetTier", getU8Encoder()],
     ["hostFixedInterestRateBps", getU16Encoder()],
-    ["reserved2", getArrayEncoder(getU8Encoder(), { size: 2 })],
-    ["reserved3", getArrayEncoder(getU8Encoder(), { size: 8 })],
+    ["reserved2", getArrayEncoder(getU8Encoder(), { size: 9 })],
+    ["protocolOrderExecutionFeePct", getU8Encoder()],
     ["protocolTakeRatePct", getU8Encoder()],
     ["protocolLiquidationFeePct", getU8Encoder()],
     ["loanToValuePct", getU8Encoder()],
@@ -154,8 +275,8 @@ export function getReserveConfigDecoder(): FixedSizeDecoder<ReserveConfig> {
     ["status", getU8Decoder()],
     ["assetTier", getU8Decoder()],
     ["hostFixedInterestRateBps", getU16Decoder()],
-    ["reserved2", getArrayDecoder(getU8Decoder(), { size: 2 })],
-    ["reserved3", getArrayDecoder(getU8Decoder(), { size: 8 })],
+    ["reserved2", getArrayDecoder(getU8Decoder(), { size: 9 })],
+    ["protocolOrderExecutionFeePct", getU8Decoder()],
     ["protocolTakeRatePct", getU8Decoder()],
     ["protocolLiquidationFeePct", getU8Decoder()],
     ["loanToValuePct", getU8Decoder()],

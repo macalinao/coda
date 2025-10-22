@@ -10,9 +10,9 @@ import type {
   AccountMeta,
   AccountSignerMeta,
   Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+  Codec,
+  Decoder,
+  Encoder,
   Instruction,
   InstructionWithAccounts,
   InstructionWithData,
@@ -22,22 +22,30 @@ import type {
   WritableAccount,
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
+import type {
+  UpdateGlobalConfigMode,
+  UpdateGlobalConfigModeArgs,
+} from "../types/index.js";
 import {
+  addDecoderSizePrefix,
+  addEncoderSizePrefix,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getArrayDecoder,
-  getArrayEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU32Decoder,
+  getU32Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  getUpdateGlobalConfigModeDecoder,
+  getUpdateGlobalConfigModeEncoder,
+} from "../types/index.js";
 
 export const UPDATE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([164, 84, 130, 189, 111, 58, 250, 200]);
@@ -49,7 +57,7 @@ export function getUpdateGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
 }
 
 export type UpdateGlobalConfigInstruction<
-  TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
+  TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountGlobalAdmin extends string | AccountMeta = string,
   TAccountGlobalConfig extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -70,21 +78,21 @@ export type UpdateGlobalConfigInstruction<
 
 export interface UpdateGlobalConfigInstructionData {
   discriminator: ReadonlyUint8Array;
-  mode: number;
-  value: number[];
+  mode: UpdateGlobalConfigMode;
+  value: ReadonlyUint8Array;
 }
 
 export interface UpdateGlobalConfigInstructionDataArgs {
-  mode: number;
-  value: number[];
+  mode: UpdateGlobalConfigModeArgs;
+  value: ReadonlyUint8Array;
 }
 
-export function getUpdateGlobalConfigInstructionDataEncoder(): FixedSizeEncoder<UpdateGlobalConfigInstructionDataArgs> {
+export function getUpdateGlobalConfigInstructionDataEncoder(): Encoder<UpdateGlobalConfigInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["mode", getU8Encoder()],
-      ["value", getArrayEncoder(getU8Encoder(), { size: 32 })],
+      ["mode", getUpdateGlobalConfigModeEncoder()],
+      ["value", addEncoderSizePrefix(getBytesEncoder(), getU32Encoder())],
     ]),
     (value) => ({
       ...value,
@@ -93,15 +101,15 @@ export function getUpdateGlobalConfigInstructionDataEncoder(): FixedSizeEncoder<
   );
 }
 
-export function getUpdateGlobalConfigInstructionDataDecoder(): FixedSizeDecoder<UpdateGlobalConfigInstructionData> {
+export function getUpdateGlobalConfigInstructionDataDecoder(): Decoder<UpdateGlobalConfigInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["mode", getU8Decoder()],
-    ["value", getArrayDecoder(getU8Decoder(), { size: 32 })],
+    ["mode", getUpdateGlobalConfigModeDecoder()],
+    ["value", addDecoderSizePrefix(getBytesDecoder(), getU32Decoder())],
   ]);
 }
 
-export function getUpdateGlobalConfigInstructionDataCodec(): FixedSizeCodec<
+export function getUpdateGlobalConfigInstructionDataCodec(): Codec<
   UpdateGlobalConfigInstructionDataArgs,
   UpdateGlobalConfigInstructionData
 > {
@@ -124,7 +132,7 @@ export interface UpdateGlobalConfigInput<
 export function getUpdateGlobalConfigInstruction<
   TAccountGlobalAdmin extends string,
   TAccountGlobalConfig extends string,
-  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: UpdateGlobalConfigInput<TAccountGlobalAdmin, TAccountGlobalConfig>,
   config?: { programAddress?: TProgramAddress },
@@ -134,7 +142,8 @@ export function getUpdateGlobalConfigInstruction<
   TAccountGlobalConfig
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -167,7 +176,7 @@ export function getUpdateGlobalConfigInstruction<
 }
 
 export interface ParsedUpdateGlobalConfigInstruction<
-  TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
+  TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
   programAddress: Address<TProgram>;

@@ -71,35 +71,55 @@ export function getReserveDiscriminatorBytes(): ReadonlyUint8Array {
 
 export interface Reserve {
   discriminator: ReadonlyUint8Array;
+  /** Version of the reserve */
   version: bigint;
+  /** Last slot when supply and rates updated */
   lastUpdate: LastUpdate;
+  /** Lending market address */
   lendingMarket: Address;
   farmCollateral: Address;
   farmDebt: Address;
+  /** Reserve liquidity */
   liquidity: ReserveLiquidity;
   reserveLiquidityPadding: bigint[];
+  /** Reserve collateral */
   collateral: ReserveCollateral;
   reserveCollateralPadding: bigint[];
+  /** Reserve configuration values */
   config: ReserveConfig;
   configPadding: bigint[];
   borrowedAmountOutsideElevationGroup: bigint;
+  /**
+   * Amount of token borrowed in lamport of debt asset in the given
+   * elevation group when this reserve is part of the collaterals.
+   */
   borrowedAmountsAgainstThisReserveInElevationGroups: bigint[];
   padding: bigint[];
 }
 
 export interface ReserveArgs {
+  /** Version of the reserve */
   version: number | bigint;
+  /** Last slot when supply and rates updated */
   lastUpdate: LastUpdateArgs;
+  /** Lending market address */
   lendingMarket: Address;
   farmCollateral: Address;
   farmDebt: Address;
+  /** Reserve liquidity */
   liquidity: ReserveLiquidityArgs;
   reserveLiquidityPadding: (number | bigint)[];
+  /** Reserve collateral */
   collateral: ReserveCollateralArgs;
   reserveCollateralPadding: (number | bigint)[];
+  /** Reserve configuration values */
   config: ReserveConfigArgs;
   configPadding: (number | bigint)[];
   borrowedAmountOutsideElevationGroup: number | bigint;
+  /**
+   * Amount of token borrowed in lamport of debt asset in the given
+   * elevation group when this reserve is part of the collaterals.
+   */
   borrowedAmountsAgainstThisReserveInElevationGroups: (number | bigint)[];
   padding: (number | bigint)[];
 }

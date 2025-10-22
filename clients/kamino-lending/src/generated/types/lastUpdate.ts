@@ -23,16 +23,23 @@ import {
   getU64Encoder,
 } from "@solana/kit";
 
+/** Last update state */
 export interface LastUpdate {
+  /** Last slot when updated */
   slot: bigint;
+  /** True when marked stale, false when slot updated */
   stale: number;
+  /** Status of the prices used to calculate the last update */
   priceStatus: number;
   placeholder: number[];
 }
 
 export interface LastUpdateArgs {
+  /** Last slot when updated */
   slot: number | bigint;
+  /** True when marked stale, false when slot updated */
   stale: number;
+  /** Status of the prices used to calculate the last update */
   priceStatus: number;
   placeholder: number[];
 }

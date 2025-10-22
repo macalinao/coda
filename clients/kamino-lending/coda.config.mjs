@@ -108,11 +108,11 @@ export default defineConfig({
       ]),
     },
 
-    // other
+    // lending
     {
       instruction: "initGlobalConfig",
       account: "globalConfig",
-      defaultValue: pdaValueNode(pdaLinkNode("globalConfig")),
+      defaultValue: pdaValueNode(pdaLinkNode("lendingGlobalConfigState")),
     },
     {
       account: "lendingMarketAuthority",
@@ -121,7 +121,7 @@ export default defineConfig({
       ]),
     },
     {
-      account: "sysvarInfo",
+      account: /sysvarInfo|instructionSysvarAccount/,
       defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
     },
     {

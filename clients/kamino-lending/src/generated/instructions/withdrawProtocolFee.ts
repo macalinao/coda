@@ -8,7 +8,6 @@
 
 import type {
   AccountMeta,
-  AccountSignerMeta,
   Address,
   FixedSizeCodec,
   FixedSizeDecoder,
@@ -17,9 +16,7 @@ import type {
   InstructionWithAccounts,
   InstructionWithData,
   ReadonlyAccount,
-  ReadonlySignerAccount,
   ReadonlyUint8Array,
-  TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
@@ -50,13 +47,13 @@ export function getWithdrawProtocolFeeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawProtocolFeeInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta = string,
+  TAccountGlobalConfig extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountReserve extends string | AccountMeta = string,
   TAccountReserveLiquidityMint extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountFeeVault extends string | AccountMeta = string,
-  TAccountLendingMarketOwnerAta extends string | AccountMeta = string,
+  TAccountFeeCollectorAta extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
@@ -65,10 +62,9 @@ export type WithdrawProtocolFeeInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountLendingMarketOwner extends string
-        ? ReadonlySignerAccount<TAccountLendingMarketOwner> &
-            AccountSignerMeta<TAccountLendingMarketOwner>
-        : TAccountLendingMarketOwner,
+      TAccountGlobalConfig extends string
+        ? ReadonlyAccount<TAccountGlobalConfig>
+        : TAccountGlobalConfig,
       TAccountLendingMarket extends string
         ? ReadonlyAccount<TAccountLendingMarket>
         : TAccountLendingMarket,
@@ -84,9 +80,9 @@ export type WithdrawProtocolFeeInstruction<
       TAccountFeeVault extends string
         ? WritableAccount<TAccountFeeVault>
         : TAccountFeeVault,
-      TAccountLendingMarketOwnerAta extends string
-        ? WritableAccount<TAccountLendingMarketOwnerAta>
-        : TAccountLendingMarketOwnerAta,
+      TAccountFeeCollectorAta extends string
+        ? WritableAccount<TAccountFeeCollectorAta>
+        : TAccountFeeCollectorAta,
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
@@ -134,58 +130,58 @@ export function getWithdrawProtocolFeeInstructionDataCodec(): FixedSizeCodec<
 }
 
 export interface WithdrawProtocolFeeAsyncInput<
-  TAccountLendingMarketOwner extends string = string,
+  TAccountGlobalConfig extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
   TAccountReserveLiquidityMint extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountFeeVault extends string = string,
-  TAccountLendingMarketOwnerAta extends string = string,
+  TAccountFeeCollectorAta extends string = string,
   TAccountTokenProgram extends string = string,
 > {
-  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  globalConfig: Address<TAccountGlobalConfig>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
   feeVault: Address<TAccountFeeVault>;
-  lendingMarketOwnerAta: Address<TAccountLendingMarketOwnerAta>;
+  feeCollectorAta: Address<TAccountFeeCollectorAta>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: WithdrawProtocolFeeInstructionDataArgs["amount"];
 }
 
 export async function getWithdrawProtocolFeeInstructionAsync<
-  TAccountLendingMarketOwner extends string,
+  TAccountGlobalConfig extends string,
   TAccountLendingMarket extends string,
   TAccountReserve extends string,
   TAccountReserveLiquidityMint extends string,
   TAccountLendingMarketAuthority extends string,
   TAccountFeeVault extends string,
-  TAccountLendingMarketOwnerAta extends string,
+  TAccountFeeCollectorAta extends string,
   TAccountTokenProgram extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: WithdrawProtocolFeeAsyncInput<
-    TAccountLendingMarketOwner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve,
     TAccountReserveLiquidityMint,
     TAccountLendingMarketAuthority,
     TAccountFeeVault,
-    TAccountLendingMarketOwnerAta,
+    TAccountFeeCollectorAta,
     TAccountTokenProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
   WithdrawProtocolFeeInstruction<
     TProgramAddress,
-    TAccountLendingMarketOwner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve,
     TAccountReserveLiquidityMint,
     TAccountLendingMarketAuthority,
     TAccountFeeVault,
-    TAccountLendingMarketOwnerAta,
+    TAccountFeeCollectorAta,
     TAccountTokenProgram
   >
 > {
@@ -195,10 +191,7 @@ export async function getWithdrawProtocolFeeInstructionAsync<
 
   // Original accounts.
   const originalAccounts = {
-    lendingMarketOwner: {
-      value: input.lendingMarketOwner ?? null,
-      isWritable: false,
-    },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
     lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
     reserve: { value: input.reserve ?? null, isWritable: false },
     reserveLiquidityMint: {
@@ -210,10 +203,7 @@ export async function getWithdrawProtocolFeeInstructionAsync<
       isWritable: false,
     },
     feeVault: { value: input.feeVault ?? null, isWritable: true },
-    lendingMarketOwnerAta: {
-      value: input.lendingMarketOwnerAta ?? null,
-      isWritable: true,
-    },
+    feeCollectorAta: { value: input.feeCollectorAta ?? null, isWritable: true },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
@@ -238,13 +228,13 @@ export async function getWithdrawProtocolFeeInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.globalConfig),
       getAccountMeta(accounts.lendingMarket),
       getAccountMeta(accounts.reserve),
       getAccountMeta(accounts.reserveLiquidityMint),
       getAccountMeta(accounts.lendingMarketAuthority),
       getAccountMeta(accounts.feeVault),
-      getAccountMeta(accounts.lendingMarketOwnerAta),
+      getAccountMeta(accounts.feeCollectorAta),
       getAccountMeta(accounts.tokenProgram),
     ],
     data: getWithdrawProtocolFeeInstructionDataEncoder().encode(
@@ -253,69 +243,69 @@ export async function getWithdrawProtocolFeeInstructionAsync<
     programAddress,
   } as WithdrawProtocolFeeInstruction<
     TProgramAddress,
-    TAccountLendingMarketOwner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve,
     TAccountReserveLiquidityMint,
     TAccountLendingMarketAuthority,
     TAccountFeeVault,
-    TAccountLendingMarketOwnerAta,
+    TAccountFeeCollectorAta,
     TAccountTokenProgram
   >);
 }
 
 export interface WithdrawProtocolFeeInput<
-  TAccountLendingMarketOwner extends string = string,
+  TAccountGlobalConfig extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
   TAccountReserveLiquidityMint extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountFeeVault extends string = string,
-  TAccountLendingMarketOwnerAta extends string = string,
+  TAccountFeeCollectorAta extends string = string,
   TAccountTokenProgram extends string = string,
 > {
-  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  globalConfig: Address<TAccountGlobalConfig>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   feeVault: Address<TAccountFeeVault>;
-  lendingMarketOwnerAta: Address<TAccountLendingMarketOwnerAta>;
+  feeCollectorAta: Address<TAccountFeeCollectorAta>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: WithdrawProtocolFeeInstructionDataArgs["amount"];
 }
 
 export function getWithdrawProtocolFeeInstruction<
-  TAccountLendingMarketOwner extends string,
+  TAccountGlobalConfig extends string,
   TAccountLendingMarket extends string,
   TAccountReserve extends string,
   TAccountReserveLiquidityMint extends string,
   TAccountLendingMarketAuthority extends string,
   TAccountFeeVault extends string,
-  TAccountLendingMarketOwnerAta extends string,
+  TAccountFeeCollectorAta extends string,
   TAccountTokenProgram extends string,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: WithdrawProtocolFeeInput<
-    TAccountLendingMarketOwner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve,
     TAccountReserveLiquidityMint,
     TAccountLendingMarketAuthority,
     TAccountFeeVault,
-    TAccountLendingMarketOwnerAta,
+    TAccountFeeCollectorAta,
     TAccountTokenProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): WithdrawProtocolFeeInstruction<
   TProgramAddress,
-  TAccountLendingMarketOwner,
+  TAccountGlobalConfig,
   TAccountLendingMarket,
   TAccountReserve,
   TAccountReserveLiquidityMint,
   TAccountLendingMarketAuthority,
   TAccountFeeVault,
-  TAccountLendingMarketOwnerAta,
+  TAccountFeeCollectorAta,
   TAccountTokenProgram
 > {
   // Program address.
@@ -324,10 +314,7 @@ export function getWithdrawProtocolFeeInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    lendingMarketOwner: {
-      value: input.lendingMarketOwner ?? null,
-      isWritable: false,
-    },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
     lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
     reserve: { value: input.reserve ?? null, isWritable: false },
     reserveLiquidityMint: {
@@ -339,10 +326,7 @@ export function getWithdrawProtocolFeeInstruction<
       isWritable: false,
     },
     feeVault: { value: input.feeVault ?? null, isWritable: true },
-    lendingMarketOwnerAta: {
-      value: input.lendingMarketOwnerAta ?? null,
-      isWritable: true,
-    },
+    feeCollectorAta: { value: input.feeCollectorAta ?? null, isWritable: true },
     tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
@@ -362,13 +346,13 @@ export function getWithdrawProtocolFeeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.globalConfig),
       getAccountMeta(accounts.lendingMarket),
       getAccountMeta(accounts.reserve),
       getAccountMeta(accounts.reserveLiquidityMint),
       getAccountMeta(accounts.lendingMarketAuthority),
       getAccountMeta(accounts.feeVault),
-      getAccountMeta(accounts.lendingMarketOwnerAta),
+      getAccountMeta(accounts.feeCollectorAta),
       getAccountMeta(accounts.tokenProgram),
     ],
     data: getWithdrawProtocolFeeInstructionDataEncoder().encode(
@@ -377,13 +361,13 @@ export function getWithdrawProtocolFeeInstruction<
     programAddress,
   } as WithdrawProtocolFeeInstruction<
     TProgramAddress,
-    TAccountLendingMarketOwner,
+    TAccountGlobalConfig,
     TAccountLendingMarket,
     TAccountReserve,
     TAccountReserveLiquidityMint,
     TAccountLendingMarketAuthority,
     TAccountFeeVault,
-    TAccountLendingMarketOwnerAta,
+    TAccountFeeCollectorAta,
     TAccountTokenProgram
   >);
 }
@@ -394,13 +378,13 @@ export interface ParsedWithdrawProtocolFeeInstruction<
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    lendingMarketOwner: TAccountMetas[0];
+    globalConfig: TAccountMetas[0];
     lendingMarket: TAccountMetas[1];
     reserve: TAccountMetas[2];
     reserveLiquidityMint: TAccountMetas[3];
     lendingMarketAuthority: TAccountMetas[4];
     feeVault: TAccountMetas[5];
-    lendingMarketOwnerAta: TAccountMetas[6];
+    feeCollectorAta: TAccountMetas[6];
     tokenProgram: TAccountMetas[7];
   };
   data: WithdrawProtocolFeeInstructionData;
@@ -427,13 +411,13 @@ export function parseWithdrawProtocolFeeInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      lendingMarketOwner: getNextAccount(),
+      globalConfig: getNextAccount(),
       lendingMarket: getNextAccount(),
       reserve: getNextAccount(),
       reserveLiquidityMint: getNextAccount(),
       lendingMarketAuthority: getNextAccount(),
       feeVault: getNextAccount(),
-      lendingMarketOwnerAta: getNextAccount(),
+      feeCollectorAta: getNextAccount(),
       tokenProgram: getNextAccount(),
     },
     data: getWithdrawProtocolFeeInstructionDataDecoder().decode(

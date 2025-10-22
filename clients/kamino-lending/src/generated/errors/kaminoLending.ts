@@ -182,8 +182,8 @@ export const KAMINO_LENDING_ERROR__SHORT_URL_NOT_ASCII_ALPHANUMERIC = 0x17c1; //
 export const KAMINO_LENDING_ERROR__RESERVE_OBSOLETE = 0x17c2; // 6082
 /** ElevationGroupAlreadyActivated: Obligation already part of the same elevation group */
 export const KAMINO_LENDING_ERROR__ELEVATION_GROUP_ALREADY_ACTIVATED = 0x17c3; // 6083
-/** ObligationInDeprecatedReserve: Obligation has a deposit in a deprecated reserve */
-export const KAMINO_LENDING_ERROR__OBLIGATION_IN_DEPRECATED_RESERVE = 0x17c4; // 6084
+/** ObligationInObsoleteReserve: Obligation has a deposit or borrow in an obsolete reserve */
+export const KAMINO_LENDING_ERROR__OBLIGATION_IN_OBSOLETE_RESERVE = 0x17c4; // 6084
 /** ReferrerStateOwnerMismatch: Referrer state owner does not match the given signer */
 export const KAMINO_LENDING_ERROR__REFERRER_STATE_OWNER_MISMATCH = 0x17c5; // 6085
 /** UserMetadataOwnerAlreadySet: User metadata owner is already set */
@@ -200,8 +200,8 @@ export const KAMINO_LENDING_ERROR__DEPOSIT_LIMIT_EXCEEDED = 0x17ca; // 6090
 export const KAMINO_LENDING_ERROR__BORROWING_DISABLED_OUTSIDE_ELEVATION_GROUP = 0x17cb; // 6091
 /** NetValueRemainingTooSmall: Net value remaining too small */
 export const KAMINO_LENDING_ERROR__NET_VALUE_REMAINING_TOO_SMALL = 0x17cc; // 6092
-/** WorseLTVBlocked: Cannot get the obligation in a worse position */
-export const KAMINO_LENDING_ERROR__WORSE_L_T_V_BLOCKED = 0x17cd; // 6093
+/** WorseLtvBlocked: Cannot get the obligation in a worse position */
+export const KAMINO_LENDING_ERROR__WORSE_LTV_BLOCKED = 0x17cd; // 6093
 /** LiabilitiesBiggerThanAssets: Cannot have more liabilities than assets in a position */
 export const KAMINO_LENDING_ERROR__LIABILITIES_BIGGER_THAN_ASSETS = 0x17ce; // 6094
 /** ReserveTokenBalanceMismatch: Reserve state and token account cannot drift */
@@ -214,8 +214,8 @@ export const KAMINO_LENDING_ERROR__RESERVE_ACCOUNTING_MISMATCH = 0x17d1; // 6097
 export const KAMINO_LENDING_ERROR__BORROWING_ABOVE_UTILIZATION_RATE_DISABLED = 0x17d2; // 6098
 /** LiquidationBorrowFactorPriority: Liquidation must prioritize the debt with the highest borrow factor */
 export const KAMINO_LENDING_ERROR__LIQUIDATION_BORROW_FACTOR_PRIORITY = 0x17d3; // 6099
-/** LiquidationLowestLTVPriority: Liquidation must prioritize the collateral with the lowest LTV */
-export const KAMINO_LENDING_ERROR__LIQUIDATION_LOWEST_L_T_V_PRIORITY = 0x17d4; // 6100
+/** LiquidationLowestLiquidationLtvPriority: Liquidation must prioritize the collateral with the lowest liquidation LTV */
+export const KAMINO_LENDING_ERROR__LIQUIDATION_LOWEST_LIQUIDATION_LTV_PRIORITY = 0x17d4; // 6100
 /** ElevationGroupBorrowLimitExceeded: Elevation group borrow limit exceeded */
 export const KAMINO_LENDING_ERROR__ELEVATION_GROUP_BORROW_LIMIT_EXCEEDED = 0x17d5; // 6101
 /** ElevationGroupWithoutDebtReserve: The elevation group does not have a debt reserve defined */
@@ -250,16 +250,30 @@ export const KAMINO_LENDING_ERROR__OBLIGATION_CURRENTLY_MARKED_FOR_DELEVERAGING 
 export const KAMINO_LENDING_ERROR__MAXIMUM_WITHDRAW_VALUE_ZERO = 0x17e4; // 6116
 /** ZeroMaxLtvAssetsInDeposits: No max LTV 0 assets allowed in deposits for repay and withdraw */
 export const KAMINO_LENDING_ERROR__ZERO_MAX_LTV_ASSETS_IN_DEPOSITS = 0x17e5; // 6117
-/** MinLtvAssetsPriority: The operation must prioritize the collateral with the lowest LTV */
-export const KAMINO_LENDING_ERROR__MIN_LTV_ASSETS_PRIORITY = 0x17e6; // 6118
-/** WorseLTVThanUnhealthyLTV: Cannot get the obligation liquidatable */
-export const KAMINO_LENDING_ERROR__WORSE_L_T_V_THAN_UNHEALTHY_L_T_V = 0x17e7; // 6119
+/** LowestLtvAssetsPriority: Withdrawing must prioritize the collateral with the lowest reserve max-LTV */
+export const KAMINO_LENDING_ERROR__LOWEST_LTV_ASSETS_PRIORITY = 0x17e6; // 6118
+/** WorseLtvThanUnhealthyLtv: Cannot get the obligation liquidatable */
+export const KAMINO_LENDING_ERROR__WORSE_LTV_THAN_UNHEALTHY_LTV = 0x17e7; // 6119
 /** FarmAccountsMissing: Farm accounts to refresh are missing */
 export const KAMINO_LENDING_ERROR__FARM_ACCOUNTS_MISSING = 0x17e8; // 6120
 /** RepayTooSmallForFullLiquidation: Repay amount is too small to satisfy the mandatory full liquidation */
 export const KAMINO_LENDING_ERROR__REPAY_TOO_SMALL_FOR_FULL_LIQUIDATION = 0x17e9; // 6121
 /** InsufficientRepayAmount: Liquidator provided repay amount lower than required by liquidation rules */
 export const KAMINO_LENDING_ERROR__INSUFFICIENT_REPAY_AMOUNT = 0x17ea; // 6122
+/** OrderIndexOutOfBounds: Obligation order of the given index cannot exist */
+export const KAMINO_LENDING_ERROR__ORDER_INDEX_OUT_OF_BOUNDS = 0x17eb; // 6123
+/** InvalidOrderConfiguration: Given order configuration has wrong parameters */
+export const KAMINO_LENDING_ERROR__INVALID_ORDER_CONFIGURATION = 0x17ec; // 6124
+/** OrderConfigurationNotSupportedByObligation: Given order configuration cannot be used with the current state of the obligation */
+export const KAMINO_LENDING_ERROR__ORDER_CONFIGURATION_NOT_SUPPORTED_BY_OBLIGATION = 0x17ed; // 6125
+/** OperationNotPermittedWithCurrentObligationOrders: Single debt, single collateral obligation orders have to be cancelled before changing the deposit/borrow count */
+export const KAMINO_LENDING_ERROR__OPERATION_NOT_PERMITTED_WITH_CURRENT_OBLIGATION_ORDERS = 0x17ee; // 6126
+/** OperationNotPermittedMarketImmutable: Cannot update lending market because it is set as immutable */
+export const KAMINO_LENDING_ERROR__OPERATION_NOT_PERMITTED_MARKET_IMMUTABLE = 0x17ef; // 6127
+/** OrderCreationDisabled: Creation of new orders is disabled */
+export const KAMINO_LENDING_ERROR__ORDER_CREATION_DISABLED = 0x17f0; // 6128
+/** NoUpgradeAuthority: Cannot initialize global config because there is no upgrade authority to the program */
+export const KAMINO_LENDING_ERROR__NO_UPGRADE_AUTHORITY = 0x17f1; // 6129
 
 export type KaminoLendingError =
   | typeof KAMINO_LENDING_ERROR__BORROWING_ABOVE_UTILIZATION_RATE_DISABLED
@@ -311,6 +325,7 @@ export type KaminoLendingError =
   | typeof KAMINO_LENDING_ERROR__INVALID_OBLIGATION_OWNER
   | typeof KAMINO_LENDING_ERROR__INVALID_OBLIGATION_SEEDS_VALUE
   | typeof KAMINO_LENDING_ERROR__INVALID_ORACLE_CONFIG
+  | typeof KAMINO_LENDING_ERROR__INVALID_ORDER_CONFIGURATION
   | typeof KAMINO_LENDING_ERROR__INVALID_PYTH_PRICE_ACCOUNT
   | typeof KAMINO_LENDING_ERROR__INVALID_SCOPE_PRICE_ACCOUNT
   | typeof KAMINO_LENDING_ERROR__INVALID_SIGNER
@@ -324,18 +339,19 @@ export type KaminoLendingError =
   | typeof KAMINO_LENDING_ERROR__LENDING_MARKETS_MUST_MATCH
   | typeof KAMINO_LENDING_ERROR__LIABILITIES_BIGGER_THAN_ASSETS
   | typeof KAMINO_LENDING_ERROR__LIQUIDATION_BORROW_FACTOR_PRIORITY
-  | typeof KAMINO_LENDING_ERROR__LIQUIDATION_LOWEST_L_T_V_PRIORITY
+  | typeof KAMINO_LENDING_ERROR__LIQUIDATION_LOWEST_LIQUIDATION_LTV_PRIORITY
   | typeof KAMINO_LENDING_ERROR__LIQUIDATION_REWARD_TOO_SMALL
   | typeof KAMINO_LENDING_ERROR__LIQUIDATION_TOO_SMALL
+  | typeof KAMINO_LENDING_ERROR__LOWEST_LTV_ASSETS_PRIORITY
   | typeof KAMINO_LENDING_ERROR__MATH_OVERFLOW
   | typeof KAMINO_LENDING_ERROR__MAXIMUM_WITHDRAW_VALUE_ZERO
-  | typeof KAMINO_LENDING_ERROR__MIN_LTV_ASSETS_PRIORITY
   | typeof KAMINO_LENDING_ERROR__MULTIPLE_FLASH_BORROWS
   | typeof KAMINO_LENDING_ERROR__NEGATIVE_INTEREST_RATE
   | typeof KAMINO_LENDING_ERROR__NET_VALUE_REMAINING_TOO_SMALL
   | typeof KAMINO_LENDING_ERROR__NO_FARM_FOR_RESERVE
   | typeof KAMINO_LENDING_ERROR__NO_FLASH_REPAY_FOUND
   | typeof KAMINO_LENDING_ERROR__NO_PRICE_FOUND
+  | typeof KAMINO_LENDING_ERROR__NO_UPGRADE_AUTHORITY
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_BORROWS_EMPTY
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_BORROWS_ZERO
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_COLLATERAL_EMPTY
@@ -347,12 +363,17 @@ export type KaminoLendingError =
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_ELEVATION_GROUP_MULTIPLE_DEBT_RESERVE
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_EMPTY
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_HEALTHY
-  | typeof KAMINO_LENDING_ERROR__OBLIGATION_IN_DEPRECATED_RESERVE
+  | typeof KAMINO_LENDING_ERROR__OBLIGATION_IN_OBSOLETE_RESERVE
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_LIQUIDITY_EMPTY
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_OWNERS_MUST_MATCH
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_RESERVE_LIMIT
   | typeof KAMINO_LENDING_ERROR__OBLIGATIONS_MUST_MATCH
   | typeof KAMINO_LENDING_ERROR__OBLIGATION_STALE
+  | typeof KAMINO_LENDING_ERROR__OPERATION_NOT_PERMITTED_MARKET_IMMUTABLE
+  | typeof KAMINO_LENDING_ERROR__OPERATION_NOT_PERMITTED_WITH_CURRENT_OBLIGATION_ORDERS
+  | typeof KAMINO_LENDING_ERROR__ORDER_CONFIGURATION_NOT_SUPPORTED_BY_OBLIGATION
+  | typeof KAMINO_LENDING_ERROR__ORDER_CREATION_DISABLED
+  | typeof KAMINO_LENDING_ERROR__ORDER_INDEX_OUT_OF_BOUNDS
   | typeof KAMINO_LENDING_ERROR__PRICE_CONFIDENCE_TOO_WIDE
   | typeof KAMINO_LENDING_ERROR__PRICE_IS_BIGGER_THAN_HEURISTIC
   | typeof KAMINO_LENDING_ERROR__PRICE_IS_LOWER_THAN_HEURISTIC
@@ -382,8 +403,8 @@ export type KaminoLendingError =
   | typeof KAMINO_LENDING_ERROR__WITHDRAWAL_CAP_REACHED
   | typeof KAMINO_LENDING_ERROR__WITHDRAW_TOO_LARGE
   | typeof KAMINO_LENDING_ERROR__WITHDRAW_TOO_SMALL
-  | typeof KAMINO_LENDING_ERROR__WORSE_L_T_V_BLOCKED
-  | typeof KAMINO_LENDING_ERROR__WORSE_L_T_V_THAN_UNHEALTHY_L_T_V
+  | typeof KAMINO_LENDING_ERROR__WORSE_LTV_BLOCKED
+  | typeof KAMINO_LENDING_ERROR__WORSE_LTV_THAN_UNHEALTHY_LTV
   | typeof KAMINO_LENDING_ERROR__ZERO_MAX_LTV_ASSETS_IN_DEPOSITS;
 
 let kaminoLendingErrorMessages: Record<KaminoLendingError, string> | undefined;
@@ -472,6 +493,8 @@ if (true) {
       "Seeds must be default pubkeys for tag 0, and mint addresses for tag 1 or 2",
     [KAMINO_LENDING_ERROR__INVALID_ORACLE_CONFIG]:
       "Input oracle config is invalid",
+    [KAMINO_LENDING_ERROR__INVALID_ORDER_CONFIGURATION]:
+      "Given order configuration has wrong parameters",
     [KAMINO_LENDING_ERROR__INVALID_PYTH_PRICE_ACCOUNT]:
       "Pyth price account does not match configuration",
     [KAMINO_LENDING_ERROR__INVALID_SCOPE_PRICE_ACCOUNT]:
@@ -494,17 +517,17 @@ if (true) {
       "Cannot have more liabilities than assets in a position",
     [KAMINO_LENDING_ERROR__LIQUIDATION_BORROW_FACTOR_PRIORITY]:
       "Liquidation must prioritize the debt with the highest borrow factor",
-    [KAMINO_LENDING_ERROR__LIQUIDATION_LOWEST_L_T_V_PRIORITY]:
-      "Liquidation must prioritize the collateral with the lowest LTV",
+    [KAMINO_LENDING_ERROR__LIQUIDATION_LOWEST_LIQUIDATION_LTV_PRIORITY]:
+      "Liquidation must prioritize the collateral with the lowest liquidation LTV",
     [KAMINO_LENDING_ERROR__LIQUIDATION_REWARD_TOO_SMALL]:
       "The reward amount is less than the minimum acceptable received liquidity",
     [KAMINO_LENDING_ERROR__LIQUIDATION_TOO_SMALL]:
       "Liquidation amount too small to receive collateral",
+    [KAMINO_LENDING_ERROR__LOWEST_LTV_ASSETS_PRIORITY]:
+      "Withdrawing must prioritize the collateral with the lowest reserve max-LTV",
     [KAMINO_LENDING_ERROR__MATH_OVERFLOW]: "Math operation overflow",
     [KAMINO_LENDING_ERROR__MAXIMUM_WITHDRAW_VALUE_ZERO]:
       "Maximum withdrawable value of this collateral is zero, LTV needs improved",
-    [KAMINO_LENDING_ERROR__MIN_LTV_ASSETS_PRIORITY]:
-      "The operation must prioritize the collateral with the lowest LTV",
     [KAMINO_LENDING_ERROR__MULTIPLE_FLASH_BORROWS]:
       "Multiple flash borrows not allowed in the same transaction",
     [KAMINO_LENDING_ERROR__NEGATIVE_INTEREST_RATE]: "Interest rate is negative",
@@ -515,6 +538,8 @@ if (true) {
     [KAMINO_LENDING_ERROR__NO_FLASH_REPAY_FOUND]:
       "No corresponding repay found for flash borrow",
     [KAMINO_LENDING_ERROR__NO_PRICE_FOUND]: "No price found",
+    [KAMINO_LENDING_ERROR__NO_UPGRADE_AUTHORITY]:
+      "Cannot initialize global config because there is no upgrade authority to the program",
     [KAMINO_LENDING_ERROR__OBLIGATION_BORROWS_EMPTY]:
       "Obligation borrows are empty",
     [KAMINO_LENDING_ERROR__OBLIGATION_BORROWS_ZERO]:
@@ -537,8 +562,8 @@ if (true) {
       "Obligation has no borrows or deposits.",
     [KAMINO_LENDING_ERROR__OBLIGATION_HEALTHY]:
       "Cannot liquidate healthy obligations",
-    [KAMINO_LENDING_ERROR__OBLIGATION_IN_DEPRECATED_RESERVE]:
-      "Obligation has a deposit in a deprecated reserve",
+    [KAMINO_LENDING_ERROR__OBLIGATION_IN_OBSOLETE_RESERVE]:
+      "Obligation has a deposit or borrow in an obsolete reserve",
     [KAMINO_LENDING_ERROR__OBLIGATION_LIQUIDITY_EMPTY]:
       "Obligation liquidity is empty",
     [KAMINO_LENDING_ERROR__OBLIGATION_OWNERS_MUST_MATCH]:
@@ -548,6 +573,16 @@ if (true) {
     [KAMINO_LENDING_ERROR__OBLIGATIONS_MUST_MATCH]: "Obligations must match",
     [KAMINO_LENDING_ERROR__OBLIGATION_STALE]:
       "Obligation state needs to be refreshed",
+    [KAMINO_LENDING_ERROR__OPERATION_NOT_PERMITTED_MARKET_IMMUTABLE]:
+      "Cannot update lending market because it is set as immutable",
+    [KAMINO_LENDING_ERROR__OPERATION_NOT_PERMITTED_WITH_CURRENT_OBLIGATION_ORDERS]:
+      "Single debt, single collateral obligation orders have to be cancelled before changing the deposit/borrow count",
+    [KAMINO_LENDING_ERROR__ORDER_CONFIGURATION_NOT_SUPPORTED_BY_OBLIGATION]:
+      "Given order configuration cannot be used with the current state of the obligation",
+    [KAMINO_LENDING_ERROR__ORDER_CREATION_DISABLED]:
+      "Creation of new orders is disabled",
+    [KAMINO_LENDING_ERROR__ORDER_INDEX_OUT_OF_BOUNDS]:
+      "Obligation order of the given index cannot exist",
     [KAMINO_LENDING_ERROR__PRICE_CONFIDENCE_TOO_WIDE]:
       "Price confidence too wide",
     [KAMINO_LENDING_ERROR__PRICE_IS_BIGGER_THAN_HEURISTIC]:
@@ -598,9 +633,9 @@ if (true) {
     [KAMINO_LENDING_ERROR__WITHDRAWAL_CAP_REACHED]: "Withdrawal cap is reached",
     [KAMINO_LENDING_ERROR__WITHDRAW_TOO_LARGE]: "Withdraw amount too large",
     [KAMINO_LENDING_ERROR__WITHDRAW_TOO_SMALL]: "Withdraw amount too small",
-    [KAMINO_LENDING_ERROR__WORSE_L_T_V_BLOCKED]:
+    [KAMINO_LENDING_ERROR__WORSE_LTV_BLOCKED]:
       "Cannot get the obligation in a worse position",
-    [KAMINO_LENDING_ERROR__WORSE_L_T_V_THAN_UNHEALTHY_L_T_V]:
+    [KAMINO_LENDING_ERROR__WORSE_LTV_THAN_UNHEALTHY_LTV]:
       "Cannot get the obligation liquidatable",
     [KAMINO_LENDING_ERROR__ZERO_MAX_LTV_ASSETS_IN_DEPOSITS]:
       "No max LTV 0 assets allowed in deposits for repay and withdraw",

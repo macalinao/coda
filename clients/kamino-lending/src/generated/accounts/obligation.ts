@@ -27,6 +27,8 @@ import type {
   ObligationCollateralArgs,
   ObligationLiquidity,
   ObligationLiquidityArgs,
+  ObligationOrder,
+  ObligationOrderArgs,
 } from "../types/index.js";
 import {
   assertAccountExists,
@@ -61,6 +63,8 @@ import {
   getObligationCollateralEncoder,
   getObligationLiquidityDecoder,
   getObligationLiquidityEncoder,
+  getObligationOrderDecoder,
+  getObligationOrderEncoder,
 } from "../types/index.js";
 
 export const OBLIGATION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -73,58 +77,128 @@ export function getObligationDiscriminatorBytes(): ReadonlyUint8Array {
 
 export interface Obligation {
   discriminator: ReadonlyUint8Array;
+  /** Version of the struct */
   tag: bigint;
+  /** Last update to collateral, liquidity, or their market values */
   lastUpdate: LastUpdate;
+  /** Lending market address */
   lendingMarket: Address;
+  /** Owner authority which can borrow liquidity */
   owner: Address;
+  /** Deposited collateral for the obligation, unique by deposit reserve address */
   deposits: ObligationCollateral[];
+  /** Worst LTV for the collaterals backing the loan, represented as a percentage */
   lowestReserveDepositLiquidationLtv: bigint;
+  /** Market value of deposits (scaled fraction) */
   depositedValueSf: bigint;
+  /** Borrowed liquidity for the obligation, unique by borrow reserve address */
   borrows: ObligationLiquidity[];
+  /** Risk adjusted market value of borrows/debt (sum of price * borrowed_amount * borrow_factor) (scaled fraction) */
   borrowFactorAdjustedDebtValueSf: bigint;
+  /** Market value of borrows - used for max_liquidatable_borrowed_amount (scaled fraction) */
   borrowedAssetsMarketValueSf: bigint;
+  /** The maximum borrow value at the weighted average loan to value ratio (scaled fraction) */
   allowedBorrowValueSf: bigint;
+  /** The dangerous borrow value at the weighted average liquidation threshold (scaled fraction) */
   unhealthyBorrowValueSf: bigint;
+  /** The asset tier of the deposits */
   depositsAssetTiers: number[];
+  /** The asset tier of the borrows */
   borrowsAssetTiers: number[];
+  /** The elevation group id the obligation opted into. */
   elevationGroup: number;
-  numOfObsoleteReserves: number;
+  /** The number of obsolete reserves the obligation has a deposit in */
+  numOfObsoleteDepositReserves: number;
+  /** Marked = 1 if borrows array is not empty, 0 = borrows empty */
   hasDebt: number;
+  /** Wallet address of the referrer */
   referrer: Address;
+  /** Marked = 1 if borrowing disabled, 0 = borrowing enabled */
   borrowingDisabled: number;
+  /**
+   * A target LTV set by the risk council when marking this obligation for deleveraging.
+   * Only effective when `deleveraging_margin_call_started_slot != 0`.
+   */
   autodeleverageTargetLtvPct: number;
+  /** The lowest max LTV found amongst the collateral deposits */
   lowestReserveDepositMaxLtvPct: number;
+  /** The number of obsolete reserves the obligation has a borrow in */
+  numOfObsoleteBorrowReserves: number;
   reserved: number[];
   highestBorrowFactorPct: bigint;
+  /**
+   * A timestamp at which the risk council most-recently marked this obligation for deleveraging.
+   * Zero if not currently subject to deleveraging.
+   */
   autodeleverageMarginCallStartedTimestamp: bigint;
+  /**
+   * Owner-defined, liquidator-executed orders applicable to this obligation.
+   * Typical use-cases would be a stop-loss and a take-profit (possibly co-existing).
+   */
+  orders: ObligationOrder[];
   padding3: bigint[];
 }
 
 export interface ObligationArgs {
+  /** Version of the struct */
   tag: number | bigint;
+  /** Last update to collateral, liquidity, or their market values */
   lastUpdate: LastUpdateArgs;
+  /** Lending market address */
   lendingMarket: Address;
+  /** Owner authority which can borrow liquidity */
   owner: Address;
+  /** Deposited collateral for the obligation, unique by deposit reserve address */
   deposits: ObligationCollateralArgs[];
+  /** Worst LTV for the collaterals backing the loan, represented as a percentage */
   lowestReserveDepositLiquidationLtv: number | bigint;
+  /** Market value of deposits (scaled fraction) */
   depositedValueSf: number | bigint;
+  /** Borrowed liquidity for the obligation, unique by borrow reserve address */
   borrows: ObligationLiquidityArgs[];
+  /** Risk adjusted market value of borrows/debt (sum of price * borrowed_amount * borrow_factor) (scaled fraction) */
   borrowFactorAdjustedDebtValueSf: number | bigint;
+  /** Market value of borrows - used for max_liquidatable_borrowed_amount (scaled fraction) */
   borrowedAssetsMarketValueSf: number | bigint;
+  /** The maximum borrow value at the weighted average loan to value ratio (scaled fraction) */
   allowedBorrowValueSf: number | bigint;
+  /** The dangerous borrow value at the weighted average liquidation threshold (scaled fraction) */
   unhealthyBorrowValueSf: number | bigint;
+  /** The asset tier of the deposits */
   depositsAssetTiers: number[];
+  /** The asset tier of the borrows */
   borrowsAssetTiers: number[];
+  /** The elevation group id the obligation opted into. */
   elevationGroup: number;
-  numOfObsoleteReserves: number;
+  /** The number of obsolete reserves the obligation has a deposit in */
+  numOfObsoleteDepositReserves: number;
+  /** Marked = 1 if borrows array is not empty, 0 = borrows empty */
   hasDebt: number;
+  /** Wallet address of the referrer */
   referrer: Address;
+  /** Marked = 1 if borrowing disabled, 0 = borrowing enabled */
   borrowingDisabled: number;
+  /**
+   * A target LTV set by the risk council when marking this obligation for deleveraging.
+   * Only effective when `deleveraging_margin_call_started_slot != 0`.
+   */
   autodeleverageTargetLtvPct: number;
+  /** The lowest max LTV found amongst the collateral deposits */
   lowestReserveDepositMaxLtvPct: number;
+  /** The number of obsolete reserves the obligation has a borrow in */
+  numOfObsoleteBorrowReserves: number;
   reserved: number[];
   highestBorrowFactorPct: number | bigint;
+  /**
+   * A timestamp at which the risk council most-recently marked this obligation for deleveraging.
+   * Zero if not currently subject to deleveraging.
+   */
   autodeleverageMarginCallStartedTimestamp: number | bigint;
+  /**
+   * Owner-defined, liquidator-executed orders applicable to this obligation.
+   * Typical use-cases would be a stop-loss and a take-profit (possibly co-existing).
+   */
+  orders: ObligationOrderArgs[];
   padding3: (number | bigint)[];
 }
 
@@ -153,16 +227,18 @@ export function getObligationEncoder(): FixedSizeEncoder<ObligationArgs> {
       ["depositsAssetTiers", getArrayEncoder(getU8Encoder(), { size: 8 })],
       ["borrowsAssetTiers", getArrayEncoder(getU8Encoder(), { size: 5 })],
       ["elevationGroup", getU8Encoder()],
-      ["numOfObsoleteReserves", getU8Encoder()],
+      ["numOfObsoleteDepositReserves", getU8Encoder()],
       ["hasDebt", getU8Encoder()],
       ["referrer", getAddressEncoder()],
       ["borrowingDisabled", getU8Encoder()],
       ["autodeleverageTargetLtvPct", getU8Encoder()],
       ["lowestReserveDepositMaxLtvPct", getU8Encoder()],
-      ["reserved", getArrayEncoder(getU8Encoder(), { size: 5 })],
+      ["numOfObsoleteBorrowReserves", getU8Encoder()],
+      ["reserved", getArrayEncoder(getU8Encoder(), { size: 4 })],
       ["highestBorrowFactorPct", getU64Encoder()],
       ["autodeleverageMarginCallStartedTimestamp", getU64Encoder()],
-      ["padding3", getArrayEncoder(getU64Encoder(), { size: 125 })],
+      ["orders", getArrayEncoder(getObligationOrderEncoder(), { size: 2 })],
+      ["padding3", getArrayEncoder(getU64Encoder(), { size: 93 })],
     ]),
     (value) => ({ ...value, discriminator: OBLIGATION_DISCRIMINATOR }),
   );
@@ -189,16 +265,18 @@ export function getObligationDecoder(): FixedSizeDecoder<Obligation> {
     ["depositsAssetTiers", getArrayDecoder(getU8Decoder(), { size: 8 })],
     ["borrowsAssetTiers", getArrayDecoder(getU8Decoder(), { size: 5 })],
     ["elevationGroup", getU8Decoder()],
-    ["numOfObsoleteReserves", getU8Decoder()],
+    ["numOfObsoleteDepositReserves", getU8Decoder()],
     ["hasDebt", getU8Decoder()],
     ["referrer", getAddressDecoder()],
     ["borrowingDisabled", getU8Decoder()],
     ["autodeleverageTargetLtvPct", getU8Decoder()],
     ["lowestReserveDepositMaxLtvPct", getU8Decoder()],
-    ["reserved", getArrayDecoder(getU8Decoder(), { size: 5 })],
+    ["numOfObsoleteBorrowReserves", getU8Decoder()],
+    ["reserved", getArrayDecoder(getU8Decoder(), { size: 4 })],
     ["highestBorrowFactorPct", getU64Decoder()],
     ["autodeleverageMarginCallStartedTimestamp", getU64Decoder()],
-    ["padding3", getArrayDecoder(getU64Decoder(), { size: 125 })],
+    ["orders", getArrayDecoder(getObligationOrderDecoder(), { size: 2 })],
+    ["padding3", getArrayDecoder(getU64Decoder(), { size: 93 })],
   ]);
 }
 
