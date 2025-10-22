@@ -68,7 +68,9 @@ export type LiquidateObligationAndRedeemReserveCollateralInstruction<
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
   TAccountUserDestinationCollateral extends string | AccountMeta = string,
   TAccountUserDestinationLiquidity extends string | AccountMeta = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta = string,
+  TAccountCollateralTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRepayLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountWithdrawLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends
@@ -230,7 +232,7 @@ export interface LiquidateObligationAndRedeemReserveCollateralAsyncInput<
   userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
   userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
   repayLiquidityTokenProgram: Address<TAccountRepayLiquidityTokenProgram>;
   withdrawLiquidityTokenProgram: Address<TAccountWithdrawLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
@@ -396,6 +398,10 @@ export async function getLiquidateObligationAndRedeemReserveCollateralInstructio
       lendingMarket: expectAddress(accounts.lendingMarket.value),
     });
   }
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
@@ -492,7 +498,7 @@ export interface LiquidateObligationAndRedeemReserveCollateralInput<
   userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
   userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
   repayLiquidityTokenProgram: Address<TAccountRepayLiquidityTokenProgram>;
   withdrawLiquidityTokenProgram: Address<TAccountWithdrawLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
@@ -651,6 +657,10 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;

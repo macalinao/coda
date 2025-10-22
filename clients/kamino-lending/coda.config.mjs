@@ -13,6 +13,7 @@ import {
   renameVisitor,
   SYSVAR_INSTRUCTIONS_VALUE_NODE,
   stringTypeNode,
+  TOKEN_PROGRAM_VALUE_NODE,
   updateAccountsVisitor,
   variablePdaSeedNode,
 } from "@macalinao/coda";
@@ -110,8 +111,40 @@ export default defineConfig({
 
     // lending
     {
+      account: /collateralTokenProgram|liquidityTokenProgram/,
+      defaultValue: TOKEN_PROGRAM_VALUE_NODE,
+    },
+    {
+      account: "feeReceiver",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveFeeVault"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      account: "reserveLiquiditySupply",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveLiquiditySupply"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
       account: "reserveLiquidityFeeReceiver",
       defaultValue: pdaValueNode(pdaLinkNode("reserveFeeVault"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      account: "reserveCollateralMint",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveCollateralMint"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      account: "reserveCollateralSupply",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveCollateralSupply"), [
         pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
         pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
       ]),

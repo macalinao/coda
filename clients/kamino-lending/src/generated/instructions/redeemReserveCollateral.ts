@@ -35,7 +35,11 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { findLendingMarketAuthPda } from "../pdas/index.js";
+import {
+  findLendingMarketAuthPda,
+  findReserveCollateralMintPda,
+  findReserveLiquiditySupplyPda,
+} from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -59,8 +63,12 @@ export type RedeemReserveCollateralInstruction<
   TAccountReserveLiquiditySupply extends string | AccountMeta = string,
   TAccountUserSourceCollateral extends string | AccountMeta = string,
   TAccountUserDestinationLiquidity extends string | AccountMeta = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta = string,
-  TAccountLiquidityTokenProgram extends string | AccountMeta = string,
+  TAccountCollateralTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountLiquidityTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
@@ -168,12 +176,12 @@ export interface RedeemReserveCollateralAsyncInput<
   reserve: Address<TAccountReserve>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  reserveCollateralMint: Address<TAccountReserveCollateralMint>;
-  reserveLiquiditySupply: Address<TAccountReserveLiquiditySupply>;
+  reserveCollateralMint?: Address<TAccountReserveCollateralMint>;
+  reserveLiquiditySupply?: Address<TAccountReserveLiquiditySupply>;
   userSourceCollateral: Address<TAccountUserSourceCollateral>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
-  liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
+  liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   collateralAmount: RedeemReserveCollateralInstructionDataArgs["collateralAmount"];
 }
@@ -285,6 +293,28 @@ export async function getRedeemReserveCollateralInstructionAsync<
       lendingMarket: expectAddress(accounts.lendingMarket.value),
     });
   }
+  if (!accounts.reserveCollateralMint.value) {
+    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      mint: expectAddress(accounts.reserveLiquidityMint.value),
+    });
+  }
+  if (!accounts.reserveLiquiditySupply.value) {
+    accounts.reserveLiquiditySupply.value = await findReserveLiquiditySupplyPda(
+      {
+        lendingMarket: expectAddress(accounts.lendingMarket.value),
+        mint: expectAddress(accounts.reserveLiquidityMint.value),
+      },
+    );
+  }
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.liquidityTokenProgram.value) {
+    accounts.liquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
@@ -350,8 +380,8 @@ export interface RedeemReserveCollateralInput<
   reserveLiquiditySupply: Address<TAccountReserveLiquiditySupply>;
   userSourceCollateral: Address<TAccountUserSourceCollateral>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
-  liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
+  liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   collateralAmount: RedeemReserveCollateralInstructionDataArgs["collateralAmount"];
 }
@@ -456,6 +486,14 @@ export function getRedeemReserveCollateralInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.liquidityTokenProgram.value) {
+    accounts.liquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;

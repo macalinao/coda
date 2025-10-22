@@ -33,7 +33,13 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
-import { findLendingMarketAuthPda } from "../pdas/index.js";
+import {
+  findLendingMarketAuthPda,
+  findReserveCollateralMintPda,
+  findReserveCollateralSupplyPda,
+  findReserveFeeVaultPda,
+  findReserveLiquiditySupplyPda,
+} from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -62,8 +68,12 @@ export type InitReserveInstruction<
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountLiquidityTokenProgram extends string | AccountMeta = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta = string,
+  TAccountLiquidityTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountCollateralTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
@@ -169,14 +179,14 @@ export interface InitReserveAsyncInput<
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
   reserve: Address<TAccountReserve>;
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  reserveLiquiditySupply: Address<TAccountReserveLiquiditySupply>;
-  feeReceiver: Address<TAccountFeeReceiver>;
-  reserveCollateralMint: Address<TAccountReserveCollateralMint>;
-  reserveCollateralSupply: Address<TAccountReserveCollateralSupply>;
+  reserveLiquiditySupply?: Address<TAccountReserveLiquiditySupply>;
+  feeReceiver?: Address<TAccountFeeReceiver>;
+  reserveCollateralMint?: Address<TAccountReserveCollateralMint>;
+  reserveCollateralSupply?: Address<TAccountReserveCollateralSupply>;
   initialLiquiditySource: Address<TAccountInitialLiquiditySource>;
   rent?: Address<TAccountRent>;
-  liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
+  liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
 }
 
@@ -292,9 +302,44 @@ export async function getInitReserveInstructionAsync<
       lendingMarket: expectAddress(accounts.lendingMarket.value),
     });
   }
+  if (!accounts.reserveLiquiditySupply.value) {
+    accounts.reserveLiquiditySupply.value = await findReserveLiquiditySupplyPda(
+      {
+        lendingMarket: expectAddress(accounts.lendingMarket.value),
+        mint: expectAddress(accounts.reserveLiquidityMint.value),
+      },
+    );
+  }
+  if (!accounts.feeReceiver.value) {
+    accounts.feeReceiver.value = await findReserveFeeVaultPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      mint: expectAddress(accounts.reserveLiquidityMint.value),
+    });
+  }
+  if (!accounts.reserveCollateralMint.value) {
+    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      mint: expectAddress(accounts.reserveLiquidityMint.value),
+    });
+  }
+  if (!accounts.reserveCollateralSupply.value) {
+    accounts.reserveCollateralSupply.value =
+      await findReserveCollateralSupplyPda({
+        lendingMarket: expectAddress(accounts.lendingMarket.value),
+        mint: expectAddress(accounts.reserveLiquidityMint.value),
+      });
+  }
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.liquidityTokenProgram.value) {
+    accounts.liquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
@@ -367,8 +412,8 @@ export interface InitReserveInput<
   reserveCollateralSupply: Address<TAccountReserveCollateralSupply>;
   initialLiquiditySource: Address<TAccountInitialLiquiditySource>;
   rent?: Address<TAccountRent>;
-  liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
+  liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
 }
 
@@ -480,6 +525,14 @@ export function getInitReserveInstruction<
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.liquidityTokenProgram.value) {
+    accounts.liquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
