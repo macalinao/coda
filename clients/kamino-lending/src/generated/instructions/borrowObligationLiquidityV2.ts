@@ -35,11 +35,12 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const BORROW_OBLIGATION_LIQUIDITY_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([161, 128, 143, 245, 171, 199, 194, 6]);
@@ -57,16 +58,12 @@ export type BorrowObligationLiquidityV2Instruction<
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountBorrowReserve extends string | AccountMeta = string,
-  TAccountBorrowReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
+  TAccountBorrowReserveLiquidityMint extends string | AccountMeta = string,
   TAccountReserveSourceLiquidity extends string | AccountMeta = string,
   TAccountBorrowReserveLiquidityFeeReceiver extends
     | string
     | AccountMeta = string,
-  TAccountUserDestinationLiquidity extends
-    | string
-    | AccountMeta = string,
+  TAccountUserDestinationLiquidity extends string | AccountMeta = string,
   TAccountReferrerTokenState extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
@@ -171,6 +168,216 @@ export function getBorrowObligationLiquidityV2InstructionDataCodec(): FixedSizeC
     getBorrowObligationLiquidityV2InstructionDataEncoder(),
     getBorrowObligationLiquidityV2InstructionDataDecoder(),
   );
+}
+
+export interface BorrowObligationLiquidityV2AsyncInput<
+  TAccountOwner extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountBorrowReserve extends string = string,
+  TAccountBorrowReserveLiquidityMint extends string = string,
+  TAccountReserveSourceLiquidity extends string = string,
+  TAccountBorrowReserveLiquidityFeeReceiver extends string = string,
+  TAccountUserDestinationLiquidity extends string = string,
+  TAccountReferrerTokenState extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountInstructionSysvarAccount extends string = string,
+  TAccountObligationFarmUserState extends string = string,
+  TAccountReserveFarmState extends string = string,
+  TAccountFarmsProgram extends string = string,
+> {
+  owner: TransactionSigner<TAccountOwner>;
+  obligation: Address<TAccountObligation>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  borrowReserve: Address<TAccountBorrowReserve>;
+  borrowReserveLiquidityMint: Address<TAccountBorrowReserveLiquidityMint>;
+  reserveSourceLiquidity: Address<TAccountReserveSourceLiquidity>;
+  borrowReserveLiquidityFeeReceiver: Address<TAccountBorrowReserveLiquidityFeeReceiver>;
+  userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
+  referrerTokenState?: Address<TAccountReferrerTokenState>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
+  reserveFarmState?: Address<TAccountReserveFarmState>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
+  liquidityAmount: BorrowObligationLiquidityV2InstructionDataArgs["liquidityAmount"];
+}
+
+export async function getBorrowObligationLiquidityV2InstructionAsync<
+  TAccountOwner extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountBorrowReserve extends string,
+  TAccountBorrowReserveLiquidityMint extends string,
+  TAccountReserveSourceLiquidity extends string,
+  TAccountBorrowReserveLiquidityFeeReceiver extends string,
+  TAccountUserDestinationLiquidity extends string,
+  TAccountReferrerTokenState extends string,
+  TAccountTokenProgram extends string,
+  TAccountInstructionSysvarAccount extends string,
+  TAccountObligationFarmUserState extends string,
+  TAccountReserveFarmState extends string,
+  TAccountFarmsProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: BorrowObligationLiquidityV2AsyncInput<
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountBorrowReserve,
+    TAccountBorrowReserveLiquidityMint,
+    TAccountReserveSourceLiquidity,
+    TAccountBorrowReserveLiquidityFeeReceiver,
+    TAccountUserDestinationLiquidity,
+    TAccountReferrerTokenState,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountFarmsProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  BorrowObligationLiquidityV2Instruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountBorrowReserve,
+    TAccountBorrowReserveLiquidityMint,
+    TAccountReserveSourceLiquidity,
+    TAccountBorrowReserveLiquidityFeeReceiver,
+    TAccountUserDestinationLiquidity,
+    TAccountReferrerTokenState,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountFarmsProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    owner: { value: input.owner ?? null, isWritable: false },
+    obligation: { value: input.obligation ?? null, isWritable: true },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    borrowReserve: { value: input.borrowReserve ?? null, isWritable: true },
+    borrowReserveLiquidityMint: {
+      value: input.borrowReserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    reserveSourceLiquidity: {
+      value: input.reserveSourceLiquidity ?? null,
+      isWritable: true,
+    },
+    borrowReserveLiquidityFeeReceiver: {
+      value: input.borrowReserveLiquidityFeeReceiver ?? null,
+      isWritable: true,
+    },
+    userDestinationLiquidity: {
+      value: input.userDestinationLiquidity ?? null,
+      isWritable: true,
+    },
+    referrerTokenState: {
+      value: input.referrerTokenState ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    instructionSysvarAccount: {
+      value: input.instructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+    obligationFarmUserState: {
+      value: input.obligationFarmUserState ?? null,
+      isWritable: true,
+    },
+    reserveFarmState: {
+      value: input.reserveFarmState ?? null,
+      isWritable: true,
+    },
+    farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.instructionSysvarAccount.value) {
+    accounts.instructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.borrowReserve),
+      getAccountMeta(accounts.borrowReserveLiquidityMint),
+      getAccountMeta(accounts.reserveSourceLiquidity),
+      getAccountMeta(accounts.borrowReserveLiquidityFeeReceiver),
+      getAccountMeta(accounts.userDestinationLiquidity),
+      getAccountMeta(accounts.referrerTokenState),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta(accounts.obligationFarmUserState),
+      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.farmsProgram),
+    ],
+    data: getBorrowObligationLiquidityV2InstructionDataEncoder().encode(
+      args as BorrowObligationLiquidityV2InstructionDataArgs,
+    ),
+    programAddress,
+  } as BorrowObligationLiquidityV2Instruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountBorrowReserve,
+    TAccountBorrowReserveLiquidityMint,
+    TAccountReserveSourceLiquidity,
+    TAccountBorrowReserveLiquidityFeeReceiver,
+    TAccountUserDestinationLiquidity,
+    TAccountReferrerTokenState,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountFarmsProgram
+  >);
 }
 
 export interface BorrowObligationLiquidityV2Input<

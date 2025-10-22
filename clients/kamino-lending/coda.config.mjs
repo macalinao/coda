@@ -11,6 +11,7 @@ import {
   programLinkNode,
   publicKeyTypeNode,
   renameVisitor,
+  SYSVAR_INSTRUCTIONS_VALUE_NODE,
   stringTypeNode,
   updateAccountsVisitor,
   variablePdaSeedNode,
@@ -109,6 +110,21 @@ export default defineConfig({
 
     // other
     {
+      instruction: "initGlobalConfig",
+      account: "globalConfig",
+      defaultValue: pdaValueNode(pdaLinkNode("globalConfig")),
+    },
+    {
+      account: "lendingMarketAuthority",
+      defaultValue: pdaValueNode(pdaLinkNode("lendingMarketAuth"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+      ]),
+    },
+    {
+      account: "sysvarInfo",
+      defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
+    },
+    {
       account: "farmsProgram",
       defaultValue: programLinkNode("farms"),
     },
@@ -163,12 +179,16 @@ export default defineConfig({
             variablePdaSeedNode(
               "owner",
               publicKeyTypeNode(),
-              "The user who owns the farm.",
+              "The user who is farming. This is sometimes the obligation in the case of delegated farms.",
             ),
           ],
         },
       ],
       kaminoLending: [
+        {
+          name: "lendingGlobalConfigState",
+          seeds: [constantPdaSeedNodeFromString("utf8", "global_config")],
+        },
         {
           name: "obligation",
           seeds: [
@@ -254,6 +274,7 @@ export default defineConfig({
       farms: {
         accounts: {
           userState: "farmsUserState",
+          globalConfig: "farmsGlobalConfig",
         },
         instructions: {
           idlMissingTypes: "farmsIdlMissingTypes",
@@ -270,6 +291,9 @@ export default defineConfig({
         pda: pdaLinkNode("farmsUserState"),
       },
       // lending
+      lendingGlobalConfig: {
+        pda: pdaLinkNode("lendingGlobalConfigState"),
+      },
       obligation: {
         pda: pdaLinkNode("obligation"),
       },

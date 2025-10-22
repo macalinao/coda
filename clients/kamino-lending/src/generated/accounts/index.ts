@@ -7,8 +7,9 @@
  */
 
 export * from "./farmState.js";
+export * from "./farmsGlobalConfig.js";
 export * from "./farmsUserState.js";
-export * from "./globalConfig.js";
+export * from "./lendingGlobalConfig.js";
 export * from "./lendingMarket.js";
 export * from "./obligation.js";
 export * from "./oraclePrices.js";

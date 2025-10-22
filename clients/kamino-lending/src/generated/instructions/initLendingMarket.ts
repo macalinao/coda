@@ -37,8 +37,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_LENDING_MARKET_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([34, 162, 116, 14, 101, 137, 94, 239]);
@@ -119,6 +120,111 @@ export function getInitLendingMarketInstructionDataCodec(): FixedSizeCodec<
     getInitLendingMarketInstructionDataEncoder(),
     getInitLendingMarketInstructionDataDecoder(),
   );
+}
+
+export interface InitLendingMarketAsyncInput<
+  TAccountLendingMarketOwner extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+> {
+  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+  quoteCurrency: InitLendingMarketInstructionDataArgs["quoteCurrency"];
+}
+
+export async function getInitLendingMarketInstructionAsync<
+  TAccountLendingMarketOwner extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: InitLendingMarketAsyncInput<
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountSystemProgram,
+    TAccountRent
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitLendingMarketInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountSystemProgram,
+    TAccountRent
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    lendingMarketOwner: {
+      value: input.lendingMarketOwner ?? null,
+      isWritable: true,
+    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: true },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+    ],
+    data: getInitLendingMarketInstructionDataEncoder().encode(
+      args as InitLendingMarketInstructionDataArgs,
+    ),
+    programAddress,
+  } as InitLendingMarketInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountSystemProgram,
+    TAccountRent
+  >);
 }
 
 export interface InitLendingMarketInput<

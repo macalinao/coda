@@ -15,7 +15,7 @@ import {
 
 export interface FarmsUserStateSeeds {
   farmState: Address;
-  /** The user who owns the farm. */
+  /** The user who is farming. This is sometimes the obligation in the case of delegated farms. */
   owner: Address;
 }
 

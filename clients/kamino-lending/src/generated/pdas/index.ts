@@ -9,6 +9,7 @@
 export * from "./farmsUserState.js";
 export * from "./farmVault.js";
 export * from "./farmVaultsAuthority.js";
+export * from "./lendingGlobalConfigState.js";
 export * from "./lendingMarketAuth.js";
 export * from "./obligation.js";
 export * from "./referrerState.js";

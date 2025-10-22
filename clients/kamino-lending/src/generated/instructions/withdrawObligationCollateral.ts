@@ -35,8 +35,9 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_OBLIGATION_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([37, 116, 205, 103, 243, 192, 92, 198]);
@@ -55,9 +56,7 @@ export type WithdrawObligationCollateralInstruction<
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountWithdrawReserve extends string | AccountMeta = string,
   TAccountReserveSourceCollateral extends string | AccountMeta = string,
-  TAccountUserDestinationCollateral extends
-    | string
-    | AccountMeta = string,
+  TAccountUserDestinationCollateral extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
@@ -138,6 +137,149 @@ export function getWithdrawObligationCollateralInstructionDataCodec(): FixedSize
     getWithdrawObligationCollateralInstructionDataEncoder(),
     getWithdrawObligationCollateralInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawObligationCollateralAsyncInput<
+  TAccountOwner extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountWithdrawReserve extends string = string,
+  TAccountReserveSourceCollateral extends string = string,
+  TAccountUserDestinationCollateral extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountInstructionSysvarAccount extends string = string,
+> {
+  owner: TransactionSigner<TAccountOwner>;
+  obligation: Address<TAccountObligation>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  withdrawReserve: Address<TAccountWithdrawReserve>;
+  reserveSourceCollateral: Address<TAccountReserveSourceCollateral>;
+  userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  collateralAmount: WithdrawObligationCollateralInstructionDataArgs["collateralAmount"];
+}
+
+export async function getWithdrawObligationCollateralInstructionAsync<
+  TAccountOwner extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountWithdrawReserve extends string,
+  TAccountReserveSourceCollateral extends string,
+  TAccountUserDestinationCollateral extends string,
+  TAccountTokenProgram extends string,
+  TAccountInstructionSysvarAccount extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: WithdrawObligationCollateralAsyncInput<
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountWithdrawReserve,
+    TAccountReserveSourceCollateral,
+    TAccountUserDestinationCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawObligationCollateralInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountWithdrawReserve,
+    TAccountReserveSourceCollateral,
+    TAccountUserDestinationCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    owner: { value: input.owner ?? null, isWritable: false },
+    obligation: { value: input.obligation ?? null, isWritable: true },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    withdrawReserve: { value: input.withdrawReserve ?? null, isWritable: true },
+    reserveSourceCollateral: {
+      value: input.reserveSourceCollateral ?? null,
+      isWritable: true,
+    },
+    userDestinationCollateral: {
+      value: input.userDestinationCollateral ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    instructionSysvarAccount: {
+      value: input.instructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.instructionSysvarAccount.value) {
+    accounts.instructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.withdrawReserve),
+      getAccountMeta(accounts.reserveSourceCollateral),
+      getAccountMeta(accounts.userDestinationCollateral),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.instructionSysvarAccount),
+    ],
+    data: getWithdrawObligationCollateralInstructionDataEncoder().encode(
+      args as WithdrawObligationCollateralInstructionDataArgs,
+    ),
+    programAddress,
+  } as WithdrawObligationCollateralInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountWithdrawReserve,
+    TAccountReserveSourceCollateral,
+    TAccountUserDestinationCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount
+  >);
 }
 
 export interface WithdrawObligationCollateralInput<

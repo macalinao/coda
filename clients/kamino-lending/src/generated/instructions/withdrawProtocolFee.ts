@@ -35,8 +35,9 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_PROTOCOL_FEE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([158, 201, 158, 189, 33, 93, 162, 103]);
@@ -130,6 +131,137 @@ export function getWithdrawProtocolFeeInstructionDataCodec(): FixedSizeCodec<
     getWithdrawProtocolFeeInstructionDataEncoder(),
     getWithdrawProtocolFeeInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawProtocolFeeAsyncInput<
+  TAccountLendingMarketOwner extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountReserve extends string = string,
+  TAccountReserveLiquidityMint extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountFeeVault extends string = string,
+  TAccountLendingMarketOwnerAta extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  reserve: Address<TAccountReserve>;
+  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  feeVault: Address<TAccountFeeVault>;
+  lendingMarketOwnerAta: Address<TAccountLendingMarketOwnerAta>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  amount: WithdrawProtocolFeeInstructionDataArgs["amount"];
+}
+
+export async function getWithdrawProtocolFeeInstructionAsync<
+  TAccountLendingMarketOwner extends string,
+  TAccountLendingMarket extends string,
+  TAccountReserve extends string,
+  TAccountReserveLiquidityMint extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountFeeVault extends string,
+  TAccountLendingMarketOwnerAta extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: WithdrawProtocolFeeAsyncInput<
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountLendingMarketAuthority,
+    TAccountFeeVault,
+    TAccountLendingMarketOwnerAta,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawProtocolFeeInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountLendingMarketAuthority,
+    TAccountFeeVault,
+    TAccountLendingMarketOwnerAta,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    lendingMarketOwner: {
+      value: input.lendingMarketOwner ?? null,
+      isWritable: false,
+    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    reserve: { value: input.reserve ?? null, isWritable: false },
+    reserveLiquidityMint: {
+      value: input.reserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    feeVault: { value: input.feeVault ?? null, isWritable: true },
+    lendingMarketOwnerAta: {
+      value: input.lendingMarketOwnerAta ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.reserveLiquidityMint),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.feeVault),
+      getAccountMeta(accounts.lendingMarketOwnerAta),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getWithdrawProtocolFeeInstructionDataEncoder().encode(
+      args as WithdrawProtocolFeeInstructionDataArgs,
+    ),
+    programAddress,
+  } as WithdrawProtocolFeeInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountLendingMarketAuthority,
+    TAccountFeeVault,
+    TAccountLendingMarketOwnerAta,
+    TAccountTokenProgram
+  >);
 }
 
 export interface WithdrawProtocolFeeInput<

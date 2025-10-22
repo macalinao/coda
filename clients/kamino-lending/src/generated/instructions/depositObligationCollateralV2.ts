@@ -35,11 +35,12 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_OBLIGATION_COLLATERAL_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([137, 145, 151, 94, 167, 113, 4, 145]);
@@ -56,9 +57,7 @@ export type DepositObligationCollateralV2Instruction<
   TAccountObligation extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountDepositReserve extends string | AccountMeta = string,
-  TAccountReserveDestinationCollateral extends
-    | string
-    | AccountMeta = string,
+  TAccountReserveDestinationCollateral extends string | AccountMeta = string,
   TAccountUserSourceCollateral extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
@@ -155,6 +154,183 @@ export function getDepositObligationCollateralV2InstructionDataCodec(): FixedSiz
     getDepositObligationCollateralV2InstructionDataEncoder(),
     getDepositObligationCollateralV2InstructionDataDecoder(),
   );
+}
+
+export interface DepositObligationCollateralV2AsyncInput<
+  TAccountOwner extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountDepositReserve extends string = string,
+  TAccountReserveDestinationCollateral extends string = string,
+  TAccountUserSourceCollateral extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountInstructionSysvarAccount extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountObligationFarmUserState extends string = string,
+  TAccountReserveFarmState extends string = string,
+  TAccountFarmsProgram extends string = string,
+> {
+  owner: TransactionSigner<TAccountOwner>;
+  obligation: Address<TAccountObligation>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  depositReserve: Address<TAccountDepositReserve>;
+  reserveDestinationCollateral: Address<TAccountReserveDestinationCollateral>;
+  userSourceCollateral: Address<TAccountUserSourceCollateral>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
+  reserveFarmState?: Address<TAccountReserveFarmState>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
+  collateralAmount: DepositObligationCollateralV2InstructionDataArgs["collateralAmount"];
+}
+
+export async function getDepositObligationCollateralV2InstructionAsync<
+  TAccountOwner extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarket extends string,
+  TAccountDepositReserve extends string,
+  TAccountReserveDestinationCollateral extends string,
+  TAccountUserSourceCollateral extends string,
+  TAccountTokenProgram extends string,
+  TAccountInstructionSysvarAccount extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountObligationFarmUserState extends string,
+  TAccountReserveFarmState extends string,
+  TAccountFarmsProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: DepositObligationCollateralV2AsyncInput<
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountDepositReserve,
+    TAccountReserveDestinationCollateral,
+    TAccountUserSourceCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountLendingMarketAuthority,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountFarmsProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  DepositObligationCollateralV2Instruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountDepositReserve,
+    TAccountReserveDestinationCollateral,
+    TAccountUserSourceCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountLendingMarketAuthority,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountFarmsProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    owner: { value: input.owner ?? null, isWritable: false },
+    obligation: { value: input.obligation ?? null, isWritable: true },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    depositReserve: { value: input.depositReserve ?? null, isWritable: true },
+    reserveDestinationCollateral: {
+      value: input.reserveDestinationCollateral ?? null,
+      isWritable: true,
+    },
+    userSourceCollateral: {
+      value: input.userSourceCollateral ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    instructionSysvarAccount: {
+      value: input.instructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    obligationFarmUserState: {
+      value: input.obligationFarmUserState ?? null,
+      isWritable: true,
+    },
+    reserveFarmState: {
+      value: input.reserveFarmState ?? null,
+      isWritable: true,
+    },
+    farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.instructionSysvarAccount.value) {
+    accounts.instructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.depositReserve),
+      getAccountMeta(accounts.reserveDestinationCollateral),
+      getAccountMeta(accounts.userSourceCollateral),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.obligationFarmUserState),
+      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.farmsProgram),
+    ],
+    data: getDepositObligationCollateralV2InstructionDataEncoder().encode(
+      args as DepositObligationCollateralV2InstructionDataArgs,
+    ),
+    programAddress,
+  } as DepositObligationCollateralV2Instruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountDepositReserve,
+    TAccountReserveDestinationCollateral,
+    TAccountUserSourceCollateral,
+    TAccountTokenProgram,
+    TAccountInstructionSysvarAccount,
+    TAccountLendingMarketAuthority,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountFarmsProgram
+  >);
 }
 
 export interface DepositObligationCollateralV2Input<

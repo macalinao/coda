@@ -35,11 +35,12 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_FARMS_FOR_RESERVE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([218, 6, 62, 233, 1, 33, 232, 82]);
@@ -145,6 +146,161 @@ export function getInitFarmsForReserveInstructionDataCodec(): FixedSizeCodec<
     getInitFarmsForReserveInstructionDataEncoder(),
     getInitFarmsForReserveInstructionDataDecoder(),
   );
+}
+
+export interface InitFarmsForReserveAsyncInput<
+  TAccountLendingMarketOwner extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountReserve extends string = string,
+  TAccountFarmsProgram extends string = string,
+  TAccountFarmsGlobalConfig extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountFarmsVaultAuthority extends string = string,
+  TAccountRent extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  reserve: Address<TAccountReserve>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
+  farmsGlobalConfig: Address<TAccountFarmsGlobalConfig>;
+  farmState: Address<TAccountFarmState>;
+  farmsVaultAuthority: Address<TAccountFarmsVaultAuthority>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  mode: InitFarmsForReserveInstructionDataArgs["mode"];
+}
+
+export async function getInitFarmsForReserveInstructionAsync<
+  TAccountLendingMarketOwner extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountReserve extends string,
+  TAccountFarmsProgram extends string,
+  TAccountFarmsGlobalConfig extends string,
+  TAccountFarmState extends string,
+  TAccountFarmsVaultAuthority extends string,
+  TAccountRent extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: InitFarmsForReserveAsyncInput<
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountFarmsProgram,
+    TAccountFarmsGlobalConfig,
+    TAccountFarmState,
+    TAccountFarmsVaultAuthority,
+    TAccountRent,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitFarmsForReserveInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountFarmsProgram,
+    TAccountFarmsGlobalConfig,
+    TAccountFarmState,
+    TAccountFarmsVaultAuthority,
+    TAccountRent,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    lendingMarketOwner: {
+      value: input.lendingMarketOwner ?? null,
+      isWritable: true,
+    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    reserve: { value: input.reserve ?? null, isWritable: true },
+    farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
+    farmsGlobalConfig: {
+      value: input.farmsGlobalConfig ?? null,
+      isWritable: false,
+    },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    farmsVaultAuthority: {
+      value: input.farmsVaultAuthority ?? null,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.farmsProgram),
+      getAccountMeta(accounts.farmsGlobalConfig),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.farmsVaultAuthority),
+      getAccountMeta(accounts.rent),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    data: getInitFarmsForReserveInstructionDataEncoder().encode(
+      args as InitFarmsForReserveInstructionDataArgs,
+    ),
+    programAddress,
+  } as InitFarmsForReserveInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountFarmsProgram,
+    TAccountFarmsGlobalConfig,
+    TAccountFarmState,
+    TAccountFarmsVaultAuthority,
+    TAccountRent,
+    TAccountSystemProgram
+  >);
 }
 
 export interface InitFarmsForReserveInput<

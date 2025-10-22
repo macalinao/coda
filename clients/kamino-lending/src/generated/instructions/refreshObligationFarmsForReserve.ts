@@ -35,11 +35,12 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REFRESH_OBLIGATION_FARMS_FOR_RESERVE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([140, 144, 253, 21, 10, 74, 248, 3]);
@@ -145,6 +146,158 @@ export function getRefreshObligationFarmsForReserveInstructionDataCodec(): Fixed
     getRefreshObligationFarmsForReserveInstructionDataEncoder(),
     getRefreshObligationFarmsForReserveInstructionDataDecoder(),
   );
+}
+
+export interface RefreshObligationFarmsForReserveAsyncInput<
+  TAccountCrank extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountReserve extends string = string,
+  TAccountReserveFarmState extends string = string,
+  TAccountObligationFarmUserState extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountFarmsProgram extends string = string,
+  TAccountRent extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  crank: TransactionSigner<TAccountCrank>;
+  obligation: Address<TAccountObligation>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  reserve: Address<TAccountReserve>;
+  reserveFarmState: Address<TAccountReserveFarmState>;
+  obligationFarmUserState: Address<TAccountObligationFarmUserState>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
+  rent?: Address<TAccountRent>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  mode: RefreshObligationFarmsForReserveInstructionDataArgs["mode"];
+}
+
+export async function getRefreshObligationFarmsForReserveInstructionAsync<
+  TAccountCrank extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountReserve extends string,
+  TAccountReserveFarmState extends string,
+  TAccountObligationFarmUserState extends string,
+  TAccountLendingMarket extends string,
+  TAccountFarmsProgram extends string,
+  TAccountRent extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: RefreshObligationFarmsForReserveAsyncInput<
+    TAccountCrank,
+    TAccountObligation,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveFarmState,
+    TAccountObligationFarmUserState,
+    TAccountLendingMarket,
+    TAccountFarmsProgram,
+    TAccountRent,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  RefreshObligationFarmsForReserveInstruction<
+    TProgramAddress,
+    TAccountCrank,
+    TAccountObligation,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveFarmState,
+    TAccountObligationFarmUserState,
+    TAccountLendingMarket,
+    TAccountFarmsProgram,
+    TAccountRent,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    crank: { value: input.crank ?? null, isWritable: false },
+    obligation: { value: input.obligation ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    reserve: { value: input.reserve ?? null, isWritable: false },
+    reserveFarmState: {
+      value: input.reserveFarmState ?? null,
+      isWritable: true,
+    },
+    obligationFarmUserState: {
+      value: input.obligationFarmUserState ?? null,
+      isWritable: true,
+    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.crank),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.obligationFarmUserState),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.farmsProgram),
+      getAccountMeta(accounts.rent),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    data: getRefreshObligationFarmsForReserveInstructionDataEncoder().encode(
+      args as RefreshObligationFarmsForReserveInstructionDataArgs,
+    ),
+    programAddress,
+  } as RefreshObligationFarmsForReserveInstruction<
+    TProgramAddress,
+    TAccountCrank,
+    TAccountObligation,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveFarmState,
+    TAccountObligationFarmUserState,
+    TAccountLendingMarket,
+    TAccountFarmsProgram,
+    TAccountRent,
+    TAccountSystemProgram
+  >);
 }
 
 export interface RefreshObligationFarmsForReserveInput<

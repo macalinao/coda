@@ -2410,6 +2410,10 @@
       "discriminator": [72, 177, 85, 249, 76, 167, 186, 126]
     },
     {
+      "name": "LendingGlobalConfig",
+      "discriminator": [149, 8, 156, 202, 160, 252, 176, 217]
+    },
+    {
       "name": "LendingMarket",
       "discriminator": [246, 114, 50, 98, 72, 157, 28, 120]
     },
@@ -4785,6 +4789,45 @@
             "name": "padding",
             "type": {
               "array": ["u64", 207]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "LendingGlobalConfig",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c",
+        "packed": true
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "global_admin",
+            "docs": ["Global admin of the program"],
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_admin",
+            "docs": [
+              "Pending admin must sign a specific transaction to become the global admin"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_collector",
+            "docs": [
+              "Fee collector is the only allowed owner of token accounts receiving protocol fees"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "padding",
+            "docs": ["Padding to make the struct size 1024 bytes"],
+            "type": {
+              "array": ["u8", 928]
             }
           }
         ]

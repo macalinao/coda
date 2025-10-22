@@ -60,13 +60,14 @@ export const KAMINO_LENDING_PROGRAM_ADDRESS =
 
 export enum KaminoLendingAccount {
   UserState = 0,
-  LendingMarket = 1,
-  Obligation = 2,
-  ReferrerState = 3,
-  ReferrerTokenState = 4,
-  ShortUrl = 5,
-  UserMetadata = 6,
-  Reserve = 7,
+  LendingGlobalConfig = 1,
+  LendingMarket = 2,
+  Obligation = 3,
+  ReferrerState = 4,
+  ReferrerTokenState = 5,
+  ShortUrl = 6,
+  UserMetadata = 7,
+  Reserve = 8,
 }
 
 export function identifyKaminoLendingAccount(
@@ -83,6 +84,17 @@ export function identifyKaminoLendingAccount(
     )
   ) {
     return KaminoLendingAccount.UserState;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([149, 8, 156, 202, 160, 252, 176, 217]),
+      ),
+      0,
+    )
+  ) {
+    return KaminoLendingAccount.LendingGlobalConfig;
   }
   if (
     containsBytes(

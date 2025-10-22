@@ -58,9 +58,7 @@ export type WithdrawTreasuryInstruction<
   TAccountRewardMint extends string | AccountMeta = string,
   TAccountRewardTreasuryVault extends string | AccountMeta = string,
   TAccountTreasuryVaultAuthority extends string | AccountMeta = string,
-  TAccountWithdrawDestinationTokenAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawDestinationTokenAccount extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",

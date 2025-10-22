@@ -52,21 +52,15 @@ export function getLiquidateObligationAndRedeemReserveCollateralV2DiscriminatorB
 
 export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLiquidationAccountsLiquidator extends
-    | string
-    | AccountMeta = string,
-  TAccountLiquidationAccountsObligation extends
-    | string
-    | AccountMeta = string,
+  TAccountLiquidationAccountsLiquidator extends string | AccountMeta = string,
+  TAccountLiquidationAccountsObligation extends string | AccountMeta = string,
   TAccountLiquidationAccountsLendingMarket extends
     | string
     | AccountMeta = string,
   TAccountLiquidationAccountsLendingMarketAuthority extends
     | string
     | AccountMeta = string,
-  TAccountLiquidationAccountsRepayReserve extends
-    | string
-    | AccountMeta = string,
+  TAccountLiquidationAccountsRepayReserve extends string | AccountMeta = string,
   TAccountLiquidationAccountsRepayReserveLiquidityMint extends
     | string
     | AccountMeta = string,

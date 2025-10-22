@@ -33,8 +33,9 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   138, 245, 71, 225, 153, 4, 3, 43,
@@ -145,6 +146,198 @@ export function getInitReserveInstructionDataCodec(): FixedSizeCodec<
     getInitReserveInstructionDataEncoder(),
     getInitReserveInstructionDataDecoder(),
   );
+}
+
+export interface InitReserveAsyncInput<
+  TAccountLendingMarketOwner extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountReserve extends string = string,
+  TAccountReserveLiquidityMint extends string = string,
+  TAccountReserveLiquiditySupply extends string = string,
+  TAccountFeeReceiver extends string = string,
+  TAccountReserveCollateralMint extends string = string,
+  TAccountReserveCollateralSupply extends string = string,
+  TAccountInitialLiquiditySource extends string = string,
+  TAccountRent extends string = string,
+  TAccountLiquidityTokenProgram extends string = string,
+  TAccountCollateralTokenProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  reserve: Address<TAccountReserve>;
+  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
+  reserveLiquiditySupply: Address<TAccountReserveLiquiditySupply>;
+  feeReceiver: Address<TAccountFeeReceiver>;
+  reserveCollateralMint: Address<TAccountReserveCollateralMint>;
+  reserveCollateralSupply: Address<TAccountReserveCollateralSupply>;
+  initialLiquiditySource: Address<TAccountInitialLiquiditySource>;
+  rent?: Address<TAccountRent>;
+  liquidityTokenProgram: Address<TAccountLiquidityTokenProgram>;
+  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+}
+
+export async function getInitReserveInstructionAsync<
+  TAccountLendingMarketOwner extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountReserve extends string,
+  TAccountReserveLiquidityMint extends string,
+  TAccountReserveLiquiditySupply extends string,
+  TAccountFeeReceiver extends string,
+  TAccountReserveCollateralMint extends string,
+  TAccountReserveCollateralSupply extends string,
+  TAccountInitialLiquiditySource extends string,
+  TAccountRent extends string,
+  TAccountLiquidityTokenProgram extends string,
+  TAccountCollateralTokenProgram extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: InitReserveAsyncInput<
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveLiquiditySupply,
+    TAccountFeeReceiver,
+    TAccountReserveCollateralMint,
+    TAccountReserveCollateralSupply,
+    TAccountInitialLiquiditySource,
+    TAccountRent,
+    TAccountLiquidityTokenProgram,
+    TAccountCollateralTokenProgram,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitReserveInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveLiquiditySupply,
+    TAccountFeeReceiver,
+    TAccountReserveCollateralMint,
+    TAccountReserveCollateralSupply,
+    TAccountInitialLiquiditySource,
+    TAccountRent,
+    TAccountLiquidityTokenProgram,
+    TAccountCollateralTokenProgram,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    lendingMarketOwner: {
+      value: input.lendingMarketOwner ?? null,
+      isWritable: true,
+    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    reserve: { value: input.reserve ?? null, isWritable: true },
+    reserveLiquidityMint: {
+      value: input.reserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    reserveLiquiditySupply: {
+      value: input.reserveLiquiditySupply ?? null,
+      isWritable: true,
+    },
+    feeReceiver: { value: input.feeReceiver ?? null, isWritable: true },
+    reserveCollateralMint: {
+      value: input.reserveCollateralMint ?? null,
+      isWritable: true,
+    },
+    reserveCollateralSupply: {
+      value: input.reserveCollateralSupply ?? null,
+      isWritable: true,
+    },
+    initialLiquiditySource: {
+      value: input.initialLiquiditySource ?? null,
+      isWritable: true,
+    },
+    rent: { value: input.rent ?? null, isWritable: false },
+    liquidityTokenProgram: {
+      value: input.liquidityTokenProgram ?? null,
+      isWritable: false,
+    },
+    collateralTokenProgram: {
+      value: input.collateralTokenProgram ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.lendingMarketOwner),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.reserveLiquidityMint),
+      getAccountMeta(accounts.reserveLiquiditySupply),
+      getAccountMeta(accounts.feeReceiver),
+      getAccountMeta(accounts.reserveCollateralMint),
+      getAccountMeta(accounts.reserveCollateralSupply),
+      getAccountMeta(accounts.initialLiquiditySource),
+      getAccountMeta(accounts.rent),
+      getAccountMeta(accounts.liquidityTokenProgram),
+      getAccountMeta(accounts.collateralTokenProgram),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    data: getInitReserveInstructionDataEncoder().encode({}),
+    programAddress,
+  } as InitReserveInstruction<
+    TProgramAddress,
+    TAccountLendingMarketOwner,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveLiquiditySupply,
+    TAccountFeeReceiver,
+    TAccountReserveCollateralMint,
+    TAccountReserveCollateralSupply,
+    TAccountInitialLiquiditySource,
+    TAccountRent,
+    TAccountLiquidityTokenProgram,
+    TAccountCollateralTokenProgram,
+    TAccountSystemProgram
+  >);
 }
 
 export interface InitReserveInput<
