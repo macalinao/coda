@@ -1,5 +1,11 @@
 # @macalinao/clients-kamino-lending
 
+## 0.5.0
+
+### Minor Changes
+
+- 8f4eef2: Update Kamino Lending PDAs
+
 ## 0.4.3
 
 ### Patch Changes
