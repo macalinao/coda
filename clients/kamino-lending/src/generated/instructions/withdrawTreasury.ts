@@ -35,8 +35,12 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findRewardTreasuryVaultPda,
+  findTreasuryVaultsAuthorityPda,
+} from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_TREASURY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([40, 63, 122, 158, 144, 216, 83, 96]);
@@ -54,7 +58,9 @@ export type WithdrawTreasuryInstruction<
   TAccountRewardMint extends string | AccountMeta = string,
   TAccountRewardTreasuryVault extends string | AccountMeta = string,
   TAccountTreasuryVaultAuthority extends string | AccountMeta = string,
-  TAccountWithdrawDestinationTokenAccount extends string | AccountMeta = string,
+  TAccountWithdrawDestinationTokenAccount extends
+    | string
+    | AccountMeta = string,
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
@@ -123,6 +129,132 @@ export function getWithdrawTreasuryInstructionDataCodec(): FixedSizeCodec<
     getWithdrawTreasuryInstructionDataEncoder(),
     getWithdrawTreasuryInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawTreasuryAsyncInput<
+  TAccountGlobalAdmin extends string = string,
+  TAccountGlobalConfig extends string = string,
+  TAccountRewardMint extends string = string,
+  TAccountRewardTreasuryVault extends string = string,
+  TAccountTreasuryVaultAuthority extends string = string,
+  TAccountWithdrawDestinationTokenAccount extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
+  globalConfig: Address<TAccountGlobalConfig>;
+  rewardMint: Address<TAccountRewardMint>;
+  rewardTreasuryVault?: Address<TAccountRewardTreasuryVault>;
+  treasuryVaultAuthority?: Address<TAccountTreasuryVaultAuthority>;
+  withdrawDestinationTokenAccount: Address<TAccountWithdrawDestinationTokenAccount>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  amount: WithdrawTreasuryInstructionDataArgs["amount"];
+}
+
+export async function getWithdrawTreasuryInstructionAsync<
+  TAccountGlobalAdmin extends string,
+  TAccountGlobalConfig extends string,
+  TAccountRewardMint extends string,
+  TAccountRewardTreasuryVault extends string,
+  TAccountTreasuryVaultAuthority extends string,
+  TAccountWithdrawDestinationTokenAccount extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: WithdrawTreasuryAsyncInput<
+    TAccountGlobalAdmin,
+    TAccountGlobalConfig,
+    TAccountRewardMint,
+    TAccountRewardTreasuryVault,
+    TAccountTreasuryVaultAuthority,
+    TAccountWithdrawDestinationTokenAccount,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawTreasuryInstruction<
+    TProgramAddress,
+    TAccountGlobalAdmin,
+    TAccountGlobalConfig,
+    TAccountRewardMint,
+    TAccountRewardTreasuryVault,
+    TAccountTreasuryVaultAuthority,
+    TAccountWithdrawDestinationTokenAccount,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    globalAdmin: { value: input.globalAdmin ?? null, isWritable: true },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
+    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
+    rewardTreasuryVault: {
+      value: input.rewardTreasuryVault ?? null,
+      isWritable: true,
+    },
+    treasuryVaultAuthority: {
+      value: input.treasuryVaultAuthority ?? null,
+      isWritable: false,
+    },
+    withdrawDestinationTokenAccount: {
+      value: input.withdrawDestinationTokenAccount ?? null,
+      isWritable: true,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.rewardTreasuryVault.value) {
+    accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda({
+      globalConfig: expectAddress(accounts.globalConfig.value),
+      rewardMint: expectAddress(accounts.rewardMint.value),
+    });
+  }
+  if (!accounts.treasuryVaultAuthority.value) {
+    accounts.treasuryVaultAuthority.value =
+      await findTreasuryVaultsAuthorityPda({
+        globalConfig: expectAddress(accounts.globalConfig.value),
+      });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.globalAdmin),
+      getAccountMeta(accounts.globalConfig),
+      getAccountMeta(accounts.rewardMint),
+      getAccountMeta(accounts.rewardTreasuryVault),
+      getAccountMeta(accounts.treasuryVaultAuthority),
+      getAccountMeta(accounts.withdrawDestinationTokenAccount),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getWithdrawTreasuryInstructionDataEncoder().encode(
+      args as WithdrawTreasuryInstructionDataArgs,
+    ),
+    programAddress,
+  } as WithdrawTreasuryInstruction<
+    TProgramAddress,
+    TAccountGlobalAdmin,
+    TAccountGlobalConfig,
+    TAccountRewardMint,
+    TAccountRewardTreasuryVault,
+    TAccountTreasuryVaultAuthority,
+    TAccountWithdrawDestinationTokenAccount,
+    TAccountTokenProgram
+  >);
 }
 
 export interface WithdrawTreasuryInput<

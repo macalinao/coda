@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { FarmsUserStateSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -44,6 +45,7 @@ import {
   getU128Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmsUserStatePda } from "../pdas/index.js";
 
 export const FARMS_USER_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([72, 177, 85, 249, 76, 167, 186, 126]);
@@ -263,4 +265,28 @@ export async function fetchAllMaybeFarmsUserState(
   return maybeAccounts.map((maybeAccount) =>
     decodeFarmsUserState(maybeAccount),
   );
+}
+
+export async function fetchFarmsUserStateFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: FarmsUserStateSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<FarmsUserState>> {
+  const maybeAccount = await fetchMaybeFarmsUserStateFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeFarmsUserStateFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: FarmsUserStateSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<FarmsUserState>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findFarmsUserStatePda(seeds, { programAddress });
+  return await fetchMaybeFarmsUserState(rpc, address, fetchConfig);
 }

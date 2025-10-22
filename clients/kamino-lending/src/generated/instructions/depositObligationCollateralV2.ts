@@ -56,7 +56,9 @@ export type DepositObligationCollateralV2Instruction<
   TAccountObligation extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountDepositReserve extends string | AccountMeta = string,
-  TAccountReserveDestinationCollateral extends string | AccountMeta = string,
+  TAccountReserveDestinationCollateral extends
+    | string
+    | AccountMeta = string,
   TAccountUserSourceCollateral extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string

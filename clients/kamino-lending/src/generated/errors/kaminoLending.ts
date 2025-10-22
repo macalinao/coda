@@ -609,7 +609,9 @@ if (true) {
 
 export function getKaminoLendingErrorMessage(code: KaminoLendingError): string {
   if (true) {
-    return kaminoLendingErrorMessages![code];
+    return (kaminoLendingErrorMessages!)[
+      code
+    ];
   }
 
   return "Error message not available in production bundles.";

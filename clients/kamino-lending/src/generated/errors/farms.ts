@@ -271,7 +271,7 @@ if (true) {
 
 export function getFarmsErrorMessage(code: FarmsError): string {
   if (true) {
-    return farmsErrorMessages![code];
+    return (farmsErrorMessages!)[code];
   }
 
   return "Error message not available in production bundles.";

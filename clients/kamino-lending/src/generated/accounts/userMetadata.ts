@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { UserMetadataSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,6 +41,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findUserMetadataPda } from "../pdas/index.js";
 
 export const USER_METADATA_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   157, 214, 220, 235, 98, 135, 171, 28,
@@ -155,4 +157,28 @@ export async function fetchAllMaybeUserMetadata(
 ): Promise<MaybeAccount<UserMetadata>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeUserMetadata(maybeAccount));
+}
+
+export async function fetchUserMetadataFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: UserMetadataSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<UserMetadata>> {
+  const maybeAccount = await fetchMaybeUserMetadataFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeUserMetadataFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: UserMetadataSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<UserMetadata>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findUserMetadataPda(seeds, { programAddress });
+  return await fetchMaybeUserMetadata(rpc, address, fetchConfig);
 }

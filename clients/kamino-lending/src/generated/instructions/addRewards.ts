@@ -35,8 +35,12 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findFarmVaultsAuthorityPda,
+  findRewardVaultPda,
+} from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const ADD_REWARDS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   88, 186, 25, 227, 38, 137, 81, 23,
@@ -130,6 +134,137 @@ export function getAddRewardsInstructionDataCodec(): FixedSizeCodec<
     getAddRewardsInstructionDataEncoder(),
     getAddRewardsInstructionDataDecoder(),
   );
+}
+
+export interface AddRewardsAsyncInput<
+  TAccountPayer extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountRewardMint extends string = string,
+  TAccountRewardVault extends string = string,
+  TAccountFarmVaultsAuthority extends string = string,
+  TAccountPayerRewardTokenAta extends string = string,
+  TAccountScopePrices extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  payer: TransactionSigner<TAccountPayer>;
+  farmState: Address<TAccountFarmState>;
+  rewardMint: Address<TAccountRewardMint>;
+  rewardVault?: Address<TAccountRewardVault>;
+  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
+  payerRewardTokenAta: Address<TAccountPayerRewardTokenAta>;
+  scopePrices?: Address<TAccountScopePrices>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  amount: AddRewardsInstructionDataArgs["amount"];
+  rewardIndex: AddRewardsInstructionDataArgs["rewardIndex"];
+}
+
+export async function getAddRewardsInstructionAsync<
+  TAccountPayer extends string,
+  TAccountFarmState extends string,
+  TAccountRewardMint extends string,
+  TAccountRewardVault extends string,
+  TAccountFarmVaultsAuthority extends string,
+  TAccountPayerRewardTokenAta extends string,
+  TAccountScopePrices extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: AddRewardsAsyncInput<
+    TAccountPayer,
+    TAccountFarmState,
+    TAccountRewardMint,
+    TAccountRewardVault,
+    TAccountFarmVaultsAuthority,
+    TAccountPayerRewardTokenAta,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  AddRewardsInstruction<
+    TProgramAddress,
+    TAccountPayer,
+    TAccountFarmState,
+    TAccountRewardMint,
+    TAccountRewardVault,
+    TAccountFarmVaultsAuthority,
+    TAccountPayerRewardTokenAta,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    payer: { value: input.payer ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
+    rewardVault: { value: input.rewardVault ?? null, isWritable: true },
+    farmVaultsAuthority: {
+      value: input.farmVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    payerRewardTokenAta: {
+      value: input.payerRewardTokenAta ?? null,
+      isWritable: true,
+    },
+    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.rewardVault.value) {
+    accounts.rewardVault.value = await findRewardVaultPda({
+      farmState: expectAddress(accounts.farmState.value),
+      rewardMint: expectAddress(accounts.rewardMint.value),
+    });
+  }
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
+      farmState: expectAddress(accounts.farmState.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.rewardMint),
+      getAccountMeta(accounts.rewardVault),
+      getAccountMeta(accounts.farmVaultsAuthority),
+      getAccountMeta(accounts.payerRewardTokenAta),
+      getAccountMeta(accounts.scopePrices),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getAddRewardsInstructionDataEncoder().encode(
+      args as AddRewardsInstructionDataArgs,
+    ),
+    programAddress,
+  } as AddRewardsInstruction<
+    TProgramAddress,
+    TAccountPayer,
+    TAccountFarmState,
+    TAccountRewardMint,
+    TAccountRewardVault,
+    TAccountFarmVaultsAuthority,
+    TAccountPayerRewardTokenAta,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >);
 }
 
 export interface AddRewardsInput<

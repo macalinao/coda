@@ -33,8 +33,12 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findFarmsUserStatePda,
+  findFarmVaultsAuthorityPda,
+} from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_UNSTAKED_DEPOSITS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([36, 102, 187, 49, 220, 36, 132, 67]);
@@ -117,6 +121,119 @@ export function getWithdrawUnstakedDepositsInstructionDataCodec(): FixedSizeCode
     getWithdrawUnstakedDepositsInstructionDataEncoder(),
     getWithdrawUnstakedDepositsInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawUnstakedDepositsAsyncInput<
+  TAccountOwner extends string = string,
+  TAccountUserState extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountUserAta extends string = string,
+  TAccountFarmVault extends string = string,
+  TAccountFarmVaultsAuthority extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  owner: TransactionSigner<TAccountOwner>;
+  userState?: Address<TAccountUserState>;
+  farmState: Address<TAccountFarmState>;
+  userAta: Address<TAccountUserAta>;
+  farmVault: Address<TAccountFarmVault>;
+  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+}
+
+export async function getWithdrawUnstakedDepositsInstructionAsync<
+  TAccountOwner extends string,
+  TAccountUserState extends string,
+  TAccountFarmState extends string,
+  TAccountUserAta extends string,
+  TAccountFarmVault extends string,
+  TAccountFarmVaultsAuthority extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: WithdrawUnstakedDepositsAsyncInput<
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountUserAta,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawUnstakedDepositsInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountUserAta,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    owner: { value: input.owner ?? null, isWritable: true },
+    userState: { value: input.userState ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    userAta: { value: input.userAta ?? null, isWritable: true },
+    farmVault: { value: input.farmVault ?? null, isWritable: true },
+    farmVaultsAuthority: {
+      value: input.farmVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.userState.value) {
+    accounts.userState.value = await findFarmsUserStatePda({
+      farmState: expectAddress(accounts.farmState.value),
+      owner: expectAddress(accounts.owner.value),
+    });
+  }
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
+      farmState: expectAddress(accounts.farmState.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.userState),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.userAta),
+      getAccountMeta(accounts.farmVault),
+      getAccountMeta(accounts.farmVaultsAuthority),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getWithdrawUnstakedDepositsInstructionDataEncoder().encode({}),
+    programAddress,
+  } as WithdrawUnstakedDepositsInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountUserAta,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >);
 }
 
 export interface WithdrawUnstakedDepositsInput<

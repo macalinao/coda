@@ -56,9 +56,13 @@ export type FlashRepayReserveLiquidityInstruction<
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountReserve extends string | AccountMeta = string,
   TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveDestinationLiquidity extends string | AccountMeta = string,
+  TAccountReserveDestinationLiquidity extends
+    | string
+    | AccountMeta = string,
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
-  TAccountReserveLiquidityFeeReceiver extends string | AccountMeta = string,
+  TAccountReserveLiquidityFeeReceiver extends
+    | string
+    | AccountMeta = string,
   TAccountReferrerTokenState extends string | AccountMeta = string,
   TAccountReferrerAccount extends string | AccountMeta = string,
   TAccountSysvarInfo extends

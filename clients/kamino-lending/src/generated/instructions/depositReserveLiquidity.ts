@@ -57,7 +57,9 @@ export type DepositReserveLiquidityInstruction<
   TAccountReserveLiquiditySupply extends string | AccountMeta = string,
   TAccountReserveCollateralMint extends string | AccountMeta = string,
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
-  TAccountUserDestinationCollateral extends string | AccountMeta = string,
+  TAccountUserDestinationCollateral extends
+    | string
+    | AccountMeta = string,
   TAccountCollateralTokenProgram extends string | AccountMeta = string,
   TAccountLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends

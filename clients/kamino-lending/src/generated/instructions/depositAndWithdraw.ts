@@ -53,8 +53,12 @@ export function getDepositAndWithdrawDiscriminatorBytes(): ReadonlyUint8Array {
 export type DepositAndWithdrawInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountDepositAccountsOwner extends string | AccountMeta = string,
-  TAccountDepositAccountsObligation extends string | AccountMeta = string,
-  TAccountDepositAccountsLendingMarket extends string | AccountMeta = string,
+  TAccountDepositAccountsObligation extends
+    | string
+    | AccountMeta = string,
+  TAccountDepositAccountsLendingMarket extends
+    | string
+    | AccountMeta = string,
   TAccountDepositAccountsLendingMarketAuthority extends
     | string
     | AccountMeta = string,
@@ -87,12 +91,18 @@ export type DepositAndWithdrawInstruction<
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
-  TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
-  TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
+  TAccountWithdrawAccountsObligation extends
+    | string
+    | AccountMeta = string,
+  TAccountWithdrawAccountsLendingMarket extends
+    | string
+    | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarketAuthority extends
     | string
     | AccountMeta = string,
-  TAccountWithdrawAccountsWithdrawReserve extends string | AccountMeta = string,
+  TAccountWithdrawAccountsWithdrawReserve extends
+    | string
+    | AccountMeta = string,
   TAccountWithdrawAccountsReserveLiquidityMint extends
     | string
     | AccountMeta = string,

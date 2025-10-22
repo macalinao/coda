@@ -57,7 +57,9 @@ export type RepayObligationLiquidityV2Instruction<
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountRepayReserve extends string | AccountMeta = string,
   TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveDestinationLiquidity extends string | AccountMeta = string,
+  TAccountReserveDestinationLiquidity extends
+    | string
+    | AccountMeta = string,
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string

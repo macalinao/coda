@@ -34,8 +34,9 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_FARM_DELEGATED_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([250, 84, 101, 25, 51, 77, 204, 91]);
@@ -121,6 +122,117 @@ export function getInitializeFarmDelegatedInstructionDataCodec(): FixedSizeCodec
     getInitializeFarmDelegatedInstructionDataEncoder(),
     getInitializeFarmDelegatedInstructionDataDecoder(),
   );
+}
+
+export interface InitializeFarmDelegatedAsyncInput<
+  TAccountFarmAdmin extends string = string,
+  TAccountFarmDelegate extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountGlobalConfig extends string = string,
+  TAccountFarmVaultsAuthority extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+> {
+  farmAdmin: TransactionSigner<TAccountFarmAdmin>;
+  farmDelegate: TransactionSigner<TAccountFarmDelegate>;
+  farmState: Address<TAccountFarmState>;
+  globalConfig: Address<TAccountGlobalConfig>;
+  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+}
+
+export async function getInitializeFarmDelegatedInstructionAsync<
+  TAccountFarmAdmin extends string,
+  TAccountFarmDelegate extends string,
+  TAccountFarmState extends string,
+  TAccountGlobalConfig extends string,
+  TAccountFarmVaultsAuthority extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: InitializeFarmDelegatedAsyncInput<
+    TAccountFarmAdmin,
+    TAccountFarmDelegate,
+    TAccountFarmState,
+    TAccountGlobalConfig,
+    TAccountFarmVaultsAuthority,
+    TAccountSystemProgram,
+    TAccountRent
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitializeFarmDelegatedInstruction<
+    TProgramAddress,
+    TAccountFarmAdmin,
+    TAccountFarmDelegate,
+    TAccountFarmState,
+    TAccountGlobalConfig,
+    TAccountFarmVaultsAuthority,
+    TAccountSystemProgram,
+    TAccountRent
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    farmAdmin: { value: input.farmAdmin ?? null, isWritable: true },
+    farmDelegate: { value: input.farmDelegate ?? null, isWritable: false },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
+    farmVaultsAuthority: {
+      value: input.farmVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
+      farmState: expectAddress(accounts.farmState.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.farmAdmin),
+      getAccountMeta(accounts.farmDelegate),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.globalConfig),
+      getAccountMeta(accounts.farmVaultsAuthority),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+    ],
+    data: getInitializeFarmDelegatedInstructionDataEncoder().encode({}),
+    programAddress,
+  } as InitializeFarmDelegatedInstruction<
+    TProgramAddress,
+    TAccountFarmAdmin,
+    TAccountFarmDelegate,
+    TAccountFarmState,
+    TAccountGlobalConfig,
+    TAccountFarmVaultsAuthority,
+    TAccountSystemProgram,
+    TAccountRent
+  >);
 }
 
 export interface InitializeFarmDelegatedInput<

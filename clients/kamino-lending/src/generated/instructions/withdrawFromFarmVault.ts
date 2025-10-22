@@ -35,8 +35,9 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_FROM_FARM_VAULT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([22, 82, 128, 250, 86, 79, 124, 78]);
@@ -122,6 +123,117 @@ export function getWithdrawFromFarmVaultInstructionDataCodec(): FixedSizeCodec<
     getWithdrawFromFarmVaultInstructionDataEncoder(),
     getWithdrawFromFarmVaultInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawFromFarmVaultAsyncInput<
+  TAccountWithdrawAuthority extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountWithdrawerTokenAccount extends string = string,
+  TAccountFarmVault extends string = string,
+  TAccountFarmVaultsAuthority extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  withdrawAuthority: TransactionSigner<TAccountWithdrawAuthority>;
+  farmState: Address<TAccountFarmState>;
+  withdrawerTokenAccount: Address<TAccountWithdrawerTokenAccount>;
+  farmVault: Address<TAccountFarmVault>;
+  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  amount: WithdrawFromFarmVaultInstructionDataArgs["amount"];
+}
+
+export async function getWithdrawFromFarmVaultInstructionAsync<
+  TAccountWithdrawAuthority extends string,
+  TAccountFarmState extends string,
+  TAccountWithdrawerTokenAccount extends string,
+  TAccountFarmVault extends string,
+  TAccountFarmVaultsAuthority extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: WithdrawFromFarmVaultAsyncInput<
+    TAccountWithdrawAuthority,
+    TAccountFarmState,
+    TAccountWithdrawerTokenAccount,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawFromFarmVaultInstruction<
+    TProgramAddress,
+    TAccountWithdrawAuthority,
+    TAccountFarmState,
+    TAccountWithdrawerTokenAccount,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    withdrawAuthority: {
+      value: input.withdrawAuthority ?? null,
+      isWritable: true,
+    },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    withdrawerTokenAccount: {
+      value: input.withdrawerTokenAccount ?? null,
+      isWritable: true,
+    },
+    farmVault: { value: input.farmVault ?? null, isWritable: true },
+    farmVaultsAuthority: {
+      value: input.farmVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
+      farmState: expectAddress(accounts.farmState.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.withdrawAuthority),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.withdrawerTokenAccount),
+      getAccountMeta(accounts.farmVault),
+      getAccountMeta(accounts.farmVaultsAuthority),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getWithdrawFromFarmVaultInstructionDataEncoder().encode(
+      args as WithdrawFromFarmVaultInstructionDataArgs,
+    ),
+    programAddress,
+  } as WithdrawFromFarmVaultInstruction<
+    TProgramAddress,
+    TAccountWithdrawAuthority,
+    TAccountFarmState,
+    TAccountWithdrawerTokenAccount,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >);
 }
 
 export interface WithdrawFromFarmVaultInput<

@@ -34,8 +34,9 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmsUserStatePda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_USER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [111, 17, 185, 250, 60, 122, 38, 254],
@@ -123,6 +124,123 @@ export function getInitializeUserInstructionDataCodec(): FixedSizeCodec<
     getInitializeUserInstructionDataEncoder(),
     getInitializeUserInstructionDataDecoder(),
   );
+}
+
+export interface InitializeUserAsyncInput<
+  TAccountAuthority extends string = string,
+  TAccountPayer extends string = string,
+  TAccountOwner extends string = string,
+  TAccountDelegatee extends string = string,
+  TAccountUserState extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+> {
+  authority: TransactionSigner<TAccountAuthority>;
+  payer: TransactionSigner<TAccountPayer>;
+  owner: Address<TAccountOwner>;
+  delegatee: Address<TAccountDelegatee>;
+  userState?: Address<TAccountUserState>;
+  farmState: Address<TAccountFarmState>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+}
+
+export async function getInitializeUserInstructionAsync<
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountOwner extends string,
+  TAccountDelegatee extends string,
+  TAccountUserState extends string,
+  TAccountFarmState extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: InitializeUserAsyncInput<
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountOwner,
+    TAccountDelegatee,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountSystemProgram,
+    TAccountRent
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitializeUserInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountOwner,
+    TAccountDelegatee,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountSystemProgram,
+    TAccountRent
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    authority: { value: input.authority ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    owner: { value: input.owner ?? null, isWritable: false },
+    delegatee: { value: input.delegatee ?? null, isWritable: false },
+    userState: { value: input.userState ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.userState.value) {
+    accounts.userState.value = await findFarmsUserStatePda({
+      farmState: expectAddress(accounts.farmState.value),
+      delegatee: expectAddress(accounts.owner.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.delegatee),
+      getAccountMeta(accounts.userState),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+    ],
+    data: getInitializeUserInstructionDataEncoder().encode({}),
+    programAddress,
+  } as InitializeUserInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountOwner,
+    TAccountDelegatee,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountSystemProgram,
+    TAccountRent
+  >);
 }
 
 export interface InitializeUserInput<

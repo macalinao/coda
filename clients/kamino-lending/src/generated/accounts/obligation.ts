@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { ObligationSeeds } from "../pdas/index.js";
 import type {
   LastUpdate,
   LastUpdateArgs,
@@ -52,6 +53,7 @@ import {
   getU128Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findObligationPda } from "../pdas/index.js";
 import {
   getLastUpdateDecoder,
   getLastUpdateEncoder,
@@ -258,4 +260,24 @@ export async function fetchAllMaybeObligation(
 ): Promise<MaybeAccount<Obligation>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeObligation(maybeAccount));
+}
+
+export async function fetchObligationFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ObligationSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Obligation>> {
+  const maybeAccount = await fetchMaybeObligationFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeObligationFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ObligationSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Obligation>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findObligationPda(seeds, { programAddress });
+  return await fetchMaybeObligation(rpc, address, fetchConfig);
 }

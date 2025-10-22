@@ -33,8 +33,9 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmVaultPda, findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_FARM_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [252, 28, 185, 172, 244, 74, 117, 165],
@@ -127,6 +128,143 @@ export function getInitializeFarmInstructionDataCodec(): FixedSizeCodec<
     getInitializeFarmInstructionDataEncoder(),
     getInitializeFarmInstructionDataDecoder(),
   );
+}
+
+export interface InitializeFarmAsyncInput<
+  TAccountFarmAdmin extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountGlobalConfig extends string = string,
+  TAccountFarmVault extends string = string,
+  TAccountFarmVaultsAuthority extends string = string,
+  TAccountTokenMint extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+> {
+  farmAdmin: TransactionSigner<TAccountFarmAdmin>;
+  farmState: Address<TAccountFarmState>;
+  globalConfig: Address<TAccountGlobalConfig>;
+  farmVault?: Address<TAccountFarmVault>;
+  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
+  tokenMint: Address<TAccountTokenMint>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  rent?: Address<TAccountRent>;
+}
+
+export async function getInitializeFarmInstructionAsync<
+  TAccountFarmAdmin extends string,
+  TAccountFarmState extends string,
+  TAccountGlobalConfig extends string,
+  TAccountFarmVault extends string,
+  TAccountFarmVaultsAuthority extends string,
+  TAccountTokenMint extends string,
+  TAccountTokenProgram extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: InitializeFarmAsyncInput<
+    TAccountFarmAdmin,
+    TAccountFarmState,
+    TAccountGlobalConfig,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenMint,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitializeFarmInstruction<
+    TProgramAddress,
+    TAccountFarmAdmin,
+    TAccountFarmState,
+    TAccountGlobalConfig,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenMint,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    farmAdmin: { value: input.farmAdmin ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
+    farmVault: { value: input.farmVault ?? null, isWritable: true },
+    farmVaultsAuthority: {
+      value: input.farmVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.farmVault.value) {
+    accounts.farmVault.value = await findFarmVaultPda({
+      farmState: expectAddress(accounts.farmState.value),
+      tokenMint: expectAddress(accounts.tokenMint.value),
+    });
+  }
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
+      farmState: expectAddress(accounts.farmState.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.farmAdmin),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.globalConfig),
+      getAccountMeta(accounts.farmVault),
+      getAccountMeta(accounts.farmVaultsAuthority),
+      getAccountMeta(accounts.tokenMint),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+    ],
+    data: getInitializeFarmInstructionDataEncoder().encode({}),
+    programAddress,
+  } as InitializeFarmInstruction<
+    TProgramAddress,
+    TAccountFarmAdmin,
+    TAccountFarmState,
+    TAccountGlobalConfig,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenMint,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >);
 }
 
 export interface InitializeFarmInput<

@@ -45,7 +45,9 @@ export type RedeemFeesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountReserve extends string | AccountMeta = string,
   TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveLiquidityFeeReceiver extends string | AccountMeta = string,
+  TAccountReserveLiquidityFeeReceiver extends
+    | string
+    | AccountMeta = string,
   TAccountReserveSupplyLiquidity extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
