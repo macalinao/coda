@@ -9,21 +9,21 @@
 import type {
   Account,
   Address,
-  Codec,
-  Decoder,
   EncodedAccount,
-  Encoder,
   FetchAccountConfig,
   FetchAccountsConfig,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
 import type {
+  FarmsTokenInfo,
+  FarmsTokenInfoArgs,
   RewardInfo,
   RewardInfoArgs,
-  TokenInfo,
-  TokenInfoArgs,
 } from "../types/index.js";
 import {
   assertAccountExists,
@@ -53,10 +53,10 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import {
+  getFarmsTokenInfoDecoder,
+  getFarmsTokenInfoEncoder,
   getRewardInfoDecoder,
   getRewardInfoEncoder,
-  getTokenInfoDecoder,
-  getTokenInfoEncoder,
 } from "../types/index.js";
 
 export const FARM_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -71,7 +71,7 @@ export interface FarmState {
   discriminator: ReadonlyUint8Array;
   farmAdmin: Address;
   globalConfig: Address;
-  token: TokenInfo;
+  token: FarmsTokenInfo;
   rewardInfos: RewardInfo[];
   numRewardTokens: bigint;
   /** Data used to calculate the rewards of the user */
@@ -149,7 +149,7 @@ export interface FarmState {
 export interface FarmStateArgs {
   farmAdmin: Address;
   globalConfig: Address;
-  token: TokenInfoArgs;
+  token: FarmsTokenInfoArgs;
   rewardInfos: RewardInfoArgs[];
   numRewardTokens: number | bigint;
   /** Data used to calculate the rewards of the user */
@@ -224,13 +224,13 @@ export interface FarmStateArgs {
   padding: (number | bigint)[];
 }
 
-export function getFarmStateEncoder(): Encoder<FarmStateArgs> {
+export function getFarmStateEncoder(): FixedSizeEncoder<FarmStateArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
       ["farmAdmin", getAddressEncoder()],
       ["globalConfig", getAddressEncoder()],
-      ["token", getTokenInfoEncoder()],
+      ["token", getFarmsTokenInfoEncoder()],
       ["rewardInfos", getArrayEncoder(getRewardInfoEncoder(), { size: 10 })],
       ["numRewardTokens", getU64Encoder()],
       ["numUsers", getU64Encoder()],
@@ -270,12 +270,12 @@ export function getFarmStateEncoder(): Encoder<FarmStateArgs> {
   );
 }
 
-export function getFarmStateDecoder(): Decoder<FarmState> {
+export function getFarmStateDecoder(): FixedSizeDecoder<FarmState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["farmAdmin", getAddressDecoder()],
     ["globalConfig", getAddressDecoder()],
-    ["token", getTokenInfoDecoder()],
+    ["token", getFarmsTokenInfoDecoder()],
     ["rewardInfos", getArrayDecoder(getRewardInfoDecoder(), { size: 10 })],
     ["numRewardTokens", getU64Decoder()],
     ["numUsers", getU64Decoder()],
@@ -313,7 +313,7 @@ export function getFarmStateDecoder(): Decoder<FarmState> {
   ]);
 }
 
-export function getFarmStateCodec(): Codec<FarmStateArgs, FarmState> {
+export function getFarmStateCodec(): FixedSizeCodec<FarmStateArgs, FarmState> {
   return combineCodec(getFarmStateEncoder(), getFarmStateDecoder());
 }
 

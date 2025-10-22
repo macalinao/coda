@@ -822,7 +822,7 @@
       "discriminator": [149, 8, 156, 202, 160, 252, 176, 217]
     },
     {
-      "name": "UserState",
+      "name": "FarmsUserState",
       "discriminator": [72, 177, 85, 249, 76, 167, 186, 126]
     },
     {
@@ -1224,7 +1224,7 @@
             "name": "token",
             "type": {
               "defined": {
-                "name": "TokenInfo"
+                "name": "FarmsTokenInfo"
               }
             }
           },
@@ -1378,7 +1378,7 @@
       }
     },
     {
-      "name": "TokenInfo",
+      "name": "FarmsTokenInfo",
       "serialization": "bytemuck",
       "repr": {
         "kind": "c",
@@ -1496,7 +1496,7 @@
             "name": "token",
             "type": {
               "defined": {
-                "name": "TokenInfo"
+                "name": "FarmsTokenInfo"
               }
             }
           },
@@ -1729,7 +1729,7 @@
       }
     },
     {
-      "name": "UserState",
+      "name": "FarmsUserState",
       "serialization": "bytemuck",
       "repr": {
         "kind": "c",
