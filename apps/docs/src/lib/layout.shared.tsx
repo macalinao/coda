@@ -1,4 +1,5 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { ExternalLink } from "fumadocs-ui/internal/icons";
 
 /**
  * Shared layout configurations
@@ -18,6 +19,12 @@ export function baseOptions(): BaseLayoutProps {
         text: "Documentation",
         url: "/docs",
         active: "nested-url",
+      },
+      {
+        icon: <ExternalLink />,
+        text: "Typedocs",
+        description: "Full TypeDoc documentation",
+        url: "https://coda-typedocs.ianm.com",
       },
     ],
   };
