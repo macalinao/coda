@@ -6,12 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import type {
+  Address,
+  FixedSizeCodec,
+  FixedSizeDecoder,
+  FixedSizeEncoder,
+} from "@solana/kit";
+import type {
+  FarmsTokenInfo,
+  FarmsTokenInfoArgs,
   RewardScheduleCurve,
   RewardScheduleCurveArgs,
-  TokenInfo,
-  TokenInfoArgs,
 } from "./index.js";
 import {
   combineCodec,
@@ -29,14 +34,14 @@ import {
   getU128Encoder,
 } from "@solana/kit";
 import {
+  getFarmsTokenInfoDecoder,
+  getFarmsTokenInfoEncoder,
   getRewardScheduleCurveDecoder,
   getRewardScheduleCurveEncoder,
-  getTokenInfoDecoder,
-  getTokenInfoEncoder,
 } from "./index.js";
 
 export interface RewardInfo {
-  token: TokenInfo;
+  token: FarmsTokenInfo;
   rewardsVault: Address;
   rewardsAvailable: bigint;
   rewardScheduleCurve: RewardScheduleCurve;
@@ -53,7 +58,7 @@ export interface RewardInfo {
 }
 
 export interface RewardInfoArgs {
-  token: TokenInfoArgs;
+  token: FarmsTokenInfoArgs;
   rewardsVault: Address;
   rewardsAvailable: number | bigint;
   rewardScheduleCurve: RewardScheduleCurveArgs;
@@ -69,9 +74,9 @@ export interface RewardInfoArgs {
   padding1: (number | bigint)[];
 }
 
-export function getRewardInfoEncoder(): Encoder<RewardInfoArgs> {
+export function getRewardInfoEncoder(): FixedSizeEncoder<RewardInfoArgs> {
   return getStructEncoder([
-    ["token", getTokenInfoEncoder()],
+    ["token", getFarmsTokenInfoEncoder()],
     ["rewardsVault", getAddressEncoder()],
     ["rewardsAvailable", getU64Encoder()],
     ["rewardScheduleCurve", getRewardScheduleCurveEncoder()],
@@ -88,9 +93,9 @@ export function getRewardInfoEncoder(): Encoder<RewardInfoArgs> {
   ]);
 }
 
-export function getRewardInfoDecoder(): Decoder<RewardInfo> {
+export function getRewardInfoDecoder(): FixedSizeDecoder<RewardInfo> {
   return getStructDecoder([
-    ["token", getTokenInfoDecoder()],
+    ["token", getFarmsTokenInfoDecoder()],
     ["rewardsVault", getAddressDecoder()],
     ["rewardsAvailable", getU64Decoder()],
     ["rewardScheduleCurve", getRewardScheduleCurveDecoder()],
@@ -107,6 +112,9 @@ export function getRewardInfoDecoder(): Decoder<RewardInfo> {
   ]);
 }
 
-export function getRewardInfoCodec(): Codec<RewardInfoArgs, RewardInfo> {
+export function getRewardInfoCodec(): FixedSizeCodec<
+  RewardInfoArgs,
+  RewardInfo
+> {
   return combineCodec(getRewardInfoEncoder(), getRewardInfoDecoder());
 }

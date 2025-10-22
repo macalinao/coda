@@ -319,10 +319,6 @@ export default defineConfig({
         instructions: {
           idlMissingTypes: "farmsIdlMissingTypes",
         },
-        definedTypes: {
-          tokenInfo: "farmsTokenInfo",
-          userState: "farmsUserState",
-        },
       },
     }),
     updateAccountsVisitor({
