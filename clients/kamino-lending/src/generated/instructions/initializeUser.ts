@@ -204,7 +204,7 @@ export async function getInitializeUserInstructionAsync<
   if (!accounts.userState.value) {
     accounts.userState.value = await findFarmsUserStatePda({
       farmState: expectAddress(accounts.farmState.value),
-      delegatee: expectAddress(accounts.owner.value),
+      owner: expectAddress(accounts.delegatee.value),
     });
   }
   if (!accounts.systemProgram.value) {

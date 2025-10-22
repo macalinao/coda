@@ -35,7 +35,10 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { findLendingMarketAuthPda } from "../pdas/index.js";
+import {
+  findLendingMarketAuthPda,
+  findReserveFeeVaultPda,
+} from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -172,7 +175,7 @@ export interface FlashBorrowReserveLiquidityAsyncInput<
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
   reserveSourceLiquidity: Address<TAccountReserveSourceLiquidity>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
-  reserveLiquidityFeeReceiver: Address<TAccountReserveLiquidityFeeReceiver>;
+  reserveLiquidityFeeReceiver?: Address<TAccountReserveLiquidityFeeReceiver>;
   referrerTokenState?: Address<TAccountReferrerTokenState>;
   referrerAccount?: Address<TAccountReferrerAccount>;
   sysvarInfo?: Address<TAccountSysvarInfo>;
@@ -279,6 +282,12 @@ export async function getFlashBorrowReserveLiquidityInstructionAsync<
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
       lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.reserveLiquidityFeeReceiver.value) {
+    accounts.reserveLiquidityFeeReceiver.value = await findReserveFeeVaultPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      mint: expectAddress(accounts.reserveLiquidityMint.value),
     });
   }
   if (!accounts.sysvarInfo.value) {

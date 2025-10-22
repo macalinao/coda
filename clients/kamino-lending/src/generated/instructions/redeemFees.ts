@@ -30,7 +30,10 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
-import { findLendingMarketAuthPda } from "../pdas/index.js";
+import {
+  findLendingMarketAuthPda,
+  findReserveFeeVaultPda,
+} from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
@@ -123,7 +126,7 @@ export interface RedeemFeesAsyncInput<
 > {
   reserve: Address<TAccountReserve>;
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  reserveLiquidityFeeReceiver: Address<TAccountReserveLiquidityFeeReceiver>;
+  reserveLiquidityFeeReceiver?: Address<TAccountReserveLiquidityFeeReceiver>;
   reserveSupplyLiquidity: Address<TAccountReserveSupplyLiquidity>;
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
@@ -194,6 +197,12 @@ export async function getRedeemFeesInstructionAsync<
   >;
 
   // Resolve default values.
+  if (!accounts.reserveLiquidityFeeReceiver.value) {
+    accounts.reserveLiquidityFeeReceiver.value = await findReserveFeeVaultPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      mint: expectAddress(accounts.reserveLiquidityMint.value),
+    });
+  }
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
       lendingMarket: expectAddress(accounts.lendingMarket.value),

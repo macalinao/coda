@@ -50,7 +50,7 @@ export default defineConfig({
       account: "userState",
       defaultValue: pdaValueNode(pdaLinkNode("farmsUserState"), [
         pdaSeedValueNode("farmState", accountValueNode("farmState")),
-        pdaSeedValueNode("delegatee", accountValueNode("owner")),
+        pdaSeedValueNode("owner", accountValueNode("delegatee")),
       ]),
     },
     {
@@ -109,6 +109,13 @@ export default defineConfig({
     },
 
     // lending
+    {
+      account: "reserveLiquidityFeeReceiver",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveFeeVault"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
     {
       instruction: "initGlobalConfig",
       account: "globalConfig",
