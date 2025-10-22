@@ -1,5 +1,12 @@
 # @macalinao/clients-kamino-lending
 
+## 0.5.1
+
+### Patch Changes
+
+- 64f22ed: Update dependencies
+- b2958d8: Use FixedSizeEncoder for more types
+
 ## 0.5.0
 
 ### Minor Changes

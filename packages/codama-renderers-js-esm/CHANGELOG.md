@@ -1,5 +1,11 @@
 # @macalinao/codama-renderers-js-esm
 
+## 0.4.3
+
+### Patch Changes
+
+- 64f22ed: Update dependencies
+
 ## 0.4.2
 
 ### Patch Changes

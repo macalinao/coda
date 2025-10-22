@@ -1,5 +1,11 @@
 # @macalinao/coda-visitors
 
+## 0.1.6
+
+### Patch Changes
+
+- 64f22ed: Update dependencies
+
 ## 0.1.5
 
 ### Patch Changes
