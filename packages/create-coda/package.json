@@ -40,7 +40,7 @@
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.9.1",
     "eslint": "catalog:",
     "typescript": "catalog:"
   }
