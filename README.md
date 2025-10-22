@@ -22,6 +22,8 @@ Visit **[coda.ianm.com](https://coda.ianm.com)** for complete documentation incl
 - API reference
 - Examples and tutorials
 
+Full TypeDoc documentation is available at **[coda-typedocs.ianm.com](https://coda-typedocs.ianm.com)**.
+
 ## Quick Start
 
 ```bash
