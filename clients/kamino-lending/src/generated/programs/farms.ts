@@ -41,7 +41,7 @@ export const FARMS_PROGRAM_ADDRESS =
 
 export enum FarmsAccount {
   FarmState = 0,
-  GlobalConfig = 1,
+  FarmsGlobalConfig = 1,
   FarmsUserState = 2,
   OraclePrices = 3,
 }
@@ -70,7 +70,7 @@ export function identifyFarmsAccount(
       0,
     )
   ) {
-    return FarmsAccount.GlobalConfig;
+    return FarmsAccount.FarmsGlobalConfig;
   }
   if (
     containsBytes(

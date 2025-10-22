@@ -21,6 +21,7 @@ import {
 } from "@solana/kit";
 
 export interface SwitchboardConfiguration {
+  /** Pubkey of the base price feed (disabled if `null` or `default`) */
   priceAggregator: Address;
   twapAggregator: Address;
 }

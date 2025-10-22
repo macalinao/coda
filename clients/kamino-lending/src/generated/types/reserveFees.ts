@@ -23,15 +23,48 @@ import {
   getU64Encoder,
 } from "@solana/kit";
 
+/**
+ * Additional fee information on a reserve
+ *
+ * These exist separately from interest accrual fees, and are specifically for the program owner
+ * and referral fee. The fees are paid out as a percentage of liquidity token amounts during
+ * repayments and liquidations.
+ */
 export interface ReserveFees {
+  /**
+   * Fee assessed on `BorrowObligationLiquidity`, as scaled fraction (60 bits fractional part)
+   * Must be between `0` and `2^60`, such that `2^60 = 1`.  A few examples for
+   * clarity:
+   * 1% = (1 << 60) / 100 = 11529215046068470
+   * 0.01% (1 basis point) = 115292150460685
+   * 0.00001% (Aave borrow fee) = 115292150461
+   */
   borrowFeeSf: bigint;
+  /**
+   * Fee for flash loan, expressed as scaled fraction.
+   * 0.3% (Aave flash loan fee) = 0.003 * 2^60 = 3458764513820541
+   */
   flashLoanFeeSf: bigint;
+  /** Used for allignment */
   padding: number[];
 }
 
 export interface ReserveFeesArgs {
+  /**
+   * Fee assessed on `BorrowObligationLiquidity`, as scaled fraction (60 bits fractional part)
+   * Must be between `0` and `2^60`, such that `2^60 = 1`.  A few examples for
+   * clarity:
+   * 1% = (1 << 60) / 100 = 11529215046068470
+   * 0.01% (1 basis point) = 115292150460685
+   * 0.00001% (Aave borrow fee) = 115292150461
+   */
   borrowFeeSf: number | bigint;
+  /**
+   * Fee for flash loan, expressed as scaled fraction.
+   * 0.3% (Aave flash loan fee) = 0.003 * 2^60 = 3458764513820541
+   */
   flashLoanFeeSf: number | bigint;
+  /** Used for allignment */
   padding: number[];
 }
 

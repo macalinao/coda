@@ -33,8 +33,9 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_SLASHED_AMOUNT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([202, 217, 67, 74, 172, 22, 140, 216]);
@@ -113,6 +114,108 @@ export function getWithdrawSlashedAmountInstructionDataCodec(): FixedSizeCodec<
     getWithdrawSlashedAmountInstructionDataEncoder(),
     getWithdrawSlashedAmountInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawSlashedAmountAsyncInput<
+  TAccountCrank extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountSlashedAmountSpillAddress extends string = string,
+  TAccountFarmVault extends string = string,
+  TAccountFarmVaultsAuthority extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  crank: TransactionSigner<TAccountCrank>;
+  farmState: Address<TAccountFarmState>;
+  slashedAmountSpillAddress: Address<TAccountSlashedAmountSpillAddress>;
+  farmVault: Address<TAccountFarmVault>;
+  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+}
+
+export async function getWithdrawSlashedAmountInstructionAsync<
+  TAccountCrank extends string,
+  TAccountFarmState extends string,
+  TAccountSlashedAmountSpillAddress extends string,
+  TAccountFarmVault extends string,
+  TAccountFarmVaultsAuthority extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: WithdrawSlashedAmountAsyncInput<
+    TAccountCrank,
+    TAccountFarmState,
+    TAccountSlashedAmountSpillAddress,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawSlashedAmountInstruction<
+    TProgramAddress,
+    TAccountCrank,
+    TAccountFarmState,
+    TAccountSlashedAmountSpillAddress,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    crank: { value: input.crank ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    slashedAmountSpillAddress: {
+      value: input.slashedAmountSpillAddress ?? null,
+      isWritable: true,
+    },
+    farmVault: { value: input.farmVault ?? null, isWritable: true },
+    farmVaultsAuthority: {
+      value: input.farmVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
+      farmState: expectAddress(accounts.farmState.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.crank),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.slashedAmountSpillAddress),
+      getAccountMeta(accounts.farmVault),
+      getAccountMeta(accounts.farmVaultsAuthority),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getWithdrawSlashedAmountInstructionDataEncoder().encode({}),
+    programAddress,
+  } as WithdrawSlashedAmountInstruction<
+    TProgramAddress,
+    TAccountCrank,
+    TAccountFarmState,
+    TAccountSlashedAmountSpillAddress,
+    TAccountFarmVault,
+    TAccountFarmVaultsAuthority,
+    TAccountTokenProgram
+  >);
 }
 
 export interface WithdrawSlashedAmountInput<

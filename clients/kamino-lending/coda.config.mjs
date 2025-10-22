@@ -1,12 +1,20 @@
 import {
+  accountValueNode,
   addPdasVisitor,
+  associatedTokenAccountValueNode,
   constantPdaSeedNodeFromString,
   defineConfig,
   numberTypeNode,
+  pdaLinkNode,
+  pdaSeedValueNode,
+  pdaValueNode,
   programLinkNode,
   publicKeyTypeNode,
   renameVisitor,
+  SYSVAR_INSTRUCTIONS_VALUE_NODE,
   stringTypeNode,
+  TOKEN_PROGRAM_VALUE_NODE,
+  updateAccountsVisitor,
   variablePdaSeedNode,
 } from "@macalinao/coda";
 
@@ -18,6 +26,144 @@ export default defineConfig({
     npmPackageName: "@macalinao/clients-kamino-lending",
   },
   instructionAccountDefaultValues: [
+    // farms
+    ...["initializeFarm", "stake"].map((instruction) => ({
+      instruction,
+      account: "farmVault",
+      defaultValue: pdaValueNode(pdaLinkNode("farmVault"), [
+        pdaSeedValueNode("farmState", accountValueNode("farmState")),
+        pdaSeedValueNode("tokenMint", accountValueNode("tokenMint")),
+      ]),
+    })),
+    // note: delegated farms will have a different seed, the "owner" is the delegatee.
+    ...["harvestReward", "stake", "unstake", "withdrawUnstakedDeposits"].map(
+      (instruction) => ({
+        instruction,
+        account: "userState",
+        defaultValue: pdaValueNode(pdaLinkNode("farmsUserState"), [
+          pdaSeedValueNode("farmState", accountValueNode("farmState")),
+          pdaSeedValueNode("owner", accountValueNode("owner")),
+        ]),
+      }),
+    ),
+    {
+      instruction: "initializeUser",
+      account: "userState",
+      defaultValue: pdaValueNode(pdaLinkNode("farmsUserState"), [
+        pdaSeedValueNode("farmState", accountValueNode("farmState")),
+        pdaSeedValueNode("owner", accountValueNode("delegatee")),
+      ]),
+    },
+    {
+      account: "userRewardAta",
+      defaultValue: associatedTokenAccountValueNode({
+        owner: accountValueNode("owner"),
+        mint: accountValueNode("rewardMint"),
+        tokenProgram: accountValueNode("tokenProgram"),
+      }),
+    },
+    {
+      account: "rewardVault",
+      defaultValue: pdaValueNode(pdaLinkNode("rewardVault"), [
+        pdaSeedValueNode("farmState", accountValueNode("farmState")),
+        pdaSeedValueNode("rewardMint", accountValueNode("rewardMint")),
+      ]),
+    },
+    {
+      account: "rewardsVault",
+      defaultValue: pdaValueNode(pdaLinkNode("rewardVault"), [
+        pdaSeedValueNode("farmState", accountValueNode("farmState")),
+        pdaSeedValueNode("rewardMint", accountValueNode("rewardMint")),
+      ]),
+    },
+    {
+      account: "rewardsTreasuryVault",
+      defaultValue: pdaValueNode(pdaLinkNode("rewardTreasuryVault"), [
+        pdaSeedValueNode("globalConfig", accountValueNode("globalConfig")),
+        pdaSeedValueNode("rewardMint", accountValueNode("rewardMint")),
+      ]),
+    },
+    {
+      account: "rewardTreasuryVault",
+      defaultValue: pdaValueNode(pdaLinkNode("rewardTreasuryVault"), [
+        pdaSeedValueNode("globalConfig", accountValueNode("globalConfig")),
+        pdaSeedValueNode("rewardMint", accountValueNode("rewardMint")),
+      ]),
+    },
+    {
+      account: "treasuryVaultAuthority",
+      defaultValue: pdaValueNode(pdaLinkNode("treasuryVaultsAuthority"), [
+        pdaSeedValueNode("globalConfig", accountValueNode("globalConfig")),
+      ]),
+    },
+    {
+      account: "treasuryVaultsAuthority",
+      defaultValue: pdaValueNode(pdaLinkNode("treasuryVaultsAuthority"), [
+        pdaSeedValueNode("globalConfig", accountValueNode("globalConfig")),
+      ]),
+    },
+    {
+      account: "farmVaultsAuthority",
+      defaultValue: pdaValueNode(pdaLinkNode("farmVaultsAuthority"), [
+        pdaSeedValueNode("farmState", accountValueNode("farmState")),
+      ]),
+    },
+
+    // lending
+    {
+      account: /collateralTokenProgram|liquidityTokenProgram/,
+      defaultValue: TOKEN_PROGRAM_VALUE_NODE,
+    },
+    {
+      account: "feeReceiver",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveFeeVault"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      account: "reserveLiquiditySupply",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveLiquiditySupply"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      account: "reserveLiquidityFeeReceiver",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveFeeVault"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      account: "reserveCollateralMint",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveCollateralMint"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      account: "reserveCollateralSupply",
+      defaultValue: pdaValueNode(pdaLinkNode("reserveCollateralSupply"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+        pdaSeedValueNode("mint", accountValueNode("reserveLiquidityMint")),
+      ]),
+    },
+    {
+      instruction: "initGlobalConfig",
+      account: "globalConfig",
+      defaultValue: pdaValueNode(pdaLinkNode("lendingGlobalConfigState")),
+    },
+    {
+      account: "lendingMarketAuthority",
+      defaultValue: pdaValueNode(pdaLinkNode("lendingMarketAuth"), [
+        pdaSeedValueNode("lendingMarket", accountValueNode("lendingMarket")),
+      ]),
+    },
+    {
+      account: /sysvarInfo|instructionSysvarAccount/,
+      defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
+    },
     {
       account: "farmsProgram",
       defaultValue: programLinkNode("farms"),
@@ -28,15 +174,61 @@ export default defineConfig({
     addPdasVisitor({
       farms: [
         {
-          name: "obligationFarmState",
+          name: "rewardTreasuryVault",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "tvault"),
+            variablePdaSeedNode("globalConfig", publicKeyTypeNode()),
+            variablePdaSeedNode("rewardMint", publicKeyTypeNode()),
+          ],
+        },
+        {
+          name: "treasuryVaultsAuthority",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "authority"),
+            variablePdaSeedNode("globalConfig", publicKeyTypeNode()),
+          ],
+        },
+        {
+          name: "farmVaultsAuthority",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "authority"),
+            variablePdaSeedNode("farmState", publicKeyTypeNode()),
+          ],
+        },
+        {
+          name: "farmVault",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "fvault"),
+            variablePdaSeedNode("farmState", publicKeyTypeNode()),
+            variablePdaSeedNode("tokenMint", publicKeyTypeNode()),
+          ],
+        },
+        {
+          name: "rewardVault",
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "rvault"),
+            variablePdaSeedNode("farmState", publicKeyTypeNode()),
+            variablePdaSeedNode("rewardMint", publicKeyTypeNode()),
+          ],
+        },
+        {
+          name: "farmsUserState",
           seeds: [
             constantPdaSeedNodeFromString("utf8", "user"),
-            variablePdaSeedNode("farm", publicKeyTypeNode()),
-            variablePdaSeedNode("obligation", publicKeyTypeNode()),
+            variablePdaSeedNode("farmState", publicKeyTypeNode()),
+            variablePdaSeedNode(
+              "owner",
+              publicKeyTypeNode(),
+              "The user who is farming. This is sometimes the obligation in the case of delegated farms.",
+            ),
           ],
         },
       ],
       kaminoLending: [
+        {
+          name: "lendingGlobalConfigState",
+          seeds: [constantPdaSeedNodeFromString("utf8", "global_config")],
+        },
         {
           name: "obligation",
           seeds: [
@@ -122,6 +314,7 @@ export default defineConfig({
       farms: {
         accounts: {
           userState: "farmsUserState",
+          globalConfig: "farmsGlobalConfig",
         },
         instructions: {
           idlMissingTypes: "farmsIdlMissingTypes",
@@ -130,6 +323,31 @@ export default defineConfig({
           tokenInfo: "farmsTokenInfo",
           userState: "farmsUserState",
         },
+      },
+    }),
+    updateAccountsVisitor({
+      // farms
+      farmsUserState: {
+        pda: pdaLinkNode("farmsUserState"),
+      },
+      // lending
+      lendingGlobalConfig: {
+        pda: pdaLinkNode("lendingGlobalConfigState"),
+      },
+      obligation: {
+        pda: pdaLinkNode("obligation"),
+      },
+      userMetadata: {
+        pda: pdaLinkNode("userMetadata"),
+      },
+      referrerTokenState: {
+        pda: pdaLinkNode("referrerTokenState"),
+      },
+      referrerState: {
+        pda: pdaLinkNode("referrerState"),
+      },
+      shortUrl: {
+        pda: pdaLinkNode("shortUrl"),
       },
     }),
   ],

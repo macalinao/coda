@@ -35,11 +35,12 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const SOCIALIZE_LOSS_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([238, 95, 98, 220, 187, 40, 204, 154]);
@@ -136,6 +137,149 @@ export function getSocializeLossV2InstructionDataCodec(): FixedSizeCodec<
     getSocializeLossV2InstructionDataEncoder(),
     getSocializeLossV2InstructionDataDecoder(),
   );
+}
+
+export interface SocializeLossV2AsyncInput<
+  TAccountRiskCouncil extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountReserve extends string = string,
+  TAccountInstructionSysvarAccount extends string = string,
+  TAccountObligationFarmUserState extends string = string,
+  TAccountReserveFarmState extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountFarmsProgram extends string = string,
+> {
+  riskCouncil: TransactionSigner<TAccountRiskCouncil>;
+  obligation: Address<TAccountObligation>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  reserve: Address<TAccountReserve>;
+  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  obligationFarmUserState?: Address<TAccountObligationFarmUserState>;
+  reserveFarmState?: Address<TAccountReserveFarmState>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  farmsProgram?: Address<TAccountFarmsProgram>;
+  liquidityAmount: SocializeLossV2InstructionDataArgs["liquidityAmount"];
+}
+
+export async function getSocializeLossV2InstructionAsync<
+  TAccountRiskCouncil extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarket extends string,
+  TAccountReserve extends string,
+  TAccountInstructionSysvarAccount extends string,
+  TAccountObligationFarmUserState extends string,
+  TAccountReserveFarmState extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountFarmsProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: SocializeLossV2AsyncInput<
+    TAccountRiskCouncil,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountLendingMarketAuthority,
+    TAccountFarmsProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  SocializeLossV2Instruction<
+    TProgramAddress,
+    TAccountRiskCouncil,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountLendingMarketAuthority,
+    TAccountFarmsProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    riskCouncil: { value: input.riskCouncil ?? null, isWritable: false },
+    obligation: { value: input.obligation ?? null, isWritable: true },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    reserve: { value: input.reserve ?? null, isWritable: true },
+    instructionSysvarAccount: {
+      value: input.instructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+    obligationFarmUserState: {
+      value: input.obligationFarmUserState ?? null,
+      isWritable: true,
+    },
+    reserveFarmState: {
+      value: input.reserveFarmState ?? null,
+      isWritable: true,
+    },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.instructionSysvarAccount.value) {
+    accounts.instructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.farmsProgram.value) {
+    accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
+    accounts.farmsProgram.isWritable = false;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.riskCouncil),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta(accounts.obligationFarmUserState),
+      getAccountMeta(accounts.reserveFarmState),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.farmsProgram),
+    ],
+    data: getSocializeLossV2InstructionDataEncoder().encode(
+      args as SocializeLossV2InstructionDataArgs,
+    ),
+    programAddress,
+  } as SocializeLossV2Instruction<
+    TProgramAddress,
+    TAccountRiskCouncil,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountInstructionSysvarAccount,
+    TAccountObligationFarmUserState,
+    TAccountReserveFarmState,
+    TAccountLendingMarketAuthority,
+    TAccountFarmsProgram
+  >);
 }
 
 export interface SocializeLossV2Input<

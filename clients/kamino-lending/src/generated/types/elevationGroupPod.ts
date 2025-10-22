@@ -28,7 +28,7 @@ import {
   getU64Encoder,
 } from "@solana/kit";
 
-export interface ElevationGroupLendingMarket {
+export interface ElevationGroupPod {
   maxLiquidationBonusBps: number;
   id: number;
   ltvPct: number;
@@ -36,11 +36,12 @@ export interface ElevationGroupLendingMarket {
   allowNewLoans: number;
   maxReservesAsCollateral: number;
   padding0: number;
+  /** Mandatory debt reserve for this elevation group */
   debtReserve: Address;
   padding1: bigint[];
 }
 
-export interface ElevationGroupLendingMarketArgs {
+export interface ElevationGroupPodArgs {
   maxLiquidationBonusBps: number;
   id: number;
   ltvPct: number;
@@ -48,11 +49,12 @@ export interface ElevationGroupLendingMarketArgs {
   allowNewLoans: number;
   maxReservesAsCollateral: number;
   padding0: number;
+  /** Mandatory debt reserve for this elevation group */
   debtReserve: Address;
   padding1: (number | bigint)[];
 }
 
-export function getElevationGroupLendingMarketEncoder(): FixedSizeEncoder<ElevationGroupLendingMarketArgs> {
+export function getElevationGroupPodEncoder(): FixedSizeEncoder<ElevationGroupPodArgs> {
   return getStructEncoder([
     ["maxLiquidationBonusBps", getU16Encoder()],
     ["id", getU8Encoder()],
@@ -66,7 +68,7 @@ export function getElevationGroupLendingMarketEncoder(): FixedSizeEncoder<Elevat
   ]);
 }
 
-export function getElevationGroupLendingMarketDecoder(): FixedSizeDecoder<ElevationGroupLendingMarket> {
+export function getElevationGroupPodDecoder(): FixedSizeDecoder<ElevationGroupPod> {
   return getStructDecoder([
     ["maxLiquidationBonusBps", getU16Decoder()],
     ["id", getU8Decoder()],
@@ -80,12 +82,12 @@ export function getElevationGroupLendingMarketDecoder(): FixedSizeDecoder<Elevat
   ]);
 }
 
-export function getElevationGroupLendingMarketCodec(): FixedSizeCodec<
-  ElevationGroupLendingMarketArgs,
-  ElevationGroupLendingMarket
+export function getElevationGroupPodCodec(): FixedSizeCodec<
+  ElevationGroupPodArgs,
+  ElevationGroupPod
 > {
   return combineCodec(
-    getElevationGroupLendingMarketEncoder(),
-    getElevationGroupLendingMarketDecoder(),
+    getElevationGroupPodEncoder(),
+    getElevationGroupPodDecoder(),
   );
 }

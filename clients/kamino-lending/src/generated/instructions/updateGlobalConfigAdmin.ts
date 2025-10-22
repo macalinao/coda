@@ -32,7 +32,7 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_GLOBAL_CONFIG_ADMIN_DISCRIMINATOR: ReadonlyUint8Array =
@@ -45,18 +45,18 @@ export function getUpdateGlobalConfigAdminDiscriminatorBytes(): ReadonlyUint8Arr
 }
 
 export type UpdateGlobalConfigAdminInstruction<
-  TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountPendingGlobalAdmin extends string | AccountMeta = string,
+  TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+  TAccountPendingAdmin extends string | AccountMeta = string,
   TAccountGlobalConfig extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountPendingGlobalAdmin extends string
-        ? ReadonlySignerAccount<TAccountPendingGlobalAdmin> &
-            AccountSignerMeta<TAccountPendingGlobalAdmin>
-        : TAccountPendingGlobalAdmin,
+      TAccountPendingAdmin extends string
+        ? ReadonlySignerAccount<TAccountPendingAdmin> &
+            AccountSignerMeta<TAccountPendingAdmin>
+        : TAccountPendingAdmin,
       TAccountGlobalConfig extends string
         ? WritableAccount<TAccountGlobalConfig>
         : TAccountGlobalConfig,
@@ -97,37 +97,35 @@ export function getUpdateGlobalConfigAdminInstructionDataCodec(): FixedSizeCodec
 }
 
 export interface UpdateGlobalConfigAdminInput<
-  TAccountPendingGlobalAdmin extends string = string,
+  TAccountPendingAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
 > {
-  pendingGlobalAdmin: TransactionSigner<TAccountPendingGlobalAdmin>;
+  pendingAdmin: TransactionSigner<TAccountPendingAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
 }
 
 export function getUpdateGlobalConfigAdminInstruction<
-  TAccountPendingGlobalAdmin extends string,
+  TAccountPendingAdmin extends string,
   TAccountGlobalConfig extends string,
-  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: UpdateGlobalConfigAdminInput<
-    TAccountPendingGlobalAdmin,
+    TAccountPendingAdmin,
     TAccountGlobalConfig
   >,
   config?: { programAddress?: TProgramAddress },
 ): UpdateGlobalConfigAdminInstruction<
   TProgramAddress,
-  TAccountPendingGlobalAdmin,
+  TAccountPendingAdmin,
   TAccountGlobalConfig
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    pendingGlobalAdmin: {
-      value: input.pendingGlobalAdmin ?? null,
-      isWritable: false,
-    },
+    pendingAdmin: { value: input.pendingAdmin ?? null, isWritable: false },
     globalConfig: { value: input.globalConfig ?? null, isWritable: true },
   };
   const accounts = originalAccounts as Record<
@@ -138,25 +136,25 @@ export function getUpdateGlobalConfigAdminInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pendingGlobalAdmin),
+      getAccountMeta(accounts.pendingAdmin),
       getAccountMeta(accounts.globalConfig),
     ],
     data: getUpdateGlobalConfigAdminInstructionDataEncoder().encode({}),
     programAddress,
   } as UpdateGlobalConfigAdminInstruction<
     TProgramAddress,
-    TAccountPendingGlobalAdmin,
+    TAccountPendingAdmin,
     TAccountGlobalConfig
   >);
 }
 
 export interface ParsedUpdateGlobalConfigAdminInstruction<
-  TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
+  TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > {
   programAddress: Address<TProgram>;
   accounts: {
-    pendingGlobalAdmin: TAccountMetas[0];
+    pendingAdmin: TAccountMetas[0];
     globalConfig: TAccountMetas[1];
   };
   data: UpdateGlobalConfigAdminInstructionData;
@@ -183,7 +181,7 @@ export function parseUpdateGlobalConfigAdminInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      pendingGlobalAdmin: getNextAccount(),
+      pendingAdmin: getNextAccount(),
       globalConfig: getNextAccount(),
     },
     data: getUpdateGlobalConfigAdminInstructionDataDecoder().decode(

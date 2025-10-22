@@ -35,8 +35,12 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findFarmVaultsAuthorityPda,
+  findRewardVaultPda,
+} from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [191, 187, 176, 137, 9, 25, 187, 244],
@@ -132,6 +136,137 @@ export function getWithdrawRewardInstructionDataCodec(): FixedSizeCodec<
     getWithdrawRewardInstructionDataEncoder(),
     getWithdrawRewardInstructionDataDecoder(),
   );
+}
+
+export interface WithdrawRewardAsyncInput<
+  TAccountFarmAdmin extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountRewardMint extends string = string,
+  TAccountRewardVault extends string = string,
+  TAccountFarmVaultsAuthority extends string = string,
+  TAccountAdminRewardTokenAta extends string = string,
+  TAccountScopePrices extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  farmAdmin: TransactionSigner<TAccountFarmAdmin>;
+  farmState: Address<TAccountFarmState>;
+  rewardMint: Address<TAccountRewardMint>;
+  rewardVault?: Address<TAccountRewardVault>;
+  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
+  adminRewardTokenAta: Address<TAccountAdminRewardTokenAta>;
+  scopePrices?: Address<TAccountScopePrices>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  amount: WithdrawRewardInstructionDataArgs["amount"];
+  rewardIndex: WithdrawRewardInstructionDataArgs["rewardIndex"];
+}
+
+export async function getWithdrawRewardInstructionAsync<
+  TAccountFarmAdmin extends string,
+  TAccountFarmState extends string,
+  TAccountRewardMint extends string,
+  TAccountRewardVault extends string,
+  TAccountFarmVaultsAuthority extends string,
+  TAccountAdminRewardTokenAta extends string,
+  TAccountScopePrices extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: WithdrawRewardAsyncInput<
+    TAccountFarmAdmin,
+    TAccountFarmState,
+    TAccountRewardMint,
+    TAccountRewardVault,
+    TAccountFarmVaultsAuthority,
+    TAccountAdminRewardTokenAta,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WithdrawRewardInstruction<
+    TProgramAddress,
+    TAccountFarmAdmin,
+    TAccountFarmState,
+    TAccountRewardMint,
+    TAccountRewardVault,
+    TAccountFarmVaultsAuthority,
+    TAccountAdminRewardTokenAta,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    farmAdmin: { value: input.farmAdmin ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
+    rewardVault: { value: input.rewardVault ?? null, isWritable: true },
+    farmVaultsAuthority: {
+      value: input.farmVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    adminRewardTokenAta: {
+      value: input.adminRewardTokenAta ?? null,
+      isWritable: true,
+    },
+    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.rewardVault.value) {
+    accounts.rewardVault.value = await findRewardVaultPda({
+      farmState: expectAddress(accounts.farmState.value),
+      rewardMint: expectAddress(accounts.rewardMint.value),
+    });
+  }
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
+      farmState: expectAddress(accounts.farmState.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.farmAdmin),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.rewardMint),
+      getAccountMeta(accounts.rewardVault),
+      getAccountMeta(accounts.farmVaultsAuthority),
+      getAccountMeta(accounts.adminRewardTokenAta),
+      getAccountMeta(accounts.scopePrices),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getWithdrawRewardInstructionDataEncoder().encode(
+      args as WithdrawRewardInstructionDataArgs,
+    ),
+    programAddress,
+  } as WithdrawRewardInstruction<
+    TProgramAddress,
+    TAccountFarmAdmin,
+    TAccountFarmState,
+    TAccountRewardMint,
+    TAccountRewardVault,
+    TAccountFarmVaultsAuthority,
+    TAccountAdminRewardTokenAta,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >);
 }
 
 export interface WithdrawRewardInput<

@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { UserMetadataSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,6 +41,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findUserMetadataPda } from "../pdas/index.js";
 
 export const USER_METADATA_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   157, 214, 220, 235, 98, 135, 171, 28,
@@ -53,18 +55,26 @@ export function getUserMetadataDiscriminatorBytes(): ReadonlyUint8Array {
 
 export interface UserMetadata {
   discriminator: ReadonlyUint8Array;
+  /** Pubkey of the referrer/owner - pubkey::default if no referrer */
   referrer: Address;
+  /** Bump used for validation of account address */
   bump: bigint;
+  /** User lookup table - used to store all user accounts - atas for each reserve mint, each obligation PDA, UserMetadata itself and all referrer_token_states if there is a referrer */
   userLookupTable: Address;
+  /** User metadata account owner */
   owner: Address;
   padding1: bigint[];
   padding2: bigint[];
 }
 
 export interface UserMetadataArgs {
+  /** Pubkey of the referrer/owner - pubkey::default if no referrer */
   referrer: Address;
+  /** Bump used for validation of account address */
   bump: number | bigint;
+  /** User lookup table - used to store all user accounts - atas for each reserve mint, each obligation PDA, UserMetadata itself and all referrer_token_states if there is a referrer */
   userLookupTable: Address;
+  /** User metadata account owner */
   owner: Address;
   padding1: (number | bigint)[];
   padding2: (number | bigint)[];
@@ -155,4 +165,28 @@ export async function fetchAllMaybeUserMetadata(
 ): Promise<MaybeAccount<UserMetadata>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeUserMetadata(maybeAccount));
+}
+
+export async function fetchUserMetadataFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: UserMetadataSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<UserMetadata>> {
+  const maybeAccount = await fetchMaybeUserMetadataFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeUserMetadataFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: UserMetadataSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<UserMetadata>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findUserMetadataPda(seeds, { programAddress });
+  return await fetchMaybeUserMetadata(rpc, address, fetchConfig);
 }

@@ -105,7 +105,7 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
     | AccountMeta = string,
   TAccountLiquidationAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = string,
   TAccountCollateralFarmsAccountsV2ObligationFarmUserState extends
     | string
     | AccountMeta = string,
@@ -137,7 +137,7 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
         ? ReadonlyAccount<TAccountLiquidationAccountsLendingMarket>
         : TAccountLiquidationAccountsLendingMarket,
       TAccountLiquidationAccountsLendingMarketAuthority extends string
-        ? ReadonlyAccount<TAccountLiquidationAccountsLendingMarketAuthority>
+        ? WritableAccount<TAccountLiquidationAccountsLendingMarketAuthority>
         : TAccountLiquidationAccountsLendingMarketAuthority,
       TAccountLiquidationAccountsRepayReserve extends string
         ? WritableAccount<TAccountLiquidationAccountsRepayReserve>
@@ -308,7 +308,7 @@ export interface LiquidateObligationAndRedeemReserveCollateralV2Input<
   liquidationAccountsCollateralTokenProgram: Address<TAccountLiquidationAccountsCollateralTokenProgram>;
   liquidationAccountsRepayLiquidityTokenProgram: Address<TAccountLiquidationAccountsRepayLiquidityTokenProgram>;
   liquidationAccountsWithdrawLiquidityTokenProgram: Address<TAccountLiquidationAccountsWithdrawLiquidityTokenProgram>;
-  liquidationAccountsInstructionSysvarAccount?: Address<TAccountLiquidationAccountsInstructionSysvarAccount>;
+  liquidationAccountsInstructionSysvarAccount: Address<TAccountLiquidationAccountsInstructionSysvarAccount>;
   collateralFarmsAccountsV2ObligationFarmUserState?: Address<TAccountCollateralFarmsAccountsV2ObligationFarmUserState>;
   collateralFarmsAccountsV2ReserveFarmState?: Address<TAccountCollateralFarmsAccountsV2ReserveFarmState>;
   debtFarmsAccountsObligationFarmUserState?: Address<TAccountDebtFarmsAccountsObligationFarmUserState>;
@@ -423,7 +423,7 @@ export function getLiquidateObligationAndRedeemReserveCollateralV2Instruction<
     },
     liquidationAccountsLendingMarketAuthority: {
       value: input.liquidationAccountsLendingMarketAuthority ?? null,
-      isWritable: false,
+      isWritable: true,
     },
     liquidationAccountsRepayReserve: {
       value: input.liquidationAccountsRepayReserve ?? null,
@@ -517,10 +517,6 @@ export function getLiquidateObligationAndRedeemReserveCollateralV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.liquidationAccountsInstructionSysvarAccount.value) {
-    accounts.liquidationAccountsInstructionSysvarAccount.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
   if (!accounts.farmsProgram.value) {
     accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
     accounts.farmsProgram.isWritable = false;

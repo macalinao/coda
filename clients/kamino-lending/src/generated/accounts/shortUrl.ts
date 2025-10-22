@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { ShortUrlSeeds } from "../pdas/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -42,6 +43,7 @@ import {
   getUtf8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findShortUrlPda } from "../pdas/index.js";
 
 export const SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   28, 89, 174, 25, 226, 124, 126, 212,
@@ -136,4 +138,24 @@ export async function fetchAllMaybeShortUrl(
 ): Promise<MaybeAccount<ShortUrl>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeShortUrl(maybeAccount));
+}
+
+export async function fetchShortUrlFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ShortUrlSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<ShortUrl>> {
+  const maybeAccount = await fetchMaybeShortUrlFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeShortUrlFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ShortUrlSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<ShortUrl>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findShortUrlPda(seeds, { programAddress });
+  return await fetchMaybeShortUrl(rpc, address, fetchConfig);
 }

@@ -26,17 +26,24 @@ import {
   getU128Encoder,
 } from "@solana/kit";
 
+/** Reserve collateral */
 export interface ReserveCollateral {
+  /** Reserve collateral mint address */
   mintPubkey: Address;
+  /** Reserve collateral mint supply, used for exchange rate */
   mintTotalSupply: bigint;
+  /** Reserve collateral supply address */
   supplyVault: Address;
   padding1: bigint[];
   padding2: bigint[];
 }
 
 export interface ReserveCollateralArgs {
+  /** Reserve collateral mint address */
   mintPubkey: Address;
+  /** Reserve collateral mint supply, used for exchange rate */
   mintTotalSupply: number | bigint;
+  /** Reserve collateral supply address */
   supplyVault: Address;
   padding1: (number | bigint)[];
   padding2: (number | bigint)[];

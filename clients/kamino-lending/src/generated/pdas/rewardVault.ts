@@ -13,13 +13,13 @@ import {
   getUtf8Encoder,
 } from "@solana/kit";
 
-export interface ObligationFarmStateSeeds {
-  farm: Address;
-  obligation: Address;
+export interface RewardVaultSeeds {
+  farmState: Address;
+  rewardMint: Address;
 }
 
-export async function findObligationFarmStatePda(
-  seeds: ObligationFarmStateSeeds,
+export async function findRewardVaultPda(
+  seeds: RewardVaultSeeds,
   config: { programAddress?: Address | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
@@ -28,9 +28,9 @@ export async function findObligationFarmStatePda(
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [
-      getUtf8Encoder().encode("user"),
-      getAddressEncoder().encode(seeds.farm),
-      getAddressEncoder().encode(seeds.obligation),
+      getUtf8Encoder().encode("rvault"),
+      getAddressEncoder().encode(seeds.farmState),
+      getAddressEncoder().encode(seeds.rewardMint),
     ],
   });
 }

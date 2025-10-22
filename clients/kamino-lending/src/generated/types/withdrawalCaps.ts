@@ -21,6 +21,7 @@ import {
   getU64Encoder,
 } from "@solana/kit";
 
+/** Reserve Withdrawal Caps State */
 export interface WithdrawalCaps {
   configCapacity: bigint;
   currentTotal: bigint;

@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { ReferrerTokenStateSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,6 +43,7 @@ import {
   getU128Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findReferrerTokenStatePda } from "../pdas/index.js";
 
 export const REFERRER_TOKEN_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([39, 15, 208, 77, 32, 195, 105, 56]);
@@ -54,19 +56,29 @@ export function getReferrerTokenStateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export interface ReferrerTokenState {
   discriminator: ReadonlyUint8Array;
+  /** Pubkey of the referrer/owner */
   referrer: Address;
+  /** Token mint for the account */
   mint: Address;
+  /** Amount that has been accumulated and not claimed yet -> available to claim (scaled fraction) */
   amountUnclaimedSf: bigint;
+  /** Amount that has been accumulated in total -> both already claimed and unclaimed (scaled fraction) */
   amountCumulativeSf: bigint;
+  /** Referrer token state bump, used for address validation */
   bump: bigint;
   padding: bigint[];
 }
 
 export interface ReferrerTokenStateArgs {
+  /** Pubkey of the referrer/owner */
   referrer: Address;
+  /** Token mint for the account */
   mint: Address;
+  /** Amount that has been accumulated and not claimed yet -> available to claim (scaled fraction) */
   amountUnclaimedSf: number | bigint;
+  /** Amount that has been accumulated in total -> both already claimed and unclaimed (scaled fraction) */
   amountCumulativeSf: number | bigint;
+  /** Referrer token state bump, used for address validation */
   bump: number | bigint;
   padding: (number | bigint)[];
 }
@@ -172,4 +184,28 @@ export async function fetchAllMaybeReferrerTokenState(
   return maybeAccounts.map((maybeAccount) =>
     decodeReferrerTokenState(maybeAccount),
   );
+}
+
+export async function fetchReferrerTokenStateFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ReferrerTokenStateSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<ReferrerTokenState>> {
+  const maybeAccount = await fetchMaybeReferrerTokenStateFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeReferrerTokenStateFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ReferrerTokenStateSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<ReferrerTokenState>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findReferrerTokenStatePda(seeds, { programAddress });
+  return await fetchMaybeReferrerTokenState(rpc, address, fetchConfig);
 }

@@ -58,17 +58,42 @@ export interface UserState {
   userId: bigint;
   farmState: Address;
   owner: Address;
+  /** Indicate if this user state is part of a delegated farm */
   isFarmDelegated: number;
   padding0: number[];
+  /**
+   * Rewards tally used for computation of gained rewards
+   * (scaled from `Decimal` representation).
+   */
   rewardsTallyScaled: bigint[];
+  /** Number of reward tokens ready for claim */
   rewardsIssuedUnclaimed: bigint[];
   lastClaimTs: bigint[];
+  /**
+   * User stake deposited and usable, generating rewards and fees.
+   * (scaled from `Decimal` representation).
+   */
   activeStakeScaled: bigint;
+  /**
+   * User stake deposited but not usable and not generating rewards yet.
+   * (scaled from `Decimal` representation).
+   */
   pendingDepositStakeScaled: bigint;
+  /**
+   * After this timestamp, pending user stake can be moved to user stake
+   * Initialized to now() + delayed user stake period
+   */
   pendingDepositStakeTs: bigint;
+  /**
+   * User deposits unstaked, pending for withdrawal, not usable and not generating rewards.
+   * (scaled from `Decimal` representation).
+   */
   pendingWithdrawalUnstakeScaled: bigint;
+  /** After this timestamp, user can withdraw their deposit. */
   pendingWithdrawalUnstakeTs: bigint;
+  /** User bump used for account address validation */
   bump: bigint;
+  /** Delegatee used for initialisation - useful to check against */
   delegatee: Address;
   lastStakeTs: bigint;
   padding1: bigint[];
@@ -78,17 +103,42 @@ export interface UserStateArgs {
   userId: number | bigint;
   farmState: Address;
   owner: Address;
+  /** Indicate if this user state is part of a delegated farm */
   isFarmDelegated: number;
   padding0: number[];
+  /**
+   * Rewards tally used for computation of gained rewards
+   * (scaled from `Decimal` representation).
+   */
   rewardsTallyScaled: (number | bigint)[];
+  /** Number of reward tokens ready for claim */
   rewardsIssuedUnclaimed: (number | bigint)[];
   lastClaimTs: (number | bigint)[];
+  /**
+   * User stake deposited and usable, generating rewards and fees.
+   * (scaled from `Decimal` representation).
+   */
   activeStakeScaled: number | bigint;
+  /**
+   * User stake deposited but not usable and not generating rewards yet.
+   * (scaled from `Decimal` representation).
+   */
   pendingDepositStakeScaled: number | bigint;
+  /**
+   * After this timestamp, pending user stake can be moved to user stake
+   * Initialized to now() + delayed user stake period
+   */
   pendingDepositStakeTs: number | bigint;
+  /**
+   * User deposits unstaked, pending for withdrawal, not usable and not generating rewards.
+   * (scaled from `Decimal` representation).
+   */
   pendingWithdrawalUnstakeScaled: number | bigint;
+  /** After this timestamp, user can withdraw their deposit. */
   pendingWithdrawalUnstakeTs: number | bigint;
+  /** User bump used for account address validation */
   bump: number | bigint;
+  /** Delegatee used for initialisation - useful to check against */
   delegatee: Address;
   lastStakeTs: number | bigint;
   padding1: (number | bigint)[];

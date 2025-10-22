@@ -35,8 +35,9 @@ import {
   getU128Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmsUserStatePda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const UNSTAKE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   90, 95, 107, 42, 205, 124, 50, 225,
@@ -108,6 +109,89 @@ export function getUnstakeInstructionDataCodec(): FixedSizeCodec<
     getUnstakeInstructionDataEncoder(),
     getUnstakeInstructionDataDecoder(),
   );
+}
+
+export interface UnstakeAsyncInput<
+  TAccountOwner extends string = string,
+  TAccountUserState extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountScopePrices extends string = string,
+> {
+  owner: TransactionSigner<TAccountOwner>;
+  userState?: Address<TAccountUserState>;
+  farmState: Address<TAccountFarmState>;
+  scopePrices?: Address<TAccountScopePrices>;
+  stakeSharesScaled: UnstakeInstructionDataArgs["stakeSharesScaled"];
+}
+
+export async function getUnstakeInstructionAsync<
+  TAccountOwner extends string,
+  TAccountUserState extends string,
+  TAccountFarmState extends string,
+  TAccountScopePrices extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: UnstakeAsyncInput<
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountScopePrices
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  UnstakeInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountScopePrices
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    owner: { value: input.owner ?? null, isWritable: true },
+    userState: { value: input.userState ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.userState.value) {
+    accounts.userState.value = await findFarmsUserStatePda({
+      farmState: expectAddress(accounts.farmState.value),
+      owner: expectAddress(accounts.owner.value),
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.userState),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.scopePrices),
+    ],
+    data: getUnstakeInstructionDataEncoder().encode(
+      args as UnstakeInstructionDataArgs,
+    ),
+    programAddress,
+  } as UnstakeInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountScopePrices
+  >);
 }
 
 export interface UnstakeInput<

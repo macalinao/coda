@@ -33,8 +33,9 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findTreasuryVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([113, 216, 122, 131, 225, 209, 22, 55]);
@@ -105,6 +106,90 @@ export function getInitializeGlobalConfigInstructionDataCodec(): FixedSizeCodec<
     getInitializeGlobalConfigInstructionDataEncoder(),
     getInitializeGlobalConfigInstructionDataDecoder(),
   );
+}
+
+export interface InitializeGlobalConfigAsyncInput<
+  TAccountGlobalAdmin extends string = string,
+  TAccountGlobalConfig extends string = string,
+  TAccountTreasuryVaultsAuthority extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
+  globalConfig: Address<TAccountGlobalConfig>;
+  treasuryVaultsAuthority?: Address<TAccountTreasuryVaultsAuthority>;
+  systemProgram?: Address<TAccountSystemProgram>;
+}
+
+export async function getInitializeGlobalConfigInstructionAsync<
+  TAccountGlobalAdmin extends string,
+  TAccountGlobalConfig extends string,
+  TAccountTreasuryVaultsAuthority extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: InitializeGlobalConfigAsyncInput<
+    TAccountGlobalAdmin,
+    TAccountGlobalConfig,
+    TAccountTreasuryVaultsAuthority,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  InitializeGlobalConfigInstruction<
+    TProgramAddress,
+    TAccountGlobalAdmin,
+    TAccountGlobalConfig,
+    TAccountTreasuryVaultsAuthority,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    globalAdmin: { value: input.globalAdmin ?? null, isWritable: true },
+    globalConfig: { value: input.globalConfig ?? null, isWritable: true },
+    treasuryVaultsAuthority: {
+      value: input.treasuryVaultsAuthority ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.treasuryVaultsAuthority.value) {
+    accounts.treasuryVaultsAuthority.value =
+      await findTreasuryVaultsAuthorityPda({
+        globalConfig: expectAddress(accounts.globalConfig.value),
+      });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.globalAdmin),
+      getAccountMeta(accounts.globalConfig),
+      getAccountMeta(accounts.treasuryVaultsAuthority),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    data: getInitializeGlobalConfigInstructionDataEncoder().encode({}),
+    programAddress,
+  } as InitializeGlobalConfigInstruction<
+    TProgramAddress,
+    TAccountGlobalAdmin,
+    TAccountGlobalConfig,
+    TAccountTreasuryVaultsAuthority,
+    TAccountSystemProgram
+  >);
 }
 
 export interface InitializeGlobalConfigInput<

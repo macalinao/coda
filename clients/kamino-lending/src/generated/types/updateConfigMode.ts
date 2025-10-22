@@ -21,7 +21,7 @@ export enum UpdateConfigMode {
   UpdateProtocolTakeRate = 4,
   UpdateFeesBorrowFee = 5,
   UpdateFeesFlashLoanFee = 6,
-  UpdateFeesReferralFeeBps = 7,
+  DeprecatedUpdateFeesReferralFeeBps = 7,
   UpdateDepositLimit = 8,
   UpdateBorrowLimit = 9,
   UpdateTokenInfoLowerHeuristic = 10,
@@ -41,8 +41,8 @@ export enum UpdateConfigMode {
   UpdateEntireReserveConfig = 24,
   UpdateDebtWithdrawalCap = 25,
   UpdateDepositWithdrawalCap = 26,
-  UpdateDebtWithdrawalCapCurrentTotal = 27,
-  UpdateDepositWithdrawalCapCurrentTotal = 28,
+  DeprecatedUpdateDebtWithdrawalCapCurrentTotal = 27,
+  DeprecatedUpdateDepositWithdrawalCapCurrentTotal = 28,
   UpdateBadDebtLiquidationBonusBps = 29,
   UpdateMinLiquidationBonusBps = 30,
   UpdateDeleveragingMarginCallPeriod = 31,
@@ -63,6 +63,7 @@ export enum UpdateConfigMode {
   UpdateHostFixedInterestRateBps = 46,
   UpdateAutodeleverageEnabled = 47,
   UpdateDeleveragingBonusIncreaseBpsPerDay = 48,
+  UpdateProtocolOrderExecutionFee = 49,
 }
 
 export type UpdateConfigModeArgs = UpdateConfigMode;

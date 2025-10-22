@@ -26,18 +26,37 @@ import {
   getU128Encoder,
 } from "@solana/kit";
 
+/** Obligation collateral state */
 export interface ObligationCollateral {
+  /** Reserve collateral is deposited to */
   depositReserve: Address;
+  /** Amount of collateral deposited */
   depositedAmount: bigint;
+  /** Collateral market value in quote currency (scaled fraction) */
   marketValueSf: bigint;
+  /**
+   * Debt amount (lamport) taken against this collateral.
+   * (only meaningful if this obligation is part of an elevation group, otherwise 0)
+   * This is only indicative of the debt computed on the last refresh obligation.
+   * If the obligation have multiple collateral this value is the same for all of them.
+   */
   borrowedAmountAgainstThisCollateralInElevationGroup: bigint;
   padding: bigint[];
 }
 
 export interface ObligationCollateralArgs {
+  /** Reserve collateral is deposited to */
   depositReserve: Address;
+  /** Amount of collateral deposited */
   depositedAmount: number | bigint;
+  /** Collateral market value in quote currency (scaled fraction) */
   marketValueSf: number | bigint;
+  /**
+   * Debt amount (lamport) taken against this collateral.
+   * (only meaningful if this obligation is part of an elevation group, otherwise 0)
+   * This is only indicative of the debt computed on the last refresh obligation.
+   * If the obligation have multiple collateral this value is the same for all of them.
+   */
   borrowedAmountAgainstThisCollateralInElevationGroup: number | bigint;
   padding: (number | bigint)[];
 }

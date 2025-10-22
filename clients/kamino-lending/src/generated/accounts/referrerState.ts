@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { ReferrerStateSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,6 +37,7 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findReferrerStatePda } from "../pdas/index.js";
 
 export const REFERRER_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   194, 81, 217, 103, 12, 19, 12, 66,
@@ -139,4 +141,28 @@ export async function fetchAllMaybeReferrerState(
 ): Promise<MaybeAccount<ReferrerState>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeReferrerState(maybeAccount));
+}
+
+export async function fetchReferrerStateFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ReferrerStateSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<ReferrerState>> {
+  const maybeAccount = await fetchMaybeReferrerStateFromSeeds(
+    rpc,
+    seeds,
+    config,
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeReferrerStateFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: ReferrerStateSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<ReferrerState>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findReferrerStatePda(seeds, { programAddress });
+  return await fetchMaybeReferrerState(rpc, address, fetchConfig);
 }

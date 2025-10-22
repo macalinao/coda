@@ -36,6 +36,7 @@ export interface ElevationGroup {
   allowNewLoans: number;
   maxReservesAsCollateral: number;
   padding0: number;
+  /** Mandatory debt reserve for this elevation group */
   debtReserve: Address;
   padding1: bigint[];
 }
@@ -48,6 +49,7 @@ export interface ElevationGroupArgs {
   allowNewLoans: number;
   maxReservesAsCollateral: number;
   padding0: number;
+  /** Mandatory debt reserve for this elevation group */
   debtReserve: Address;
   padding1: (number | bigint)[];
 }

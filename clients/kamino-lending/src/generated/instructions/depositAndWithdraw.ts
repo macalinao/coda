@@ -85,7 +85,7 @@ export type DepositAndWithdrawInstruction<
     | AccountMeta = string,
   TAccountDepositAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = string,
   TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
   TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
@@ -119,7 +119,7 @@ export type DepositAndWithdrawInstruction<
     | AccountMeta = string,
   TAccountWithdrawAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+    | AccountMeta = string,
   TAccountDepositFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
@@ -339,7 +339,7 @@ export interface DepositAndWithdrawInput<
   depositAccountsPlaceholderUserDestinationCollateral?: Address<TAccountDepositAccountsPlaceholderUserDestinationCollateral>;
   depositAccountsCollateralTokenProgram: Address<TAccountDepositAccountsCollateralTokenProgram>;
   depositAccountsLiquidityTokenProgram: Address<TAccountDepositAccountsLiquidityTokenProgram>;
-  depositAccountsInstructionSysvarAccount?: Address<TAccountDepositAccountsInstructionSysvarAccount>;
+  depositAccountsInstructionSysvarAccount: Address<TAccountDepositAccountsInstructionSysvarAccount>;
   withdrawAccountsOwner: TransactionSigner<TAccountWithdrawAccountsOwner>;
   withdrawAccountsObligation: Address<TAccountWithdrawAccountsObligation>;
   withdrawAccountsLendingMarket: Address<TAccountWithdrawAccountsLendingMarket>;
@@ -353,7 +353,7 @@ export interface DepositAndWithdrawInput<
   withdrawAccountsPlaceholderUserDestinationCollateral?: Address<TAccountWithdrawAccountsPlaceholderUserDestinationCollateral>;
   withdrawAccountsCollateralTokenProgram: Address<TAccountWithdrawAccountsCollateralTokenProgram>;
   withdrawAccountsLiquidityTokenProgram: Address<TAccountWithdrawAccountsLiquidityTokenProgram>;
-  withdrawAccountsInstructionSysvarAccount?: Address<TAccountWithdrawAccountsInstructionSysvarAccount>;
+  withdrawAccountsInstructionSysvarAccount: Address<TAccountWithdrawAccountsInstructionSysvarAccount>;
   depositFarmsAccountsObligationFarmUserState?: Address<TAccountDepositFarmsAccountsObligationFarmUserState>;
   depositFarmsAccountsReserveFarmState?: Address<TAccountDepositFarmsAccountsReserveFarmState>;
   withdrawFarmsAccountsObligationFarmUserState?: Address<TAccountWithdrawFarmsAccountsObligationFarmUserState>;
@@ -616,14 +616,6 @@ export function getDepositAndWithdrawInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.depositAccountsInstructionSysvarAccount.value) {
-    accounts.depositAccountsInstructionSysvarAccount.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
-  if (!accounts.withdrawAccountsInstructionSysvarAccount.value) {
-    accounts.withdrawAccountsInstructionSysvarAccount.value =
-      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
   if (!accounts.farmsProgram.value) {
     accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
     accounts.farmsProgram.isWritable = false;

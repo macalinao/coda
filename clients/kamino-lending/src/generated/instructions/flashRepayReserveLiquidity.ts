@@ -37,8 +37,12 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findLendingMarketAuthPda,
+  findReserveFeeVaultPda,
+} from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const FLASH_REPAY_RESERVE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([185, 117, 0, 203, 96, 245, 180, 186]);
@@ -154,6 +158,189 @@ export function getFlashRepayReserveLiquidityInstructionDataCodec(): FixedSizeCo
     getFlashRepayReserveLiquidityInstructionDataEncoder(),
     getFlashRepayReserveLiquidityInstructionDataDecoder(),
   );
+}
+
+export interface FlashRepayReserveLiquidityAsyncInput<
+  TAccountUserTransferAuthority extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountReserve extends string = string,
+  TAccountReserveLiquidityMint extends string = string,
+  TAccountReserveDestinationLiquidity extends string = string,
+  TAccountUserSourceLiquidity extends string = string,
+  TAccountReserveLiquidityFeeReceiver extends string = string,
+  TAccountReferrerTokenState extends string = string,
+  TAccountReferrerAccount extends string = string,
+  TAccountSysvarInfo extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  userTransferAuthority: TransactionSigner<TAccountUserTransferAuthority>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  reserve: Address<TAccountReserve>;
+  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
+  reserveDestinationLiquidity: Address<TAccountReserveDestinationLiquidity>;
+  userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
+  reserveLiquidityFeeReceiver?: Address<TAccountReserveLiquidityFeeReceiver>;
+  referrerTokenState?: Address<TAccountReferrerTokenState>;
+  referrerAccount?: Address<TAccountReferrerAccount>;
+  sysvarInfo?: Address<TAccountSysvarInfo>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  liquidityAmount: FlashRepayReserveLiquidityInstructionDataArgs["liquidityAmount"];
+  borrowInstructionIndex: FlashRepayReserveLiquidityInstructionDataArgs["borrowInstructionIndex"];
+}
+
+export async function getFlashRepayReserveLiquidityInstructionAsync<
+  TAccountUserTransferAuthority extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountLendingMarket extends string,
+  TAccountReserve extends string,
+  TAccountReserveLiquidityMint extends string,
+  TAccountReserveDestinationLiquidity extends string,
+  TAccountUserSourceLiquidity extends string,
+  TAccountReserveLiquidityFeeReceiver extends string,
+  TAccountReferrerTokenState extends string,
+  TAccountReferrerAccount extends string,
+  TAccountSysvarInfo extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: FlashRepayReserveLiquidityAsyncInput<
+    TAccountUserTransferAuthority,
+    TAccountLendingMarketAuthority,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveDestinationLiquidity,
+    TAccountUserSourceLiquidity,
+    TAccountReserveLiquidityFeeReceiver,
+    TAccountReferrerTokenState,
+    TAccountReferrerAccount,
+    TAccountSysvarInfo,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  FlashRepayReserveLiquidityInstruction<
+    TProgramAddress,
+    TAccountUserTransferAuthority,
+    TAccountLendingMarketAuthority,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveDestinationLiquidity,
+    TAccountUserSourceLiquidity,
+    TAccountReserveLiquidityFeeReceiver,
+    TAccountReferrerTokenState,
+    TAccountReferrerAccount,
+    TAccountSysvarInfo,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    userTransferAuthority: {
+      value: input.userTransferAuthority ?? null,
+      isWritable: false,
+    },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    reserve: { value: input.reserve ?? null, isWritable: true },
+    reserveLiquidityMint: {
+      value: input.reserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    reserveDestinationLiquidity: {
+      value: input.reserveDestinationLiquidity ?? null,
+      isWritable: true,
+    },
+    userSourceLiquidity: {
+      value: input.userSourceLiquidity ?? null,
+      isWritable: true,
+    },
+    reserveLiquidityFeeReceiver: {
+      value: input.reserveLiquidityFeeReceiver ?? null,
+      isWritable: true,
+    },
+    referrerTokenState: {
+      value: input.referrerTokenState ?? null,
+      isWritable: true,
+    },
+    referrerAccount: { value: input.referrerAccount ?? null, isWritable: true },
+    sysvarInfo: { value: input.sysvarInfo ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.reserveLiquidityFeeReceiver.value) {
+    accounts.reserveLiquidityFeeReceiver.value = await findReserveFeeVaultPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      mint: expectAddress(accounts.reserveLiquidityMint.value),
+    });
+  }
+  if (!accounts.sysvarInfo.value) {
+    accounts.sysvarInfo.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.userTransferAuthority),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.reserveLiquidityMint),
+      getAccountMeta(accounts.reserveDestinationLiquidity),
+      getAccountMeta(accounts.userSourceLiquidity),
+      getAccountMeta(accounts.reserveLiquidityFeeReceiver),
+      getAccountMeta(accounts.referrerTokenState),
+      getAccountMeta(accounts.referrerAccount),
+      getAccountMeta(accounts.sysvarInfo),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getFlashRepayReserveLiquidityInstructionDataEncoder().encode(
+      args as FlashRepayReserveLiquidityInstructionDataArgs,
+    ),
+    programAddress,
+  } as FlashRepayReserveLiquidityInstruction<
+    TProgramAddress,
+    TAccountUserTransferAuthority,
+    TAccountLendingMarketAuthority,
+    TAccountLendingMarket,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveDestinationLiquidity,
+    TAccountUserSourceLiquidity,
+    TAccountReserveLiquidityFeeReceiver,
+    TAccountReferrerTokenState,
+    TAccountReferrerAccount,
+    TAccountSysvarInfo,
+    TAccountTokenProgram
+  >);
 }
 
 export interface FlashRepayReserveLiquidityInput<

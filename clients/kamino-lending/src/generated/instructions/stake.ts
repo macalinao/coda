@@ -35,8 +35,9 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findFarmsUserStatePda, findFarmVaultPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const STAKE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   206, 176, 202, 18, 200, 209, 179, 108,
@@ -126,6 +127,131 @@ export function getStakeInstructionDataCodec(): FixedSizeCodec<
     getStakeInstructionDataEncoder(),
     getStakeInstructionDataDecoder(),
   );
+}
+
+export interface StakeAsyncInput<
+  TAccountOwner extends string = string,
+  TAccountUserState extends string = string,
+  TAccountFarmState extends string = string,
+  TAccountFarmVault extends string = string,
+  TAccountUserAta extends string = string,
+  TAccountTokenMint extends string = string,
+  TAccountScopePrices extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  owner: TransactionSigner<TAccountOwner>;
+  userState?: Address<TAccountUserState>;
+  farmState: Address<TAccountFarmState>;
+  farmVault?: Address<TAccountFarmVault>;
+  userAta: Address<TAccountUserAta>;
+  tokenMint: Address<TAccountTokenMint>;
+  scopePrices?: Address<TAccountScopePrices>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  amount: StakeInstructionDataArgs["amount"];
+}
+
+export async function getStakeInstructionAsync<
+  TAccountOwner extends string,
+  TAccountUserState extends string,
+  TAccountFarmState extends string,
+  TAccountFarmVault extends string,
+  TAccountUserAta extends string,
+  TAccountTokenMint extends string,
+  TAccountScopePrices extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
+>(
+  input: StakeAsyncInput<
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountFarmVault,
+    TAccountUserAta,
+    TAccountTokenMint,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  StakeInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountFarmVault,
+    TAccountUserAta,
+    TAccountTokenMint,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    owner: { value: input.owner ?? null, isWritable: false },
+    userState: { value: input.userState ?? null, isWritable: true },
+    farmState: { value: input.farmState ?? null, isWritable: true },
+    farmVault: { value: input.farmVault ?? null, isWritable: true },
+    userAta: { value: input.userAta ?? null, isWritable: true },
+    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
+    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.userState.value) {
+    accounts.userState.value = await findFarmsUserStatePda({
+      farmState: expectAddress(accounts.farmState.value),
+      owner: expectAddress(accounts.owner.value),
+    });
+  }
+  if (!accounts.farmVault.value) {
+    accounts.farmVault.value = await findFarmVaultPda({
+      farmState: expectAddress(accounts.farmState.value),
+      tokenMint: expectAddress(accounts.tokenMint.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.userState),
+      getAccountMeta(accounts.farmState),
+      getAccountMeta(accounts.farmVault),
+      getAccountMeta(accounts.userAta),
+      getAccountMeta(accounts.tokenMint),
+      getAccountMeta(accounts.scopePrices),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getStakeInstructionDataEncoder().encode(
+      args as StakeInstructionDataArgs,
+    ),
+    programAddress,
+  } as StakeInstruction<
+    TProgramAddress,
+    TAccountOwner,
+    TAccountUserState,
+    TAccountFarmState,
+    TAccountFarmVault,
+    TAccountUserAta,
+    TAccountTokenMint,
+    TAccountScopePrices,
+    TAccountTokenProgram
+  >);
 }
 
 export interface StakeInput<

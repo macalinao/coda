@@ -43,17 +43,16 @@ import {
   transformEncoder,
 } from "@solana/kit";
 
-export const GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
-  149, 8, 156, 202, 160, 252, 176, 217,
-]);
+export const FARMS_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
+  new Uint8Array([149, 8, 156, 202, 160, 252, 176, 217]);
 
-export function getGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
+export function getFarmsGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    GLOBAL_CONFIG_DISCRIMINATOR,
+    FARMS_GLOBAL_CONFIG_DISCRIMINATOR,
   );
 }
 
-export interface GlobalConfig {
+export interface FarmsGlobalConfig {
   discriminator: ReadonlyUint8Array;
   globalAdmin: Address;
   treasuryFeeBps: bigint;
@@ -63,7 +62,7 @@ export interface GlobalConfig {
   padding1: bigint[];
 }
 
-export interface GlobalConfigArgs {
+export interface FarmsGlobalConfigArgs {
   globalAdmin: Address;
   treasuryFeeBps: number | bigint;
   treasuryVaultsAuthority: Address;
@@ -72,7 +71,7 @@ export interface GlobalConfigArgs {
   padding1: (number | bigint)[];
 }
 
-export function getGlobalConfigEncoder(): FixedSizeEncoder<GlobalConfigArgs> {
+export function getFarmsGlobalConfigEncoder(): FixedSizeEncoder<FarmsGlobalConfigArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
@@ -83,11 +82,11 @@ export function getGlobalConfigEncoder(): FixedSizeEncoder<GlobalConfigArgs> {
       ["pendingGlobalAdmin", getAddressEncoder()],
       ["padding1", getArrayEncoder(getU128Encoder(), { size: 126 })],
     ]),
-    (value) => ({ ...value, discriminator: GLOBAL_CONFIG_DISCRIMINATOR }),
+    (value) => ({ ...value, discriminator: FARMS_GLOBAL_CONFIG_DISCRIMINATOR }),
   );
 }
 
-export function getGlobalConfigDecoder(): FixedSizeDecoder<GlobalConfig> {
+export function getFarmsGlobalConfigDecoder(): FixedSizeDecoder<FarmsGlobalConfig> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["globalAdmin", getAddressDecoder()],
@@ -99,62 +98,75 @@ export function getGlobalConfigDecoder(): FixedSizeDecoder<GlobalConfig> {
   ]);
 }
 
-export function getGlobalConfigCodec(): FixedSizeCodec<
-  GlobalConfigArgs,
-  GlobalConfig
+export function getFarmsGlobalConfigCodec(): FixedSizeCodec<
+  FarmsGlobalConfigArgs,
+  FarmsGlobalConfig
 > {
-  return combineCodec(getGlobalConfigEncoder(), getGlobalConfigDecoder());
-}
-
-export function decodeGlobalConfig<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress>,
-): Account<GlobalConfig, TAddress>;
-export function decodeGlobalConfig<TAddress extends string = string>(
-  encodedAccount: MaybeEncodedAccount<TAddress>,
-): MaybeAccount<GlobalConfig, TAddress>;
-export function decodeGlobalConfig<TAddress extends string = string>(
-  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
-): Account<GlobalConfig, TAddress> | MaybeAccount<GlobalConfig, TAddress> {
-  return decodeAccount(
-    encodedAccount as MaybeEncodedAccount<TAddress>,
-    getGlobalConfigDecoder(),
+  return combineCodec(
+    getFarmsGlobalConfigEncoder(),
+    getFarmsGlobalConfigDecoder(),
   );
 }
 
-export async function fetchGlobalConfig<TAddress extends string = string>(
+export function decodeFarmsGlobalConfig<TAddress extends string = string>(
+  encodedAccount: EncodedAccount<TAddress>,
+): Account<FarmsGlobalConfig, TAddress>;
+export function decodeFarmsGlobalConfig<TAddress extends string = string>(
+  encodedAccount: MaybeEncodedAccount<TAddress>,
+): MaybeAccount<FarmsGlobalConfig, TAddress>;
+export function decodeFarmsGlobalConfig<TAddress extends string = string>(
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>,
+):
+  | Account<FarmsGlobalConfig, TAddress>
+  | MaybeAccount<FarmsGlobalConfig, TAddress> {
+  return decodeAccount(
+    encodedAccount as MaybeEncodedAccount<TAddress>,
+    getFarmsGlobalConfigDecoder(),
+  );
+}
+
+export async function fetchFarmsGlobalConfig<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig,
-): Promise<Account<GlobalConfig, TAddress>> {
-  const maybeAccount = await fetchMaybeGlobalConfig(rpc, address, config);
+): Promise<Account<FarmsGlobalConfig, TAddress>> {
+  const maybeAccount = await fetchMaybeFarmsGlobalConfig(rpc, address, config);
   assertAccountExists(maybeAccount);
   return maybeAccount;
 }
 
-export async function fetchMaybeGlobalConfig<TAddress extends string = string>(
+export async function fetchMaybeFarmsGlobalConfig<
+  TAddress extends string = string,
+>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig,
-): Promise<MaybeAccount<GlobalConfig, TAddress>> {
+): Promise<MaybeAccount<FarmsGlobalConfig, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
-  return decodeGlobalConfig(maybeAccount);
+  return decodeFarmsGlobalConfig(maybeAccount);
 }
 
-export async function fetchAllGlobalConfig(
+export async function fetchAllFarmsGlobalConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Address[],
   config?: FetchAccountsConfig,
-): Promise<Account<GlobalConfig>[]> {
-  const maybeAccounts = await fetchAllMaybeGlobalConfig(rpc, addresses, config);
+): Promise<Account<FarmsGlobalConfig>[]> {
+  const maybeAccounts = await fetchAllMaybeFarmsGlobalConfig(
+    rpc,
+    addresses,
+    config,
+  );
   assertAccountsExist(maybeAccounts);
   return maybeAccounts;
 }
 
-export async function fetchAllMaybeGlobalConfig(
+export async function fetchAllMaybeFarmsGlobalConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Address[],
   config?: FetchAccountsConfig,
-): Promise<MaybeAccount<GlobalConfig>[]> {
+): Promise<MaybeAccount<FarmsGlobalConfig>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
-  return maybeAccounts.map((maybeAccount) => decodeGlobalConfig(maybeAccount));
+  return maybeAccounts.map((maybeAccount) =>
+    decodeFarmsGlobalConfig(maybeAccount),
+  );
 }

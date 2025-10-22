@@ -36,6 +36,9 @@ export enum UpdateLendingMarketMode {
   UpdateName = 19,
   UpdateIndividualAutodeleverageMarginCallPeriodSecs = 20,
   UpdateInitialDepositAmount = 21,
+  UpdateObligationOrderExecutionEnabled = 22,
+  UpdateImmutableFlag = 23,
+  UpdateObligationOrderCreationEnabled = 24,
 }
 
 export type UpdateLendingMarketModeArgs = UpdateLendingMarketMode;

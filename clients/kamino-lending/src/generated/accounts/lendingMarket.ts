@@ -20,8 +20,8 @@ import type {
   ReadonlyUint8Array,
 } from "@solana/kit";
 import type {
-  ElevationGroupLendingMarket,
-  ElevationGroupLendingMarketArgs,
+  ElevationGroupPod,
+  ElevationGroupPodArgs,
 } from "../types/index.js";
 import {
   assertAccountExists,
@@ -51,8 +51,8 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import {
-  getElevationGroupLendingMarketDecoder,
-  getElevationGroupLendingMarketEncoder,
+  getElevationGroupPodDecoder,
+  getElevationGroupPodEncoder,
 } from "../types/index.js";
 
 export const LENDING_MARKET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -67,62 +67,164 @@ export function getLendingMarketDiscriminatorBytes(): ReadonlyUint8Array {
 
 export interface LendingMarket {
   discriminator: ReadonlyUint8Array;
+  /** Version of lending market */
   version: bigint;
+  /** Bump seed for derived authority address */
   bumpSeed: bigint;
+  /** Owner authority which can add new reserves */
   lendingMarketOwner: Address;
+  /** Temporary cache of the lending market owner, used in update_lending_market_owner */
   lendingMarketOwnerCached: Address;
+  /**
+   * Currency market prices are quoted in
+   * e.g. "USD" null padded (`*b"USD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"`) or a SPL token mint pubkey
+   */
   quoteCurrency: number[];
+  /** Referral fee for the lending market, as bps out of the total protocol fee */
   referralFeeBps: number;
   emergencyMode: number;
+  /**
+   * Whether the obligations on this market should be subject to auto-deleveraging after deposit
+   * or borrow limit is crossed.
+   * Besides this flag, the particular reserve's flag also needs to be enabled (logical `AND`).
+   * **NOTE:** this also affects the individual "target LTV" deleveraging.
+   */
   autodeleverageEnabled: number;
   borrowDisabled: number;
+  /**
+   * Refresh price from oracle only if it's older than this percentage of the price max age.
+   * e.g. if the max age is set to 100s and this is set to 80%, the price will be refreshed if it's older than 80s.
+   * Price is always refreshed if this set to 0.
+   */
   priceRefreshTriggerToMaxAgePct: number;
+  /** Percentage of the total borrowed value in an obligation available for liquidation */
   liquidationMaxDebtCloseFactorPct: number;
+  /** Minimum acceptable unhealthy LTV before max_debt_close_factor_pct becomes 100% */
   insolvencyRiskUnhealthyLtvPct: number;
+  /** Minimum liquidation value threshold triggering full liquidation for an obligation */
   minFullLiquidationValueThreshold: bigint;
+  /** Max allowed liquidation value in one ix call */
   maxLiquidatableDebtMarketValueAtOnce: bigint;
+  /** [DEPRECATED] Global maximum unhealthy borrow value allowed for any obligation */
   reserved0: number[];
+  /** Global maximum allowed borrow value allowed for any obligation */
   globalAllowedBorrowValue: bigint;
+  /** The address of the risk council, in charge of making parameter and risk decisions on behalf of the protocol */
   riskCouncil: Address;
+  /** [DEPRECATED] Reward points multiplier per obligation type */
   reserved1: number[];
-  elevationGroups: ElevationGroupLendingMarket[];
+  /** Elevation groups are used to group together reserves that have the same risk parameters and can bump the ltv and liquidation threshold */
+  elevationGroups: ElevationGroupPod[];
   elevationGroupPadding: bigint[];
+  /** Min net value accepted to be found in a position after any lending action in an obligation (scaled by quote currency decimals) */
   minNetValueInObligationSf: bigint;
+  /** Minimum value to enforce smallest ltv priority checks on the collateral reserves on liquidation */
   minValueSkipLiquidationLtvChecks: bigint;
+  /** Market name, zero-padded. */
   name: number[];
+  /** Minimum value to enforce highest borrow factor priority checks on the debt reserves on liquidation */
   minValueSkipLiquidationBfChecks: bigint;
+  /**
+   * Time (in seconds) that must pass before liquidation is allowed on an obligation that has
+   * been individually marked for auto-deleveraging (by the risk council).
+   */
   individualAutodeleverageMarginCallPeriodSecs: bigint;
+  /**
+   * Minimum amount of deposit at creation of a reserve to prevent artificial inflation
+   * Note: this amount cannot be recovered, the ctoken associated are never minted
+   */
   minInitialDepositAmount: bigint;
+  /** Whether the obligation orders should be evaluated during liquidations. */
+  obligationOrderExecutionEnabled: number;
+  /** Whether the lending market is set as immutable. */
+  immutable: number;
+  /**
+   * Whether new obligation orders can be created.
+   * Note: updating or cancelling existing orders is *not* affected by this flag.
+   */
+  obligationOrderCreationEnabled: number;
+  padding2: number[];
   padding1: bigint[];
 }
 
 export interface LendingMarketArgs {
+  /** Version of lending market */
   version: number | bigint;
+  /** Bump seed for derived authority address */
   bumpSeed: number | bigint;
+  /** Owner authority which can add new reserves */
   lendingMarketOwner: Address;
+  /** Temporary cache of the lending market owner, used in update_lending_market_owner */
   lendingMarketOwnerCached: Address;
+  /**
+   * Currency market prices are quoted in
+   * e.g. "USD" null padded (`*b"USD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"`) or a SPL token mint pubkey
+   */
   quoteCurrency: number[];
+  /** Referral fee for the lending market, as bps out of the total protocol fee */
   referralFeeBps: number;
   emergencyMode: number;
+  /**
+   * Whether the obligations on this market should be subject to auto-deleveraging after deposit
+   * or borrow limit is crossed.
+   * Besides this flag, the particular reserve's flag also needs to be enabled (logical `AND`).
+   * **NOTE:** this also affects the individual "target LTV" deleveraging.
+   */
   autodeleverageEnabled: number;
   borrowDisabled: number;
+  /**
+   * Refresh price from oracle only if it's older than this percentage of the price max age.
+   * e.g. if the max age is set to 100s and this is set to 80%, the price will be refreshed if it's older than 80s.
+   * Price is always refreshed if this set to 0.
+   */
   priceRefreshTriggerToMaxAgePct: number;
+  /** Percentage of the total borrowed value in an obligation available for liquidation */
   liquidationMaxDebtCloseFactorPct: number;
+  /** Minimum acceptable unhealthy LTV before max_debt_close_factor_pct becomes 100% */
   insolvencyRiskUnhealthyLtvPct: number;
+  /** Minimum liquidation value threshold triggering full liquidation for an obligation */
   minFullLiquidationValueThreshold: number | bigint;
+  /** Max allowed liquidation value in one ix call */
   maxLiquidatableDebtMarketValueAtOnce: number | bigint;
+  /** [DEPRECATED] Global maximum unhealthy borrow value allowed for any obligation */
   reserved0: number[];
+  /** Global maximum allowed borrow value allowed for any obligation */
   globalAllowedBorrowValue: number | bigint;
+  /** The address of the risk council, in charge of making parameter and risk decisions on behalf of the protocol */
   riskCouncil: Address;
+  /** [DEPRECATED] Reward points multiplier per obligation type */
   reserved1: number[];
-  elevationGroups: ElevationGroupLendingMarketArgs[];
+  /** Elevation groups are used to group together reserves that have the same risk parameters and can bump the ltv and liquidation threshold */
+  elevationGroups: ElevationGroupPodArgs[];
   elevationGroupPadding: (number | bigint)[];
+  /** Min net value accepted to be found in a position after any lending action in an obligation (scaled by quote currency decimals) */
   minNetValueInObligationSf: number | bigint;
+  /** Minimum value to enforce smallest ltv priority checks on the collateral reserves on liquidation */
   minValueSkipLiquidationLtvChecks: number | bigint;
+  /** Market name, zero-padded. */
   name: number[];
+  /** Minimum value to enforce highest borrow factor priority checks on the debt reserves on liquidation */
   minValueSkipLiquidationBfChecks: number | bigint;
+  /**
+   * Time (in seconds) that must pass before liquidation is allowed on an obligation that has
+   * been individually marked for auto-deleveraging (by the risk council).
+   */
   individualAutodeleverageMarginCallPeriodSecs: number | bigint;
+  /**
+   * Minimum amount of deposit at creation of a reserve to prevent artificial inflation
+   * Note: this amount cannot be recovered, the ctoken associated are never minted
+   */
   minInitialDepositAmount: number | bigint;
+  /** Whether the obligation orders should be evaluated during liquidations. */
+  obligationOrderExecutionEnabled: number;
+  /** Whether the lending market is set as immutable. */
+  immutable: number;
+  /**
+   * Whether new obligation orders can be created.
+   * Note: updating or cancelling existing orders is *not* affected by this flag.
+   */
+  obligationOrderCreationEnabled: number;
+  padding2: number[];
   padding1: (number | bigint)[];
 }
 
@@ -150,7 +252,7 @@ export function getLendingMarketEncoder(): FixedSizeEncoder<LendingMarketArgs> {
       ["reserved1", getArrayEncoder(getU8Encoder(), { size: 8 })],
       [
         "elevationGroups",
-        getArrayEncoder(getElevationGroupLendingMarketEncoder(), { size: 32 }),
+        getArrayEncoder(getElevationGroupPodEncoder(), { size: 32 }),
       ],
       ["elevationGroupPadding", getArrayEncoder(getU64Encoder(), { size: 90 })],
       ["minNetValueInObligationSf", getU128Encoder()],
@@ -159,7 +261,11 @@ export function getLendingMarketEncoder(): FixedSizeEncoder<LendingMarketArgs> {
       ["minValueSkipLiquidationBfChecks", getU64Encoder()],
       ["individualAutodeleverageMarginCallPeriodSecs", getU64Encoder()],
       ["minInitialDepositAmount", getU64Encoder()],
-      ["padding1", getArrayEncoder(getU64Encoder(), { size: 170 })],
+      ["obligationOrderExecutionEnabled", getU8Encoder()],
+      ["immutable", getU8Encoder()],
+      ["obligationOrderCreationEnabled", getU8Encoder()],
+      ["padding2", getArrayEncoder(getU8Encoder(), { size: 5 })],
+      ["padding1", getArrayEncoder(getU64Encoder(), { size: 169 })],
     ]),
     (value) => ({ ...value, discriminator: LENDING_MARKET_DISCRIMINATOR }),
   );
@@ -188,7 +294,7 @@ export function getLendingMarketDecoder(): FixedSizeDecoder<LendingMarket> {
     ["reserved1", getArrayDecoder(getU8Decoder(), { size: 8 })],
     [
       "elevationGroups",
-      getArrayDecoder(getElevationGroupLendingMarketDecoder(), { size: 32 }),
+      getArrayDecoder(getElevationGroupPodDecoder(), { size: 32 }),
     ],
     ["elevationGroupPadding", getArrayDecoder(getU64Decoder(), { size: 90 })],
     ["minNetValueInObligationSf", getU128Decoder()],
@@ -197,7 +303,11 @@ export function getLendingMarketDecoder(): FixedSizeDecoder<LendingMarket> {
     ["minValueSkipLiquidationBfChecks", getU64Decoder()],
     ["individualAutodeleverageMarginCallPeriodSecs", getU64Decoder()],
     ["minInitialDepositAmount", getU64Decoder()],
-    ["padding1", getArrayDecoder(getU64Decoder(), { size: 170 })],
+    ["obligationOrderExecutionEnabled", getU8Decoder()],
+    ["immutable", getU8Decoder()],
+    ["obligationOrderCreationEnabled", getU8Decoder()],
+    ["padding2", getArrayDecoder(getU8Decoder(), { size: 5 })],
+    ["padding1", getArrayDecoder(getU64Decoder(), { size: 169 })],
   ]);
 }
 

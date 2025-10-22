@@ -25,8 +25,11 @@ import {
 } from "@solana/kit";
 
 export interface ScopeConfiguration {
+  /** Pubkey of the scope price feed (disabled if `null` or `default`) */
   priceFeed: Address;
+  /** This is the scope_id price chain that results in a price for the token */
   priceChain: number[];
+  /** This is the scope_id price chain for the twap */
   twapChain: number[];
 }
 

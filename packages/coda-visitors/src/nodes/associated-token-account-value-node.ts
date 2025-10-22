@@ -1,16 +1,18 @@
 import type { AccountValueNode, PublicKeyValueNode } from "codama";
+import { ASSOCIATED_TOKEN_PROGRAM_ADDRESS } from "@solana-program/token";
 import {
   pdaNode,
   pdaSeedValueNode,
   pdaValueNode,
   publicKeyTypeNode,
-  publicKeyValueNode,
   variablePdaSeedNode,
 } from "codama";
+import { TOKEN_PROGRAM_VALUE_NODE } from "./program-value-nodes.js";
 
 export const associatedTokenAccountPdaNode = pdaNode({
   name: "associatedTokenAccount",
-  programId: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  docs: "Associated Token Account",
+  programId: ASSOCIATED_TOKEN_PROGRAM_ADDRESS,
   seeds: [
     variablePdaSeedNode("owner", publicKeyTypeNode()),
     variablePdaSeedNode("tokenProgram", publicKeyTypeNode()),
@@ -21,9 +23,7 @@ export const associatedTokenAccountPdaNode = pdaNode({
 export const associatedTokenAccountValueNode = ({
   owner,
   mint,
-  tokenProgram = publicKeyValueNode(
-    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  ),
+  tokenProgram = TOKEN_PROGRAM_VALUE_NODE,
 }: {
   owner: AccountValueNode;
   mint: AccountValueNode;

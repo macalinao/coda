@@ -31,43 +31,88 @@ import {
   getBigFractionBytesEncoder,
 } from "./index.js";
 
+/** Reserve liquidity */
 export interface ReserveLiquidity {
+  /** Reserve liquidity mint address */
   mintPubkey: Address;
+  /** Reserve liquidity supply address */
   supplyVault: Address;
+  /** Reserve liquidity fee collection address */
   feeVault: Address;
+  /** Reserve liquidity available */
   availableAmount: bigint;
+  /** Reserve liquidity borrowed (scaled fraction) */
   borrowedAmountSf: bigint;
+  /** Reserve liquidity market price in quote currency (scaled fraction) */
   marketPriceSf: bigint;
+  /** Unix timestamp of the market price (from the oracle) */
   marketPriceLastUpdatedTs: bigint;
+  /** Reserve liquidity mint decimals */
   mintDecimals: bigint;
+  /**
+   * Timestamp when the last refresh reserve detected that the liquidity amount is above the deposit cap. When this threshold is crossed, then redemptions (auto-deleverage) are enabled.
+   * If the threshold is not crossed, then the timestamp is set to 0
+   */
   depositLimitCrossedTimestamp: bigint;
+  /**
+   * Timestamp when the last refresh reserve detected that the borrowed amount is above the borrow cap. When this threshold is crossed, then redemptions (auto-deleverage) are enabled.
+   * If the threshold is not crossed, then the timestamp is set to 0
+   */
   borrowLimitCrossedTimestamp: bigint;
+  /** Reserve liquidity cumulative borrow rate (scaled fraction) */
   cumulativeBorrowRateBsf: BigFractionBytes;
+  /** Reserve cumulative protocol fees (scaled fraction) */
   accumulatedProtocolFeesSf: bigint;
+  /** Reserve cumulative referrer fees (scaled fraction) */
   accumulatedReferrerFeesSf: bigint;
+  /** Reserve pending referrer fees, to be claimed in refresh_obligation by referrer or protocol (scaled fraction) */
   pendingReferrerFeesSf: bigint;
+  /** Reserve referrer fee absolute rate calculated at each refresh_reserve operation (scaled fraction) */
   absoluteReferralRateSf: bigint;
+  /** Token program of the liquidity mint */
   tokenProgram: Address;
   padding2: bigint[];
   padding3: bigint[];
 }
 
 export interface ReserveLiquidityArgs {
+  /** Reserve liquidity mint address */
   mintPubkey: Address;
+  /** Reserve liquidity supply address */
   supplyVault: Address;
+  /** Reserve liquidity fee collection address */
   feeVault: Address;
+  /** Reserve liquidity available */
   availableAmount: number | bigint;
+  /** Reserve liquidity borrowed (scaled fraction) */
   borrowedAmountSf: number | bigint;
+  /** Reserve liquidity market price in quote currency (scaled fraction) */
   marketPriceSf: number | bigint;
+  /** Unix timestamp of the market price (from the oracle) */
   marketPriceLastUpdatedTs: number | bigint;
+  /** Reserve liquidity mint decimals */
   mintDecimals: number | bigint;
+  /**
+   * Timestamp when the last refresh reserve detected that the liquidity amount is above the deposit cap. When this threshold is crossed, then redemptions (auto-deleverage) are enabled.
+   * If the threshold is not crossed, then the timestamp is set to 0
+   */
   depositLimitCrossedTimestamp: number | bigint;
+  /**
+   * Timestamp when the last refresh reserve detected that the borrowed amount is above the borrow cap. When this threshold is crossed, then redemptions (auto-deleverage) are enabled.
+   * If the threshold is not crossed, then the timestamp is set to 0
+   */
   borrowLimitCrossedTimestamp: number | bigint;
+  /** Reserve liquidity cumulative borrow rate (scaled fraction) */
   cumulativeBorrowRateBsf: BigFractionBytesArgs;
+  /** Reserve cumulative protocol fees (scaled fraction) */
   accumulatedProtocolFeesSf: number | bigint;
+  /** Reserve cumulative referrer fees (scaled fraction) */
   accumulatedReferrerFeesSf: number | bigint;
+  /** Reserve pending referrer fees, to be claimed in refresh_obligation by referrer or protocol (scaled fraction) */
   pendingReferrerFeesSf: number | bigint;
+  /** Reserve referrer fee absolute rate calculated at each refresh_reserve operation (scaled fraction) */
   absoluteReferralRateSf: number | bigint;
+  /** Token program of the liquidity mint */
   tokenProgram: Address;
   padding2: (number | bigint)[];
   padding3: (number | bigint)[];

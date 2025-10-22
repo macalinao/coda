@@ -35,8 +35,9 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const LIQUIDATE_OBLIGATION_AND_REDEEM_RESERVE_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([177, 71, 154, 188, 226, 133, 74, 55]);
@@ -67,7 +68,9 @@ export type LiquidateObligationAndRedeemReserveCollateralInstruction<
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
   TAccountUserDestinationCollateral extends string | AccountMeta = string,
   TAccountUserDestinationLiquidity extends string | AccountMeta = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta = string,
+  TAccountCollateralTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRepayLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountWithdrawLiquidityTokenProgram extends string | AccountMeta = string,
   TAccountInstructionSysvarAccount extends
@@ -191,6 +194,272 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstructionDataC
   );
 }
 
+export interface LiquidateObligationAndRedeemReserveCollateralAsyncInput<
+  TAccountLiquidator extends string = string,
+  TAccountObligation extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountRepayReserve extends string = string,
+  TAccountRepayReserveLiquidityMint extends string = string,
+  TAccountRepayReserveLiquiditySupply extends string = string,
+  TAccountWithdrawReserve extends string = string,
+  TAccountWithdrawReserveLiquidityMint extends string = string,
+  TAccountWithdrawReserveCollateralMint extends string = string,
+  TAccountWithdrawReserveCollateralSupply extends string = string,
+  TAccountWithdrawReserveLiquiditySupply extends string = string,
+  TAccountWithdrawReserveLiquidityFeeReceiver extends string = string,
+  TAccountUserSourceLiquidity extends string = string,
+  TAccountUserDestinationCollateral extends string = string,
+  TAccountUserDestinationLiquidity extends string = string,
+  TAccountCollateralTokenProgram extends string = string,
+  TAccountRepayLiquidityTokenProgram extends string = string,
+  TAccountWithdrawLiquidityTokenProgram extends string = string,
+  TAccountInstructionSysvarAccount extends string = string,
+> {
+  liquidator: TransactionSigner<TAccountLiquidator>;
+  obligation: Address<TAccountObligation>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  repayReserve: Address<TAccountRepayReserve>;
+  repayReserveLiquidityMint: Address<TAccountRepayReserveLiquidityMint>;
+  repayReserveLiquiditySupply: Address<TAccountRepayReserveLiquiditySupply>;
+  withdrawReserve: Address<TAccountWithdrawReserve>;
+  withdrawReserveLiquidityMint: Address<TAccountWithdrawReserveLiquidityMint>;
+  withdrawReserveCollateralMint: Address<TAccountWithdrawReserveCollateralMint>;
+  withdrawReserveCollateralSupply: Address<TAccountWithdrawReserveCollateralSupply>;
+  withdrawReserveLiquiditySupply: Address<TAccountWithdrawReserveLiquiditySupply>;
+  withdrawReserveLiquidityFeeReceiver: Address<TAccountWithdrawReserveLiquidityFeeReceiver>;
+  userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
+  userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
+  userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
+  repayLiquidityTokenProgram: Address<TAccountRepayLiquidityTokenProgram>;
+  withdrawLiquidityTokenProgram: Address<TAccountWithdrawLiquidityTokenProgram>;
+  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  liquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["liquidityAmount"];
+  minAcceptableReceivedLiquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["minAcceptableReceivedLiquidityAmount"];
+  maxAllowedLtvOverridePercent: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["maxAllowedLtvOverridePercent"];
+}
+
+export async function getLiquidateObligationAndRedeemReserveCollateralInstructionAsync<
+  TAccountLiquidator extends string,
+  TAccountObligation extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountRepayReserve extends string,
+  TAccountRepayReserveLiquidityMint extends string,
+  TAccountRepayReserveLiquiditySupply extends string,
+  TAccountWithdrawReserve extends string,
+  TAccountWithdrawReserveLiquidityMint extends string,
+  TAccountWithdrawReserveCollateralMint extends string,
+  TAccountWithdrawReserveCollateralSupply extends string,
+  TAccountWithdrawReserveLiquiditySupply extends string,
+  TAccountWithdrawReserveLiquidityFeeReceiver extends string,
+  TAccountUserSourceLiquidity extends string,
+  TAccountUserDestinationCollateral extends string,
+  TAccountUserDestinationLiquidity extends string,
+  TAccountCollateralTokenProgram extends string,
+  TAccountRepayLiquidityTokenProgram extends string,
+  TAccountWithdrawLiquidityTokenProgram extends string,
+  TAccountInstructionSysvarAccount extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: LiquidateObligationAndRedeemReserveCollateralAsyncInput<
+    TAccountLiquidator,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountRepayReserve,
+    TAccountRepayReserveLiquidityMint,
+    TAccountRepayReserveLiquiditySupply,
+    TAccountWithdrawReserve,
+    TAccountWithdrawReserveLiquidityMint,
+    TAccountWithdrawReserveCollateralMint,
+    TAccountWithdrawReserveCollateralSupply,
+    TAccountWithdrawReserveLiquiditySupply,
+    TAccountWithdrawReserveLiquidityFeeReceiver,
+    TAccountUserSourceLiquidity,
+    TAccountUserDestinationCollateral,
+    TAccountUserDestinationLiquidity,
+    TAccountCollateralTokenProgram,
+    TAccountRepayLiquidityTokenProgram,
+    TAccountWithdrawLiquidityTokenProgram,
+    TAccountInstructionSysvarAccount
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  LiquidateObligationAndRedeemReserveCollateralInstruction<
+    TProgramAddress,
+    TAccountLiquidator,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountRepayReserve,
+    TAccountRepayReserveLiquidityMint,
+    TAccountRepayReserveLiquiditySupply,
+    TAccountWithdrawReserve,
+    TAccountWithdrawReserveLiquidityMint,
+    TAccountWithdrawReserveCollateralMint,
+    TAccountWithdrawReserveCollateralSupply,
+    TAccountWithdrawReserveLiquiditySupply,
+    TAccountWithdrawReserveLiquidityFeeReceiver,
+    TAccountUserSourceLiquidity,
+    TAccountUserDestinationCollateral,
+    TAccountUserDestinationLiquidity,
+    TAccountCollateralTokenProgram,
+    TAccountRepayLiquidityTokenProgram,
+    TAccountWithdrawLiquidityTokenProgram,
+    TAccountInstructionSysvarAccount
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    liquidator: { value: input.liquidator ?? null, isWritable: false },
+    obligation: { value: input.obligation ?? null, isWritable: true },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    repayReserve: { value: input.repayReserve ?? null, isWritable: true },
+    repayReserveLiquidityMint: {
+      value: input.repayReserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    repayReserveLiquiditySupply: {
+      value: input.repayReserveLiquiditySupply ?? null,
+      isWritable: true,
+    },
+    withdrawReserve: { value: input.withdrawReserve ?? null, isWritable: true },
+    withdrawReserveLiquidityMint: {
+      value: input.withdrawReserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    withdrawReserveCollateralMint: {
+      value: input.withdrawReserveCollateralMint ?? null,
+      isWritable: true,
+    },
+    withdrawReserveCollateralSupply: {
+      value: input.withdrawReserveCollateralSupply ?? null,
+      isWritable: true,
+    },
+    withdrawReserveLiquiditySupply: {
+      value: input.withdrawReserveLiquiditySupply ?? null,
+      isWritable: true,
+    },
+    withdrawReserveLiquidityFeeReceiver: {
+      value: input.withdrawReserveLiquidityFeeReceiver ?? null,
+      isWritable: true,
+    },
+    userSourceLiquidity: {
+      value: input.userSourceLiquidity ?? null,
+      isWritable: true,
+    },
+    userDestinationCollateral: {
+      value: input.userDestinationCollateral ?? null,
+      isWritable: true,
+    },
+    userDestinationLiquidity: {
+      value: input.userDestinationLiquidity ?? null,
+      isWritable: true,
+    },
+    collateralTokenProgram: {
+      value: input.collateralTokenProgram ?? null,
+      isWritable: false,
+    },
+    repayLiquidityTokenProgram: {
+      value: input.repayLiquidityTokenProgram ?? null,
+      isWritable: false,
+    },
+    withdrawLiquidityTokenProgram: {
+      value: input.withdrawLiquidityTokenProgram ?? null,
+      isWritable: false,
+    },
+    instructionSysvarAccount: {
+      value: input.instructionSysvarAccount ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.instructionSysvarAccount.value) {
+    accounts.instructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.liquidator),
+      getAccountMeta(accounts.obligation),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.repayReserve),
+      getAccountMeta(accounts.repayReserveLiquidityMint),
+      getAccountMeta(accounts.repayReserveLiquiditySupply),
+      getAccountMeta(accounts.withdrawReserve),
+      getAccountMeta(accounts.withdrawReserveLiquidityMint),
+      getAccountMeta(accounts.withdrawReserveCollateralMint),
+      getAccountMeta(accounts.withdrawReserveCollateralSupply),
+      getAccountMeta(accounts.withdrawReserveLiquiditySupply),
+      getAccountMeta(accounts.withdrawReserveLiquidityFeeReceiver),
+      getAccountMeta(accounts.userSourceLiquidity),
+      getAccountMeta(accounts.userDestinationCollateral),
+      getAccountMeta(accounts.userDestinationLiquidity),
+      getAccountMeta(accounts.collateralTokenProgram),
+      getAccountMeta(accounts.repayLiquidityTokenProgram),
+      getAccountMeta(accounts.withdrawLiquidityTokenProgram),
+      getAccountMeta(accounts.instructionSysvarAccount),
+    ],
+    data: getLiquidateObligationAndRedeemReserveCollateralInstructionDataEncoder().encode(
+      args as LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs,
+    ),
+    programAddress,
+  } as LiquidateObligationAndRedeemReserveCollateralInstruction<
+    TProgramAddress,
+    TAccountLiquidator,
+    TAccountObligation,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountRepayReserve,
+    TAccountRepayReserveLiquidityMint,
+    TAccountRepayReserveLiquiditySupply,
+    TAccountWithdrawReserve,
+    TAccountWithdrawReserveLiquidityMint,
+    TAccountWithdrawReserveCollateralMint,
+    TAccountWithdrawReserveCollateralSupply,
+    TAccountWithdrawReserveLiquiditySupply,
+    TAccountWithdrawReserveLiquidityFeeReceiver,
+    TAccountUserSourceLiquidity,
+    TAccountUserDestinationCollateral,
+    TAccountUserDestinationLiquidity,
+    TAccountCollateralTokenProgram,
+    TAccountRepayLiquidityTokenProgram,
+    TAccountWithdrawLiquidityTokenProgram,
+    TAccountInstructionSysvarAccount
+  >);
+}
+
 export interface LiquidateObligationAndRedeemReserveCollateralInput<
   TAccountLiquidator extends string = string,
   TAccountObligation extends string = string,
@@ -229,7 +498,7 @@ export interface LiquidateObligationAndRedeemReserveCollateralInput<
   userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
   userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
-  collateralTokenProgram: Address<TAccountCollateralTokenProgram>;
+  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
   repayLiquidityTokenProgram: Address<TAccountRepayLiquidityTokenProgram>;
   withdrawLiquidityTokenProgram: Address<TAccountWithdrawLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
@@ -388,6 +657,10 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.collateralTokenProgram.value) {
+    accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;

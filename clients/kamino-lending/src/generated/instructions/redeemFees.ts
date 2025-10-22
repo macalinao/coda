@@ -30,8 +30,12 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findLendingMarketAuthPda,
+  findReserveFeeVaultPda,
+} from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REDEEM_FEES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   215, 39, 180, 41, 173, 46, 248, 220,
@@ -109,6 +113,129 @@ export function getRedeemFeesInstructionDataCodec(): FixedSizeCodec<
     getRedeemFeesInstructionDataEncoder(),
     getRedeemFeesInstructionDataDecoder(),
   );
+}
+
+export interface RedeemFeesAsyncInput<
+  TAccountReserve extends string = string,
+  TAccountReserveLiquidityMint extends string = string,
+  TAccountReserveLiquidityFeeReceiver extends string = string,
+  TAccountReserveSupplyLiquidity extends string = string,
+  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketAuthority extends string = string,
+  TAccountTokenProgram extends string = string,
+> {
+  reserve: Address<TAccountReserve>;
+  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
+  reserveLiquidityFeeReceiver?: Address<TAccountReserveLiquidityFeeReceiver>;
+  reserveSupplyLiquidity: Address<TAccountReserveSupplyLiquidity>;
+  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+}
+
+export async function getRedeemFeesInstructionAsync<
+  TAccountReserve extends string,
+  TAccountReserveLiquidityMint extends string,
+  TAccountReserveLiquidityFeeReceiver extends string,
+  TAccountReserveSupplyLiquidity extends string,
+  TAccountLendingMarket extends string,
+  TAccountLendingMarketAuthority extends string,
+  TAccountTokenProgram extends string,
+  TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
+>(
+  input: RedeemFeesAsyncInput<
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveLiquidityFeeReceiver,
+    TAccountReserveSupplyLiquidity,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  RedeemFeesInstruction<
+    TProgramAddress,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveLiquidityFeeReceiver,
+    TAccountReserveSupplyLiquidity,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    reserve: { value: input.reserve ?? null, isWritable: true },
+    reserveLiquidityMint: {
+      value: input.reserveLiquidityMint ?? null,
+      isWritable: false,
+    },
+    reserveLiquidityFeeReceiver: {
+      value: input.reserveLiquidityFeeReceiver ?? null,
+      isWritable: true,
+    },
+    reserveSupplyLiquidity: {
+      value: input.reserveSupplyLiquidity ?? null,
+      isWritable: true,
+    },
+    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isWritable: false,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.reserveLiquidityFeeReceiver.value) {
+    accounts.reserveLiquidityFeeReceiver.value = await findReserveFeeVaultPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      mint: expectAddress(accounts.reserveLiquidityMint.value),
+    });
+  }
+  if (!accounts.lendingMarketAuthority.value) {
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
+      lendingMarket: expectAddress(accounts.lendingMarket.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.reserve),
+      getAccountMeta(accounts.reserveLiquidityMint),
+      getAccountMeta(accounts.reserveLiquidityFeeReceiver),
+      getAccountMeta(accounts.reserveSupplyLiquidity),
+      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(accounts.lendingMarketAuthority),
+      getAccountMeta(accounts.tokenProgram),
+    ],
+    data: getRedeemFeesInstructionDataEncoder().encode({}),
+    programAddress,
+  } as RedeemFeesInstruction<
+    TProgramAddress,
+    TAccountReserve,
+    TAccountReserveLiquidityMint,
+    TAccountReserveLiquidityFeeReceiver,
+    TAccountReserveSupplyLiquidity,
+    TAccountLendingMarket,
+    TAccountLendingMarketAuthority,
+    TAccountTokenProgram
+  >);
 }
 
 export interface RedeemFeesInput<
