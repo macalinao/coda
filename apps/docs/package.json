@@ -1,7 +1,7 @@
 {
   "name": "coda-docs",
   "description": "Documentation site for Coda",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {

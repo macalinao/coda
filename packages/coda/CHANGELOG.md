@@ -1,5 +1,11 @@
 # @macalinao/grill-cli
 
+## 0.4.7
+
+### Patch Changes
+
+- 778f6ec: Update deps
+
 ## 0.4.6
 
 ### Patch Changes
