@@ -1,5 +1,11 @@
 # @macalinao/token-metadata-client
 
+## 0.4.4
+
+### Patch Changes
+
+- cd86950: Adds more account defaults
+
 ## 0.4.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @macalinao/clients-spl-governance
 
+## 0.2.5
+
+### Patch Changes
+
+- cd86950: Adds more account defaults
+
 ## 0.2.4
 
 ### Patch Changes
