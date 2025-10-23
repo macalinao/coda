@@ -16,7 +16,7 @@
     },
     "apps/docs": {
       "name": "coda-docs",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "dependencies": {
         "fumadocs-core": "16.0.1",
         "fumadocs-mdx": "13.0.0",
@@ -147,7 +147,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.6",
+      "version": "0.4.7",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -271,7 +271,7 @@
     },
     "packages/create-coda": {
       "name": "@macalinao/create-coda",
-      "version": "0.2.3",
+      "version": "0.2.4",
       "bin": {
         "create-coda": "./dist/bin.js",
       },
