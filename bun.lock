@@ -41,7 +41,7 @@
     },
     "clients/kamino-lending": {
       "name": "@macalinao/clients-kamino-lending",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -56,7 +56,7 @@
     },
     "clients/orca-whirlpools": {
       "name": "@macalinao/clients-orca-whirlpools",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -87,7 +87,7 @@
     },
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
-      "version": "0.2.4",
+      "version": "0.2.5",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -102,7 +102,7 @@
     },
     "clients/spl-stake-pool": {
       "name": "@macalinao/clients-spl-stake-pool",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -117,7 +117,7 @@
     },
     "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -132,7 +132,7 @@
     },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -147,7 +147,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.5",
+      "version": "0.4.6",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -173,7 +173,7 @@
     },
     "packages/coda-visitors": {
       "name": "@macalinao/coda-visitors",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "dependencies": {
         "@solana-program/memo": "^0.9.0",
         "@solana-program/system": "^0.9.0",
@@ -1436,9 +1436,9 @@
 
     "linkify-it": ["linkify-it@5.0.0", "", { "dependencies": { "uc.micro": "^2.0.0" } }, "sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ=="],
 
-    "lint-staged": ["lint-staged@16.2.5", "", { "dependencies": { "commander": "^14.0.1", "listr2": "^9.0.4", "micromatch": "^4.0.8", "nano-spawn": "^2.0.0", "pidtree": "^0.6.0", "string-argv": "^0.3.2", "yaml": "^2.8.1" }, "bin": { "lint-staged": "bin/lint-staged.js" } }, "sha512-o36wH3OX0jRWqDw5dOa8a8x6GXTKaLM+LvhRaucZxez0IxA+KNDUCiyjBfNgsMNmchwSX6urLSL7wShcUqAang=="],
+    "lint-staged": ["lint-staged@16.2.6", "", { "dependencies": { "commander": "^14.0.1", "listr2": "^9.0.5", "micromatch": "^4.0.8", "nano-spawn": "^2.0.0", "pidtree": "^0.6.0", "string-argv": "^0.3.2", "yaml": "^2.8.1" }, "bin": { "lint-staged": "bin/lint-staged.js" } }, "sha512-s1gphtDbV4bmW1eylXpVMk2u7is7YsrLl8hzrtvC70h4ByhcMLZFY01Fx05ZUDNuv1H8HO4E+e2zgejV1jVwNw=="],
 
-    "listr2": ["listr2@9.0.4", "", { "dependencies": { "cli-truncate": "^5.0.0", "colorette": "^2.0.20", "eventemitter3": "^5.0.1", "log-update": "^6.1.0", "rfdc": "^1.4.1", "wrap-ansi": "^9.0.0" } }, "sha512-1wd/kpAdKRLwv7/3OKC8zZ5U8e/fajCfWMxacUvB79S5nLrYGPtUI/8chMQhn3LQjsRVErTb9i1ECAwW0ZIHnQ=="],
+    "listr2": ["listr2@9.0.5", "", { "dependencies": { "cli-truncate": "^5.0.0", "colorette": "^2.0.20", "eventemitter3": "^5.0.1", "log-update": "^6.1.0", "rfdc": "^1.4.1", "wrap-ansi": "^9.0.0" } }, "sha512-ME4Fb83LgEgwNw96RKNvKV4VTLuXfoKudAmm2lP8Kk87KaMK0/Xrx/aAkMWmT8mDb+3MlFDspfbCs7adjRxA2g=="],
 
     "locate-path": ["locate-path@6.0.0", "", { "dependencies": { "p-locate": "^5.0.0" } }, "sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw=="],
 
