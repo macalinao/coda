@@ -1,5 +1,11 @@
 # coda-docs
 
+## 0.2.3
+
+### Patch Changes
+
+- 778f6ec: Update deps
+
 ## 0.2.2
 
 ### Patch Changes

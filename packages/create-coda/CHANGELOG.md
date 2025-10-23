@@ -1,5 +1,11 @@
 # @macalinao/create-coda
 
+## 0.2.4
+
+### Patch Changes
+
+- 778f6ec: Update deps
+
 ## 0.2.3
 
 ### Patch Changes
