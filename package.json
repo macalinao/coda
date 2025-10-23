@@ -11,7 +11,7 @@
       "clients/*"
     ],
     "catalog": {
-      "eslint": "^9.37.0",
+      "eslint": "^9.38.0",
       "typescript": "^5.9.3",
       "@macalinao/eslint-config": "^7",
       "@macalinao/tsconfig": "^3.2.3",
@@ -50,7 +50,7 @@
     "@changesets/cli": "^2.29.7",
     "@macalinao/biome-config": "^0.1.2",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.5",
+    "lint-staged": "^16.2.6",
     "turbo": "^2.5.8",
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3"
