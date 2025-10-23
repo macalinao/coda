@@ -7,7 +7,7 @@ import {
   pdaSeedValueNode,
   pdaValueNode,
   publicKeyTypeNode,
-  publicKeyValueNode,
+  TOKEN_METADATA_PROGRAM_VALUE_NODE,
   updateAccountsVisitor,
   variablePdaSeedNode,
 } from "@macalinao/coda";
@@ -90,10 +90,7 @@ export default defineConfig({
       instruction,
       account: "metadata",
       defaultValue: pdaValueNode(pdaLinkNode("metadata"), [
-        pdaSeedValueNode(
-          "programId",
-          publicKeyValueNode("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-        ),
+        pdaSeedValueNode("programId", TOKEN_METADATA_PROGRAM_VALUE_NODE),
         pdaSeedValueNode("mint", accountValueNode("mint")),
       ]),
     })),
