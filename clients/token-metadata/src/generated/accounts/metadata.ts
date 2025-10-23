@@ -20,6 +20,7 @@ import type {
   Option,
   OptionOrNullable,
 } from "@solana/kit";
+import type { MetadataSeeds } from "../pdas/index.js";
 import type {
   Collection,
   CollectionArgs,
@@ -54,6 +55,7 @@ import {
   getU8Decoder,
   getU8Encoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import {
   getCollectionDecoder,
   getCollectionDetailsDecoder,
@@ -190,4 +192,24 @@ export async function fetchAllMaybeMetadata(
 ): Promise<MaybeAccount<Metadata>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeMetadata(maybeAccount));
+}
+
+export async function fetchMetadataFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MetadataSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Metadata>> {
+  const maybeAccount = await fetchMaybeMetadataFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeMetadataFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MetadataSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Metadata>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findMetadataPda(seeds, { programAddress });
+  return await fetchMaybeMetadata(rpc, address, fetchConfig);
 }

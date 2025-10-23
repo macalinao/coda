@@ -25,6 +25,7 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import type { UtilizeArgs, UtilizeArgsArgs } from "../types/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -32,8 +33,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getUtilizeArgsDecoder,
   getUtilizeArgsEncoder,
@@ -154,6 +156,176 @@ export function getUtilizeInstructionDataCodec(): FixedSizeCodec<
     getUtilizeInstructionDataEncoder(),
     getUtilizeInstructionDataDecoder(),
   );
+}
+
+export interface UtilizeAsyncInput<
+  TAccountMetadata extends string = string,
+  TAccountTokenAccount extends string = string,
+  TAccountMint extends string = string,
+  TAccountUseAuthority extends string = string,
+  TAccountOwner extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountAtaProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+  TAccountUseAuthorityRecord extends string = string,
+  TAccountBurner extends string = string,
+> {
+  /** Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Token Account Of NFT */
+  tokenAccount: Address<TAccountTokenAccount>;
+  /** Mint of the Metadata */
+  mint: Address<TAccountMint>;
+  /** A Use Authority / Can be the current Owner of the NFT */
+  useAuthority: TransactionSigner<TAccountUseAuthority>;
+  /** Owner */
+  owner: Address<TAccountOwner>;
+  /** Token program */
+  tokenProgram?: Address<TAccountTokenProgram>;
+  /** Associated Token program */
+  ataProgram?: Address<TAccountAtaProgram>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** Rent info */
+  rent?: Address<TAccountRent>;
+  /** Use Authority Record PDA If present the program Assumes a delegated use authority */
+  useAuthorityRecord?: Address<TAccountUseAuthorityRecord>;
+  /** Program As Signer (Burner) */
+  burner?: Address<TAccountBurner>;
+  utilizeArgs: UtilizeInstructionDataArgs["utilizeArgs"];
+}
+
+export async function getUtilizeInstructionAsync<
+  TAccountMetadata extends string,
+  TAccountTokenAccount extends string,
+  TAccountMint extends string,
+  TAccountUseAuthority extends string,
+  TAccountOwner extends string,
+  TAccountTokenProgram extends string,
+  TAccountAtaProgram extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TAccountUseAuthorityRecord extends string,
+  TAccountBurner extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: UtilizeAsyncInput<
+    TAccountMetadata,
+    TAccountTokenAccount,
+    TAccountMint,
+    TAccountUseAuthority,
+    TAccountOwner,
+    TAccountTokenProgram,
+    TAccountAtaProgram,
+    TAccountSystemProgram,
+    TAccountRent,
+    TAccountUseAuthorityRecord,
+    TAccountBurner
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  UtilizeInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountTokenAccount,
+    TAccountMint,
+    TAccountUseAuthority,
+    TAccountOwner,
+    TAccountTokenProgram,
+    TAccountAtaProgram,
+    TAccountSystemProgram,
+    TAccountRent,
+    TAccountUseAuthorityRecord,
+    TAccountBurner
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
+    mint: { value: input.mint ?? null, isWritable: true },
+    useAuthority: { value: input.useAuthority ?? null, isWritable: true },
+    owner: { value: input.owner ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    ataProgram: { value: input.ataProgram ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+    useAuthorityRecord: {
+      value: input.useAuthorityRecord ?? null,
+      isWritable: true,
+    },
+    burner: { value: input.burner ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.ataProgram.value) {
+    accounts.ataProgram.value =
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.rent.value) {
+    accounts.rent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.tokenAccount),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.useAuthority),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.ataProgram),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+      getAccountMeta(accounts.useAuthorityRecord),
+      getAccountMeta(accounts.burner),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getUtilizeInstructionDataEncoder().encode(
+      args as UtilizeInstructionDataArgs,
+    ),
+    programAddress,
+  } as UtilizeInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountTokenAccount,
+    TAccountMint,
+    TAccountUseAuthority,
+    TAccountOwner,
+    TAccountTokenProgram,
+    TAccountAtaProgram,
+    TAccountSystemProgram,
+    TAccountRent,
+    TAccountUseAuthorityRecord,
+    TAccountBurner
+  >);
 }
 
 export interface UtilizeInput<

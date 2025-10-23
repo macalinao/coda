@@ -24,6 +24,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -31,8 +32,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const APPROVE_COLLECTION_AUTHORITY_DISCRIMINATOR = 23;
 
@@ -119,6 +121,134 @@ export function getApproveCollectionAuthorityInstructionDataCodec(): FixedSizeCo
     getApproveCollectionAuthorityInstructionDataEncoder(),
     getApproveCollectionAuthorityInstructionDataDecoder(),
   );
+}
+
+export interface ApproveCollectionAuthorityAsyncInput<
+  TAccountCollectionAuthorityRecord extends string = string,
+  TAccountNewCollectionAuthority extends string = string,
+  TAccountUpdateAuthority extends string = string,
+  TAccountPayer extends string = string,
+  TAccountMetadata extends string = string,
+  TAccountMint extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+> {
+  /** Collection Authority Record PDA */
+  collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
+  /** A Collection Authority */
+  newCollectionAuthority: Address<TAccountNewCollectionAuthority>;
+  /** Update Authority of Collection NFT */
+  updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  /** Payer */
+  payer: TransactionSigner<TAccountPayer>;
+  /** Collection Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Mint of Collection Metadata */
+  mint: Address<TAccountMint>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** Rent info */
+  rent?: Address<TAccountRent>;
+}
+
+export async function getApproveCollectionAuthorityInstructionAsync<
+  TAccountCollectionAuthorityRecord extends string,
+  TAccountNewCollectionAuthority extends string,
+  TAccountUpdateAuthority extends string,
+  TAccountPayer extends string,
+  TAccountMetadata extends string,
+  TAccountMint extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: ApproveCollectionAuthorityAsyncInput<
+    TAccountCollectionAuthorityRecord,
+    TAccountNewCollectionAuthority,
+    TAccountUpdateAuthority,
+    TAccountPayer,
+    TAccountMetadata,
+    TAccountMint,
+    TAccountSystemProgram,
+    TAccountRent
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  ApproveCollectionAuthorityInstruction<
+    TProgramAddress,
+    TAccountCollectionAuthorityRecord,
+    TAccountNewCollectionAuthority,
+    TAccountUpdateAuthority,
+    TAccountPayer,
+    TAccountMetadata,
+    TAccountMint,
+    TAccountSystemProgram,
+    TAccountRent
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    collectionAuthorityRecord: {
+      value: input.collectionAuthorityRecord ?? null,
+      isWritable: true,
+    },
+    newCollectionAuthority: {
+      value: input.newCollectionAuthority ?? null,
+      isWritable: false,
+    },
+    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    metadata: { value: input.metadata ?? null, isWritable: false },
+    mint: { value: input.mint ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.collectionAuthorityRecord),
+      getAccountMeta(accounts.newCollectionAuthority),
+      getAccountMeta(accounts.updateAuthority),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getApproveCollectionAuthorityInstructionDataEncoder().encode({}),
+    programAddress,
+  } as ApproveCollectionAuthorityInstruction<
+    TProgramAddress,
+    TAccountCollectionAuthorityRecord,
+    TAccountNewCollectionAuthority,
+    TAccountUpdateAuthority,
+    TAccountPayer,
+    TAccountMetadata,
+    TAccountMint,
+    TAccountSystemProgram,
+    TAccountRent
+  >);
 }
 
 export interface ApproveCollectionAuthorityInput<
@@ -212,10 +342,6 @@ export function getApproveCollectionAuthorityInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.rent.value) {
-    accounts.rent.value =
-      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");

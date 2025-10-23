@@ -24,6 +24,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -31,8 +32,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_TOKEN_STANDARD_DISCRIMINATOR = 35;
 
@@ -97,6 +99,91 @@ export function getSetTokenStandardInstructionDataCodec(): FixedSizeCodec<
     getSetTokenStandardInstructionDataEncoder(),
     getSetTokenStandardInstructionDataDecoder(),
   );
+}
+
+export interface SetTokenStandardAsyncInput<
+  TAccountMetadata extends string = string,
+  TAccountUpdateAuthority extends string = string,
+  TAccountMint extends string = string,
+  TAccountEdition extends string = string,
+> {
+  /** Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Metadata update authority */
+  updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  /** Mint account */
+  mint: Address<TAccountMint>;
+  /** Edition account */
+  edition?: Address<TAccountEdition>;
+}
+
+export async function getSetTokenStandardInstructionAsync<
+  TAccountMetadata extends string,
+  TAccountUpdateAuthority extends string,
+  TAccountMint extends string,
+  TAccountEdition extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: SetTokenStandardAsyncInput<
+    TAccountMetadata,
+    TAccountUpdateAuthority,
+    TAccountMint,
+    TAccountEdition
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  SetTokenStandardInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountUpdateAuthority,
+    TAccountMint,
+    TAccountEdition
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    updateAuthority: {
+      value: input.updateAuthority ?? null,
+      isWritable: false,
+    },
+    mint: { value: input.mint ?? null, isWritable: false },
+    edition: { value: input.edition ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.updateAuthority),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.edition),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getSetTokenStandardInstructionDataEncoder().encode({}),
+    programAddress,
+  } as SetTokenStandardInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountUpdateAuthority,
+    TAccountMint,
+    TAccountEdition
+  >);
 }
 
 export interface SetTokenStandardInput<

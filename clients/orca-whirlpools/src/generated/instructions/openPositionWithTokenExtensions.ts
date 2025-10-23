@@ -57,11 +57,15 @@ export type OpenPositionWithTokenExtensionsInstruction<
   TAccountPositionMint extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountToken2022Program extends string | AccountMeta = string,
+  TAccountToken2022Program extends
+    | string
+    | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends string | AccountMeta = string,
+  TAccountAssociatedTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountMetadataUpdateAuth extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -169,9 +173,9 @@ export interface OpenPositionWithTokenExtensionsInput<
   positionMint: TransactionSigner<TAccountPositionMint>;
   positionTokenAccount: Address<TAccountPositionTokenAccount>;
   whirlpool: Address<TAccountWhirlpool>;
-  token2022Program: Address<TAccountToken2022Program>;
+  token2022Program?: Address<TAccountToken2022Program>;
   systemProgram?: Address<TAccountSystemProgram>;
-  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   metadataUpdateAuth: Address<TAccountMetadataUpdateAuth>;
   tickLowerIndex: OpenPositionWithTokenExtensionsInstructionDataArgs["tickLowerIndex"];
   tickUpperIndex: OpenPositionWithTokenExtensionsInstructionDataArgs["tickUpperIndex"];
@@ -254,9 +258,17 @@ export function getOpenPositionWithTokenExtensionsInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.token2022Program.value) {
+    accounts.token2022Program.value =
+      "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" as Address<"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.associatedTokenProgram.value) {
+    accounts.associatedTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

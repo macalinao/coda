@@ -58,7 +58,9 @@ export type LockPositionInstruction<
   TAccountPositionTokenAccount extends string | AccountMeta = string,
   TAccountLockConfig extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountToken2022Program extends string | AccountMeta = string,
+  TAccountToken2022Program extends
+    | string
+    | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
@@ -154,7 +156,7 @@ export interface LockPositionInput<
   positionTokenAccount: Address<TAccountPositionTokenAccount>;
   lockConfig: Address<TAccountLockConfig>;
   whirlpool: Address<TAccountWhirlpool>;
-  token2022Program: Address<TAccountToken2022Program>;
+  token2022Program?: Address<TAccountToken2022Program>;
   systemProgram?: Address<TAccountSystemProgram>;
   lockType: LockPositionInstructionDataArgs["lockType"];
 }
@@ -228,6 +230,10 @@ export function getLockPositionInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.token2022Program.value) {
+    accounts.token2022Program.value =
+      "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" as Address<"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

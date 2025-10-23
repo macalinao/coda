@@ -26,6 +26,7 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import type { DelegateArgs, DelegateArgsArgs } from "../types/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -33,8 +34,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getDelegateArgsDecoder,
   getDelegateArgsEncoder,
@@ -63,9 +65,7 @@ export type DelegateInstruction<
   TAccountSysvarInstructions extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSplTokenProgram extends string | AccountMeta = string,
   TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
   TAccountAuthorizationRules extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
@@ -155,6 +155,204 @@ export function getDelegateInstructionDataCodec(): Codec<
     getDelegateInstructionDataEncoder(),
     getDelegateInstructionDataDecoder(),
   );
+}
+
+export interface DelegateAsyncInput<
+  TAccountDelegateRecord extends string = string,
+  TAccountDelegate extends string = string,
+  TAccountMetadata extends string = string,
+  TAccountMasterEdition extends string = string,
+  TAccountTokenRecord extends string = string,
+  TAccountMint extends string = string,
+  TAccountToken extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountPayer extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountSysvarInstructions extends string = string,
+  TAccountSplTokenProgram extends string = string,
+  TAccountAuthorizationRulesProgram extends string = string,
+  TAccountAuthorizationRules extends string = string,
+> {
+  /** Delegate record account */
+  delegateRecord?: Address<TAccountDelegateRecord>;
+  /** Owner of the delegated account */
+  delegate: Address<TAccountDelegate>;
+  /** Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Master Edition account */
+  masterEdition?: Address<TAccountMasterEdition>;
+  /** Token record account */
+  tokenRecord?: Address<TAccountTokenRecord>;
+  /** Mint of metadata */
+  mint: Address<TAccountMint>;
+  /** Token account of mint */
+  token?: Address<TAccountToken>;
+  /** Update authority or token owner */
+  authority: TransactionSigner<TAccountAuthority>;
+  /** Payer */
+  payer: TransactionSigner<TAccountPayer>;
+  /** System Program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** Instructions sysvar account */
+  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  /** SPL Token Program */
+  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  /** Token Authorization Rules Program */
+  authorizationRulesProgram?: Address<TAccountAuthorizationRulesProgram>;
+  /** Token Authorization Rules account */
+  authorizationRules?: Address<TAccountAuthorizationRules>;
+  delegateArgs: DelegateInstructionDataArgs["delegateArgs"];
+}
+
+export async function getDelegateInstructionAsync<
+  TAccountDelegateRecord extends string,
+  TAccountDelegate extends string,
+  TAccountMetadata extends string,
+  TAccountMasterEdition extends string,
+  TAccountTokenRecord extends string,
+  TAccountMint extends string,
+  TAccountToken extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TAccountSysvarInstructions extends string,
+  TAccountSplTokenProgram extends string,
+  TAccountAuthorizationRulesProgram extends string,
+  TAccountAuthorizationRules extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: DelegateAsyncInput<
+    TAccountDelegateRecord,
+    TAccountDelegate,
+    TAccountMetadata,
+    TAccountMasterEdition,
+    TAccountTokenRecord,
+    TAccountMint,
+    TAccountToken,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram,
+    TAccountAuthorizationRulesProgram,
+    TAccountAuthorizationRules
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  DelegateInstruction<
+    TProgramAddress,
+    TAccountDelegateRecord,
+    TAccountDelegate,
+    TAccountMetadata,
+    TAccountMasterEdition,
+    TAccountTokenRecord,
+    TAccountMint,
+    TAccountToken,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram,
+    TAccountAuthorizationRulesProgram,
+    TAccountAuthorizationRules
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    delegateRecord: { value: input.delegateRecord ?? null, isWritable: true },
+    delegate: { value: input.delegate ?? null, isWritable: false },
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    masterEdition: { value: input.masterEdition ?? null, isWritable: false },
+    tokenRecord: { value: input.tokenRecord ?? null, isWritable: true },
+    mint: { value: input.mint ?? null, isWritable: false },
+    token: { value: input.token ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    sysvarInstructions: {
+      value: input.sysvarInstructions ?? null,
+      isWritable: false,
+    },
+    splTokenProgram: {
+      value: input.splTokenProgram ?? null,
+      isWritable: false,
+    },
+    authorizationRulesProgram: {
+      value: input.authorizationRulesProgram ?? null,
+      isWritable: false,
+    },
+    authorizationRules: {
+      value: input.authorizationRules ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.sysvarInstructions.value) {
+    accounts.sysvarInstructions.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.delegateRecord),
+      getAccountMeta(accounts.delegate),
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.masterEdition),
+      getAccountMeta(accounts.tokenRecord),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.token),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.sysvarInstructions),
+      getAccountMeta(accounts.splTokenProgram),
+      getAccountMeta(accounts.authorizationRulesProgram),
+      getAccountMeta(accounts.authorizationRules),
+    ],
+    data: getDelegateInstructionDataEncoder().encode(
+      args as DelegateInstructionDataArgs,
+    ),
+    programAddress,
+  } as DelegateInstruction<
+    TProgramAddress,
+    TAccountDelegateRecord,
+    TAccountDelegate,
+    TAccountMetadata,
+    TAccountMasterEdition,
+    TAccountTokenRecord,
+    TAccountMint,
+    TAccountToken,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram,
+    TAccountAuthorizationRulesProgram,
+    TAccountAuthorizationRules
+  >);
 }
 
 export interface DelegateInput<
@@ -304,10 +502,6 @@ export function getDelegateInstruction<
   if (!accounts.sysvarInstructions.value) {
     accounts.sysvarInstructions.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
-  }
-  if (!accounts.splTokenProgram.value) {
-    accounts.splTokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

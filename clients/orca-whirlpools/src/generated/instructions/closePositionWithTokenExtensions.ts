@@ -52,7 +52,9 @@ export type ClosePositionWithTokenExtensionsInstruction<
   TAccountPosition extends string | AccountMeta = string,
   TAccountPositionMint extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountToken2022Program extends string | AccountMeta = string,
+  TAccountToken2022Program extends
+    | string
+    | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -126,7 +128,7 @@ export interface ClosePositionWithTokenExtensionsInput<
   position: Address<TAccountPosition>;
   positionMint: Address<TAccountPositionMint>;
   positionTokenAccount: Address<TAccountPositionTokenAccount>;
-  token2022Program: Address<TAccountToken2022Program>;
+  token2022Program?: Address<TAccountToken2022Program>;
 }
 
 export function getClosePositionWithTokenExtensionsInstruction<
@@ -181,6 +183,12 @@ export function getClosePositionWithTokenExtensionsInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.token2022Program.value) {
+    accounts.token2022Program.value =
+      "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" as Address<"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

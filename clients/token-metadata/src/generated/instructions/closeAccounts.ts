@@ -23,6 +23,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -30,8 +31,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_ACCOUNTS_DISCRIMINATOR = 57;
 
@@ -96,6 +98,97 @@ export function getCloseAccountsInstructionDataCodec(): FixedSizeCodec<
     getCloseAccountsInstructionDataEncoder(),
     getCloseAccountsInstructionDataDecoder(),
   );
+}
+
+export interface CloseAccountsAsyncInput<
+  TAccountMetadata extends string = string,
+  TAccountEdition extends string = string,
+  TAccountMint extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountDestination extends string = string,
+> {
+  /** Metadata (pda of ['metadata', program id, mint id]) */
+  metadata?: Address<TAccountMetadata>;
+  /** Edition of the asset */
+  edition: Address<TAccountEdition>;
+  /** Mint of token asset */
+  mint: Address<TAccountMint>;
+  /** Authority to close ownerless accounts */
+  authority: TransactionSigner<TAccountAuthority>;
+  /** The destination account that will receive the rent. */
+  destination: Address<TAccountDestination>;
+}
+
+export async function getCloseAccountsInstructionAsync<
+  TAccountMetadata extends string,
+  TAccountEdition extends string,
+  TAccountMint extends string,
+  TAccountAuthority extends string,
+  TAccountDestination extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: CloseAccountsAsyncInput<
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    TAccountAuthority,
+    TAccountDestination
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CloseAccountsInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    TAccountAuthority,
+    TAccountDestination
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    edition: { value: input.edition ?? null, isWritable: true },
+    mint: { value: input.mint ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    destination: { value: input.destination ?? null, isWritable: true },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.edition),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.destination),
+    ],
+    data: getCloseAccountsInstructionDataEncoder().encode({}),
+    programAddress,
+  } as CloseAccountsInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    TAccountAuthority,
+    TAccountDestination
+  >);
 }
 
 export interface CloseAccountsInput<

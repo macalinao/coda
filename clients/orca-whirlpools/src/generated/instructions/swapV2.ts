@@ -66,7 +66,9 @@ export type SwapV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountTokenProgramA extends string | AccountMeta = string,
   TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta = string,
+  TAccountMemoProgram extends
+    | string
+    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TAccountTokenAuthority extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountTokenMintA extends string | AccountMeta = string,
@@ -215,7 +217,7 @@ export interface SwapV2Input<
 > {
   tokenProgramA: Address<TAccountTokenProgramA>;
   tokenProgramB: Address<TAccountTokenProgramB>;
-  memoProgram: Address<TAccountMemoProgram>;
+  memoProgram?: Address<TAccountMemoProgram>;
   tokenAuthority: TransactionSigner<TAccountTokenAuthority>;
   whirlpool: Address<TAccountWhirlpool>;
   tokenMintA: Address<TAccountTokenMintA>;
@@ -324,6 +326,12 @@ export function getSwapV2Instruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.memoProgram.value) {
+    accounts.memoProgram.value =
+      "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr" as Address<"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

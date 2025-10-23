@@ -56,7 +56,9 @@ export type CreateTokenMetadataInstruction<
   TAccountPoolMint extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountMetadataAccount extends string | AccountMeta = string,
-  TAccountMetadataProgram extends string | AccountMeta = string,
+  TAccountMetadataProgram extends
+    | string
+    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
@@ -158,7 +160,7 @@ export interface CreateTokenMetadataAsyncInput<
   poolMint: Address<TAccountPoolMint>;
   payer: TransactionSigner<TAccountPayer>;
   metadataAccount: Address<TAccountMetadataAccount>;
-  metadataProgram: Address<TAccountMetadataProgram>;
+  metadataProgram?: Address<TAccountMetadataProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   name: CreateTokenMetadataInstructionDataArgs["name"];
   symbol: CreateTokenMetadataInstructionDataArgs["symbol"];
@@ -235,6 +237,10 @@ export async function getCreateTokenMetadataInstructionAsync<
       stakePoolAddress: expectAddress(accounts.stakePool.value),
     });
   }
+  if (!accounts.metadataProgram.value) {
+    accounts.metadataProgram.value =
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -285,7 +291,7 @@ export interface CreateTokenMetadataInput<
   poolMint: Address<TAccountPoolMint>;
   payer: TransactionSigner<TAccountPayer>;
   metadataAccount: Address<TAccountMetadataAccount>;
-  metadataProgram: Address<TAccountMetadataProgram>;
+  metadataProgram?: Address<TAccountMetadataProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   name: CreateTokenMetadataInstructionDataArgs["name"];
   symbol: CreateTokenMetadataInstructionDataArgs["symbol"];
@@ -355,6 +361,10 @@ export function getCreateTokenMetadataInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.metadataProgram.value) {
+    accounts.metadataProgram.value =
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
