@@ -41,7 +41,7 @@
     },
     "clients/kamino-lending": {
       "name": "@macalinao/clients-kamino-lending",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -56,7 +56,7 @@
     },
     "clients/orca-whirlpools": {
       "name": "@macalinao/clients-orca-whirlpools",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -87,7 +87,7 @@
     },
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
-      "version": "0.2.4",
+      "version": "0.2.5",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -102,7 +102,7 @@
     },
     "clients/spl-stake-pool": {
       "name": "@macalinao/clients-spl-stake-pool",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -117,7 +117,7 @@
     },
     "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -132,7 +132,7 @@
     },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -147,7 +147,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.5",
+      "version": "0.4.6",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -173,7 +173,7 @@
     },
     "packages/coda-visitors": {
       "name": "@macalinao/coda-visitors",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "dependencies": {
         "@solana-program/memo": "^0.9.0",
         "@solana-program/system": "^0.9.0",

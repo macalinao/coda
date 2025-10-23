@@ -1,5 +1,11 @@
 # @macalinao/clients-voter-stake-registry
 
+## 0.2.1
+
+### Patch Changes
+
+- cd86950: Adds more account defaults
+
 ## 0.2.0
 
 ### Minor Changes

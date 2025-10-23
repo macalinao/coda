@@ -1,5 +1,13 @@
 # @macalinao/grill-cli
 
+## 0.4.6
+
+### Patch Changes
+
+- cd86950: Adds more account defaults
+- Updated dependencies [cd86950]
+  - @macalinao/coda-visitors@0.1.7
+
 ## 0.4.5
 
 ### Patch Changes

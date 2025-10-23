@@ -1,5 +1,11 @@
 # @macalinao/coda-visitors
 
+## 0.1.7
+
+### Patch Changes
+
+- cd86950: Adds more account defaults
+
 ## 0.1.6
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @macalinao/clients-kamino-lending
 
+## 0.5.2
+
+### Patch Changes
+
+- cd86950: Adds more account defaults
+
 ## 0.5.1
 
 ### Patch Changes
