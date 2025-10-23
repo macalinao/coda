@@ -96,16 +96,16 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
     | AccountMeta = string,
   TAccountLiquidationAccountsCollateralTokenProgram extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountLiquidationAccountsRepayLiquidityTokenProgram extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountLiquidationAccountsWithdrawLiquidityTokenProgram extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountLiquidationAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountCollateralFarmsAccountsV2ObligationFarmUserState extends
     | string
     | AccountMeta = string,
@@ -305,10 +305,10 @@ export interface LiquidateObligationAndRedeemReserveCollateralV2Input<
   liquidationAccountsUserSourceLiquidity: Address<TAccountLiquidationAccountsUserSourceLiquidity>;
   liquidationAccountsUserDestinationCollateral: Address<TAccountLiquidationAccountsUserDestinationCollateral>;
   liquidationAccountsUserDestinationLiquidity: Address<TAccountLiquidationAccountsUserDestinationLiquidity>;
-  liquidationAccountsCollateralTokenProgram: Address<TAccountLiquidationAccountsCollateralTokenProgram>;
-  liquidationAccountsRepayLiquidityTokenProgram: Address<TAccountLiquidationAccountsRepayLiquidityTokenProgram>;
-  liquidationAccountsWithdrawLiquidityTokenProgram: Address<TAccountLiquidationAccountsWithdrawLiquidityTokenProgram>;
-  liquidationAccountsInstructionSysvarAccount: Address<TAccountLiquidationAccountsInstructionSysvarAccount>;
+  liquidationAccountsCollateralTokenProgram?: Address<TAccountLiquidationAccountsCollateralTokenProgram>;
+  liquidationAccountsRepayLiquidityTokenProgram?: Address<TAccountLiquidationAccountsRepayLiquidityTokenProgram>;
+  liquidationAccountsWithdrawLiquidityTokenProgram?: Address<TAccountLiquidationAccountsWithdrawLiquidityTokenProgram>;
+  liquidationAccountsInstructionSysvarAccount?: Address<TAccountLiquidationAccountsInstructionSysvarAccount>;
   collateralFarmsAccountsV2ObligationFarmUserState?: Address<TAccountCollateralFarmsAccountsV2ObligationFarmUserState>;
   collateralFarmsAccountsV2ReserveFarmState?: Address<TAccountCollateralFarmsAccountsV2ReserveFarmState>;
   debtFarmsAccountsObligationFarmUserState?: Address<TAccountDebtFarmsAccountsObligationFarmUserState>;
@@ -517,6 +517,22 @@ export function getLiquidateObligationAndRedeemReserveCollateralV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.liquidationAccountsCollateralTokenProgram.value) {
+    accounts.liquidationAccountsCollateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.liquidationAccountsRepayLiquidityTokenProgram.value) {
+    accounts.liquidationAccountsRepayLiquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.liquidationAccountsWithdrawLiquidityTokenProgram.value) {
+    accounts.liquidationAccountsWithdrawLiquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.liquidationAccountsInstructionSysvarAccount.value) {
+    accounts.liquidationAccountsInstructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
   if (!accounts.farmsProgram.value) {
     accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
     accounts.farmsProgram.isWritable = false;

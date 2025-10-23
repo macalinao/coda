@@ -1,14 +1,14 @@
 import {
-  ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
+  accountValueNode,
   addPdasVisitor,
   constantPdaSeedNodeFromString,
   defineConfig,
+  pdaLinkNode,
+  pdaSeedValueNode,
+  pdaValueNode,
   publicKeyTypeNode,
-  SYSTEM_PROGRAM_VALUE_NODE,
-  SYSVAR_INSTRUCTIONS_VALUE_NODE,
-  SYSVAR_RENT_VALUE_NODE,
-  setInstructionAccountDefaultValuesVisitor,
-  TOKEN_PROGRAM_VALUE_NODE,
+  TOKEN_METADATA_PROGRAM_VALUE_NODE,
+  updateAccountsVisitor,
   variablePdaSeedNode,
 } from "@macalinao/coda";
 
@@ -56,42 +56,51 @@ export default defineConfig({
     npmPackageName: "@macalinao/clients-token-metadata",
   },
   instructionAccountDefaultValues: [
-    {
-      account: "associatedTokenProgram",
-      defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
-    },
+    ...[
+      "approveCollectionAuthority",
+      "approveUseAuthority",
+      "burn",
+      "burnNft",
+      "closeAccounts",
+      "closeEscrowAccount",
+      "create",
+      "createEscrowAccount",
+      "createMasterEdition",
+      "createMasterEditionV3",
+      "createMetadataAccount",
+      "createMetadataAccountV2",
+      "createMetadataAccountV3",
+      "delegate",
+      "deprecatedCreateMasterEdition",
+      "deprecatedMintNewEditionFromMasterEditionViaPrintingToken",
+      "lock",
+      "migrate",
+      "mint",
+      "resize",
+      "revoke",
+      "revokeCollectionAuthority",
+      "revokeUseAuthority",
+      "setTokenStandard",
+      "transfer",
+      "unlock",
+      "update",
+      "use",
+      "utilize",
+    ].map((instruction) => ({
+      instruction,
+      account: "metadata",
+      defaultValue: pdaValueNode(pdaLinkNode("metadata"), [
+        pdaSeedValueNode("programId", TOKEN_METADATA_PROGRAM_VALUE_NODE),
+        pdaSeedValueNode("mint", accountValueNode("mint")),
+      ]),
+    })),
   ],
   visitors: [
+    updateAccountsVisitor({
+      metadata: {
+        pda: pdaLinkNode("metadata"),
+      },
+    }),
     addCustomPDAsVisitor,
-    setInstructionAccountDefaultValuesVisitor([
-      {
-        account: "systemProgram",
-        defaultValue: SYSTEM_PROGRAM_VALUE_NODE,
-      },
-      {
-        account: "sysvarInstructions",
-        defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
-      },
-      {
-        account: "tokenProgram",
-        defaultValue: TOKEN_PROGRAM_VALUE_NODE,
-      },
-      {
-        account: "splTokenProgram",
-        defaultValue: TOKEN_PROGRAM_VALUE_NODE,
-      },
-      {
-        account: "ataProgram",
-        defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
-      },
-      {
-        account: "splAtaProgram",
-        defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
-      },
-      {
-        account: "rent",
-        defaultValue: SYSVAR_RENT_VALUE_NODE,
-      },
-    ]),
   ],
 });

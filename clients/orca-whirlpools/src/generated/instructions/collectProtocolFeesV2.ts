@@ -70,7 +70,9 @@ export type CollectProtocolFeesV2Instruction<
   TAccountTokenDestinationB extends string | AccountMeta = string,
   TAccountTokenProgramA extends string | AccountMeta = string,
   TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta = string,
+  TAccountMemoProgram extends
+    | string
+    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -187,7 +189,7 @@ export interface CollectProtocolFeesV2Input<
   tokenDestinationB: Address<TAccountTokenDestinationB>;
   tokenProgramA: Address<TAccountTokenProgramA>;
   tokenProgramB: Address<TAccountTokenProgramB>;
-  memoProgram: Address<TAccountMemoProgram>;
+  memoProgram?: Address<TAccountMemoProgram>;
   remainingAccountsInfo: CollectProtocolFeesV2InstructionDataArgs["remainingAccountsInfo"];
 }
 
@@ -273,6 +275,12 @@ export function getCollectProtocolFeesV2Instruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.memoProgram.value) {
+    accounts.memoProgram.value =
+      "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr" as Address<"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

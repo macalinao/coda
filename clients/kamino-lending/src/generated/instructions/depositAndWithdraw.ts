@@ -79,13 +79,13 @@ export type DepositAndWithdrawInstruction<
     | AccountMeta = string,
   TAccountDepositAccountsCollateralTokenProgram extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountDepositAccountsLiquidityTokenProgram extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountDepositAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
   TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
@@ -113,13 +113,13 @@ export type DepositAndWithdrawInstruction<
     | AccountMeta = string,
   TAccountWithdrawAccountsCollateralTokenProgram extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountWithdrawAccountsLiquidityTokenProgram extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountWithdrawAccountsInstructionSysvarAccount extends
     | string
-    | AccountMeta = string,
+    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountDepositFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
@@ -337,9 +337,9 @@ export interface DepositAndWithdrawInput<
   depositAccountsReserveDestinationDepositCollateral: Address<TAccountDepositAccountsReserveDestinationDepositCollateral>;
   depositAccountsUserSourceLiquidity: Address<TAccountDepositAccountsUserSourceLiquidity>;
   depositAccountsPlaceholderUserDestinationCollateral?: Address<TAccountDepositAccountsPlaceholderUserDestinationCollateral>;
-  depositAccountsCollateralTokenProgram: Address<TAccountDepositAccountsCollateralTokenProgram>;
-  depositAccountsLiquidityTokenProgram: Address<TAccountDepositAccountsLiquidityTokenProgram>;
-  depositAccountsInstructionSysvarAccount: Address<TAccountDepositAccountsInstructionSysvarAccount>;
+  depositAccountsCollateralTokenProgram?: Address<TAccountDepositAccountsCollateralTokenProgram>;
+  depositAccountsLiquidityTokenProgram?: Address<TAccountDepositAccountsLiquidityTokenProgram>;
+  depositAccountsInstructionSysvarAccount?: Address<TAccountDepositAccountsInstructionSysvarAccount>;
   withdrawAccountsOwner: TransactionSigner<TAccountWithdrawAccountsOwner>;
   withdrawAccountsObligation: Address<TAccountWithdrawAccountsObligation>;
   withdrawAccountsLendingMarket: Address<TAccountWithdrawAccountsLendingMarket>;
@@ -351,9 +351,9 @@ export interface DepositAndWithdrawInput<
   withdrawAccountsReserveLiquiditySupply: Address<TAccountWithdrawAccountsReserveLiquiditySupply>;
   withdrawAccountsUserDestinationLiquidity: Address<TAccountWithdrawAccountsUserDestinationLiquidity>;
   withdrawAccountsPlaceholderUserDestinationCollateral?: Address<TAccountWithdrawAccountsPlaceholderUserDestinationCollateral>;
-  withdrawAccountsCollateralTokenProgram: Address<TAccountWithdrawAccountsCollateralTokenProgram>;
-  withdrawAccountsLiquidityTokenProgram: Address<TAccountWithdrawAccountsLiquidityTokenProgram>;
-  withdrawAccountsInstructionSysvarAccount: Address<TAccountWithdrawAccountsInstructionSysvarAccount>;
+  withdrawAccountsCollateralTokenProgram?: Address<TAccountWithdrawAccountsCollateralTokenProgram>;
+  withdrawAccountsLiquidityTokenProgram?: Address<TAccountWithdrawAccountsLiquidityTokenProgram>;
+  withdrawAccountsInstructionSysvarAccount?: Address<TAccountWithdrawAccountsInstructionSysvarAccount>;
   depositFarmsAccountsObligationFarmUserState?: Address<TAccountDepositFarmsAccountsObligationFarmUserState>;
   depositFarmsAccountsReserveFarmState?: Address<TAccountDepositFarmsAccountsReserveFarmState>;
   withdrawFarmsAccountsObligationFarmUserState?: Address<TAccountWithdrawFarmsAccountsObligationFarmUserState>;
@@ -616,6 +616,30 @@ export function getDepositAndWithdrawInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.depositAccountsCollateralTokenProgram.value) {
+    accounts.depositAccountsCollateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.depositAccountsLiquidityTokenProgram.value) {
+    accounts.depositAccountsLiquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.depositAccountsInstructionSysvarAccount.value) {
+    accounts.depositAccountsInstructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.withdrawAccountsCollateralTokenProgram.value) {
+    accounts.withdrawAccountsCollateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.withdrawAccountsLiquidityTokenProgram.value) {
+    accounts.withdrawAccountsLiquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.withdrawAccountsInstructionSysvarAccount.value) {
+    accounts.withdrawAccountsInstructionSysvarAccount.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
   if (!accounts.farmsProgram.value) {
     accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;
     accounts.farmsProgram.isWritable = false;

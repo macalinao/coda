@@ -24,6 +24,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -31,8 +32,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const BURN_NFT_DISCRIMINATOR = 29;
 
@@ -114,6 +116,128 @@ export function getBurnNftInstructionDataCodec(): FixedSizeCodec<
     getBurnNftInstructionDataEncoder(),
     getBurnNftInstructionDataDecoder(),
   );
+}
+
+export interface BurnNftAsyncInput<
+  TAccountMetadata extends string = string,
+  TAccountOwner extends string = string,
+  TAccountMint extends string = string,
+  TAccountTokenAccount extends string = string,
+  TAccountMasterEditionAccount extends string = string,
+  TAccountSplTokenProgram extends string = string,
+  TAccountCollectionMetadata extends string = string,
+> {
+  /** Metadata (pda of ['metadata', program id, mint id]) */
+  metadata?: Address<TAccountMetadata>;
+  /** NFT owner */
+  owner: TransactionSigner<TAccountOwner>;
+  /** Mint of the NFT */
+  mint: Address<TAccountMint>;
+  /** Token account to close */
+  tokenAccount: Address<TAccountTokenAccount>;
+  /** MasterEdition2 of the NFT */
+  masterEditionAccount: Address<TAccountMasterEditionAccount>;
+  /** SPL Token Program */
+  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  /** Metadata of the Collection */
+  collectionMetadata?: Address<TAccountCollectionMetadata>;
+}
+
+export async function getBurnNftInstructionAsync<
+  TAccountMetadata extends string,
+  TAccountOwner extends string,
+  TAccountMint extends string,
+  TAccountTokenAccount extends string,
+  TAccountMasterEditionAccount extends string,
+  TAccountSplTokenProgram extends string,
+  TAccountCollectionMetadata extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: BurnNftAsyncInput<
+    TAccountMetadata,
+    TAccountOwner,
+    TAccountMint,
+    TAccountTokenAccount,
+    TAccountMasterEditionAccount,
+    TAccountSplTokenProgram,
+    TAccountCollectionMetadata
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  BurnNftInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountOwner,
+    TAccountMint,
+    TAccountTokenAccount,
+    TAccountMasterEditionAccount,
+    TAccountSplTokenProgram,
+    TAccountCollectionMetadata
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    owner: { value: input.owner ?? null, isWritable: true },
+    mint: { value: input.mint ?? null, isWritable: true },
+    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
+    masterEditionAccount: {
+      value: input.masterEditionAccount ?? null,
+      isWritable: true,
+    },
+    splTokenProgram: {
+      value: input.splTokenProgram ?? null,
+      isWritable: false,
+    },
+    collectionMetadata: {
+      value: input.collectionMetadata ?? null,
+      isWritable: true,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.splTokenProgram.value) {
+    accounts.splTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.tokenAccount),
+      getAccountMeta(accounts.masterEditionAccount),
+      getAccountMeta(accounts.splTokenProgram),
+      getAccountMeta(accounts.collectionMetadata),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getBurnNftInstructionDataEncoder().encode({}),
+    programAddress,
+  } as BurnNftInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountOwner,
+    TAccountMint,
+    TAccountTokenAccount,
+    TAccountMasterEditionAccount,
+    TAccountSplTokenProgram,
+    TAccountCollectionMetadata
+  >);
 }
 
 export interface BurnNftInput<

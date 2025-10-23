@@ -56,7 +56,9 @@ export type CreateProgramGovernanceInstruction<
   TAccountCurrentUpgradeAuthority extends string | AccountMeta = string,
   TAccountGoverningTokenOwnerRecord extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountBpfUpgradeableLoaderProgram extends string | AccountMeta = string,
+  TAccountBpfUpgradeableLoaderProgram extends
+    | string
+    | AccountMeta = "BPFLoaderUpgradeab1e11111111111111111111111",
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
@@ -182,7 +184,7 @@ export interface CreateProgramGovernanceInput<
   governingTokenOwnerRecord: Address<TAccountGoverningTokenOwnerRecord>;
   payer: TransactionSigner<TAccountPayer>;
   /** bpf_upgradeable_loader_program program */
-  bpfUpgradeableLoaderProgram: Address<TAccountBpfUpgradeableLoaderProgram>;
+  bpfUpgradeableLoaderProgram?: Address<TAccountBpfUpgradeableLoaderProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
   /** RealmConfig account. seeds=['realm-config', realm] */
@@ -287,6 +289,10 @@ export function getCreateProgramGovernanceInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.bpfUpgradeableLoaderProgram.value) {
+    accounts.bpfUpgradeableLoaderProgram.value =
+      "BPFLoaderUpgradeab1e11111111111111111111111" as Address<"BPFLoaderUpgradeab1e11111111111111111111111">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

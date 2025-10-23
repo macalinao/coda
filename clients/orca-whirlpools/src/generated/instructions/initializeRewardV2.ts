@@ -56,7 +56,9 @@ export type InitializeRewardV2Instruction<
   TAccountRewardMint extends string | AccountMeta = string,
   TAccountRewardTokenBadge extends string | AccountMeta = string,
   TAccountRewardVault extends string | AccountMeta = string,
-  TAccountRewardTokenProgram extends string | AccountMeta = string,
+  TAccountRewardTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountSystemProgram extends
     | string
     | AccountMeta = "11111111111111111111111111111111",
@@ -158,7 +160,7 @@ export interface InitializeRewardV2Input<
   rewardMint: Address<TAccountRewardMint>;
   rewardTokenBadge: Address<TAccountRewardTokenBadge>;
   rewardVault: TransactionSigner<TAccountRewardVault>;
-  rewardTokenProgram: Address<TAccountRewardTokenProgram>;
+  rewardTokenProgram?: Address<TAccountRewardTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
   rewardIndex: InitializeRewardV2InstructionDataArgs["rewardIndex"];
@@ -233,6 +235,10 @@ export function getInitializeRewardV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.rewardTokenProgram.value) {
+    accounts.rewardTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

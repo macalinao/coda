@@ -73,7 +73,9 @@ export type OpenPositionInstruction<
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends string | AccountMeta = string,
+  TAccountAssociatedTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -180,7 +182,7 @@ export interface OpenPositionInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   bumps: OpenPositionInstructionDataArgs["bumps"];
   tickLowerIndex: OpenPositionInstructionDataArgs["tickLowerIndex"];
   tickUpperIndex: OpenPositionInstructionDataArgs["tickUpperIndex"];
@@ -267,6 +269,10 @@ export function getOpenPositionInstruction<
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.associatedTokenProgram.value) {
+    accounts.associatedTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

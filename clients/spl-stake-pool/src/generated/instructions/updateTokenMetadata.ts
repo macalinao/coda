@@ -53,7 +53,9 @@ export type UpdateTokenMetadataInstruction<
   TAccountManager extends string | AccountMeta = string,
   TAccountWithdrawAuthority extends string | AccountMeta = string,
   TAccountMetadataAccount extends string | AccountMeta = string,
-  TAccountMetadataProgram extends string | AccountMeta = string,
+  TAccountMetadataProgram extends
+    | string
+    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -137,7 +139,7 @@ export interface UpdateTokenMetadataAsyncInput<
   manager: TransactionSigner<TAccountManager>;
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
   metadataAccount: Address<TAccountMetadataAccount>;
-  metadataProgram: Address<TAccountMetadataProgram>;
+  metadataProgram?: Address<TAccountMetadataProgram>;
   name: UpdateTokenMetadataInstructionDataArgs["name"];
   symbol: UpdateTokenMetadataInstructionDataArgs["symbol"];
   uri: UpdateTokenMetadataInstructionDataArgs["uri"];
@@ -201,6 +203,10 @@ export async function getUpdateTokenMetadataInstructionAsync<
       stakePoolAddress: expectAddress(accounts.stakePool.value),
     });
   }
+  if (!accounts.metadataProgram.value) {
+    accounts.metadataProgram.value =
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
@@ -236,7 +242,7 @@ export interface UpdateTokenMetadataInput<
   manager: TransactionSigner<TAccountManager>;
   withdrawAuthority: Address<TAccountWithdrawAuthority>;
   metadataAccount: Address<TAccountMetadataAccount>;
-  metadataProgram: Address<TAccountMetadataProgram>;
+  metadataProgram?: Address<TAccountMetadataProgram>;
   name: UpdateTokenMetadataInstructionDataArgs["name"];
   symbol: UpdateTokenMetadataInstructionDataArgs["symbol"];
   uri: UpdateTokenMetadataInstructionDataArgs["uri"];
@@ -291,6 +297,12 @@ export function getUpdateTokenMetadataInstruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.metadataProgram.value) {
+    accounts.metadataProgram.value =
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

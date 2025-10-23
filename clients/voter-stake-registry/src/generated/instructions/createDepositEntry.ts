@@ -74,7 +74,9 @@ export type CreateDepositEntryInstruction<
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends string | AccountMeta = string,
+  TAccountAssociatedTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
@@ -194,7 +196,7 @@ export interface CreateDepositEntryInput<
   depositMint: Address<TAccountDepositMint>;
   systemProgram?: Address<TAccountSystemProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   rent?: Address<TAccountRent>;
   depositEntryIndex: CreateDepositEntryInstructionDataArgs["depositEntryIndex"];
   kind: CreateDepositEntryInstructionDataArgs["kind"];
@@ -277,6 +279,10 @@ export function getCreateDepositEntryInstruction<
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.associatedTokenProgram.value) {
+    accounts.associatedTokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.rent.value) {

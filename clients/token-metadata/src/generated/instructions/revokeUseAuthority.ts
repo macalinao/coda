@@ -24,6 +24,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -31,8 +32,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REVOKE_USE_AUTHORITY_DISCRIMINATOR = 21;
 
@@ -124,6 +126,147 @@ export function getRevokeUseAuthorityInstructionDataCodec(): FixedSizeCodec<
     getRevokeUseAuthorityInstructionDataEncoder(),
     getRevokeUseAuthorityInstructionDataDecoder(),
   );
+}
+
+export interface RevokeUseAuthorityAsyncInput<
+  TAccountUseAuthorityRecord extends string = string,
+  TAccountOwner extends string = string,
+  TAccountUser extends string = string,
+  TAccountOwnerTokenAccount extends string = string,
+  TAccountMint extends string = string,
+  TAccountMetadata extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+> {
+  /** Use Authority Record PDA */
+  useAuthorityRecord: Address<TAccountUseAuthorityRecord>;
+  /** Owner */
+  owner: TransactionSigner<TAccountOwner>;
+  /** A Use Authority */
+  user: Address<TAccountUser>;
+  /** Owned Token Account Of Mint */
+  ownerTokenAccount: Address<TAccountOwnerTokenAccount>;
+  /** Mint of Metadata */
+  mint: Address<TAccountMint>;
+  /** Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Token program */
+  tokenProgram?: Address<TAccountTokenProgram>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** Rent info */
+  rent?: Address<TAccountRent>;
+}
+
+export async function getRevokeUseAuthorityInstructionAsync<
+  TAccountUseAuthorityRecord extends string,
+  TAccountOwner extends string,
+  TAccountUser extends string,
+  TAccountOwnerTokenAccount extends string,
+  TAccountMint extends string,
+  TAccountMetadata extends string,
+  TAccountTokenProgram extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: RevokeUseAuthorityAsyncInput<
+    TAccountUseAuthorityRecord,
+    TAccountOwner,
+    TAccountUser,
+    TAccountOwnerTokenAccount,
+    TAccountMint,
+    TAccountMetadata,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  RevokeUseAuthorityInstruction<
+    TProgramAddress,
+    TAccountUseAuthorityRecord,
+    TAccountOwner,
+    TAccountUser,
+    TAccountOwnerTokenAccount,
+    TAccountMint,
+    TAccountMetadata,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    useAuthorityRecord: {
+      value: input.useAuthorityRecord ?? null,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isWritable: true },
+    user: { value: input.user ?? null, isWritable: false },
+    ownerTokenAccount: {
+      value: input.ownerTokenAccount ?? null,
+      isWritable: true,
+    },
+    mint: { value: input.mint ?? null, isWritable: false },
+    metadata: { value: input.metadata ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.useAuthorityRecord),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.user),
+      getAccountMeta(accounts.ownerTokenAccount),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getRevokeUseAuthorityInstructionDataEncoder().encode({}),
+    programAddress,
+  } as RevokeUseAuthorityInstruction<
+    TProgramAddress,
+    TAccountUseAuthorityRecord,
+    TAccountOwner,
+    TAccountUser,
+    TAccountOwnerTokenAccount,
+    TAccountMint,
+    TAccountMetadata,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >);
 }
 
 export interface RevokeUseAuthorityInput<
@@ -228,10 +371,6 @@ export function getRevokeUseAuthorityInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.rent.value) {
-    accounts.rent.value =
-      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");

@@ -77,7 +77,9 @@ export type GrantInstruction<
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends string | AccountMeta = string,
+  TAccountAssociatedTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
@@ -223,7 +225,7 @@ export interface GrantInput<
   depositMint: Address<TAccountDepositMint>;
   systemProgram?: Address<TAccountSystemProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
-  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   rent?: Address<TAccountRent>;
   voterBump: GrantInstructionDataArgs["voterBump"];
   voterWeightRecordBump: GrantInstructionDataArgs["voterWeightRecordBump"];
@@ -327,6 +329,10 @@ export function getGrantInstruction<
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.associatedTokenProgram.value) {
+    accounts.associatedTokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.rent.value) {

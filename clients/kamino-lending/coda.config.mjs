@@ -161,7 +161,7 @@ export default defineConfig({
       ]),
     },
     {
-      account: /sysvarInfo|instructionSysvarAccount/,
+      account: /sysvarInfo|[\w+][iI]nstructionSysvarAccount/,
       defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
     },
     {

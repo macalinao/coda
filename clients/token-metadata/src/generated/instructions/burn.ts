@@ -25,6 +25,7 @@ import type {
 import type { ResolvedAccount } from "../shared/index.js";
 import type { BurnArgs, BurnArgsArgs } from "../types/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -32,8 +33,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import { getBurnArgsDecoder, getBurnArgsEncoder } from "../types/index.js";
 
 export const BURN_DISCRIMINATOR = 41;
@@ -150,6 +152,211 @@ export function getBurnInstructionDataCodec(): FixedSizeCodec<
     getBurnInstructionDataEncoder(),
     getBurnInstructionDataDecoder(),
   );
+}
+
+export interface BurnAsyncInput<
+  TAccountAuthority extends string = string,
+  TAccountCollectionMetadata extends string = string,
+  TAccountMetadata extends string = string,
+  TAccountEdition extends string = string,
+  TAccountMint extends string = string,
+  TAccountToken extends string = string,
+  TAccountMasterEdition extends string = string,
+  TAccountMasterEditionMint extends string = string,
+  TAccountMasterEditionToken extends string = string,
+  TAccountEditionMarker extends string = string,
+  TAccountTokenRecord extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountSysvarInstructions extends string = string,
+  TAccountSplTokenProgram extends string = string,
+> {
+  /** Asset owner or Utility delegate */
+  authority: TransactionSigner<TAccountAuthority>;
+  /** Metadata of the Collection */
+  collectionMetadata?: Address<TAccountCollectionMetadata>;
+  /** Metadata (pda of ['metadata', program id, mint id]) */
+  metadata?: Address<TAccountMetadata>;
+  /** Edition of the asset */
+  edition?: Address<TAccountEdition>;
+  /** Mint of token asset */
+  mint: Address<TAccountMint>;
+  /** Token account to close */
+  token: Address<TAccountToken>;
+  /** Master edition account */
+  masterEdition?: Address<TAccountMasterEdition>;
+  /** Master edition mint of the asset */
+  masterEditionMint?: Address<TAccountMasterEditionMint>;
+  /** Master edition token account */
+  masterEditionToken?: Address<TAccountMasterEditionToken>;
+  /** Edition marker account */
+  editionMarker?: Address<TAccountEditionMarker>;
+  /** Token record account */
+  tokenRecord?: Address<TAccountTokenRecord>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** Instructions sysvar account */
+  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  /** SPL Token Program */
+  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  burnArgs: BurnInstructionDataArgs["burnArgs"];
+}
+
+export async function getBurnInstructionAsync<
+  TAccountAuthority extends string,
+  TAccountCollectionMetadata extends string,
+  TAccountMetadata extends string,
+  TAccountEdition extends string,
+  TAccountMint extends string,
+  TAccountToken extends string,
+  TAccountMasterEdition extends string,
+  TAccountMasterEditionMint extends string,
+  TAccountMasterEditionToken extends string,
+  TAccountEditionMarker extends string,
+  TAccountTokenRecord extends string,
+  TAccountSystemProgram extends string,
+  TAccountSysvarInstructions extends string,
+  TAccountSplTokenProgram extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: BurnAsyncInput<
+    TAccountAuthority,
+    TAccountCollectionMetadata,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    TAccountToken,
+    TAccountMasterEdition,
+    TAccountMasterEditionMint,
+    TAccountMasterEditionToken,
+    TAccountEditionMarker,
+    TAccountTokenRecord,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  BurnInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountCollectionMetadata,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    TAccountToken,
+    TAccountMasterEdition,
+    TAccountMasterEditionMint,
+    TAccountMasterEditionToken,
+    TAccountEditionMarker,
+    TAccountTokenRecord,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    authority: { value: input.authority ?? null, isWritable: true },
+    collectionMetadata: {
+      value: input.collectionMetadata ?? null,
+      isWritable: true,
+    },
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    edition: { value: input.edition ?? null, isWritable: true },
+    mint: { value: input.mint ?? null, isWritable: true },
+    token: { value: input.token ?? null, isWritable: true },
+    masterEdition: { value: input.masterEdition ?? null, isWritable: true },
+    masterEditionMint: {
+      value: input.masterEditionMint ?? null,
+      isWritable: false,
+    },
+    masterEditionToken: {
+      value: input.masterEditionToken ?? null,
+      isWritable: false,
+    },
+    editionMarker: { value: input.editionMarker ?? null, isWritable: true },
+    tokenRecord: { value: input.tokenRecord ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    sysvarInstructions: {
+      value: input.sysvarInstructions ?? null,
+      isWritable: false,
+    },
+    splTokenProgram: {
+      value: input.splTokenProgram ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.sysvarInstructions.value) {
+    accounts.sysvarInstructions.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.splTokenProgram.value) {
+    accounts.splTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.collectionMetadata),
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.edition),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.token),
+      getAccountMeta(accounts.masterEdition),
+      getAccountMeta(accounts.masterEditionMint),
+      getAccountMeta(accounts.masterEditionToken),
+      getAccountMeta(accounts.editionMarker),
+      getAccountMeta(accounts.tokenRecord),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.sysvarInstructions),
+      getAccountMeta(accounts.splTokenProgram),
+    ],
+    data: getBurnInstructionDataEncoder().encode(
+      args as BurnInstructionDataArgs,
+    ),
+    programAddress,
+  } as BurnInstruction<
+    TProgramAddress,
+    TAccountAuthority,
+    TAccountCollectionMetadata,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    TAccountToken,
+    TAccountMasterEdition,
+    TAccountMasterEditionMint,
+    TAccountMasterEditionToken,
+    TAccountEditionMarker,
+    TAccountTokenRecord,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram
+  >);
 }
 
 export interface BurnInput<

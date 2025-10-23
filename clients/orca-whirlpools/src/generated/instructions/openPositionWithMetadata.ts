@@ -73,8 +73,12 @@ export type OpenPositionWithMetadataInstruction<
   TAccountRent extends
     | string
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends string | AccountMeta = string,
-  TAccountMetadataProgram extends string | AccountMeta = string,
+  TAccountAssociatedTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountMetadataProgram extends
+    | string
+    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
   TAccountMetadataUpdateAuth extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
@@ -198,8 +202,8 @@ export interface OpenPositionWithMetadataInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
-  metadataProgram: Address<TAccountMetadataProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
+  metadataProgram?: Address<TAccountMetadataProgram>;
   metadataUpdateAuth: Address<TAccountMetadataUpdateAuth>;
   bumps: OpenPositionWithMetadataInstructionDataArgs["bumps"];
   tickLowerIndex: OpenPositionWithMetadataInstructionDataArgs["tickLowerIndex"];
@@ -308,6 +312,14 @@ export function getOpenPositionWithMetadataInstruction<
   if (!accounts.rent.value) {
     accounts.rent.value =
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.associatedTokenProgram.value) {
+    accounts.associatedTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.metadataProgram.value) {
+    accounts.metadataProgram.value =
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

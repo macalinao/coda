@@ -24,6 +24,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -31,8 +32,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REVOKE_COLLECTION_AUTHORITY_DISCRIMINATOR = 24;
 
@@ -100,6 +102,103 @@ export function getRevokeCollectionAuthorityInstructionDataCodec(): FixedSizeCod
     getRevokeCollectionAuthorityInstructionDataEncoder(),
     getRevokeCollectionAuthorityInstructionDataDecoder(),
   );
+}
+
+export interface RevokeCollectionAuthorityAsyncInput<
+  TAccountCollectionAuthorityRecord extends string = string,
+  TAccountDelegateAuthority extends string = string,
+  TAccountRevokeAuthority extends string = string,
+  TAccountMetadata extends string = string,
+  TAccountMint extends string = string,
+> {
+  /** Collection Authority Record PDA */
+  collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
+  /** Delegated Collection Authority */
+  delegateAuthority: Address<TAccountDelegateAuthority>;
+  /** Update Authority, or Delegated Authority, of Collection NFT */
+  revokeAuthority: TransactionSigner<TAccountRevokeAuthority>;
+  /** Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Mint of Metadata */
+  mint: Address<TAccountMint>;
+}
+
+export async function getRevokeCollectionAuthorityInstructionAsync<
+  TAccountCollectionAuthorityRecord extends string,
+  TAccountDelegateAuthority extends string,
+  TAccountRevokeAuthority extends string,
+  TAccountMetadata extends string,
+  TAccountMint extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: RevokeCollectionAuthorityAsyncInput<
+    TAccountCollectionAuthorityRecord,
+    TAccountDelegateAuthority,
+    TAccountRevokeAuthority,
+    TAccountMetadata,
+    TAccountMint
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  RevokeCollectionAuthorityInstruction<
+    TProgramAddress,
+    TAccountCollectionAuthorityRecord,
+    TAccountDelegateAuthority,
+    TAccountRevokeAuthority,
+    TAccountMetadata,
+    TAccountMint
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    collectionAuthorityRecord: {
+      value: input.collectionAuthorityRecord ?? null,
+      isWritable: true,
+    },
+    delegateAuthority: {
+      value: input.delegateAuthority ?? null,
+      isWritable: true,
+    },
+    revokeAuthority: { value: input.revokeAuthority ?? null, isWritable: true },
+    metadata: { value: input.metadata ?? null, isWritable: false },
+    mint: { value: input.mint ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.collectionAuthorityRecord),
+      getAccountMeta(accounts.delegateAuthority),
+      getAccountMeta(accounts.revokeAuthority),
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.mint),
+    ],
+    data: getRevokeCollectionAuthorityInstructionDataEncoder().encode({}),
+    programAddress,
+  } as RevokeCollectionAuthorityInstruction<
+    TProgramAddress,
+    TAccountCollectionAuthorityRecord,
+    TAccountDelegateAuthority,
+    TAccountRevokeAuthority,
+    TAccountMetadata,
+    TAccountMint
+  >);
 }
 
 export interface RevokeCollectionAuthorityInput<

@@ -25,6 +25,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -32,8 +33,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const RESIZE_DISCRIMINATOR = 56;
 
@@ -108,6 +110,123 @@ export function getResizeInstructionDataCodec(): FixedSizeCodec<
     getResizeInstructionDataEncoder(),
     getResizeInstructionDataDecoder(),
   );
+}
+
+export interface ResizeAsyncInput<
+  TAccountMetadata extends string = string,
+  TAccountEdition extends string = string,
+  TAccountMint extends string = string,
+  TAccountPayer extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountToken extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  /** The metadata account of the digital asset */
+  metadata?: Address<TAccountMetadata>;
+  /** The master edition or edition account of the digital asset, an uninitialized account for fungible assets */
+  edition: Address<TAccountEdition>;
+  /** Mint of token asset */
+  mint: Address<TAccountMint>;
+  /** The recipient of the excess rent and authority if the authority account is not present */
+  payer: Address<TAccountPayer> | TransactionSigner<TAccountPayer>;
+  /** Owner of the asset for (p)NFTs, or mint authority for fungible assets, if different from the payer */
+  authority?: TransactionSigner<TAccountAuthority>;
+  /** Token or Associated Token account */
+  token?: Address<TAccountToken>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+}
+
+export async function getResizeInstructionAsync<
+  TAccountMetadata extends string,
+  TAccountEdition extends string,
+  TAccountMint extends string,
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
+  TAccountToken extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: ResizeAsyncInput<
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountToken,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  ResizeInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
+      ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+      : TAccountPayer,
+    TAccountAuthority,
+    TAccountToken,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    edition: { value: input.edition ?? null, isWritable: true },
+    mint: { value: input.mint ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    token: { value: input.token ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.edition),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.token),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    data: getResizeInstructionDataEncoder().encode({}),
+    programAddress,
+  } as ResizeInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountMint,
+    (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
+      ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+      : TAccountPayer,
+    TAccountAuthority,
+    TAccountToken,
+    TAccountSystemProgram
+  >);
 }
 
 export interface ResizeInput<

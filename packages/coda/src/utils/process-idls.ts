@@ -2,7 +2,16 @@ import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import type { Codama } from "codama";
 import type { CodaConfig } from "../config.js";
 import { resolve } from "node:path";
-import { fixDocsVisitor } from "@macalinao/coda-visitors";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
+  BPF_UPGRADEABLE_LOADER_PROGRAM_VALUE_NODE,
+  fixDocsVisitor,
+  MEMO_PROGRAM_VALUE_NODE,
+  SYSVAR_INSTRUCTIONS_VALUE_NODE,
+  TOKEN_2022_PROGRAM_VALUE_NODE,
+  TOKEN_METADATA_PROGRAM_VALUE_NODE,
+  TOKEN_PROGRAM_VALUE_NODE,
+} from "@macalinao/coda-visitors";
 import {
   getCommonInstructionAccountDefaultRules,
   publicKeyValueNode,
@@ -52,10 +61,38 @@ export async function processIdls(options: {
     setInstructionAccountDefaultValuesVisitor([
       ...getCommonInstructionAccountDefaultRules(),
       {
+        account: /[\w+]TokenProgram/,
+        defaultValue: TOKEN_PROGRAM_VALUE_NODE,
+      },
+      {
+        account: "bpfUpgradeableLoaderProgram",
+        defaultValue: BPF_UPGRADEABLE_LOADER_PROGRAM_VALUE_NODE,
+      },
+      {
+        account: "memoProgram",
+        defaultValue: MEMO_PROGRAM_VALUE_NODE,
+      },
+      {
+        account: "metadataProgram",
+        defaultValue: TOKEN_METADATA_PROGRAM_VALUE_NODE,
+      },
+      {
+        account: "token2022Program",
+        defaultValue: TOKEN_2022_PROGRAM_VALUE_NODE,
+      },
+      {
+        account: /associatedTokenProgram|ataProgram|splAtaProgram/,
+        defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
+      },
+      {
         account: "stakeConfigSysvar",
         defaultValue: publicKeyValueNode(
           "StakeConfig11111111111111111111111111111111",
         ),
+      },
+      {
+        account: "sysvarInstructions",
+        defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
       },
       ...(config.instructionAccountDefaultValues ?? []),
     ]),

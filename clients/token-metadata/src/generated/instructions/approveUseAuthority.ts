@@ -28,6 +28,7 @@ import type {
   ApproveUseAuthorityArgsArgs,
 } from "../types/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -35,8 +36,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getApproveUseAuthorityArgsDecoder,
   getApproveUseAuthorityArgsEncoder,
@@ -150,6 +152,171 @@ export function getApproveUseAuthorityInstructionDataCodec(): FixedSizeCodec<
     getApproveUseAuthorityInstructionDataEncoder(),
     getApproveUseAuthorityInstructionDataDecoder(),
   );
+}
+
+export interface ApproveUseAuthorityAsyncInput<
+  TAccountUseAuthorityRecord extends string = string,
+  TAccountOwner extends string = string,
+  TAccountPayer extends string = string,
+  TAccountUser extends string = string,
+  TAccountOwnerTokenAccount extends string = string,
+  TAccountMetadata extends string = string,
+  TAccountMint extends string = string,
+  TAccountBurner extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountRent extends string = string,
+> {
+  /** Use Authority Record PDA */
+  useAuthorityRecord: Address<TAccountUseAuthorityRecord>;
+  /** Owner */
+  owner: TransactionSigner<TAccountOwner>;
+  /** Payer */
+  payer: TransactionSigner<TAccountPayer>;
+  /** A Use Authority */
+  user: Address<TAccountUser>;
+  /** Owned Token Account Of Mint */
+  ownerTokenAccount: Address<TAccountOwnerTokenAccount>;
+  /** Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Mint of Metadata */
+  mint: Address<TAccountMint>;
+  /** Program As Signer (Burner) */
+  burner: Address<TAccountBurner>;
+  /** Token program */
+  tokenProgram?: Address<TAccountTokenProgram>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** Rent info */
+  rent?: Address<TAccountRent>;
+  approveUseAuthorityArgs: ApproveUseAuthorityInstructionDataArgs["approveUseAuthorityArgs"];
+}
+
+export async function getApproveUseAuthorityInstructionAsync<
+  TAccountUseAuthorityRecord extends string,
+  TAccountOwner extends string,
+  TAccountPayer extends string,
+  TAccountUser extends string,
+  TAccountOwnerTokenAccount extends string,
+  TAccountMetadata extends string,
+  TAccountMint extends string,
+  TAccountBurner extends string,
+  TAccountTokenProgram extends string,
+  TAccountSystemProgram extends string,
+  TAccountRent extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: ApproveUseAuthorityAsyncInput<
+    TAccountUseAuthorityRecord,
+    TAccountOwner,
+    TAccountPayer,
+    TAccountUser,
+    TAccountOwnerTokenAccount,
+    TAccountMetadata,
+    TAccountMint,
+    TAccountBurner,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  ApproveUseAuthorityInstruction<
+    TProgramAddress,
+    TAccountUseAuthorityRecord,
+    TAccountOwner,
+    TAccountPayer,
+    TAccountUser,
+    TAccountOwnerTokenAccount,
+    TAccountMetadata,
+    TAccountMint,
+    TAccountBurner,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    useAuthorityRecord: {
+      value: input.useAuthorityRecord ?? null,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    user: { value: input.user ?? null, isWritable: false },
+    ownerTokenAccount: {
+      value: input.ownerTokenAccount ?? null,
+      isWritable: true,
+    },
+    metadata: { value: input.metadata ?? null, isWritable: false },
+    mint: { value: input.mint ?? null, isWritable: false },
+    burner: { value: input.burner ?? null, isWritable: false },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.useAuthorityRecord),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.user),
+      getAccountMeta(accounts.ownerTokenAccount),
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.burner),
+      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.rent),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getApproveUseAuthorityInstructionDataEncoder().encode(
+      args as ApproveUseAuthorityInstructionDataArgs,
+    ),
+    programAddress,
+  } as ApproveUseAuthorityInstruction<
+    TProgramAddress,
+    TAccountUseAuthorityRecord,
+    TAccountOwner,
+    TAccountPayer,
+    TAccountUser,
+    TAccountOwnerTokenAccount,
+    TAccountMetadata,
+    TAccountMint,
+    TAccountBurner,
+    TAccountTokenProgram,
+    TAccountSystemProgram,
+    TAccountRent
+  >);
 }
 
 export interface ApproveUseAuthorityInput<
@@ -272,10 +439,6 @@ export function getApproveUseAuthorityInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
-  if (!accounts.rent.value) {
-    accounts.rent.value =
-      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");

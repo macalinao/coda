@@ -71,8 +71,12 @@ export type LiquidateObligationAndRedeemReserveCollateralInstruction<
   TAccountCollateralTokenProgram extends
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRepayLiquidityTokenProgram extends string | AccountMeta = string,
-  TAccountWithdrawLiquidityTokenProgram extends string | AccountMeta = string,
+  TAccountRepayLiquidityTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountWithdrawLiquidityTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
@@ -233,8 +237,8 @@ export interface LiquidateObligationAndRedeemReserveCollateralAsyncInput<
   userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
   collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
-  repayLiquidityTokenProgram: Address<TAccountRepayLiquidityTokenProgram>;
-  withdrawLiquidityTokenProgram: Address<TAccountWithdrawLiquidityTokenProgram>;
+  repayLiquidityTokenProgram?: Address<TAccountRepayLiquidityTokenProgram>;
+  withdrawLiquidityTokenProgram?: Address<TAccountWithdrawLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   liquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["liquidityAmount"];
   minAcceptableReceivedLiquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["minAcceptableReceivedLiquidityAmount"];
@@ -402,6 +406,14 @@ export async function getLiquidateObligationAndRedeemReserveCollateralInstructio
     accounts.collateralTokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
+  if (!accounts.repayLiquidityTokenProgram.value) {
+    accounts.repayLiquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.withdrawLiquidityTokenProgram.value) {
+    accounts.withdrawLiquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
   if (!accounts.instructionSysvarAccount.value) {
     accounts.instructionSysvarAccount.value =
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
@@ -499,8 +511,8 @@ export interface LiquidateObligationAndRedeemReserveCollateralInput<
   userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
   userDestinationLiquidity: Address<TAccountUserDestinationLiquidity>;
   collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
-  repayLiquidityTokenProgram: Address<TAccountRepayLiquidityTokenProgram>;
-  withdrawLiquidityTokenProgram: Address<TAccountWithdrawLiquidityTokenProgram>;
+  repayLiquidityTokenProgram?: Address<TAccountRepayLiquidityTokenProgram>;
+  withdrawLiquidityTokenProgram?: Address<TAccountWithdrawLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   liquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["liquidityAmount"];
   minAcceptableReceivedLiquidityAmount: LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs["minAcceptableReceivedLiquidityAmount"];
@@ -659,6 +671,14 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstruction<
   // Resolve default values.
   if (!accounts.collateralTokenProgram.value) {
     accounts.collateralTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.repayLiquidityTokenProgram.value) {
+    accounts.repayLiquidityTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.withdrawLiquidityTokenProgram.value) {
+    accounts.withdrawLiquidityTokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.instructionSysvarAccount.value) {

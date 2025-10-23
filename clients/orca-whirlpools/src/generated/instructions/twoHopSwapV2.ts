@@ -89,7 +89,9 @@ export type TwoHopSwapV2Instruction<
   TAccountTickArrayTwo2 extends string | AccountMeta = string,
   TAccountOracleOne extends string | AccountMeta = string,
   TAccountOracleTwo extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta = string,
+  TAccountMemoProgram extends
+    | string
+    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -291,7 +293,7 @@ export interface TwoHopSwapV2Input<
   tickArrayTwo2: Address<TAccountTickArrayTwo2>;
   oracleOne: Address<TAccountOracleOne>;
   oracleTwo: Address<TAccountOracleTwo>;
-  memoProgram: Address<TAccountMemoProgram>;
+  memoProgram?: Address<TAccountMemoProgram>;
   amount: TwoHopSwapV2InstructionDataArgs["amount"];
   otherAmountThreshold: TwoHopSwapV2InstructionDataArgs["otherAmountThreshold"];
   amountSpecifiedIsInput: TwoHopSwapV2InstructionDataArgs["amountSpecifiedIsInput"];
@@ -453,6 +455,12 @@ export function getTwoHopSwapV2Instruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.memoProgram.value) {
+    accounts.memoProgram.value =
+      "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr" as Address<"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

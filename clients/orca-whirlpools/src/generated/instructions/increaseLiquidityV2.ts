@@ -66,7 +66,9 @@ export type IncreaseLiquidityV2Instruction<
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountTokenProgramA extends string | AccountMeta = string,
   TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta = string,
+  TAccountMemoProgram extends
+    | string
+    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TAccountPositionAuthority extends string | AccountMeta = string,
   TAccountPosition extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
@@ -210,7 +212,7 @@ export interface IncreaseLiquidityV2Input<
   whirlpool: Address<TAccountWhirlpool>;
   tokenProgramA: Address<TAccountTokenProgramA>;
   tokenProgramB: Address<TAccountTokenProgramB>;
-  memoProgram: Address<TAccountMemoProgram>;
+  memoProgram?: Address<TAccountMemoProgram>;
   positionAuthority: TransactionSigner<TAccountPositionAuthority>;
   position: Address<TAccountPosition>;
   positionTokenAccount: Address<TAccountPositionTokenAccount>;
@@ -322,6 +324,12 @@ export function getIncreaseLiquidityV2Instruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.memoProgram.value) {
+    accounts.memoProgram.value =
+      "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr" as Address<"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

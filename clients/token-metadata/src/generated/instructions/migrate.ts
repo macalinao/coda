@@ -25,6 +25,7 @@ import type {
 } from "@solana/kit";
 import type { ResolvedAccount } from "../shared/index.js";
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -32,8 +33,9 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const MIGRATE_DISCRIMINATOR = 48;
 
@@ -145,6 +147,214 @@ export function getMigrateInstructionDataCodec(): FixedSizeCodec<
     getMigrateInstructionDataEncoder(),
     getMigrateInstructionDataDecoder(),
   );
+}
+
+export interface MigrateAsyncInput<
+  TAccountMetadata extends string = string,
+  TAccountEdition extends string = string,
+  TAccountToken extends string = string,
+  TAccountTokenOwner extends string = string,
+  TAccountMint extends string = string,
+  TAccountPayer extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountCollectionMetadata extends string = string,
+  TAccountDelegateRecord extends string = string,
+  TAccountTokenRecord extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountSysvarInstructions extends string = string,
+  TAccountSplTokenProgram extends string = string,
+  TAccountAuthorizationRulesProgram extends string = string,
+  TAccountAuthorizationRules extends string = string,
+> {
+  /** Metadata account */
+  metadata?: Address<TAccountMetadata>;
+  /** Edition account */
+  edition: Address<TAccountEdition>;
+  /** Token account */
+  token: Address<TAccountToken>;
+  /** Token account owner */
+  tokenOwner: Address<TAccountTokenOwner>;
+  /** Mint account */
+  mint: Address<TAccountMint>;
+  /** Payer */
+  payer: TransactionSigner<TAccountPayer>;
+  /** Update authority */
+  authority: TransactionSigner<TAccountAuthority>;
+  /** Collection metadata account */
+  collectionMetadata: Address<TAccountCollectionMetadata>;
+  /** Delegate record account */
+  delegateRecord: Address<TAccountDelegateRecord>;
+  /** Token record account */
+  tokenRecord: Address<TAccountTokenRecord>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** Instruction sysvar account */
+  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  /** SPL Token Program */
+  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  /** Token Authorization Rules Program */
+  authorizationRulesProgram?: Address<TAccountAuthorizationRulesProgram>;
+  /** Token Authorization Rules account */
+  authorizationRules?: Address<TAccountAuthorizationRules>;
+}
+
+export async function getMigrateInstructionAsync<
+  TAccountMetadata extends string,
+  TAccountEdition extends string,
+  TAccountToken extends string,
+  TAccountTokenOwner extends string,
+  TAccountMint extends string,
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
+  TAccountCollectionMetadata extends string,
+  TAccountDelegateRecord extends string,
+  TAccountTokenRecord extends string,
+  TAccountSystemProgram extends string,
+  TAccountSysvarInstructions extends string,
+  TAccountSplTokenProgram extends string,
+  TAccountAuthorizationRulesProgram extends string,
+  TAccountAuthorizationRules extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: MigrateAsyncInput<
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountToken,
+    TAccountTokenOwner,
+    TAccountMint,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountCollectionMetadata,
+    TAccountDelegateRecord,
+    TAccountTokenRecord,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram,
+    TAccountAuthorizationRulesProgram,
+    TAccountAuthorizationRules
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  MigrateInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountToken,
+    TAccountTokenOwner,
+    TAccountMint,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountCollectionMetadata,
+    TAccountDelegateRecord,
+    TAccountTokenRecord,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram,
+    TAccountAuthorizationRulesProgram,
+    TAccountAuthorizationRules
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    edition: { value: input.edition ?? null, isWritable: true },
+    token: { value: input.token ?? null, isWritable: true },
+    tokenOwner: { value: input.tokenOwner ?? null, isWritable: false },
+    mint: { value: input.mint ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    collectionMetadata: {
+      value: input.collectionMetadata ?? null,
+      isWritable: false,
+    },
+    delegateRecord: { value: input.delegateRecord ?? null, isWritable: false },
+    tokenRecord: { value: input.tokenRecord ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    sysvarInstructions: {
+      value: input.sysvarInstructions ?? null,
+      isWritable: false,
+    },
+    splTokenProgram: {
+      value: input.splTokenProgram ?? null,
+      isWritable: false,
+    },
+    authorizationRulesProgram: {
+      value: input.authorizationRulesProgram ?? null,
+      isWritable: false,
+    },
+    authorizationRules: {
+      value: input.authorizationRules ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: expectAddress(accounts.mint.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.sysvarInstructions.value) {
+    accounts.sysvarInstructions.value =
+      "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
+  }
+  if (!accounts.splTokenProgram.value) {
+    accounts.splTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta(accounts.metadata),
+      getAccountMeta(accounts.edition),
+      getAccountMeta(accounts.token),
+      getAccountMeta(accounts.tokenOwner),
+      getAccountMeta(accounts.mint),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.collectionMetadata),
+      getAccountMeta(accounts.delegateRecord),
+      getAccountMeta(accounts.tokenRecord),
+      getAccountMeta(accounts.systemProgram),
+      getAccountMeta(accounts.sysvarInstructions),
+      getAccountMeta(accounts.splTokenProgram),
+      getAccountMeta(accounts.authorizationRulesProgram),
+      getAccountMeta(accounts.authorizationRules),
+    ],
+    data: getMigrateInstructionDataEncoder().encode({}),
+    programAddress,
+  } as MigrateInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountEdition,
+    TAccountToken,
+    TAccountTokenOwner,
+    TAccountMint,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountCollectionMetadata,
+    TAccountDelegateRecord,
+    TAccountTokenRecord,
+    TAccountSystemProgram,
+    TAccountSysvarInstructions,
+    TAccountSplTokenProgram,
+    TAccountAuthorizationRulesProgram,
+    TAccountAuthorizationRules
+  >);
 }
 
 export interface MigrateInput<

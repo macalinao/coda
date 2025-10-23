@@ -68,8 +68,12 @@ export type CollectRewardV2Instruction<
   TAccountRewardOwnerAccount extends string | AccountMeta = string,
   TAccountRewardMint extends string | AccountMeta = string,
   TAccountRewardVault extends string | AccountMeta = string,
-  TAccountRewardTokenProgram extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta = string,
+  TAccountRewardTokenProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountMemoProgram extends
+    | string
+    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -171,8 +175,8 @@ export interface CollectRewardV2Input<
   rewardOwnerAccount: Address<TAccountRewardOwnerAccount>;
   rewardMint: Address<TAccountRewardMint>;
   rewardVault: Address<TAccountRewardVault>;
-  rewardTokenProgram: Address<TAccountRewardTokenProgram>;
-  memoProgram: Address<TAccountMemoProgram>;
+  rewardTokenProgram?: Address<TAccountRewardTokenProgram>;
+  memoProgram?: Address<TAccountMemoProgram>;
   rewardIndex: CollectRewardV2InstructionDataArgs["rewardIndex"];
   remainingAccountsInfo: CollectRewardV2InstructionDataArgs["remainingAccountsInfo"];
 }
@@ -247,6 +251,16 @@ export function getCollectRewardV2Instruction<
 
   // Original args.
   const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.rewardTokenProgram.value) {
+    accounts.rewardTokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.memoProgram.value) {
+    accounts.memoProgram.value =
+      "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr" as Address<"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
