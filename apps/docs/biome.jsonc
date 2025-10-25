@@ -1,0 +1,15 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.0/schema.json",
+  "root": false,
+  "extends": ["@macalinao/biome-config/base"],
+  "linter": {
+    "domains": {
+      "next": "recommended"
+    },
+    "rules": {
+      "correctness": {
+        "useImportExtensions": "off"
+      }
+    }
+  }
+}
