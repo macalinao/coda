@@ -65,7 +65,7 @@ export type InitializePositionBundleWithMetadataInstruction<
     | AccountMeta = "SysvarRent111111111111111111111111111111111",
   TAccountAssociatedTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
   TAccountMetadataProgram extends
     | string
     | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
@@ -280,7 +280,7 @@ export function getInitializePositionBundleWithMetadataInstruction<
   }
   if (!accounts.associatedTokenProgram.value) {
     accounts.associatedTokenProgram.value =
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
   }
   if (!accounts.metadataProgram.value) {
     accounts.metadataProgram.value =
