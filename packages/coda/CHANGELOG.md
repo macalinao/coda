@@ -1,5 +1,11 @@
 # @macalinao/grill-cli
 
+## 0.4.8
+
+### Patch Changes
+
+- 9d147c5: Fix bug where ATA program had the wrong default value
+
 ## 0.4.7
 
 ### Patch Changes
