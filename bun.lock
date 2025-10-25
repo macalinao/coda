@@ -57,7 +57,7 @@
     },
     "clients/orca-whirlpools": {
       "name": "@macalinao/clients-orca-whirlpools",
-      "version": "0.4.4",
+      "version": "0.4.5",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -133,7 +133,7 @@
     },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -148,7 +148,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.7",
+      "version": "0.4.8",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },

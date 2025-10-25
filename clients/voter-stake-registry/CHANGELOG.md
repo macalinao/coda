@@ -1,5 +1,11 @@
 # @macalinao/clients-voter-stake-registry
 
+## 0.2.2
+
+### Patch Changes
+
+- 9d147c5: Fix bug where ATA program had the wrong default value
+
 ## 0.2.1
 
 ### Patch Changes

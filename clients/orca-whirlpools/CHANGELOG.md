@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.4.5
+
+### Patch Changes
+
+- 9d147c5: Fix bug where ATA program had the wrong default value
+
 ## 0.4.4
 
 ### Patch Changes
