@@ -61,10 +61,6 @@ export async function processIdls(options: {
     setInstructionAccountDefaultValuesVisitor([
       ...getCommonInstructionAccountDefaultRules(),
       {
-        account: /[\w+]TokenProgram/,
-        defaultValue: TOKEN_PROGRAM_VALUE_NODE,
-      },
-      {
         account: "bpfUpgradeableLoaderProgram",
         defaultValue: BPF_UPGRADEABLE_LOADER_PROGRAM_VALUE_NODE,
       },
@@ -93,6 +89,10 @@ export async function processIdls(options: {
       {
         account: "sysvarInstructions",
         defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
+      },
+      {
+        account: /(?!associatedTokenProgram)([\w]+)TokenProgram/,
+        defaultValue: TOKEN_PROGRAM_VALUE_NODE,
       },
       ...(config.instructionAccountDefaultValues ?? []),
     ]),
