@@ -1,7 +1,7 @@
 {
-  "name": "@macalinao/clients-orca-whirlpools",
-  "version": "0.4.5",
-  "description": "TypeScript client for Orca Whirlpools program",
+  "name": "@macalinao/clients-tribeca",
+  "version": "0.1.0",
+  "description": "TypeScript client for Tribeca governance programs (Govern and Locked Voter)",
   "type": "module",
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
@@ -10,10 +10,10 @@
   "keywords": [
     "coda",
     "solana",
-    "orca",
-    "whirlpools",
-    "dex",
-    "amm",
+    "tribeca",
+    "governance",
+    "voting",
+    "dao",
     "client",
     "typescript"
   ],
@@ -52,6 +52,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
-    "directory": "clients/orca-whirlpools"
+    "directory": "clients/tribeca"
   }
 }
