@@ -131,6 +131,21 @@
         "@solana/kit": "*",
       },
     },
+    "clients/tribeca": {
+      "name": "@macalinao/clients-tribeca",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "@solana/kit": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@solana/kit": "*",
+      },
+    },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
       "version": "0.2.2",
@@ -586,6 +601,8 @@
     "@macalinao/clients-spl-stake-pool": ["@macalinao/clients-spl-stake-pool@workspace:clients/spl-stake-pool"],
 
     "@macalinao/clients-token-metadata": ["@macalinao/clients-token-metadata@workspace:clients/token-metadata"],
+
+    "@macalinao/clients-tribeca": ["@macalinao/clients-tribeca@workspace:clients/tribeca"],
 
     "@macalinao/clients-voter-stake-registry": ["@macalinao/clients-voter-stake-registry@workspace:clients/voter-stake-registry"],
 
