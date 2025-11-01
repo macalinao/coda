@@ -20,12 +20,14 @@ Tribeca is a governance protocol on Solana that provides decentralized autonomou
 ## Programs Included
 
 ### Govern Program
+
 - **Governor**: Manages proposals and voting parameters
 - **Proposal**: Individual governance proposals with metadata
 - **Vote**: Records individual voter decisions on proposals
 - **ProposalMeta**: Additional metadata for proposals
 
 ### Locked Voter Program
+
 - **Locker**: Manages vote escrows for a governance token
 - **Escrow**: Individual user's locked tokens and voting power
 - **Whitelist**: Programs authorized to interact with the locker
