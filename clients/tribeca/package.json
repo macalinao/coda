@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-tribeca",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript client for Tribeca governance programs (Govern and Locked Voter)",
   "type": "module",
   "sideEffects": false,
