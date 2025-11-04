@@ -1,5 +1,11 @@
 # @macalinao/clients-spl-governance
 
+## 0.2.6
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+
 ## 0.2.5
 
 ### Patch Changes
