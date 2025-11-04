@@ -32,7 +32,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -fr dist/",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "test": "bun test src/"
   },
   "bugs": {
