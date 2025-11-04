@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.4.6
+
+### Patch Changes
+
+- 2b05e81: update package.json
+
 ## 0.4.5
 
 ### Patch Changes
