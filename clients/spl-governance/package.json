@@ -41,7 +41,7 @@
     "directory": "clients/spl-governance"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc",
     "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "codegen": "coda generate"

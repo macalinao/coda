@@ -38,7 +38,7 @@
     "directory": "packages/codama-instruction-accounts-dedupe-visitor"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc",
     "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "test": "bun test src/"

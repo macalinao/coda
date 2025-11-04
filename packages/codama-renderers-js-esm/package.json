@@ -37,7 +37,7 @@
     "directory": "packages/codama-renderers-js-esm"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc",
     "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache"
   },

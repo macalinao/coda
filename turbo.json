@@ -8,8 +8,7 @@
       "env": ["NODE_ENV"]
     },
     "lint": {
-      "dependsOn": ["^build"],
-      "cache": false
+      "dependsOn": ["^build"]
     },
     "test": {
       "dependsOn": ["build"],
