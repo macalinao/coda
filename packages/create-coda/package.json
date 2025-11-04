@@ -12,8 +12,8 @@
     "template/"
   ],
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist/ template/node_modules template/dist template/src/generated",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache"
   },
   "keywords": [

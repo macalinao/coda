@@ -30,8 +30,8 @@
     "src/"
   ],
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -fr dist/ tsconfig.tsbuildinfo",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "codegen": "rm -fr src/generated/ && coda generate",
     "lint": "eslint . --cache"
   },

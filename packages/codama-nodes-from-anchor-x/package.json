@@ -31,8 +31,8 @@
     "url": "git+https://github.com/macalinao/coda.git"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -fr dist/",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "test": "bun test src/"
   },
   "bugs": {

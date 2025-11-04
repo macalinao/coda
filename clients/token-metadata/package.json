@@ -39,8 +39,8 @@
     "directory": "clients/token-metadata"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -fr dist/",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "test": "echo 'No tests yet'",
     "codegen": "coda generate"

@@ -40,8 +40,8 @@
     "directory": "packages/coda-visitors"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -fr dist/",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache"
   },
   "dependencies": {

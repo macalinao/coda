@@ -41,8 +41,8 @@
     "directory": "clients/spl-stake-pool"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -fr dist/",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "codegen": "coda generate"
   },
