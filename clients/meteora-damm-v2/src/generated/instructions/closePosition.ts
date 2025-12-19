@@ -29,13 +29,17 @@ import {
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findEventAuthorityPda,
+  findPoolAuthorityPda,
+  findPositionNftAccountPda,
+} from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   123, 134, 81, 0, 49, 68, 98, 98,
@@ -53,16 +57,16 @@ export type ClosePositionInstruction<
   TAccountPositionNftAccount extends string | AccountMeta = string,
   TAccountPool extends string | AccountMeta = string,
   TAccountPosition extends string | AccountMeta = string,
-  TAccountPoolAuthority extends
-    | string
-    | AccountMeta = "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
+  TAccountPoolAuthority extends string | AccountMeta = string,
   TAccountRentReceiver extends string | AccountMeta = string,
   TAccountOwner extends string | AccountMeta = string,
   TAccountTokenProgram extends
     | string
     | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   TAccountEventAuthority extends string | AccountMeta = string,
-  TAccountProgram extends string | AccountMeta = string,
+  TAccountProgram extends
+    | string
+    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -147,7 +151,7 @@ export interface ClosePositionAsyncInput<
   /** position_nft_mint */
   positionNftMint: Address<TAccountPositionNftMint>;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
+  positionNftAccount?: Address<TAccountPositionNftAccount>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   poolAuthority?: Address<TAccountPoolAuthority>;
@@ -157,7 +161,7 @@ export interface ClosePositionAsyncInput<
   /** Program to create NFT mint/token account and transfer for token22 account */
   tokenProgram?: Address<TAccountTokenProgram>;
   eventAuthority?: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
 }
 
 export async function getClosePositionInstructionAsync<
@@ -226,26 +230,24 @@ export async function getClosePositionInstructionAsync<
   >;
 
   // Resolve default values.
+  if (!accounts.positionNftAccount.value) {
+    accounts.positionNftAccount.value = await findPositionNftAccountPda({
+      positionNftMint: expectAddress(accounts.positionNftMint.value),
+    });
+  }
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
+    accounts.poolAuthority.value = await findPoolAuthorityPda();
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" as Address<"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114,
-            105, 116, 121,
-          ]),
-        ),
-      ],
-    });
+    accounts.eventAuthority.value = await findEventAuthorityPda();
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -297,14 +299,14 @@ export interface ClosePositionInput<
   positionNftAccount: Address<TAccountPositionNftAccount>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
-  poolAuthority?: Address<TAccountPoolAuthority>;
+  poolAuthority: Address<TAccountPoolAuthority>;
   rentReceiver: Address<TAccountRentReceiver>;
   /** Owner of position */
   owner: TransactionSigner<TAccountOwner>;
   /** Program to create NFT mint/token account and transfer for token22 account */
   tokenProgram?: Address<TAccountTokenProgram>;
   eventAuthority: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
 }
 
 export function getClosePositionInstruction<
@@ -371,13 +373,13 @@ export function getClosePositionInstruction<
   >;
 
   // Resolve default values.
-  if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
-  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" as Address<"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb">;
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

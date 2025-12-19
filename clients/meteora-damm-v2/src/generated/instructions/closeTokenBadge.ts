@@ -29,11 +29,11 @@ import {
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
@@ -52,7 +52,9 @@ export type CloseTokenBadgeInstruction<
   TAccountAdmin extends string | AccountMeta = string,
   TAccountRentReceiver extends string | AccountMeta = string,
   TAccountEventAuthority extends string | AccountMeta = string,
-  TAccountProgram extends string | AccountMeta = string,
+  TAccountProgram extends
+    | string
+    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -118,7 +120,7 @@ export interface CloseTokenBadgeAsyncInput<
   admin: TransactionSigner<TAccountAdmin>;
   rentReceiver: Address<TAccountRentReceiver>;
   eventAuthority?: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
 }
 
 export async function getCloseTokenBadgeInstructionAsync<
@@ -165,17 +167,11 @@ export async function getCloseTokenBadgeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114,
-            105, 116, 121,
-          ]),
-        ),
-      ],
-    });
+    accounts.eventAuthority.value = await findEventAuthorityPda();
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -210,7 +206,7 @@ export interface CloseTokenBadgeInput<
   admin: TransactionSigner<TAccountAdmin>;
   rentReceiver: Address<TAccountRentReceiver>;
   eventAuthority: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
 }
 
 export function getCloseTokenBadgeInstruction<
@@ -252,6 +248,12 @@ export function getCloseTokenBadgeInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
+
+  // Resolve default values.
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
+  }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({

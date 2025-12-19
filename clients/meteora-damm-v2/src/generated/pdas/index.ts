@@ -9,6 +9,7 @@
 export * from "./claimFeeOperator.js";
 export * from "./config.js";
 export * from "./customizablePool.js";
+export * from "./eventAuthority.js";
 export * from "./pool.js";
 export * from "./poolAuthority.js";
 export * from "./position.js";

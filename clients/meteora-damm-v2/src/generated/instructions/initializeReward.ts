@@ -41,6 +41,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findEventAuthorityPda, findPoolAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   expectAddress,
@@ -59,9 +60,7 @@ export function getInitializeRewardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeRewardInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPoolAuthority extends
-    | string
-    | AccountMeta = "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
+  TAccountPoolAuthority extends string | AccountMeta = string,
   TAccountPool extends string | AccountMeta = string,
   TAccountRewardVault extends string | AccountMeta = string,
   TAccountRewardMint extends string | AccountMeta = string,
@@ -74,7 +73,9 @@ export type InitializeRewardInstruction<
     | string
     | AccountMeta = "11111111111111111111111111111111",
   TAccountEventAuthority extends string | AccountMeta = string,
-  TAccountProgram extends string | AccountMeta = string,
+  TAccountProgram extends
+    | string
+    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -181,7 +182,7 @@ export interface InitializeRewardAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   eventAuthority?: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
   rewardIndex: InitializeRewardInstructionDataArgs["rewardIndex"];
   rewardDuration: InitializeRewardInstructionDataArgs["rewardDuration"];
   funder: InitializeRewardInstructionDataArgs["funder"];
@@ -254,8 +255,7 @@ export async function getInitializeRewardInstructionAsync<
 
   // Resolve default values.
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
+    accounts.poolAuthority.value = await findPoolAuthorityPda();
   }
   if (!accounts.rewardVault.value) {
     accounts.rewardVault.value = await getProgramDerivedAddress({
@@ -280,17 +280,11 @@ export async function getInitializeRewardInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114,
-            105, 116, 121,
-          ]),
-        ),
-      ],
-    });
+    accounts.eventAuthority.value = await findEventAuthorityPda();
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -338,7 +332,7 @@ export interface InitializeRewardInput<
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
 > {
-  poolAuthority?: Address<TAccountPoolAuthority>;
+  poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   rewardVault: Address<TAccountRewardVault>;
   rewardMint: Address<TAccountRewardMint>;
@@ -347,7 +341,7 @@ export interface InitializeRewardInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   eventAuthority: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
   rewardIndex: InitializeRewardInstructionDataArgs["rewardIndex"];
   rewardDuration: InitializeRewardInstructionDataArgs["rewardDuration"];
   funder: InitializeRewardInstructionDataArgs["funder"];
@@ -417,10 +411,6 @@ export function getInitializeRewardInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
-  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
@@ -428,6 +418,10 @@ export function getInitializeRewardInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

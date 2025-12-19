@@ -29,13 +29,13 @@ import {
   fixEncoderSize,
   getBytesDecoder,
   getBytesEncoder,
-  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findEventAuthorityPda, findPoolAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getAccountMetaFactory } from "../shared/index.js";
 
@@ -51,9 +51,7 @@ export function getClaimRewardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClaimRewardInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPoolAuthority extends
-    | string
-    | AccountMeta = "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
+  TAccountPoolAuthority extends string | AccountMeta = string,
   TAccountPool extends string | AccountMeta = string,
   TAccountPosition extends string | AccountMeta = string,
   TAccountRewardVault extends string | AccountMeta = string,
@@ -65,7 +63,9 @@ export type ClaimRewardInstruction<
     | string
     | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountEventAuthority extends string | AccountMeta = string,
-  TAccountProgram extends string | AccountMeta = string,
+  TAccountProgram extends
+    | string
+    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -175,7 +175,7 @@ export interface ClaimRewardAsyncInput<
   owner: TransactionSigner<TAccountOwner>;
   tokenProgram?: Address<TAccountTokenProgram>;
   eventAuthority?: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
   rewardIndex: ClaimRewardInstructionDataArgs["rewardIndex"];
   skipReward: ClaimRewardInstructionDataArgs["skipReward"];
 }
@@ -257,25 +257,18 @@ export async function getClaimRewardInstructionAsync<
 
   // Resolve default values.
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
+    accounts.poolAuthority.value = await findPoolAuthorityPda();
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114,
-            105, 116, 121,
-          ]),
-        ),
-      ],
-    });
+    accounts.eventAuthority.value = await findEventAuthorityPda();
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -326,7 +319,7 @@ export interface ClaimRewardInput<
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
 > {
-  poolAuthority?: Address<TAccountPoolAuthority>;
+  poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   /** The vault token account for reward token */
@@ -339,7 +332,7 @@ export interface ClaimRewardInput<
   owner: TransactionSigner<TAccountOwner>;
   tokenProgram?: Address<TAccountTokenProgram>;
   eventAuthority: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
   rewardIndex: ClaimRewardInstructionDataArgs["rewardIndex"];
   skipReward: ClaimRewardInstructionDataArgs["skipReward"];
 }
@@ -418,13 +411,13 @@ export function getClaimRewardInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
-  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

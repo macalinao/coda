@@ -39,6 +39,12 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
+import {
+  findEventAuthorityPda,
+  findPoolAuthorityPda,
+  findPositionNftAccountPda,
+  findTokenVaultPda,
+} from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
@@ -61,9 +67,7 @@ export type InitializeCustomizablePoolInstruction<
   TAccountPositionNftMint extends string | AccountMeta = string,
   TAccountPositionNftAccount extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountPoolAuthority extends
-    | string
-    | AccountMeta = "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
+  TAccountPoolAuthority extends string | AccountMeta = string,
   TAccountPool extends string | AccountMeta = string,
   TAccountPosition extends string | AccountMeta = string,
   TAccountTokenAMint extends string | AccountMeta = string,
@@ -72,8 +76,12 @@ export type InitializeCustomizablePoolInstruction<
   TAccountTokenBVault extends string | AccountMeta = string,
   TAccountPayerTokenA extends string | AccountMeta = string,
   TAccountPayerTokenB extends string | AccountMeta = string,
-  TAccountTokenAProgram extends string | AccountMeta = string,
-  TAccountTokenBProgram extends string | AccountMeta = string,
+  TAccountTokenAProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenBProgram extends
+    | string
+    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountToken2022Program extends
     | string
     | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
@@ -81,7 +89,9 @@ export type InitializeCustomizablePoolInstruction<
     | string
     | AccountMeta = "11111111111111111111111111111111",
   TAccountEventAuthority extends string | AccountMeta = string,
-  TAccountProgram extends string | AccountMeta = string,
+  TAccountProgram extends
+    | string
+    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -234,14 +244,14 @@ export interface InitializeCustomizablePoolAsyncInput<
   /** creator token b account */
   payerTokenB: Address<TAccountPayerTokenB>;
   /** Program to create mint account and mint tokens */
-  tokenAProgram: Address<TAccountTokenAProgram>;
+  tokenAProgram?: Address<TAccountTokenAProgram>;
   /** Program to create mint account and mint tokens */
-  tokenBProgram: Address<TAccountTokenBProgram>;
+  tokenBProgram?: Address<TAccountTokenBProgram>;
   /** Program to create NFT mint/token account and transfer for token22 account */
   token2022Program?: Address<TAccountToken2022Program>;
   systemProgram?: Address<TAccountSystemProgram>;
   eventAuthority?: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
   params: InitializeCustomizablePoolInstructionDataArgs["params"];
 }
 
@@ -354,24 +364,12 @@ export async function getInitializeCustomizablePoolInstructionAsync<
 
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
-    accounts.positionNftAccount.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            112, 111, 115, 105, 116, 105, 111, 110, 95, 110, 102, 116, 95, 97,
-            99, 99, 111, 117, 110, 116,
-          ]),
-        ),
-        getAddressEncoder().encode(
-          expectAddress(accounts.positionNftMint.value),
-        ),
-      ],
+    accounts.positionNftAccount.value = await findPositionNftAccountPda({
+      positionNftMint: expectAddress(accounts.positionNftMint.value),
     });
   }
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
+    accounts.poolAuthority.value = await findPoolAuthorityPda();
   }
   if (!accounts.position.value) {
     accounts.position.value = await getProgramDerivedAddress({
@@ -387,28 +385,24 @@ export async function getInitializeCustomizablePoolInstructionAsync<
     });
   }
   if (!accounts.tokenAVault.value) {
-    accounts.tokenAVault.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.tokenAMint.value)),
-        getAddressEncoder().encode(expectAddress(accounts.pool.value)),
-      ],
+    accounts.tokenAVault.value = await findTokenVaultPda({
+      tokenMint: expectAddress(accounts.tokenAMint.value),
+      pool: expectAddress(accounts.pool.value),
     });
   }
   if (!accounts.tokenBVault.value) {
-    accounts.tokenBVault.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]),
-        ),
-        getAddressEncoder().encode(expectAddress(accounts.tokenBMint.value)),
-        getAddressEncoder().encode(expectAddress(accounts.pool.value)),
-      ],
+    accounts.tokenBVault.value = await findTokenVaultPda({
+      tokenMint: expectAddress(accounts.tokenBMint.value),
+      pool: expectAddress(accounts.pool.value),
     });
+  }
+  if (!accounts.tokenAProgram.value) {
+    accounts.tokenAProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.tokenBProgram.value) {
+    accounts.tokenBProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.token2022Program.value) {
     accounts.token2022Program.value =
@@ -419,17 +413,11 @@ export async function getInitializeCustomizablePoolInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114,
-            105, 116, 121,
-          ]),
-        ),
-      ],
-    });
+    accounts.eventAuthority.value = await findEventAuthorityPda();
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -511,7 +499,7 @@ export interface InitializeCustomizablePoolInput<
   positionNftAccount: Address<TAccountPositionNftAccount>;
   /** Address paying to create the pool. Can be anyone */
   payer: TransactionSigner<TAccountPayer>;
-  poolAuthority?: Address<TAccountPoolAuthority>;
+  poolAuthority: Address<TAccountPoolAuthority>;
   /** Initialize an account to store the pool state */
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -528,14 +516,14 @@ export interface InitializeCustomizablePoolInput<
   /** creator token b account */
   payerTokenB: Address<TAccountPayerTokenB>;
   /** Program to create mint account and mint tokens */
-  tokenAProgram: Address<TAccountTokenAProgram>;
+  tokenAProgram?: Address<TAccountTokenAProgram>;
   /** Program to create mint account and mint tokens */
-  tokenBProgram: Address<TAccountTokenBProgram>;
+  tokenBProgram?: Address<TAccountTokenBProgram>;
   /** Program to create NFT mint/token account and transfer for token22 account */
   token2022Program?: Address<TAccountToken2022Program>;
   systemProgram?: Address<TAccountSystemProgram>;
   eventAuthority: Address<TAccountEventAuthority>;
-  program: Address<TAccountProgram>;
+  program?: Address<TAccountProgram>;
   params: InitializeCustomizablePoolInstructionDataArgs["params"];
 }
 
@@ -645,9 +633,13 @@ export function getInitializeCustomizablePoolInstruction<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value =
-      "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
+  if (!accounts.tokenAProgram.value) {
+    accounts.tokenAProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.tokenBProgram.value) {
+    accounts.tokenBProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.token2022Program.value) {
     accounts.token2022Program.value =
@@ -656,6 +648,10 @@ export function getInitializeCustomizablePoolInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.program.value) {
+    accounts.program.value =
+      "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

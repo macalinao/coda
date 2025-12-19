@@ -1,11 +1,20 @@
 import {
+  accountValueNode,
   addPdasVisitor,
   constantPdaSeedNodeFromString,
   defineConfig,
   numberTypeNode,
+  pdaLinkNode,
+  pdaSeedValueNode,
+  pdaValueNode,
   publicKeyTypeNode,
+  publicKeyValueNode,
+  TOKEN_PROGRAM_VALUE_NODE,
   variablePdaSeedNode,
 } from "@macalinao/coda";
+
+// CP-AMM program address
+const CP_AMM_PROGRAM_ADDRESS = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG";
 
 const addCustomPDAsVisitor = addPdasVisitor({
   cpAmm: [
@@ -165,10 +174,112 @@ const addCustomPDAsVisitor = addPdasVisitor({
         ),
       ],
     },
+    {
+      name: "eventAuthority",
+      docs: [
+        "The event authority PDA used for emitting program events via CPI.",
+      ],
+      seeds: [constantPdaSeedNodeFromString("utf8", "__event_authority")],
+    },
   ],
 });
 
+// Instructions that use pool_authority account
+const instructionsWithPoolAuthority = [
+  "claimPartnerFee",
+  "claimPositionFee",
+  "claimProtocolFee",
+  "claimReward",
+  "closePosition",
+  "createPosition",
+  "initializeCustomizablePool",
+  "initializePoolWithDynamicConfig",
+  "initializeReward",
+  "removeAllLiquidity",
+  "removeLiquidity",
+  "swap",
+  "swap2",
+  "withdrawIneligibleReward",
+];
+
+// Instructions that have position_nft_mint and can derive position from it
+const instructionsWithPositionNftMint = [
+  "closePosition",
+  "createPosition",
+  "initializeCustomizablePool",
+  "initializePoolWithDynamicConfig",
+];
+
 export default defineConfig({
   outputDir: "./src/generated",
+  instructionAccountDefaultValues: [
+    // Set pool_authority for all instructions that use it
+    ...instructionsWithPoolAuthority.map((instruction) => ({
+      instruction,
+      account: "poolAuthority",
+      defaultValue: pdaValueNode(pdaLinkNode("poolAuthority"), []),
+    })),
+    // Set position account derived from position NFT mint (only for instructions that have positionNftMint)
+    ...instructionsWithPositionNftMint
+      .filter(
+        (i) =>
+          i !== "initializeCustomizablePool" &&
+          i !== "initializePoolWithDynamicConfig",
+      )
+      .map((instruction) => ({
+        instruction,
+        account: "position",
+        defaultValue: pdaValueNode(pdaLinkNode("position"), [
+          pdaSeedValueNode("positionNft", accountValueNode("positionNftMint")),
+        ]),
+      })),
+    // Set position_nft_account derived from position NFT mint (only for instructions that have positionNftMint)
+    ...instructionsWithPositionNftMint.map((instruction) => ({
+      instruction,
+      account: "positionNftAccount",
+      defaultValue: pdaValueNode(pdaLinkNode("positionNftAccount"), [
+        pdaSeedValueNode(
+          "positionNftMint",
+          accountValueNode("positionNftMint"),
+        ),
+      ]),
+    })),
+    // Set tokenAProgram to SPL Token program
+    {
+      account: "tokenAProgram",
+      defaultValue: TOKEN_PROGRAM_VALUE_NODE,
+    },
+    // Set tokenBProgram to SPL Token program
+    {
+      account: "tokenBProgram",
+      defaultValue: TOKEN_PROGRAM_VALUE_NODE,
+    },
+    // Set program account to CP-AMM program (used with event_authority for CPI)
+    {
+      account: "program",
+      defaultValue: publicKeyValueNode(CP_AMM_PROGRAM_ADDRESS),
+    },
+    // Set eventAuthority to the event authority PDA
+    {
+      account: "eventAuthority",
+      defaultValue: pdaValueNode(pdaLinkNode("eventAuthority"), []),
+    },
+    // Set tokenAVault derived from tokenAMint and pool
+    {
+      account: "tokenAVault",
+      defaultValue: pdaValueNode(pdaLinkNode("tokenVault"), [
+        pdaSeedValueNode("tokenMint", accountValueNode("tokenAMint")),
+        pdaSeedValueNode("pool", accountValueNode("pool")),
+      ]),
+    },
+    // Set tokenBVault derived from tokenBMint and pool
+    {
+      account: "tokenBVault",
+      defaultValue: pdaValueNode(pdaLinkNode("tokenVault"), [
+        pdaSeedValueNode("tokenMint", accountValueNode("tokenBMint")),
+        pdaSeedValueNode("pool", accountValueNode("pool")),
+      ]),
+    },
+  ],
   visitors: [addCustomPDAsVisitor],
 });
