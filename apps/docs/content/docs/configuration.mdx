@@ -18,16 +18,19 @@ This creates a `coda.config.mjs` file with helpful comments and examples.
 ## Configuration Options
 
 ### `idlPath`
+
 - **Type**: `string | string[]`
 - **Default**: `"./target/idl/program.json"`
 - **Description**: Path to your Anchor IDL file(s). Can be a single path or array for multiple IDLs.
 
 ### `outputDir`
+
 - **Type**: `string`
 - **Default**: `"./src/generated"`
 - **Description**: Directory where generated TypeScript files will be placed
 
 ### `docs`
+
 - **Type**: `{ path?: string, npmPackageName?: string }`
 - **Default**: `{}`
 - **Description**: Documentation-specific options
@@ -35,6 +38,7 @@ This creates a `coda.config.mjs` file with helpful comments and examples.
   - `npmPackageName`: NPM package name to display badge and link in documentation
 
 ### `visitors`
+
 - **Type**: `Visitor[] | (context) => Visitor[]`
 - **Default**: `[]`
 - **Description**: Codama visitors to transform the AST. Can be an array or function that receives the IDL context.
@@ -88,11 +92,11 @@ export default defineConfig({
       // Rename conflicting instructions in specific programs
       programA: {
         instructions: {
-          transfer: "transferA",  // Rename transfer to transferA
-          deposit: "depositA",    // Rename deposit to depositA
+          transfer: "transferA", // Rename transfer to transferA
+          deposit: "depositA", // Rename deposit to depositA
         },
         definedTypes: {
-          account: "accountA",    // Rename account type to accountA
+          account: "accountA", // Rename account type to accountA
         },
       },
     }),
@@ -207,7 +211,7 @@ export default defineConfig({
         },
       ],
     }),
-    
+
     // Rename instructions to avoid conflicts between programs
     renameVisitor({
       quarryMergeMine: {
@@ -237,7 +241,7 @@ export default defineConfig({
   visitors: ({ idl, idls }) => {
     // Access parsed IDL(s) to customize visitors
     console.log(`Generating for ${idl.name}`);
-    
+
     return [
       someCustomVisitor(idl),
       // Add more visitors based on IDL content
@@ -281,6 +285,7 @@ coda docs -c ./custom.config.mjs
 ## Priority Order
 
 Settings are applied in this priority order (highest to lowest):
+
 1. Command line arguments
 2. Configuration file (`coda.config.mjs`)
 3. Default values
@@ -303,16 +308,19 @@ Add to your package.json scripts:
 ## Troubleshooting
 
 ### Config not loading
+
 - Ensure file is named `coda.config.mjs` with `.mjs` extension
 - Check that you're using ES module syntax (`export default`)
 - Verify the config file is in your project root or specified via `--config`
 
 ### Multiple IDL conflicts
+
 - Use `renameVisitor` to rename conflicting instructions/types
 - Generate to separate output directories
 - Consider splitting into multiple config files
 
 ### Visitor errors
+
 - Ensure visitors are compatible with your Codama version
 - Check that visitor functions return valid visitor objects
 - Use the context parameter to access IDL information

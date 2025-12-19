@@ -1476,7 +1476,7 @@
 - **6029 - ProtocolFeeRateMaxExceeded**: Exceeded max protocol fee rate _(Hex: `0x178d`)_
 - **6030 - MultiplicationShiftRightOverflow**: Multiplication with shift right overflow _(Hex: `0x178e`)_
 - **6031 - MulDivOverflow**: Muldiv overflow _(Hex: `0x178f`)_
-- **6032 - MulDivInvalidInput**: Invalid div_u256 input _(Hex: `0x1790`)_
+- **6032 - MulDivInvalidInput**: Invalid div*u256 input *(Hex: `0x1790`)\_
 - **6033 - MultiplicationOverflow**: Multiplication overflow _(Hex: `0x1791`)_
 - **6034 - InvalidSqrtPriceLimitDirection**: Provided SqrtPriceLimit not in the same direction as the swap. _(Hex: `0x1792`)_
 - **6035 - ZeroTradableAmount**: There are no tradable amount to swap. _(Hex: `0x1793`)_

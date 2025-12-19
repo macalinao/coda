@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Coda is an automated client generation tool for Solana programs. Built on top of [Codama](https://github.com/codama-idl/codama), Coda provides a CLI that transforms Anchor IDLs into modern TypeScript clients with full type safety and ES modules support.
 
 The monorepo contains:
+
 - **Coda CLI** - The main tool for generating TypeScript clients from Anchor IDLs
 - **Codama utilities** - Custom visitors and renderers for enhanced code generation
 - **Generated clients** - Pre-built clients for popular Solana programs
@@ -71,27 +72,31 @@ coda/
 ## Core Packages
 
 ### 1. **@macalinao/coda** - CLI for client generation
-   - Works out of the box (looks for `./idls/*.json` by default)
-   - Configurable via `coda.config.mjs`
-   - Generates TypeScript clients with full type safety
-   - Built on Codama for extensibility
-   - Supports glob patterns for IDL discovery
+
+- Works out of the box (looks for `./idls/*.json` by default)
+- Configurable via `coda.config.mjs`
+- Generates TypeScript clients with full type safety
+- Built on Codama for extensibility
+- Supports glob patterns for IDL discovery
 
 ### 2. **@macalinao/codama-instruction-accounts-dedupe-visitor**
-   - Flattens nested account structures from Anchor IDL
-   - Preserves relationships through naming conventions
-   - Updates PDA seeds when accounts are flattened
+
+- Flattens nested account structures from Anchor IDL
+- Preserves relationships through naming conventions
+- Updates PDA seeds when accounts are flattened
 
 ### 3. **@macalinao/codama-renderers-js-esm**
-   - ESM-native TypeScript renderer for Codama
-   - Adds `.js` extensions to all imports
-   - Removes Node.js-specific environment checks
-   - Ensures compatibility with `"type": "module"`
+
+- ESM-native TypeScript renderer for Codama
+- Adds `.js` extensions to all imports
+- Removes Node.js-specific environment checks
+- Ensures compatibility with `"type": "module"`
 
 ### 4. **@macalinao/clients-token-metadata**
-   - Pre-generated client for Metaplex Token Metadata program
-   - Includes custom PDAs and type definitions
-   - Ready-to-use TypeScript client
+
+- Pre-generated client for Metaplex Token Metadata program
+- Includes custom PDAs and type definitions
+- Ready-to-use TypeScript client
 
 ## How Coda Works
 
@@ -104,12 +109,15 @@ coda/
 ## Configuration (coda.config.mjs)
 
 ### Default Configuration
+
 Coda automatically discovers IDLs without any configuration:
+
 - Looks for `./idls/*.json` by default
 - Place your IDL files in the `idls/` directory
 - No config file needed for basic usage!
 
 ### Single IDL Configuration
+
 For projects with a single program (like [token-metadata](https://github.com/macalinao/coda/tree/master/clients/token-metadata)):
 
 ```javascript
@@ -120,17 +128,18 @@ export default defineConfig({
   // Optional: Custom path for single IDL
   idlPath: "./idls/my_program.json",
   outputDir: "./src/generated",
-  
+
   // Optional: Codama visitors for customization
   visitors: [
     addPdasVisitor({
       // Add custom PDAs
-    })
-  ]
+    }),
+  ],
 });
 ```
 
 ### Multiple IDL Configuration with Glob Pattern
+
 For projects with multiple programs (like [quarry](https://github.com/macalinao/coda/tree/master/clients/quarry)):
 
 ```javascript
@@ -140,15 +149,16 @@ export default defineConfig({
   // Use glob pattern to match all IDLs
   idlPath: "./idls/*.json",
   outputDir: "./src/generated",
-  
+
   // Optional: Add PDAs and other visitors for each program
   visitors: [
     // Custom visitors for each program
-  ]
+  ],
 });
 ```
 
 ### Multiple IDL Configuration with Array
+
 You can also explicitly list IDL files:
 
 ```javascript
@@ -166,6 +176,7 @@ export default defineConfig({
 ```
 
 ### Advanced Glob Patterns
+
 Use specific patterns to match only certain IDLs:
 
 ```javascript
@@ -183,6 +194,7 @@ export default defineConfig({
 ## Code Style Guidelines
 
 ### TypeScript
+
 - Use specific types, avoid `any`
 - Prefer interfaces over type aliases for objects
 - Use `import type` for type-only imports (enforced by Biome)
@@ -192,11 +204,14 @@ export default defineConfig({
 - **File naming**: Use kebab-case for all TypeScript files (e.g., `root-node-from-anchor.ts`, `create-codama-from-idls.ts`)
 
 ### After Making Code Changes
+
 **Always run these commands to ensure code quality:**
+
 1. `bun run build` - Check for TypeScript errors
 2. `bun run lint:fix` - Fix linting and formatting issues
 
 ### Biome/ESLint Configuration
+
 - No floating promises (must be handled)
 - Use const assertions where applicable
 - No non-null assertions are allowed
@@ -207,6 +222,7 @@ export default defineConfig({
 ## Turborepo Configuration
 
 Tasks are defined in turbo.json:
+
 - `build`: Depends on upstream builds, outputs to `./dist/**`
 - `lint`: Depends on upstream builds
 - `test`: Depends on build, no caching
@@ -222,6 +238,7 @@ Tasks are defined in turbo.json:
 5. **Build**: Run `bun run build`
 
 Example package.json for a client:
+
 ```json
 {
   "name": "@macalinao/clients-[program-name]",
@@ -236,6 +253,7 @@ Example package.json for a client:
 ## CI/CD
 
 GitHub Actions workflow runs on push/PR to main:
+
 - Installs dependencies with frozen lockfile
 - Builds all packages
 - Runs linting (biome + eslint)
@@ -252,6 +270,7 @@ GitHub Actions workflow runs on push/PR to main:
 ## Package Structure Guidelines
 
 When creating new packages:
+
 - Use TypeScript directly with `tsc` for building (no tsup/rollup/etc)
 - Follow the same structure as existing packages
 - Scripts should be: `build`, `clean`, `lint`, `test`, `codegen` (if applicable)
@@ -261,6 +280,7 @@ When creating new packages:
 ## Working with Generated Code
 
 Generated clients provide:
+
 - **Instructions**: Typed builders for all program instructions
 - **Accounts**: Decoders and fetchers for all account types
 - **Types**: All TypeScript types from the IDL
@@ -268,6 +288,7 @@ Generated clients provide:
 - **Errors**: Typed error enums and handlers
 
 Example usage:
+
 ```typescript
 import { createTransferInstruction } from "./generated";
 
@@ -275,7 +296,7 @@ const instruction = createTransferInstruction({
   source: sourceAddress,
   destination: destAddress,
   authority: authorityAddress,
-  amount: 1000n
+  amount: 1000n,
 });
 ```
 
@@ -285,7 +306,7 @@ const instruction = createTransferInstruction({
 
 When writing documentation for Coda or generated clients:
 
-1. **Command Examples**: 
+1. **Command Examples**:
    - Always show direct command usage: `coda generate`, not `bunx coda generate` or `npx coda`
    - Assume users have installed the package globally or are using it directly
    - Show the simplest path to success
@@ -318,6 +339,7 @@ When writing documentation for Coda or generated clients:
 The `apps/docs/` folder contains the documentation site built with Fumadocs and Next.js 15. The structure follows the Fumadocs reference implementation in `vendor/fumadocs/apps/docs/`.
 
 ### Tech Stack
+
 - **Framework**: Next.js 15 with App Router
 - **Documentation**: Fumadocs UI
 - **Styling**: Tailwind CSS v4 (no config file needed, uses @source directives)
@@ -326,6 +348,7 @@ The `apps/docs/` folder contains the documentation site built with Fumadocs and 
 - **Linting**: Modern ESLint flat config (eslint.config.mjs)
 
 ### Development
+
 ```bash
 cd apps/docs
 bun run dev     # Start dev server on localhost:3000
@@ -333,6 +356,7 @@ bun run build   # Build for production
 ```
 
 ### Adding Documentation
+
 1. Create MDX files in `apps/docs/content/docs/`
 2. Update navigation in `meta.json` files if needed
 3. Code blocks automatically get syntax highlighting
@@ -340,12 +364,14 @@ bun run build   # Build for production
 5. **Important**: Do NOT include `# Title` headers in MDX files - the title is already specified in the YAML frontmatter and will be rendered automatically
 
 ### Key Files
+
 - `src/app/layout.config.tsx` - Site branding and navigation
 - `source.config.ts` - MDX and syntax highlighting config
 - `src/app/global.css` - Tailwind v4 imports with @source directives
 - `content/docs/` - Documentation content in MDX
 
 ### MDX Writing Guidelines
+
 - **No redundant headers**: Since the title is specified in YAML frontmatter, do NOT add `# Title` as the first line of content
 - Start documentation content directly with the introduction paragraph or first section (`##`)
 - The title from frontmatter will be automatically rendered by Fumadocs

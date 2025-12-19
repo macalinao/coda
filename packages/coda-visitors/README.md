@@ -26,7 +26,7 @@ const visitor = addNodesVisitor({
       accountNode({
         name: "customAccount",
         // ... account configuration
-      })
+      }),
     ],
     instructions: [
       // Add custom instructions
@@ -39,8 +39,8 @@ const visitor = addNodesVisitor({
     ],
     pdas: [
       // Add custom PDAs
-    ]
-  }
+    ],
+  },
 });
 ```
 
@@ -58,10 +58,10 @@ export default defineConfig({
       voterStakeRegistry: {
         accounts: [
           // Add custom accounts not in IDL
-        ]
-      }
-    })
-  ]
+        ],
+      },
+    }),
+  ],
 });
 ```
 

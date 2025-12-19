@@ -35,20 +35,20 @@ The `coda.config.mjs` file defines custom PDAs for the SPL Stake Pool program, i
 ## Usage
 
 ```typescript
-import { 
+import {
   findWithdrawAuthorityPda,
-  findStakePda 
+  findStakePda,
 } from "@macalinao/clients-spl-stake-pool";
 
 // Get withdraw authority PDA
-const withdrawAuthorityPda = await findWithdrawAuthorityPda({ 
-  stakePool: stakePoolPublicKey 
+const withdrawAuthorityPda = await findWithdrawAuthorityPda({
+  stakePool: stakePoolPublicKey,
 });
 
 // Get stake account PDA
 const stakePda = await findStakePda({
   voteAccount: validatorVoteAccount,
-  stakePool: stakePoolPublicKey
+  stakePool: stakePoolPublicKey,
 });
 
 // Use the generated client functions

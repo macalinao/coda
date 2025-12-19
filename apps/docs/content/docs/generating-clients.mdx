@@ -14,6 +14,7 @@ coda generate
 ```
 
 This command will:
+
 1. Look for IDL files in `./idls/*.json` (or use your configured path)
 2. Generate TypeScript code to `./src/generated/` directory
 3. Create a complete client with types, instructions, accounts, and more
@@ -23,14 +24,18 @@ This command will:
 Coda generates a comprehensive TypeScript client that includes:
 
 ### 1. **Programs**
+
 Program constants and metadata:
+
 ```typescript
-export const MY_PROGRAM_PROGRAM_ADDRESS = 
+export const MY_PROGRAM_PROGRAM_ADDRESS =
   "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
 ```
 
 ### 2. **Instructions**
+
 Type-safe instruction builders:
+
 ```typescript
 import { createTransferInstruction } from "./generated";
 
@@ -43,7 +48,9 @@ const instruction = createTransferInstruction({
 ```
 
 ### 3. **Accounts**
+
 Account decoders and fetchers:
+
 ```typescript
 import { fetchMintAccount, decodeMintAccount } from "./generated";
 
@@ -56,7 +63,9 @@ const mint = decodeMintAccount(accountInfo.data);
 ```
 
 ### 4. **Types**
+
 All TypeScript types from your IDL:
+
 ```typescript
 import type { TokenMetadata, Creator } from "./generated";
 
@@ -69,7 +78,9 @@ const metadata: TokenMetadata = {
 ```
 
 ### 5. **PDAs (Program Derived Addresses)**
+
 Helper functions for deriving PDAs:
+
 ```typescript
 import { findMetadataPda } from "./generated";
 
@@ -79,7 +90,9 @@ const [metadataAddress, bump] = await findMetadataPda({
 ```
 
 ### 6. **Errors**
+
 Typed error enums and handlers:
+
 ```typescript
 import { MyProgramError, isMyProgramError } from "./generated";
 
@@ -95,6 +108,7 @@ try {
 ## Configuration
 
 Client generation can be customized through `coda.config.mjs`. See the [Configuration](/docs/configuration) page for detailed options including:
+
 - Custom IDL paths and output directories
 - Working with multiple programs
 - Adding custom PDAs with visitors
@@ -122,7 +136,7 @@ The `coda generate` command accepts several options. See the [Configuration](/do
 Here's a complete example of using a generated client:
 
 ```typescript
-import { 
+import {
   createMintInstruction,
   createTransferInstruction,
   fetchTokenAccount,
@@ -164,6 +178,7 @@ console.log("Balance:", tokenAccount.amount);
 ### Custom Visitors
 
 Coda uses the Codama visitor pattern for AST transformations. You can:
+
 - Rename types and instructions
 - Add custom PDAs
 - Modify account structures
@@ -195,19 +210,25 @@ const amount = 1_000_000_000n; // 1 billion lamports
 ### Common Issues
 
 **IDL not found**
+
 ```bash
 Error: IDL file not found at ./idls/*.json
 ```
+
 Solution: Ensure your Anchor program is built (`anchor build`)
 
 **TypeScript errors**
+
 ```bash
 Cannot find module './types/index.js'
 ```
+
 Solution: Make sure your `tsconfig.json` has proper module resolution settings
 
 **Import errors**
+
 ```bash
 ERR_MODULE_NOT_FOUND
 ```
+
 Solution: Ensure your `package.json` has `"type": "module"` set

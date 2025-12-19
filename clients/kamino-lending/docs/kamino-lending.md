@@ -1956,7 +1956,7 @@
 - **6078 - ReferrerAccountMissing**: Referrer account missing for obligation with referrer _(Hex: `0x17be`)_
 - **6079 - InsufficientReferralFeesToRedeem**: Insufficient referral fees to claim or no liquidity available _(Hex: `0x17bf`)_
 - **6080 - CpiDisabled**: CPI disabled for this instruction _(Hex: `0x17c0`)_
-- **6081 - ShortUrlNotAsciiAlphanumeric**: Referrer short_url is not ascii alphanumeric _(Hex: `0x17c1`)_
+- **6081 - ShortUrlNotAsciiAlphanumeric**: Referrer short*url is not ascii alphanumeric *(Hex: `0x17c1`)\_
 - **6082 - ReserveObsolete**: Reserve is marked as obsolete _(Hex: `0x17c2`)_
 - **6083 - ElevationGroupAlreadyActivated**: Obligation already part of the same elevation group _(Hex: `0x17c3`)_
 - **6084 - ObligationInDeprecatedReserve**: Obligation has a deposit in a deprecated reserve _(Hex: `0x17c4`)_

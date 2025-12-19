@@ -14,6 +14,7 @@ coda docs
 ```
 
 This command will:
+
 1. Look for IDL files in `./idls/*.json` (or use your configured path)
 2. Generate markdown documentation to `./docs/` directory
 3. Create one markdown file per program with kebab-case naming
@@ -63,6 +64,7 @@ export default defineConfig({
 ```
 
 This will add:
+
 - An NPM version badge at the top of the document
 - A link to your TypeScript client package on NPM
 
@@ -82,13 +84,16 @@ Example output:
 The generated markdown documentation includes:
 
 ### Program Information
+
 - Program name (converted to Title Case)
 - Program description (from IDL docs)
 - Program ID
 - TypeScript client link (if configured)
 
 ### Table of Contents
+
 Automatically generated with links to all sections:
+
 - Accounts
 - Instructions
 - PDAs (Program Derived Addresses)
@@ -96,34 +101,44 @@ Automatically generated with links to all sections:
 - Errors
 
 ### Accounts Section
+
 For each account:
+
 - Account name and description
 - Data structure with field types
 - TypeScript interface representation
 - Discriminator information (if applicable)
 
 ### Instructions Section
+
 For each instruction:
+
 - Instruction name and description
 - Account requirements (signer, writable status)
 - Argument types and descriptions
 - TypeScript function signature
 
 ### PDAs Section
+
 For each PDA:
+
 - PDA name and description
 - Seed structure and types
 - How to derive the address
 
 ### Types Section
+
 For each custom type:
+
 - Type name and description
 - Field definitions for structs
 - Variants for enums
 - TypeScript type representation
 
 ### Errors Section
+
 All program errors in a bullet list format:
+
 - Error name with code in decimal, padded, and hex formats
 - Error message
 
@@ -132,6 +147,7 @@ Example: `- **InvalidAccount** (Code: 100 / \`100\` / \`0x64\`) -- The account i
 ## Multiple Programs
 
 When working with multiple programs, Coda generates separate documentation files for each. Each program gets its own markdown file with kebab-case naming:
+
 - `docs/program-one.md`
 - `docs/program-two.md`
 - etc.
@@ -174,10 +190,10 @@ A simple SPL Token program for minting and transferring tokens.
 
 The mint account stores token supply and decimals.
 
-| Field | Type | Description |
-| --- | --- | --- |
-| supply | `u64` | Total supply of tokens |
-| decimals | `u8` | Number of decimals |
+| Field    | Type  | Description            |
+| -------- | ----- | ---------------------- |
+| supply   | `u64` | Total supply of tokens |
+| decimals | `u8`  | Number of decimals     |
 
 ...
 ```
@@ -185,6 +201,7 @@ The mint account stores token supply and decimals.
 ## Integration with Documentation Sites
 
 The generated markdown files can be easily integrated into documentation sites like:
+
 - GitHub Pages
 - GitBook
 - Docusaurus
@@ -201,6 +218,7 @@ The generated markdown files can be easily integrated into documentation sites l
 3. **Commit Generated Docs**: Consider committing the generated documentation to your repository so it's available on GitHub.
 
 4. **Automate Generation**: Add a script to your `package.json` to regenerate docs:
+
    ```json
    {
      "scripts": {

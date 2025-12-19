@@ -826,10 +826,10 @@
 - **6026 - TokenFarmTokenMintMissmatch**: Token mint and farm token have different mints _(Hex: `0x178a`)_
 - **6027 - RewardAtaRewardMintMissmatch**: Reward ata mint is different than reward mint _(Hex: `0x178b`)_
 - **6028 - RewardAtaOwnerNotPayer**: Reward ata owner is different than payer _(Hex: `0x178c`)_
-- **6029 - InvalidGlobalConfigMode**: Mode to update global_config is invalid _(Hex: `0x178d`)_
+- **6029 - InvalidGlobalConfigMode**: Mode to update global*config is invalid *(Hex: `0x178d`)\_
 - **6030 - RewardIndexOutOfRange**: Reward Index is higher than number of rewards _(Hex: `0x178e`)_
 - **6031 - NothingToWithdraw**: No tokens available to withdraw _(Hex: `0x178f`)_
-- **6032 - UserDelegatedFarmNonDelegatedMissmatch**: user, user_ref, authority and payer must match for non-delegated farm _(Hex: `0x1790`)_
+- **6032 - UserDelegatedFarmNonDelegatedMissmatch**: user, user*ref, authority and payer must match for non-delegated farm *(Hex: `0x1790`)\_
 - **6033 - AuthorityFarmDelegateMissmatch**: Authority must match farm delegate authority _(Hex: `0x1791`)_
 - **6034 - FarmNotDelegated**: Farm not delegated, can not set stake _(Hex: `0x1792`)_
 - **6035 - FarmDelegated**: Operation not allowed for delegated farm _(Hex: `0x1793`)_

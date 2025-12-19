@@ -12,6 +12,7 @@ bun add -D @macalinao/codama-instruction-accounts-dedupe-visitor
 ```
 
 Or with npm:
+
 ```bash
 npm install -D @macalinao/codama-instruction-accounts-dedupe-visitor
 ```
@@ -61,8 +62,8 @@ export default defineConfig({
   outputDir: "./src/generated",
   visitors: (idl) => [
     // Pass the IDL to the visitor
-    instructionAccountsDedupeVisitor(idl)
-  ]
+    instructionAccountsDedupeVisitor(idl),
+  ],
 });
 ```
 
@@ -83,12 +84,12 @@ The visitor transforms nested account structures through a multi-step process:
 {
   name: "mintAccounts",
   accounts: [
-    { 
+    {
       name: "mint",
       isMut: false,
       isSigner: false
     },
-    { 
+    {
       name: "metadata",
       isMut: true,
       isSigner: false
@@ -101,17 +102,17 @@ The visitor transforms nested account structures through a multi-step process:
 
 ```typescript
 [
-  { 
+  {
     name: "mintAccounts_mint",
     isMut: false,
-    isSigner: false
+    isSigner: false,
   },
-  { 
+  {
     name: "mintAccounts_metadata",
     isMut: true,
-    isSigner: false
-  }
-]
+    isSigner: false,
+  },
+];
 ```
 
 ### PDA Seed Updates
@@ -119,26 +120,28 @@ The visitor transforms nested account structures through a multi-step process:
 When flattening accounts, PDA seeds are also updated to reflect the new structure:
 
 #### Before
+
 ```typescript
 {
   seeds: [
-    { 
+    {
       kind: "account",
-      path: "mintAccounts.mint"
-    }
-  ]
+      path: "mintAccounts.mint",
+    },
+  ];
 }
 ```
 
 #### After
+
 ```typescript
 {
   seeds: [
-    { 
+    {
       kind: "account",
-      path: "mintAccounts_mint"
-    }
-  ]
+      path: "mintAccounts_mint",
+    },
+  ];
 }
 ```
 
@@ -153,9 +156,11 @@ function instructionAccountsDedupeVisitor(idl: AnchorIdl): Visitor;
 ```
 
 **Parameters:**
+
 - `idl`: The Anchor IDL containing the instruction definitions with potentially nested accounts
 
 **Returns:**
+
 - A Codama visitor that can be applied to transform the AST
 
 ## Use Cases
@@ -213,8 +218,8 @@ Ensure you're passing the correct IDL and that it contains nested account struct
 
 ```typescript
 // Check if your IDL has nested structures
-const hasNested = idl.instructions.some(ix => 
-  ix.accounts.some(acc => acc.accounts && acc.accounts.length > 0)
+const hasNested = idl.instructions.some((ix) =>
+  ix.accounts.some((acc) => acc.accounts && acc.accounts.length > 0),
 );
 ```
 
