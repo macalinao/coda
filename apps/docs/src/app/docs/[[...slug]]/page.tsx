@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { createRelativeLink } from "fumadocs-ui/mdx";
 import {
   DocsBody,
   DocsDescription,
   DocsPage,
   DocsTitle,
-} from "fumadocs-ui/page";
+  EditOnGitHub,
+} from "fumadocs-ui/layouts/docs/page";
+import { createRelativeLink } from "fumadocs-ui/mdx";
 import { notFound } from "next/navigation";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
@@ -23,11 +24,12 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
     <DocsPage
       toc={page.data.toc}
       full={page.data.full}
-      editOnGithub={{
-        owner: "macalinao",
-        repo: "coda",
-        sha: "master",
-        path: `apps/docs/content/docs/${params.slug?.join("/") || "index"}.mdx`,
+      tableOfContent={{
+        footer: (
+          <EditOnGitHub
+            href={`https://github.com/macalinao/coda/edit/master/apps/docs/content/docs/${params.slug?.join("/") ?? "index"}.mdx`}
+          />
+        ),
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
