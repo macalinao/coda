@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import type { MDXContent } from "mdx/types";
 import {
   DocsBody,
   DocsDescription,
@@ -19,7 +18,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
     notFound();
   }
 
-  const MDX = page.data.body as MDXContent;
+  const MDX = page.data.body;
 
   return (
     <DocsPage
