@@ -5,7 +5,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "build": "next build",
+    "build": "fumadocs-mdx && next build",
     "clean": "rm -rf .next/ .source/ out/ node_modules/",
     "dev": "next dev --turbo",
     "start": "next start",
