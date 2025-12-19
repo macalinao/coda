@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-voter-stake-registry",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "TypeScript client for the SPL Governance Voter Stake Registry program",
   "type": "module",
   "sideEffects": false,

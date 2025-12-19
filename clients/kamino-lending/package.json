@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-kamino-lending",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "TypeScript client for the Kamino Lending program",
   "type": "module",
   "sideEffects": false,

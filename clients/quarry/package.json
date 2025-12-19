@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-quarry",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "TypeScript client for Quarry protocol programs",
   "type": "module",
   "sideEffects": false,

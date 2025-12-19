@@ -1,5 +1,12 @@
 # @macalinao/create-coda
 
+## 0.2.6
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+- f199765: Update all dependencies
+
 ## 0.2.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @macalinao/clients-kamino-lending
 
+## 0.5.4
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.5.3
 
 ### Patch Changes

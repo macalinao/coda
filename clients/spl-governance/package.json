@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-spl-governance",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "TypeScript client for the SPL Governance program",
   "type": "module",
   "sideEffects": false,

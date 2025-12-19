@@ -1,5 +1,11 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
+## 0.4.3
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.4.2
 
 ### Patch Changes

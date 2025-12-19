@@ -1,5 +1,11 @@
 # @macalinao/clients-voter-stake-registry
 
+## 0.2.4
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.2.3
 
 ### Patch Changes
