@@ -115,6 +115,7 @@ export interface ConfigArgs {
   padding1: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link ConfigArgs} account data. */
 export function getConfigEncoder(): FixedSizeEncoder<ConfigArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -135,6 +136,7 @@ export function getConfigEncoder(): FixedSizeEncoder<ConfigArgs> {
   );
 }
 
+/** Gets the decoder for {@link Config} account data. */
 export function getConfigDecoder(): FixedSizeDecoder<Config> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -152,6 +154,7 @@ export function getConfigDecoder(): FixedSizeDecoder<Config> {
   ]);
 }
 
+/** Gets the codec for {@link Config} account data. */
 export function getConfigCodec(): FixedSizeCodec<ConfigArgs, Config> {
   return combineCodec(getConfigEncoder(), getConfigDecoder());
 }

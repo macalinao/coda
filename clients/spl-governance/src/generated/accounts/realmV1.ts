@@ -83,6 +83,7 @@ export interface RealmV1Args {
   name: string;
 }
 
+/** Gets the encoder for {@link RealmV1Args} account data. */
 export function getRealmV1Encoder(): Encoder<RealmV1Args> {
   return transformEncoder(
     getStructEncoder([
@@ -98,6 +99,7 @@ export function getRealmV1Encoder(): Encoder<RealmV1Args> {
   );
 }
 
+/** Gets the decoder for {@link RealmV1} account data. */
 export function getRealmV1Decoder(): Decoder<RealmV1> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -110,6 +112,7 @@ export function getRealmV1Decoder(): Decoder<RealmV1> {
   ]);
 }
 
+/** Gets the codec for {@link RealmV1} account data. */
 export function getRealmV1Codec(): Codec<RealmV1Args, RealmV1> {
   return combineCodec(getRealmV1Encoder(), getRealmV1Decoder());
 }

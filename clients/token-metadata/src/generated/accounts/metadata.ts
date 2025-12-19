@@ -103,6 +103,7 @@ export interface MetadataArgs {
   programmableConfig: OptionOrNullable<ProgrammableConfigArgs>;
 }
 
+/** Gets the encoder for {@link MetadataArgs} account data. */
 export function getMetadataEncoder(): Encoder<MetadataArgs> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -120,6 +121,7 @@ export function getMetadataEncoder(): Encoder<MetadataArgs> {
   ]);
 }
 
+/** Gets the decoder for {@link Metadata} account data. */
 export function getMetadataDecoder(): Decoder<Metadata> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -137,6 +139,7 @@ export function getMetadataDecoder(): Decoder<Metadata> {
   ]);
 }
 
+/** Gets the codec for {@link Metadata} account data. */
 export function getMetadataCodec(): Codec<MetadataArgs, Metadata> {
   return combineCodec(getMetadataEncoder(), getMetadataDecoder());
 }

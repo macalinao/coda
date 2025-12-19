@@ -85,6 +85,7 @@ export interface RealmV2Args {
   reservedV2: number[];
 }
 
+/** Gets the encoder for {@link RealmV2Args} account data. */
 export function getRealmV2Encoder(): Encoder<RealmV2Args> {
   return transformEncoder(
     getStructEncoder([
@@ -101,6 +102,7 @@ export function getRealmV2Encoder(): Encoder<RealmV2Args> {
   );
 }
 
+/** Gets the decoder for {@link RealmV2} account data. */
 export function getRealmV2Decoder(): Decoder<RealmV2> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -114,6 +116,7 @@ export function getRealmV2Decoder(): Decoder<RealmV2> {
   ]);
 }
 
+/** Gets the codec for {@link RealmV2} account data. */
 export function getRealmV2Codec(): Codec<RealmV2Args, RealmV2> {
   return combineCodec(getRealmV2Encoder(), getRealmV2Decoder());
 }

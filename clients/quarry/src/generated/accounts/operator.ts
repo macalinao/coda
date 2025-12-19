@@ -78,6 +78,7 @@ export interface OperatorArgs {
   generation: number | bigint;
 }
 
+/** Gets the encoder for {@link OperatorArgs} account data. */
 export function getOperatorEncoder(): FixedSizeEncoder<OperatorArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -96,6 +97,7 @@ export function getOperatorEncoder(): FixedSizeEncoder<OperatorArgs> {
   );
 }
 
+/** Gets the decoder for {@link Operator} account data. */
 export function getOperatorDecoder(): FixedSizeDecoder<Operator> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -111,6 +113,7 @@ export function getOperatorDecoder(): FixedSizeDecoder<Operator> {
   ]);
 }
 
+/** Gets the codec for {@link Operator} account data. */
 export function getOperatorCodec(): FixedSizeCodec<OperatorArgs, Operator> {
   return combineCodec(getOperatorEncoder(), getOperatorDecoder());
 }

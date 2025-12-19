@@ -60,6 +60,7 @@ export interface ReferrerStateArgs {
   owner: Address;
 }
 
+/** Gets the encoder for {@link ReferrerStateArgs} account data. */
 export function getReferrerStateEncoder(): FixedSizeEncoder<ReferrerStateArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -71,6 +72,7 @@ export function getReferrerStateEncoder(): FixedSizeEncoder<ReferrerStateArgs> {
   );
 }
 
+/** Gets the decoder for {@link ReferrerState} account data. */
 export function getReferrerStateDecoder(): FixedSizeDecoder<ReferrerState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -79,6 +81,7 @@ export function getReferrerStateDecoder(): FixedSizeDecoder<ReferrerState> {
   ]);
 }
 
+/** Gets the codec for {@link ReferrerState} account data. */
 export function getReferrerStateCodec(): FixedSizeCodec<
   ReferrerStateArgs,
   ReferrerState

@@ -68,6 +68,7 @@ export interface VoteArgs {
   weight: number | bigint;
 }
 
+/** Gets the encoder for {@link VoteArgs} account data. */
 export function getVoteEncoder(): FixedSizeEncoder<VoteArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -82,6 +83,7 @@ export function getVoteEncoder(): FixedSizeEncoder<VoteArgs> {
   );
 }
 
+/** Gets the decoder for {@link Vote} account data. */
 export function getVoteDecoder(): FixedSizeDecoder<Vote> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -93,6 +95,7 @@ export function getVoteDecoder(): FixedSizeDecoder<Vote> {
   ]);
 }
 
+/** Gets the codec for {@link Vote} account data. */
 export function getVoteCodec(): FixedSizeCodec<VoteArgs, Vote> {
   return combineCodec(getVoteEncoder(), getVoteDecoder());
 }

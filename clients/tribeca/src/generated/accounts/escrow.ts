@@ -76,6 +76,7 @@ export interface EscrowArgs {
   voteDelegate: Address;
 }
 
+/** Gets the encoder for {@link EscrowArgs} account data. */
 export function getEscrowEncoder(): FixedSizeEncoder<EscrowArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -93,6 +94,7 @@ export function getEscrowEncoder(): FixedSizeEncoder<EscrowArgs> {
   );
 }
 
+/** Gets the decoder for {@link Escrow} account data. */
 export function getEscrowDecoder(): FixedSizeDecoder<Escrow> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -107,6 +109,7 @@ export function getEscrowDecoder(): FixedSizeDecoder<Escrow> {
   ]);
 }
 
+/** Gets the codec for {@link Escrow} account data. */
 export function getEscrowCodec(): FixedSizeCodec<EscrowArgs, Escrow> {
   return combineCodec(getEscrowEncoder(), getEscrowDecoder());
 }

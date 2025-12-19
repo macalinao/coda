@@ -124,6 +124,7 @@ export interface ReserveArgs {
   padding: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link ReserveArgs} account data. */
 export function getReserveEncoder(): FixedSizeEncoder<ReserveArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -156,6 +157,7 @@ export function getReserveEncoder(): FixedSizeEncoder<ReserveArgs> {
   );
 }
 
+/** Gets the decoder for {@link Reserve} account data. */
 export function getReserveDecoder(): FixedSizeDecoder<Reserve> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -185,6 +187,7 @@ export function getReserveDecoder(): FixedSizeDecoder<Reserve> {
   ]);
 }
 
+/** Gets the codec for {@link Reserve} account data. */
 export function getReserveCodec(): FixedSizeCodec<ReserveArgs, Reserve> {
   return combineCodec(getReserveEncoder(), getReserveDecoder());
 }

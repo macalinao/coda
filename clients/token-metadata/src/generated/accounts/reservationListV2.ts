@@ -69,6 +69,7 @@ export interface ReservationListV2Args {
   currentReservationSpots: number | bigint;
 }
 
+/** Gets the encoder for {@link ReservationListV2Args} account data. */
 export function getReservationListV2Encoder(): Encoder<ReservationListV2Args> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -80,6 +81,7 @@ export function getReservationListV2Encoder(): Encoder<ReservationListV2Args> {
   ]);
 }
 
+/** Gets the decoder for {@link ReservationListV2} account data. */
 export function getReservationListV2Decoder(): Decoder<ReservationListV2> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -91,6 +93,7 @@ export function getReservationListV2Decoder(): Decoder<ReservationListV2> {
   ]);
 }
 
+/** Gets the codec for {@link ReservationListV2} account data. */
 export function getReservationListV2Codec(): Codec<
   ReservationListV2Args,
   ReservationListV2

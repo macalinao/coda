@@ -65,6 +65,7 @@ export interface ClaimFeeOperatorArgs {
   padding: number[];
 }
 
+/** Gets the encoder for {@link ClaimFeeOperatorArgs} account data. */
 export function getClaimFeeOperatorEncoder(): FixedSizeEncoder<ClaimFeeOperatorArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -76,6 +77,7 @@ export function getClaimFeeOperatorEncoder(): FixedSizeEncoder<ClaimFeeOperatorA
   );
 }
 
+/** Gets the decoder for {@link ClaimFeeOperator} account data. */
 export function getClaimFeeOperatorDecoder(): FixedSizeDecoder<ClaimFeeOperator> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -84,6 +86,7 @@ export function getClaimFeeOperatorDecoder(): FixedSizeDecoder<ClaimFeeOperator>
   ]);
 }
 
+/** Gets the codec for {@link ClaimFeeOperator} account data. */
 export function getClaimFeeOperatorCodec(): FixedSizeCodec<
   ClaimFeeOperatorArgs,
   ClaimFeeOperator

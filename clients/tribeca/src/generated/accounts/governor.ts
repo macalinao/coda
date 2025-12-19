@@ -78,6 +78,7 @@ export interface GovernorArgs {
   params: GovernanceParametersArgs;
 }
 
+/** Gets the encoder for {@link GovernorArgs} account data. */
 export function getGovernorEncoder(): FixedSizeEncoder<GovernorArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -93,6 +94,7 @@ export function getGovernorEncoder(): FixedSizeEncoder<GovernorArgs> {
   );
 }
 
+/** Gets the decoder for {@link Governor} account data. */
 export function getGovernorDecoder(): FixedSizeDecoder<Governor> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -105,6 +107,7 @@ export function getGovernorDecoder(): FixedSizeDecoder<Governor> {
   ]);
 }
 
+/** Gets the codec for {@link Governor} account data. */
 export function getGovernorCodec(): FixedSizeCodec<GovernorArgs, Governor> {
   return combineCodec(getGovernorEncoder(), getGovernorDecoder());
 }

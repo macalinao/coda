@@ -144,6 +144,7 @@ export interface UserStateArgs {
   padding1: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link UserStateArgs} account data. */
 export function getUserStateEncoder(): FixedSizeEncoder<UserStateArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -173,6 +174,7 @@ export function getUserStateEncoder(): FixedSizeEncoder<UserStateArgs> {
   );
 }
 
+/** Gets the decoder for {@link UserState} account data. */
 export function getUserStateDecoder(): FixedSizeDecoder<UserState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -196,6 +198,7 @@ export function getUserStateDecoder(): FixedSizeDecoder<UserState> {
   ]);
 }
 
+/** Gets the codec for {@link UserState} account data. */
 export function getUserStateCodec(): FixedSizeCodec<UserStateArgs, UserState> {
   return combineCodec(getUserStateEncoder(), getUserStateDecoder());
 }

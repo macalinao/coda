@@ -78,6 +78,7 @@ export interface MintWrapperArgs {
   totalMinted: number | bigint;
 }
 
+/** Gets the encoder for {@link MintWrapperArgs} account data. */
 export function getMintWrapperEncoder(): FixedSizeEncoder<MintWrapperArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -96,6 +97,7 @@ export function getMintWrapperEncoder(): FixedSizeEncoder<MintWrapperArgs> {
   );
 }
 
+/** Gets the decoder for {@link MintWrapper} account data. */
 export function getMintWrapperDecoder(): FixedSizeDecoder<MintWrapper> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -111,6 +113,7 @@ export function getMintWrapperDecoder(): FixedSizeDecoder<MintWrapper> {
   ]);
 }
 
+/** Gets the codec for {@link MintWrapper} account data. */
 export function getMintWrapperCodec(): FixedSizeCodec<
   MintWrapperArgs,
   MintWrapper

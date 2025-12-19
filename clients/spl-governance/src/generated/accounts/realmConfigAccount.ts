@@ -73,6 +73,7 @@ export interface RealmConfigAccountArgs {
   reserved: Reserved110Args;
 }
 
+/** Gets the encoder for {@link RealmConfigAccountArgs} account data. */
 export function getRealmConfigAccountEncoder(): Encoder<RealmConfigAccountArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -86,6 +87,7 @@ export function getRealmConfigAccountEncoder(): Encoder<RealmConfigAccountArgs> 
   );
 }
 
+/** Gets the decoder for {@link RealmConfigAccount} account data. */
 export function getRealmConfigAccountDecoder(): Decoder<RealmConfigAccount> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -96,6 +98,7 @@ export function getRealmConfigAccountDecoder(): Decoder<RealmConfigAccount> {
   ]);
 }
 
+/** Gets the codec for {@link RealmConfigAccount} account data. */
 export function getRealmConfigAccountCodec(): Codec<
   RealmConfigAccountArgs,
   RealmConfigAccount

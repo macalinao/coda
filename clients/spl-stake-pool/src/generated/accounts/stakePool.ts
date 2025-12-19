@@ -65,6 +65,7 @@ export function getStakePoolAccountTypeBytes() {
   return getAccountTypeEncoder().encode(STAKE_POOL_ACCOUNT_TYPE);
 }
 
+/** Initialized program details. */
 export interface StakePool {
   /** Account type, must be `StakePool` currently */
   accountType: AccountType;
@@ -275,6 +276,7 @@ export interface StakePoolArgs {
   lastEpochTotalLamports: number | bigint;
 }
 
+/** Gets the encoder for {@link StakePoolArgs} account data. */
 export function getStakePoolEncoder(): Encoder<StakePoolArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -319,6 +321,7 @@ export function getStakePoolEncoder(): Encoder<StakePoolArgs> {
   );
 }
 
+/** Gets the decoder for {@link StakePool} account data. */
 export function getStakePoolDecoder(): Decoder<StakePool> {
   return getStructDecoder([
     ["accountType", getAccountTypeDecoder()],
@@ -360,6 +363,7 @@ export function getStakePoolDecoder(): Decoder<StakePool> {
   ]);
 }
 
+/** Gets the codec for {@link StakePool} account data. */
 export function getStakePoolCodec(): Codec<StakePoolArgs, StakePool> {
   return combineCodec(getStakePoolEncoder(), getStakePoolDecoder());
 }

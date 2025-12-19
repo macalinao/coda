@@ -87,6 +87,7 @@ export interface LegacyTokenOwnerRecordArgs {
   reservedV2: number[];
 }
 
+/** Gets the encoder for {@link LegacyTokenOwnerRecordArgs} account data. */
 export function getLegacyTokenOwnerRecordEncoder(): Encoder<LegacyTokenOwnerRecordArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -109,6 +110,7 @@ export function getLegacyTokenOwnerRecordEncoder(): Encoder<LegacyTokenOwnerReco
   );
 }
 
+/** Gets the decoder for {@link LegacyTokenOwnerRecord} account data. */
 export function getLegacyTokenOwnerRecordDecoder(): Decoder<LegacyTokenOwnerRecord> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -125,6 +127,7 @@ export function getLegacyTokenOwnerRecordDecoder(): Decoder<LegacyTokenOwnerReco
   ]);
 }
 
+/** Gets the codec for {@link LegacyTokenOwnerRecord} account data. */
 export function getLegacyTokenOwnerRecordCodec(): Codec<
   LegacyTokenOwnerRecordArgs,
   LegacyTokenOwnerRecord

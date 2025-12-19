@@ -202,6 +202,7 @@ export interface ObligationArgs {
   padding3: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link ObligationArgs} account data. */
 export function getObligationEncoder(): FixedSizeEncoder<ObligationArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -244,6 +245,7 @@ export function getObligationEncoder(): FixedSizeEncoder<ObligationArgs> {
   );
 }
 
+/** Gets the decoder for {@link Obligation} account data. */
 export function getObligationDecoder(): FixedSizeDecoder<Obligation> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -280,6 +282,7 @@ export function getObligationDecoder(): FixedSizeDecoder<Obligation> {
   ]);
 }
 
+/** Gets the codec for {@link Obligation} account data. */
 export function getObligationCodec(): FixedSizeCodec<
   ObligationArgs,
   Obligation

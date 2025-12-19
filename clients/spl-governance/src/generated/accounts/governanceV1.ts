@@ -65,6 +65,7 @@ export interface GovernanceV1Args {
   config: GovernanceConfigArgs;
 }
 
+/** Gets the encoder for {@link GovernanceV1Args} account data. */
 export function getGovernanceV1Encoder(): Encoder<GovernanceV1Args> {
   return transformEncoder(
     getStructEncoder([
@@ -78,6 +79,7 @@ export function getGovernanceV1Encoder(): Encoder<GovernanceV1Args> {
   );
 }
 
+/** Gets the decoder for {@link GovernanceV1} account data. */
 export function getGovernanceV1Decoder(): Decoder<GovernanceV1> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -88,6 +90,7 @@ export function getGovernanceV1Decoder(): Decoder<GovernanceV1> {
   ]);
 }
 
+/** Gets the codec for {@link GovernanceV1} account data. */
 export function getGovernanceV1Codec(): Codec<GovernanceV1Args, GovernanceV1> {
   return combineCodec(getGovernanceV1Encoder(), getGovernanceV1Decoder());
 }

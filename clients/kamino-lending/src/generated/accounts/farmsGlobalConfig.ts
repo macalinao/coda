@@ -71,6 +71,7 @@ export interface FarmsGlobalConfigArgs {
   padding1: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link FarmsGlobalConfigArgs} account data. */
 export function getFarmsGlobalConfigEncoder(): FixedSizeEncoder<FarmsGlobalConfigArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -86,6 +87,7 @@ export function getFarmsGlobalConfigEncoder(): FixedSizeEncoder<FarmsGlobalConfi
   );
 }
 
+/** Gets the decoder for {@link FarmsGlobalConfig} account data. */
 export function getFarmsGlobalConfigDecoder(): FixedSizeDecoder<FarmsGlobalConfig> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -98,6 +100,7 @@ export function getFarmsGlobalConfigDecoder(): FixedSizeDecoder<FarmsGlobalConfi
   ]);
 }
 
+/** Gets the codec for {@link FarmsGlobalConfig} account data. */
 export function getFarmsGlobalConfigCodec(): FixedSizeCodec<
   FarmsGlobalConfigArgs,
   FarmsGlobalConfig

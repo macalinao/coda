@@ -110,6 +110,7 @@ export interface WhirlpoolArgs {
   rewardInfos: WhirlpoolRewardInfoArgs[];
 }
 
+/** Gets the encoder for {@link WhirlpoolArgs} account data. */
 export function getWhirlpoolEncoder(): FixedSizeEncoder<WhirlpoolArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -141,6 +142,7 @@ export function getWhirlpoolEncoder(): FixedSizeEncoder<WhirlpoolArgs> {
   );
 }
 
+/** Gets the decoder for {@link Whirlpool} account data. */
 export function getWhirlpoolDecoder(): FixedSizeDecoder<Whirlpool> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -169,6 +171,7 @@ export function getWhirlpoolDecoder(): FixedSizeDecoder<Whirlpool> {
   ]);
 }
 
+/** Gets the codec for {@link Whirlpool} account data. */
 export function getWhirlpoolCodec(): FixedSizeCodec<WhirlpoolArgs, Whirlpool> {
   return combineCodec(getWhirlpoolEncoder(), getWhirlpoolDecoder());
 }

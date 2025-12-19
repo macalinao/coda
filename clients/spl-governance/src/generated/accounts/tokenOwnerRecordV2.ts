@@ -85,6 +85,7 @@ export interface TokenOwnerRecordV2Args {
   reservedV2: number[];
 }
 
+/** Gets the encoder for {@link TokenOwnerRecordV2Args} account data. */
 export function getTokenOwnerRecordV2Encoder(): Encoder<TokenOwnerRecordV2Args> {
   return transformEncoder(
     getStructEncoder([
@@ -104,6 +105,7 @@ export function getTokenOwnerRecordV2Encoder(): Encoder<TokenOwnerRecordV2Args> 
   );
 }
 
+/** Gets the decoder for {@link TokenOwnerRecordV2} account data. */
 export function getTokenOwnerRecordV2Decoder(): Decoder<TokenOwnerRecordV2> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -120,6 +122,7 @@ export function getTokenOwnerRecordV2Decoder(): Decoder<TokenOwnerRecordV2> {
   ]);
 }
 
+/** Gets the codec for {@link TokenOwnerRecordV2} account data. */
 export function getTokenOwnerRecordV2Codec(): Codec<
   TokenOwnerRecordV2Args,
   TokenOwnerRecordV2

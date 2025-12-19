@@ -147,6 +147,7 @@ export interface FarmsUserStateArgs {
   padding1: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link FarmsUserStateArgs} account data. */
 export function getFarmsUserStateEncoder(): FixedSizeEncoder<FarmsUserStateArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -176,6 +177,7 @@ export function getFarmsUserStateEncoder(): FixedSizeEncoder<FarmsUserStateArgs>
   );
 }
 
+/** Gets the decoder for {@link FarmsUserState} account data. */
 export function getFarmsUserStateDecoder(): FixedSizeDecoder<FarmsUserState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -199,6 +201,7 @@ export function getFarmsUserStateDecoder(): FixedSizeDecoder<FarmsUserState> {
   ]);
 }
 
+/** Gets the codec for {@link FarmsUserState} account data. */
 export function getFarmsUserStateCodec(): FixedSizeCodec<
   FarmsUserStateArgs,
   FarmsUserState

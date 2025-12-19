@@ -64,6 +64,7 @@ export interface TokenBadgeArgs {
   padding: number[];
 }
 
+/** Gets the encoder for {@link TokenBadgeArgs} account data. */
 export function getTokenBadgeEncoder(): FixedSizeEncoder<TokenBadgeArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -75,6 +76,7 @@ export function getTokenBadgeEncoder(): FixedSizeEncoder<TokenBadgeArgs> {
   );
 }
 
+/** Gets the decoder for {@link TokenBadge} account data. */
 export function getTokenBadgeDecoder(): FixedSizeDecoder<TokenBadge> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -83,6 +85,7 @@ export function getTokenBadgeDecoder(): FixedSizeDecoder<TokenBadge> {
   ]);
 }
 
+/** Gets the codec for {@link TokenBadge} account data. */
 export function getTokenBadgeCodec(): FixedSizeCodec<
   TokenBadgeArgs,
   TokenBadge

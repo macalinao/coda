@@ -45,6 +45,7 @@ export interface EditionMarkerArgs {
   ledger: number[];
 }
 
+/** Gets the encoder for {@link EditionMarkerArgs} account data. */
 export function getEditionMarkerEncoder(): FixedSizeEncoder<EditionMarkerArgs> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -52,6 +53,7 @@ export function getEditionMarkerEncoder(): FixedSizeEncoder<EditionMarkerArgs> {
   ]);
 }
 
+/** Gets the decoder for {@link EditionMarker} account data. */
 export function getEditionMarkerDecoder(): FixedSizeDecoder<EditionMarker> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -59,6 +61,7 @@ export function getEditionMarkerDecoder(): FixedSizeDecoder<EditionMarker> {
   ]);
 }
 
+/** Gets the codec for {@link EditionMarker} account data. */
 export function getEditionMarkerCodec(): FixedSizeCodec<
   EditionMarkerArgs,
   EditionMarker

@@ -65,6 +65,7 @@ export interface VoteRecordV1Args {
   voteWeight: VoteWeightV1Args;
 }
 
+/** Gets the encoder for {@link VoteRecordV1Args} account data. */
 export function getVoteRecordV1Encoder(): FixedSizeEncoder<VoteRecordV1Args> {
   return transformEncoder(
     getStructEncoder([
@@ -78,6 +79,7 @@ export function getVoteRecordV1Encoder(): FixedSizeEncoder<VoteRecordV1Args> {
   );
 }
 
+/** Gets the decoder for {@link VoteRecordV1} account data. */
 export function getVoteRecordV1Decoder(): FixedSizeDecoder<VoteRecordV1> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -88,6 +90,7 @@ export function getVoteRecordV1Decoder(): FixedSizeDecoder<VoteRecordV1> {
   ]);
 }
 
+/** Gets the codec for {@link VoteRecordV1} account data. */
 export function getVoteRecordV1Codec(): FixedSizeCodec<
   VoteRecordV1Args,
   VoteRecordV1

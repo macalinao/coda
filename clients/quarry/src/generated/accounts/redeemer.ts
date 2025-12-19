@@ -66,6 +66,7 @@ export interface RedeemerArgs {
   totalTokensRedeemed: number | bigint;
 }
 
+/** Gets the encoder for {@link RedeemerArgs} account data. */
 export function getRedeemerEncoder(): FixedSizeEncoder<RedeemerArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -79,6 +80,7 @@ export function getRedeemerEncoder(): FixedSizeEncoder<RedeemerArgs> {
   );
 }
 
+/** Gets the decoder for {@link Redeemer} account data. */
 export function getRedeemerDecoder(): FixedSizeDecoder<Redeemer> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -89,6 +91,7 @@ export function getRedeemerDecoder(): FixedSizeDecoder<Redeemer> {
   ]);
 }
 
+/** Gets the codec for {@link Redeemer} account data. */
 export function getRedeemerCodec(): FixedSizeCodec<RedeemerArgs, Redeemer> {
   return combineCodec(getRedeemerEncoder(), getRedeemerDecoder());
 }

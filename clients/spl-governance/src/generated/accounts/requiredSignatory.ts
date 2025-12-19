@@ -63,6 +63,7 @@ export interface RequiredSignatoryArgs {
   signatory: Address;
 }
 
+/** Gets the encoder for {@link RequiredSignatoryArgs} account data. */
 export function getRequiredSignatoryEncoder(): FixedSizeEncoder<RequiredSignatoryArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -75,6 +76,7 @@ export function getRequiredSignatoryEncoder(): FixedSizeEncoder<RequiredSignator
   );
 }
 
+/** Gets the decoder for {@link RequiredSignatory} account data. */
 export function getRequiredSignatoryDecoder(): FixedSizeDecoder<RequiredSignatory> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -84,6 +86,7 @@ export function getRequiredSignatoryDecoder(): FixedSizeDecoder<RequiredSignator
   ]);
 }
 
+/** Gets the codec for {@link RequiredSignatory} account data. */
 export function getRequiredSignatoryCodec(): FixedSizeCodec<
   RequiredSignatoryArgs,
   RequiredSignatory

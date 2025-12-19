@@ -64,6 +64,7 @@ export interface TickArrayArgs {
   whirlpool: Address;
 }
 
+/** Gets the encoder for {@link TickArrayArgs} account data. */
 export function getTickArrayEncoder(): FixedSizeEncoder<TickArrayArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -76,6 +77,7 @@ export function getTickArrayEncoder(): FixedSizeEncoder<TickArrayArgs> {
   );
 }
 
+/** Gets the decoder for {@link TickArray} account data. */
 export function getTickArrayDecoder(): FixedSizeDecoder<TickArray> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -85,6 +87,7 @@ export function getTickArrayDecoder(): FixedSizeDecoder<TickArray> {
   ]);
 }
 
+/** Gets the codec for {@link TickArray} account data. */
 export function getTickArrayCodec(): FixedSizeCodec<TickArrayArgs, TickArray> {
   return combineCodec(getTickArrayEncoder(), getTickArrayDecoder());
 }

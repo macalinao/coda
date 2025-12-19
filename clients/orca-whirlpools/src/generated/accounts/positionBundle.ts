@@ -62,6 +62,7 @@ export interface PositionBundleArgs {
   positionBitmap: number[];
 }
 
+/** Gets the encoder for {@link PositionBundleArgs} account data. */
 export function getPositionBundleEncoder(): FixedSizeEncoder<PositionBundleArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -73,6 +74,7 @@ export function getPositionBundleEncoder(): FixedSizeEncoder<PositionBundleArgs>
   );
 }
 
+/** Gets the decoder for {@link PositionBundle} account data. */
 export function getPositionBundleDecoder(): FixedSizeDecoder<PositionBundle> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -81,6 +83,7 @@ export function getPositionBundleDecoder(): FixedSizeDecoder<PositionBundle> {
   ]);
 }
 
+/** Gets the codec for {@link PositionBundle} account data. */
 export function getPositionBundleCodec(): FixedSizeCodec<
   PositionBundleArgs,
   PositionBundle

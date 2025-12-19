@@ -228,6 +228,7 @@ export interface LendingMarketArgs {
   padding1: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link LendingMarketArgs} account data. */
 export function getLendingMarketEncoder(): FixedSizeEncoder<LendingMarketArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -271,6 +272,7 @@ export function getLendingMarketEncoder(): FixedSizeEncoder<LendingMarketArgs> {
   );
 }
 
+/** Gets the decoder for {@link LendingMarket} account data. */
 export function getLendingMarketDecoder(): FixedSizeDecoder<LendingMarket> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -311,6 +313,7 @@ export function getLendingMarketDecoder(): FixedSizeDecoder<LendingMarket> {
   ]);
 }
 
+/** Gets the codec for {@link LendingMarket} account data. */
 export function getLendingMarketCodec(): FixedSizeCodec<
   LendingMarketArgs,
   LendingMarket

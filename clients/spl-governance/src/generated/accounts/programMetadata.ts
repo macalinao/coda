@@ -70,6 +70,7 @@ export interface ProgramMetadataArgs {
   reserved: number[];
 }
 
+/** Gets the encoder for {@link ProgramMetadataArgs} account data. */
 export function getProgramMetadataEncoder(): Encoder<ProgramMetadataArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -82,6 +83,7 @@ export function getProgramMetadataEncoder(): Encoder<ProgramMetadataArgs> {
   );
 }
 
+/** Gets the decoder for {@link ProgramMetadata} account data. */
 export function getProgramMetadataDecoder(): Decoder<ProgramMetadata> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -91,6 +93,7 @@ export function getProgramMetadataDecoder(): Decoder<ProgramMetadata> {
   ]);
 }
 
+/** Gets the codec for {@link ProgramMetadata} account data. */
 export function getProgramMetadataCodec(): Codec<
   ProgramMetadataArgs,
   ProgramMetadata

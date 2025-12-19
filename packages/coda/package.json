@@ -57,7 +57,8 @@
     "@macalinao/codama-renderers-markdown": "workspace:^",
     "codama": "catalog:",
     "commander": "^14.0.2",
-    "glob": "^13.0.0"
+    "glob": "^13.0.0",
+    "ws": "catalog:"
   },
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",

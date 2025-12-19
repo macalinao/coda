@@ -69,6 +69,7 @@ export interface LockConfigArgs {
   lockType: LockTypeLabelArgs;
 }
 
+/** Gets the encoder for {@link LockConfigArgs} account data. */
 export function getLockConfigEncoder(): FixedSizeEncoder<LockConfigArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -83,6 +84,7 @@ export function getLockConfigEncoder(): FixedSizeEncoder<LockConfigArgs> {
   );
 }
 
+/** Gets the decoder for {@link LockConfig} account data. */
 export function getLockConfigDecoder(): FixedSizeDecoder<LockConfig> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -94,6 +96,7 @@ export function getLockConfigDecoder(): FixedSizeDecoder<LockConfig> {
   ]);
 }
 
+/** Gets the codec for {@link LockConfig} account data. */
 export function getLockConfigCodec(): FixedSizeCodec<
   LockConfigArgs,
   LockConfig

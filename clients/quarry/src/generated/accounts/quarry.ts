@@ -88,6 +88,7 @@ export interface QuarryArgs {
   numMiners: number | bigint;
 }
 
+/** Gets the encoder for {@link QuarryArgs} account data. */
 export function getQuarryEncoder(): FixedSizeEncoder<QuarryArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -109,6 +110,7 @@ export function getQuarryEncoder(): FixedSizeEncoder<QuarryArgs> {
   );
 }
 
+/** Gets the decoder for {@link Quarry} account data. */
 export function getQuarryDecoder(): FixedSizeDecoder<Quarry> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -127,6 +129,7 @@ export function getQuarryDecoder(): FixedSizeDecoder<Quarry> {
   ]);
 }
 
+/** Gets the codec for {@link Quarry} account data. */
 export function getQuarryCodec(): FixedSizeCodec<QuarryArgs, Quarry> {
   return combineCodec(getQuarryEncoder(), getQuarryDecoder());
 }

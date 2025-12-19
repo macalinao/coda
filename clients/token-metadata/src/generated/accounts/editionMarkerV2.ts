@@ -48,6 +48,7 @@ export interface EditionMarkerV2Args {
   ledger: ReadonlyUint8Array;
 }
 
+/** Gets the encoder for {@link EditionMarkerV2Args} account data. */
 export function getEditionMarkerV2Encoder(): Encoder<EditionMarkerV2Args> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -55,6 +56,7 @@ export function getEditionMarkerV2Encoder(): Encoder<EditionMarkerV2Args> {
   ]);
 }
 
+/** Gets the decoder for {@link EditionMarkerV2} account data. */
 export function getEditionMarkerV2Decoder(): Decoder<EditionMarkerV2> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -62,6 +64,7 @@ export function getEditionMarkerV2Decoder(): Decoder<EditionMarkerV2> {
   ]);
 }
 
+/** Gets the codec for {@link EditionMarkerV2} account data. */
 export function getEditionMarkerV2Codec(): Codec<
   EditionMarkerV2Args,
   EditionMarkerV2

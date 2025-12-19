@@ -83,6 +83,7 @@ export interface TokenOwnerRecordV1Args {
   governanceDelegate: OptionOrNullable<Address>;
 }
 
+/** Gets the encoder for {@link TokenOwnerRecordV1Args} account data. */
 export function getTokenOwnerRecordV1Encoder(): Encoder<TokenOwnerRecordV1Args> {
   return transformEncoder(
     getStructEncoder([
@@ -101,6 +102,7 @@ export function getTokenOwnerRecordV1Encoder(): Encoder<TokenOwnerRecordV1Args> 
   );
 }
 
+/** Gets the decoder for {@link TokenOwnerRecordV1} account data. */
 export function getTokenOwnerRecordV1Decoder(): Decoder<TokenOwnerRecordV1> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -116,6 +118,7 @@ export function getTokenOwnerRecordV1Decoder(): Decoder<TokenOwnerRecordV1> {
   ]);
 }
 
+/** Gets the codec for {@link TokenOwnerRecordV1} account data. */
 export function getTokenOwnerRecordV1Codec(): Codec<
   TokenOwnerRecordV1Args,
   TokenOwnerRecordV1

@@ -118,6 +118,7 @@ export interface PositionArgs {
   padding: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link PositionArgs} account data. */
 export function getPositionEncoder(): FixedSizeEncoder<PositionArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -139,6 +140,7 @@ export function getPositionEncoder(): FixedSizeEncoder<PositionArgs> {
   );
 }
 
+/** Gets the decoder for {@link Position} account data. */
 export function getPositionDecoder(): FixedSizeDecoder<Position> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -157,6 +159,7 @@ export function getPositionDecoder(): FixedSizeDecoder<Position> {
   ]);
 }
 
+/** Gets the codec for {@link Position} account data. */
 export function getPositionCodec(): FixedSizeCodec<PositionArgs, Position> {
   return combineCodec(getPositionEncoder(), getPositionDecoder());
 }

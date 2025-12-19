@@ -65,6 +65,7 @@ export interface ReservationListV1Args {
   reservations: ReservationV1Args[];
 }
 
+/** Gets the encoder for {@link ReservationListV1Args} account data. */
 export function getReservationListV1Encoder(): Encoder<ReservationListV1Args> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -74,6 +75,7 @@ export function getReservationListV1Encoder(): Encoder<ReservationListV1Args> {
   ]);
 }
 
+/** Gets the decoder for {@link ReservationListV1} account data. */
 export function getReservationListV1Decoder(): Decoder<ReservationListV1> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -83,6 +85,7 @@ export function getReservationListV1Decoder(): Decoder<ReservationListV1> {
   ]);
 }
 
+/** Gets the codec for {@link ReservationListV1} account data. */
 export function getReservationListV1Codec(): Codec<
   ReservationListV1Args,
   ReservationListV1

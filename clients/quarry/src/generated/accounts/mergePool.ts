@@ -74,6 +74,7 @@ export interface MergePoolArgs {
   reserved: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link MergePoolArgs} account data. */
 export function getMergePoolEncoder(): FixedSizeEncoder<MergePoolArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -90,6 +91,7 @@ export function getMergePoolEncoder(): FixedSizeEncoder<MergePoolArgs> {
   );
 }
 
+/** Gets the decoder for {@link MergePool} account data. */
 export function getMergePoolDecoder(): FixedSizeDecoder<MergePool> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -103,6 +105,7 @@ export function getMergePoolDecoder(): FixedSizeDecoder<MergePool> {
   ]);
 }
 
+/** Gets the codec for {@link MergePool} account data. */
 export function getMergePoolCodec(): FixedSizeCodec<MergePoolArgs, MergePool> {
   return combineCodec(getMergePoolEncoder(), getMergePoolDecoder());
 }
