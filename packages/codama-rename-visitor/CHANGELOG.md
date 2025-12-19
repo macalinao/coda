@@ -1,5 +1,11 @@
 # @macalinao/codama-rename-visitor
 
+## 0.3.2
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+
 ## 0.3.1
 
 ### Patch Changes

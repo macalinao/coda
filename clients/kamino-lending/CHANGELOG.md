@@ -1,5 +1,11 @@
 # @macalinao/clients-kamino-lending
 
+## 0.5.3
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+
 ## 0.5.2
 
 ### Patch Changes

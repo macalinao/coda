@@ -1,5 +1,17 @@
 # @macalinao/grill-cli
 
+## 0.4.9
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+- Updated dependencies [519b847]
+  - @macalinao/codama-nodes-from-anchor-x@0.1.2
+  - @macalinao/codama-renderers-markdown@0.4.2
+  - @macalinao/codama-renderers-js-esm@0.4.4
+  - @macalinao/codama-rename-visitor@0.3.2
+  - @macalinao/coda-visitors@0.1.8
+
 ## 0.4.8
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @macalinao/clients-quarry
 
+## 0.4.5
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+
 ## 0.4.4
 
 ### Patch Changes

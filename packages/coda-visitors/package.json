@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/coda-visitors",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Additional Codama visitors for enhanced code generation with Coda",
   "type": "module",
   "sideEffects": false,
