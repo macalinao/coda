@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { MDXContent } from "mdx/types";
 import {
   DocsBody,
   DocsDescription,
@@ -18,7 +19,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
     notFound();
   }
 
-  const MDXContent = page.data.body;
+  const MDX = page.data.body as MDXContent;
 
   return (
     <DocsPage
@@ -35,7 +36,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDXContent
+        <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths
             a: createRelativeLink(source, page),
