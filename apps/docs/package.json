@@ -20,7 +20,7 @@
     "yaml": "^2.8.1"
   },
   "devDependencies": {
-    "@macalinao/biome-config": "^0.1.4",
+    "@macalinao/biome-config": "^0.1.6",
     "@tailwindcss/postcss": "^4.1.16",
     "@types/mdx": "^2.0.13",
     "@types/node": "24.9.1",
