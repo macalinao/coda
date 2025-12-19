@@ -1,5 +1,5 @@
 ---
-title: API Reference  
+title: API Reference
 description: Pre-built TypeScript client libraries for popular Solana programs
 ---
 
@@ -12,15 +12,17 @@ Coda provides pre-built TypeScript client libraries for popular Solana programs.
 Pre-generated client for the Metaplex Token Metadata program.
 
 **Installation:**
+
 ```bash
 bun add @macalinao/clients-token-metadata
 ```
 
 **Usage:**
+
 ```typescript
-import { 
+import {
   createMetadataInstruction,
-  findMetadataPda 
+  findMetadataPda,
 } from "@macalinao/clients-token-metadata";
 
 // Find the metadata PDA for a mint
@@ -58,7 +60,7 @@ Every instruction from the program IDL is available as a typed function:
 ```typescript
 // Pattern: create{InstructionName}Instruction
 export function createTransferInstruction(
-  input: TransferInstructionInput
+  input: TransferInstructionInput,
 ): TransactionInstruction;
 ```
 
@@ -68,20 +70,18 @@ Account types include decoders and fetchers:
 
 ```typescript
 // Decode account data
-export function decodeMetadata(
-  data: Uint8Array
-): Metadata;
+export function decodeMetadata(data: Uint8Array): Metadata;
 
 // Fetch and decode account
 export async function fetchMetadata(
   rpc: Rpc,
-  address: Address
+  address: Address,
 ): Promise<Metadata>;
 
 // Fetch multiple accounts
 export async function fetchAllMetadata(
   rpc: Rpc,
-  addresses: Address[]
+  addresses: Address[],
 ): Promise<Metadata[]>;
 ```
 
@@ -91,12 +91,10 @@ Helper functions for finding PDAs:
 
 ```typescript
 // Pattern: find{PdaName}Pda
-export function findMetadataPda(
-  seeds: {
-    mint: Address;
-    programId?: Address;
-  }
-): [Address, number]; // Returns [address, bump]
+export function findMetadataPda(seeds: {
+  mint: Address;
+  programId?: Address;
+}): [Address, number]; // Returns [address, bump]
 ```
 
 ### Types
@@ -138,9 +136,7 @@ export enum TokenMetadataError {
   // ... more error codes
 }
 
-export function getTokenMetadataErrorMessage(
-  code: number
-): string | undefined;
+export function getTokenMetadataErrorMessage(code: number): string | undefined;
 ```
 
 ## Working with Generated Clients
@@ -203,7 +199,7 @@ try {
   if (error.code === TokenProgramError.InsufficientFunds) {
     console.error("Insufficient funds for transfer");
   }
-  
+
   const message = getTokenProgramErrorMessage(error.code);
   console.error("Error:", message);
 }
@@ -216,16 +212,16 @@ All generated clients provide full TypeScript type safety:
 ```typescript
 // TypeScript will enforce correct field types
 const instruction = createMintToInstruction({
-  mint: mintAddress,           // Must be Address type
-  destination: tokenAccount,   // Must be Address type  
-  authority: authorityKeypair,  // Must be Keypair or Address
-  amount: "not a number",      // ❌ TypeScript error: must be bigint
+  mint: mintAddress, // Must be Address type
+  destination: tokenAccount, // Must be Address type
+  authority: authorityKeypair, // Must be Keypair or Address
+  amount: "not a number", // ❌ TypeScript error: must be bigint
 });
 
 // Accounts are fully typed
 const metadata = await fetchMetadata(rpc, metadataAddress);
 console.log(metadata.data.name); // ✅ TypeScript knows this is a string
-console.log(metadata.foo);       // ❌ TypeScript error: property doesn't exist
+console.log(metadata.foo); // ❌ TypeScript error: property doesn't exist
 ```
 
 ## Integration with Solana Web3.js
@@ -233,7 +229,11 @@ console.log(metadata.foo);       // ❌ TypeScript error: property doesn't exist
 Generated clients work seamlessly with `@solana/web3.js`:
 
 ```typescript
-import { Connection, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import {
+  Connection,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import { createTransferInstruction } from "./generated";
 
 const connection = new Connection("https://api.mainnet-beta.solana.com");
@@ -244,11 +244,9 @@ const instruction = createTransferInstruction({
 
 const transaction = new Transaction().add(instruction);
 
-const signature = await sendAndConfirmTransaction(
-  connection,
-  transaction,
-  [payer]
-);
+const signature = await sendAndConfirmTransaction(connection, transaction, [
+  payer,
+]);
 ```
 
 ## Custom Clients

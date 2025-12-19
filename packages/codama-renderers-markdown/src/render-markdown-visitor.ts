@@ -50,7 +50,7 @@ export function renderMarkdownVisitor(
         .toLowerCase()
         .replace(/^-/, ""); // Remove leading dash if present
       const filename = `${kebabCase}.md`;
-      map = addToRenderMap(map, filename, markdown);
+      map = addToRenderMap(map, filename, { content: markdown });
     }
 
     writeRenderMap(map, outputDir);

@@ -12,6 +12,7 @@ bun add -D @macalinao/codama-rename-visitor
 ```
 
 Or with npm:
+
 ```bash
 npm install -D @macalinao/codama-rename-visitor
 ```
@@ -42,24 +43,24 @@ const visitor = renameVisitor({
   quarryMine: {
     instructions: {
       claimRewards: "claimRewardsMine",
-      stake: "stakeInQuarry"
+      stake: "stakeInQuarry",
     },
     accounts: {
-      miner: "quarryMiner"
+      miner: "quarryMiner",
     },
     definedTypes: {
-      StakeEvent: "QuarryStakeEvent"
-    }
+      StakeEvent: "QuarryStakeEvent",
+    },
   },
   quarryMergeMine: {
     instructions: {
       claimRewards: "claimRewardsMergeMine",
-      stake: "stakeInMergePool"
+      stake: "stakeInMergePool",
     },
     accounts: {
-      miner: "mergeMiner"
-    }
-  }
+      miner: "mergeMiner",
+    },
+  },
 });
 
 const updatedRoot = visit(root, visitor);
@@ -82,17 +83,17 @@ export default defineConfig({
         instructions: {
           // Avoid conflicts with quarryMergeMine
           claimRewards: "claimRewardsMine",
-          claimRewardsV2: "claimRewardsMineV2"
-        }
+          claimRewardsV2: "claimRewardsMineV2",
+        },
       },
       quarryMergeMine: {
         instructions: {
           // Give these distinct names
-          claimRewards: "claimRewardsMergeMine"
-        }
-      }
-    })
-  ]
+          claimRewards: "claimRewardsMergeMine",
+        },
+      },
+    }),
+  ],
 });
 ```
 
@@ -108,7 +109,7 @@ import { renameInstructionsVisitor } from "@macalinao/codama-rename-visitor";
 const visitor = renameInstructionsVisitor({
   transfer: "transferTokens",
   mint: "mintNft",
-  burn: "burnToken"
+  burn: "burnToken",
 });
 
 const updatedRoot = visit(root, visitor);
@@ -122,7 +123,7 @@ import { renameAccountsVisitor } from "@macalinao/codama-rename-visitor";
 const visitor = renameAccountsVisitor({
   userAccount: "user",
   configAccount: "config",
-  metadataAccount: "metadata"
+  metadataAccount: "metadata",
 });
 
 const updatedRoot = visit(root, visitor);
@@ -135,7 +136,7 @@ import { renameDefinedTypesVisitor } from "@macalinao/codama-rename-visitor";
 
 const visitor = renameDefinedTypesVisitor({
   TokenMetadata: "NftMetadata",
-  TransferEvent: "TokenTransferEvent"
+  TransferEvent: "TokenTransferEvent",
 });
 
 const updatedRoot = visit(root, visitor);
@@ -149,7 +150,7 @@ The main visitor for comprehensive renaming:
 
 ```typescript
 function renameVisitor(
-  renamesByProgram: Record<string, ProgramRenameOptions>
+  renamesByProgram: Record<string, ProgramRenameOptions>,
 ): Visitor;
 
 interface ProgramRenameOptions {
@@ -160,6 +161,7 @@ interface ProgramRenameOptions {
 ```
 
 **Parameters:**
+
 - `renamesByProgram`: Object mapping program names to their rename configurations
 
 ### renameInstructionsVisitor
@@ -167,12 +169,11 @@ interface ProgramRenameOptions {
 Visitor for renaming only instructions:
 
 ```typescript
-function renameInstructionsVisitor(
-  mapping: Record<string, string>
-): Visitor;
+function renameInstructionsVisitor(mapping: Record<string, string>): Visitor;
 ```
 
 **Parameters:**
+
 - `mapping`: Object mapping old instruction names to new names
 
 ### renameAccountsVisitor
@@ -180,12 +181,11 @@ function renameInstructionsVisitor(
 Visitor for renaming only accounts:
 
 ```typescript
-function renameAccountsVisitor(
-  mapping: Record<string, string>
-): Visitor;
+function renameAccountsVisitor(mapping: Record<string, string>): Visitor;
 ```
 
 **Parameters:**
+
 - `mapping`: Object mapping old account names to new names
 
 ### renameDefinedTypesVisitor
@@ -193,12 +193,11 @@ function renameAccountsVisitor(
 Visitor for renaming only defined types:
 
 ```typescript
-function renameDefinedTypesVisitor(
-  mapping: Record<string, string>
-): Visitor;
+function renameDefinedTypesVisitor(mapping: Record<string, string>): Visitor;
 ```
 
 **Parameters:**
+
 - `mapping`: Object mapping old type names to new names
 
 ### Transform Functions
@@ -227,26 +226,26 @@ renameVisitor({
     instructions: {
       createMiner: "createQuarryMiner",
       stake: "stakeInQuarry",
-      claimRewards: "claimQuarryRewards"
+      claimRewards: "claimQuarryRewards",
     },
     accounts: {
       miner: "quarryMiner",
-      quarry: "quarryAccount"
-    }
+      quarry: "quarryAccount",
+    },
   },
   // Quarry Merge Mine program
   quarryMergeMine: {
     instructions: {
       createMiner: "createMergeMiner",
       stake: "stakeInMergePool",
-      claimRewards: "claimMergeRewards"
+      claimRewards: "claimMergeRewards",
     },
     accounts: {
       miner: "mergeMiner",
-      pool: "mergePool"
-    }
-  }
-})
+      pool: "mergePool",
+    },
+  },
+});
 ```
 
 ### Adding Context
@@ -259,25 +258,25 @@ renameVisitor({
     instructions: {
       transfer: "transferToken",
       burn: "burnToken",
-      mint: "mintToken"
+      mint: "mintToken",
     },
     accounts: {
       account: "tokenAccount",
-      mint: "tokenMint"
-    }
+      mint: "tokenMint",
+    },
   },
   nft: {
     instructions: {
       transfer: "transferNft",
       burn: "burnNft",
-      mint: "mintNft"
+      mint: "mintNft",
     },
     accounts: {
       metadata: "nftMetadata",
-      edition: "nftEdition"
-    }
-  }
-})
+      edition: "nftEdition",
+    },
+  },
+});
 ```
 
 ### Consistent Naming Conventions
@@ -291,16 +290,16 @@ renameVisitor({
       // Convert snake_case to camelCase
       create_account: "createAccount",
       update_metadata: "updateMetadata",
-      delete_record: "deleteRecord"
+      delete_record: "deleteRecord",
     },
     definedTypes: {
       // Add consistent suffixes
       AccountCreated: "AccountCreatedEvent",
       MetadataUpdated: "MetadataUpdatedEvent",
-      RecordDeleted: "RecordDeletedEvent"
-    }
-  }
-})
+      RecordDeleted: "RecordDeletedEvent",
+    },
+  },
+});
 ```
 
 ## Real-World Example
@@ -319,17 +318,17 @@ renameVisitor({
       rescueTokens: "rescueTokensMine",
       unpause: "unpauseMine",
       // ... more renames
-    }
+    },
   },
   quarryMergeMine: {
     instructions: {
       claimRewards: "claimRewardsMergeMine",
       initMergeMiner: "initMergeMinerV2",
       initMiner: "initMinerMergeMine",
-      withdrawTokens: "withdrawTokensMergeMine"
-    }
-  }
-})
+      withdrawTokens: "withdrawTokensMergeMine",
+    },
+  },
+});
 ```
 
 ## Best Practices
@@ -354,6 +353,7 @@ console.log(idl.metadata?.name || idl.name); // Should match keys in renameVisit
 ### Type Errors After Renaming
 
 Make sure all references are updated. The visitor handles most cases, but verify:
+
 - Instruction builders use new names
 - Account types use new names
 - Defined types are correctly referenced

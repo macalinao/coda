@@ -60,6 +60,7 @@ export interface FeeTierArgs {
   defaultFeeRate: number;
 }
 
+/** Gets the encoder for {@link FeeTierArgs} account data. */
 export function getFeeTierEncoder(): FixedSizeEncoder<FeeTierArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -72,6 +73,7 @@ export function getFeeTierEncoder(): FixedSizeEncoder<FeeTierArgs> {
   );
 }
 
+/** Gets the decoder for {@link FeeTier} account data. */
 export function getFeeTierDecoder(): FixedSizeDecoder<FeeTier> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -81,6 +83,7 @@ export function getFeeTierDecoder(): FixedSizeDecoder<FeeTier> {
   ]);
 }
 
+/** Gets the codec for {@link FeeTier} account data. */
 export function getFeeTierCodec(): FixedSizeCodec<FeeTierArgs, FeeTier> {
   return combineCodec(getFeeTierEncoder(), getFeeTierDecoder());
 }

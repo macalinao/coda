@@ -51,6 +51,7 @@ export interface CollectionAuthorityRecordArgs {
   updateAuthority: OptionOrNullable<Address>;
 }
 
+/** Gets the encoder for {@link CollectionAuthorityRecordArgs} account data. */
 export function getCollectionAuthorityRecordEncoder(): Encoder<CollectionAuthorityRecordArgs> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -59,6 +60,7 @@ export function getCollectionAuthorityRecordEncoder(): Encoder<CollectionAuthori
   ]);
 }
 
+/** Gets the decoder for {@link CollectionAuthorityRecord} account data. */
 export function getCollectionAuthorityRecordDecoder(): Decoder<CollectionAuthorityRecord> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -67,6 +69,7 @@ export function getCollectionAuthorityRecordDecoder(): Decoder<CollectionAuthori
   ]);
 }
 
+/** Gets the codec for {@link CollectionAuthorityRecord} account data. */
 export function getCollectionAuthorityRecordCodec(): Codec<
   CollectionAuthorityRecordArgs,
   CollectionAuthorityRecord

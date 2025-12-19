@@ -68,6 +68,7 @@ export interface ProposalMetaArgs {
   descriptionLink: string;
 }
 
+/** Gets the encoder for {@link ProposalMetaArgs} account data. */
 export function getProposalMetaEncoder(): Encoder<ProposalMetaArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -83,6 +84,7 @@ export function getProposalMetaEncoder(): Encoder<ProposalMetaArgs> {
   );
 }
 
+/** Gets the decoder for {@link ProposalMeta} account data. */
 export function getProposalMetaDecoder(): Decoder<ProposalMeta> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -95,6 +97,7 @@ export function getProposalMetaDecoder(): Decoder<ProposalMeta> {
   ]);
 }
 
+/** Gets the codec for {@link ProposalMeta} account data. */
 export function getProposalMetaCodec(): Codec<ProposalMetaArgs, ProposalMeta> {
   return combineCodec(getProposalMetaEncoder(), getProposalMetaDecoder());
 }

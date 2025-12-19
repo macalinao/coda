@@ -9,6 +9,7 @@ TypeScript client for Solana program generated with [Coda](https://github.com/ma
    - Remove the example.json file
 
 2. **Generate the client code**
+
    ```bash
    bun run codegen
    ```
@@ -41,6 +42,7 @@ TypeScript client for Solana program generated with [Coda](https://github.com/ma
 ## Configuration
 
 Edit `coda.config.mjs` to customize:
+
 - IDL discovery patterns
 - Output directory
 - Custom PDAs and visitors

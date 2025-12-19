@@ -65,6 +65,7 @@ export interface ProposalDepositArgs {
   reserved: number[];
 }
 
+/** Gets the encoder for {@link ProposalDepositArgs} account data. */
 export function getProposalDepositEncoder(): FixedSizeEncoder<ProposalDepositArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -77,6 +78,7 @@ export function getProposalDepositEncoder(): FixedSizeEncoder<ProposalDepositArg
   );
 }
 
+/** Gets the decoder for {@link ProposalDeposit} account data. */
 export function getProposalDepositDecoder(): FixedSizeDecoder<ProposalDeposit> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -86,6 +88,7 @@ export function getProposalDepositDecoder(): FixedSizeDecoder<ProposalDeposit> {
   ]);
 }
 
+/** Gets the codec for {@link ProposalDeposit} account data. */
 export function getProposalDepositCodec(): FixedSizeCodec<
   ProposalDepositArgs,
   ProposalDeposit

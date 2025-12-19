@@ -83,6 +83,7 @@ export interface ReferrerTokenStateArgs {
   padding: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link ReferrerTokenStateArgs} account data. */
 export function getReferrerTokenStateEncoder(): FixedSizeEncoder<ReferrerTokenStateArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -101,6 +102,7 @@ export function getReferrerTokenStateEncoder(): FixedSizeEncoder<ReferrerTokenSt
   );
 }
 
+/** Gets the decoder for {@link ReferrerTokenState} account data. */
 export function getReferrerTokenStateDecoder(): FixedSizeDecoder<ReferrerTokenState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -113,6 +115,7 @@ export function getReferrerTokenStateDecoder(): FixedSizeDecoder<ReferrerTokenSt
   ]);
 }
 
+/** Gets the codec for {@link ReferrerTokenState} account data. */
 export function getReferrerTokenStateCodec(): FixedSizeCodec<
   ReferrerTokenStateArgs,
   ReferrerTokenState

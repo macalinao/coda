@@ -69,6 +69,7 @@ export interface SignatoryRecordV2Args {
   reservedV2: number[];
 }
 
+/** Gets the encoder for {@link SignatoryRecordV2Args} account data. */
 export function getSignatoryRecordV2Encoder(): FixedSizeEncoder<SignatoryRecordV2Args> {
   return transformEncoder(
     getStructEncoder([
@@ -82,6 +83,7 @@ export function getSignatoryRecordV2Encoder(): FixedSizeEncoder<SignatoryRecordV
   );
 }
 
+/** Gets the decoder for {@link SignatoryRecordV2} account data. */
 export function getSignatoryRecordV2Decoder(): FixedSizeDecoder<SignatoryRecordV2> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -92,6 +94,7 @@ export function getSignatoryRecordV2Decoder(): FixedSizeDecoder<SignatoryRecordV
   ]);
 }
 
+/** Gets the codec for {@link SignatoryRecordV2} account data. */
 export function getSignatoryRecordV2Codec(): FixedSizeCodec<
   SignatoryRecordV2Args,
   SignatoryRecordV2

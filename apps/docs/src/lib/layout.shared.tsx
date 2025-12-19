@@ -1,5 +1,5 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { ExternalLink } from "fumadocs-ui/internal/icons";
+import { ExternalLink } from "lucide-react";
 
 /**
  * Shared layout configurations

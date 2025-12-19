@@ -21,15 +21,15 @@ import { renameVisitor } from "@macalinao/codama-rename-visitor";
 const visitor = renameVisitor({
   myProgram: {
     instructions: {
-      oldName: "newName"
+      oldName: "newName",
     },
     accounts: {
-      oldAccount: "newAccount"
+      oldAccount: "newAccount",
     },
     definedTypes: {
-      oldType: "newType"
-    }
-  }
+      oldType: "newType",
+    },
+  },
 });
 ```
 

@@ -70,6 +70,7 @@ export interface MergeMinerArgs {
   replicaBalance: number | bigint;
 }
 
+/** Gets the encoder for {@link MergeMinerArgs} account data. */
 export function getMergeMinerEncoder(): FixedSizeEncoder<MergeMinerArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -85,6 +86,7 @@ export function getMergeMinerEncoder(): FixedSizeEncoder<MergeMinerArgs> {
   );
 }
 
+/** Gets the decoder for {@link MergeMiner} account data. */
 export function getMergeMinerDecoder(): FixedSizeDecoder<MergeMiner> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -97,6 +99,7 @@ export function getMergeMinerDecoder(): FixedSizeDecoder<MergeMiner> {
   ]);
 }
 
+/** Gets the codec for {@link MergeMiner} account data. */
 export function getMergeMinerCodec(): FixedSizeCodec<
   MergeMinerArgs,
   MergeMiner

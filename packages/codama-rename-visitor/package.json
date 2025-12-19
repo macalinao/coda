@@ -40,7 +40,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
+    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "test": "bun test src/"
   },

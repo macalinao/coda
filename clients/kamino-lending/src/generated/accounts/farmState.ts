@@ -224,6 +224,7 @@ export interface FarmStateArgs {
   padding: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link FarmStateArgs} account data. */
 export function getFarmStateEncoder(): FixedSizeEncoder<FarmStateArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -270,6 +271,7 @@ export function getFarmStateEncoder(): FixedSizeEncoder<FarmStateArgs> {
   );
 }
 
+/** Gets the decoder for {@link FarmState} account data. */
 export function getFarmStateDecoder(): FixedSizeDecoder<FarmState> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -313,6 +315,7 @@ export function getFarmStateDecoder(): FixedSizeDecoder<FarmState> {
   ]);
 }
 
+/** Gets the codec for {@link FarmState} account data. */
 export function getFarmStateCodec(): FixedSizeCodec<FarmStateArgs, FarmState> {
   return combineCodec(getFarmStateEncoder(), getFarmStateDecoder());
 }

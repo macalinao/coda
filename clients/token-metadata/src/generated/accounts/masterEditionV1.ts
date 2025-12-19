@@ -55,6 +55,7 @@ export interface MasterEditionV1Args {
   oneTimePrintingAuthorizationMint: Address;
 }
 
+/** Gets the encoder for {@link MasterEditionV1Args} account data. */
 export function getMasterEditionV1Encoder(): Encoder<MasterEditionV1Args> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -65,6 +66,7 @@ export function getMasterEditionV1Encoder(): Encoder<MasterEditionV1Args> {
   ]);
 }
 
+/** Gets the decoder for {@link MasterEditionV1} account data. */
 export function getMasterEditionV1Decoder(): Decoder<MasterEditionV1> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -75,6 +77,7 @@ export function getMasterEditionV1Decoder(): Decoder<MasterEditionV1> {
   ]);
 }
 
+/** Gets the codec for {@link MasterEditionV1} account data. */
 export function getMasterEditionV1Codec(): Codec<
   MasterEditionV1Args,
   MasterEditionV1

@@ -70,6 +70,7 @@ export interface MinterArgs {
   totalMinted: number | bigint;
 }
 
+/** Gets the encoder for {@link MinterArgs} account data. */
 export function getMinterEncoder(): FixedSizeEncoder<MinterArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -85,6 +86,7 @@ export function getMinterEncoder(): FixedSizeEncoder<MinterArgs> {
   );
 }
 
+/** Gets the decoder for {@link Minter} account data. */
 export function getMinterDecoder(): FixedSizeDecoder<Minter> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -97,6 +99,7 @@ export function getMinterDecoder(): FixedSizeDecoder<Minter> {
   ]);
 }
 
+/** Gets the codec for {@link Minter} account data. */
 export function getMinterCodec(): FixedSizeCodec<MinterArgs, Minter> {
   return combineCodec(getMinterEncoder(), getMinterDecoder());
 }

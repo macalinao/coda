@@ -38,7 +38,7 @@ const program = new Program(idl, programId, provider);
 // No built-in PDA helpers - manual derivation
 const [vaultPda] = PublicKey.findProgramAddressSync(
   [Buffer.from("vault"), user.toBuffer()],
-  program.programId
+  program.programId,
 );
 
 // Basic instruction without documentation
@@ -103,7 +103,7 @@ const transaction = createTransaction({
 });
 
 const signedTransaction = await signTransactionMessageWithSigners(
-  setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, transaction)
+  setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, transaction),
 );
 
 await sendAndConfirmTransaction(signedTransaction);
@@ -129,7 +129,7 @@ Unlike Anchor's client, Coda automatically generates PDA finder functions powere
 // Anchor client - manual PDA derivation every time
 const [pda] = PublicKey.findProgramAddressSync(
   [Buffer.from("seed"), user.toBuffer()],
-  programId
+  programId,
 );
 
 // Coda - clean, reusable PDA helpers

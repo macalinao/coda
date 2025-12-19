@@ -51,6 +51,7 @@ export function getValidatorListAccountTypeBytes() {
   return getAccountTypeEncoder().encode(VALIDATOR_LIST_ACCOUNT_TYPE);
 }
 
+/** Storage list for all validator stake accounts in the pool. */
 export interface ValidatorList {
   /** Account type, must be `ValidatorList` currently */
   accountType: AccountType;
@@ -67,6 +68,7 @@ export interface ValidatorListArgs {
   validators: ValidatorStakeInfoArgs[];
 }
 
+/** Gets the encoder for {@link ValidatorListArgs} account data. */
 export function getValidatorListEncoder(): Encoder<ValidatorListArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -78,6 +80,7 @@ export function getValidatorListEncoder(): Encoder<ValidatorListArgs> {
   );
 }
 
+/** Gets the decoder for {@link ValidatorList} account data. */
 export function getValidatorListDecoder(): Decoder<ValidatorList> {
   return getStructDecoder([
     ["accountType", getAccountTypeDecoder()],
@@ -86,6 +89,7 @@ export function getValidatorListDecoder(): Decoder<ValidatorList> {
   ]);
 }
 
+/** Gets the codec for {@link ValidatorList} account data. */
 export function getValidatorListCodec(): Codec<
   ValidatorListArgs,
   ValidatorList

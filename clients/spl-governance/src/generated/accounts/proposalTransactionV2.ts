@@ -97,6 +97,7 @@ export interface ProposalTransactionV2Args {
   reservedV2: number[];
 }
 
+/** Gets the encoder for {@link ProposalTransactionV2Args} account data. */
 export function getProposalTransactionV2Encoder(): Encoder<ProposalTransactionV2Args> {
   return transformEncoder(
     getStructEncoder([
@@ -117,6 +118,7 @@ export function getProposalTransactionV2Encoder(): Encoder<ProposalTransactionV2
   );
 }
 
+/** Gets the decoder for {@link ProposalTransactionV2} account data. */
 export function getProposalTransactionV2Decoder(): Decoder<ProposalTransactionV2> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -131,6 +133,7 @@ export function getProposalTransactionV2Decoder(): Decoder<ProposalTransactionV2
   ]);
 }
 
+/** Gets the codec for {@link ProposalTransactionV2} account data. */
 export function getProposalTransactionV2Codec(): Codec<
   ProposalTransactionV2Args,
   ProposalTransactionV2

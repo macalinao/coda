@@ -89,6 +89,7 @@ export interface ProposalInstructionV1Args {
   executionStatus: TransactionExecutionStatusArgs;
 }
 
+/** Gets the encoder for {@link ProposalInstructionV1Args} account data. */
 export function getProposalInstructionV1Encoder(): Encoder<ProposalInstructionV1Args> {
   return transformEncoder(
     getStructEncoder([
@@ -107,6 +108,7 @@ export function getProposalInstructionV1Encoder(): Encoder<ProposalInstructionV1
   );
 }
 
+/** Gets the decoder for {@link ProposalInstructionV1} account data. */
 export function getProposalInstructionV1Decoder(): Decoder<ProposalInstructionV1> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -119,6 +121,7 @@ export function getProposalInstructionV1Decoder(): Decoder<ProposalInstructionV1
   ]);
 }
 
+/** Gets the codec for {@link ProposalInstructionV1} account data. */
 export function getProposalInstructionV1Codec(): Codec<
   ProposalInstructionV1Args,
   ProposalInstructionV1

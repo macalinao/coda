@@ -88,6 +88,7 @@ export interface RewarderArgs {
   isPaused: boolean;
 }
 
+/** Gets the encoder for {@link RewarderArgs} account data. */
 export function getRewarderEncoder(): FixedSizeEncoder<RewarderArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -110,6 +111,7 @@ export function getRewarderEncoder(): FixedSizeEncoder<RewarderArgs> {
   );
 }
 
+/** Gets the decoder for {@link Rewarder} account data. */
 export function getRewarderDecoder(): FixedSizeDecoder<Rewarder> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -129,6 +131,7 @@ export function getRewarderDecoder(): FixedSizeDecoder<Rewarder> {
   ]);
 }
 
+/** Gets the codec for {@link Rewarder} account data. */
 export function getRewarderCodec(): FixedSizeCodec<RewarderArgs, Rewarder> {
   return combineCodec(getRewarderEncoder(), getRewarderDecoder());
 }

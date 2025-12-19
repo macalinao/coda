@@ -55,13 +55,13 @@ For better documentation layout, use the `<Cards>` component for link grids:
 
 ```mdx
 <Cards>
-  <Card 
-    title="Installation" 
+  <Card
+    title="Installation"
     description="Step-by-step guide to install Coda"
     href="/docs/installation"
   />
-  <Card 
-    title="Quick Start" 
+  <Card
+    title="Quick Start"
     description="Generate your first TypeScript client"
     href="/docs/quick-start"
   />

@@ -59,6 +59,7 @@ export interface WhirlpoolsConfigExtensionArgs {
   tokenBadgeAuthority: Address;
 }
 
+/** Gets the encoder for {@link WhirlpoolsConfigExtensionArgs} account data. */
 export function getWhirlpoolsConfigExtensionEncoder(): FixedSizeEncoder<WhirlpoolsConfigExtensionArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -74,6 +75,7 @@ export function getWhirlpoolsConfigExtensionEncoder(): FixedSizeEncoder<Whirlpoo
   );
 }
 
+/** Gets the decoder for {@link WhirlpoolsConfigExtension} account data. */
 export function getWhirlpoolsConfigExtensionDecoder(): FixedSizeDecoder<WhirlpoolsConfigExtension> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -83,6 +85,7 @@ export function getWhirlpoolsConfigExtensionDecoder(): FixedSizeDecoder<Whirlpoo
   ]);
 }
 
+/** Gets the codec for {@link WhirlpoolsConfigExtension} account data. */
 export function getWhirlpoolsConfigExtensionCodec(): FixedSizeCodec<
   WhirlpoolsConfigExtensionArgs,
   WhirlpoolsConfigExtension

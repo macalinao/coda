@@ -51,6 +51,7 @@ export interface MetadataDelegateRecordArgs {
   updateAuthority: Address;
 }
 
+/** Gets the encoder for {@link MetadataDelegateRecordArgs} account data. */
 export function getMetadataDelegateRecordEncoder(): FixedSizeEncoder<MetadataDelegateRecordArgs> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -61,6 +62,7 @@ export function getMetadataDelegateRecordEncoder(): FixedSizeEncoder<MetadataDel
   ]);
 }
 
+/** Gets the decoder for {@link MetadataDelegateRecord} account data. */
 export function getMetadataDelegateRecordDecoder(): FixedSizeDecoder<MetadataDelegateRecord> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -71,6 +73,7 @@ export function getMetadataDelegateRecordDecoder(): FixedSizeDecoder<MetadataDel
   ]);
 }
 
+/** Gets the codec for {@link MetadataDelegateRecord} account data. */
 export function getMetadataDelegateRecordCodec(): FixedSizeCodec<
   MetadataDelegateRecordArgs,
   MetadataDelegateRecord

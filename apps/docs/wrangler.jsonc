@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "coda-docs",
+  "compatibility_date": "2025-06-19",
+  "assets": {
+    "directory": "./out/",
+    "not_found_handling": "single-page-application"
+  },
+  "routes": [
+    {
+      "pattern": "coda.ianm.com",
+      "zone_name": "ianm.com",
+      "custom_domain": true
+    }
+  ],
+  "build": {
+    "command": "bun run build"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

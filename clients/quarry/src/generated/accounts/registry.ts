@@ -64,6 +64,7 @@ export interface RegistryArgs {
   tokens: Address[];
 }
 
+/** Gets the encoder for {@link RegistryArgs} account data. */
 export function getRegistryEncoder(): Encoder<RegistryArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -76,6 +77,7 @@ export function getRegistryEncoder(): Encoder<RegistryArgs> {
   );
 }
 
+/** Gets the decoder for {@link Registry} account data. */
 export function getRegistryDecoder(): Decoder<Registry> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -85,6 +87,7 @@ export function getRegistryDecoder(): Decoder<Registry> {
   ]);
 }
 
+/** Gets the codec for {@link Registry} account data. */
 export function getRegistryCodec(): Codec<RegistryArgs, Registry> {
   return combineCodec(getRegistryEncoder(), getRegistryDecoder());
 }

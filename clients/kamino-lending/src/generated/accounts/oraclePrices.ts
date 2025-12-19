@@ -62,6 +62,7 @@ export interface OraclePricesArgs {
   prices: DatedPriceArgs[];
 }
 
+/** Gets the encoder for {@link OraclePricesArgs} account data. */
 export function getOraclePricesEncoder(): FixedSizeEncoder<OraclePricesArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -73,6 +74,7 @@ export function getOraclePricesEncoder(): FixedSizeEncoder<OraclePricesArgs> {
   );
 }
 
+/** Gets the decoder for {@link OraclePrices} account data. */
 export function getOraclePricesDecoder(): FixedSizeDecoder<OraclePrices> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -81,6 +83,7 @@ export function getOraclePricesDecoder(): FixedSizeDecoder<OraclePrices> {
   ]);
 }
 
+/** Gets the codec for {@link OraclePrices} account data. */
 export function getOraclePricesCodec(): FixedSizeCodec<
   OraclePricesArgs,
   OraclePrices

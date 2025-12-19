@@ -12,6 +12,7 @@ bun add -D @macalinao/coda
 ```
 
 Or with npm:
+
 ```bash
 npm install -D @macalinao/coda
 ```
@@ -75,7 +76,7 @@ export default defineConfig({
   // Custom paths (optional)
   idlPath: "./idls/my_program.json",
   outputDir: "./src/clients/my_program",
-  
+
   // Add visitors to customize generation
   visitors: [
     // Add custom PDAs
@@ -85,12 +86,12 @@ export default defineConfig({
           name: "authority",
           seeds: [
             { kind: "constant", value: "authority" },
-            { kind: "variable", name: "user", type: publicKeyTypeNode() }
-          ]
-        }
-      ]
-    })
-  ]
+            { kind: "variable", name: "user", type: publicKeyTypeNode() },
+          ],
+        },
+      ],
+    }),
+  ],
 });
 ```
 
@@ -110,10 +111,7 @@ Or specify an array of paths:
 
 ```javascript
 export default defineConfig({
-  idlPath: [
-    "./idls/program1.json",
-    "./idls/program2.json",
-  ],
+  idlPath: ["./idls/program1.json", "./idls/program2.json"],
   outputDir: "./src/generated",
 });
 ```
@@ -126,14 +124,14 @@ Use a function to conditionally apply visitors:
 export default defineConfig({
   visitors: ({ idl }) => {
     const visitors = [];
-    
+
     // Conditionally add visitors based on IDL content
     if (idl.name === "my_program") {
       visitors.push(myCustomVisitor());
     }
-    
+
     return visitors;
-  }
+  },
 });
 ```
 
@@ -145,7 +143,7 @@ Coda generates a comprehensive client with the following structure:
 src/generated/
 ├── accounts/           # Account decoders and fetchers
 ├── instructions/       # Instruction builders
-├── types/             # TypeScript type definitions  
+├── types/             # TypeScript type definitions
 ├── pdas/              # PDA helper functions
 ├── errors/            # Typed error codes
 ├── programs/          # Program ID constants
@@ -158,7 +156,7 @@ Fully typed instruction builders with proper serialization:
 
 ```typescript
 export function createTransferInstruction(
-  input: TransferInstructionInput
+  input: TransferInstructionInput,
 ): Instruction;
 
 export function getTransferInstructionDataEncoder(): Encoder<TransferArgs>;
@@ -170,12 +168,12 @@ Account decoders with type safety:
 
 ```typescript
 export function decodeTokenAccount(
-  encodedAccount: EncodedAccount
+  encodedAccount: EncodedAccount,
 ): TokenAccount;
 
 export async function fetchTokenAccount(
   rpc: Rpc,
-  address: Address
+  address: Address,
 ): Promise<TokenAccount>;
 ```
 
@@ -197,11 +195,9 @@ export type TokenAccount = {
 Helper functions for program-derived addresses:
 
 ```typescript
-export async function findAuthorityPda(
-  seeds: {
-    user: Address;
-  }
-): Promise<[Address, number]>;
+export async function findAuthorityPda(seeds: {
+  user: Address;
+}): Promise<[Address, number]>;
 ```
 
 ### Errors
@@ -238,9 +234,9 @@ Context passed to dynamic visitor functions:
 
 ```typescript
 interface VisitorContext {
-  idl: Idl;           // The parsed Anchor IDL
-  idlPath: string;    // Path to the IDL file
-  outputDir: string;  // Output directory path
+  idl: Idl; // The parsed Anchor IDL
+  idlPath: string; // Path to the IDL file
+  outputDir: string; // Output directory path
 }
 ```
 
@@ -292,13 +288,13 @@ import { updateInstructionsVisitor } from "codama";
 const customVisitor = updateInstructionsVisitor({
   transfer: {
     defaults: {
-      amount: 0n
-    }
-  }
+      amount: 0n,
+    },
+  },
 });
 
 export default defineConfig({
-  visitors: [customVisitor]
+  visitors: [customVisitor],
 });
 ```
 
@@ -310,9 +306,7 @@ Use the dedupe visitor to flatten nested account structures:
 import { instructionAccountsDedupeVisitor } from "@macalinao/codama-instruction-accounts-dedupe-visitor";
 
 export default defineConfig({
-  visitors: ({ idl }) => [
-    instructionAccountsDedupeVisitor(idl)
-  ]
+  visitors: ({ idl }) => [instructionAccountsDedupeVisitor(idl)],
 });
 ```
 
@@ -328,16 +322,16 @@ export default defineConfig({
     renameVisitor({
       programA: {
         instructions: {
-          transfer: "transferProgramA"
-        }
+          transfer: "transferProgramA",
+        },
       },
       programB: {
         instructions: {
-          transfer: "transferProgramB"
-        }
-      }
-    })
-  ]
+          transfer: "transferProgramB",
+        },
+      },
+    }),
+  ],
 });
 ```
 
@@ -372,9 +366,7 @@ Add documentation generation to your config:
 import { renderMarkdownVisitor } from "@macalinao/codama-renderers-markdown";
 
 export default defineConfig({
-  visitors: [
-    renderMarkdownVisitor("./docs")
-  ]
+  visitors: [renderMarkdownVisitor("./docs")],
 });
 ```
 

@@ -80,6 +80,7 @@ export interface VestingArgs {
   padding2: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link VestingArgs} account data. */
 export function getVestingEncoder(): FixedSizeEncoder<VestingArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -98,6 +99,7 @@ export function getVestingEncoder(): FixedSizeEncoder<VestingArgs> {
   );
 }
 
+/** Gets the decoder for {@link Vesting} account data. */
 export function getVestingDecoder(): FixedSizeDecoder<Vesting> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -113,6 +115,7 @@ export function getVestingDecoder(): FixedSizeDecoder<Vesting> {
   ]);
 }
 
+/** Gets the codec for {@link Vesting} account data. */
 export function getVestingCodec(): FixedSizeCodec<VestingArgs, Vesting> {
   return combineCodec(getVestingEncoder(), getVestingDecoder());
 }

@@ -100,6 +100,7 @@ export interface ProposalArgs {
   instructions: ProposalInstructionArgs[];
 }
 
+/** Gets the encoder for {@link ProposalArgs} account data. */
 export function getProposalEncoder(): Encoder<ProposalArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -124,6 +125,7 @@ export function getProposalEncoder(): Encoder<ProposalArgs> {
   );
 }
 
+/** Gets the decoder for {@link Proposal} account data. */
 export function getProposalDecoder(): Decoder<Proposal> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -145,6 +147,7 @@ export function getProposalDecoder(): Decoder<Proposal> {
   ]);
 }
 
+/** Gets the codec for {@link Proposal} account data. */
 export function getProposalCodec(): Codec<ProposalArgs, Proposal> {
   return combineCodec(getProposalEncoder(), getProposalDecoder());
 }

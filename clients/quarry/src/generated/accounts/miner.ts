@@ -76,6 +76,7 @@ export interface MinerArgs {
   index: number | bigint;
 }
 
+/** Gets the encoder for {@link MinerArgs} account data. */
 export function getMinerEncoder(): FixedSizeEncoder<MinerArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -93,6 +94,7 @@ export function getMinerEncoder(): FixedSizeEncoder<MinerArgs> {
   );
 }
 
+/** Gets the decoder for {@link Miner} account data. */
 export function getMinerDecoder(): FixedSizeDecoder<Miner> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -107,6 +109,7 @@ export function getMinerDecoder(): FixedSizeDecoder<Miner> {
   ]);
 }
 
+/** Gets the codec for {@link Miner} account data. */
 export function getMinerCodec(): FixedSizeCodec<MinerArgs, Miner> {
   return combineCodec(getMinerEncoder(), getMinerDecoder());
 }

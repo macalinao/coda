@@ -77,6 +77,7 @@ export interface VoterWeightRecordArgs {
   weightActionTarget: OptionOrNullable<Address>;
 }
 
+/** Gets the encoder for {@link VoterWeightRecordArgs} account data. */
 export function getVoterWeightRecordEncoder(): Encoder<VoterWeightRecordArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -93,6 +94,7 @@ export function getVoterWeightRecordEncoder(): Encoder<VoterWeightRecordArgs> {
   );
 }
 
+/** Gets the decoder for {@link VoterWeightRecord} account data. */
 export function getVoterWeightRecordDecoder(): Decoder<VoterWeightRecord> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -106,6 +108,7 @@ export function getVoterWeightRecordDecoder(): Decoder<VoterWeightRecord> {
   ]);
 }
 
+/** Gets the codec for {@link VoterWeightRecord} account data. */
 export function getVoterWeightRecordCodec(): Codec<
   VoterWeightRecordArgs,
   VoterWeightRecord

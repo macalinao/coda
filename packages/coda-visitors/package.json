@@ -41,15 +41,15 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
+    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache"
   },
   "dependencies": {
-    "@solana-program/memo": "^0.9.0",
-    "@solana-program/system": "^0.9.0",
-    "@solana-program/token": "^0.7.0",
-    "@solana-program/token-2022": "^0.6.0",
-    "@solana/sysvars": "^4.0.0",
+    "@solana-program/memo": "^0.10.0",
+    "@solana-program/system": "^0.10.0",
+    "@solana-program/token": "^0.9.0",
+    "@solana-program/token-2022": "^0.6.1",
+    "@solana/sysvars": "^5.1.0",
     "codama": "catalog:"
   },
   "devDependencies": {

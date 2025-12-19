@@ -65,6 +65,7 @@ export interface LockerWhitelistEntryArgs {
   owner: Address;
 }
 
+/** Gets the encoder for {@link LockerWhitelistEntryArgs} account data. */
 export function getLockerWhitelistEntryEncoder(): FixedSizeEncoder<LockerWhitelistEntryArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -81,6 +82,7 @@ export function getLockerWhitelistEntryEncoder(): FixedSizeEncoder<LockerWhiteli
   );
 }
 
+/** Gets the decoder for {@link LockerWhitelistEntry} account data. */
 export function getLockerWhitelistEntryDecoder(): FixedSizeDecoder<LockerWhitelistEntry> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -91,6 +93,7 @@ export function getLockerWhitelistEntryDecoder(): FixedSizeDecoder<LockerWhiteli
   ]);
 }
 
+/** Gets the codec for {@link LockerWhitelistEntry} account data. */
 export function getLockerWhitelistEntryCodec(): FixedSizeCodec<
   LockerWhitelistEntryArgs,
   LockerWhitelistEntry

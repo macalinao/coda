@@ -75,6 +75,7 @@ export interface VoteRecordV2Args {
   reservedV2: number[];
 }
 
+/** Gets the encoder for {@link VoteRecordV2Args} account data. */
 export function getVoteRecordV2Encoder(): Encoder<VoteRecordV2Args> {
   return transformEncoder(
     getStructEncoder([
@@ -90,6 +91,7 @@ export function getVoteRecordV2Encoder(): Encoder<VoteRecordV2Args> {
   );
 }
 
+/** Gets the decoder for {@link VoteRecordV2} account data. */
 export function getVoteRecordV2Decoder(): Decoder<VoteRecordV2> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -102,6 +104,7 @@ export function getVoteRecordV2Decoder(): Decoder<VoteRecordV2> {
   ]);
 }
 
+/** Gets the codec for {@link VoteRecordV2} account data. */
 export function getVoteRecordV2Codec(): Codec<VoteRecordV2Args, VoteRecordV2> {
   return combineCodec(getVoteRecordV2Encoder(), getVoteRecordV2Decoder());
 }

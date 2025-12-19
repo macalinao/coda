@@ -38,12 +38,12 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
+    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache"
   },
   "dependencies": {
     "@codama/renderers-core": "catalog:",
-    "@codama/renderers-js": "^1.4.3",
+    "@codama/renderers-js": "^1.5.5",
     "codama": "catalog:"
   },
   "devDependencies": {

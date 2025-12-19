@@ -63,6 +63,7 @@ export interface WhirlpoolsConfigArgs {
   defaultProtocolFeeRate: number;
 }
 
+/** Gets the encoder for {@link WhirlpoolsConfigArgs} account data. */
 export function getWhirlpoolsConfigEncoder(): FixedSizeEncoder<WhirlpoolsConfigArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -76,6 +77,7 @@ export function getWhirlpoolsConfigEncoder(): FixedSizeEncoder<WhirlpoolsConfigA
   );
 }
 
+/** Gets the decoder for {@link WhirlpoolsConfig} account data. */
 export function getWhirlpoolsConfigDecoder(): FixedSizeDecoder<WhirlpoolsConfig> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -86,6 +88,7 @@ export function getWhirlpoolsConfigDecoder(): FixedSizeDecoder<WhirlpoolsConfig>
   ]);
 }
 
+/** Gets the codec for {@link WhirlpoolsConfig} account data. */
 export function getWhirlpoolsConfigCodec(): FixedSizeCodec<
   WhirlpoolsConfigArgs,
   WhirlpoolsConfig

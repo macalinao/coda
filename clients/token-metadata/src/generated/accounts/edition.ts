@@ -47,6 +47,7 @@ export interface EditionArgs {
   edition: number | bigint;
 }
 
+/** Gets the encoder for {@link EditionArgs} account data. */
 export function getEditionEncoder(): FixedSizeEncoder<EditionArgs> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -55,6 +56,7 @@ export function getEditionEncoder(): FixedSizeEncoder<EditionArgs> {
   ]);
 }
 
+/** Gets the decoder for {@link Edition} account data. */
 export function getEditionDecoder(): FixedSizeDecoder<Edition> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -63,6 +65,7 @@ export function getEditionDecoder(): FixedSizeDecoder<Edition> {
   ]);
 }
 
+/** Gets the codec for {@link Edition} account data. */
 export function getEditionCodec(): FixedSizeCodec<EditionArgs, Edition> {
   return combineCodec(getEditionEncoder(), getEditionDecoder());
 }

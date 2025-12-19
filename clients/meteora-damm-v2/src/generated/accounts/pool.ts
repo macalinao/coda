@@ -202,6 +202,7 @@ export interface PoolArgs {
   rewardInfos: RewardInfoArgs[];
 }
 
+/** Gets the encoder for {@link PoolArgs} account data. */
 export function getPoolEncoder(): FixedSizeEncoder<PoolArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -243,6 +244,7 @@ export function getPoolEncoder(): FixedSizeEncoder<PoolArgs> {
   );
 }
 
+/** Gets the decoder for {@link Pool} account data. */
 export function getPoolDecoder(): FixedSizeDecoder<Pool> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -281,6 +283,7 @@ export function getPoolDecoder(): FixedSizeDecoder<Pool> {
   ]);
 }
 
+/** Gets the codec for {@link Pool} account data. */
 export function getPoolCodec(): FixedSizeCodec<PoolArgs, Pool> {
   return combineCodec(getPoolEncoder(), getPoolDecoder());
 }

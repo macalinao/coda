@@ -74,6 +74,7 @@ export interface LendingGlobalConfigArgs {
   padding: number[];
 }
 
+/** Gets the encoder for {@link LendingGlobalConfigArgs} account data. */
 export function getLendingGlobalConfigEncoder(): FixedSizeEncoder<LendingGlobalConfigArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -90,6 +91,7 @@ export function getLendingGlobalConfigEncoder(): FixedSizeEncoder<LendingGlobalC
   );
 }
 
+/** Gets the decoder for {@link LendingGlobalConfig} account data. */
 export function getLendingGlobalConfigDecoder(): FixedSizeDecoder<LendingGlobalConfig> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -100,6 +102,7 @@ export function getLendingGlobalConfigDecoder(): FixedSizeDecoder<LendingGlobalC
   ]);
 }
 
+/** Gets the codec for {@link LendingGlobalConfig} account data. */
 export function getLendingGlobalConfigCodec(): FixedSizeCodec<
   LendingGlobalConfigArgs,
   LendingGlobalConfig

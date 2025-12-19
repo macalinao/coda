@@ -80,6 +80,7 @@ export interface UserMetadataArgs {
   padding2: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link UserMetadataArgs} account data. */
 export function getUserMetadataEncoder(): FixedSizeEncoder<UserMetadataArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -95,6 +96,7 @@ export function getUserMetadataEncoder(): FixedSizeEncoder<UserMetadataArgs> {
   );
 }
 
+/** Gets the decoder for {@link UserMetadata} account data. */
 export function getUserMetadataDecoder(): FixedSizeDecoder<UserMetadata> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -107,6 +109,7 @@ export function getUserMetadataDecoder(): FixedSizeDecoder<UserMetadata> {
   ]);
 }
 
+/** Gets the codec for {@link UserMetadata} account data. */
 export function getUserMetadataCodec(): FixedSizeCodec<
   UserMetadataArgs,
   UserMetadata

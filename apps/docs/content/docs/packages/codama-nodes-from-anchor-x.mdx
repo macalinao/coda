@@ -77,9 +77,11 @@ const program = programNodeFromAnchor(idl);
 Creates a Codama root node from a single Anchor IDL.
 
 **Parameters:**
+
 - `idl`: Anchor IDL object (v0.0.0 or v0.1.0)
 
 **Returns:**
+
 - Codama `RootNode` containing the parsed program
 
 ### `rootNodeFromAnchorIdls(idls: Idl[]): RootNode`
@@ -87,9 +89,11 @@ Creates a Codama root node from a single Anchor IDL.
 Creates a Codama root node from multiple Anchor IDLs.
 
 **Parameters:**
+
 - `idls`: Array of Anchor IDL objects
 
 **Returns:**
+
 - Codama `RootNode` with the first IDL as the main program and others as additional programs
 
 ### `programNodeFromAnchor(idl: Idl): ProgramNode`
@@ -97,9 +101,11 @@ Creates a Codama root node from multiple Anchor IDLs.
 Creates a Codama program node from an Anchor IDL.
 
 **Parameters:**
+
 - `idl`: Anchor IDL object
 
 **Returns:**
+
 - Codama `ProgramNode` without the root wrapper
 
 ## Handling Multiple Programs
@@ -174,10 +180,7 @@ const root = rootNodeFromAnchorIdls(idls);
 Support multiple versions of the same program:
 
 ```typescript
-const idls = [
-  currentVersionIdl,
-  legacyVersionIdl,
-];
+const idls = [currentVersionIdl, legacyVersionIdl];
 
 const root = rootNodeFromAnchorIdls(idls);
 // Both versions available for migration tools

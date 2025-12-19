@@ -82,6 +82,7 @@ export interface GovernanceV2Args {
   activeProposalCount: number | bigint;
 }
 
+/** Gets the encoder for {@link GovernanceV2Args} account data. */
 export function getGovernanceV2Encoder(): Encoder<GovernanceV2Args> {
   return transformEncoder(
     getStructEncoder([
@@ -98,6 +99,7 @@ export function getGovernanceV2Encoder(): Encoder<GovernanceV2Args> {
   );
 }
 
+/** Gets the decoder for {@link GovernanceV2} account data. */
 export function getGovernanceV2Decoder(): Decoder<GovernanceV2> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -111,6 +113,7 @@ export function getGovernanceV2Decoder(): Decoder<GovernanceV2> {
   ]);
 }
 
+/** Gets the codec for {@link GovernanceV2} account data. */
 export function getGovernanceV2Codec(): Codec<GovernanceV2Args, GovernanceV2> {
   return combineCodec(getGovernanceV2Encoder(), getGovernanceV2Decoder());
 }

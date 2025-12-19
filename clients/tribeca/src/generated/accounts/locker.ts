@@ -75,6 +75,7 @@ export interface LockerArgs {
   params: LockerParamsArgs;
 }
 
+/** Gets the encoder for {@link LockerArgs} account data. */
 export function getLockerEncoder(): FixedSizeEncoder<LockerArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -90,6 +91,7 @@ export function getLockerEncoder(): FixedSizeEncoder<LockerArgs> {
   );
 }
 
+/** Gets the decoder for {@link Locker} account data. */
 export function getLockerDecoder(): FixedSizeDecoder<Locker> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -102,6 +104,7 @@ export function getLockerDecoder(): FixedSizeDecoder<Locker> {
   ]);
 }
 
+/** Gets the codec for {@link Locker} account data. */
 export function getLockerCodec(): FixedSizeCodec<LockerArgs, Locker> {
   return combineCodec(getLockerEncoder(), getLockerDecoder());
 }

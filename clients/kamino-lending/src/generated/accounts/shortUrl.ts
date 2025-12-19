@@ -64,6 +64,7 @@ export interface ShortUrlArgs {
   shortUrl: string;
 }
 
+/** Gets the encoder for {@link ShortUrlArgs} account data. */
 export function getShortUrlEncoder(): Encoder<ShortUrlArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -75,6 +76,7 @@ export function getShortUrlEncoder(): Encoder<ShortUrlArgs> {
   );
 }
 
+/** Gets the decoder for {@link ShortUrl} account data. */
 export function getShortUrlDecoder(): Decoder<ShortUrl> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -83,6 +85,7 @@ export function getShortUrlDecoder(): Decoder<ShortUrl> {
   ]);
 }
 
+/** Gets the codec for {@link ShortUrl} account data. */
 export function getShortUrlCodec(): Codec<ShortUrlArgs, ShortUrl> {
   return combineCodec(getShortUrlEncoder(), getShortUrlDecoder());
 }

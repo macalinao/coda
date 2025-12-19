@@ -59,6 +59,7 @@ export interface TokenOwnedEscrowArgs {
   bump: number;
 }
 
+/** Gets the encoder for {@link TokenOwnedEscrowArgs} account data. */
 export function getTokenOwnedEscrowEncoder(): Encoder<TokenOwnedEscrowArgs> {
   return getStructEncoder([
     ["key", getKeyEncoder()],
@@ -68,6 +69,7 @@ export function getTokenOwnedEscrowEncoder(): Encoder<TokenOwnedEscrowArgs> {
   ]);
 }
 
+/** Gets the decoder for {@link TokenOwnedEscrow} account data. */
 export function getTokenOwnedEscrowDecoder(): Decoder<TokenOwnedEscrow> {
   return getStructDecoder([
     ["key", getKeyDecoder()],
@@ -77,6 +79,7 @@ export function getTokenOwnedEscrowDecoder(): Decoder<TokenOwnedEscrow> {
   ]);
 }
 
+/** Gets the codec for {@link TokenOwnedEscrow} account data. */
 export function getTokenOwnedEscrowCodec(): Codec<
   TokenOwnedEscrowArgs,
   TokenOwnedEscrow

@@ -87,6 +87,7 @@ export interface RegistrarArgs {
   reserved3: (number | bigint)[];
 }
 
+/** Gets the encoder for {@link RegistrarArgs} account data. */
 export function getRegistrarEncoder(): FixedSizeEncoder<RegistrarArgs> {
   return transformEncoder(
     getStructEncoder([
@@ -109,6 +110,7 @@ export function getRegistrarEncoder(): FixedSizeEncoder<RegistrarArgs> {
   );
 }
 
+/** Gets the decoder for {@link Registrar} account data. */
 export function getRegistrarDecoder(): FixedSizeDecoder<Registrar> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
@@ -125,6 +127,7 @@ export function getRegistrarDecoder(): FixedSizeDecoder<Registrar> {
   ]);
 }
 
+/** Gets the codec for {@link Registrar} account data. */
 export function getRegistrarCodec(): FixedSizeCodec<RegistrarArgs, Registrar> {
   return combineCodec(getRegistrarEncoder(), getRegistrarDecoder());
 }

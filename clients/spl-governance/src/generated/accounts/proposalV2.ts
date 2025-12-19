@@ -152,6 +152,7 @@ export interface ProposalV2Args {
   vetoVoteWeight: number | bigint;
 }
 
+/** Gets the encoder for {@link ProposalV2Args} account data. */
 export function getProposalV2Encoder(): Encoder<ProposalV2Args> {
   return transformEncoder(
     getStructEncoder([
@@ -191,6 +192,7 @@ export function getProposalV2Encoder(): Encoder<ProposalV2Args> {
   );
 }
 
+/** Gets the decoder for {@link ProposalV2} account data. */
 export function getProposalV2Decoder(): Decoder<ProposalV2> {
   return getStructDecoder([
     ["accountType", getGovernanceAccountTypeDecoder()],
@@ -227,6 +229,7 @@ export function getProposalV2Decoder(): Decoder<ProposalV2> {
   ]);
 }
 
+/** Gets the codec for {@link ProposalV2} account data. */
 export function getProposalV2Codec(): Codec<ProposalV2Args, ProposalV2> {
   return combineCodec(getProposalV2Encoder(), getProposalV2Decoder());
 }
