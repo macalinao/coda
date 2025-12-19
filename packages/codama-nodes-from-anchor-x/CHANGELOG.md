@@ -1,5 +1,13 @@
 # @macalinao/codama-nodes-from-anchor-x
 
+## 0.1.2
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+- Updated dependencies [519b847]
+  - @macalinao/codama-instruction-accounts-dedupe-visitor@0.4.2
+
 ## 0.1.1
 
 ### Patch Changes

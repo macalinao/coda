@@ -1,5 +1,11 @@
 # @macalinao/clients-voter-stake-registry
 
+## 0.2.3
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+
 ## 0.2.2
 
 ### Patch Changes

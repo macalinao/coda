@@ -1,5 +1,11 @@
 # @macalinao/coda-visitors
 
+## 0.1.8
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+
 ## 0.1.7
 
 ### Patch Changes

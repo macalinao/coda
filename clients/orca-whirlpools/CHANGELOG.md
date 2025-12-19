@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.4.7
+
+### Patch Changes
+
+- 519b847: Update build script to use TypeScript cache
+
 ## 0.4.6
 
 ### Patch Changes
