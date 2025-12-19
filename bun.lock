@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "@macalinao/coda-monorepo",
@@ -43,6 +44,21 @@
     "clients/kamino-lending": {
       "name": "@macalinao/clients-kamino-lending",
       "version": "0.5.2",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "@solana/kit": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@solana/kit": "*",
+      },
+    },
+    "clients/meteora-damm-v2": {
+      "name": "@macalinao/clients-meteora-damm-v2",
+      "version": "0.1.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -591,6 +607,8 @@
     "@macalinao/biome-config": ["@macalinao/biome-config@0.1.4", "", { "peerDependencies": { "@biomejs/biome": "^2.3.0" } }, "sha512-7m85Q+6FVfCLSxIkjDxuPdIWBWQFSpps3KOrP7psRP4ncQyskQnnK+6qRxiCHTHUKQWklIOzI6VkbGEuRUrYWA=="],
 
     "@macalinao/clients-kamino-lending": ["@macalinao/clients-kamino-lending@workspace:clients/kamino-lending"],
+
+    "@macalinao/clients-meteora-damm-v2": ["@macalinao/clients-meteora-damm-v2@workspace:clients/meteora-damm-v2"],
 
     "@macalinao/clients-orca-whirlpools": ["@macalinao/clients-orca-whirlpools@workspace:clients/orca-whirlpools"],
 
