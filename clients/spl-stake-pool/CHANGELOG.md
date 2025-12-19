@@ -1,5 +1,11 @@
 # @macalinao/clients-spl-stake-pool
 
+## 0.1.4
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.1.3
 
 ### Patch Changes

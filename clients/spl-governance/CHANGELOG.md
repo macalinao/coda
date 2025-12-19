@@ -1,5 +1,11 @@
 # @macalinao/clients-spl-governance
 
+## 0.2.7
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.2.6
 
 ### Patch Changes

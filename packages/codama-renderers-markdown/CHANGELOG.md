@@ -1,5 +1,12 @@
 # @macalinao/codama-renderers-markdown
 
+## 0.4.3
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+- f199765: Update all dependencies
+
 ## 0.4.2
 
 ### Patch Changes

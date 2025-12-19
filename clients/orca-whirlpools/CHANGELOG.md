@@ -1,5 +1,11 @@
 # @macalinao/clients-orca-whirlpools
 
+## 0.4.8
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.4.7
 
 ### Patch Changes

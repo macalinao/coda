@@ -1,5 +1,11 @@
 # @macalinao/codama-rename-visitor
 
+## 0.3.3
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.3.2
 
 ### Patch Changes

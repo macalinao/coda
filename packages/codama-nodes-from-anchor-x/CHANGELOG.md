@@ -1,5 +1,13 @@
 # @macalinao/codama-nodes-from-anchor-x
 
+## 0.1.3
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+- Updated dependencies [e3d8e0f]
+  - @macalinao/codama-instruction-accounts-dedupe-visitor@0.4.3
+
 ## 0.1.2
 
 ### Patch Changes

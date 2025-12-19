@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-meteora-damm-v2",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript client for Meteora Damm V2 program",
   "type": "module",
   "sideEffects": false,

@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/codama-rename-visitor",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Codama visitor for renaming instructions and events within a program",
   "type": "module",
   "sideEffects": false,

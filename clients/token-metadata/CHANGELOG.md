@@ -1,5 +1,11 @@
 # @macalinao/token-metadata-client
 
+## 0.4.6
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+
 ## 0.4.5
 
 ### Patch Changes

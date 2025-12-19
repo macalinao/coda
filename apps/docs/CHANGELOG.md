@@ -1,5 +1,12 @@
 # coda-docs
 
+## 0.2.4
+
+### Patch Changes
+
+- e3d8e0f: Regenerate all clients
+- f199765: Update all dependencies
+
 ## 0.2.3
 
 ### Patch Changes
