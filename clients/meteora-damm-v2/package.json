@@ -1,0 +1,60 @@
+{
+  "name": "@macalinao/clients-meteora-damm-v2",
+  "version": "0.4.6",
+  "description": "TypeScript client for Meteora Damm V2 program",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://coda.ianm.com",
+  "license": "Apache-2.0",
+  "keywords": [
+    "coda",
+    "solana",
+    "meteora",
+    "damm",
+    "cpamm",
+    "dex",
+    "amm",
+    "client",
+    "esm",
+    "typescript",
+    "ian-macalinao"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
+    "codegen": "rm -fr src/generated/ && coda generate",
+    "lint": "eslint . --cache"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*"
+  },
+  "devDependencies": {
+    "@macalinao/coda": "workspace:^",
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/meteora-damm-v2"
+  }
+}
