@@ -1,6 +1,6 @@
 import "@/app/global.css";
 import type { Metadata } from "next";
-import { RootProvider } from "fumadocs-ui/provider";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 export const metadata: Metadata = {
