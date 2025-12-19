@@ -38,6 +38,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import {
+  findClaimFeeOperatorPda,
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
@@ -199,7 +200,7 @@ export interface ClaimProtocolFeeAsyncInput<
   /** The treasury token b account */
   tokenBAccount?: Address<TAccountTokenBAccount>;
   /** Claim fee operator */
-  claimFeeOperator: Address<TAccountClaimFeeOperator>;
+  claimFeeOperator?: Address<TAccountClaimFeeOperator>;
   /** Operator */
   operator: TransactionSigner<TAccountOperator>;
   /** Token a program */
@@ -352,6 +353,11 @@ export async function getClaimProtocolFeeInstructionAsync<
         getAddressEncoder().encode(expectAddress(accounts.tokenBProgram.value)),
         getAddressEncoder().encode(expectAddress(accounts.tokenBMint.value)),
       ],
+    });
+  }
+  if (!accounts.claimFeeOperator.value) {
+    accounts.claimFeeOperator.value = await findClaimFeeOperatorPda({
+      operator: expectAddress(accounts.operator.value),
     });
   }
   if (!accounts.eventAuthority.value) {

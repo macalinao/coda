@@ -39,9 +39,13 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { findEventAuthorityPda } from "../pdas/index.js";
+import { findEventAuthorityPda, findRewardVaultPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  expectSome,
+  getAccountMetaFactory,
+} from "../shared/index.js";
 
 export const FUND_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   188, 50, 249, 165, 93, 151, 38, 63,
@@ -154,7 +158,7 @@ export interface FundRewardAsyncInput<
   TAccountProgram extends string = string,
 > {
   pool: Address<TAccountPool>;
-  rewardVault: Address<TAccountRewardVault>;
+  rewardVault?: Address<TAccountRewardVault>;
   rewardMint: Address<TAccountRewardMint>;
   funderTokenAccount: Address<TAccountFunderTokenAccount>;
   funder: TransactionSigner<TAccountFunder>;
@@ -227,6 +231,12 @@ export async function getFundRewardInstructionAsync<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.rewardVault.value) {
+    accounts.rewardVault.value = await findRewardVaultPda({
+      pool: expectAddress(accounts.pool.value),
+      rewardIndex: expectSome(args.rewardIndex),
+    });
+  }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;

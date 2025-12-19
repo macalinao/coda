@@ -40,6 +40,7 @@ import {
   transformEncoder,
 } from "@solana/kit";
 import {
+  findCustomizablePoolPda,
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findPositionNftAccountPda,
@@ -229,7 +230,7 @@ export interface InitializeCustomizablePoolAsyncInput<
   payer: TransactionSigner<TAccountPayer>;
   poolAuthority?: Address<TAccountPoolAuthority>;
   /** Initialize an account to store the pool state */
-  pool: Address<TAccountPool>;
+  pool?: Address<TAccountPool>;
   position?: Address<TAccountPosition>;
   /** Token a mint */
   tokenAMint: Address<TAccountTokenAMint>;
@@ -370,6 +371,12 @@ export async function getInitializeCustomizablePoolInstructionAsync<
   }
   if (!accounts.poolAuthority.value) {
     accounts.poolAuthority.value = await findPoolAuthorityPda();
+  }
+  if (!accounts.pool.value) {
+    accounts.pool.value = await findCustomizablePoolPda({
+      tokenAMint: expectAddress(accounts.tokenAMint.value),
+      tokenBMint: expectAddress(accounts.tokenBMint.value),
+    });
   }
   if (!accounts.position.value) {
     accounts.position.value = await getProgramDerivedAddress({

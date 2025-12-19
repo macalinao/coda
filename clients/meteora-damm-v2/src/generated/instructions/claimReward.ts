@@ -35,9 +35,17 @@ import {
   getU8Encoder,
   transformEncoder,
 } from "@solana/kit";
-import { findEventAuthorityPda, findPoolAuthorityPda } from "../pdas/index.js";
+import {
+  findEventAuthorityPda,
+  findPoolAuthorityPda,
+  findRewardVaultPda,
+} from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
+import {
+  expectAddress,
+  expectSome,
+  getAccountMetaFactory,
+} from "../shared/index.js";
 
 export const CLAIM_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   149, 95, 181, 242, 94, 90, 158, 162,
@@ -166,7 +174,7 @@ export interface ClaimRewardAsyncInput<
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   /** The vault token account for reward token */
-  rewardVault: Address<TAccountRewardVault>;
+  rewardVault?: Address<TAccountRewardVault>;
   rewardMint: Address<TAccountRewardMint>;
   userTokenAccount: Address<TAccountUserTokenAccount>;
   /** The token account for nft */
@@ -258,6 +266,12 @@ export async function getClaimRewardInstructionAsync<
   // Resolve default values.
   if (!accounts.poolAuthority.value) {
     accounts.poolAuthority.value = await findPoolAuthorityPda();
+  }
+  if (!accounts.rewardVault.value) {
+    accounts.rewardVault.value = await findRewardVaultPda({
+      pool: expectAddress(accounts.pool.value),
+      rewardIndex: expectSome(args.rewardIndex),
+    });
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

@@ -1,6 +1,7 @@
 import {
   accountValueNode,
   addPdasVisitor,
+  argumentValueNode,
   constantPdaSeedNodeFromString,
   defineConfig,
   numberTypeNode,
@@ -207,6 +208,7 @@ const instructionsWithPositionNftMint = [
   "closePosition",
   "createPosition",
   "initializeCustomizablePool",
+  "initializePool",
   "initializePoolWithDynamicConfig",
 ];
 
@@ -220,10 +222,12 @@ export default defineConfig({
       defaultValue: pdaValueNode(pdaLinkNode("poolAuthority"), []),
     })),
     // Set position account derived from position NFT mint (only for instructions that have positionNftMint)
+    // Note: initialize* instructions already have position as a PDA in the IDL, so we exclude them
     ...instructionsWithPositionNftMint
       .filter(
         (i) =>
           i !== "initializeCustomizablePool" &&
+          i !== "initializePool" &&
           i !== "initializePoolWithDynamicConfig",
       )
       .map((instruction) => ({
@@ -278,6 +282,70 @@ export default defineConfig({
       defaultValue: pdaValueNode(pdaLinkNode("tokenVault"), [
         pdaSeedValueNode("tokenMint", accountValueNode("tokenBMint")),
         pdaSeedValueNode("pool", accountValueNode("pool")),
+      ]),
+    },
+    // Set pool to customizablePool PDA for initializeCustomizablePool
+    {
+      instruction: "initializeCustomizablePool",
+      account: "pool",
+      defaultValue: pdaValueNode(pdaLinkNode("customizablePool"), [
+        pdaSeedValueNode("tokenAMint", accountValueNode("tokenAMint")),
+        pdaSeedValueNode("tokenBMint", accountValueNode("tokenBMint")),
+      ]),
+    },
+    // Set pool to pool PDA for initializePool (uses config)
+    {
+      instruction: "initializePool",
+      account: "pool",
+      defaultValue: pdaValueNode(pdaLinkNode("pool"), [
+        pdaSeedValueNode("config", accountValueNode("config")),
+        pdaSeedValueNode("tokenAMint", accountValueNode("tokenAMint")),
+        pdaSeedValueNode("tokenBMint", accountValueNode("tokenBMint")),
+      ]),
+    },
+    // Set pool to pool PDA for initializePoolWithDynamicConfig (uses config)
+    {
+      instruction: "initializePoolWithDynamicConfig",
+      account: "pool",
+      defaultValue: pdaValueNode(pdaLinkNode("pool"), [
+        pdaSeedValueNode("config", accountValueNode("config")),
+        pdaSeedValueNode("tokenAMint", accountValueNode("tokenAMint")),
+        pdaSeedValueNode("tokenBMint", accountValueNode("tokenBMint")),
+      ]),
+    },
+    // Set claimFeeOperator derived from operator for claimProtocolFee
+    {
+      instruction: "claimProtocolFee",
+      account: "claimFeeOperator",
+      defaultValue: pdaValueNode(pdaLinkNode("claimFeeOperator"), [
+        pdaSeedValueNode("operator", accountValueNode("operator")),
+      ]),
+    },
+    // Set rewardVault derived from pool and rewardIndex arg for claimReward
+    {
+      instruction: "claimReward",
+      account: "rewardVault",
+      defaultValue: pdaValueNode(pdaLinkNode("rewardVault"), [
+        pdaSeedValueNode("pool", accountValueNode("pool")),
+        pdaSeedValueNode("rewardIndex", argumentValueNode("rewardIndex")),
+      ]),
+    },
+    // Set rewardVault derived from pool and rewardIndex arg for fundReward
+    {
+      instruction: "fundReward",
+      account: "rewardVault",
+      defaultValue: pdaValueNode(pdaLinkNode("rewardVault"), [
+        pdaSeedValueNode("pool", accountValueNode("pool")),
+        pdaSeedValueNode("rewardIndex", argumentValueNode("rewardIndex")),
+      ]),
+    },
+    // Set rewardVault derived from pool and rewardIndex arg for withdrawIneligibleReward
+    {
+      instruction: "withdrawIneligibleReward",
+      account: "rewardVault",
+      defaultValue: pdaValueNode(pdaLinkNode("rewardVault"), [
+        pdaSeedValueNode("pool", accountValueNode("pool")),
+        pdaSeedValueNode("rewardIndex", argumentValueNode("rewardIndex")),
       ]),
     },
   ],

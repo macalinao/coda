@@ -58,7 +58,7 @@
     },
     "clients/meteora-damm-v2": {
       "name": "@macalinao/clients-meteora-damm-v2",
-      "version": "0.4.6",
+      "version": "0.1.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",

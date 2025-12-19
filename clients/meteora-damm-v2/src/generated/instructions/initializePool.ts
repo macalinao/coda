@@ -39,7 +39,12 @@ import {
   getStructEncoder,
   transformEncoder,
 } from "@solana/kit";
-import { findEventAuthorityPda, findTokenVaultPda } from "../pdas/index.js";
+import {
+  findEventAuthorityPda,
+  findPoolPda,
+  findPositionNftAccountPda,
+  findTokenVaultPda,
+} from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
@@ -231,7 +236,7 @@ export interface InitializePoolAsyncInput<
   config: Address<TAccountConfig>;
   poolAuthority?: Address<TAccountPoolAuthority>;
   /** Initialize an account to store the pool state */
-  pool: Address<TAccountPool>;
+  pool?: Address<TAccountPool>;
   position?: Address<TAccountPosition>;
   /** Token a mint */
   tokenAMint: Address<TAccountTokenAMint>;
@@ -370,24 +375,20 @@ export async function getInitializePoolInstructionAsync<
 
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
-    accounts.positionNftAccount.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([
-            112, 111, 115, 105, 116, 105, 111, 110, 95, 110, 102, 116, 95, 97,
-            99, 99, 111, 117, 110, 116,
-          ]),
-        ),
-        getAddressEncoder().encode(
-          expectAddress(accounts.positionNftMint.value),
-        ),
-      ],
+    accounts.positionNftAccount.value = await findPositionNftAccountPda({
+      positionNftMint: expectAddress(accounts.positionNftMint.value),
     });
   }
   if (!accounts.poolAuthority.value) {
     accounts.poolAuthority.value =
       "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
+  }
+  if (!accounts.pool.value) {
+    accounts.pool.value = await findPoolPda({
+      config: expectAddress(accounts.config.value),
+      tokenAMint: expectAddress(accounts.tokenAMint.value),
+      tokenBMint: expectAddress(accounts.tokenBMint.value),
+    });
   }
   if (!accounts.position.value) {
     accounts.position.value = await getProgramDerivedAddress({
