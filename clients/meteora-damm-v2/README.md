@@ -78,18 +78,18 @@ const instruction = getAddLiquidityInstruction({
 
 The client exports PDA helper functions for all program-derived addresses:
 
-| Function | Seeds | Description |
-|----------|-------|-------------|
-| `findPoolAuthorityPda()` | `"pool_authority"` | Global pool authority |
-| `findConfigPda({ index })` | `"config"`, index (u64) | Configuration account |
-| `findPoolPda({ config, tokenAMint, tokenBMint })` | `"pool"`, config, tokenAMint, tokenBMint | Pool account |
-| `findPositionPda({ positionNft })` | `"position"`, positionNft | Position account |
-| `findTokenVaultPda({ tokenMint, pool })` | `"token_vault"`, tokenMint, pool | Token vault account |
-| `findRewardVaultPda({ pool, rewardIndex })` | `"reward_vault"`, pool, rewardIndex (u8) | Reward vault account |
-| `findCustomizablePoolPda({ tokenAMint, tokenBMint })` | `"cpool"`, tokenAMint, tokenBMint | Customizable pool account |
-| `findTokenBadgePda({ tokenMint })` | `"token_badge"`, tokenMint | Token badge account |
-| `findClaimFeeOperatorPda({ operator })` | `"cf_operator"`, operator | Claim fee operator account |
-| `findPositionNftAccountPda({ positionNftMint })` | `"position_nft_account"`, positionNftMint | Position NFT account |
+| Function                                              | Seeds                                     | Description                |
+| ----------------------------------------------------- | ----------------------------------------- | -------------------------- |
+| `findPoolAuthorityPda()`                              | `"pool_authority"`                        | Global pool authority      |
+| `findConfigPda({ index })`                            | `"config"`, index (u64)                   | Configuration account      |
+| `findPoolPda({ config, tokenAMint, tokenBMint })`     | `"pool"`, config, tokenAMint, tokenBMint  | Pool account               |
+| `findPositionPda({ positionNft })`                    | `"position"`, positionNft                 | Position account           |
+| `findTokenVaultPda({ tokenMint, pool })`              | `"token_vault"`, tokenMint, pool          | Token vault account        |
+| `findRewardVaultPda({ pool, rewardIndex })`           | `"reward_vault"`, pool, rewardIndex (u8)  | Reward vault account       |
+| `findCustomizablePoolPda({ tokenAMint, tokenBMint })` | `"cpool"`, tokenAMint, tokenBMint         | Customizable pool account  |
+| `findTokenBadgePda({ tokenMint })`                    | `"token_badge"`, tokenMint                | Token badge account        |
+| `findClaimFeeOperatorPda({ operator })`               | `"cf_operator"`, operator                 | Claim fee operator account |
+| `findPositionNftAccountPda({ positionNftMint })`      | `"position_nft_account"`, positionNftMint | Position NFT account       |
 
 **Note:** For `findPoolPda` and `findCustomizablePoolPda`, the token mints must be sorted. The first mint should be the lexicographically smaller address.
 
