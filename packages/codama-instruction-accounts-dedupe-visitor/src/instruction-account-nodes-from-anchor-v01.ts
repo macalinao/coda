@@ -60,28 +60,9 @@ export function instructionAccountNodesFromAnchorV01(
         )
       : [
           instructionAccountNodeFromAnchorV01(
-            allAccounts,
+            account,
             instructionArguments,
-            {
-              ...account,
-              name: parent ? `${parent}_${account.name}` : account.name,
-              pda:
-                account.pda && parent
-                  ? {
-                      ...account.pda,
-                      seeds: account.pda.seeds.map((seed) => {
-                        if (seed.kind === "account") {
-                          return {
-                            ...seed,
-                            path: `${parent}_${seed.path}`,
-                          };
-                        }
-                        return seed;
-                      }),
-                    }
-                  : undefined,
-            },
-            idl,
+            parent ?? undefined,
           ),
         ],
   );

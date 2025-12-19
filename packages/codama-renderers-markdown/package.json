@@ -26,7 +26,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr dist/ tsconfig.tsbuildinfo",
+    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint --ext js,ts,tsx src",
     "lint:fix": "eslint --ext js,ts,tsx src --fix",
     "test": "bun test src/",
