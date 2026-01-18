@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
       - name: Cache turbo build setup
         uses: actions/cache@v5
         with:
@@ -27,33 +28,42 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
 
       - name: Cache dependencies
         uses: actions/cache@v5
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          key: ${{ runner.os }}-bc-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-bc-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
       - name: Build
         run: bun run build:ci
+
+      - name: Run Biome
+        run: biome ci
+
       - name: Lint
-        run: bun run lint
+        run: bun run lint:ci
 
       # GitHub pages documentation
       - name: TypeDoc
         run: bun run typedoc
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: "docs/"
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

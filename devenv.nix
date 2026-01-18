@@ -3,8 +3,9 @@
 {
   dotenv.enable = true;
   packages = with pkgs; [
+    biome
     git
-    nixfmt-rfc-style
+    nixfmt
   ];
 
   languages.javascript = {
