@@ -39,7 +39,7 @@
     "lint": "eslint . --cache"
   },
   "peerDependencies": {
-    "@solana/kit": "*"
+    "@solana/kit": "catalog:peer"
   },
   "devDependencies": {
     "@macalinao/coda": "workspace:^",

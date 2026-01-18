@@ -46,7 +46,7 @@
     "codegen": "coda generate"
   },
   "peerDependencies": {
-    "@solana/kit": "*"
+    "@solana/kit": "catalog:peer"
   },
   "devDependencies": {
     "@macalinao/coda": "workspace:^",
