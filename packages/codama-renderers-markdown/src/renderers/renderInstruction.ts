@@ -4,7 +4,7 @@ import type {
   InstructionNode,
 } from "@codama/nodes";
 import type { RenderContext } from "../types.js";
-import { isNode } from "@codama/nodes";
+import { renderDiscriminators } from "./render-discriminators.js";
 import { renderTypeNode } from "./renderType.js";
 
 export function renderInstruction(
@@ -16,7 +16,7 @@ export function renderInstruction(
   lines.push(`### ${instruction.name}`);
   lines.push("");
 
-  if (instruction.docs?.length) {
+  if (instruction.docs && instruction.docs.length > 0) {
     for (const doc of instruction.docs) {
       lines.push(doc);
       lines.push("");
@@ -51,61 +51,11 @@ export function renderInstruction(
 
   // Discriminator - only show if hideDiscriminators is explicitly false (default is true = hidden)
   if (
-    instruction.discriminators?.length &&
+    instruction.discriminators &&
+    instruction.discriminators.length > 0 &&
     context.options.hideDiscriminators === false
   ) {
-    lines.push("**Discriminator:**");
-    lines.push("");
-    for (const discriminator of instruction.discriminators) {
-      if (isNode(discriminator, ["constantDiscriminatorNode"])) {
-        // constantDiscriminatorNode has a constant property, not value
-        const discriminatorNode = discriminator as {
-          constant: {
-            kind?: string;
-            type?: { kind?: string };
-            data?: unknown;
-            value?: unknown;
-          };
-        };
-        const discriminatorConstant = discriminatorNode.constant;
-        if (
-          discriminatorConstant.kind === "constantValueNode" &&
-          discriminatorConstant.type?.kind === "bytesTypeNode"
-        ) {
-          // For bytes type, we need to handle the data property
-          if (
-            "data" in discriminatorConstant &&
-            Array.isArray(discriminatorConstant.data)
-          ) {
-            const bytes = discriminatorConstant.data
-              .map((b: number) => `0x${b.toString(16).padStart(2, "0")}`)
-              .join(", ");
-            lines.push(`- Bytes: \`[${bytes}]\``);
-          }
-        } else if (discriminatorConstant.kind === "constantValueNode") {
-          // For other constant values
-          if (
-            "value" in discriminatorConstant &&
-            discriminatorConstant.value &&
-            typeof discriminatorConstant.value === "object" &&
-            "kind" in discriminatorConstant.value &&
-            discriminatorConstant.value.kind === "numberValueNode"
-          ) {
-            const numberValue = discriminatorConstant.value as unknown as {
-              number: number;
-            };
-            lines.push(`- Constant: \`${String(numberValue.number)}\``);
-          } else if ("value" in discriminatorConstant) {
-            lines.push(
-              `- Constant: \`${String(discriminatorConstant.value)}\``,
-            );
-          }
-        }
-      } else if (isNode(discriminator, ["fieldDiscriminatorNode"])) {
-        lines.push(`- Field: \`${discriminator.name}\``);
-      }
-    }
-    lines.push("");
+    lines.push(...renderDiscriminators(instruction.discriminators));
   }
 
   return lines.join("\n");

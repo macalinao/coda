@@ -76,8 +76,8 @@ export interface UserMetadataArgs {
   userLookupTable: Address;
   /** User metadata account owner */
   owner: Address;
-  padding1: (number | bigint)[];
-  padding2: (number | bigint)[];
+  padding1: Array<number | bigint>;
+  padding2: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link UserMetadataArgs} account data. */

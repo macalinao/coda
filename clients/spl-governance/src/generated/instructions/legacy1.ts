@@ -44,7 +44,7 @@ export interface Legacy1InstructionData {
   discriminator: number;
 }
 
-export interface Legacy1InstructionDataArgs {}
+export type Legacy1InstructionDataArgs = {};
 
 export function getLegacy1InstructionDataEncoder(): FixedSizeEncoder<Legacy1InstructionDataArgs> {
   return transformEncoder(
@@ -67,7 +67,7 @@ export function getLegacy1InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface Legacy1Input {}
+export type Legacy1Input = {};
 
 export function getLegacy1Instruction<
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,

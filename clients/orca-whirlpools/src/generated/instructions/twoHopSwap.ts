@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,10 +37,12 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const TWO_HOP_SWAP_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   195, 96, 237, 108, 68, 162, 219, 230,
@@ -366,7 +368,7 @@ export function getTwoHopSwapInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -381,26 +383,26 @@ export function getTwoHopSwapInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.tokenAuthority),
-      getAccountMeta(accounts.whirlpoolOne),
-      getAccountMeta(accounts.whirlpoolTwo),
-      getAccountMeta(accounts.tokenOwnerAccountOneA),
-      getAccountMeta(accounts.tokenVaultOneA),
-      getAccountMeta(accounts.tokenOwnerAccountOneB),
-      getAccountMeta(accounts.tokenVaultOneB),
-      getAccountMeta(accounts.tokenOwnerAccountTwoA),
-      getAccountMeta(accounts.tokenVaultTwoA),
-      getAccountMeta(accounts.tokenOwnerAccountTwoB),
-      getAccountMeta(accounts.tokenVaultTwoB),
-      getAccountMeta(accounts.tickArrayOne0),
-      getAccountMeta(accounts.tickArrayOne1),
-      getAccountMeta(accounts.tickArrayOne2),
-      getAccountMeta(accounts.tickArrayTwo0),
-      getAccountMeta(accounts.tickArrayTwo1),
-      getAccountMeta(accounts.tickArrayTwo2),
-      getAccountMeta(accounts.oracleOne),
-      getAccountMeta(accounts.oracleTwo),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("tokenAuthority", accounts.tokenAuthority),
+      getAccountMeta("whirlpoolOne", accounts.whirlpoolOne),
+      getAccountMeta("whirlpoolTwo", accounts.whirlpoolTwo),
+      getAccountMeta("tokenOwnerAccountOneA", accounts.tokenOwnerAccountOneA),
+      getAccountMeta("tokenVaultOneA", accounts.tokenVaultOneA),
+      getAccountMeta("tokenOwnerAccountOneB", accounts.tokenOwnerAccountOneB),
+      getAccountMeta("tokenVaultOneB", accounts.tokenVaultOneB),
+      getAccountMeta("tokenOwnerAccountTwoA", accounts.tokenOwnerAccountTwoA),
+      getAccountMeta("tokenVaultTwoA", accounts.tokenVaultTwoA),
+      getAccountMeta("tokenOwnerAccountTwoB", accounts.tokenOwnerAccountTwoB),
+      getAccountMeta("tokenVaultTwoB", accounts.tokenVaultTwoB),
+      getAccountMeta("tickArrayOne0", accounts.tickArrayOne0),
+      getAccountMeta("tickArrayOne1", accounts.tickArrayOne1),
+      getAccountMeta("tickArrayOne2", accounts.tickArrayOne2),
+      getAccountMeta("tickArrayTwo0", accounts.tickArrayTwo0),
+      getAccountMeta("tickArrayTwo1", accounts.tickArrayTwo1),
+      getAccountMeta("tickArrayTwo2", accounts.tickArrayTwo2),
+      getAccountMeta("oracleOne", accounts.oracleOne),
+      getAccountMeta("oracleTwo", accounts.oracleTwo),
     ],
     data: getTwoHopSwapInstructionDataEncoder().encode(
       args as TwoHopSwapInstructionDataArgs,
@@ -470,8 +472,13 @@ export function parseTwoHopSwapInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedTwoHopSwapInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 20) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 20,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

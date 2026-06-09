@@ -19,7 +19,7 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -28,10 +28,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REFRESH_RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [2, 218, 138, 235, 79, 201, 25, 102],
@@ -82,7 +84,7 @@ export interface RefreshReserveInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface RefreshReserveInstructionDataArgs {}
+export type RefreshReserveInstructionDataArgs = {};
 
 export function getRefreshReserveInstructionDataEncoder(): FixedSizeEncoder<RefreshReserveInstructionDataArgs> {
   return transformEncoder(
@@ -171,18 +173,18 @@ export function getRefreshReserveInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.pythOracle),
-      getAccountMeta(accounts.switchboardPriceOracle),
-      getAccountMeta(accounts.switchboardTwapOracle),
-      getAccountMeta(accounts.scopePrices),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("pythOracle", accounts.pythOracle),
+      getAccountMeta("switchboardPriceOracle", accounts.switchboardPriceOracle),
+      getAccountMeta("switchboardTwapOracle", accounts.switchboardTwapOracle),
+      getAccountMeta("scopePrices", accounts.scopePrices),
     ],
     data: getRefreshReserveInstructionDataEncoder().encode({}),
     programAddress,
@@ -222,8 +224,13 @@ export function parseRefreshReserveInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRefreshReserveInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

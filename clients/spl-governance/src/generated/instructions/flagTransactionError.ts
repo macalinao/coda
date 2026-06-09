@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const FLAG_TRANSACTION_ERROR_DISCRIMINATOR = 20;
 
@@ -72,7 +74,7 @@ export interface FlagTransactionErrorInstructionData {
   discriminator: number;
 }
 
-export interface FlagTransactionErrorInstructionDataArgs {}
+export type FlagTransactionErrorInstructionDataArgs = {};
 
 export function getFlagTransactionErrorInstructionDataEncoder(): FixedSizeEncoder<FlagTransactionErrorInstructionDataArgs> {
   return transformEncoder(
@@ -156,16 +158,19 @@ export function getFlagTransactionErrorInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.governanceAuthority),
-      getAccountMeta(accounts.proposalTransactionAccount),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta("governanceAuthority", accounts.governanceAuthority),
+      getAccountMeta(
+        "proposalTransactionAccount",
+        accounts.proposalTransactionAccount,
+      ),
     ],
     data: getFlagTransactionErrorInstructionDataEncoder().encode({}),
     programAddress,
@@ -204,8 +209,13 @@ export function parseFlagTransactionErrorInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFlagTransactionErrorInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

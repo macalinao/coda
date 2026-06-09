@@ -19,7 +19,7 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -28,10 +28,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_VOTER_WEIGHT_RECORD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([45, 185, 3, 36, 109, 190, 115, 169]);
@@ -75,7 +77,7 @@ export interface UpdateVoterWeightRecordInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface UpdateVoterWeightRecordInstructionDataArgs {}
+export type UpdateVoterWeightRecordInstructionDataArgs = {};
 
 export function getUpdateVoterWeightRecordInstructionDataEncoder(): FixedSizeEncoder<UpdateVoterWeightRecordInstructionDataArgs> {
   return transformEncoder(
@@ -152,7 +154,7 @@ export function getUpdateVoterWeightRecordInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -164,10 +166,10 @@ export function getUpdateVoterWeightRecordInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.voterWeightRecord),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("voterWeightRecord", accounts.voterWeightRecord),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getUpdateVoterWeightRecordInstructionDataEncoder().encode({}),
     programAddress,
@@ -203,8 +205,13 @@ export function parseUpdateVoterWeightRecordInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateVoterWeightRecordInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

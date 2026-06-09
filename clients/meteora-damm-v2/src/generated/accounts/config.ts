@@ -112,7 +112,7 @@ export interface ConfigArgs {
    * Fee curve point
    * Padding for further use
    */
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link ConfigArgs} account data. */

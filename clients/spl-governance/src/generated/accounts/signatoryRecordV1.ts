@@ -17,6 +17,7 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { SignatoryRecordSeeds } from "../pdas/index.js";
 import {
@@ -41,10 +42,10 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const SIGNATORY_RECORD_V1_ACCOUNT_TYPE =
+export const SIGNATORY_RECORD_V1_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.SignatoryRecordV1;
 
-export function getSignatoryRecordV1AccountTypeBytes() {
+export function getSignatoryRecordV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(
     SIGNATORY_RECORD_V1_ACCOUNT_TYPE,
   );

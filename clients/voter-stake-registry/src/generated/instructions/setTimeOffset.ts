@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,10 +32,12 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_TIME_OFFSET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [89, 238, 89, 160, 239, 113, 25, 123],
@@ -135,7 +137,7 @@ export function getSetTimeOffsetInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -144,8 +146,8 @@ export function getSetTimeOffsetInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.realmAuthority),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("realmAuthority", accounts.realmAuthority),
     ],
     data: getSetTimeOffsetInstructionDataEncoder().encode(
       args as SetTimeOffsetInstructionDataArgs,
@@ -179,8 +181,13 @@ export function parseSetTimeOffsetInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetTimeOffsetInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

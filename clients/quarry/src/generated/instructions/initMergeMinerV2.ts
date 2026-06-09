@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMergeMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_MERGE_MINER_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([153, 44, 29, 197, 171, 114, 71, 208]);
@@ -82,7 +87,7 @@ export interface InitMergeMinerV2InstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitMergeMinerV2InstructionDataArgs {}
+export type InitMergeMinerV2InstructionDataArgs = {};
 
 export function getInitMergeMinerV2InstructionDataEncoder(): FixedSizeEncoder<InitMergeMinerV2InstructionDataArgs> {
   return transformEncoder(
@@ -161,14 +166,20 @@ export async function getInitMergeMinerV2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.mm.value) {
     accounts.mm.value = await findMergeMinerPda({
-      pool: expectAddress(accounts.pool.value),
-      owner: expectAddress(accounts.owner.value),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
+      owner: getAddressFromResolvedInstructionAccount(
+        "owner",
+        accounts.owner.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -179,11 +190,11 @@ export async function getInitMergeMinerV2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitMergeMinerV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -249,7 +260,7 @@ export function getInitMergeMinerV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -261,11 +272,11 @@ export function getInitMergeMinerV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitMergeMinerV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -303,8 +314,13 @@ export function parseInitMergeMinerV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitMergeMinerV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,10 +32,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_CONFIG_EXTENSION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([55, 9, 53, 9, 114, 57, 209, 52]);
@@ -85,7 +87,7 @@ export interface InitializeConfigExtensionInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitializeConfigExtensionInstructionDataArgs {}
+export type InitializeConfigExtensionInstructionDataArgs = {};
 
 export function getInitializeConfigExtensionInstructionDataEncoder(): FixedSizeEncoder<InitializeConfigExtensionInstructionDataArgs> {
   return transformEncoder(
@@ -164,7 +166,7 @@ export function getInitializeConfigExtensionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -176,11 +178,11 @@ export function getInitializeConfigExtensionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.config),
-      getAccountMeta(accounts.configExtension),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.feeAuthority),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("config", accounts.config),
+      getAccountMeta("configExtension", accounts.configExtension),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("feeAuthority", accounts.feeAuthority),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitializeConfigExtensionInstructionDataEncoder().encode({}),
     programAddress,
@@ -218,8 +220,13 @@ export function parseInitializeConfigExtensionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeConfigExtensionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

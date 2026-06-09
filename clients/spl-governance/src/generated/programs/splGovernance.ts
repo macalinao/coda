@@ -6,8 +6,82 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  GovernanceV1,
+  GovernanceV1Args,
+  GovernanceV2,
+  GovernanceV2Args,
+  LegacyTokenOwnerRecord,
+  LegacyTokenOwnerRecordArgs,
+  ProgramMetadata,
+  ProgramMetadataArgs,
+  ProposalDeposit,
+  ProposalDepositArgs,
+  ProposalInstructionV1,
+  ProposalInstructionV1Args,
+  ProposalTransactionV2,
+  ProposalTransactionV2Args,
+  ProposalV1,
+  ProposalV1Args,
+  ProposalV2,
+  ProposalV2Args,
+  RealmConfigAccount,
+  RealmConfigAccountArgs,
+  RealmV1,
+  RealmV1Args,
+  RealmV2,
+  RealmV2Args,
+  RequiredSignatory,
+  RequiredSignatoryArgs,
+  SignatoryRecordV1,
+  SignatoryRecordV1Args,
+  SignatoryRecordV2,
+  SignatoryRecordV2Args,
+  TokenOwnerRecordV1,
+  TokenOwnerRecordV1Args,
+  TokenOwnerRecordV2,
+  TokenOwnerRecordV2Args,
+  VoteRecordV1,
+  VoteRecordV1Args,
+  VoteRecordV2,
+  VoteRecordV2Args,
+} from "../accounts/index.js";
+import type {
+  AddRequiredSignatoryInput,
+  AddSignatoryInput,
+  CancelProposalInput,
+  CastVoteInput,
+  CompleteProposalInput,
+  CreateGovernanceInput,
+  CreateMintGovernanceInput,
+  CreateNativeTreasuryInput,
+  CreateProgramGovernanceInput,
+  CreateProposalInput,
+  CreateRealmInput,
+  CreateTokenGovernanceInput,
+  CreateTokenOwnerRecordAsyncInput,
+  DepositGoverningTokensInput,
+  ExecuteTransactionInput,
+  FinalizeVoteInput,
+  FlagTransactionErrorInput,
+  InsertTransactionInput,
+  Legacy1Input,
   ParsedAddRequiredSignatoryInstruction,
   ParsedAddSignatoryInstruction,
   ParsedCancelProposalInstruction,
@@ -39,8 +113,134 @@ import type {
   ParsedSignOffProposalInstruction,
   ParsedUpdateProgramMetadataInstruction,
   ParsedWithdrawGoverningTokensInstruction,
+  RefundProposalDepositInput,
+  RelinquishVoteInput,
+  RemoveRequiredSignatoryInput,
+  RemoveTransactionInput,
+  RevokeGoverningTokensInput,
+  SetGovernanceConfigInput,
+  SetGovernanceDelegateInput,
+  SetRealmAuthorityInput,
+  SetRealmConfigInput,
+  SignOffProposalInput,
+  UpdateProgramMetadataInput,
+  WithdrawGoverningTokensInput,
 } from "../instructions/index.js";
-import { containsBytes, getU8Encoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getGovernanceV1Codec,
+  getGovernanceV2Codec,
+  getLegacyTokenOwnerRecordCodec,
+  getProgramMetadataCodec,
+  getProposalDepositCodec,
+  getProposalInstructionV1Codec,
+  getProposalTransactionV2Codec,
+  getProposalV1Codec,
+  getProposalV2Codec,
+  getRealmConfigAccountCodec,
+  getRealmV1Codec,
+  getRealmV2Codec,
+  getRequiredSignatoryCodec,
+  getSignatoryRecordV1Codec,
+  getSignatoryRecordV2Codec,
+  getTokenOwnerRecordV1Codec,
+  getTokenOwnerRecordV2Codec,
+  getVoteRecordV1Codec,
+  getVoteRecordV2Codec,
+} from "../accounts/index.js";
+import {
+  getAddRequiredSignatoryInstruction,
+  getAddSignatoryInstruction,
+  getCancelProposalInstruction,
+  getCastVoteInstruction,
+  getCompleteProposalInstruction,
+  getCreateGovernanceInstruction,
+  getCreateMintGovernanceInstruction,
+  getCreateNativeTreasuryInstruction,
+  getCreateProgramGovernanceInstruction,
+  getCreateProposalInstruction,
+  getCreateRealmInstruction,
+  getCreateTokenGovernanceInstruction,
+  getCreateTokenOwnerRecordInstructionAsync,
+  getDepositGoverningTokensInstruction,
+  getExecuteTransactionInstruction,
+  getFinalizeVoteInstruction,
+  getFlagTransactionErrorInstruction,
+  getInsertTransactionInstruction,
+  getLegacy1Instruction,
+  getRefundProposalDepositInstruction,
+  getRelinquishVoteInstruction,
+  getRemoveRequiredSignatoryInstruction,
+  getRemoveTransactionInstruction,
+  getRevokeGoverningTokensInstruction,
+  getSetGovernanceConfigInstruction,
+  getSetGovernanceDelegateInstruction,
+  getSetRealmAuthorityInstruction,
+  getSetRealmConfigInstruction,
+  getSignOffProposalInstruction,
+  getUpdateProgramMetadataInstruction,
+  getWithdrawGoverningTokensInstruction,
+  parseAddRequiredSignatoryInstruction,
+  parseAddSignatoryInstruction,
+  parseCancelProposalInstruction,
+  parseCastVoteInstruction,
+  parseCompleteProposalInstruction,
+  parseCreateGovernanceInstruction,
+  parseCreateMintGovernanceInstruction,
+  parseCreateNativeTreasuryInstruction,
+  parseCreateProgramGovernanceInstruction,
+  parseCreateProposalInstruction,
+  parseCreateRealmInstruction,
+  parseCreateTokenGovernanceInstruction,
+  parseCreateTokenOwnerRecordInstruction,
+  parseDepositGoverningTokensInstruction,
+  parseExecuteTransactionInstruction,
+  parseFinalizeVoteInstruction,
+  parseFlagTransactionErrorInstruction,
+  parseInsertTransactionInstruction,
+  parseLegacy1Instruction,
+  parseRefundProposalDepositInstruction,
+  parseRelinquishVoteInstruction,
+  parseRemoveRequiredSignatoryInstruction,
+  parseRemoveTransactionInstruction,
+  parseRevokeGoverningTokensInstruction,
+  parseSetGovernanceConfigInstruction,
+  parseSetGovernanceDelegateInstruction,
+  parseSetRealmAuthorityInstruction,
+  parseSetRealmConfigInstruction,
+  parseSignOffProposalInstruction,
+  parseUpdateProgramMetadataInstruction,
+  parseWithdrawGoverningTokensInstruction,
+} from "../instructions/index.js";
+import {
+  findCommunityTokenHoldingPda,
+  findCouncilTokenHoldingPda,
+  findGovernancePda,
+  findGoverningTokenHoldingPda,
+  findNativeTreasuryPda,
+  findProposalDepositPda,
+  findProposalPda,
+  findProposalTransactionPda,
+  findRealmConfigPda,
+  findRealmPda,
+  findRequiredSignatoryPda,
+  findSignatoryRecordPda,
+  findTokenOwnerRecordPda,
+  findVoteRecordPda,
+} from "../pdas/index.js";
 import {
   GovernanceAccountType,
   getGovernanceAccountTypeEncoder,
@@ -280,8 +480,9 @@ export function identifySplGovernanceAccount(
   ) {
     return SplGovernanceAccount.VoteRecordV2;
   }
-  throw new Error(
-    "The provided account could not be identified as a splGovernance account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "splGovernance" },
   );
 }
 
@@ -416,8 +617,9 @@ export function identifySplGovernanceInstruction(
   if (containsBytes(data, getU8Encoder().encode(30), 0)) {
     return SplGovernanceInstruction.RemoveRequiredSignatory;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a splGovernance instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "splGovernance" },
   );
 }
 
@@ -517,3 +719,707 @@ export type ParsedSplGovernanceInstruction<
   | ({
       instructionType: SplGovernanceInstruction.RemoveRequiredSignatory;
     } & ParsedRemoveRequiredSignatoryInstruction<TProgram>);
+
+export function parseSplGovernanceInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedSplGovernanceInstruction<TProgram> {
+  const instructionType = identifySplGovernanceInstruction(instruction);
+  switch (instructionType) {
+    case SplGovernanceInstruction.CreateRealm: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateRealm,
+        ...parseCreateRealmInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.DepositGoverningTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.DepositGoverningTokens,
+        ...parseDepositGoverningTokensInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.WithdrawGoverningTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.WithdrawGoverningTokens,
+        ...parseWithdrawGoverningTokensInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.SetGovernanceDelegate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.SetGovernanceDelegate,
+        ...parseSetGovernanceDelegateInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CreateGovernance: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateGovernance,
+        ...parseCreateGovernanceInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CreateProgramGovernance: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateProgramGovernance,
+        ...parseCreateProgramGovernanceInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CreateProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateProposal,
+        ...parseCreateProposalInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.AddSignatory: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.AddSignatory,
+        ...parseAddSignatoryInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.Legacy1: {
+      return {
+        instructionType: SplGovernanceInstruction.Legacy1,
+        ...parseLegacy1Instruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.InsertTransaction: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.InsertTransaction,
+        ...parseInsertTransactionInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.RemoveTransaction: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.RemoveTransaction,
+        ...parseRemoveTransactionInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CancelProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CancelProposal,
+        ...parseCancelProposalInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.SignOffProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.SignOffProposal,
+        ...parseSignOffProposalInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CastVote: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CastVote,
+        ...parseCastVoteInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.FinalizeVote: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.FinalizeVote,
+        ...parseFinalizeVoteInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.RelinquishVote: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.RelinquishVote,
+        ...parseRelinquishVoteInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.ExecuteTransaction: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.ExecuteTransaction,
+        ...parseExecuteTransactionInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CreateMintGovernance: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateMintGovernance,
+        ...parseCreateMintGovernanceInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CreateTokenGovernance: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateTokenGovernance,
+        ...parseCreateTokenGovernanceInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.SetGovernanceConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.SetGovernanceConfig,
+        ...parseSetGovernanceConfigInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.FlagTransactionError: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.FlagTransactionError,
+        ...parseFlagTransactionErrorInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.SetRealmAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.SetRealmAuthority,
+        ...parseSetRealmAuthorityInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.SetRealmConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.SetRealmConfig,
+        ...parseSetRealmConfigInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CreateTokenOwnerRecord: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateTokenOwnerRecord,
+        ...parseCreateTokenOwnerRecordInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.UpdateProgramMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.UpdateProgramMetadata,
+        ...parseUpdateProgramMetadataInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CreateNativeTreasury: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CreateNativeTreasury,
+        ...parseCreateNativeTreasuryInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.RevokeGoverningTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.RevokeGoverningTokens,
+        ...parseRevokeGoverningTokensInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.RefundProposalDeposit: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.RefundProposalDeposit,
+        ...parseRefundProposalDepositInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.CompleteProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.CompleteProposal,
+        ...parseCompleteProposalInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.AddRequiredSignatory: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.AddRequiredSignatory,
+        ...parseAddRequiredSignatoryInstruction(instruction),
+      };
+    }
+    case SplGovernanceInstruction.RemoveRequiredSignatory: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplGovernanceInstruction.RemoveRequiredSignatory,
+        ...parseRemoveRequiredSignatoryInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "splGovernance",
+        },
+      );
+  }
+}
+
+export interface SplGovernancePlugin {
+  accounts: SplGovernancePluginAccounts;
+  instructions: SplGovernancePluginInstructions;
+  pdas: SplGovernancePluginPdas;
+}
+
+export interface SplGovernancePluginAccounts {
+  governanceV2: ReturnType<typeof getGovernanceV2Codec> &
+    SelfFetchFunctions<GovernanceV2Args, GovernanceV2>;
+  realmV1: ReturnType<typeof getRealmV1Codec> &
+    SelfFetchFunctions<RealmV1Args, RealmV1>;
+  tokenOwnerRecordV1: ReturnType<typeof getTokenOwnerRecordV1Codec> &
+    SelfFetchFunctions<TokenOwnerRecordV1Args, TokenOwnerRecordV1>;
+  governanceV1: ReturnType<typeof getGovernanceV1Codec> &
+    SelfFetchFunctions<GovernanceV1Args, GovernanceV1>;
+  proposalV1: ReturnType<typeof getProposalV1Codec> &
+    SelfFetchFunctions<ProposalV1Args, ProposalV1>;
+  signatoryRecordV1: ReturnType<typeof getSignatoryRecordV1Codec> &
+    SelfFetchFunctions<SignatoryRecordV1Args, SignatoryRecordV1>;
+  proposalInstructionV1: ReturnType<typeof getProposalInstructionV1Codec> &
+    SelfFetchFunctions<ProposalInstructionV1Args, ProposalInstructionV1>;
+  voteRecordV1: ReturnType<typeof getVoteRecordV1Codec> &
+    SelfFetchFunctions<VoteRecordV1Args, VoteRecordV1>;
+  programMetadata: ReturnType<typeof getProgramMetadataCodec> &
+    SelfFetchFunctions<ProgramMetadataArgs, ProgramMetadata>;
+  proposalV2: ReturnType<typeof getProposalV2Codec> &
+    SelfFetchFunctions<ProposalV2Args, ProposalV2>;
+  proposalDeposit: ReturnType<typeof getProposalDepositCodec> &
+    SelfFetchFunctions<ProposalDepositArgs, ProposalDeposit>;
+  proposalTransactionV2: ReturnType<typeof getProposalTransactionV2Codec> &
+    SelfFetchFunctions<ProposalTransactionV2Args, ProposalTransactionV2>;
+  realmV2: ReturnType<typeof getRealmV2Codec> &
+    SelfFetchFunctions<RealmV2Args, RealmV2>;
+  realmConfigAccount: ReturnType<typeof getRealmConfigAccountCodec> &
+    SelfFetchFunctions<RealmConfigAccountArgs, RealmConfigAccount>;
+  requiredSignatory: ReturnType<typeof getRequiredSignatoryCodec> &
+    SelfFetchFunctions<RequiredSignatoryArgs, RequiredSignatory>;
+  signatoryRecordV2: ReturnType<typeof getSignatoryRecordV2Codec> &
+    SelfFetchFunctions<SignatoryRecordV2Args, SignatoryRecordV2>;
+  tokenOwnerRecordV2: ReturnType<typeof getTokenOwnerRecordV2Codec> &
+    SelfFetchFunctions<TokenOwnerRecordV2Args, TokenOwnerRecordV2>;
+  legacyTokenOwnerRecord: ReturnType<typeof getLegacyTokenOwnerRecordCodec> &
+    SelfFetchFunctions<LegacyTokenOwnerRecordArgs, LegacyTokenOwnerRecord>;
+  voteRecordV2: ReturnType<typeof getVoteRecordV2Codec> &
+    SelfFetchFunctions<VoteRecordV2Args, VoteRecordV2>;
+}
+
+export interface SplGovernancePluginInstructions {
+  createRealm: (
+    input: MakeOptional<CreateRealmInput, "payer">,
+  ) => ReturnType<typeof getCreateRealmInstruction> & SelfPlanAndSendFunctions;
+  depositGoverningTokens: (
+    input: MakeOptional<DepositGoverningTokensInput, "payer">,
+  ) => ReturnType<typeof getDepositGoverningTokensInstruction> &
+    SelfPlanAndSendFunctions;
+  withdrawGoverningTokens: (
+    input: WithdrawGoverningTokensInput,
+  ) => ReturnType<typeof getWithdrawGoverningTokensInstruction> &
+    SelfPlanAndSendFunctions;
+  setGovernanceDelegate: (
+    input: SetGovernanceDelegateInput,
+  ) => ReturnType<typeof getSetGovernanceDelegateInstruction> &
+    SelfPlanAndSendFunctions;
+  createGovernance: (
+    input: MakeOptional<CreateGovernanceInput, "payer">,
+  ) => ReturnType<typeof getCreateGovernanceInstruction> &
+    SelfPlanAndSendFunctions;
+  createProgramGovernance: (
+    input: MakeOptional<CreateProgramGovernanceInput, "payer">,
+  ) => ReturnType<typeof getCreateProgramGovernanceInstruction> &
+    SelfPlanAndSendFunctions;
+  createProposal: (
+    input: MakeOptional<CreateProposalInput, "payer">,
+  ) => ReturnType<typeof getCreateProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  addSignatory: (
+    input: MakeOptional<AddSignatoryInput, "payer">,
+  ) => ReturnType<typeof getAddSignatoryInstruction> & SelfPlanAndSendFunctions;
+  legacy1: (
+    input: Legacy1Input,
+  ) => ReturnType<typeof getLegacy1Instruction> & SelfPlanAndSendFunctions;
+  insertTransaction: (
+    input: MakeOptional<InsertTransactionInput, "payer">,
+  ) => ReturnType<typeof getInsertTransactionInstruction> &
+    SelfPlanAndSendFunctions;
+  removeTransaction: (
+    input: RemoveTransactionInput,
+  ) => ReturnType<typeof getRemoveTransactionInstruction> &
+    SelfPlanAndSendFunctions;
+  cancelProposal: (
+    input: CancelProposalInput,
+  ) => ReturnType<typeof getCancelProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  signOffProposal: (
+    input: SignOffProposalInput,
+  ) => ReturnType<typeof getSignOffProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  castVote: (
+    input: MakeOptional<CastVoteInput, "payer">,
+  ) => ReturnType<typeof getCastVoteInstruction> & SelfPlanAndSendFunctions;
+  finalizeVote: (
+    input: FinalizeVoteInput,
+  ) => ReturnType<typeof getFinalizeVoteInstruction> & SelfPlanAndSendFunctions;
+  relinquishVote: (
+    input: RelinquishVoteInput,
+  ) => ReturnType<typeof getRelinquishVoteInstruction> &
+    SelfPlanAndSendFunctions;
+  executeTransaction: (
+    input: ExecuteTransactionInput,
+  ) => ReturnType<typeof getExecuteTransactionInstruction> &
+    SelfPlanAndSendFunctions;
+  createMintGovernance: (
+    input: MakeOptional<CreateMintGovernanceInput, "payer">,
+  ) => ReturnType<typeof getCreateMintGovernanceInstruction> &
+    SelfPlanAndSendFunctions;
+  createTokenGovernance: (
+    input: MakeOptional<CreateTokenGovernanceInput, "payer">,
+  ) => ReturnType<typeof getCreateTokenGovernanceInstruction> &
+    SelfPlanAndSendFunctions;
+  setGovernanceConfig: (
+    input: SetGovernanceConfigInput,
+  ) => ReturnType<typeof getSetGovernanceConfigInstruction> &
+    SelfPlanAndSendFunctions;
+  flagTransactionError: (
+    input: FlagTransactionErrorInput,
+  ) => ReturnType<typeof getFlagTransactionErrorInstruction> &
+    SelfPlanAndSendFunctions;
+  setRealmAuthority: (
+    input: SetRealmAuthorityInput,
+  ) => ReturnType<typeof getSetRealmAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  setRealmConfig: (
+    input: SetRealmConfigInput,
+  ) => ReturnType<typeof getSetRealmConfigInstruction> &
+    SelfPlanAndSendFunctions;
+  createTokenOwnerRecord: (
+    input: MakeOptional<CreateTokenOwnerRecordAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateTokenOwnerRecordInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateProgramMetadata: (
+    input: MakeOptional<UpdateProgramMetadataInput, "payer">,
+  ) => ReturnType<typeof getUpdateProgramMetadataInstruction> &
+    SelfPlanAndSendFunctions;
+  createNativeTreasury: (
+    input: MakeOptional<CreateNativeTreasuryInput, "payer">,
+  ) => ReturnType<typeof getCreateNativeTreasuryInstruction> &
+    SelfPlanAndSendFunctions;
+  revokeGoverningTokens: (
+    input: RevokeGoverningTokensInput,
+  ) => ReturnType<typeof getRevokeGoverningTokensInstruction> &
+    SelfPlanAndSendFunctions;
+  refundProposalDeposit: (
+    input: RefundProposalDepositInput,
+  ) => ReturnType<typeof getRefundProposalDepositInstruction> &
+    SelfPlanAndSendFunctions;
+  completeProposal: (
+    input: CompleteProposalInput,
+  ) => ReturnType<typeof getCompleteProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  addRequiredSignatory: (
+    input: MakeOptional<AddRequiredSignatoryInput, "payer">,
+  ) => ReturnType<typeof getAddRequiredSignatoryInstruction> &
+    SelfPlanAndSendFunctions;
+  removeRequiredSignatory: (
+    input: RemoveRequiredSignatoryInput,
+  ) => ReturnType<typeof getRemoveRequiredSignatoryInstruction> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface SplGovernancePluginPdas {
+  realm: typeof findRealmPda;
+  communityTokenHolding: typeof findCommunityTokenHoldingPda;
+  councilTokenHolding: typeof findCouncilTokenHoldingPda;
+  realmConfig: typeof findRealmConfigPda;
+  tokenOwnerRecord: typeof findTokenOwnerRecordPda;
+  governingTokenHolding: typeof findGoverningTokenHoldingPda;
+  governance: typeof findGovernancePda;
+  nativeTreasury: typeof findNativeTreasuryPda;
+  proposal: typeof findProposalPda;
+  proposalDeposit: typeof findProposalDepositPda;
+  signatoryRecord: typeof findSignatoryRecordPda;
+  proposalTransaction: typeof findProposalTransactionPda;
+  voteRecord: typeof findVoteRecordPda;
+  requiredSignatory: typeof findRequiredSignatoryPda;
+}
+
+export type SplGovernancePluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function splGovernanceProgram() {
+  return <T extends SplGovernancePluginRequirements>(
+    client: T,
+  ): Omit<T, "splGovernance"> & { splGovernance: SplGovernancePlugin } => {
+    return extendClient(client, {
+      splGovernance: <SplGovernancePlugin>{
+        accounts: {
+          governanceV2: addSelfFetchFunctions(client, getGovernanceV2Codec()),
+          realmV1: addSelfFetchFunctions(client, getRealmV1Codec()),
+          tokenOwnerRecordV1: addSelfFetchFunctions(
+            client,
+            getTokenOwnerRecordV1Codec(),
+          ),
+          governanceV1: addSelfFetchFunctions(client, getGovernanceV1Codec()),
+          proposalV1: addSelfFetchFunctions(client, getProposalV1Codec()),
+          signatoryRecordV1: addSelfFetchFunctions(
+            client,
+            getSignatoryRecordV1Codec(),
+          ),
+          proposalInstructionV1: addSelfFetchFunctions(
+            client,
+            getProposalInstructionV1Codec(),
+          ),
+          voteRecordV1: addSelfFetchFunctions(client, getVoteRecordV1Codec()),
+          programMetadata: addSelfFetchFunctions(
+            client,
+            getProgramMetadataCodec(),
+          ),
+          proposalV2: addSelfFetchFunctions(client, getProposalV2Codec()),
+          proposalDeposit: addSelfFetchFunctions(
+            client,
+            getProposalDepositCodec(),
+          ),
+          proposalTransactionV2: addSelfFetchFunctions(
+            client,
+            getProposalTransactionV2Codec(),
+          ),
+          realmV2: addSelfFetchFunctions(client, getRealmV2Codec()),
+          realmConfigAccount: addSelfFetchFunctions(
+            client,
+            getRealmConfigAccountCodec(),
+          ),
+          requiredSignatory: addSelfFetchFunctions(
+            client,
+            getRequiredSignatoryCodec(),
+          ),
+          signatoryRecordV2: addSelfFetchFunctions(
+            client,
+            getSignatoryRecordV2Codec(),
+          ),
+          tokenOwnerRecordV2: addSelfFetchFunctions(
+            client,
+            getTokenOwnerRecordV2Codec(),
+          ),
+          legacyTokenOwnerRecord: addSelfFetchFunctions(
+            client,
+            getLegacyTokenOwnerRecordCodec(),
+          ),
+          voteRecordV2: addSelfFetchFunctions(client, getVoteRecordV2Codec()),
+        },
+        instructions: {
+          createRealm: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateRealmInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          depositGoverningTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositGoverningTokensInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          withdrawGoverningTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawGoverningTokensInstruction(input),
+            ),
+          setGovernanceDelegate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetGovernanceDelegateInstruction(input),
+            ),
+          createGovernance: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateGovernanceInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createProgramGovernance: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateProgramGovernanceInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateProposalInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          addSignatory: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddSignatoryInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          legacy1: (input) =>
+            addSelfPlanAndSendFunctions(client, getLegacy1Instruction(input)),
+          insertTransaction: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInsertTransactionInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          removeTransaction: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveTransactionInstruction(input),
+            ),
+          cancelProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCancelProposalInstruction(input),
+            ),
+          signOffProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSignOffProposalInstruction(input),
+            ),
+          castVote: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCastVoteInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          finalizeVote: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFinalizeVoteInstruction(input),
+            ),
+          relinquishVote: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRelinquishVoteInstruction(input),
+            ),
+          executeTransaction: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getExecuteTransactionInstruction(input),
+            ),
+          createMintGovernance: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMintGovernanceInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createTokenGovernance: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTokenGovernanceInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setGovernanceConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetGovernanceConfigInstruction(input),
+            ),
+          flagTransactionError: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFlagTransactionErrorInstruction(input),
+            ),
+          setRealmAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRealmAuthorityInstruction(input),
+            ),
+          setRealmConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRealmConfigInstruction(input),
+            ),
+          createTokenOwnerRecord: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTokenOwnerRecordInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          updateProgramMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateProgramMetadataInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createNativeTreasury: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateNativeTreasuryInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          revokeGoverningTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeGoverningTokensInstruction(input),
+            ),
+          refundProposalDeposit: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefundProposalDepositInstruction(input),
+            ),
+          completeProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCompleteProposalInstruction(input),
+            ),
+          addRequiredSignatory: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddRequiredSignatoryInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          removeRequiredSignatory: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveRequiredSignatoryInstruction(input),
+            ),
+        },
+        pdas: {
+          realm: findRealmPda,
+          communityTokenHolding: findCommunityTokenHoldingPda,
+          councilTokenHolding: findCouncilTokenHoldingPda,
+          realmConfig: findRealmConfigPda,
+          tokenOwnerRecord: findTokenOwnerRecordPda,
+          governingTokenHolding: findGoverningTokenHoldingPda,
+          governance: findGovernancePda,
+          nativeTreasury: findNativeTreasuryPda,
+          proposal: findProposalPda,
+          proposalDeposit: findProposalDepositPda,
+          signatoryRecord: findSignatoryRecordPda,
+          proposalTransaction: findProposalTransactionPda,
+          voteRecord: findVoteRecordPda,
+          requiredSignatory: findRequiredSignatoryPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

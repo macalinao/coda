@@ -115,7 +115,7 @@ export interface PositionArgs {
   /** Farming reward information */
   rewardInfos: UserRewardInfoArgs[];
   /** padding for future usage */
-  padding: (number | bigint)[];
+  padding: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link PositionArgs} account data. */

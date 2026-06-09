@@ -13,7 +13,7 @@ import type {
 } from "@solana/kit";
 import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 
-export interface NativeTreasury {}
+export type NativeTreasury = {};
 
 export type NativeTreasuryArgs = NativeTreasury;
 

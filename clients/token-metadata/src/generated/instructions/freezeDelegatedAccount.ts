@@ -22,17 +22,19 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const FREEZE_DELEGATED_ACCOUNT_DISCRIMINATOR = 26;
 
@@ -78,7 +80,7 @@ export interface FreezeDelegatedAccountInstructionData {
   discriminator: number;
 }
 
-export interface FreezeDelegatedAccountInstructionDataArgs {}
+export type FreezeDelegatedAccountInstructionDataArgs = {};
 
 export function getFreezeDelegatedAccountInstructionDataEncoder(): FixedSizeEncoder<FreezeDelegatedAccountInstructionDataArgs> {
   return transformEncoder(
@@ -161,7 +163,7 @@ export function getFreezeDelegatedAccountInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -173,11 +175,11 @@ export function getFreezeDelegatedAccountInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.tokenAccount),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("delegate", accounts.delegate),
+      getAccountMeta("tokenAccount", accounts.tokenAccount),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getFreezeDelegatedAccountInstructionDataEncoder().encode({}),
     programAddress,
@@ -220,8 +222,13 @@ export function parseFreezeDelegatedAccountInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFreezeDelegatedAccountInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

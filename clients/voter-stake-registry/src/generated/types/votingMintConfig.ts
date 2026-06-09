@@ -47,7 +47,7 @@ export interface VotingMintConfigArgs {
   lockupSaturationSecs: number | bigint;
   digitShift: number;
   reserved1: number[];
-  reserved2: (number | bigint)[];
+  reserved2: Array<number | bigint>;
 }
 
 export function getVotingMintConfigEncoder(): FixedSizeEncoder<VotingMintConfigArgs> {

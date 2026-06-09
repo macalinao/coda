@@ -23,6 +23,11 @@ import { loadConfig } from "./load-config.js";
 import { loadIdls } from "./load-idls.js";
 import { resolveIdlPaths } from "./resolve-idl-paths.js";
 
+const ASSOCIATED_TOKEN_PROGRAM_ACCOUNT_REGEX =
+  /associatedTokenProgram|ataProgram|splAtaProgram/;
+const TOKEN_PROGRAM_ACCOUNT_REGEX =
+  /(?!associatedTokenProgram)([\w]+)TokenProgram/;
+
 /**
  * Process IDLs with the common workflow:
  * 1. Load config
@@ -77,7 +82,7 @@ export async function processIdls(options: {
         defaultValue: TOKEN_2022_PROGRAM_VALUE_NODE,
       },
       {
-        account: /associatedTokenProgram|ataProgram|splAtaProgram/,
+        account: ASSOCIATED_TOKEN_PROGRAM_ACCOUNT_REGEX,
         defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
       },
       {
@@ -91,7 +96,7 @@ export async function processIdls(options: {
         defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
       },
       {
-        account: /(?!associatedTokenProgram)([\w]+)TokenProgram/,
+        account: TOKEN_PROGRAM_ACCOUNT_REGEX,
         defaultValue: TOKEN_PROGRAM_VALUE_NODE,
       },
       ...(config.instructionAccountDefaultValues ?? []),

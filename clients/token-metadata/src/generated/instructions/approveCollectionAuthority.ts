@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -30,11 +30,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const APPROVE_COLLECTION_AUTHORITY_DISCRIMINATOR = 23;
 
@@ -97,7 +102,7 @@ export interface ApproveCollectionAuthorityInstructionData {
   discriminator: number;
 }
 
-export interface ApproveCollectionAuthorityInstructionDataArgs {}
+export type ApproveCollectionAuthorityInstructionDataArgs = {};
 
 export function getApproveCollectionAuthorityInstructionDataEncoder(): FixedSizeEncoder<ApproveCollectionAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -209,14 +214,17 @@ export async function getApproveCollectionAuthorityInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -227,14 +235,17 @@ export async function getApproveCollectionAuthorityInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.collectionAuthorityRecord),
-      getAccountMeta(accounts.newCollectionAuthority),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta(
+        "collectionAuthorityRecord",
+        accounts.collectionAuthorityRecord,
+      ),
+      getAccountMeta("newCollectionAuthority", accounts.newCollectionAuthority),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getApproveCollectionAuthorityInstructionDataEncoder().encode({}),
     programAddress,
@@ -335,7 +346,7 @@ export function getApproveCollectionAuthorityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -347,14 +358,17 @@ export function getApproveCollectionAuthorityInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.collectionAuthorityRecord),
-      getAccountMeta(accounts.newCollectionAuthority),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta(
+        "collectionAuthorityRecord",
+        accounts.collectionAuthorityRecord,
+      ),
+      getAccountMeta("newCollectionAuthority", accounts.newCollectionAuthority),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getApproveCollectionAuthorityInstructionDataEncoder().encode({}),
     programAddress,
@@ -406,8 +420,13 @@ export function parseApproveCollectionAuthorityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedApproveCollectionAuthorityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -418,7 +437,7 @@ export function parseApproveCollectionAuthorityInstruction<
   let optionalAccountsRemaining = instruction.accounts.length - 7;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

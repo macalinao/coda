@@ -35,7 +35,7 @@ export interface FarmsTokenInfoArgs {
   mint: Address;
   decimals: number | bigint;
   tokenProgram: Address;
-  padding: (number | bigint)[];
+  padding: Array<number | bigint>;
 }
 
 export function getFarmsTokenInfoEncoder(): FixedSizeEncoder<FarmsTokenInfoArgs> {

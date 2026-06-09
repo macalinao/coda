@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   SetRealmAuthorityAction,
   SetRealmAuthorityActionArgs,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getSetRealmAuthorityActionDecoder,
   getSetRealmAuthorityActionEncoder,
@@ -153,7 +155,7 @@ export function getSetRealmAuthorityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -162,9 +164,9 @@ export function getSetRealmAuthorityInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.realmAuthority),
-      getAccountMeta(accounts.newRealmAuthority),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta("realmAuthority", accounts.realmAuthority),
+      getAccountMeta("newRealmAuthority", accounts.newRealmAuthority),
     ],
     data: getSetRealmAuthorityInstructionDataEncoder().encode(
       args as SetRealmAuthorityInstructionDataArgs,
@@ -201,8 +203,13 @@ export function parseSetRealmAuthorityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetRealmAuthorityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

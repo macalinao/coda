@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -36,11 +36,16 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_TOKEN_METADATA_DISCRIMINATOR = 17;
 
@@ -225,7 +230,7 @@ export async function getCreateTokenMetadataInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -234,7 +239,10 @@ export async function getCreateTokenMetadataInstructionAsync<
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
     accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: expectAddress(accounts.stakePool.value),
+      stakePoolAddress: getAddressFromResolvedInstructionAccount(
+        "stakePool",
+        accounts.stakePool.value,
+      ),
     });
   }
   if (!accounts.metadataProgram.value) {
@@ -249,14 +257,14 @@ export async function getCreateTokenMetadataInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.manager),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.poolMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadataAccount),
-      getAccountMeta(accounts.metadataProgram),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("manager", accounts.manager),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("poolMint", accounts.poolMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadataAccount", accounts.metadataAccount),
+      getAccountMeta("metadataProgram", accounts.metadataProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateTokenMetadataInstructionDataEncoder().encode(
       args as CreateTokenMetadataInstructionDataArgs,
@@ -354,7 +362,7 @@ export function getCreateTokenMetadataInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -373,14 +381,14 @@ export function getCreateTokenMetadataInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.manager),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.poolMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadataAccount),
-      getAccountMeta(accounts.metadataProgram),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("manager", accounts.manager),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("poolMint", accounts.poolMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadataAccount", accounts.metadataAccount),
+      getAccountMeta("metadataProgram", accounts.metadataProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateTokenMetadataInstructionDataEncoder().encode(
       args as CreateTokenMetadataInstructionDataArgs,
@@ -426,8 +434,13 @@ export function parseCreateTokenMetadataInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateTokenMetadataInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

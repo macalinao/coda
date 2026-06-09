@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,10 +37,15 @@ import {
   getU8Encoder,
   getU16Decoder,
   getU16Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const NEW_REGISTRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   237, 187, 50, 70, 74, 26, 144, 230,
@@ -172,7 +177,7 @@ export async function getNewRegistryInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -189,7 +194,12 @@ export async function getNewRegistryInstructionAsync<
             121, 34,
           ]),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.rewarder.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "rewarder",
+            accounts.rewarder.value,
+          ),
+        ),
       ],
     });
   }
@@ -201,10 +211,10 @@ export async function getNewRegistryInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.registry),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("registry", accounts.registry),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewRegistryInstructionDataEncoder().encode(
       args as NewRegistryInstructionDataArgs,
@@ -267,7 +277,7 @@ export function getNewRegistryInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -282,10 +292,10 @@ export function getNewRegistryInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.registry),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("registry", accounts.registry),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewRegistryInstructionDataEncoder().encode(
       args as NewRegistryInstructionDataArgs,
@@ -323,8 +333,13 @@ export function parseNewRegistryInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedNewRegistryInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

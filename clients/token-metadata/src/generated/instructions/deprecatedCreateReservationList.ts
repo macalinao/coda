@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPRECATED_CREATE_RESERVATION_LIST_DISCRIMINATOR = 6;
 
@@ -95,7 +97,7 @@ export interface DeprecatedCreateReservationListInstructionData {
   discriminator: number;
 }
 
-export interface DeprecatedCreateReservationListInstructionDataArgs {}
+export type DeprecatedCreateReservationListInstructionDataArgs = {};
 
 export function getDeprecatedCreateReservationListInstructionDataEncoder(): FixedSizeEncoder<DeprecatedCreateReservationListInstructionDataArgs> {
   return transformEncoder(
@@ -202,7 +204,7 @@ export function getDeprecatedCreateReservationListInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -218,14 +220,14 @@ export function getDeprecatedCreateReservationListInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.reservationList),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.resource),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("reservationList", accounts.reservationList),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("resource", accounts.resource),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getDeprecatedCreateReservationListInstructionDataEncoder().encode({}),
     programAddress,
@@ -277,8 +279,13 @@ export function parseDeprecatedCreateReservationListInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDeprecatedCreateReservationListInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

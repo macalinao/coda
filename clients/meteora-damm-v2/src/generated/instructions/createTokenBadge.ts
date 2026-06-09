@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,11 +33,16 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_TOKEN_BADGE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([88, 206, 0, 91, 60, 175, 151, 118]);
@@ -92,7 +97,7 @@ export interface CreateTokenBadgeInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CreateTokenBadgeInstructionDataArgs {}
+export type CreateTokenBadgeInstructionDataArgs = {};
 
 export function getCreateTokenBadgeInstructionDataEncoder(): FixedSizeEncoder<CreateTokenBadgeInstructionDataArgs> {
   return transformEncoder(
@@ -176,7 +181,7 @@ export async function getCreateTokenBadgeInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -187,7 +192,12 @@ export async function getCreateTokenBadgeInstructionAsync<
         getBytesEncoder().encode(
           new Uint8Array([116, 111, 107, 101, 110, 95, 98, 97, 100, 103, 101]),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.tokenMint.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "tokenMint",
+            accounts.tokenMint.value,
+          ),
+        ),
       ],
     });
   }
@@ -206,12 +216,12 @@ export async function getCreateTokenBadgeInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.tokenBadge),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("tokenBadge", accounts.tokenBadge),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCreateTokenBadgeInstructionDataEncoder().encode({}),
     programAddress,
@@ -283,7 +293,7 @@ export function getCreateTokenBadgeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -299,12 +309,12 @@ export function getCreateTokenBadgeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.tokenBadge),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("tokenBadge", accounts.tokenBadge),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCreateTokenBadgeInstructionDataEncoder().encode({}),
     programAddress,
@@ -344,8 +354,13 @@ export function parseCreateTokenBadgeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateTokenBadgeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

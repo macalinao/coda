@@ -80,7 +80,7 @@ export interface TokenInfoArgs {
   pythConfiguration: PythConfigurationArgs;
   blockPriceUsage: number;
   reserved: number[];
-  padding: (number | bigint)[];
+  padding: Array<number | bigint>;
 }
 
 export function getTokenInfoEncoder(): FixedSizeEncoder<TokenInfoArgs> {

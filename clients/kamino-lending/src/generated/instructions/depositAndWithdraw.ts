@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,13 +33,15 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_AND_WITHDRAW_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([141, 153, 39, 15, 64, 61, 88, 84]);
@@ -609,7 +611,7 @@ export function getDepositAndWithdrawInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -648,45 +650,126 @@ export function getDepositAndWithdrawInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.depositAccountsOwner),
-      getAccountMeta(accounts.depositAccountsObligation),
-      getAccountMeta(accounts.depositAccountsLendingMarket),
-      getAccountMeta(accounts.depositAccountsLendingMarketAuthority),
-      getAccountMeta(accounts.depositAccountsReserve),
-      getAccountMeta(accounts.depositAccountsReserveLiquidityMint),
-      getAccountMeta(accounts.depositAccountsReserveLiquiditySupply),
-      getAccountMeta(accounts.depositAccountsReserveCollateralMint),
+      getAccountMeta("depositAccountsOwner", accounts.depositAccountsOwner),
       getAccountMeta(
+        "depositAccountsObligation",
+        accounts.depositAccountsObligation,
+      ),
+      getAccountMeta(
+        "depositAccountsLendingMarket",
+        accounts.depositAccountsLendingMarket,
+      ),
+      getAccountMeta(
+        "depositAccountsLendingMarketAuthority",
+        accounts.depositAccountsLendingMarketAuthority,
+      ),
+      getAccountMeta("depositAccountsReserve", accounts.depositAccountsReserve),
+      getAccountMeta(
+        "depositAccountsReserveLiquidityMint",
+        accounts.depositAccountsReserveLiquidityMint,
+      ),
+      getAccountMeta(
+        "depositAccountsReserveLiquiditySupply",
+        accounts.depositAccountsReserveLiquiditySupply,
+      ),
+      getAccountMeta(
+        "depositAccountsReserveCollateralMint",
+        accounts.depositAccountsReserveCollateralMint,
+      ),
+      getAccountMeta(
+        "depositAccountsReserveDestinationDepositCollateral",
         accounts.depositAccountsReserveDestinationDepositCollateral,
       ),
-      getAccountMeta(accounts.depositAccountsUserSourceLiquidity),
       getAccountMeta(
+        "depositAccountsUserSourceLiquidity",
+        accounts.depositAccountsUserSourceLiquidity,
+      ),
+      getAccountMeta(
+        "depositAccountsPlaceholderUserDestinationCollateral",
         accounts.depositAccountsPlaceholderUserDestinationCollateral,
       ),
-      getAccountMeta(accounts.depositAccountsCollateralTokenProgram),
-      getAccountMeta(accounts.depositAccountsLiquidityTokenProgram),
-      getAccountMeta(accounts.depositAccountsInstructionSysvarAccount),
-      getAccountMeta(accounts.withdrawAccountsOwner),
-      getAccountMeta(accounts.withdrawAccountsObligation),
-      getAccountMeta(accounts.withdrawAccountsLendingMarket),
-      getAccountMeta(accounts.withdrawAccountsLendingMarketAuthority),
-      getAccountMeta(accounts.withdrawAccountsWithdrawReserve),
-      getAccountMeta(accounts.withdrawAccountsReserveLiquidityMint),
-      getAccountMeta(accounts.withdrawAccountsReserveSourceCollateral),
-      getAccountMeta(accounts.withdrawAccountsReserveCollateralMint),
-      getAccountMeta(accounts.withdrawAccountsReserveLiquiditySupply),
-      getAccountMeta(accounts.withdrawAccountsUserDestinationLiquidity),
       getAccountMeta(
+        "depositAccountsCollateralTokenProgram",
+        accounts.depositAccountsCollateralTokenProgram,
+      ),
+      getAccountMeta(
+        "depositAccountsLiquidityTokenProgram",
+        accounts.depositAccountsLiquidityTokenProgram,
+      ),
+      getAccountMeta(
+        "depositAccountsInstructionSysvarAccount",
+        accounts.depositAccountsInstructionSysvarAccount,
+      ),
+      getAccountMeta("withdrawAccountsOwner", accounts.withdrawAccountsOwner),
+      getAccountMeta(
+        "withdrawAccountsObligation",
+        accounts.withdrawAccountsObligation,
+      ),
+      getAccountMeta(
+        "withdrawAccountsLendingMarket",
+        accounts.withdrawAccountsLendingMarket,
+      ),
+      getAccountMeta(
+        "withdrawAccountsLendingMarketAuthority",
+        accounts.withdrawAccountsLendingMarketAuthority,
+      ),
+      getAccountMeta(
+        "withdrawAccountsWithdrawReserve",
+        accounts.withdrawAccountsWithdrawReserve,
+      ),
+      getAccountMeta(
+        "withdrawAccountsReserveLiquidityMint",
+        accounts.withdrawAccountsReserveLiquidityMint,
+      ),
+      getAccountMeta(
+        "withdrawAccountsReserveSourceCollateral",
+        accounts.withdrawAccountsReserveSourceCollateral,
+      ),
+      getAccountMeta(
+        "withdrawAccountsReserveCollateralMint",
+        accounts.withdrawAccountsReserveCollateralMint,
+      ),
+      getAccountMeta(
+        "withdrawAccountsReserveLiquiditySupply",
+        accounts.withdrawAccountsReserveLiquiditySupply,
+      ),
+      getAccountMeta(
+        "withdrawAccountsUserDestinationLiquidity",
+        accounts.withdrawAccountsUserDestinationLiquidity,
+      ),
+      getAccountMeta(
+        "withdrawAccountsPlaceholderUserDestinationCollateral",
         accounts.withdrawAccountsPlaceholderUserDestinationCollateral,
       ),
-      getAccountMeta(accounts.withdrawAccountsCollateralTokenProgram),
-      getAccountMeta(accounts.withdrawAccountsLiquidityTokenProgram),
-      getAccountMeta(accounts.withdrawAccountsInstructionSysvarAccount),
-      getAccountMeta(accounts.depositFarmsAccountsObligationFarmUserState),
-      getAccountMeta(accounts.depositFarmsAccountsReserveFarmState),
-      getAccountMeta(accounts.withdrawFarmsAccountsObligationFarmUserState),
-      getAccountMeta(accounts.withdrawFarmsAccountsReserveFarmState),
-      getAccountMeta(accounts.farmsProgram),
+      getAccountMeta(
+        "withdrawAccountsCollateralTokenProgram",
+        accounts.withdrawAccountsCollateralTokenProgram,
+      ),
+      getAccountMeta(
+        "withdrawAccountsLiquidityTokenProgram",
+        accounts.withdrawAccountsLiquidityTokenProgram,
+      ),
+      getAccountMeta(
+        "withdrawAccountsInstructionSysvarAccount",
+        accounts.withdrawAccountsInstructionSysvarAccount,
+      ),
+      getAccountMeta(
+        "depositFarmsAccountsObligationFarmUserState",
+        accounts.depositFarmsAccountsObligationFarmUserState,
+      ),
+      getAccountMeta(
+        "depositFarmsAccountsReserveFarmState",
+        accounts.depositFarmsAccountsReserveFarmState,
+      ),
+      getAccountMeta(
+        "withdrawFarmsAccountsObligationFarmUserState",
+        accounts.withdrawFarmsAccountsObligationFarmUserState,
+      ),
+      getAccountMeta(
+        "withdrawFarmsAccountsReserveFarmState",
+        accounts.withdrawFarmsAccountsReserveFarmState,
+      ),
+      getAccountMeta("farmsProgram", accounts.farmsProgram),
     ],
     data: getDepositAndWithdrawInstructionDataEncoder().encode(
       args as DepositAndWithdrawInstructionDataArgs,
@@ -788,8 +871,13 @@ export function parseDepositAndWithdrawInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDepositAndWithdrawInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 33) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 33,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

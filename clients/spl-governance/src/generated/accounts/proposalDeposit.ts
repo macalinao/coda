@@ -17,6 +17,7 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { ProposalDepositSeeds } from "../pdas/index.js";
 import {
@@ -43,10 +44,10 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const PROPOSAL_DEPOSIT_ACCOUNT_TYPE =
+export const PROPOSAL_DEPOSIT_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.ProposalDeposit;
 
-export function getProposalDepositAccountTypeBytes() {
+export function getProposalDepositAccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(
     PROPOSAL_DEPOSIT_ACCOUNT_TYPE,
   );

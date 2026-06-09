@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findTreasuryVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([113, 216, 122, 131, 225, 209, 22, 55]);
@@ -80,7 +85,7 @@ export interface InitializeGlobalConfigInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitializeGlobalConfigInstructionDataArgs {}
+export type InitializeGlobalConfigInstructionDataArgs = {};
 
 export function getInitializeGlobalConfigInstructionDataEncoder(): FixedSizeEncoder<InitializeGlobalConfigInstructionDataArgs> {
   return transformEncoder(
@@ -158,14 +163,17 @@ export async function getInitializeGlobalConfigInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.treasuryVaultsAuthority.value) {
     accounts.treasuryVaultsAuthority.value =
       await findTreasuryVaultsAuthorityPda({
-        globalConfig: expectAddress(accounts.globalConfig.value),
+        globalConfig: getAddressFromResolvedInstructionAccount(
+          "globalConfig",
+          accounts.globalConfig.value,
+        ),
       });
   }
   if (!accounts.systemProgram.value) {
@@ -176,10 +184,13 @@ export async function getInitializeGlobalConfigInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalAdmin),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.treasuryVaultsAuthority),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("globalAdmin", accounts.globalAdmin),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta(
+        "treasuryVaultsAuthority",
+        accounts.treasuryVaultsAuthority,
+      ),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitializeGlobalConfigInstructionDataEncoder().encode({}),
     programAddress,
@@ -240,7 +251,7 @@ export function getInitializeGlobalConfigInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -252,10 +263,13 @@ export function getInitializeGlobalConfigInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalAdmin),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.treasuryVaultsAuthority),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("globalAdmin", accounts.globalAdmin),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta(
+        "treasuryVaultsAuthority",
+        accounts.treasuryVaultsAuthority,
+      ),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitializeGlobalConfigInstructionDataEncoder().encode({}),
     programAddress,
@@ -291,8 +305,13 @@ export function parseInitializeGlobalConfigInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeGlobalConfigInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

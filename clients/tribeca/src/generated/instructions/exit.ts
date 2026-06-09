@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,10 +32,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const EXIT_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   234, 32, 12, 71, 126, 5, 219, 160,
@@ -92,7 +94,7 @@ export interface ExitInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface ExitInstructionDataArgs {}
+export type ExitInstructionDataArgs = {};
 
 export function getExitInstructionDataEncoder(): FixedSizeEncoder<ExitInstructionDataArgs> {
   return transformEncoder(
@@ -183,7 +185,7 @@ export function getExitInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -195,13 +197,13 @@ export function getExitInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.locker),
-      getAccountMeta(accounts.escrow),
-      getAccountMeta(accounts.escrowOwner),
-      getAccountMeta(accounts.escrowTokens),
-      getAccountMeta(accounts.destinationTokens),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("locker", accounts.locker),
+      getAccountMeta("escrow", accounts.escrow),
+      getAccountMeta("escrowOwner", accounts.escrowOwner),
+      getAccountMeta("escrowTokens", accounts.escrowTokens),
+      getAccountMeta("destinationTokens", accounts.destinationTokens),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getExitInstructionDataEncoder().encode({}),
     programAddress,
@@ -243,8 +245,13 @@ export function parseExitInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedExitInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

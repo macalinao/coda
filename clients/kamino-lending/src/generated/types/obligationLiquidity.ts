@@ -63,7 +63,7 @@ export interface ObligationLiquidityArgs {
   borrowFactorAdjustedMarketValueSf: number | bigint;
   /** Amount of liquidity borrowed outside of an elevation group */
   borrowedAmountOutsideElevationGroups: number | bigint;
-  padding2: (number | bigint)[];
+  padding2: Array<number | bigint>;
 }
 
 export function getObligationLiquidityEncoder(): FixedSizeEncoder<ObligationLiquidityArgs> {

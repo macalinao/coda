@@ -29,6 +29,7 @@ describe("renderMarkdownVisitor", () => {
         standard: "codama" as const,
         version: "0.1.0" as const,
       };
+      // biome-ignore lint/nursery/useAwaitThenable: the visitor is async at runtime but codama types visit() as synchronous
       await visit(rootNode, visitor);
 
       // Check that the file was created with kebab-case naming
@@ -75,6 +76,7 @@ describe("renderMarkdownVisitor", () => {
         standard: "codama" as const,
         version: "0.1.0" as const,
       };
+      // biome-ignore lint/nursery/useAwaitThenable: the visitor is async at runtime but codama types visit() as synchronous
       await visit(rootNode, visitor);
 
       // Check that both files were created

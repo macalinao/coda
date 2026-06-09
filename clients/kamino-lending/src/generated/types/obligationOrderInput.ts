@@ -196,7 +196,7 @@ export interface ObligationOrderInputArgs {
    * End padding.
    * The total size of a single instance is 8*u128 = 128 bytes.
    */
-  padding2: (number | bigint)[];
+  padding2: Array<number | bigint>;
 }
 
 export function getObligationOrderInputEncoder(): FixedSizeEncoder<ObligationOrderInputArgs> {

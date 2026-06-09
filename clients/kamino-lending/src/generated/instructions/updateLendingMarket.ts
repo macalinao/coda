@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +36,12 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_LENDING_MARKET_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([209, 157, 53, 210, 97, 180, 31, 45]);
@@ -152,7 +154,7 @@ export function getUpdateLendingMarketInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -161,8 +163,8 @@ export function getUpdateLendingMarketInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwner),
-      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta("lendingMarketOwner", accounts.lendingMarketOwner),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
     ],
     data: getUpdateLendingMarketInstructionDataEncoder().encode(
       args as UpdateLendingMarketInstructionDataArgs,
@@ -196,8 +198,13 @@ export function parseUpdateLendingMarketInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateLendingMarketInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

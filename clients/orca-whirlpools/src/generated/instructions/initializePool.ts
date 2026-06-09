@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { WhirlpoolBumps, WhirlpoolBumpsArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -36,10 +36,12 @@ import {
   getU16Encoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getWhirlpoolBumpsDecoder,
   getWhirlpoolBumpsEncoder,
@@ -256,7 +258,7 @@ export function getInitializePoolInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -279,17 +281,17 @@ export function getInitializePoolInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.tokenMintA),
-      getAccountMeta(accounts.tokenMintB),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.tokenVaultA),
-      getAccountMeta(accounts.tokenVaultB),
-      getAccountMeta(accounts.feeTier),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta("tokenMintA", accounts.tokenMintA),
+      getAccountMeta("tokenMintB", accounts.tokenMintB),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("tokenVaultA", accounts.tokenVaultA),
+      getAccountMeta("tokenVaultB", accounts.tokenVaultB),
+      getAccountMeta("feeTier", accounts.feeTier),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializePoolInstructionDataEncoder().encode(
       args as InitializePoolInstructionDataArgs,
@@ -341,8 +343,13 @@ export function parseInitializePoolInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializePoolInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

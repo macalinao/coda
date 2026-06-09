@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -35,11 +35,16 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_TOKEN_METADATA_DISCRIMINATOR = 18;
 
@@ -191,7 +196,7 @@ export async function getUpdateTokenMetadataInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -200,7 +205,10 @@ export async function getUpdateTokenMetadataInstructionAsync<
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
     accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: expectAddress(accounts.stakePool.value),
+      stakePoolAddress: getAddressFromResolvedInstructionAccount(
+        "stakePool",
+        accounts.stakePool.value,
+      ),
     });
   }
   if (!accounts.metadataProgram.value) {
@@ -211,11 +219,11 @@ export async function getUpdateTokenMetadataInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.manager),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.metadataAccount),
-      getAccountMeta(accounts.metadataProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("manager", accounts.manager),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("metadataAccount", accounts.metadataAccount),
+      getAccountMeta("metadataProgram", accounts.metadataProgram),
     ],
     data: getUpdateTokenMetadataInstructionDataEncoder().encode(
       args as UpdateTokenMetadataInstructionDataArgs,
@@ -292,7 +300,7 @@ export function getUpdateTokenMetadataInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -307,11 +315,11 @@ export function getUpdateTokenMetadataInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.manager),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.metadataAccount),
-      getAccountMeta(accounts.metadataProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("manager", accounts.manager),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("metadataAccount", accounts.metadataAccount),
+      getAccountMeta("metadataProgram", accounts.metadataProgram),
     ],
     data: getUpdateTokenMetadataInstructionDataEncoder().encode(
       args as UpdateTokenMetadataInstructionDataArgs,
@@ -351,8 +359,13 @@ export function parseUpdateTokenMetadataInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateTokenMetadataInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

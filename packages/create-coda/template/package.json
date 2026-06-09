@@ -30,15 +30,17 @@
     "lint": "eslint . --cache"
   },
   "peerDependencies": {
-    "@solana/kit": "*"
+    "@solana/kit": "*",
+    "@solana/program-client-core": "*"
   },
   "devDependencies": {
-    "@macalinao/coda": "^0.4.2",
-    "@macalinao/eslint-config": "^6.0.2",
-    "@macalinao/tsconfig": "^3.2.3",
+    "@macalinao/coda": "^0.4.10",
+    "@macalinao/eslint-config": "^8.1.0",
+    "@macalinao/tsconfig": "^3.2.5",
     "@solana/kit": "*",
+    "@solana/program-client-core": "*",
     "@types/bun": "catalog:",
-    "eslint": "^9.37.0",
-    "typescript": "^5.9.3"
+    "eslint": "^10.4.1",
+    "typescript": "^6.0.3"
   }
 }

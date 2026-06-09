@@ -17,6 +17,7 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { RequiredSignatorySeeds } from "../pdas/index.js";
 import {
@@ -41,10 +42,10 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const REQUIRED_SIGNATORY_ACCOUNT_TYPE =
+export const REQUIRED_SIGNATORY_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.RequiredSignatory;
 
-export function getRequiredSignatoryAccountTypeBytes() {
+export function getRequiredSignatoryAccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(
     REQUIRED_SIGNATORY_ACCOUNT_TYPE,
   );

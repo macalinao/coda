@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,11 +32,16 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_SOL_DISCRIMINATOR = 14;
 
@@ -258,7 +263,7 @@ export async function getDepositSolInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -267,7 +272,10 @@ export async function getDepositSolInstructionAsync<
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
     accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: expectAddress(accounts.stakePool.value),
+      stakePoolAddress: getAddressFromResolvedInstructionAccount(
+        "stakePool",
+        accounts.stakePool.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -282,17 +290,17 @@ export async function getDepositSolInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.reserveStake),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.userPoolTokenAccount),
-      getAccountMeta(accounts.managerFeeAccount),
-      getAccountMeta(accounts.referralPoolAccount),
-      getAccountMeta(accounts.poolMint),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.depositAuthority),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("reserveStake", accounts.reserveStake),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("userPoolTokenAccount", accounts.userPoolTokenAccount),
+      getAccountMeta("managerFeeAccount", accounts.managerFeeAccount),
+      getAccountMeta("referralPoolAccount", accounts.referralPoolAccount),
+      getAccountMeta("poolMint", accounts.poolMint),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("depositAuthority", accounts.depositAuthority),
     ],
     data: getDepositSolInstructionDataEncoder().encode(
       args as DepositSolInstructionDataArgs,
@@ -429,7 +437,7 @@ export function getDepositSolInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -448,17 +456,17 @@ export function getDepositSolInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.reserveStake),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.userPoolTokenAccount),
-      getAccountMeta(accounts.managerFeeAccount),
-      getAccountMeta(accounts.referralPoolAccount),
-      getAccountMeta(accounts.poolMint),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.depositAuthority),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("reserveStake", accounts.reserveStake),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("userPoolTokenAccount", accounts.userPoolTokenAccount),
+      getAccountMeta("managerFeeAccount", accounts.managerFeeAccount),
+      getAccountMeta("referralPoolAccount", accounts.referralPoolAccount),
+      getAccountMeta("poolMint", accounts.poolMint),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("depositAuthority", accounts.depositAuthority),
     ],
     data: getDepositSolInstructionDataEncoder().encode(
       args as DepositSolInstructionDataArgs,
@@ -521,8 +529,13 @@ export function parseDepositSolInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDepositSolInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,15 +39,17 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+  getNonNullResolvedInstructionInput,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda, findPoolAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  expectSome,
-  getAccountMetaFactory,
-} from "../shared/index.js";
 
 export const INITIALIZE_REWARD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([95, 135, 192, 196, 242, 129, 230, 68]);
@@ -247,7 +249,7 @@ export async function getInitializeRewardInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -266,8 +268,12 @@ export async function getInitializeRewardInstructionAsync<
             114, 101, 119, 97, 114, 100, 95, 118, 97, 117, 108, 116,
           ]),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.pool.value)),
-        getU8Encoder().encode(expectSome(args.rewardIndex)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount("pool", accounts.pool.value),
+        ),
+        getU8Encoder().encode(
+          getNonNullResolvedInstructionInput("rewardIndex", args.rewardIndex),
+        ),
       ],
     });
   }
@@ -290,16 +296,16 @@ export async function getInitializeRewardInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.signer),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("signer", accounts.signer),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getInitializeRewardInstructionDataEncoder().encode(
       args as InitializeRewardInstructionDataArgs,
@@ -404,7 +410,7 @@ export function getInitializeRewardInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -427,16 +433,16 @@ export function getInitializeRewardInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.signer),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("signer", accounts.signer),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getInitializeRewardInstructionDataEncoder().encode(
       args as InitializeRewardInstructionDataArgs,
@@ -486,8 +492,13 @@ export function parseInitializeRewardInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeRewardInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 10,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

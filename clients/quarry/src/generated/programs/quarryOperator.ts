@@ -6,8 +6,31 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type { Operator, OperatorArgs } from "../accounts/index.js";
+import type {
+  CreateOperatorAsyncInput,
+  CreateOperatorV2AsyncInput,
+  DelegateCreateQuarryAsyncInput,
+  DelegateCreateQuarryV2AsyncInput,
+  DelegateSetAnnualRewardsInput,
+  DelegateSetFamineInput,
+  DelegateSetRewardsShareInput,
   ParsedCreateOperatorInstruction,
   ParsedCreateOperatorV2Instruction,
   ParsedDelegateCreateQuarryInstruction,
@@ -19,8 +42,52 @@ import type {
   ParsedSetQuarryCreatorInstruction,
   ParsedSetRateSetterInstruction,
   ParsedSetShareAllocatorInstruction,
+  SetAdminInput,
+  SetQuarryCreatorInput,
+  SetRateSetterInput,
+  SetShareAllocatorInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import { getOperatorCodec } from "../accounts/index.js";
+import {
+  getCreateOperatorInstructionAsync,
+  getCreateOperatorV2InstructionAsync,
+  getDelegateCreateQuarryInstructionAsync,
+  getDelegateCreateQuarryV2InstructionAsync,
+  getDelegateSetAnnualRewardsInstruction,
+  getDelegateSetFamineInstruction,
+  getDelegateSetRewardsShareInstruction,
+  getSetAdminInstruction,
+  getSetQuarryCreatorInstruction,
+  getSetRateSetterInstruction,
+  getSetShareAllocatorInstruction,
+  parseCreateOperatorInstruction,
+  parseCreateOperatorV2Instruction,
+  parseDelegateCreateQuarryInstruction,
+  parseDelegateCreateQuarryV2Instruction,
+  parseDelegateSetAnnualRewardsInstruction,
+  parseDelegateSetFamineInstruction,
+  parseDelegateSetRewardsShareInstruction,
+  parseSetAdminInstruction,
+  parseSetQuarryCreatorInstruction,
+  parseSetRateSetterInstruction,
+  parseSetShareAllocatorInstruction,
+} from "../instructions/index.js";
+import { findOperatorPda } from "../pdas/index.js";
 
 export const QUARRY_OPERATOR_PROGRAM_ADDRESS =
   "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz" as Address<"QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz">;
@@ -44,8 +111,9 @@ export function identifyQuarryOperatorAccount(
   ) {
     return QuarryOperatorAccount.Operator;
   }
-  throw new Error(
-    "The provided account could not be identified as a quarryOperator account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "quarryOperator" },
   );
 }
 
@@ -188,8 +256,9 @@ export function identifyQuarryOperatorInstruction(
   ) {
     return QuarryOperatorInstruction.DelegateSetFamine;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a quarryOperator instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "quarryOperator" },
   );
 }
 
@@ -229,3 +298,247 @@ export type ParsedQuarryOperatorInstruction<
   | ({
       instructionType: QuarryOperatorInstruction.DelegateSetFamine;
     } & ParsedDelegateSetFamineInstruction<TProgram>);
+
+export function parseQuarryOperatorInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedQuarryOperatorInstruction<TProgram> {
+  const instructionType = identifyQuarryOperatorInstruction(instruction);
+  switch (instructionType) {
+    case QuarryOperatorInstruction.CreateOperator: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.CreateOperator,
+        ...parseCreateOperatorInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.CreateOperatorV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.CreateOperatorV2,
+        ...parseCreateOperatorV2Instruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.SetAdmin: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.SetAdmin,
+        ...parseSetAdminInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.SetRateSetter: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.SetRateSetter,
+        ...parseSetRateSetterInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.SetQuarryCreator: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.SetQuarryCreator,
+        ...parseSetQuarryCreatorInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.SetShareAllocator: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.SetShareAllocator,
+        ...parseSetShareAllocatorInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.DelegateSetAnnualRewards: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.DelegateSetAnnualRewards,
+        ...parseDelegateSetAnnualRewardsInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.DelegateCreateQuarry: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.DelegateCreateQuarry,
+        ...parseDelegateCreateQuarryInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.DelegateCreateQuarryV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.DelegateCreateQuarryV2,
+        ...parseDelegateCreateQuarryV2Instruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.DelegateSetRewardsShare: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.DelegateSetRewardsShare,
+        ...parseDelegateSetRewardsShareInstruction(instruction),
+      };
+    }
+    case QuarryOperatorInstruction.DelegateSetFamine: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryOperatorInstruction.DelegateSetFamine,
+        ...parseDelegateSetFamineInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "quarryOperator",
+        },
+      );
+  }
+}
+
+export interface QuarryOperatorPlugin {
+  accounts: QuarryOperatorPluginAccounts;
+  instructions: QuarryOperatorPluginInstructions;
+  pdas: QuarryOperatorPluginPdas;
+}
+
+export interface QuarryOperatorPluginAccounts {
+  operator: ReturnType<typeof getOperatorCodec> &
+    SelfFetchFunctions<OperatorArgs, Operator>;
+}
+
+export interface QuarryOperatorPluginInstructions {
+  createOperator: (
+    input: MakeOptional<CreateOperatorAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateOperatorInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createOperatorV2: (
+    input: MakeOptional<CreateOperatorV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateOperatorV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setAdmin: (
+    input: SetAdminInput,
+  ) => ReturnType<typeof getSetAdminInstruction> & SelfPlanAndSendFunctions;
+  setRateSetter: (
+    input: SetRateSetterInput,
+  ) => ReturnType<typeof getSetRateSetterInstruction> &
+    SelfPlanAndSendFunctions;
+  setQuarryCreator: (
+    input: SetQuarryCreatorInput,
+  ) => ReturnType<typeof getSetQuarryCreatorInstruction> &
+    SelfPlanAndSendFunctions;
+  setShareAllocator: (
+    input: SetShareAllocatorInput,
+  ) => ReturnType<typeof getSetShareAllocatorInstruction> &
+    SelfPlanAndSendFunctions;
+  delegateSetAnnualRewards: (
+    input: DelegateSetAnnualRewardsInput,
+  ) => ReturnType<typeof getDelegateSetAnnualRewardsInstruction> &
+    SelfPlanAndSendFunctions;
+  delegateCreateQuarry: (
+    input: MakeOptional<DelegateCreateQuarryAsyncInput, "payer">,
+  ) => ReturnType<typeof getDelegateCreateQuarryInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  delegateCreateQuarryV2: (
+    input: MakeOptional<DelegateCreateQuarryV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getDelegateCreateQuarryV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  delegateSetRewardsShare: (
+    input: DelegateSetRewardsShareInput,
+  ) => ReturnType<typeof getDelegateSetRewardsShareInstruction> &
+    SelfPlanAndSendFunctions;
+  delegateSetFamine: (
+    input: DelegateSetFamineInput,
+  ) => ReturnType<typeof getDelegateSetFamineInstruction> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface QuarryOperatorPluginPdas {
+  operator: typeof findOperatorPda;
+}
+
+export type QuarryOperatorPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function quarryOperatorProgram() {
+  return <T extends QuarryOperatorPluginRequirements>(
+    client: T,
+  ): Omit<T, "quarryOperator"> & { quarryOperator: QuarryOperatorPlugin } => {
+    return extendClient(client, {
+      quarryOperator: <QuarryOperatorPlugin>{
+        accounts: {
+          operator: addSelfFetchFunctions(client, getOperatorCodec()),
+        },
+        instructions: {
+          createOperator: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateOperatorInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createOperatorV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateOperatorV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setAdmin: (input) =>
+            addSelfPlanAndSendFunctions(client, getSetAdminInstruction(input)),
+          setRateSetter: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRateSetterInstruction(input),
+            ),
+          setQuarryCreator: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetQuarryCreatorInstruction(input),
+            ),
+          setShareAllocator: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetShareAllocatorInstruction(input),
+            ),
+          delegateSetAnnualRewards: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateSetAnnualRewardsInstruction(input),
+            ),
+          delegateCreateQuarry: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateCreateQuarryInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          delegateCreateQuarryV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateCreateQuarryV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          delegateSetRewardsShare: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateSetRewardsShareInstruction(input),
+            ),
+          delegateSetFamine: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateSetFamineInstruction(input),
+            ),
+        },
+        pdas: { operator: findOperatorPda },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

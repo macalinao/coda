@@ -196,7 +196,7 @@ export interface LendingMarketArgs {
   reserved1: number[];
   /** Elevation groups are used to group together reserves that have the same risk parameters and can bump the ltv and liquidation threshold */
   elevationGroups: ElevationGroupPodArgs[];
-  elevationGroupPadding: (number | bigint)[];
+  elevationGroupPadding: Array<number | bigint>;
   /** Min net value accepted to be found in a position after any lending action in an obligation (scaled by quote currency decimals) */
   minNetValueInObligationSf: number | bigint;
   /** Minimum value to enforce smallest ltv priority checks on the collateral reserves on liquidation */
@@ -225,7 +225,7 @@ export interface LendingMarketArgs {
    */
   obligationOrderCreationEnabled: number;
   padding2: number[];
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link LendingMarketArgs} account data. */

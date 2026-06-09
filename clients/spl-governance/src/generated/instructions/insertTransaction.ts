@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { InstructionData, InstructionDataArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -36,10 +36,12 @@ import {
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getInstructionDataDecoder,
   getInstructionDataEncoder,
@@ -237,7 +239,7 @@ export function getInsertTransactionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -256,14 +258,17 @@ export function getInsertTransactionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.governanceAuthority),
-      getAccountMeta(accounts.proposalTransactionAccount),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta("governanceAuthority", accounts.governanceAuthority),
+      getAccountMeta(
+        "proposalTransactionAccount",
+        accounts.proposalTransactionAccount,
+      ),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInsertTransactionInstructionDataEncoder().encode(
       args as InsertTransactionInstructionDataArgs,
@@ -312,8 +317,13 @@ export function parseInsertTransactionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInsertTransactionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

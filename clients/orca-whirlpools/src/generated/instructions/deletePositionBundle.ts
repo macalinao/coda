@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DELETE_POSITION_BUNDLE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([100, 25, 99, 2, 217, 239, 124, 173]);
@@ -87,7 +89,7 @@ export interface DeletePositionBundleInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface DeletePositionBundleInstructionDataArgs {}
+export type DeletePositionBundleInstructionDataArgs = {};
 
 export function getDeletePositionBundleInstructionDataEncoder(): FixedSizeEncoder<DeletePositionBundleInstructionDataArgs> {
   return transformEncoder(
@@ -181,7 +183,7 @@ export function getDeletePositionBundleInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -193,12 +195,15 @@ export function getDeletePositionBundleInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.positionBundle),
-      getAccountMeta(accounts.positionBundleMint),
-      getAccountMeta(accounts.positionBundleTokenAccount),
-      getAccountMeta(accounts.positionBundleOwner),
-      getAccountMeta(accounts.receiver),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("positionBundle", accounts.positionBundle),
+      getAccountMeta("positionBundleMint", accounts.positionBundleMint),
+      getAccountMeta(
+        "positionBundleTokenAccount",
+        accounts.positionBundleTokenAccount,
+      ),
+      getAccountMeta("positionBundleOwner", accounts.positionBundleOwner),
+      getAccountMeta("receiver", accounts.receiver),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getDeletePositionBundleInstructionDataEncoder().encode({}),
     programAddress,
@@ -238,8 +243,13 @@ export function parseDeletePositionBundleInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDeletePositionBundleInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

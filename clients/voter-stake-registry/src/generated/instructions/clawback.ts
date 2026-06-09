@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CLAWBACK_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   111, 92, 142, 79, 33, 234, 82, 27,
@@ -179,7 +181,7 @@ export function getClawbackInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -194,12 +196,12 @@ export function getClawbackInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.realmAuthority),
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.vault),
-      getAccountMeta(accounts.destination),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("realmAuthority", accounts.realmAuthority),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("vault", accounts.vault),
+      getAccountMeta("destination", accounts.destination),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getClawbackInstructionDataEncoder().encode(
       args as ClawbackInstructionDataArgs,
@@ -241,8 +243,13 @@ export function parseClawbackInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClawbackInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

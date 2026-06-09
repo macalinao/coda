@@ -19,7 +19,7 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -28,10 +28,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const EXTRACT_FEES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   57, 219, 44, 55, 130, 127, 165, 183,
@@ -76,7 +78,7 @@ export interface ExtractFeesInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface ExtractFeesInstructionDataArgs {}
+export type ExtractFeesInstructionDataArgs = {};
 
 export function getExtractFeesInstructionDataEncoder(): FixedSizeEncoder<ExtractFeesInstructionDataArgs> {
   return transformEncoder(
@@ -152,7 +154,7 @@ export function getExtractFeesInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -164,10 +166,10 @@ export function getExtractFeesInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.claimFeeTokenAccount),
-      getAccountMeta(accounts.feeToTokenAccount),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("claimFeeTokenAccount", accounts.claimFeeTokenAccount),
+      getAccountMeta("feeToTokenAccount", accounts.feeToTokenAccount),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getExtractFeesInstructionDataEncoder().encode({}),
     programAddress,
@@ -203,8 +205,13 @@ export function parseExtractFeesInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedExtractFeesInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

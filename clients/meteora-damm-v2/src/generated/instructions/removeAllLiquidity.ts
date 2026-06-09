@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,15 +33,20 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REMOVE_ALL_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([10, 51, 61, 35, 112, 105, 24, 85]);
@@ -301,7 +306,7 @@ export async function getRemoveAllLiquidityInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -313,14 +318,26 @@ export async function getRemoveAllLiquidityInstructionAsync<
   }
   if (!accounts.tokenAVault.value) {
     accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenAMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenBVault.value) {
     accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenBMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenAProgram.value) {
@@ -342,21 +359,21 @@ export async function getRemoveAllLiquidityInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAAccount),
-      getAccountMeta(accounts.tokenBAccount),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAAccount", accounts.tokenAAccount),
+      getAccountMeta("tokenBAccount", accounts.tokenBAccount),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getRemoveAllLiquidityInstructionDataEncoder().encode(
       args as RemoveAllLiquidityInstructionDataArgs,
@@ -508,7 +525,7 @@ export function getRemoveAllLiquidityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -531,21 +548,21 @@ export function getRemoveAllLiquidityInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAAccount),
-      getAccountMeta(accounts.tokenBAccount),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAAccount", accounts.tokenAAccount),
+      getAccountMeta("tokenBAccount", accounts.tokenBAccount),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getRemoveAllLiquidityInstructionDataEncoder().encode(
       args as RemoveAllLiquidityInstructionDataArgs,
@@ -615,8 +632,13 @@ export function parseRemoveAllLiquidityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRemoveAllLiquidityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 15) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 15,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

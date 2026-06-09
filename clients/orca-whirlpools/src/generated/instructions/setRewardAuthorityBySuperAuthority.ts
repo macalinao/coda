@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_REWARD_AUTHORITY_BY_SUPER_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([240, 154, 201, 198, 148, 93, 56, 25]);
@@ -169,7 +171,7 @@ export function getSetRewardAuthorityBySuperAuthorityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -178,10 +180,13 @@ export function getSetRewardAuthorityBySuperAuthorityInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.rewardEmissionsSuperAuthority),
-      getAccountMeta(accounts.newRewardAuthority),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta(
+        "rewardEmissionsSuperAuthority",
+        accounts.rewardEmissionsSuperAuthority,
+      ),
+      getAccountMeta("newRewardAuthority", accounts.newRewardAuthority),
     ],
     data: getSetRewardAuthorityBySuperAuthorityInstructionDataEncoder().encode(
       args as SetRewardAuthorityBySuperAuthorityInstructionDataArgs,
@@ -222,8 +227,13 @@ export function parseSetRewardAuthorityBySuperAuthorityInstruction<
   TAccountMetas
 > {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

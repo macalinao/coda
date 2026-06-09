@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const RELINQUISH_VOTE_DISCRIMINATOR = 15;
 
@@ -88,7 +90,7 @@ export interface RelinquishVoteInstructionData {
   discriminator: number;
 }
 
-export interface RelinquishVoteInstructionDataArgs {}
+export type RelinquishVoteInstructionDataArgs = {};
 
 export function getRelinquishVoteInstructionDataEncoder(): FixedSizeEncoder<RelinquishVoteInstructionDataArgs> {
   return transformEncoder(
@@ -206,20 +208,20 @@ export function getRelinquishVoteInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.proposalVoteRecord),
-      getAccountMeta(accounts.governingTokenMint),
-      getAccountMeta(accounts.governanceAuthority),
-      getAccountMeta(accounts.beneficiaryAccount),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta("proposalVoteRecord", accounts.proposalVoteRecord),
+      getAccountMeta("governingTokenMint", accounts.governingTokenMint),
+      getAccountMeta("governanceAuthority", accounts.governanceAuthority),
+      getAccountMeta("beneficiaryAccount", accounts.beneficiaryAccount),
     ],
     data: getRelinquishVoteInstructionDataEncoder().encode({}),
     programAddress,
@@ -270,8 +272,13 @@ export function parseRelinquishVoteInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRelinquishVoteInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

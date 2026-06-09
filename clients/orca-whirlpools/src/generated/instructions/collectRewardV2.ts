@@ -24,7 +24,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   RemainingAccountsInfo,
   RemainingAccountsInfoArgs,
@@ -41,10 +41,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
@@ -246,7 +248,7 @@ export function getCollectRewardV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -265,15 +267,15 @@ export function getCollectRewardV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.positionAuthority),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.positionTokenAccount),
-      getAccountMeta(accounts.rewardOwnerAccount),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardTokenProgram),
-      getAccountMeta(accounts.memoProgram),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("positionAuthority", accounts.positionAuthority),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("positionTokenAccount", accounts.positionTokenAccount),
+      getAccountMeta("rewardOwnerAccount", accounts.rewardOwnerAccount),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardTokenProgram", accounts.rewardTokenProgram),
+      getAccountMeta("memoProgram", accounts.memoProgram),
     ],
     data: getCollectRewardV2InstructionDataEncoder().encode(
       args as CollectRewardV2InstructionDataArgs,
@@ -321,8 +323,13 @@ export function parseCollectRewardV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCollectRewardV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DELEGATE_SET_REWARDS_SHARE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([111, 198, 20, 112, 172, 82, 102, 66]);
@@ -176,7 +178,7 @@ export function getDelegateSetRewardsShareInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -191,11 +193,11 @@ export function getDelegateSetRewardsShareInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
-      getAccountMeta(accounts.quarry),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("delegate", accounts.delegate),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarryMineProgram", accounts.quarryMineProgram),
+      getAccountMeta("quarry", accounts.quarry),
     ],
     data: getDelegateSetRewardsShareInstructionDataEncoder().encode(
       args as DelegateSetRewardsShareInstructionDataArgs,
@@ -235,8 +237,13 @@ export function parseDelegateSetRewardsShareInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDelegateSetRewardsShareInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

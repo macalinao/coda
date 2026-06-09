@@ -80,7 +80,7 @@ export interface ReferrerTokenStateArgs {
   amountCumulativeSf: number | bigint;
   /** Referrer token state bump, used for address validation */
   bump: number | bigint;
-  padding: (number | bigint)[];
+  padding: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link ReferrerTokenStateArgs} account data. */

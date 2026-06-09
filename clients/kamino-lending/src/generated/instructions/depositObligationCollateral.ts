@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_OBLIGATION_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([108, 209, 4, 72, 21, 22, 118, 133]);
@@ -214,7 +216,7 @@ export function getDepositObligationCollateralInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -233,14 +235,20 @@ export function getDepositObligationCollateralInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.depositReserve),
-      getAccountMeta(accounts.reserveDestinationCollateral),
-      getAccountMeta(accounts.userSourceCollateral),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("obligation", accounts.obligation),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("depositReserve", accounts.depositReserve),
+      getAccountMeta(
+        "reserveDestinationCollateral",
+        accounts.reserveDestinationCollateral,
+      ),
+      getAccountMeta("userSourceCollateral", accounts.userSourceCollateral),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
     ],
     data: getDepositObligationCollateralInstructionDataEncoder().encode(
       args as DepositObligationCollateralInstructionDataArgs,
@@ -286,8 +294,13 @@ export function parseDepositObligationCollateralInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDepositObligationCollateralInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

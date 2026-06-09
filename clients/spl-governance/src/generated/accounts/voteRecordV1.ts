@@ -17,6 +17,7 @@ import type {
   FixedSizeEncoder,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { VoteRecordSeeds } from "../pdas/index.js";
 import type { VoteWeightV1, VoteWeightV1Args } from "../types/index.js";
@@ -44,9 +45,10 @@ import {
   getVoteWeightV1Encoder,
 } from "../types/index.js";
 
-export const VOTE_RECORD_V1_ACCOUNT_TYPE = GovernanceAccountType.VoteRecordV1;
+export const VOTE_RECORD_V1_ACCOUNT_TYPE: GovernanceAccountType =
+  GovernanceAccountType.VoteRecordV1;
 
-export function getVoteRecordV1AccountTypeBytes() {
+export function getVoteRecordV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(VOTE_RECORD_V1_ACCOUNT_TYPE);
 }
 

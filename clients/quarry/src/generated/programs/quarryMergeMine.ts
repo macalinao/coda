@@ -6,8 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  MergeMiner,
+  MergeMinerArgs,
+  MergePool,
+  MergePoolArgs,
+} from "../accounts/index.js";
+import type {
+  ClaimRewardsMMAsyncInput,
+  InitMergeMinerAsyncInput,
+  InitMergeMinerV2AsyncInput,
+  InitMinerMMInput,
+  InitMinerMMV2Input,
+  NewPoolAsyncInput,
+  NewPoolV2AsyncInput,
   ParsedClaimRewardsMMInstruction,
   ParsedInitMergeMinerInstruction,
   ParsedInitMergeMinerV2Instruction,
@@ -21,8 +49,62 @@ import type {
   ParsedUnstakeAllReplicaMinerInstruction,
   ParsedUnstakePrimaryMinerInstruction,
   ParsedWithdrawTokensMMInstruction,
+  RescueTokensMMInput,
+  StakePrimaryMinerAsyncInput,
+  StakeReplicaMinerAsyncInput,
+  UnstakeAllReplicaMinerAsyncInput,
+  UnstakePrimaryMinerAsyncInput,
+  WithdrawTokensMMAsyncInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import { getMergeMinerCodec, getMergePoolCodec } from "../accounts/index.js";
+import {
+  getClaimRewardsMMInstructionAsync,
+  getInitMergeMinerInstructionAsync,
+  getInitMergeMinerV2InstructionAsync,
+  getInitMinerMMInstruction,
+  getInitMinerMMV2Instruction,
+  getNewPoolInstructionAsync,
+  getNewPoolV2InstructionAsync,
+  getRescueTokensMMInstruction,
+  getStakePrimaryMinerInstructionAsync,
+  getStakeReplicaMinerInstructionAsync,
+  getUnstakeAllReplicaMinerInstructionAsync,
+  getUnstakePrimaryMinerInstructionAsync,
+  getWithdrawTokensMMInstructionAsync,
+  parseClaimRewardsMMInstruction,
+  parseInitMergeMinerInstruction,
+  parseInitMergeMinerV2Instruction,
+  parseInitMinerMMInstruction,
+  parseInitMinerMMV2Instruction,
+  parseNewPoolInstruction,
+  parseNewPoolV2Instruction,
+  parseRescueTokensMMInstruction,
+  parseStakePrimaryMinerInstruction,
+  parseStakeReplicaMinerInstruction,
+  parseUnstakeAllReplicaMinerInstruction,
+  parseUnstakePrimaryMinerInstruction,
+  parseWithdrawTokensMMInstruction,
+} from "../instructions/index.js";
+import {
+  findMergeMinerPda,
+  findMergePoolPda,
+  findReplicaMintPda,
+} from "../pdas/index.js";
 
 export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;
@@ -58,8 +140,9 @@ export function identifyQuarryMergeMineAccount(
   ) {
     return QuarryMergeMineAccount.MergeMiner;
   }
-  throw new Error(
-    "The provided account could not be identified as a quarryMergeMine account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "quarryMergeMine" },
   );
 }
 
@@ -226,8 +309,9 @@ export function identifyQuarryMergeMineInstruction(
   ) {
     return QuarryMergeMineInstruction.ClaimRewardsMM;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a quarryMergeMine instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "quarryMergeMine" },
   );
 }
 
@@ -273,3 +357,298 @@ export type ParsedQuarryMergeMineInstruction<
   | ({
       instructionType: QuarryMergeMineInstruction.ClaimRewardsMM;
     } & ParsedClaimRewardsMMInstruction<TProgram>);
+
+export function parseQuarryMergeMineInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedQuarryMergeMineInstruction<TProgram> {
+  const instructionType = identifyQuarryMergeMineInstruction(instruction);
+  switch (instructionType) {
+    case QuarryMergeMineInstruction.NewPool: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.NewPool,
+        ...parseNewPoolInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.NewPoolV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.NewPoolV2,
+        ...parseNewPoolV2Instruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.InitMergeMiner: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.InitMergeMiner,
+        ...parseInitMergeMinerInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.InitMergeMinerV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.InitMergeMinerV2,
+        ...parseInitMergeMinerV2Instruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.InitMinerMM: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.InitMinerMM,
+        ...parseInitMinerMMInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.InitMinerMMV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.InitMinerMMV2,
+        ...parseInitMinerMMV2Instruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.StakePrimaryMiner: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.StakePrimaryMiner,
+        ...parseStakePrimaryMinerInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.StakeReplicaMiner: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.StakeReplicaMiner,
+        ...parseStakeReplicaMinerInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.UnstakePrimaryMiner: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.UnstakePrimaryMiner,
+        ...parseUnstakePrimaryMinerInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.UnstakeAllReplicaMiner: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.UnstakeAllReplicaMiner,
+        ...parseUnstakeAllReplicaMinerInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.WithdrawTokensMM: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.WithdrawTokensMM,
+        ...parseWithdrawTokensMMInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.RescueTokensMM: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.RescueTokensMM,
+        ...parseRescueTokensMMInstruction(instruction),
+      };
+    }
+    case QuarryMergeMineInstruction.ClaimRewardsMM: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMergeMineInstruction.ClaimRewardsMM,
+        ...parseClaimRewardsMMInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "quarryMergeMine",
+        },
+      );
+  }
+}
+
+export interface QuarryMergeMinePlugin {
+  accounts: QuarryMergeMinePluginAccounts;
+  instructions: QuarryMergeMinePluginInstructions;
+  pdas: QuarryMergeMinePluginPdas;
+}
+
+export interface QuarryMergeMinePluginAccounts {
+  mergePool: ReturnType<typeof getMergePoolCodec> &
+    SelfFetchFunctions<MergePoolArgs, MergePool>;
+  mergeMiner: ReturnType<typeof getMergeMinerCodec> &
+    SelfFetchFunctions<MergeMinerArgs, MergeMiner>;
+}
+
+export interface QuarryMergeMinePluginInstructions {
+  newPool: (
+    input: MakeOptional<NewPoolAsyncInput, "payer">,
+  ) => ReturnType<typeof getNewPoolInstructionAsync> & SelfPlanAndSendFunctions;
+  newPoolV2: (
+    input: MakeOptional<NewPoolV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getNewPoolV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initMergeMiner: (
+    input: MakeOptional<InitMergeMinerAsyncInput, "payer">,
+  ) => ReturnType<typeof getInitMergeMinerInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initMergeMinerV2: (
+    input: MakeOptional<InitMergeMinerV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getInitMergeMinerV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initMinerMM: (
+    input: MakeOptional<InitMinerMMInput, "payer">,
+  ) => ReturnType<typeof getInitMinerMMInstruction> & SelfPlanAndSendFunctions;
+  initMinerMMV2: (
+    input: MakeOptional<InitMinerMMV2Input, "payer">,
+  ) => ReturnType<typeof getInitMinerMMV2Instruction> &
+    SelfPlanAndSendFunctions;
+  stakePrimaryMiner: (
+    input: StakePrimaryMinerAsyncInput,
+  ) => ReturnType<typeof getStakePrimaryMinerInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  stakeReplicaMiner: (
+    input: StakeReplicaMinerAsyncInput,
+  ) => ReturnType<typeof getStakeReplicaMinerInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  unstakePrimaryMiner: (
+    input: UnstakePrimaryMinerAsyncInput,
+  ) => ReturnType<typeof getUnstakePrimaryMinerInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  unstakeAllReplicaMiner: (
+    input: UnstakeAllReplicaMinerAsyncInput,
+  ) => ReturnType<typeof getUnstakeAllReplicaMinerInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawTokensMM: (
+    input: WithdrawTokensMMAsyncInput,
+  ) => ReturnType<typeof getWithdrawTokensMMInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  rescueTokensMM: (
+    input: RescueTokensMMInput,
+  ) => ReturnType<typeof getRescueTokensMMInstruction> &
+    SelfPlanAndSendFunctions;
+  claimRewardsMM: (
+    input: ClaimRewardsMMAsyncInput,
+  ) => ReturnType<typeof getClaimRewardsMMInstructionAsync> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface QuarryMergeMinePluginPdas {
+  mergePool: typeof findMergePoolPda;
+  replicaMint: typeof findReplicaMintPda;
+  mergeMiner: typeof findMergeMinerPda;
+}
+
+export type QuarryMergeMinePluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function quarryMergeMineProgram() {
+  return <T extends QuarryMergeMinePluginRequirements>(
+    client: T,
+  ): Omit<T, "quarryMergeMine"> & {
+    quarryMergeMine: QuarryMergeMinePlugin;
+  } => {
+    return extendClient(client, {
+      quarryMergeMine: <QuarryMergeMinePlugin>{
+        accounts: {
+          mergePool: addSelfFetchFunctions(client, getMergePoolCodec()),
+          mergeMiner: addSelfFetchFunctions(client, getMergeMinerCodec()),
+        },
+        instructions: {
+          newPool: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewPoolInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          newPoolV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewPoolV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initMergeMiner: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMergeMinerInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initMergeMinerV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMergeMinerV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initMinerMM: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMinerMMInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initMinerMMV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMinerMMV2Instruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          stakePrimaryMiner: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getStakePrimaryMinerInstructionAsync(input),
+            ),
+          stakeReplicaMiner: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getStakeReplicaMinerInstructionAsync(input),
+            ),
+          unstakePrimaryMiner: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUnstakePrimaryMinerInstructionAsync(input),
+            ),
+          unstakeAllReplicaMiner: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUnstakeAllReplicaMinerInstructionAsync(input),
+            ),
+          withdrawTokensMM: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawTokensMMInstructionAsync(input),
+            ),
+          rescueTokensMM: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRescueTokensMMInstruction(input),
+            ),
+          claimRewardsMM: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimRewardsMMInstructionAsync(input),
+            ),
+        },
+        pdas: {
+          mergePool: findMergePoolPda,
+          replicaMint: findReplicaMintPda,
+          mergeMiner: findMergeMinerPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

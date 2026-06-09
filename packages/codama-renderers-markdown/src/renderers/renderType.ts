@@ -11,7 +11,7 @@ export function renderDefinedType(
   lines.push(`### ${type.name}`);
   lines.push("");
 
-  if (type.docs?.length) {
+  if (type.docs && type.docs.length > 0) {
     for (const doc of type.docs) {
       lines.push(doc);
       lines.push("");

@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -30,10 +30,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_LENDING_MARKET_OWNER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([118, 224, 10, 62, 196, 230, 184, 89]);
@@ -68,7 +70,7 @@ export interface UpdateLendingMarketOwnerInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface UpdateLendingMarketOwnerInstructionDataArgs {}
+export type UpdateLendingMarketOwnerInstructionDataArgs = {};
 
 export function getUpdateLendingMarketOwnerInstructionDataEncoder(): FixedSizeEncoder<UpdateLendingMarketOwnerInstructionDataArgs> {
   return transformEncoder(
@@ -133,14 +135,17 @@ export function getUpdateLendingMarketOwnerInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwnerCached),
-      getAccountMeta(accounts.lendingMarket),
+      getAccountMeta(
+        "lendingMarketOwnerCached",
+        accounts.lendingMarketOwnerCached,
+      ),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
     ],
     data: getUpdateLendingMarketOwnerInstructionDataEncoder().encode({}),
     programAddress,
@@ -172,8 +177,13 @@ export function parseUpdateLendingMarketOwnerInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateLendingMarketOwnerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

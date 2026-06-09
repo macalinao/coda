@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -29,11 +29,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_ACCOUNTS_DISCRIMINATOR = 57;
 
@@ -77,7 +82,7 @@ export interface CloseAccountsInstructionData {
   discriminator: number;
 }
 
-export interface CloseAccountsInstructionDataArgs {}
+export type CloseAccountsInstructionDataArgs = {};
 
 export function getCloseAccountsInstructionDataEncoder(): FixedSizeEncoder<CloseAccountsInstructionDataArgs> {
   return transformEncoder(
@@ -159,25 +164,28 @@ export async function getCloseAccountsInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.destination),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("destination", accounts.destination),
     ],
     data: getCloseAccountsInstructionDataEncoder().encode({}),
     programAddress,
@@ -248,17 +256,17 @@ export function getCloseAccountsInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.destination),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("destination", accounts.destination),
     ],
     data: getCloseAccountsInstructionDataEncoder().encode({}),
     programAddress,
@@ -301,8 +309,13 @@ export function parseCloseAccountsInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseAccountsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -15,23 +15,23 @@ import { isProgramError } from "@solana/kit";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** ProgramNotWhitelisted: CPI caller not whitelisted to invoke lock instruction. */
-export const LOCKED_VOTER_ERROR__PROGRAM_NOT_WHITELISTED = 0x1770; // 6000
+export const LOCKED_VOTER_ERROR__PROGRAM_NOT_WHITELISTED = 0x17_70; // 6000
 /** LockupDurationTooShort: Lockup duration must at least be the min stake duration. */
-export const LOCKED_VOTER_ERROR__LOCKUP_DURATION_TOO_SHORT = 0x1771; // 6001
+export const LOCKED_VOTER_ERROR__LOCKUP_DURATION_TOO_SHORT = 0x17_71; // 6001
 /** LockupDurationTooLong: Lockup duration must at most be the max stake duration. */
-export const LOCKED_VOTER_ERROR__LOCKUP_DURATION_TOO_LONG = 0x1772; // 6002
+export const LOCKED_VOTER_ERROR__LOCKUP_DURATION_TOO_LONG = 0x17_72; // 6002
 /** RefreshCannotShorten: A voting escrow refresh cannot shorten the escrow time remaining. */
-export const LOCKED_VOTER_ERROR__REFRESH_CANNOT_SHORTEN = 0x1773; // 6003
+export const LOCKED_VOTER_ERROR__REFRESH_CANNOT_SHORTEN = 0x17_73; // 6003
 /** EscrowNotEnded: Escrow has not ended. */
-export const LOCKED_VOTER_ERROR__ESCROW_NOT_ENDED = 0x1774; // 6004
+export const LOCKED_VOTER_ERROR__ESCROW_NOT_ENDED = 0x17_74; // 6004
 /** MustProvideWhitelist: Program whitelist enabled; please provide whitelist entry and instructions sysvar or use the 'lock_with_whitelist' instruction. */
-export const LOCKED_VOTER_ERROR__MUST_PROVIDE_WHITELIST = 0x1775; // 6005
+export const LOCKED_VOTER_ERROR__MUST_PROVIDE_WHITELIST = 0x17_75; // 6005
 /** EscrowOwnerNotWhitelisted: CPI caller not whitelisted for escrow owner to invoke lock instruction. */
-export const LOCKED_VOTER_ERROR__ESCROW_OWNER_NOT_WHITELISTED = 0x1776; // 6006
+export const LOCKED_VOTER_ERROR__ESCROW_OWNER_NOT_WHITELISTED = 0x17_76; // 6006
 /** MustCallLockWithWhitelistEntry: Must call `lock_with_whitelist_entry` to lock via CPI. */
-export const LOCKED_VOTER_ERROR__MUST_CALL_LOCK_WITH_WHITELIST_ENTRY = 0x1777; // 6007
+export const LOCKED_VOTER_ERROR__MUST_CALL_LOCK_WITH_WHITELIST_ENTRY = 0x17_77; // 6007
 /** MustCallLockPermissionless: Must call `lock_permissionless` since this DAO does not have a CPI whitelist. */
-export const LOCKED_VOTER_ERROR__MUST_CALL_LOCK_PERMISSIONLESS = 0x1778; // 6008
+export const LOCKED_VOTER_ERROR__MUST_CALL_LOCK_PERMISSIONLESS = 0x17_78; // 6008
 
 export type LockedVoterError =
   | typeof LOCKED_VOTER_ERROR__ESCROW_NOT_ENDED
@@ -45,7 +45,7 @@ export type LockedVoterError =
   | typeof LOCKED_VOTER_ERROR__REFRESH_CANNOT_SHORTEN;
 
 let lockedVoterErrorMessages: Record<LockedVoterError, string> | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   lockedVoterErrorMessages = {
     [LOCKED_VOTER_ERROR__ESCROW_NOT_ENDED]: "Escrow has not ended.",
     [LOCKED_VOTER_ERROR__ESCROW_OWNER_NOT_WHITELISTED]:
@@ -67,7 +67,7 @@ if (true) {
 }
 
 export function getLockedVoterErrorMessage(code: LockedVoterError): string {
-  if (true) {
+  if (process.env.NODE_ENV !== "production") {
     return lockedVoterErrorMessages![code];
   }
 

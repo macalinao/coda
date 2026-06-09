@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +34,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_REWARD_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([91, 1, 77, 50, 235, 229, 133, 49]);
@@ -228,7 +230,7 @@ export function getInitializeRewardV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -251,15 +253,15 @@ export function getInitializeRewardV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.rewardAuthority),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.rewardTokenBadge),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardTokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("rewardAuthority", accounts.rewardAuthority),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("rewardTokenBadge", accounts.rewardTokenBadge),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardTokenProgram", accounts.rewardTokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializeRewardV2InstructionDataEncoder().encode(
       args as InitializeRewardV2InstructionDataArgs,
@@ -307,8 +309,13 @@ export function parseInitializeRewardV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeRewardV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

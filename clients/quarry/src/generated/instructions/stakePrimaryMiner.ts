@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMergeMinerPda, findMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const STAKE_PRIMARY_MINER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([72, 59, 23, 242, 117, 178, 129, 138]);
@@ -104,7 +109,7 @@ export interface StakePrimaryMinerInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface StakePrimaryMinerInstructionDataArgs {}
+export type StakePrimaryMinerInstructionDataArgs = {};
 
 export function getStakePrimaryMinerInstructionDataEncoder(): FixedSizeEncoder<StakePrimaryMinerInstructionDataArgs> {
   return transformEncoder(
@@ -216,20 +221,32 @@ export async function getStakePrimaryMinerInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.mm.value) {
     accounts.mm.value = await findMergeMinerPda({
-      pool: expectAddress(accounts.pool.value),
-      owner: expectAddress(accounts.mmOwner.value),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
+      owner: getAddressFromResolvedInstructionAccount(
+        "mmOwner",
+        accounts.mmOwner.value,
+      ),
     });
   }
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({
-      quarry: expectAddress(accounts.quarry.value),
-      authority: expectAddress(accounts.mm.value),
+      quarry: getAddressFromResolvedInstructionAccount(
+        "quarry",
+        accounts.quarry.value,
+      ),
+      authority: getAddressFromResolvedInstructionAccount(
+        "mm",
+        accounts.mm.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -244,16 +261,16 @@ export async function getStakePrimaryMinerInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mmOwner),
-      getAccountMeta(accounts.mmPrimaryTokenAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.mineProgram),
+      getAccountMeta("mmOwner", accounts.mmOwner),
+      getAccountMeta("mmPrimaryTokenAccount", accounts.mmPrimaryTokenAccount),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("mineProgram", accounts.mineProgram),
     ],
     data: getStakePrimaryMinerInstructionDataEncoder().encode({}),
     programAddress,
@@ -357,7 +374,7 @@ export function getStakePrimaryMinerInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -373,16 +390,16 @@ export function getStakePrimaryMinerInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mmOwner),
-      getAccountMeta(accounts.mmPrimaryTokenAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.mineProgram),
+      getAccountMeta("mmOwner", accounts.mmOwner),
+      getAccountMeta("mmPrimaryTokenAccount", accounts.mmPrimaryTokenAccount),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("mineProgram", accounts.mineProgram),
     ],
     data: getStakePrimaryMinerInstructionDataEncoder().encode({}),
     programAddress,
@@ -430,8 +447,13 @@ export function parseStakePrimaryMinerInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedStakePrimaryMinerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 10,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

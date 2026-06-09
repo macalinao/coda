@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_PROGRAM_METADATA_DISCRIMINATOR = 24;
 
@@ -70,7 +72,7 @@ export interface UpdateProgramMetadataInstructionData {
   discriminator: number;
 }
 
-export interface UpdateProgramMetadataInstructionDataArgs {}
+export type UpdateProgramMetadataInstructionDataArgs = {};
 
 export function getUpdateProgramMetadataInstructionDataEncoder(): FixedSizeEncoder<UpdateProgramMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -140,7 +142,7 @@ export function getUpdateProgramMetadataInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -152,9 +154,9 @@ export function getUpdateProgramMetadataInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.programMetadataAccount),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("programMetadataAccount", accounts.programMetadataAccount),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getUpdateProgramMetadataInstructionDataEncoder().encode({}),
     programAddress,
@@ -189,8 +191,13 @@ export function parseUpdateProgramMetadataInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateProgramMetadataInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

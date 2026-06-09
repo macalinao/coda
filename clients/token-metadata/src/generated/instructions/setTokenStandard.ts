@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -30,11 +30,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_TOKEN_STANDARD_DISCRIMINATOR = 35;
 
@@ -78,7 +83,7 @@ export interface SetTokenStandardInstructionData {
   discriminator: number;
 }
 
-export interface SetTokenStandardInstructionDataArgs {}
+export type SetTokenStandardInstructionDataArgs = {};
 
 export function getSetTokenStandardInstructionDataEncoder(): FixedSizeEncoder<SetTokenStandardInstructionDataArgs> {
   return transformEncoder(
@@ -156,24 +161,27 @@ export async function getSetTokenStandardInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.edition),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("edition", accounts.edition),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getSetTokenStandardInstructionDataEncoder().encode({}),
     programAddress,
@@ -239,16 +247,16 @@ export function getSetTokenStandardInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.edition),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("edition", accounts.edition),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getSetTokenStandardInstructionDataEncoder().encode({}),
     programAddress,
@@ -288,8 +296,13 @@ export function parseSetTokenStandardInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetTokenStandardInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -300,7 +313,7 @@ export function parseSetTokenStandardInstruction<
   let optionalAccountsRemaining = instruction.accounts.length - 3;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

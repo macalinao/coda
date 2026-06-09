@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,11 +34,16 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMergeMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_TOKENS_M_M_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([2, 4, 225, 61, 19, 182, 106, 170]);
@@ -93,7 +98,7 @@ export interface WithdrawTokensMMInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface WithdrawTokensMMInstructionDataArgs {}
+export type WithdrawTokensMMInstructionDataArgs = {};
 
 export function getWithdrawTokensMMInstructionDataEncoder(): FixedSizeEncoder<WithdrawTokensMMInstructionDataArgs> {
   return transformEncoder(
@@ -187,14 +192,20 @@ export async function getWithdrawTokensMMInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.mm.value) {
     accounts.mm.value = await findMergeMinerPda({
-      pool: expectAddress(accounts.pool.value),
-      owner: expectAddress(accounts.owner.value),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
+      owner: getAddressFromResolvedInstructionAccount(
+        "owner",
+        accounts.owner.value,
+      ),
     });
   }
   if (!accounts.mmTokenAccount.value) {
@@ -202,11 +213,18 @@ export async function getWithdrawTokensMMInstructionAsync<
       programAddress:
         "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
       seeds: [
-        getAddressEncoder().encode(expectAddress(accounts.mm.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount("mm", accounts.mm.value),
+        ),
         getAddressEncoder().encode(
           address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.withdrawMint.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "withdrawMint",
+            accounts.withdrawMint.value,
+          ),
+        ),
       ],
     });
   }
@@ -218,13 +236,13 @@ export async function getWithdrawTokensMMInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.withdrawMint),
-      getAccountMeta(accounts.mmTokenAccount),
-      getAccountMeta(accounts.tokenDestination),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("withdrawMint", accounts.withdrawMint),
+      getAccountMeta("mmTokenAccount", accounts.mmTokenAccount),
+      getAccountMeta("tokenDestination", accounts.tokenDestination),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawTokensMMInstructionDataEncoder().encode({}),
     programAddress,
@@ -307,7 +325,7 @@ export function getWithdrawTokensMMInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -319,13 +337,13 @@ export function getWithdrawTokensMMInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.withdrawMint),
-      getAccountMeta(accounts.mmTokenAccount),
-      getAccountMeta(accounts.tokenDestination),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("withdrawMint", accounts.withdrawMint),
+      getAccountMeta("mmTokenAccount", accounts.mmTokenAccount),
+      getAccountMeta("tokenDestination", accounts.tokenDestination),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawTokensMMInstructionDataEncoder().encode({}),
     programAddress,
@@ -367,8 +385,13 @@ export function parseWithdrawTokensMMInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawTokensMMInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

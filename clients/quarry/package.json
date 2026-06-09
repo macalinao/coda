@@ -46,7 +46,8 @@
     "codegen": "rm -fr src/generated/ && coda generate"
   },
   "peerDependencies": {
-    "@solana/kit": "*"
+    "@solana/kit": "*",
+    "@solana/program-client-core": "*"
   },
   "devDependencies": {
     "@macalinao/coda": "workspace:^",
@@ -54,6 +55,7 @@
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "catalog:",
+    "@solana/program-client-core": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:"
   }

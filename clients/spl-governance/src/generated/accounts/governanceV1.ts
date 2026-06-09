@@ -17,6 +17,7 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { GovernanceSeeds } from "../pdas/index.js";
 import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
@@ -44,9 +45,10 @@ import {
   getGovernanceConfigEncoder,
 } from "../types/index.js";
 
-export const GOVERNANCE_V1_ACCOUNT_TYPE = GovernanceAccountType.GovernanceV1;
+export const GOVERNANCE_V1_ACCOUNT_TYPE: GovernanceAccountType =
+  GovernanceAccountType.GovernanceV1;
 
-export function getGovernanceV1AccountTypeBytes() {
+export function getGovernanceV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(GOVERNANCE_V1_ACCOUNT_TYPE);
 }
 

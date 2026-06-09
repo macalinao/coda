@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { RealmSeeds } from "../pdas/index.js";
 import type { RealmConfig, RealmConfigArgs } from "../types/index.js";
@@ -58,9 +59,10 @@ import {
   getRealmConfigEncoder,
 } from "../types/index.js";
 
-export const REALM_V2_ACCOUNT_TYPE = GovernanceAccountType.RealmV2;
+export const REALM_V2_ACCOUNT_TYPE: GovernanceAccountType =
+  GovernanceAccountType.RealmV2;
 
-export function getRealmV2AccountTypeBytes() {
+export function getRealmV2AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(REALM_V2_ACCOUNT_TYPE);
 }
 

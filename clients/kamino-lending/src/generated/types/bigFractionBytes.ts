@@ -27,8 +27,8 @@ export interface BigFractionBytes {
 }
 
 export interface BigFractionBytesArgs {
-  value: (number | bigint)[];
-  padding: (number | bigint)[];
+  value: Array<number | bigint>;
+  padding: Array<number | bigint>;
 }
 
 export function getBigFractionBytesEncoder(): FixedSizeEncoder<BigFractionBytesArgs> {

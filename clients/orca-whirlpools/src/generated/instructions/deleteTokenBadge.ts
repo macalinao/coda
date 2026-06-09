@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DELETE_TOKEN_BADGE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([53, 146, 68, 8, 18, 117, 17, 185]);
@@ -85,7 +87,7 @@ export interface DeleteTokenBadgeInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface DeleteTokenBadgeInstructionDataArgs {}
+export type DeleteTokenBadgeInstructionDataArgs = {};
 
 export function getDeleteTokenBadgeInstructionDataEncoder(): FixedSizeEncoder<DeleteTokenBadgeInstructionDataArgs> {
   return transformEncoder(
@@ -176,18 +178,21 @@ export function getDeleteTokenBadgeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.whirlpoolsConfigExtension),
-      getAccountMeta(accounts.tokenBadgeAuthority),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.tokenBadge),
-      getAccountMeta(accounts.receiver),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta(
+        "whirlpoolsConfigExtension",
+        accounts.whirlpoolsConfigExtension,
+      ),
+      getAccountMeta("tokenBadgeAuthority", accounts.tokenBadgeAuthority),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("tokenBadge", accounts.tokenBadge),
+      getAccountMeta("receiver", accounts.receiver),
     ],
     data: getDeleteTokenBadgeInstructionDataEncoder().encode({}),
     programAddress,
@@ -227,8 +232,13 @@ export function parseDeleteTokenBadgeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDeleteTokenBadgeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

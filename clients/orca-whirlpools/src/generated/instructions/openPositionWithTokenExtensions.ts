@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +35,12 @@ import {
   getI32Encoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const OPEN_POSITION_WITH_TOKEN_EXTENSIONS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([212, 47, 95, 92, 114, 102, 131, 250]);
@@ -251,7 +253,7 @@ export function getOpenPositionWithTokenExtensionsInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -274,16 +276,16 @@ export function getOpenPositionWithTokenExtensionsInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.positionMint),
-      getAccountMeta(accounts.positionTokenAccount),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.token2022Program),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.associatedTokenProgram),
-      getAccountMeta(accounts.metadataUpdateAuth),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("positionMint", accounts.positionMint),
+      getAccountMeta("positionTokenAccount", accounts.positionTokenAccount),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("token2022Program", accounts.token2022Program),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
+      getAccountMeta("metadataUpdateAuth", accounts.metadataUpdateAuth),
     ],
     data: getOpenPositionWithTokenExtensionsInstructionDataEncoder().encode(
       args as OpenPositionWithTokenExtensionsInstructionDataArgs,
@@ -333,8 +335,13 @@ export function parseOpenPositionWithTokenExtensionsInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedOpenPositionWithTokenExtensionsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 10,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

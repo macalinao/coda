@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_REWARD_EMISSIONS_SUPER_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([207, 5, 200, 209, 122, 56, 82, 183]);
@@ -75,7 +77,7 @@ export interface SetRewardEmissionsSuperAuthorityInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface SetRewardEmissionsSuperAuthorityInstructionDataArgs {}
+export type SetRewardEmissionsSuperAuthorityInstructionDataArgs = {};
 
 export function getSetRewardEmissionsSuperAuthorityInstructionDataEncoder(): FixedSizeEncoder<SetRewardEmissionsSuperAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -151,15 +153,21 @@ export function getSetRewardEmissionsSuperAuthorityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.rewardEmissionsSuperAuthority),
-      getAccountMeta(accounts.newRewardEmissionsSuperAuthority),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta(
+        "rewardEmissionsSuperAuthority",
+        accounts.rewardEmissionsSuperAuthority,
+      ),
+      getAccountMeta(
+        "newRewardEmissionsSuperAuthority",
+        accounts.newRewardEmissionsSuperAuthority,
+      ),
     ],
     data: getSetRewardEmissionsSuperAuthorityInstructionDataEncoder().encode(
       {},
@@ -195,8 +203,13 @@ export function parseSetRewardEmissionsSuperAuthorityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetRewardEmissionsSuperAuthorityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

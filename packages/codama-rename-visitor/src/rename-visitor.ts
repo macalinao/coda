@@ -36,53 +36,61 @@ import { renameInstructionTransform } from "./rename-instructions-visitor.js";
  * codama.update(visitor);
  * ```
  */
+interface RenameTransform {
+  select: string;
+  transform: (node: Node) => Node | null;
+}
+
+/**
+ * Builds a transform for each entry of a rename record, targeting nodes of the
+ * given kind within the given program.
+ */
+function buildRenameTransforms(
+  programName: string,
+  nodeKind: string,
+  renames: Record<string, string> | undefined,
+  rename: (node: Node, mapping: Record<string, string>) => Node | null,
+): RenameTransform[] {
+  if (!renames) {
+    return [];
+  }
+  return Object.entries(renames).map(([oldName, newName]) => ({
+    select: `[programNode]${programName}.[${nodeKind}]${oldName}`,
+    transform: (node: Node) => rename(node, { [oldName]: newName }),
+  }));
+}
+
 export function renameVisitor(
   renamesByProgram: Record<string, ProgramRenameOptions>,
 ): ReturnType<typeof rootNodeVisitor> {
   return rootNodeVisitor((root) => {
-    const transforms: {
-      select: string;
-      transform: (node: Node) => Node | null;
-    }[] = [];
+    const transforms: RenameTransform[] = [];
 
     // Process each program's rename configuration
-    Object.entries(renamesByProgram).forEach(([programName, renameOptions]) => {
-      // Add instruction renames for this program
-      if (renameOptions.instructions) {
-        Object.entries(renameOptions.instructions).forEach(
-          ([oldName, newName]) => {
-            transforms.push({
-              select: `[programNode]${programName}.[instructionNode]${oldName}`,
-              transform: (node) =>
-                renameInstructionTransform(node, { [oldName]: newName }),
-            });
-          },
-        );
-      }
-
-      if (renameOptions.accounts) {
-        Object.entries(renameOptions.accounts).forEach(([oldName, newName]) => {
-          transforms.push({
-            select: `[programNode]${programName}.[accountNode]${oldName}`,
-            transform: (node) =>
-              renameAccountTransform(node, { [oldName]: newName }),
-          });
-        });
-      }
-
-      // Add defined type renames for this program
-      if (renameOptions.definedTypes) {
-        Object.entries(renameOptions.definedTypes ?? {}).forEach(
-          ([oldName, newName]) => {
-            transforms.push({
-              select: `[programNode]${programName}.[definedTypeNode]${oldName}`,
-              transform: (node) =>
-                renameDefinedTypeTransform(node, { [oldName]: newName }),
-            });
-          },
-        );
-      }
-    });
+    for (const [programName, renameOptions] of Object.entries(
+      renamesByProgram,
+    )) {
+      transforms.push(
+        ...buildRenameTransforms(
+          programName,
+          "instructionNode",
+          renameOptions.instructions,
+          renameInstructionTransform,
+        ),
+        ...buildRenameTransforms(
+          programName,
+          "accountNode",
+          renameOptions.accounts,
+          renameAccountTransform,
+        ),
+        ...buildRenameTransforms(
+          programName,
+          "definedTypeNode",
+          renameOptions.definedTypes,
+          renameDefinedTypeTransform,
+        ),
+      );
+    }
 
     if (transforms.length === 0) {
       return root;

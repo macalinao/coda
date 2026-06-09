@@ -21,17 +21,19 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REMOVE_REQUIRED_SIGNATORY_DISCRIMINATOR = 30;
 
@@ -67,7 +69,7 @@ export interface RemoveRequiredSignatoryInstructionData {
   discriminator: number;
 }
 
-export interface RemoveRequiredSignatoryInstructionDataArgs {}
+export type RemoveRequiredSignatoryInstructionDataArgs = {};
 
 export function getRemoveRequiredSignatoryInstructionDataEncoder(): FixedSizeEncoder<RemoveRequiredSignatoryInstructionDataArgs> {
   return transformEncoder(
@@ -143,15 +145,18 @@ export function getRemoveRequiredSignatoryInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.requiredSignatoryAccount),
-      getAccountMeta(accounts.beneficiaryAccount),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta(
+        "requiredSignatoryAccount",
+        accounts.requiredSignatoryAccount,
+      ),
+      getAccountMeta("beneficiaryAccount", accounts.beneficiaryAccount),
     ],
     data: getRemoveRequiredSignatoryInstructionDataEncoder().encode({}),
     programAddress,
@@ -186,8 +191,13 @@ export function parseRemoveRequiredSignatoryInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRemoveRequiredSignatoryInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

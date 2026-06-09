@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,15 +33,20 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findPositionNftAccountPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [48, 215, 197, 153, 96, 203, 180, 133],
@@ -120,7 +125,7 @@ export interface CreatePositionInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CreatePositionInstructionDataArgs {}
+export type CreatePositionInstructionDataArgs = {};
 
 export function getCreatePositionInstructionDataEncoder(): FixedSizeEncoder<CreatePositionInstructionDataArgs> {
   return transformEncoder(
@@ -241,13 +246,16 @@ export async function getCreatePositionInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
     accounts.positionNftAccount.value = await findPositionNftAccountPda({
-      positionNftMint: expectAddress(accounts.positionNftMint.value),
+      positionNftMint: getAddressFromResolvedInstructionAccount(
+        "positionNftMint",
+        accounts.positionNftMint.value,
+      ),
     });
   }
   if (!accounts.position.value) {
@@ -258,7 +266,10 @@ export async function getCreatePositionInstructionAsync<
           new Uint8Array([112, 111, 115, 105, 116, 105, 111, 110]),
         ),
         getAddressEncoder().encode(
-          expectAddress(accounts.positionNftMint.value),
+          getAddressFromResolvedInstructionAccount(
+            "positionNftMint",
+            accounts.positionNftMint.value,
+          ),
         ),
       ],
     });
@@ -285,17 +296,17 @@ export async function getCreatePositionInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCreatePositionInstructionDataEncoder().encode({}),
     programAddress,
@@ -409,7 +420,7 @@ export function getCreatePositionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -429,17 +440,17 @@ export function getCreatePositionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCreatePositionInstructionDataEncoder().encode({}),
     programAddress,
@@ -493,8 +504,13 @@ export function parseCreatePositionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreatePositionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

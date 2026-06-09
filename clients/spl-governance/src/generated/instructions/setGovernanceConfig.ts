@@ -20,7 +20,7 @@ import type {
   TransactionSigner,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -28,10 +28,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
@@ -126,7 +128,7 @@ export function getSetGovernanceConfigInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -134,7 +136,7 @@ export function getSetGovernanceConfigInstruction<
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
-    accounts: [getAccountMeta(accounts.governanceAccount)],
+    accounts: [getAccountMeta("governanceAccount", accounts.governanceAccount)],
     data: getSetGovernanceConfigInstructionDataEncoder().encode(
       args as SetGovernanceConfigInstructionDataArgs,
     ),
@@ -165,9 +167,14 @@ export function parseSetGovernanceConfigInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetGovernanceConfigInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 1) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+  if (instruction.accounts.length === 0) {
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 1,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

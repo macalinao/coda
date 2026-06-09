@@ -52,7 +52,7 @@ export interface PoolFeesConfigArgs {
   partnerFeePercent: number;
   referralFeePercent: number;
   padding0: number[];
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 export function getPoolFeesConfigEncoder(): FixedSizeEncoder<PoolFeesConfigArgs> {

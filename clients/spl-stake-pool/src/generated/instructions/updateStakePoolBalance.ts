@@ -19,18 +19,23 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_STAKE_POOL_BALANCE_DISCRIMINATOR = 7;
 
@@ -83,7 +88,7 @@ export interface UpdateStakePoolBalanceInstructionData {
   discriminator: number;
 }
 
-export interface UpdateStakePoolBalanceInstructionDataArgs {}
+export type UpdateStakePoolBalanceInstructionDataArgs = {};
 
 export function getUpdateStakePoolBalanceInstructionDataEncoder(): FixedSizeEncoder<UpdateStakePoolBalanceInstructionDataArgs> {
   return transformEncoder(
@@ -178,13 +183,16 @@ export async function getUpdateStakePoolBalanceInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
     accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: expectAddress(accounts.stakePool.value),
+      stakePoolAddress: getAddressFromResolvedInstructionAccount(
+        "stakePool",
+        accounts.stakePool.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -195,13 +203,13 @@ export async function getUpdateStakePoolBalanceInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.validatorList),
-      getAccountMeta(accounts.reserveStake),
-      getAccountMeta(accounts.feeAccount),
-      getAccountMeta(accounts.poolMint),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("validatorList", accounts.validatorList),
+      getAccountMeta("reserveStake", accounts.reserveStake),
+      getAccountMeta("feeAccount", accounts.feeAccount),
+      getAccountMeta("poolMint", accounts.poolMint),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getUpdateStakePoolBalanceInstructionDataEncoder().encode({}),
     programAddress,
@@ -284,7 +292,7 @@ export function getUpdateStakePoolBalanceInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -296,13 +304,13 @@ export function getUpdateStakePoolBalanceInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.validatorList),
-      getAccountMeta(accounts.reserveStake),
-      getAccountMeta(accounts.feeAccount),
-      getAccountMeta(accounts.poolMint),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("validatorList", accounts.validatorList),
+      getAccountMeta("reserveStake", accounts.reserveStake),
+      getAccountMeta("feeAccount", accounts.feeAccount),
+      getAccountMeta("poolMint", accounts.poolMint),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getUpdateStakePoolBalanceInstructionDataEncoder().encode({}),
     programAddress,
@@ -344,8 +352,13 @@ export function parseUpdateStakePoolBalanceInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateStakePoolBalanceInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

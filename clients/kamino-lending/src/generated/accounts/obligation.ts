@@ -199,7 +199,7 @@ export interface ObligationArgs {
    * Typical use-cases would be a stop-loss and a take-profit (possibly co-existing).
    */
   orders: ObligationOrderArgs[];
-  padding3: (number | bigint)[];
+  padding3: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link ObligationArgs} account data. */

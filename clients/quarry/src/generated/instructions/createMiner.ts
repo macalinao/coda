@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,11 +34,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMinerPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_MINER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   126, 23, 157, 1, 147, 94, 245, 69,
@@ -217,7 +222,7 @@ export async function getCreateMinerInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -226,8 +231,14 @@ export async function getCreateMinerInstructionAsync<
   // Resolve default values.
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({
-      quarry: expectAddress(accounts.quarry.value),
-      authority: expectAddress(accounts.authority.value),
+      quarry: getAddressFromResolvedInstructionAccount(
+        "quarry",
+        accounts.quarry.value,
+      ),
+      authority: getAddressFromResolvedInstructionAccount(
+        "authority",
+        accounts.authority.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -242,15 +253,15 @@ export async function getCreateMinerInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getCreateMinerInstructionDataEncoder().encode(
       args as CreateMinerInstructionDataArgs,
@@ -346,7 +357,7 @@ export function getCreateMinerInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -365,15 +376,15 @@ export function getCreateMinerInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getCreateMinerInstructionDataEncoder().encode(
       args as CreateMinerInstructionDataArgs,
@@ -421,8 +432,13 @@ export function parseCreateMinerInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateMinerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

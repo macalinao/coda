@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_POSITION_BUNDLE_WITH_METADATA_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([93, 124, 16, 179, 249, 131, 115, 245]);
@@ -120,7 +122,7 @@ export interface InitializePositionBundleWithMetadataInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitializePositionBundleWithMetadataInstructionDataArgs {}
+export type InitializePositionBundleWithMetadataInstructionDataArgs = {};
 
 export function getInitializePositionBundleWithMetadataInstructionDataEncoder(): FixedSizeEncoder<InitializePositionBundleWithMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -262,7 +264,7 @@ export function getInitializePositionBundleWithMetadataInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -290,18 +292,21 @@ export function getInitializePositionBundleWithMetadataInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.positionBundle),
-      getAccountMeta(accounts.positionBundleMint),
-      getAccountMeta(accounts.positionBundleMetadata),
-      getAccountMeta(accounts.positionBundleTokenAccount),
-      getAccountMeta(accounts.positionBundleOwner),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.metadataUpdateAuth),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.associatedTokenProgram),
-      getAccountMeta(accounts.metadataProgram),
+      getAccountMeta("positionBundle", accounts.positionBundle),
+      getAccountMeta("positionBundleMint", accounts.positionBundleMint),
+      getAccountMeta("positionBundleMetadata", accounts.positionBundleMetadata),
+      getAccountMeta(
+        "positionBundleTokenAccount",
+        accounts.positionBundleTokenAccount,
+      ),
+      getAccountMeta("positionBundleOwner", accounts.positionBundleOwner),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("metadataUpdateAuth", accounts.metadataUpdateAuth),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
+      getAccountMeta("metadataProgram", accounts.metadataProgram),
     ],
     data: getInitializePositionBundleWithMetadataInstructionDataEncoder().encode(
       {},
@@ -358,8 +363,13 @@ export function parseInitializePositionBundleWithMetadataInstruction<
   TAccountMetas
 > {
   if (instruction.accounts.length < 12) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 12,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

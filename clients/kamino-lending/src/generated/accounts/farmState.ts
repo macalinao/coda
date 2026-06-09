@@ -221,7 +221,7 @@ export interface FarmStateArgs {
   strategyId: Address;
   delegatedRpsAdmin: Address;
   vaultId: Address;
-  padding: (number | bigint)[];
+  padding: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link FarmStateArgs} account data. */

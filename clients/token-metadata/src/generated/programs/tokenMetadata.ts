@@ -6,8 +6,83 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  CollectionAuthorityRecord,
+  CollectionAuthorityRecordArgs,
+  Edition,
+  EditionArgs,
+  EditionMarker,
+  EditionMarkerArgs,
+  EditionMarkerV2,
+  EditionMarkerV2Args,
+  HolderDelegateRecord,
+  HolderDelegateRecordArgs,
+  MasterEditionV1,
+  MasterEditionV1Args,
+  MasterEditionV2,
+  MasterEditionV2Args,
+  Metadata,
+  MetadataArgs,
+  MetadataDelegateRecord,
+  MetadataDelegateRecordArgs,
+  ReservationListV1,
+  ReservationListV1Args,
+  ReservationListV2,
+  ReservationListV2Args,
+  TokenOwnedEscrow,
+  TokenOwnedEscrowArgs,
+  TokenRecord,
+  TokenRecordArgs,
+  UseAuthorityRecord,
+  UseAuthorityRecordArgs,
+} from "../accounts/index.js";
+import type {
+  ApproveCollectionAuthorityAsyncInput,
+  ApproveUseAuthorityAsyncInput,
+  BubblegumSetCollectionSizeInput,
+  BurnAsyncInput,
+  BurnEditionNftInput,
+  BurnNftAsyncInput,
+  CloseAccountsAsyncInput,
+  CloseEscrowAccountAsyncInput,
+  CollectInput,
+  ConvertMasterEditionV1ToV2Input,
+  CreateAsyncInput,
+  CreateEscrowAccountAsyncInput,
+  CreateMasterEditionAsyncInput,
+  CreateMasterEditionV3AsyncInput,
+  CreateMetadataAccountAsyncInput,
+  CreateMetadataAccountV2AsyncInput,
+  CreateMetadataAccountV3AsyncInput,
+  DelegateAsyncInput,
+  DeprecatedCreateMasterEditionAsyncInput,
+  DeprecatedCreateReservationListInput,
+  DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAsyncInput,
+  DeprecatedMintPrintingTokensInput,
+  DeprecatedMintPrintingTokensViaTokenInput,
+  DeprecatedSetReservationListInput,
+  FreezeDelegatedAccountInput,
+  LockAsyncInput,
+  MigrateAsyncInput,
+  MintAsyncInput,
+  MintNewEditionFromMasterEditionViaTokenInput,
+  MintNewEditionFromMasterEditionViaVaultProxyInput,
   ParsedApproveCollectionAuthorityInstruction,
   ParsedApproveUseAuthorityInstruction,
   ParsedBubblegumSetCollectionSizeInstruction,
@@ -66,8 +141,183 @@ import type {
   ParsedVerifyCollectionInstruction,
   ParsedVerifyInstruction,
   ParsedVerifySizedCollectionItemInstruction,
+  PrintInput,
+  PuffMetadataInput,
+  RemoveCreatorVerificationInput,
+  ResizeAsyncInput,
+  RevokeAsyncInput,
+  RevokeCollectionAuthorityAsyncInput,
+  RevokeUseAuthorityAsyncInput,
+  SetAndVerifyCollectionInput,
+  SetAndVerifySizedCollectionItemInput,
+  SetCollectionSizeInput,
+  SetTokenStandardAsyncInput,
+  SignMetadataInput,
+  ThawDelegatedAccountInput,
+  TransferAsyncInput,
+  TransferOutOfEscrowInput,
+  UnlockAsyncInput,
+  UnverifyCollectionInput,
+  UnverifyInput,
+  UnverifySizedCollectionItemInput,
+  UpdateAsyncInput,
+  UpdateMetadataAccountInput,
+  UpdateMetadataAccountV2Input,
+  UpdatePrimarySaleHappenedViaTokenInput,
+  UseAsyncInput,
+  UtilizeAsyncInput,
+  VerifyCollectionInput,
+  VerifyInput,
+  VerifySizedCollectionItemInput,
 } from "../instructions/index.js";
-import { containsBytes, getU8Encoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getCollectionAuthorityRecordCodec,
+  getEditionCodec,
+  getEditionMarkerCodec,
+  getEditionMarkerV2Codec,
+  getHolderDelegateRecordCodec,
+  getMasterEditionV1Codec,
+  getMasterEditionV2Codec,
+  getMetadataCodec,
+  getMetadataDelegateRecordCodec,
+  getReservationListV1Codec,
+  getReservationListV2Codec,
+  getTokenOwnedEscrowCodec,
+  getTokenRecordCodec,
+  getUseAuthorityRecordCodec,
+} from "../accounts/index.js";
+import {
+  getApproveCollectionAuthorityInstructionAsync,
+  getApproveUseAuthorityInstructionAsync,
+  getBubblegumSetCollectionSizeInstruction,
+  getBurnEditionNftInstruction,
+  getBurnInstructionAsync,
+  getBurnNftInstructionAsync,
+  getCloseAccountsInstructionAsync,
+  getCloseEscrowAccountInstructionAsync,
+  getCollectInstruction,
+  getConvertMasterEditionV1ToV2Instruction,
+  getCreateEscrowAccountInstructionAsync,
+  getCreateInstructionAsync,
+  getCreateMasterEditionInstructionAsync,
+  getCreateMasterEditionV3InstructionAsync,
+  getCreateMetadataAccountInstructionAsync,
+  getCreateMetadataAccountV2InstructionAsync,
+  getCreateMetadataAccountV3InstructionAsync,
+  getDelegateInstructionAsync,
+  getDeprecatedCreateMasterEditionInstructionAsync,
+  getDeprecatedCreateReservationListInstruction,
+  getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionAsync,
+  getDeprecatedMintPrintingTokensInstruction,
+  getDeprecatedMintPrintingTokensViaTokenInstruction,
+  getDeprecatedSetReservationListInstruction,
+  getFreezeDelegatedAccountInstruction,
+  getLockInstructionAsync,
+  getMigrateInstructionAsync,
+  getMintInstructionAsync,
+  getMintNewEditionFromMasterEditionViaTokenInstruction,
+  getMintNewEditionFromMasterEditionViaVaultProxyInstruction,
+  getPrintInstruction,
+  getPuffMetadataInstruction,
+  getRemoveCreatorVerificationInstruction,
+  getResizeInstructionAsync,
+  getRevokeCollectionAuthorityInstructionAsync,
+  getRevokeInstructionAsync,
+  getRevokeUseAuthorityInstructionAsync,
+  getSetAndVerifyCollectionInstruction,
+  getSetAndVerifySizedCollectionItemInstruction,
+  getSetCollectionSizeInstruction,
+  getSetTokenStandardInstructionAsync,
+  getSignMetadataInstruction,
+  getThawDelegatedAccountInstruction,
+  getTransferInstructionAsync,
+  getTransferOutOfEscrowInstruction,
+  getUnlockInstructionAsync,
+  getUnverifyCollectionInstruction,
+  getUnverifyInstruction,
+  getUnverifySizedCollectionItemInstruction,
+  getUpdateInstructionAsync,
+  getUpdateMetadataAccountInstruction,
+  getUpdateMetadataAccountV2Instruction,
+  getUpdatePrimarySaleHappenedViaTokenInstruction,
+  getUseInstructionAsync,
+  getUtilizeInstructionAsync,
+  getVerifyCollectionInstruction,
+  getVerifyInstruction,
+  getVerifySizedCollectionItemInstruction,
+  parseApproveCollectionAuthorityInstruction,
+  parseApproveUseAuthorityInstruction,
+  parseBubblegumSetCollectionSizeInstruction,
+  parseBurnEditionNftInstruction,
+  parseBurnInstruction,
+  parseBurnNftInstruction,
+  parseCloseAccountsInstruction,
+  parseCloseEscrowAccountInstruction,
+  parseCollectInstruction,
+  parseConvertMasterEditionV1ToV2Instruction,
+  parseCreateEscrowAccountInstruction,
+  parseCreateInstruction,
+  parseCreateMasterEditionInstruction,
+  parseCreateMasterEditionV3Instruction,
+  parseCreateMetadataAccountInstruction,
+  parseCreateMetadataAccountV2Instruction,
+  parseCreateMetadataAccountV3Instruction,
+  parseDelegateInstruction,
+  parseDeprecatedCreateMasterEditionInstruction,
+  parseDeprecatedCreateReservationListInstruction,
+  parseDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction,
+  parseDeprecatedMintPrintingTokensInstruction,
+  parseDeprecatedMintPrintingTokensViaTokenInstruction,
+  parseDeprecatedSetReservationListInstruction,
+  parseFreezeDelegatedAccountInstruction,
+  parseLockInstruction,
+  parseMigrateInstruction,
+  parseMintInstruction,
+  parseMintNewEditionFromMasterEditionViaTokenInstruction,
+  parseMintNewEditionFromMasterEditionViaVaultProxyInstruction,
+  parsePrintInstruction,
+  parsePuffMetadataInstruction,
+  parseRemoveCreatorVerificationInstruction,
+  parseResizeInstruction,
+  parseRevokeCollectionAuthorityInstruction,
+  parseRevokeInstruction,
+  parseRevokeUseAuthorityInstruction,
+  parseSetAndVerifyCollectionInstruction,
+  parseSetAndVerifySizedCollectionItemInstruction,
+  parseSetCollectionSizeInstruction,
+  parseSetTokenStandardInstruction,
+  parseSignMetadataInstruction,
+  parseThawDelegatedAccountInstruction,
+  parseTransferInstruction,
+  parseTransferOutOfEscrowInstruction,
+  parseUnlockInstruction,
+  parseUnverifyCollectionInstruction,
+  parseUnverifyInstruction,
+  parseUnverifySizedCollectionItemInstruction,
+  parseUpdateInstruction,
+  parseUpdateMetadataAccountInstruction,
+  parseUpdateMetadataAccountV2Instruction,
+  parseUpdatePrimarySaleHappenedViaTokenInstruction,
+  parseUseInstruction,
+  parseUtilizeInstruction,
+  parseVerifyCollectionInstruction,
+  parseVerifyInstruction,
+  parseVerifySizedCollectionItemInstruction,
+} from "../instructions/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 
 export const TOKEN_METADATA_PROGRAM_ADDRESS =
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
@@ -328,8 +578,9 @@ export function identifyTokenMetadataInstruction(
   if (containsBytes(data, getU8Encoder().encode(57), 0)) {
     return TokenMetadataInstruction.CloseAccounts;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a tokenMetadata instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "tokenMetadata" },
   );
 }
 
@@ -510,3 +761,1157 @@ export type ParsedTokenMetadataInstruction<
   | ({
       instructionType: TokenMetadataInstruction.CloseAccounts;
     } & ParsedCloseAccountsInstruction<TProgram>);
+
+export function parseTokenMetadataInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedTokenMetadataInstruction<TProgram> {
+  const instructionType = identifyTokenMetadataInstruction(instruction);
+  switch (instructionType) {
+    case TokenMetadataInstruction.CreateMetadataAccount: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CreateMetadataAccount,
+        ...parseCreateMetadataAccountInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.UpdateMetadataAccount: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.UpdateMetadataAccount,
+        ...parseUpdateMetadataAccountInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.DeprecatedCreateMasterEdition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.DeprecatedCreateMasterEdition,
+        ...parseDeprecatedCreateMasterEditionInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.DeprecatedMintNewEditionFromMasterEditionViaPrintingToken: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          TokenMetadataInstruction.DeprecatedMintNewEditionFromMasterEditionViaPrintingToken,
+        ...parseDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction(
+          instruction,
+        ),
+      };
+    }
+    case TokenMetadataInstruction.UpdatePrimarySaleHappenedViaToken: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          TokenMetadataInstruction.UpdatePrimarySaleHappenedViaToken,
+        ...parseUpdatePrimarySaleHappenedViaTokenInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.DeprecatedSetReservationList: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.DeprecatedSetReservationList,
+        ...parseDeprecatedSetReservationListInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.DeprecatedCreateReservationList: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          TokenMetadataInstruction.DeprecatedCreateReservationList,
+        ...parseDeprecatedCreateReservationListInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.SignMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.SignMetadata,
+        ...parseSignMetadataInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.DeprecatedMintPrintingTokensViaToken: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          TokenMetadataInstruction.DeprecatedMintPrintingTokensViaToken,
+        ...parseDeprecatedMintPrintingTokensViaTokenInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.DeprecatedMintPrintingTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.DeprecatedMintPrintingTokens,
+        ...parseDeprecatedMintPrintingTokensInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.CreateMasterEdition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CreateMasterEdition,
+        ...parseCreateMasterEditionInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.MintNewEditionFromMasterEditionViaToken: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          TokenMetadataInstruction.MintNewEditionFromMasterEditionViaToken,
+        ...parseMintNewEditionFromMasterEditionViaTokenInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.ConvertMasterEditionV1ToV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.ConvertMasterEditionV1ToV2,
+        ...parseConvertMasterEditionV1ToV2Instruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.MintNewEditionFromMasterEditionViaVaultProxy: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          TokenMetadataInstruction.MintNewEditionFromMasterEditionViaVaultProxy,
+        ...parseMintNewEditionFromMasterEditionViaVaultProxyInstruction(
+          instruction,
+        ),
+      };
+    }
+    case TokenMetadataInstruction.PuffMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.PuffMetadata,
+        ...parsePuffMetadataInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.UpdateMetadataAccountV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.UpdateMetadataAccountV2,
+        ...parseUpdateMetadataAccountV2Instruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.CreateMetadataAccountV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CreateMetadataAccountV2,
+        ...parseCreateMetadataAccountV2Instruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.CreateMasterEditionV3: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CreateMasterEditionV3,
+        ...parseCreateMasterEditionV3Instruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.VerifyCollection: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.VerifyCollection,
+        ...parseVerifyCollectionInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Utilize: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Utilize,
+        ...parseUtilizeInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.ApproveUseAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.ApproveUseAuthority,
+        ...parseApproveUseAuthorityInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.RevokeUseAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.RevokeUseAuthority,
+        ...parseRevokeUseAuthorityInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.UnverifyCollection: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.UnverifyCollection,
+        ...parseUnverifyCollectionInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.ApproveCollectionAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.ApproveCollectionAuthority,
+        ...parseApproveCollectionAuthorityInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.RevokeCollectionAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.RevokeCollectionAuthority,
+        ...parseRevokeCollectionAuthorityInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.SetAndVerifyCollection: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.SetAndVerifyCollection,
+        ...parseSetAndVerifyCollectionInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.FreezeDelegatedAccount: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.FreezeDelegatedAccount,
+        ...parseFreezeDelegatedAccountInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.ThawDelegatedAccount: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.ThawDelegatedAccount,
+        ...parseThawDelegatedAccountInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.RemoveCreatorVerification: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.RemoveCreatorVerification,
+        ...parseRemoveCreatorVerificationInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.BurnNft: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.BurnNft,
+        ...parseBurnNftInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.VerifySizedCollectionItem: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.VerifySizedCollectionItem,
+        ...parseVerifySizedCollectionItemInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.UnverifySizedCollectionItem: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.UnverifySizedCollectionItem,
+        ...parseUnverifySizedCollectionItemInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.SetAndVerifySizedCollectionItem: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          TokenMetadataInstruction.SetAndVerifySizedCollectionItem,
+        ...parseSetAndVerifySizedCollectionItemInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.CreateMetadataAccountV3: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CreateMetadataAccountV3,
+        ...parseCreateMetadataAccountV3Instruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.SetCollectionSize: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.SetCollectionSize,
+        ...parseSetCollectionSizeInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.SetTokenStandard: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.SetTokenStandard,
+        ...parseSetTokenStandardInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.BubblegumSetCollectionSize: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.BubblegumSetCollectionSize,
+        ...parseBubblegumSetCollectionSizeInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.BurnEditionNft: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.BurnEditionNft,
+        ...parseBurnEditionNftInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.CreateEscrowAccount: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CreateEscrowAccount,
+        ...parseCreateEscrowAccountInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.CloseEscrowAccount: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CloseEscrowAccount,
+        ...parseCloseEscrowAccountInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.TransferOutOfEscrow: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.TransferOutOfEscrow,
+        ...parseTransferOutOfEscrowInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Burn: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Burn,
+        ...parseBurnInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Create: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Create,
+        ...parseCreateInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Mint: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Mint,
+        ...parseMintInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Delegate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Delegate,
+        ...parseDelegateInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Revoke: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Revoke,
+        ...parseRevokeInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Lock: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Lock,
+        ...parseLockInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Unlock: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Unlock,
+        ...parseUnlockInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Migrate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Migrate,
+        ...parseMigrateInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Transfer: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Transfer,
+        ...parseTransferInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Update: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Update,
+        ...parseUpdateInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Use: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Use,
+        ...parseUseInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Verify: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Verify,
+        ...parseVerifyInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Unverify: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Unverify,
+        ...parseUnverifyInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Collect: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Collect,
+        ...parseCollectInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Print: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Print,
+        ...parsePrintInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.Resize: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.Resize,
+        ...parseResizeInstruction(instruction),
+      };
+    }
+    case TokenMetadataInstruction.CloseAccounts: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: TokenMetadataInstruction.CloseAccounts,
+        ...parseCloseAccountsInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "tokenMetadata",
+        },
+      );
+  }
+}
+
+export interface TokenMetadataPlugin {
+  accounts: TokenMetadataPluginAccounts;
+  instructions: TokenMetadataPluginInstructions;
+  pdas: TokenMetadataPluginPdas;
+}
+
+export interface TokenMetadataPluginAccounts {
+  collectionAuthorityRecord: ReturnType<
+    typeof getCollectionAuthorityRecordCodec
+  > &
+    SelfFetchFunctions<
+      CollectionAuthorityRecordArgs,
+      CollectionAuthorityRecord
+    >;
+  metadataDelegateRecord: ReturnType<typeof getMetadataDelegateRecordCodec> &
+    SelfFetchFunctions<MetadataDelegateRecordArgs, MetadataDelegateRecord>;
+  holderDelegateRecord: ReturnType<typeof getHolderDelegateRecordCodec> &
+    SelfFetchFunctions<HolderDelegateRecordArgs, HolderDelegateRecord>;
+  edition: ReturnType<typeof getEditionCodec> &
+    SelfFetchFunctions<EditionArgs, Edition>;
+  editionMarker: ReturnType<typeof getEditionMarkerCodec> &
+    SelfFetchFunctions<EditionMarkerArgs, EditionMarker>;
+  editionMarkerV2: ReturnType<typeof getEditionMarkerV2Codec> &
+    SelfFetchFunctions<EditionMarkerV2Args, EditionMarkerV2>;
+  tokenOwnedEscrow: ReturnType<typeof getTokenOwnedEscrowCodec> &
+    SelfFetchFunctions<TokenOwnedEscrowArgs, TokenOwnedEscrow>;
+  masterEditionV2: ReturnType<typeof getMasterEditionV2Codec> &
+    SelfFetchFunctions<MasterEditionV2Args, MasterEditionV2>;
+  masterEditionV1: ReturnType<typeof getMasterEditionV1Codec> &
+    SelfFetchFunctions<MasterEditionV1Args, MasterEditionV1>;
+  metadata: ReturnType<typeof getMetadataCodec> &
+    SelfFetchFunctions<MetadataArgs, Metadata>;
+  tokenRecord: ReturnType<typeof getTokenRecordCodec> &
+    SelfFetchFunctions<TokenRecordArgs, TokenRecord>;
+  reservationListV2: ReturnType<typeof getReservationListV2Codec> &
+    SelfFetchFunctions<ReservationListV2Args, ReservationListV2>;
+  reservationListV1: ReturnType<typeof getReservationListV1Codec> &
+    SelfFetchFunctions<ReservationListV1Args, ReservationListV1>;
+  useAuthorityRecord: ReturnType<typeof getUseAuthorityRecordCodec> &
+    SelfFetchFunctions<UseAuthorityRecordArgs, UseAuthorityRecord>;
+}
+
+export interface TokenMetadataPluginInstructions {
+  createMetadataAccount: (
+    input: MakeOptional<CreateMetadataAccountAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateMetadataAccountInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateMetadataAccount: (
+    input: UpdateMetadataAccountInput,
+  ) => ReturnType<typeof getUpdateMetadataAccountInstruction> &
+    SelfPlanAndSendFunctions;
+  deprecatedCreateMasterEdition: (
+    input: MakeOptional<DeprecatedCreateMasterEditionAsyncInput, "payer">,
+  ) => ReturnType<typeof getDeprecatedCreateMasterEditionInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  deprecatedMintNewEditionFromMasterEditionViaPrintingToken: (
+    input: MakeOptional<
+      DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAsyncInput,
+      "payer"
+    >,
+  ) => ReturnType<
+    typeof getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionAsync
+  > &
+    SelfPlanAndSendFunctions;
+  updatePrimarySaleHappenedViaToken: (
+    input: UpdatePrimarySaleHappenedViaTokenInput,
+  ) => ReturnType<typeof getUpdatePrimarySaleHappenedViaTokenInstruction> &
+    SelfPlanAndSendFunctions;
+  deprecatedSetReservationList: (
+    input: DeprecatedSetReservationListInput,
+  ) => ReturnType<typeof getDeprecatedSetReservationListInstruction> &
+    SelfPlanAndSendFunctions;
+  deprecatedCreateReservationList: (
+    input: MakeOptional<DeprecatedCreateReservationListInput, "payer">,
+  ) => ReturnType<typeof getDeprecatedCreateReservationListInstruction> &
+    SelfPlanAndSendFunctions;
+  signMetadata: (
+    input: SignMetadataInput,
+  ) => ReturnType<typeof getSignMetadataInstruction> & SelfPlanAndSendFunctions;
+  deprecatedMintPrintingTokensViaToken: (
+    input: DeprecatedMintPrintingTokensViaTokenInput,
+  ) => ReturnType<typeof getDeprecatedMintPrintingTokensViaTokenInstruction> &
+    SelfPlanAndSendFunctions;
+  deprecatedMintPrintingTokens: (
+    input: DeprecatedMintPrintingTokensInput,
+  ) => ReturnType<typeof getDeprecatedMintPrintingTokensInstruction> &
+    SelfPlanAndSendFunctions;
+  createMasterEdition: (
+    input: MakeOptional<CreateMasterEditionAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateMasterEditionInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  mintNewEditionFromMasterEditionViaToken: (
+    input: MakeOptional<MintNewEditionFromMasterEditionViaTokenInput, "payer">,
+  ) => ReturnType<
+    typeof getMintNewEditionFromMasterEditionViaTokenInstruction
+  > &
+    SelfPlanAndSendFunctions;
+  convertMasterEditionV1ToV2: (
+    input: ConvertMasterEditionV1ToV2Input,
+  ) => ReturnType<typeof getConvertMasterEditionV1ToV2Instruction> &
+    SelfPlanAndSendFunctions;
+  mintNewEditionFromMasterEditionViaVaultProxy: (
+    input: MakeOptional<
+      MintNewEditionFromMasterEditionViaVaultProxyInput,
+      "payer"
+    >,
+  ) => ReturnType<
+    typeof getMintNewEditionFromMasterEditionViaVaultProxyInstruction
+  > &
+    SelfPlanAndSendFunctions;
+  puffMetadata: (
+    input: PuffMetadataInput,
+  ) => ReturnType<typeof getPuffMetadataInstruction> & SelfPlanAndSendFunctions;
+  updateMetadataAccountV2: (
+    input: UpdateMetadataAccountV2Input,
+  ) => ReturnType<typeof getUpdateMetadataAccountV2Instruction> &
+    SelfPlanAndSendFunctions;
+  createMetadataAccountV2: (
+    input: MakeOptional<CreateMetadataAccountV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateMetadataAccountV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createMasterEditionV3: (
+    input: MakeOptional<CreateMasterEditionV3AsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateMasterEditionV3InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  verifyCollection: (
+    input: MakeOptional<VerifyCollectionInput, "payer">,
+  ) => ReturnType<typeof getVerifyCollectionInstruction> &
+    SelfPlanAndSendFunctions;
+  utilize: (
+    input: UtilizeAsyncInput,
+  ) => ReturnType<typeof getUtilizeInstructionAsync> & SelfPlanAndSendFunctions;
+  approveUseAuthority: (
+    input: MakeOptional<ApproveUseAuthorityAsyncInput, "payer">,
+  ) => ReturnType<typeof getApproveUseAuthorityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  revokeUseAuthority: (
+    input: RevokeUseAuthorityAsyncInput,
+  ) => ReturnType<typeof getRevokeUseAuthorityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  unverifyCollection: (
+    input: UnverifyCollectionInput,
+  ) => ReturnType<typeof getUnverifyCollectionInstruction> &
+    SelfPlanAndSendFunctions;
+  approveCollectionAuthority: (
+    input: MakeOptional<ApproveCollectionAuthorityAsyncInput, "payer">,
+  ) => ReturnType<typeof getApproveCollectionAuthorityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  revokeCollectionAuthority: (
+    input: RevokeCollectionAuthorityAsyncInput,
+  ) => ReturnType<typeof getRevokeCollectionAuthorityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setAndVerifyCollection: (
+    input: MakeOptional<SetAndVerifyCollectionInput, "payer">,
+  ) => ReturnType<typeof getSetAndVerifyCollectionInstruction> &
+    SelfPlanAndSendFunctions;
+  freezeDelegatedAccount: (
+    input: FreezeDelegatedAccountInput,
+  ) => ReturnType<typeof getFreezeDelegatedAccountInstruction> &
+    SelfPlanAndSendFunctions;
+  thawDelegatedAccount: (
+    input: ThawDelegatedAccountInput,
+  ) => ReturnType<typeof getThawDelegatedAccountInstruction> &
+    SelfPlanAndSendFunctions;
+  removeCreatorVerification: (
+    input: RemoveCreatorVerificationInput,
+  ) => ReturnType<typeof getRemoveCreatorVerificationInstruction> &
+    SelfPlanAndSendFunctions;
+  burnNft: (
+    input: BurnNftAsyncInput,
+  ) => ReturnType<typeof getBurnNftInstructionAsync> & SelfPlanAndSendFunctions;
+  verifySizedCollectionItem: (
+    input: MakeOptional<VerifySizedCollectionItemInput, "payer">,
+  ) => ReturnType<typeof getVerifySizedCollectionItemInstruction> &
+    SelfPlanAndSendFunctions;
+  unverifySizedCollectionItem: (
+    input: MakeOptional<UnverifySizedCollectionItemInput, "payer">,
+  ) => ReturnType<typeof getUnverifySizedCollectionItemInstruction> &
+    SelfPlanAndSendFunctions;
+  setAndVerifySizedCollectionItem: (
+    input: MakeOptional<SetAndVerifySizedCollectionItemInput, "payer">,
+  ) => ReturnType<typeof getSetAndVerifySizedCollectionItemInstruction> &
+    SelfPlanAndSendFunctions;
+  createMetadataAccountV3: (
+    input: MakeOptional<CreateMetadataAccountV3AsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateMetadataAccountV3InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setCollectionSize: (
+    input: SetCollectionSizeInput,
+  ) => ReturnType<typeof getSetCollectionSizeInstruction> &
+    SelfPlanAndSendFunctions;
+  setTokenStandard: (
+    input: SetTokenStandardAsyncInput,
+  ) => ReturnType<typeof getSetTokenStandardInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  bubblegumSetCollectionSize: (
+    input: BubblegumSetCollectionSizeInput,
+  ) => ReturnType<typeof getBubblegumSetCollectionSizeInstruction> &
+    SelfPlanAndSendFunctions;
+  burnEditionNft: (
+    input: BurnEditionNftInput,
+  ) => ReturnType<typeof getBurnEditionNftInstruction> &
+    SelfPlanAndSendFunctions;
+  createEscrowAccount: (
+    input: MakeOptional<CreateEscrowAccountAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateEscrowAccountInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  closeEscrowAccount: (
+    input: MakeOptional<CloseEscrowAccountAsyncInput, "payer">,
+  ) => ReturnType<typeof getCloseEscrowAccountInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  transferOutOfEscrow: (
+    input: MakeOptional<TransferOutOfEscrowInput, "payer">,
+  ) => ReturnType<typeof getTransferOutOfEscrowInstruction> &
+    SelfPlanAndSendFunctions;
+  burn: (
+    input: BurnAsyncInput,
+  ) => ReturnType<typeof getBurnInstructionAsync> & SelfPlanAndSendFunctions;
+  create: (
+    input: MakeOptional<CreateAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateInstructionAsync> & SelfPlanAndSendFunctions;
+  mint: (
+    input: MakeOptional<MintAsyncInput, "payer">,
+  ) => ReturnType<typeof getMintInstructionAsync> & SelfPlanAndSendFunctions;
+  delegate: (
+    input: MakeOptional<DelegateAsyncInput, "payer">,
+  ) => ReturnType<typeof getDelegateInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  revoke: (
+    input: MakeOptional<RevokeAsyncInput, "payer">,
+  ) => ReturnType<typeof getRevokeInstructionAsync> & SelfPlanAndSendFunctions;
+  lock: (
+    input: MakeOptional<LockAsyncInput, "payer">,
+  ) => ReturnType<typeof getLockInstructionAsync> & SelfPlanAndSendFunctions;
+  unlock: (
+    input: MakeOptional<UnlockAsyncInput, "payer">,
+  ) => ReturnType<typeof getUnlockInstructionAsync> & SelfPlanAndSendFunctions;
+  migrate: (
+    input: MakeOptional<MigrateAsyncInput, "payer">,
+  ) => ReturnType<typeof getMigrateInstructionAsync> & SelfPlanAndSendFunctions;
+  transfer: (
+    input: MakeOptional<TransferAsyncInput, "payer">,
+  ) => ReturnType<typeof getTransferInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  update: (
+    input: MakeOptional<UpdateAsyncInput, "payer">,
+  ) => ReturnType<typeof getUpdateInstructionAsync> & SelfPlanAndSendFunctions;
+  use: (
+    input: MakeOptional<UseAsyncInput, "payer">,
+  ) => ReturnType<typeof getUseInstructionAsync> & SelfPlanAndSendFunctions;
+  verify: (
+    input: VerifyInput,
+  ) => ReturnType<typeof getVerifyInstruction> & SelfPlanAndSendFunctions;
+  unverify: (
+    input: UnverifyInput,
+  ) => ReturnType<typeof getUnverifyInstruction> & SelfPlanAndSendFunctions;
+  collect: (
+    input: CollectInput,
+  ) => ReturnType<typeof getCollectInstruction> & SelfPlanAndSendFunctions;
+  print: (
+    input: MakeOptional<PrintInput, "payer">,
+  ) => ReturnType<typeof getPrintInstruction> & SelfPlanAndSendFunctions;
+  resize: (
+    input: MakeOptional<ResizeAsyncInput, "payer">,
+  ) => ReturnType<typeof getResizeInstructionAsync> & SelfPlanAndSendFunctions;
+  closeAccounts: (
+    input: CloseAccountsAsyncInput,
+  ) => ReturnType<typeof getCloseAccountsInstructionAsync> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface TokenMetadataPluginPdas {
+  metadata: typeof findMetadataPda;
+  masterEdition: typeof findMasterEditionPda;
+}
+
+export type TokenMetadataPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function tokenMetadataProgram() {
+  return <T extends TokenMetadataPluginRequirements>(
+    client: T,
+  ): Omit<T, "tokenMetadata"> & { tokenMetadata: TokenMetadataPlugin } => {
+    return extendClient(client, {
+      tokenMetadata: <TokenMetadataPlugin>{
+        accounts: {
+          collectionAuthorityRecord: addSelfFetchFunctions(
+            client,
+            getCollectionAuthorityRecordCodec(),
+          ),
+          metadataDelegateRecord: addSelfFetchFunctions(
+            client,
+            getMetadataDelegateRecordCodec(),
+          ),
+          holderDelegateRecord: addSelfFetchFunctions(
+            client,
+            getHolderDelegateRecordCodec(),
+          ),
+          edition: addSelfFetchFunctions(client, getEditionCodec()),
+          editionMarker: addSelfFetchFunctions(client, getEditionMarkerCodec()),
+          editionMarkerV2: addSelfFetchFunctions(
+            client,
+            getEditionMarkerV2Codec(),
+          ),
+          tokenOwnedEscrow: addSelfFetchFunctions(
+            client,
+            getTokenOwnedEscrowCodec(),
+          ),
+          masterEditionV2: addSelfFetchFunctions(
+            client,
+            getMasterEditionV2Codec(),
+          ),
+          masterEditionV1: addSelfFetchFunctions(
+            client,
+            getMasterEditionV1Codec(),
+          ),
+          metadata: addSelfFetchFunctions(client, getMetadataCodec()),
+          tokenRecord: addSelfFetchFunctions(client, getTokenRecordCodec()),
+          reservationListV2: addSelfFetchFunctions(
+            client,
+            getReservationListV2Codec(),
+          ),
+          reservationListV1: addSelfFetchFunctions(
+            client,
+            getReservationListV1Codec(),
+          ),
+          useAuthorityRecord: addSelfFetchFunctions(
+            client,
+            getUseAuthorityRecordCodec(),
+          ),
+        },
+        instructions: {
+          createMetadataAccount: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMetadataAccountInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          updateMetadataAccount: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateMetadataAccountInstruction(input),
+            ),
+          deprecatedCreateMasterEdition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeprecatedCreateMasterEditionInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          deprecatedMintNewEditionFromMasterEditionViaPrintingToken: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+              ),
+            ),
+          updatePrimarySaleHappenedViaToken: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdatePrimarySaleHappenedViaTokenInstruction(input),
+            ),
+          deprecatedSetReservationList: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeprecatedSetReservationListInstruction(input),
+            ),
+          deprecatedCreateReservationList: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeprecatedCreateReservationListInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          signMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSignMetadataInstruction(input),
+            ),
+          deprecatedMintPrintingTokensViaToken: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeprecatedMintPrintingTokensViaTokenInstruction(input),
+            ),
+          deprecatedMintPrintingTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeprecatedMintPrintingTokensInstruction(input),
+            ),
+          createMasterEdition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMasterEditionInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          mintNewEditionFromMasterEditionViaToken: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintNewEditionFromMasterEditionViaTokenInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          convertMasterEditionV1ToV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getConvertMasterEditionV1ToV2Instruction(input),
+            ),
+          mintNewEditionFromMasterEditionViaVaultProxy: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintNewEditionFromMasterEditionViaVaultProxyInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          puffMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getPuffMetadataInstruction(input),
+            ),
+          updateMetadataAccountV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateMetadataAccountV2Instruction(input),
+            ),
+          createMetadataAccountV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMetadataAccountV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createMasterEditionV3: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMasterEditionV3InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          verifyCollection: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getVerifyCollectionInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          utilize: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUtilizeInstructionAsync(input),
+            ),
+          approveUseAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getApproveUseAuthorityInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          revokeUseAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeUseAuthorityInstructionAsync(input),
+            ),
+          unverifyCollection: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUnverifyCollectionInstruction(input),
+            ),
+          approveCollectionAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getApproveCollectionAuthorityInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          revokeCollectionAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeCollectionAuthorityInstructionAsync(input),
+            ),
+          setAndVerifyCollection: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetAndVerifyCollectionInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          freezeDelegatedAccount: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFreezeDelegatedAccountInstruction(input),
+            ),
+          thawDelegatedAccount: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getThawDelegatedAccountInstruction(input),
+            ),
+          removeCreatorVerification: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveCreatorVerificationInstruction(input),
+            ),
+          burnNft: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBurnNftInstructionAsync(input),
+            ),
+          verifySizedCollectionItem: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getVerifySizedCollectionItemInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          unverifySizedCollectionItem: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUnverifySizedCollectionItemInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setAndVerifySizedCollectionItem: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetAndVerifySizedCollectionItemInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createMetadataAccountV3: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMetadataAccountV3InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setCollectionSize: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetCollectionSizeInstruction(input),
+            ),
+          setTokenStandard: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetTokenStandardInstructionAsync(input),
+            ),
+          bubblegumSetCollectionSize: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBubblegumSetCollectionSizeInstruction(input),
+            ),
+          burnEditionNft: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBurnEditionNftInstruction(input),
+            ),
+          createEscrowAccount: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateEscrowAccountInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          closeEscrowAccount: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseEscrowAccountInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          transferOutOfEscrow: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferOutOfEscrowInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          burn: (input) =>
+            addSelfPlanAndSendFunctions(client, getBurnInstructionAsync(input)),
+          create: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          mint: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          delegate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          revoke: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          lock: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          unlock: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUnlockInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          migrate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMigrateInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          transfer: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          update: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          use: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUseInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          verify: (input) =>
+            addSelfPlanAndSendFunctions(client, getVerifyInstruction(input)),
+          unverify: (input) =>
+            addSelfPlanAndSendFunctions(client, getUnverifyInstruction(input)),
+          collect: (input) =>
+            addSelfPlanAndSendFunctions(client, getCollectInstruction(input)),
+          print: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getPrintInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          resize: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getResizeInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          closeAccounts: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseAccountsInstructionAsync(input),
+            ),
+        },
+        pdas: {
+          metadata: findMetadataPda,
+          masterEdition: findMasterEditionPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

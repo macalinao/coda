@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU16Decoder,
   getU16Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_PROTOCOL_FEE_RATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([95, 7, 4, 50, 154, 79, 156, 131]);
@@ -153,7 +155,7 @@ export function getSetProtocolFeeRateInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -162,9 +164,9 @@ export function getSetProtocolFeeRateInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.feeAuthority),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("feeAuthority", accounts.feeAuthority),
     ],
     data: getSetProtocolFeeRateInstructionDataEncoder().encode(
       args as SetProtocolFeeRateInstructionDataArgs,
@@ -200,8 +202,13 @@ export function parseSetProtocolFeeRateInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetProtocolFeeRateInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -21,17 +21,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPRECATED_SET_RESERVATION_LIST_DISCRIMINATOR = 5;
 
@@ -67,7 +69,7 @@ export interface DeprecatedSetReservationListInstructionData {
   discriminator: number;
 }
 
-export interface DeprecatedSetReservationListInstructionDataArgs {}
+export type DeprecatedSetReservationListInstructionDataArgs = {};
 
 export function getDeprecatedSetReservationListInstructionDataEncoder(): FixedSizeEncoder<DeprecatedSetReservationListInstructionDataArgs> {
   return transformEncoder(
@@ -136,15 +138,15 @@ export function getDeprecatedSetReservationListInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.reservationList),
-      getAccountMeta(accounts.resource),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("reservationList", accounts.reservationList),
+      getAccountMeta("resource", accounts.resource),
     ],
     data: getDeprecatedSetReservationListInstructionDataEncoder().encode({}),
     programAddress,
@@ -181,8 +183,13 @@ export function parseDeprecatedSetReservationListInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDeprecatedSetReservationListInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

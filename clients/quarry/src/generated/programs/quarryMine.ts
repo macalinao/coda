@@ -6,8 +6,41 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  Miner,
+  MinerArgs,
+  Quarry,
+  QuarryArgs,
+  Rewarder,
+  RewarderArgs,
+} from "../accounts/index.js";
+import type {
+  AcceptAuthorityInput,
+  ClaimRewardsAsyncInput,
+  ClaimRewardsV2AsyncInput,
+  CreateMinerAsyncInput,
+  CreateMinerV2AsyncInput,
+  CreateQuarryAsyncInput,
+  CreateQuarryV2AsyncInput,
+  ExtractFeesInput,
+  NewRewarderAsyncInput,
+  NewRewarderV2AsyncInput,
   ParsedAcceptAuthorityInstruction,
   ParsedClaimRewardsInstruction,
   ParsedClaimRewardsV2Instruction,
@@ -29,8 +62,83 @@ import type {
   ParsedUnpauseInstruction,
   ParsedUpdateQuarryRewardsInstruction,
   ParsedWithdrawTokensInstruction,
+  PauseInput,
+  RescueTokensInput,
+  SetAnnualRewardsInput,
+  SetFamineInput,
+  SetPauseAuthorityInput,
+  SetRewardsShareInput,
+  StakeTokensAsyncInput,
+  TransferAuthorityInput,
+  UnpauseInput,
+  UpdateQuarryRewardsInput,
+  WithdrawTokensAsyncInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getMinerCodec,
+  getQuarryCodec,
+  getRewarderCodec,
+} from "../accounts/index.js";
+import {
+  getAcceptAuthorityInstruction,
+  getClaimRewardsInstructionAsync,
+  getClaimRewardsV2InstructionAsync,
+  getCreateMinerInstructionAsync,
+  getCreateMinerV2InstructionAsync,
+  getCreateQuarryInstructionAsync,
+  getCreateQuarryV2InstructionAsync,
+  getExtractFeesInstruction,
+  getNewRewarderInstructionAsync,
+  getNewRewarderV2InstructionAsync,
+  getPauseInstruction,
+  getRescueTokensInstruction,
+  getSetAnnualRewardsInstruction,
+  getSetFamineInstruction,
+  getSetPauseAuthorityInstruction,
+  getSetRewardsShareInstruction,
+  getStakeTokensInstructionAsync,
+  getTransferAuthorityInstruction,
+  getUnpauseInstruction,
+  getUpdateQuarryRewardsInstruction,
+  getWithdrawTokensInstructionAsync,
+  parseAcceptAuthorityInstruction,
+  parseClaimRewardsInstruction,
+  parseClaimRewardsV2Instruction,
+  parseCreateMinerInstruction,
+  parseCreateMinerV2Instruction,
+  parseCreateQuarryInstruction,
+  parseCreateQuarryV2Instruction,
+  parseExtractFeesInstruction,
+  parseNewRewarderInstruction,
+  parseNewRewarderV2Instruction,
+  parsePauseInstruction,
+  parseRescueTokensInstruction,
+  parseSetAnnualRewardsInstruction,
+  parseSetFamineInstruction,
+  parseSetPauseAuthorityInstruction,
+  parseSetRewardsShareInstruction,
+  parseStakeTokensInstruction,
+  parseTransferAuthorityInstruction,
+  parseUnpauseInstruction,
+  parseUpdateQuarryRewardsInstruction,
+  parseWithdrawTokensInstruction,
+} from "../instructions/index.js";
+import { findMinerPda, findQuarryPda, findRewarderPda } from "../pdas/index.js";
 
 export const QUARRY_MINE_PROGRAM_ADDRESS =
   "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
@@ -78,8 +186,9 @@ export function identifyQuarryMineAccount(
   ) {
     return QuarryMineAccount.Miner;
   }
-  throw new Error(
-    "The provided account could not be identified as a quarryMine account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "quarryMine" },
   );
 }
 
@@ -342,8 +451,9 @@ export function identifyQuarryMineInstruction(
   ) {
     return QuarryMineInstruction.ExtractFees;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a quarryMine instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "quarryMine" },
   );
 }
 
@@ -413,3 +523,415 @@ export type ParsedQuarryMineInstruction<
   | ({
       instructionType: QuarryMineInstruction.ExtractFees;
     } & ParsedExtractFeesInstruction<TProgram>);
+
+export function parseQuarryMineInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedQuarryMineInstruction<TProgram> {
+  const instructionType = identifyQuarryMineInstruction(instruction);
+  switch (instructionType) {
+    case QuarryMineInstruction.NewRewarder: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.NewRewarder,
+        ...parseNewRewarderInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.NewRewarderV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.NewRewarderV2,
+        ...parseNewRewarderV2Instruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.SetPauseAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.SetPauseAuthority,
+        ...parseSetPauseAuthorityInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.Pause: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.Pause,
+        ...parsePauseInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.Unpause: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.Unpause,
+        ...parseUnpauseInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.TransferAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.TransferAuthority,
+        ...parseTransferAuthorityInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.AcceptAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.AcceptAuthority,
+        ...parseAcceptAuthorityInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.SetAnnualRewards: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.SetAnnualRewards,
+        ...parseSetAnnualRewardsInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.CreateQuarry: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.CreateQuarry,
+        ...parseCreateQuarryInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.CreateQuarryV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.CreateQuarryV2,
+        ...parseCreateQuarryV2Instruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.SetRewardsShare: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.SetRewardsShare,
+        ...parseSetRewardsShareInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.SetFamine: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.SetFamine,
+        ...parseSetFamineInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.UpdateQuarryRewards: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.UpdateQuarryRewards,
+        ...parseUpdateQuarryRewardsInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.CreateMiner: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.CreateMiner,
+        ...parseCreateMinerInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.CreateMinerV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.CreateMinerV2,
+        ...parseCreateMinerV2Instruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.ClaimRewards: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.ClaimRewards,
+        ...parseClaimRewardsInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.ClaimRewardsV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.ClaimRewardsV2,
+        ...parseClaimRewardsV2Instruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.StakeTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.StakeTokens,
+        ...parseStakeTokensInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.WithdrawTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.WithdrawTokens,
+        ...parseWithdrawTokensInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.RescueTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.RescueTokens,
+        ...parseRescueTokensInstruction(instruction),
+      };
+    }
+    case QuarryMineInstruction.ExtractFees: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMineInstruction.ExtractFees,
+        ...parseExtractFeesInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "quarryMine",
+        },
+      );
+  }
+}
+
+export interface QuarryMinePlugin {
+  accounts: QuarryMinePluginAccounts;
+  instructions: QuarryMinePluginInstructions;
+  pdas: QuarryMinePluginPdas;
+}
+
+export interface QuarryMinePluginAccounts {
+  rewarder: ReturnType<typeof getRewarderCodec> &
+    SelfFetchFunctions<RewarderArgs, Rewarder>;
+  quarry: ReturnType<typeof getQuarryCodec> &
+    SelfFetchFunctions<QuarryArgs, Quarry>;
+  miner: ReturnType<typeof getMinerCodec> &
+    SelfFetchFunctions<MinerArgs, Miner>;
+}
+
+export interface QuarryMinePluginInstructions {
+  newRewarder: (
+    input: MakeOptional<NewRewarderAsyncInput, "payer">,
+  ) => ReturnType<typeof getNewRewarderInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  newRewarderV2: (
+    input: MakeOptional<NewRewarderV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getNewRewarderV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setPauseAuthority: (
+    input: SetPauseAuthorityInput,
+  ) => ReturnType<typeof getSetPauseAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  pause: (
+    input: PauseInput,
+  ) => ReturnType<typeof getPauseInstruction> & SelfPlanAndSendFunctions;
+  unpause: (
+    input: UnpauseInput,
+  ) => ReturnType<typeof getUnpauseInstruction> & SelfPlanAndSendFunctions;
+  transferAuthority: (
+    input: TransferAuthorityInput,
+  ) => ReturnType<typeof getTransferAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  acceptAuthority: (
+    input: AcceptAuthorityInput,
+  ) => ReturnType<typeof getAcceptAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  setAnnualRewards: (
+    input: SetAnnualRewardsInput,
+  ) => ReturnType<typeof getSetAnnualRewardsInstruction> &
+    SelfPlanAndSendFunctions;
+  createQuarry: (
+    input: MakeOptional<CreateQuarryAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateQuarryInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createQuarryV2: (
+    input: MakeOptional<CreateQuarryV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateQuarryV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setRewardsShare: (
+    input: SetRewardsShareInput,
+  ) => ReturnType<typeof getSetRewardsShareInstruction> &
+    SelfPlanAndSendFunctions;
+  setFamine: (
+    input: SetFamineInput,
+  ) => ReturnType<typeof getSetFamineInstruction> & SelfPlanAndSendFunctions;
+  updateQuarryRewards: (
+    input: UpdateQuarryRewardsInput,
+  ) => ReturnType<typeof getUpdateQuarryRewardsInstruction> &
+    SelfPlanAndSendFunctions;
+  createMiner: (
+    input: MakeOptional<CreateMinerAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateMinerInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createMinerV2: (
+    input: MakeOptional<CreateMinerV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateMinerV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  claimRewards: (
+    input: ClaimRewardsAsyncInput,
+  ) => ReturnType<typeof getClaimRewardsInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  claimRewardsV2: (
+    input: ClaimRewardsV2AsyncInput,
+  ) => ReturnType<typeof getClaimRewardsV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  stakeTokens: (
+    input: StakeTokensAsyncInput,
+  ) => ReturnType<typeof getStakeTokensInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawTokens: (
+    input: WithdrawTokensAsyncInput,
+  ) => ReturnType<typeof getWithdrawTokensInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  rescueTokens: (
+    input: RescueTokensInput,
+  ) => ReturnType<typeof getRescueTokensInstruction> & SelfPlanAndSendFunctions;
+  extractFees: (
+    input: ExtractFeesInput,
+  ) => ReturnType<typeof getExtractFeesInstruction> & SelfPlanAndSendFunctions;
+}
+
+export interface QuarryMinePluginPdas {
+  rewarder: typeof findRewarderPda;
+  quarry: typeof findQuarryPda;
+  miner: typeof findMinerPda;
+}
+
+export type QuarryMinePluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function quarryMineProgram() {
+  return <T extends QuarryMinePluginRequirements>(
+    client: T,
+  ): Omit<T, "quarryMine"> & { quarryMine: QuarryMinePlugin } => {
+    return extendClient(client, {
+      quarryMine: <QuarryMinePlugin>{
+        accounts: {
+          rewarder: addSelfFetchFunctions(client, getRewarderCodec()),
+          quarry: addSelfFetchFunctions(client, getQuarryCodec()),
+          miner: addSelfFetchFunctions(client, getMinerCodec()),
+        },
+        instructions: {
+          newRewarder: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewRewarderInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          newRewarderV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewRewarderV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setPauseAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetPauseAuthorityInstruction(input),
+            ),
+          pause: (input) =>
+            addSelfPlanAndSendFunctions(client, getPauseInstruction(input)),
+          unpause: (input) =>
+            addSelfPlanAndSendFunctions(client, getUnpauseInstruction(input)),
+          transferAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferAuthorityInstruction(input),
+            ),
+          acceptAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAcceptAuthorityInstruction(input),
+            ),
+          setAnnualRewards: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetAnnualRewardsInstruction(input),
+            ),
+          createQuarry: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateQuarryInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createQuarryV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateQuarryV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setRewardsShare: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRewardsShareInstruction(input),
+            ),
+          setFamine: (input) =>
+            addSelfPlanAndSendFunctions(client, getSetFamineInstruction(input)),
+          updateQuarryRewards: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateQuarryRewardsInstruction(input),
+            ),
+          createMiner: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMinerInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createMinerV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMinerV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          claimRewards: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimRewardsInstructionAsync(input),
+            ),
+          claimRewardsV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimRewardsV2InstructionAsync(input),
+            ),
+          stakeTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getStakeTokensInstructionAsync(input),
+            ),
+          withdrawTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawTokensInstructionAsync(input),
+            ),
+          rescueTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRescueTokensInstruction(input),
+            ),
+          extractFees: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getExtractFeesInstruction(input),
+            ),
+        },
+        pdas: {
+          rewarder: findRewarderPda,
+          quarry: findQuarryPda,
+          miner: findMinerPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

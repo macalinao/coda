@@ -45,8 +45,8 @@ export interface ReserveCollateralArgs {
   mintTotalSupply: number | bigint;
   /** Reserve collateral supply address */
   supplyVault: Address;
-  padding1: (number | bigint)[];
-  padding2: (number | bigint)[];
+  padding1: Array<number | bigint>;
+  padding2: Array<number | bigint>;
 }
 
 export function getReserveCollateralEncoder(): FixedSizeEncoder<ReserveCollateralArgs> {

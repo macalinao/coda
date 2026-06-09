@@ -15,111 +15,111 @@ import { isProgramError } from "@solana/kit";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** MathOverflow: Math operation overflow */
-export const CP_AMM_ERROR__MATH_OVERFLOW = 0x1770; // 6000
+export const CP_AMM_ERROR__MATH_OVERFLOW = 0x17_70; // 6000
 /** InvalidFee: Invalid fee setup */
-export const CP_AMM_ERROR__INVALID_FEE = 0x1771; // 6001
+export const CP_AMM_ERROR__INVALID_FEE = 0x17_71; // 6001
 /** ExceededSlippage: Exceeded slippage tolerance */
-export const CP_AMM_ERROR__EXCEEDED_SLIPPAGE = 0x1772; // 6002
+export const CP_AMM_ERROR__EXCEEDED_SLIPPAGE = 0x17_72; // 6002
 /** PoolDisabled: Pool disabled */
-export const CP_AMM_ERROR__POOL_DISABLED = 0x1773; // 6003
+export const CP_AMM_ERROR__POOL_DISABLED = 0x17_73; // 6003
 /** ExceedMaxFeeBps: Exceeded max fee bps */
-export const CP_AMM_ERROR__EXCEED_MAX_FEE_BPS = 0x1774; // 6004
+export const CP_AMM_ERROR__EXCEED_MAX_FEE_BPS = 0x17_74; // 6004
 /** InvalidAdmin: Invalid admin */
-export const CP_AMM_ERROR__INVALID_ADMIN = 0x1775; // 6005
+export const CP_AMM_ERROR__INVALID_ADMIN = 0x17_75; // 6005
 /** AmountIsZero: Amount is zero */
-export const CP_AMM_ERROR__AMOUNT_IS_ZERO = 0x1776; // 6006
+export const CP_AMM_ERROR__AMOUNT_IS_ZERO = 0x17_76; // 6006
 /** TypeCastFailed: Type cast error */
-export const CP_AMM_ERROR__TYPE_CAST_FAILED = 0x1777; // 6007
+export const CP_AMM_ERROR__TYPE_CAST_FAILED = 0x17_77; // 6007
 /** UnableToModifyActivationPoint: Unable to modify activation point */
-export const CP_AMM_ERROR__UNABLE_TO_MODIFY_ACTIVATION_POINT = 0x1778; // 6008
+export const CP_AMM_ERROR__UNABLE_TO_MODIFY_ACTIVATION_POINT = 0x17_78; // 6008
 /** InvalidAuthorityToCreateThePool: Invalid authority to create the pool */
-export const CP_AMM_ERROR__INVALID_AUTHORITY_TO_CREATE_THE_POOL = 0x1779; // 6009
+export const CP_AMM_ERROR__INVALID_AUTHORITY_TO_CREATE_THE_POOL = 0x17_79; // 6009
 /** InvalidActivationType: Invalid activation type */
-export const CP_AMM_ERROR__INVALID_ACTIVATION_TYPE = 0x177a; // 6010
+export const CP_AMM_ERROR__INVALID_ACTIVATION_TYPE = 0x17_7a; // 6010
 /** InvalidActivationPoint: Invalid activation point */
-export const CP_AMM_ERROR__INVALID_ACTIVATION_POINT = 0x177b; // 6011
+export const CP_AMM_ERROR__INVALID_ACTIVATION_POINT = 0x17_7b; // 6011
 /** InvalidQuoteMint: Quote token must be SOL,USDC */
-export const CP_AMM_ERROR__INVALID_QUOTE_MINT = 0x177c; // 6012
+export const CP_AMM_ERROR__INVALID_QUOTE_MINT = 0x17_7c; // 6012
 /** InvalidFeeCurve: Invalid fee curve */
-export const CP_AMM_ERROR__INVALID_FEE_CURVE = 0x177d; // 6013
+export const CP_AMM_ERROR__INVALID_FEE_CURVE = 0x17_7d; // 6013
 /** InvalidPriceRange: Invalid Price Range */
-export const CP_AMM_ERROR__INVALID_PRICE_RANGE = 0x177e; // 6014
+export const CP_AMM_ERROR__INVALID_PRICE_RANGE = 0x17_7e; // 6014
 /** PriceRangeViolation: Trade is over price range */
-export const CP_AMM_ERROR__PRICE_RANGE_VIOLATION = 0x177f; // 6015
+export const CP_AMM_ERROR__PRICE_RANGE_VIOLATION = 0x17_7f; // 6015
 /** InvalidParameters: Invalid parameters */
-export const CP_AMM_ERROR__INVALID_PARAMETERS = 0x1780; // 6016
+export const CP_AMM_ERROR__INVALID_PARAMETERS = 0x17_80; // 6016
 /** InvalidCollectFeeMode: Invalid collect fee mode */
-export const CP_AMM_ERROR__INVALID_COLLECT_FEE_MODE = 0x1781; // 6017
+export const CP_AMM_ERROR__INVALID_COLLECT_FEE_MODE = 0x17_81; // 6017
 /** InvalidInput: Invalid input */
-export const CP_AMM_ERROR__INVALID_INPUT = 0x1782; // 6018
+export const CP_AMM_ERROR__INVALID_INPUT = 0x17_82; // 6018
 /** CannotCreateTokenBadgeOnSupportedMint: Cannot create token badge on supported mint */
-export const CP_AMM_ERROR__CANNOT_CREATE_TOKEN_BADGE_ON_SUPPORTED_MINT = 0x1783; // 6019
+export const CP_AMM_ERROR__CANNOT_CREATE_TOKEN_BADGE_ON_SUPPORTED_MINT = 0x17_83; // 6019
 /** InvalidTokenBadge: Invalid token badge */
-export const CP_AMM_ERROR__INVALID_TOKEN_BADGE = 0x1784; // 6020
+export const CP_AMM_ERROR__INVALID_TOKEN_BADGE = 0x17_84; // 6020
 /** InvalidMinimumLiquidity: Invalid minimum liquidity */
-export const CP_AMM_ERROR__INVALID_MINIMUM_LIQUIDITY = 0x1785; // 6021
+export const CP_AMM_ERROR__INVALID_MINIMUM_LIQUIDITY = 0x17_85; // 6021
 /** InvalidVestingInfo: Invalid vesting information */
-export const CP_AMM_ERROR__INVALID_VESTING_INFO = 0x1786; // 6022
+export const CP_AMM_ERROR__INVALID_VESTING_INFO = 0x17_86; // 6022
 /** InsufficientLiquidity: Insufficient liquidity */
-export const CP_AMM_ERROR__INSUFFICIENT_LIQUIDITY = 0x1787; // 6023
+export const CP_AMM_ERROR__INSUFFICIENT_LIQUIDITY = 0x17_87; // 6023
 /** InvalidVestingAccount: Invalid vesting account */
-export const CP_AMM_ERROR__INVALID_VESTING_ACCOUNT = 0x1788; // 6024
+export const CP_AMM_ERROR__INVALID_VESTING_ACCOUNT = 0x17_88; // 6024
 /** InvalidPoolStatus: Invalid pool status */
-export const CP_AMM_ERROR__INVALID_POOL_STATUS = 0x1789; // 6025
+export const CP_AMM_ERROR__INVALID_POOL_STATUS = 0x17_89; // 6025
 /** UnsupportNativeMintToken2022: Unsupported native mint token2022 */
-export const CP_AMM_ERROR__UNSUPPORT_NATIVE_MINT_TOKEN2022 = 0x178a; // 6026
+export const CP_AMM_ERROR__UNSUPPORT_NATIVE_MINT_TOKEN2022 = 0x17_8a; // 6026
 /** InvalidRewardIndex: Invalid reward index */
-export const CP_AMM_ERROR__INVALID_REWARD_INDEX = 0x178b; // 6027
+export const CP_AMM_ERROR__INVALID_REWARD_INDEX = 0x17_8b; // 6027
 /** InvalidRewardDuration: Invalid reward duration */
-export const CP_AMM_ERROR__INVALID_REWARD_DURATION = 0x178c; // 6028
+export const CP_AMM_ERROR__INVALID_REWARD_DURATION = 0x17_8c; // 6028
 /** RewardInitialized: Reward already initialized */
-export const CP_AMM_ERROR__REWARD_INITIALIZED = 0x178d; // 6029
+export const CP_AMM_ERROR__REWARD_INITIALIZED = 0x17_8d; // 6029
 /** RewardUninitialized: Reward not initialized */
-export const CP_AMM_ERROR__REWARD_UNINITIALIZED = 0x178e; // 6030
+export const CP_AMM_ERROR__REWARD_UNINITIALIZED = 0x17_8e; // 6030
 /** InvalidRewardVault: Invalid reward vault */
-export const CP_AMM_ERROR__INVALID_REWARD_VAULT = 0x178f; // 6031
+export const CP_AMM_ERROR__INVALID_REWARD_VAULT = 0x17_8f; // 6031
 /** MustWithdrawnIneligibleReward: Must withdraw ineligible reward */
-export const CP_AMM_ERROR__MUST_WITHDRAWN_INELIGIBLE_REWARD = 0x1790; // 6032
+export const CP_AMM_ERROR__MUST_WITHDRAWN_INELIGIBLE_REWARD = 0x17_90; // 6032
 /** IdenticalRewardDuration: Reward duration is the same */
-export const CP_AMM_ERROR__IDENTICAL_REWARD_DURATION = 0x1791; // 6033
+export const CP_AMM_ERROR__IDENTICAL_REWARD_DURATION = 0x17_91; // 6033
 /** RewardCampaignInProgress: Reward campaign in progress */
-export const CP_AMM_ERROR__REWARD_CAMPAIGN_IN_PROGRESS = 0x1792; // 6034
+export const CP_AMM_ERROR__REWARD_CAMPAIGN_IN_PROGRESS = 0x17_92; // 6034
 /** IdenticalFunder: Identical funder */
-export const CP_AMM_ERROR__IDENTICAL_FUNDER = 0x1793; // 6035
+export const CP_AMM_ERROR__IDENTICAL_FUNDER = 0x17_93; // 6035
 /** InvalidFunder: Invalid funder */
-export const CP_AMM_ERROR__INVALID_FUNDER = 0x1794; // 6036
+export const CP_AMM_ERROR__INVALID_FUNDER = 0x17_94; // 6036
 /** RewardNotEnded: Reward not ended */
-export const CP_AMM_ERROR__REWARD_NOT_ENDED = 0x1795; // 6037
+export const CP_AMM_ERROR__REWARD_NOT_ENDED = 0x17_95; // 6037
 /** FeeInverseIsIncorrect: Fee inverse is incorrect */
-export const CP_AMM_ERROR__FEE_INVERSE_IS_INCORRECT = 0x1796; // 6038
+export const CP_AMM_ERROR__FEE_INVERSE_IS_INCORRECT = 0x17_96; // 6038
 /** PositionIsNotEmpty: Position is not empty */
-export const CP_AMM_ERROR__POSITION_IS_NOT_EMPTY = 0x1797; // 6039
+export const CP_AMM_ERROR__POSITION_IS_NOT_EMPTY = 0x17_97; // 6039
 /** InvalidPoolCreatorAuthority: Invalid pool creator authority */
-export const CP_AMM_ERROR__INVALID_POOL_CREATOR_AUTHORITY = 0x1798; // 6040
+export const CP_AMM_ERROR__INVALID_POOL_CREATOR_AUTHORITY = 0x17_98; // 6040
 /** InvalidConfigType: Invalid config type */
-export const CP_AMM_ERROR__INVALID_CONFIG_TYPE = 0x1799; // 6041
+export const CP_AMM_ERROR__INVALID_CONFIG_TYPE = 0x17_99; // 6041
 /** InvalidPoolCreator: Invalid pool creator */
-export const CP_AMM_ERROR__INVALID_POOL_CREATOR = 0x179a; // 6042
+export const CP_AMM_ERROR__INVALID_POOL_CREATOR = 0x17_9a; // 6042
 /** RewardVaultFrozenSkipRequired: Reward vault is frozen, must skip reward to proceed */
-export const CP_AMM_ERROR__REWARD_VAULT_FROZEN_SKIP_REQUIRED = 0x179b; // 6043
+export const CP_AMM_ERROR__REWARD_VAULT_FROZEN_SKIP_REQUIRED = 0x17_9b; // 6043
 /** InvalidSplitPositionParameters: Invalid parameters for split position */
-export const CP_AMM_ERROR__INVALID_SPLIT_POSITION_PARAMETERS = 0x179c; // 6044
+export const CP_AMM_ERROR__INVALID_SPLIT_POSITION_PARAMETERS = 0x17_9c; // 6044
 /** UnsupportPositionHasVestingLock: Unsupported split position has vesting lock */
-export const CP_AMM_ERROR__UNSUPPORT_POSITION_HAS_VESTING_LOCK = 0x179d; // 6045
+export const CP_AMM_ERROR__UNSUPPORT_POSITION_HAS_VESTING_LOCK = 0x17_9d; // 6045
 /** SamePosition: Same position */
-export const CP_AMM_ERROR__SAME_POSITION = 0x179e; // 6046
+export const CP_AMM_ERROR__SAME_POSITION = 0x17_9e; // 6046
 /** InvalidBaseFeeMode: Invalid base fee mode */
-export const CP_AMM_ERROR__INVALID_BASE_FEE_MODE = 0x179f; // 6047
+export const CP_AMM_ERROR__INVALID_BASE_FEE_MODE = 0x17_9f; // 6047
 /** InvalidFeeRateLimiter: Invalid fee rate limiter */
-export const CP_AMM_ERROR__INVALID_FEE_RATE_LIMITER = 0x17a0; // 6048
+export const CP_AMM_ERROR__INVALID_FEE_RATE_LIMITER = 0x17_a0; // 6048
 /** FailToValidateSingleSwapInstruction: Fail to validate single swap instruction in rate limiter */
-export const CP_AMM_ERROR__FAIL_TO_VALIDATE_SINGLE_SWAP_INSTRUCTION = 0x17a1; // 6049
+export const CP_AMM_ERROR__FAIL_TO_VALIDATE_SINGLE_SWAP_INSTRUCTION = 0x17_a1; // 6049
 /** InvalidFeeScheduler: Invalid fee scheduler */
-export const CP_AMM_ERROR__INVALID_FEE_SCHEDULER = 0x17a2; // 6050
+export const CP_AMM_ERROR__INVALID_FEE_SCHEDULER = 0x17_a2; // 6050
 /** UndeterminedError: Undetermined error */
-export const CP_AMM_ERROR__UNDETERMINED_ERROR = 0x17a3; // 6051
+export const CP_AMM_ERROR__UNDETERMINED_ERROR = 0x17_a3; // 6051
 /** InvalidPoolVersion: Invalid pool version */
-export const CP_AMM_ERROR__INVALID_POOL_VERSION = 0x17a4; // 6052
+export const CP_AMM_ERROR__INVALID_POOL_VERSION = 0x17_a4; // 6052
 
 export type CpAmmError =
   | typeof CP_AMM_ERROR__AMOUNT_IS_ZERO
@@ -177,7 +177,7 @@ export type CpAmmError =
   | typeof CP_AMM_ERROR__UNSUPPORT_POSITION_HAS_VESTING_LOCK;
 
 let cpAmmErrorMessages: Record<CpAmmError, string> | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   cpAmmErrorMessages = {
     [CP_AMM_ERROR__AMOUNT_IS_ZERO]: "Amount is zero",
     [CP_AMM_ERROR__CANNOT_CREATE_TOKEN_BADGE_ON_SUPPORTED_MINT]:
@@ -246,7 +246,7 @@ if (true) {
 }
 
 export function getCpAmmErrorMessage(code: CpAmmError): string {
-  if (true) {
+  if (process.env.NODE_ENV !== "production") {
     return cpAmmErrorMessages![code];
   }
 

@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,10 +32,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const MINTER_UPDATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   11, 219, 68, 245, 38, 222, 221, 184,
@@ -144,7 +146,7 @@ export function getMinterUpdateInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -153,9 +155,9 @@ export function getMinterUpdateInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.minter),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("minter", accounts.minter),
     ],
     data: getMinterUpdateInstructionDataEncoder().encode(
       args as MinterUpdateInstructionDataArgs,
@@ -191,8 +193,13 @@ export function parseMinterUpdateInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedMinterUpdateInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

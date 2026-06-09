@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_GOVERNING_TOKENS_DISCRIMINATOR = 2;
 
@@ -88,7 +90,7 @@ export interface WithdrawGoverningTokensInstructionData {
   discriminator: number;
 }
 
-export interface WithdrawGoverningTokensInstructionDataArgs {}
+export type WithdrawGoverningTokensInstructionDataArgs = {};
 
 export function getWithdrawGoverningTokensInstructionDataEncoder(): FixedSizeEncoder<WithdrawGoverningTokensInstructionDataArgs> {
   return transformEncoder(
@@ -197,7 +199,7 @@ export function getWithdrawGoverningTokensInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -209,13 +211,22 @@ export function getWithdrawGoverningTokensInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governingTokenHoldingAccount),
-      getAccountMeta(accounts.governingTokenDestinationAccount),
-      getAccountMeta(accounts.governingTokenOwnerAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.realmConfigAccount),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta(
+        "governingTokenHoldingAccount",
+        accounts.governingTokenHoldingAccount,
+      ),
+      getAccountMeta(
+        "governingTokenDestinationAccount",
+        accounts.governingTokenDestinationAccount,
+      ),
+      getAccountMeta(
+        "governingTokenOwnerAccount",
+        accounts.governingTokenOwnerAccount,
+      ),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("realmConfigAccount", accounts.realmConfigAccount),
     ],
     data: getWithdrawGoverningTokensInstructionDataEncoder().encode({}),
     programAddress,
@@ -261,8 +272,13 @@ export function parseWithdrawGoverningTokensInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawGoverningTokensInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

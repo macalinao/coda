@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +34,12 @@ import {
   getStructEncoder,
   getU16Decoder,
   getU16Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_FEE_TIER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([183, 74, 156, 160, 112, 2, 42, 30]);
@@ -176,7 +178,7 @@ export function getInitializeFeeTierInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -191,11 +193,11 @@ export function getInitializeFeeTierInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.config),
-      getAccountMeta(accounts.feeTier),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.feeAuthority),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("config", accounts.config),
+      getAccountMeta("feeTier", accounts.feeTier),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("feeAuthority", accounts.feeAuthority),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitializeFeeTierInstructionDataEncoder().encode(
       args as InitializeFeeTierInstructionDataArgs,
@@ -235,8 +237,13 @@ export function parseInitializeFeeTierInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeFeeTierInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

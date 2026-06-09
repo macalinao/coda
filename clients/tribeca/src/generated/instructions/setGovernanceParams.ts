@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   GovernanceParameters,
   GovernanceParametersArgs,
@@ -34,10 +34,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getGovernanceParametersDecoder,
   getGovernanceParametersEncoder,
@@ -142,7 +144,7 @@ export function getSetGovernanceParamsInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -151,8 +153,8 @@ export function getSetGovernanceParamsInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.governor),
-      getAccountMeta(accounts.smartWallet),
+      getAccountMeta("governor", accounts.governor),
+      getAccountMeta("smartWallet", accounts.smartWallet),
     ],
     data: getSetGovernanceParamsInstructionDataEncoder().encode(
       args as SetGovernanceParamsInstructionDataArgs,
@@ -186,8 +188,13 @@ export function parseSetGovernanceParamsInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetGovernanceParamsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

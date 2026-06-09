@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,11 +33,16 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMinerPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const STAKE_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   136, 126, 91, 162, 40, 131, 13, 127,
@@ -193,7 +198,7 @@ export async function getStakeTokensInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -202,8 +207,14 @@ export async function getStakeTokensInstructionAsync<
   // Resolve default values.
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({
-      quarry: expectAddress(accounts.quarry.value),
-      authority: expectAddress(accounts.authority.value),
+      quarry: getAddressFromResolvedInstructionAccount(
+        "quarry",
+        accounts.quarry.value,
+      ),
+      authority: getAddressFromResolvedInstructionAccount(
+        "authority",
+        accounts.authority.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -214,13 +225,13 @@ export async function getStakeTokensInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenAccount),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenAccount", accounts.tokenAccount),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("rewarder", accounts.rewarder),
     ],
     data: getStakeTokensInstructionDataEncoder().encode(
       args as StakeTokensInstructionDataArgs,
@@ -302,7 +313,7 @@ export function getStakeTokensInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -317,13 +328,13 @@ export function getStakeTokensInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenAccount),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenAccount", accounts.tokenAccount),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("rewarder", accounts.rewarder),
     ],
     data: getStakeTokensInstructionDataEncoder().encode(
       args as StakeTokensInstructionDataArgs,
@@ -367,8 +378,13 @@ export function parseStakeTokensInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedStakeTokensInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

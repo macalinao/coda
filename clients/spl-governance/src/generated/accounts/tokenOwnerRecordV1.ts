@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { TokenOwnerRecordSeeds } from "../pdas/index.js";
 import {
@@ -49,10 +50,10 @@ import {
   getGovernanceAccountTypeEncoder,
 } from "../types/index.js";
 
-export const TOKEN_OWNER_RECORD_V1_ACCOUNT_TYPE =
+export const TOKEN_OWNER_RECORD_V1_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.TokenOwnerRecordV1;
 
-export function getTokenOwnerRecordV1AccountTypeBytes() {
+export function getTokenOwnerRecordV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(
     TOKEN_OWNER_RECORD_V1_ACCOUNT_TYPE,
   );

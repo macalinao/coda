@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,15 +36,17 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+  getResolvedInstructionAccountAsTransactionSigner,
+} from "@solana/program-client-core";
 import { findMintWrapperPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  expectTransactionSigner,
-  getAccountMetaFactory,
-} from "../shared/index.js";
 
 export const NEW_WRAPPER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   106, 226, 139, 13, 35, 121, 62, 171,
@@ -206,7 +208,7 @@ export async function getNewWrapperInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -215,11 +217,15 @@ export async function getNewWrapperInstructionAsync<
   // Resolve default values.
   if (!accounts.mintWrapper.value) {
     accounts.mintWrapper.value = await findMintWrapperPda({
-      base: expectAddress(accounts.base.value),
+      base: getAddressFromResolvedInstructionAccount(
+        "base",
+        accounts.base.value,
+      ),
     });
   }
   if (!accounts.admin.value) {
-    accounts.admin.value = expectTransactionSigner(
+    accounts.admin.value = getResolvedInstructionAccountAsTransactionSigner(
+      "payer",
       accounts.payer.value,
     ).address;
   }
@@ -235,13 +241,13 @@ export async function getNewWrapperInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("base", accounts.base),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewWrapperInstructionDataEncoder().encode(
       args as NewWrapperInstructionDataArgs,
@@ -325,7 +331,7 @@ export function getNewWrapperInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -333,7 +339,8 @@ export function getNewWrapperInstruction<
 
   // Resolve default values.
   if (!accounts.admin.value) {
-    accounts.admin.value = expectTransactionSigner(
+    accounts.admin.value = getResolvedInstructionAccountAsTransactionSigner(
+      "payer",
       accounts.payer.value,
     ).address;
   }
@@ -349,13 +356,13 @@ export function getNewWrapperInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("base", accounts.base),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewWrapperInstructionDataEncoder().encode(
       args as NewWrapperInstructionDataArgs,
@@ -399,8 +406,13 @@ export function parseNewWrapperInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedNewWrapperInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,15 +34,17 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+  getResolvedInstructionAccountAsTransactionSigner,
+} from "@solana/program-client-core";
 import { findMinterPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  expectTransactionSigner,
-  getAccountMetaFactory,
-} from "../shared/index.js";
 
 export const NEW_MINTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   14, 95, 216, 55, 122, 115, 37, 250,
@@ -191,7 +193,7 @@ export async function getNewMinterInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -199,14 +201,22 @@ export async function getNewMinterInstructionAsync<
 
   // Resolve default values.
   if (!accounts.newMinterAuthority.value) {
-    accounts.newMinterAuthority.value = expectTransactionSigner(
-      accounts.payer.value,
-    ).address;
+    accounts.newMinterAuthority.value =
+      getResolvedInstructionAccountAsTransactionSigner(
+        "payer",
+        accounts.payer.value,
+      ).address;
   }
   if (!accounts.minter.value) {
     accounts.minter.value = await findMinterPda({
-      wrapper: expectAddress(accounts.mintWrapper.value),
-      authority: expectAddress(accounts.newMinterAuthority.value),
+      wrapper: getAddressFromResolvedInstructionAccount(
+        "mintWrapper",
+        accounts.mintWrapper.value,
+      ),
+      authority: getAddressFromResolvedInstructionAccount(
+        "newMinterAuthority",
+        accounts.newMinterAuthority.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -217,12 +227,12 @@ export async function getNewMinterInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.newMinterAuthority),
-      getAccountMeta(accounts.minter),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("newMinterAuthority", accounts.newMinterAuthority),
+      getAccountMeta("minter", accounts.minter),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewMinterInstructionDataEncoder().encode(
       args as NewMinterInstructionDataArgs,
@@ -301,7 +311,7 @@ export function getNewMinterInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -309,9 +319,11 @@ export function getNewMinterInstruction<
 
   // Resolve default values.
   if (!accounts.newMinterAuthority.value) {
-    accounts.newMinterAuthority.value = expectTransactionSigner(
-      accounts.payer.value,
-    ).address;
+    accounts.newMinterAuthority.value =
+      getResolvedInstructionAccountAsTransactionSigner(
+        "payer",
+        accounts.payer.value,
+      ).address;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
@@ -321,12 +333,12 @@ export function getNewMinterInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.newMinterAuthority),
-      getAccountMeta(accounts.minter),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("newMinterAuthority", accounts.newMinterAuthority),
+      getAccountMeta("minter", accounts.minter),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewMinterInstructionDataEncoder().encode(
       args as NewMinterInstructionDataArgs,
@@ -368,8 +380,13 @@ export function parseNewMinterInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedNewMinterInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

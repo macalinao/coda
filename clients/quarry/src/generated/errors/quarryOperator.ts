@@ -15,11 +15,11 @@ import { isProgramError } from "@solana/kit";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: Signer is not authorized to perform this action. */
-export const QUARRY_OPERATOR_ERROR__UNAUTHORIZED = 0x1770; // 6000
+export const QUARRY_OPERATOR_ERROR__UNAUTHORIZED = 0x17_70; // 6000
 /** PendingAuthorityNotSet: Pending authority must be set to the created operator. */
-export const QUARRY_OPERATOR_ERROR__PENDING_AUTHORITY_NOT_SET = 0x1771; // 6001
+export const QUARRY_OPERATOR_ERROR__PENDING_AUTHORITY_NOT_SET = 0x17_71; // 6001
 /** OperatorNotRewarderAuthority: Operator is not the Rewarder authority. */
-export const QUARRY_OPERATOR_ERROR__OPERATOR_NOT_REWARDER_AUTHORITY = 0x1772; // 6002
+export const QUARRY_OPERATOR_ERROR__OPERATOR_NOT_REWARDER_AUTHORITY = 0x17_72; // 6002
 
 export type QuarryOperatorError =
   | typeof QUARRY_OPERATOR_ERROR__OPERATOR_NOT_REWARDER_AUTHORITY
@@ -29,7 +29,7 @@ export type QuarryOperatorError =
 let quarryOperatorErrorMessages:
   | Record<QuarryOperatorError, string>
   | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   quarryOperatorErrorMessages = {
     [QUARRY_OPERATOR_ERROR__OPERATOR_NOT_REWARDER_AUTHORITY]:
       "Operator is not the Rewarder authority.",
@@ -43,7 +43,7 @@ if (true) {
 export function getQuarryOperatorErrorMessage(
   code: QuarryOperatorError,
 ): string {
-  if (true) {
+  if (process.env.NODE_ENV !== "production") {
     return quarryOperatorErrorMessages![code];
   }
 

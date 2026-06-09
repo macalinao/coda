@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,10 +32,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REVOKE_PROGRAM_LOCK_PRIVILEGE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([170, 151, 7, 88, 194, 86, 245, 112]);
@@ -83,7 +85,7 @@ export interface RevokeProgramLockPrivilegeInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface RevokeProgramLockPrivilegeInstructionDataArgs {}
+export type RevokeProgramLockPrivilegeInstructionDataArgs = {};
 
 export function getRevokeProgramLockPrivilegeInstructionDataEncoder(): FixedSizeEncoder<RevokeProgramLockPrivilegeInstructionDataArgs> {
   return transformEncoder(
@@ -162,17 +164,17 @@ export function getRevokeProgramLockPrivilegeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.locker),
-      getAccountMeta(accounts.whitelistEntry),
-      getAccountMeta(accounts.governor),
-      getAccountMeta(accounts.smartWallet),
-      getAccountMeta(accounts.payer),
+      getAccountMeta("locker", accounts.locker),
+      getAccountMeta("whitelistEntry", accounts.whitelistEntry),
+      getAccountMeta("governor", accounts.governor),
+      getAccountMeta("smartWallet", accounts.smartWallet),
+      getAccountMeta("payer", accounts.payer),
     ],
     data: getRevokeProgramLockPrivilegeInstructionDataEncoder().encode({}),
     programAddress,
@@ -210,8 +212,13 @@ export function parseRevokeProgramLockPrivilegeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRevokeProgramLockPrivilegeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

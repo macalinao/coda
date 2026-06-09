@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,19 +33,21 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+  getNonNullResolvedInstructionInput,
+} from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findRewardVaultPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  expectSome,
-  getAccountMetaFactory,
-} from "../shared/index.js";
 
 export const WITHDRAW_INELIGIBLE_REWARD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([148, 206, 42, 195, 247, 49, 103, 8]);
@@ -228,7 +230,7 @@ export async function getWithdrawIneligibleRewardInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -240,8 +242,14 @@ export async function getWithdrawIneligibleRewardInstructionAsync<
   }
   if (!accounts.rewardVault.value) {
     accounts.rewardVault.value = await findRewardVaultPda({
-      pool: expectAddress(accounts.pool.value),
-      rewardIndex: expectSome(args.rewardIndex),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
+      rewardIndex: getNonNullResolvedInstructionInput(
+        "rewardIndex",
+        args.rewardIndex,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -259,15 +267,15 @@ export async function getWithdrawIneligibleRewardInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.funderTokenAccount),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("funderTokenAccount", accounts.funderTokenAccount),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getWithdrawIneligibleRewardInstructionDataEncoder().encode(
       args as WithdrawIneligibleRewardInstructionDataArgs,
@@ -366,7 +374,7 @@ export function getWithdrawIneligibleRewardInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -385,15 +393,15 @@ export function getWithdrawIneligibleRewardInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.funderTokenAccount),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("funderTokenAccount", accounts.funderTokenAccount),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getWithdrawIneligibleRewardInstructionDataEncoder().encode(
       args as WithdrawIneligibleRewardInstructionDataArgs,
@@ -441,8 +449,13 @@ export function parseWithdrawIneligibleRewardInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawIneligibleRewardInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

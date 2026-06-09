@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,14 +31,19 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findFarmsUserStatePda,
   findFarmVaultsAuthorityPda,
 } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_UNSTAKED_DEPOSITS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([36, 102, 187, 49, 220, 36, 132, 67]);
@@ -95,7 +100,7 @@ export interface WithdrawUnstakedDepositsInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface WithdrawUnstakedDepositsInstructionDataArgs {}
+export type WithdrawUnstakedDepositsInstructionDataArgs = {};
 
 export function getWithdrawUnstakedDepositsInstructionDataEncoder(): FixedSizeEncoder<WithdrawUnstakedDepositsInstructionDataArgs> {
   return transformEncoder(
@@ -191,19 +196,28 @@ export async function getWithdrawUnstakedDepositsInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.userState.value) {
     accounts.userState.value = await findFarmsUserStatePda({
-      farmState: expectAddress(accounts.farmState.value),
-      owner: expectAddress(accounts.owner.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
+      owner: getAddressFromResolvedInstructionAccount(
+        "owner",
+        accounts.owner.value,
+      ),
     });
   }
   if (!accounts.farmVaultsAuthority.value) {
     accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: expectAddress(accounts.farmState.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -214,13 +228,13 @@ export async function getWithdrawUnstakedDepositsInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.userState),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.userAta),
-      getAccountMeta(accounts.farmVault),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("userState", accounts.userState),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("userAta", accounts.userAta),
+      getAccountMeta("farmVault", accounts.farmVault),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawUnstakedDepositsInstructionDataEncoder().encode({}),
     programAddress,
@@ -302,7 +316,7 @@ export function getWithdrawUnstakedDepositsInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -314,13 +328,13 @@ export function getWithdrawUnstakedDepositsInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.userState),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.userAta),
-      getAccountMeta(accounts.farmVault),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("userState", accounts.userState),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("userAta", accounts.userAta),
+      getAccountMeta("farmVault", accounts.farmVault),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawUnstakedDepositsInstructionDataEncoder().encode({}),
     programAddress,
@@ -362,8 +376,13 @@ export function parseWithdrawUnstakedDepositsInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawUnstakedDepositsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

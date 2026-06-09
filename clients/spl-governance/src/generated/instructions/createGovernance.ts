@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -30,10 +30,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
@@ -236,7 +238,7 @@ export function getCreateGovernanceInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -251,15 +253,18 @@ export function getCreateGovernanceInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.governedAccount),
-      getAccountMeta(accounts.governingTokenOwnerRecord),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.governanceAuthority),
-      getAccountMeta(accounts.realmConfigAccount),
-      getAccountMeta(accounts.voterWeightRecord),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta("governedAccount", accounts.governedAccount),
+      getAccountMeta(
+        "governingTokenOwnerRecord",
+        accounts.governingTokenOwnerRecord,
+      ),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("governanceAuthority", accounts.governanceAuthority),
+      getAccountMeta("realmConfigAccount", accounts.realmConfigAccount),
+      getAccountMeta("voterWeightRecord", accounts.voterWeightRecord),
     ],
     data: getCreateGovernanceInstructionDataEncoder().encode(
       args as CreateGovernanceInstructionDataArgs,
@@ -316,8 +321,13 @@ export function parseCreateGovernanceInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateGovernanceInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

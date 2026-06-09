@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   InitializeCustomizablePoolParameters,
   InitializeCustomizablePoolParametersArgs,
@@ -38,8 +38,14 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
@@ -48,7 +54,6 @@ import {
   findTokenVaultPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getInitializeCustomizablePoolParametersDecoder,
   getInitializeCustomizablePoolParametersEncoder,
@@ -383,7 +388,7 @@ export async function getInitializePoolWithDynamicConfigInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -392,7 +397,10 @@ export async function getInitializePoolWithDynamicConfigInstructionAsync<
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
     accounts.positionNftAccount.value = await findPositionNftAccountPda({
-      positionNftMint: expectAddress(accounts.positionNftMint.value),
+      positionNftMint: getAddressFromResolvedInstructionAccount(
+        "positionNftMint",
+        accounts.positionNftMint.value,
+      ),
     });
   }
   if (!accounts.poolAuthority.value) {
@@ -400,9 +408,18 @@ export async function getInitializePoolWithDynamicConfigInstructionAsync<
   }
   if (!accounts.pool.value) {
     accounts.pool.value = await findPoolPda({
-      config: expectAddress(accounts.config.value),
-      tokenAMint: expectAddress(accounts.tokenAMint.value),
-      tokenBMint: expectAddress(accounts.tokenBMint.value),
+      config: getAddressFromResolvedInstructionAccount(
+        "config",
+        accounts.config.value,
+      ),
+      tokenAMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      tokenBMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
     });
   }
   if (!accounts.position.value) {
@@ -413,21 +430,36 @@ export async function getInitializePoolWithDynamicConfigInstructionAsync<
           new Uint8Array([112, 111, 115, 105, 116, 105, 111, 110]),
         ),
         getAddressEncoder().encode(
-          expectAddress(accounts.positionNftMint.value),
+          getAddressFromResolvedInstructionAccount(
+            "positionNftMint",
+            accounts.positionNftMint.value,
+          ),
         ),
       ],
     });
   }
   if (!accounts.tokenAVault.value) {
     accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenAMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenBVault.value) {
     accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenBMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenAProgram.value) {
@@ -457,27 +489,27 @@ export async function getInitializePoolWithDynamicConfigInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.creator),
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.poolCreatorAuthority),
-      getAccountMeta(accounts.config),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.payerTokenA),
-      getAccountMeta(accounts.payerTokenB),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.token2022Program),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("creator", accounts.creator),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("poolCreatorAuthority", accounts.poolCreatorAuthority),
+      getAccountMeta("config", accounts.config),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("payerTokenA", accounts.payerTokenA),
+      getAccountMeta("payerTokenB", accounts.payerTokenB),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("token2022Program", accounts.token2022Program),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getInitializePoolWithDynamicConfigInstructionDataEncoder().encode(
       args as InitializePoolWithDynamicConfigInstructionDataArgs,
@@ -680,7 +712,7 @@ export function getInitializePoolWithDynamicConfigInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -711,27 +743,27 @@ export function getInitializePoolWithDynamicConfigInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.creator),
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.poolCreatorAuthority),
-      getAccountMeta(accounts.config),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.payerTokenA),
-      getAccountMeta(accounts.payerTokenB),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.token2022Program),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("creator", accounts.creator),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("poolCreatorAuthority", accounts.poolCreatorAuthority),
+      getAccountMeta("config", accounts.config),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("payerTokenA", accounts.payerTokenA),
+      getAccountMeta("payerTokenB", accounts.payerTokenB),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("token2022Program", accounts.token2022Program),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getInitializePoolWithDynamicConfigInstructionDataEncoder().encode(
       args as InitializePoolWithDynamicConfigInstructionDataArgs,
@@ -817,8 +849,13 @@ export function parseInitializePoolWithDynamicConfigInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializePoolWithDynamicConfigInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 21) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 21,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

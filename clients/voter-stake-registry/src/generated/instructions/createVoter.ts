@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,11 +34,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findVoterPda, findVoterWeightRecordPda } from "../pdas/index.js";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_VOTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   6, 24, 245, 52, 243, 255, 148, 25,
@@ -216,7 +221,7 @@ export async function getCreateVoterInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -225,14 +230,26 @@ export async function getCreateVoterInstructionAsync<
   // Resolve default values.
   if (!accounts.voter.value) {
     accounts.voter.value = await findVoterPda({
-      registrar: expectAddress(accounts.registrar.value),
-      voterAuthority: expectAddress(accounts.voterAuthority.value),
+      registrar: getAddressFromResolvedInstructionAccount(
+        "registrar",
+        accounts.registrar.value,
+      ),
+      voterAuthority: getAddressFromResolvedInstructionAccount(
+        "voterAuthority",
+        accounts.voterAuthority.value,
+      ),
     });
   }
   if (!accounts.voterWeightRecord.value) {
     accounts.voterWeightRecord.value = await findVoterWeightRecordPda({
-      registrar: expectAddress(accounts.registrar.value),
-      voterAuthority: expectAddress(accounts.voterAuthority.value),
+      registrar: getAddressFromResolvedInstructionAccount(
+        "registrar",
+        accounts.registrar.value,
+      ),
+      voterAuthority: getAddressFromResolvedInstructionAccount(
+        "voterAuthority",
+        accounts.voterAuthority.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -247,14 +264,14 @@ export async function getCreateVoterInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.voterAuthority),
-      getAccountMeta(accounts.voterWeightRecord),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.instructions),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("voterAuthority", accounts.voterAuthority),
+      getAccountMeta("voterWeightRecord", accounts.voterWeightRecord),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("instructions", accounts.instructions),
     ],
     data: getCreateVoterInstructionDataEncoder().encode(
       args as CreateVoterInstructionDataArgs,
@@ -348,7 +365,7 @@ export function getCreateVoterInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -367,14 +384,14 @@ export function getCreateVoterInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.voterAuthority),
-      getAccountMeta(accounts.voterWeightRecord),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.instructions),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("voterAuthority", accounts.voterAuthority),
+      getAccountMeta("voterWeightRecord", accounts.voterWeightRecord),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("instructions", accounts.instructions),
     ],
     data: getCreateVoterInstructionDataEncoder().encode(
       args as CreateVoterInstructionDataArgs,
@@ -420,8 +437,13 @@ export function parseCreateVoterInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateVoterInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -15,14 +15,14 @@ import { isProgramError } from "@solana/kit";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: Unauthorized. */
-export const QUARRY_REDEEMER_ERROR__UNAUTHORIZED = 0x1770; // 6000
+export const QUARRY_REDEEMER_ERROR__UNAUTHORIZED = 0x17_70; // 6000
 
 export type QuarryRedeemerError = typeof QUARRY_REDEEMER_ERROR__UNAUTHORIZED;
 
 let quarryRedeemerErrorMessages:
   | Record<QuarryRedeemerError, string>
   | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   quarryRedeemerErrorMessages = {
     [QUARRY_REDEEMER_ERROR__UNAUTHORIZED]: "Unauthorized.",
   };
@@ -31,7 +31,7 @@ if (true) {
 export function getQuarryRedeemerErrorMessage(
   code: QuarryRedeemerError,
 ): string {
-  if (true) {
+  if (process.env.NODE_ENV !== "production") {
     return quarryRedeemerErrorMessages![code];
   }
 

@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@codama/renderers-core": "catalog:",
-    "@codama/renderers-js": "^1.5.5",
+    "@codama/renderers-js": "^2.2.0",
     "codama": "catalog:"
   },
   "devDependencies": {

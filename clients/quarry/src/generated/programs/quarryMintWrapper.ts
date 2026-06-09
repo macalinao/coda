@@ -6,8 +6,35 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  Minter,
+  MinterArgs,
+  MintWrapper,
+  MintWrapperArgs,
+} from "../accounts/index.js";
+import type {
+  AcceptAdminInput,
+  MinterUpdateInput,
+  NewMinterAsyncInput,
+  NewMinterV2AsyncInput,
+  NewWrapperAsyncInput,
+  NewWrapperV2AsyncInput,
   ParsedAcceptAdminInstruction,
   ParsedMinterUpdateInstruction,
   ParsedNewMinterInstruction,
@@ -16,8 +43,44 @@ import type {
   ParsedNewWrapperV2Instruction,
   ParsedPerformMintInstruction,
   ParsedTransferAdminInstruction,
+  PerformMintInput,
+  TransferAdminInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import { getMinterCodec, getMintWrapperCodec } from "../accounts/index.js";
+import {
+  getAcceptAdminInstruction,
+  getMinterUpdateInstruction,
+  getNewMinterInstructionAsync,
+  getNewMinterV2InstructionAsync,
+  getNewWrapperInstructionAsync,
+  getNewWrapperV2InstructionAsync,
+  getPerformMintInstruction,
+  getTransferAdminInstruction,
+  parseAcceptAdminInstruction,
+  parseMinterUpdateInstruction,
+  parseNewMinterInstruction,
+  parseNewMinterV2Instruction,
+  parseNewWrapperInstruction,
+  parseNewWrapperV2Instruction,
+  parsePerformMintInstruction,
+  parseTransferAdminInstruction,
+} from "../instructions/index.js";
+import { findMinterPda, findMintWrapperPda } from "../pdas/index.js";
 
 export const QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS =
   "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV" as Address<"QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV">;
@@ -53,8 +116,9 @@ export function identifyQuarryMintWrapperAccount(
   ) {
     return QuarryMintWrapperAccount.Minter;
   }
-  throw new Error(
-    "The provided account could not be identified as a quarryMintWrapper account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "quarryMintWrapper" },
   );
 }
 
@@ -161,8 +225,9 @@ export function identifyQuarryMintWrapperInstruction(
   ) {
     return QuarryMintWrapperInstruction.PerformMint;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a quarryMintWrapper instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "quarryMintWrapper" },
   );
 }
 
@@ -193,3 +258,206 @@ export type ParsedQuarryMintWrapperInstruction<
   | ({
       instructionType: QuarryMintWrapperInstruction.PerformMint;
     } & ParsedPerformMintInstruction<TProgram>);
+
+export function parseQuarryMintWrapperInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedQuarryMintWrapperInstruction<TProgram> {
+  const instructionType = identifyQuarryMintWrapperInstruction(instruction);
+  switch (instructionType) {
+    case QuarryMintWrapperInstruction.NewWrapper: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.NewWrapper,
+        ...parseNewWrapperInstruction(instruction),
+      };
+    }
+    case QuarryMintWrapperInstruction.NewWrapperV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.NewWrapperV2,
+        ...parseNewWrapperV2Instruction(instruction),
+      };
+    }
+    case QuarryMintWrapperInstruction.TransferAdmin: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.TransferAdmin,
+        ...parseTransferAdminInstruction(instruction),
+      };
+    }
+    case QuarryMintWrapperInstruction.AcceptAdmin: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.AcceptAdmin,
+        ...parseAcceptAdminInstruction(instruction),
+      };
+    }
+    case QuarryMintWrapperInstruction.NewMinter: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.NewMinter,
+        ...parseNewMinterInstruction(instruction),
+      };
+    }
+    case QuarryMintWrapperInstruction.NewMinterV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.NewMinterV2,
+        ...parseNewMinterV2Instruction(instruction),
+      };
+    }
+    case QuarryMintWrapperInstruction.MinterUpdate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.MinterUpdate,
+        ...parseMinterUpdateInstruction(instruction),
+      };
+    }
+    case QuarryMintWrapperInstruction.PerformMint: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryMintWrapperInstruction.PerformMint,
+        ...parsePerformMintInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "quarryMintWrapper",
+        },
+      );
+  }
+}
+
+export interface QuarryMintWrapperPlugin {
+  accounts: QuarryMintWrapperPluginAccounts;
+  instructions: QuarryMintWrapperPluginInstructions;
+  pdas: QuarryMintWrapperPluginPdas;
+}
+
+export interface QuarryMintWrapperPluginAccounts {
+  mintWrapper: ReturnType<typeof getMintWrapperCodec> &
+    SelfFetchFunctions<MintWrapperArgs, MintWrapper>;
+  minter: ReturnType<typeof getMinterCodec> &
+    SelfFetchFunctions<MinterArgs, Minter>;
+}
+
+export interface QuarryMintWrapperPluginInstructions {
+  newWrapper: (
+    input: MakeOptional<NewWrapperAsyncInput, "payer">,
+  ) => ReturnType<typeof getNewWrapperInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  newWrapperV2: (
+    input: MakeOptional<NewWrapperV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getNewWrapperV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  transferAdmin: (
+    input: TransferAdminInput,
+  ) => ReturnType<typeof getTransferAdminInstruction> &
+    SelfPlanAndSendFunctions;
+  acceptAdmin: (
+    input: AcceptAdminInput,
+  ) => ReturnType<typeof getAcceptAdminInstruction> & SelfPlanAndSendFunctions;
+  newMinter: (
+    input: MakeOptional<NewMinterAsyncInput, "payer">,
+  ) => ReturnType<typeof getNewMinterInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  newMinterV2: (
+    input: MakeOptional<NewMinterV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getNewMinterV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  minterUpdate: (
+    input: MinterUpdateInput,
+  ) => ReturnType<typeof getMinterUpdateInstruction> & SelfPlanAndSendFunctions;
+  performMint: (
+    input: PerformMintInput,
+  ) => ReturnType<typeof getPerformMintInstruction> & SelfPlanAndSendFunctions;
+}
+
+export interface QuarryMintWrapperPluginPdas {
+  mintWrapper: typeof findMintWrapperPda;
+  minter: typeof findMinterPda;
+}
+
+export type QuarryMintWrapperPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function quarryMintWrapperProgram() {
+  return <T extends QuarryMintWrapperPluginRequirements>(
+    client: T,
+  ): Omit<T, "quarryMintWrapper"> & {
+    quarryMintWrapper: QuarryMintWrapperPlugin;
+  } => {
+    return extendClient(client, {
+      quarryMintWrapper: <QuarryMintWrapperPlugin>{
+        accounts: {
+          mintWrapper: addSelfFetchFunctions(client, getMintWrapperCodec()),
+          minter: addSelfFetchFunctions(client, getMinterCodec()),
+        },
+        instructions: {
+          newWrapper: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewWrapperInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          newWrapperV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewWrapperV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          transferAdmin: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferAdminInstruction(input),
+            ),
+          acceptAdmin: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAcceptAdminInstruction(input),
+            ),
+          newMinter: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewMinterInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          newMinterV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewMinterV2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          minterUpdate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMinterUpdateInstruction(input),
+            ),
+          performMint: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getPerformMintInstruction(input),
+            ),
+        },
+        pdas: { mintWrapper: findMintWrapperPda, minter: findMinterPda },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

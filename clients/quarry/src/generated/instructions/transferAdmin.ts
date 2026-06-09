@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const TRANSFER_ADMIN_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   42, 242, 66, 106, 228, 10, 111, 156,
@@ -74,7 +76,7 @@ export interface TransferAdminInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface TransferAdminInstructionDataArgs {}
+export type TransferAdminInstructionDataArgs = {};
 
 export function getTransferAdminInstructionDataEncoder(): FixedSizeEncoder<TransferAdminInstructionDataArgs> {
   return transformEncoder(
@@ -139,15 +141,15 @@ export function getTransferAdminInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.nextAdmin),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("nextAdmin", accounts.nextAdmin),
     ],
     data: getTransferAdminInstructionDataEncoder().encode({}),
     programAddress,
@@ -181,8 +183,13 @@ export function parseTransferAdminInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedTransferAdminInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
