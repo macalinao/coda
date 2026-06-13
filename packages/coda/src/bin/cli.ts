@@ -6,7 +6,7 @@ import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
 import { renderMarkdownVisitor } from "@macalinao/codama-renderers-markdown";
 import { Command } from "commander";
 import { CONFIG_TEMPLATE } from "../config-template.js";
-import { fileExists, processIdls } from "../utils/index.js";
+import { ensureEntryBarrel, fileExists, processIdls } from "../utils/index.js";
 
 const program = new Command();
 
@@ -38,6 +38,14 @@ program
       // Apply the ESM TypeScript visitor
       console.log(`Generating client to ${outputPath}...`);
       codama.accept(renderESMTypeScriptVisitor(outputPath));
+
+      // Scaffold a barrel entry (src/index.ts) re-exporting the generated
+      // client when missing. Without it the package's compiled entry point is
+      // never produced and the published package resolves to nothing.
+      const entryPath = await ensureEntryBarrel(outputPath);
+      if (entryPath) {
+        console.log(`Created entry barrel: ${entryPath}`);
+      }
 
       console.log("✅ Client generated successfully!");
     } catch (error) {

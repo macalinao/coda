@@ -79,6 +79,57 @@
         "@solana/program-client-core": "*",
       },
     },
+    "clients/mpl-bubblegum": {
+      "name": "@macalinao/clients-mpl-bubblegum",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "@solana/kit": "catalog:",
+        "@solana/program-client-core": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@solana/kit": "*",
+        "@solana/program-client-core": "*",
+      },
+    },
+    "clients/mpl-core": {
+      "name": "@macalinao/clients-mpl-core",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "@solana/kit": "catalog:",
+        "@solana/program-client-core": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@solana/kit": "*",
+        "@solana/program-client-core": "*",
+      },
+    },
+    "clients/mpl-token-auth-rules": {
+      "name": "@macalinao/clients-mpl-token-auth-rules",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/eslint-config": "catalog:",
+        "@macalinao/tsconfig": "catalog:",
+        "@solana/kit": "catalog:",
+        "@solana/program-client-core": "catalog:",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@solana/kit": "*",
+        "@solana/program-client-core": "*",
+      },
+    },
     "clients/orca-whirlpools": {
       "name": "@macalinao/clients-orca-whirlpools",
       "version": "0.4.8",
@@ -221,6 +272,7 @@
       "devDependencies": {
         "@macalinao/eslint-config": "catalog:",
         "@macalinao/tsconfig": "catalog:",
+        "@types/bun": "catalog:",
         "@types/node": "^25.9.2",
         "eslint": "catalog:",
         "typescript": "catalog:",
@@ -656,6 +708,12 @@
     "@macalinao/clients-kamino-lending": ["@macalinao/clients-kamino-lending@workspace:clients/kamino-lending"],
 
     "@macalinao/clients-meteora-damm-v2": ["@macalinao/clients-meteora-damm-v2@workspace:clients/meteora-damm-v2"],
+
+    "@macalinao/clients-mpl-bubblegum": ["@macalinao/clients-mpl-bubblegum@workspace:clients/mpl-bubblegum"],
+
+    "@macalinao/clients-mpl-core": ["@macalinao/clients-mpl-core@workspace:clients/mpl-core"],
+
+    "@macalinao/clients-mpl-token-auth-rules": ["@macalinao/clients-mpl-token-auth-rules@workspace:clients/mpl-token-auth-rules"],
 
     "@macalinao/clients-orca-whirlpools": ["@macalinao/clients-orca-whirlpools@workspace:clients/orca-whirlpools"],
 

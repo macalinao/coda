@@ -1,0 +1,61 @@
+{
+  "name": "@macalinao/clients-mpl-token-auth-rules",
+  "version": "0.1.0",
+  "description": "TypeScript client for the Metaplex Token Auth Rules program",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://coda.ianm.com",
+  "license": "Apache-2.0",
+  "keywords": [
+    "coda",
+    "solana",
+    "metaplex",
+    "token-auth-rules",
+    "auth-rules",
+    "nft",
+    "client",
+    "esm",
+    "typescript",
+    "ian-macalinao"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
+    "codegen": "rm -fr src/generated/ && coda generate",
+    "lint": "eslint . --cache"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*",
+    "@solana/program-client-core": "*"
+  },
+  "devDependencies": {
+    "@macalinao/coda": "workspace:^",
+    "@macalinao/eslint-config": "catalog:",
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "catalog:",
+    "@solana/program-client-core": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/mpl-token-auth-rules"
+  }
+}

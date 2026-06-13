@@ -9,4 +9,7 @@ export default [
       },
     },
   },
+  {
+    ignores: ["**/*.test.ts", "dist/**"],
+  },
 ];

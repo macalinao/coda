@@ -45,7 +45,7 @@
     "build": "tsc",
     "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
-    "test": "echo 'No tests yet'"
+    "test": "bun test"
   },
   "dependencies": {
     "@codama/nodes-from-anchor": "catalog:",
@@ -63,6 +63,7 @@
   "devDependencies": {
     "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
+    "@types/bun": "catalog:",
     "@types/node": "^25.9.2",
     "eslint": "catalog:",
     "typescript": "catalog:"
