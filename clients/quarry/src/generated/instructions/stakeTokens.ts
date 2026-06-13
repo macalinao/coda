@@ -56,16 +56,16 @@ export function getStakeTokensDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type StakeTokensInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountMinerVault extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountMinerVault extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRewarder extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

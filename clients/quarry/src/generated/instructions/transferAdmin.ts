@@ -50,10 +50,10 @@ export function getTransferAdminDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type TransferAdminInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountNextAdmin extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountNextAdmin extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

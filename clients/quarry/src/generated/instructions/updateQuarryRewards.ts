@@ -46,9 +46,9 @@ export function getUpdateQuarryRewardsDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateQuarryRewardsInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

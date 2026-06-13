@@ -247,7 +247,7 @@ if (process.env.NODE_ENV !== "production") {
 
 export function getCpAmmErrorMessage(code: CpAmmError): string {
   if (process.env.NODE_ENV !== "production") {
-    return cpAmmErrorMessages![code];
+    return (cpAmmErrorMessages as Record<CpAmmError, string>)[code];
   }
 
   return "Error message not available in production bundles.";

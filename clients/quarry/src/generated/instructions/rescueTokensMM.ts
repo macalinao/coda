@@ -49,19 +49,19 @@ export function getRescueTokensMMDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RescueTokensMMInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountMmOwner extends string | AccountMeta = string,
-  TAccountMergePool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountMinerTokenAccount extends string | AccountMeta = string,
-  TAccountDestinationTokenAccount extends string | AccountMeta = string,
+  TAccountMmOwner extends string | AccountMeta<string> = string,
+  TAccountMergePool extends string | AccountMeta<string> = string,
+  TAccountMm extends string | AccountMeta<string> = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountMinerTokenAccount extends string | AccountMeta<string> = string,
+  TAccountDestinationTokenAccount extends string | AccountMeta<string> = string,
   TAccountQuarryMineProgram extends
     | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

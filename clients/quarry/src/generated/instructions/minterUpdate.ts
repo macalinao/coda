@@ -51,10 +51,10 @@ export function getMinterUpdateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type MinterUpdateInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountMinter extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountMinter extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

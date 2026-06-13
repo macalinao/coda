@@ -58,18 +58,18 @@ export function getNewRewarderDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewRewarderInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountBase extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountInitialAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountBase extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountInitialAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountUnusedAccount extends string | AccountMeta = string,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountRewardsTokenMint extends string | AccountMeta = string,
-  TAccountClaimFeeTokenAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountUnusedAccount extends string | AccountMeta<string> = string,
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
+  TAccountRewardsTokenMint extends string | AccountMeta<string> = string,
+  TAccountClaimFeeTokenAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

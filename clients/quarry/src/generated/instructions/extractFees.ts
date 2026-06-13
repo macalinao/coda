@@ -47,13 +47,13 @@ export function getExtractFeesDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ExtractFeesInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountClaimFeeTokenAccount extends string | AccountMeta = string,
-  TAccountFeeToTokenAccount extends string | AccountMeta = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountClaimFeeTokenAccount extends string | AccountMeta<string> = string,
+  TAccountFeeToTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

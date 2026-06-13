@@ -57,14 +57,14 @@ export function getCreateRedeemerDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateRedeemerInstruction<
   TProgram extends string = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
-  TAccountRedeemer extends string | AccountMeta = string,
-  TAccountIouMint extends string | AccountMeta = string,
-  TAccountRedemptionMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountRedeemer extends string | AccountMeta<string> = string,
+  TAccountIouMint extends string | AccountMeta<string> = string,
+  TAccountRedemptionMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

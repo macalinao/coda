@@ -56,20 +56,20 @@ export function getNewPoolDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewPoolInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountPrimaryMint extends string | AccountMeta = string,
-  TAccountReplicaMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountPrimaryMint extends string | AccountMeta<string> = string,
+  TAccountReplicaMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
+    | AccountMeta<string> = "11111111111111111111111111111111",
   TAccountRent extends
     | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "SysvarRent111111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

@@ -59,13 +59,13 @@ export function getNewRegistryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewRegistryInstruction<
   TProgram extends string = typeof QUARRY_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountRegistry extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountRegistry extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

@@ -76,7 +76,7 @@ if (process.env.NODE_ENV !== "production") {
 
 export function getQuarryMineErrorMessage(code: QuarryMineError): string {
   if (process.env.NODE_ENV !== "production") {
-    return quarryMineErrorMessages![code];
+    return (quarryMineErrorMessages as Record<QuarryMineError, string>)[code];
   }
 
   return "Error message not available in production bundles.";

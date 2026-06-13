@@ -43,7 +43,9 @@ export function getQuarryMintWrapperErrorMessage(
   code: QuarryMintWrapperError,
 ): string {
   if (process.env.NODE_ENV !== "production") {
-    return quarryMintWrapperErrorMessages![code];
+    return (
+      quarryMintWrapperErrorMessages as Record<QuarryMintWrapperError, string>
+    )[code];
   }
 
   return "Error message not available in production bundles.";

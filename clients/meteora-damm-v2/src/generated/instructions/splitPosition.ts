@@ -59,18 +59,20 @@ export function getSplitPositionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SplitPositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountFirstPosition extends string | AccountMeta = string,
-  TAccountFirstPositionNftAccount extends string | AccountMeta = string,
-  TAccountSecondPosition extends string | AccountMeta = string,
-  TAccountSecondPositionNftAccount extends string | AccountMeta = string,
-  TAccountFirstOwner extends string | AccountMeta = string,
-  TAccountSecondOwner extends string | AccountMeta = string,
-  TAccountEventAuthority extends string | AccountMeta = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountFirstPosition extends string | AccountMeta<string> = string,
+  TAccountFirstPositionNftAccount extends string | AccountMeta<string> = string,
+  TAccountSecondPosition extends string | AccountMeta<string> = string,
+  TAccountSecondPositionNftAccount extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountFirstOwner extends string | AccountMeta<string> = string,
+  TAccountSecondOwner extends string | AccountMeta<string> = string,
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

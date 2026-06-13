@@ -56,22 +56,22 @@ export function getClaimRewardsV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClaimRewardsV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
   TAccountMintWrapperProgram extends
     | string
-    | AccountMeta = "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
-  TAccountMinter extends string | AccountMeta = string,
-  TAccountRewardsTokenMint extends string | AccountMeta = string,
-  TAccountRewardsTokenAccount extends string | AccountMeta = string,
-  TAccountClaimFeeTokenAccount extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
+    | AccountMeta<string> = "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
+  TAccountMinter extends string | AccountMeta<string> = string,
+  TAccountRewardsTokenMint extends string | AccountMeta<string> = string,
+  TAccountRewardsTokenAccount extends string | AccountMeta<string> = string,
+  TAccountClaimFeeTokenAccount extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountQuarry extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRewarder extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

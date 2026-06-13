@@ -32,7 +32,9 @@ export function getQuarryRedeemerErrorMessage(
   code: QuarryRedeemerError,
 ): string {
   if (process.env.NODE_ENV !== "production") {
-    return quarryRedeemerErrorMessages![code];
+    return (quarryRedeemerErrorMessages as Record<QuarryRedeemerError, string>)[
+      code
+    ];
   }
 
   return "Error message not available in production bundles.";

@@ -62,7 +62,9 @@ export function getQuarryMergeMineErrorMessage(
   code: QuarryMergeMineError,
 ): string {
   if (process.env.NODE_ENV !== "production") {
-    return quarryMergeMineErrorMessages![code];
+    return (
+      quarryMergeMineErrorMessages as Record<QuarryMergeMineError, string>
+    )[code];
   }
 
   return "Error message not available in production bundles.";

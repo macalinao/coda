@@ -56,16 +56,16 @@ export function getWithdrawTokensMMDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawTokensMMInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountWithdrawMint extends string | AccountMeta = string,
-  TAccountMmTokenAccount extends string | AccountMeta = string,
-  TAccountTokenDestination extends string | AccountMeta = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountMm extends string | AccountMeta<string> = string,
+  TAccountWithdrawMint extends string | AccountMeta<string> = string,
+  TAccountMmTokenAccount extends string | AccountMeta<string> = string,
+  TAccountTokenDestination extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

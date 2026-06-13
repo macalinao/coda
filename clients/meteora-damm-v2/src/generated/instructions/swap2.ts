@@ -61,27 +61,27 @@ export function getSwap2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type Swap2Instruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPoolAuthority extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountInputTokenAccount extends string | AccountMeta = string,
-  TAccountOutputTokenAccount extends string | AccountMeta = string,
-  TAccountTokenAVault extends string | AccountMeta = string,
-  TAccountTokenBVault extends string | AccountMeta = string,
-  TAccountTokenAMint extends string | AccountMeta = string,
-  TAccountTokenBMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountPoolAuthority extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountInputTokenAccount extends string | AccountMeta<string> = string,
+  TAccountOutputTokenAccount extends string | AccountMeta<string> = string,
+  TAccountTokenAVault extends string | AccountMeta<string> = string,
+  TAccountTokenBVault extends string | AccountMeta<string> = string,
+  TAccountTokenAMint extends string | AccountMeta<string> = string,
+  TAccountTokenBMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountTokenAProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenBProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountReferralTokenAccount extends string | AccountMeta = string,
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountReferralTokenAccount extends string | AccountMeta<string> = string,
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

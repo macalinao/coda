@@ -56,15 +56,15 @@ export function getNewMinterV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewMinterV2Instruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountNewMinterAuthority extends string | AccountMeta = string,
-  TAccountMinter extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountNewMinterAuthority extends string | AccountMeta<string> = string,
+  TAccountMinter extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

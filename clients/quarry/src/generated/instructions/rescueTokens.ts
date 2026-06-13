@@ -50,14 +50,14 @@ export function getRescueTokensDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RescueTokensInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountMinerTokenAccount extends string | AccountMeta = string,
-  TAccountDestinationTokenAccount extends string | AccountMeta = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountMinerTokenAccount extends string | AccountMeta<string> = string,
+  TAccountDestinationTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

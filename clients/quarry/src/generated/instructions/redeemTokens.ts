@@ -58,16 +58,16 @@ export function getRedeemTokensDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RedeemTokensInstruction<
   TProgram extends string = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
-  TAccountRedeemer extends string | AccountMeta = string,
-  TAccountSourceAuthority extends string | AccountMeta = string,
-  TAccountIouMint extends string | AccountMeta = string,
-  TAccountIouSource extends string | AccountMeta = string,
-  TAccountRedemptionVault extends string | AccountMeta = string,
-  TAccountRedemptionDestination extends string | AccountMeta = string,
+  TAccountRedeemer extends string | AccountMeta<string> = string,
+  TAccountSourceAuthority extends string | AccountMeta<string> = string,
+  TAccountIouMint extends string | AccountMeta<string> = string,
+  TAccountIouSource extends string | AccountMeta<string> = string,
+  TAccountRedemptionVault extends string | AccountMeta<string> = string,
+  TAccountRedemptionDestination extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

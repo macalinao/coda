@@ -45,9 +45,9 @@ export function getSyncQuarryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SyncQuarryInstruction<
   TProgram extends string = typeof QUARRY_REGISTRY_PROGRAM_ADDRESS,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountRegistry extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountRegistry extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

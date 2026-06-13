@@ -49,9 +49,9 @@ export function getAcceptAdminDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type AcceptAdminInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountPendingAdmin extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
+  TAccountPendingAdmin extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

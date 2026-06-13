@@ -44,7 +44,9 @@ export function getQuarryOperatorErrorMessage(
   code: QuarryOperatorError,
 ): string {
   if (process.env.NODE_ENV !== "production") {
-    return quarryOperatorErrorMessages![code];
+    return (quarryOperatorErrorMessages as Record<QuarryOperatorError, string>)[
+      code
+    ];
   }
 
   return "Error message not available in production bundles.";
