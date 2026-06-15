@@ -47,7 +47,7 @@
     },
     "clients/kamino-lending": {
       "name": "@macalinao/clients-kamino-lending",
-      "version": "0.5.4",
+      "version": "0.6.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -64,7 +64,7 @@
     },
     "clients/meteora-damm-v2": {
       "name": "@macalinao/clients-meteora-damm-v2",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -81,7 +81,7 @@
     },
     "clients/mpl-bubblegum": {
       "name": "@macalinao/clients-mpl-bubblegum",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -98,7 +98,7 @@
     },
     "clients/mpl-core": {
       "name": "@macalinao/clients-mpl-core",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -115,7 +115,7 @@
     },
     "clients/mpl-token-auth-rules": {
       "name": "@macalinao/clients-mpl-token-auth-rules",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -132,7 +132,7 @@
     },
     "clients/orca-whirlpools": {
       "name": "@macalinao/clients-orca-whirlpools",
-      "version": "0.4.8",
+      "version": "0.5.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -149,7 +149,7 @@
     },
     "clients/quarry": {
       "name": "@macalinao/clients-quarry",
-      "version": "0.4.6",
+      "version": "0.5.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/codama-rename-visitor": "workspace:^",
@@ -167,7 +167,7 @@
     },
     "clients/spl-governance": {
       "name": "@macalinao/clients-spl-governance",
-      "version": "0.2.7",
+      "version": "0.3.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -184,7 +184,7 @@
     },
     "clients/spl-stake-pool": {
       "name": "@macalinao/clients-spl-stake-pool",
-      "version": "0.1.4",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -201,7 +201,7 @@
     },
     "clients/token-metadata": {
       "name": "@macalinao/clients-token-metadata",
-      "version": "0.4.6",
+      "version": "0.5.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -218,7 +218,7 @@
     },
     "clients/tribeca": {
       "name": "@macalinao/clients-tribeca",
-      "version": "0.1.3",
+      "version": "0.2.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -235,7 +235,7 @@
     },
     "clients/voter-stake-registry": {
       "name": "@macalinao/clients-voter-stake-registry",
-      "version": "0.2.4",
+      "version": "0.3.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -252,7 +252,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.4.10",
+      "version": "0.5.0",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -280,7 +280,7 @@
     },
     "packages/coda-visitors": {
       "name": "@macalinao/coda-visitors",
-      "version": "0.1.9",
+      "version": "0.2.0",
       "dependencies": {
         "@solana-program/memo": "^0.11.1",
         "@solana-program/system": "^0.12.2",
@@ -299,7 +299,7 @@
     },
     "packages/codama-instruction-accounts-dedupe-visitor": {
       "name": "@macalinao/codama-instruction-accounts-dedupe-visitor",
-      "version": "0.4.3",
+      "version": "0.5.0",
       "dependencies": {
         "@codama/nodes-from-anchor": "catalog:",
         "codama": "catalog:",
@@ -314,7 +314,7 @@
     },
     "packages/codama-nodes-from-anchor-x": {
       "name": "@macalinao/codama-nodes-from-anchor-x",
-      "version": "0.1.3",
+      "version": "0.2.0",
       "dependencies": {
         "@codama/nodes": "catalog:",
         "@codama/nodes-from-anchor": "catalog:",
@@ -330,7 +330,7 @@
     },
     "packages/codama-rename-visitor": {
       "name": "@macalinao/codama-rename-visitor",
-      "version": "0.3.3",
+      "version": "0.4.0",
       "dependencies": {
         "codama": "catalog:",
       },
@@ -344,7 +344,7 @@
     },
     "packages/codama-renderers-js-esm": {
       "name": "@macalinao/codama-renderers-js-esm",
-      "version": "0.4.5",
+      "version": "0.5.0",
       "dependencies": {
         "@codama/renderers-core": "catalog:",
         "@codama/renderers-js": "^2.2.0",
@@ -360,7 +360,7 @@
     },
     "packages/codama-renderers-markdown": {
       "name": "@macalinao/codama-renderers-markdown",
-      "version": "0.4.3",
+      "version": "0.5.0",
       "dependencies": {
         "@codama/nodes": "catalog:",
         "@codama/renderers-core": "catalog:",
@@ -378,7 +378,7 @@
     },
     "packages/create-coda": {
       "name": "@macalinao/create-coda",
-      "version": "0.2.6",
+      "version": "0.3.0",
       "bin": {
         "create-coda": "./dist/bin.js",
       },
