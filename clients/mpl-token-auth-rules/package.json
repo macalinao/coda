@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-mpl-token-auth-rules",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TypeScript client for the Metaplex Token Auth Rules program",
   "type": "module",
   "sideEffects": false,
