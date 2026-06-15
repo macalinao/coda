@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,14 +33,19 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_FARMS_FOR_RESERVE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([218, 6, 62, 233, 1, 33, 232, 82]);
@@ -245,7 +250,7 @@ export async function getInitFarmsForReserveInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -254,7 +259,10 @@ export async function getInitFarmsForReserveInstructionAsync<
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      lendingMarket: getAddressFromResolvedInstructionAccount(
+        "lendingMarket",
+        accounts.lendingMarket.value,
+      ),
     });
   }
   if (!accounts.farmsProgram.value) {
@@ -273,16 +281,16 @@ export async function getInitFarmsForReserveInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwner),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.farmsProgram),
-      getAccountMeta(accounts.farmsGlobalConfig),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.farmsVaultAuthority),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("lendingMarketOwner", accounts.lendingMarketOwner),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("farmsProgram", accounts.farmsProgram),
+      getAccountMeta("farmsGlobalConfig", accounts.farmsGlobalConfig),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("farmsVaultAuthority", accounts.farmsVaultAuthority),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitFarmsForReserveInstructionDataEncoder().encode(
       args as InitFarmsForReserveInstructionDataArgs,
@@ -398,7 +406,7 @@ export function getInitFarmsForReserveInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -421,16 +429,16 @@ export function getInitFarmsForReserveInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.lendingMarketOwner),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.farmsProgram),
-      getAccountMeta(accounts.farmsGlobalConfig),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.farmsVaultAuthority),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("lendingMarketOwner", accounts.lendingMarketOwner),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("farmsProgram", accounts.farmsProgram),
+      getAccountMeta("farmsGlobalConfig", accounts.farmsGlobalConfig),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("farmsVaultAuthority", accounts.farmsVaultAuthority),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitFarmsForReserveInstructionDataEncoder().encode(
       args as InitFarmsForReserveInstructionDataArgs,
@@ -480,8 +488,13 @@ export function parseInitFarmsForReserveInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitFarmsForReserveInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 10,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

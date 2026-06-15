@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SIGN_OFF_PROPOSAL_DISCRIMINATOR = 12;
 
@@ -76,7 +78,7 @@ export interface SignOffProposalInstructionData {
   discriminator: number;
 }
 
-export interface SignOffProposalInstructionDataArgs {}
+export type SignOffProposalInstructionDataArgs = {};
 
 export function getSignOffProposalInstructionDataEncoder(): FixedSizeEncoder<SignOffProposalInstructionDataArgs> {
   return transformEncoder(
@@ -168,17 +170,17 @@ export function getSignOffProposalInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.signatoryAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta("signatoryAccount", accounts.signatoryAccount),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
     ],
     data: getSignOffProposalInstructionDataEncoder().encode({}),
     programAddress,
@@ -224,8 +226,13 @@ export function parseSignOffProposalInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSignOffProposalInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

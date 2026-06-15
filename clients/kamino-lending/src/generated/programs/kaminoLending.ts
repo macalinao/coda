@@ -6,8 +6,67 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  LendingGlobalConfig,
+  LendingGlobalConfigArgs,
+  LendingMarket,
+  LendingMarketArgs,
+  Obligation,
+  ObligationArgs,
+  ReferrerState,
+  ReferrerStateArgs,
+  ReferrerTokenState,
+  ReferrerTokenStateArgs,
+  Reserve,
+  ReserveArgs,
+  ShortUrl,
+  ShortUrlArgs,
+  UserMetadata,
+  UserMetadataArgs,
+  UserState,
+  UserStateArgs,
+} from "../accounts/index.js";
+import type {
+  BorrowObligationLiquidityAsyncInput,
+  BorrowObligationLiquidityV2AsyncInput,
+  DeleteReferrerStateAndShortUrlInput,
+  DepositAndWithdrawInput,
+  DepositObligationCollateralInput,
+  DepositObligationCollateralV2AsyncInput,
+  DepositReserveLiquidityAndObligationCollateralAsyncInput,
+  DepositReserveLiquidityAndObligationCollateralV2AsyncInput,
+  DepositReserveLiquidityAsyncInput,
+  FlashBorrowReserveLiquidityAsyncInput,
+  FlashRepayReserveLiquidityAsyncInput,
+  IdlMissingTypesInput,
+  InitFarmsForReserveAsyncInput,
+  InitGlobalConfigAsyncInput,
+  InitLendingMarketAsyncInput,
+  InitObligationFarmsForReserveAsyncInput,
+  InitObligationInput,
+  InitReferrerStateAndShortUrlInput,
+  InitReferrerTokenStateInput,
+  InitReserveAsyncInput,
+  InitUserMetadataInput,
+  LiquidateObligationAndRedeemReserveCollateralAsyncInput,
+  LiquidateObligationAndRedeemReserveCollateralV2Input,
+  MarkObligationForDeleveragingInput,
   ParsedBorrowObligationLiquidityInstruction,
   ParsedBorrowObligationLiquidityV2Instruction,
   ParsedDeleteReferrerStateAndShortUrlInstruction,
@@ -56,8 +115,168 @@ import type {
   ParsedWithdrawObligationCollateralV2Instruction,
   ParsedWithdrawProtocolFeeInstruction,
   ParsedWithdrawReferrerFeesInstruction,
+  RedeemFeesAsyncInput,
+  RedeemReserveCollateralAsyncInput,
+  RefreshObligationFarmsForReserveAsyncInput,
+  RefreshObligationInput,
+  RefreshReserveInput,
+  RefreshReservesBatchInput,
+  RepayAndWithdrawAndRedeemInput,
+  RepayObligationLiquidityInput,
+  RepayObligationLiquidityV2AsyncInput,
+  RequestElevationGroupInput,
+  SetObligationOrderInput,
+  SocializeLossInput,
+  SocializeLossV2AsyncInput,
+  UpdateGlobalConfigAdminInput,
+  UpdateGlobalConfigInput,
+  UpdateLendingMarketInput,
+  UpdateLendingMarketOwnerInput,
+  UpdateReserveConfigInput,
+  WithdrawObligationCollateralAndRedeemReserveCollateralAsyncInput,
+  WithdrawObligationCollateralAndRedeemReserveCollateralV2AsyncInput,
+  WithdrawObligationCollateralAsyncInput,
+  WithdrawObligationCollateralV2AsyncInput,
+  WithdrawProtocolFeeAsyncInput,
+  WithdrawReferrerFeesAsyncInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getLendingGlobalConfigCodec,
+  getLendingMarketCodec,
+  getObligationCodec,
+  getReferrerStateCodec,
+  getReferrerTokenStateCodec,
+  getReserveCodec,
+  getShortUrlCodec,
+  getUserMetadataCodec,
+  getUserStateCodec,
+} from "../accounts/index.js";
+import {
+  getBorrowObligationLiquidityInstructionAsync,
+  getBorrowObligationLiquidityV2InstructionAsync,
+  getDeleteReferrerStateAndShortUrlInstruction,
+  getDepositAndWithdrawInstruction,
+  getDepositObligationCollateralInstruction,
+  getDepositObligationCollateralV2InstructionAsync,
+  getDepositReserveLiquidityAndObligationCollateralInstructionAsync,
+  getDepositReserveLiquidityAndObligationCollateralV2InstructionAsync,
+  getDepositReserveLiquidityInstructionAsync,
+  getFlashBorrowReserveLiquidityInstructionAsync,
+  getFlashRepayReserveLiquidityInstructionAsync,
+  getIdlMissingTypesInstruction,
+  getInitFarmsForReserveInstructionAsync,
+  getInitGlobalConfigInstructionAsync,
+  getInitLendingMarketInstructionAsync,
+  getInitObligationFarmsForReserveInstructionAsync,
+  getInitObligationInstruction,
+  getInitReferrerStateAndShortUrlInstruction,
+  getInitReferrerTokenStateInstruction,
+  getInitReserveInstructionAsync,
+  getInitUserMetadataInstruction,
+  getLiquidateObligationAndRedeemReserveCollateralInstructionAsync,
+  getLiquidateObligationAndRedeemReserveCollateralV2Instruction,
+  getMarkObligationForDeleveragingInstruction,
+  getRedeemFeesInstructionAsync,
+  getRedeemReserveCollateralInstructionAsync,
+  getRefreshObligationFarmsForReserveInstructionAsync,
+  getRefreshObligationInstruction,
+  getRefreshReserveInstruction,
+  getRefreshReservesBatchInstruction,
+  getRepayAndWithdrawAndRedeemInstruction,
+  getRepayObligationLiquidityInstruction,
+  getRepayObligationLiquidityV2InstructionAsync,
+  getRequestElevationGroupInstruction,
+  getSetObligationOrderInstruction,
+  getSocializeLossInstruction,
+  getSocializeLossV2InstructionAsync,
+  getUpdateGlobalConfigAdminInstruction,
+  getUpdateGlobalConfigInstruction,
+  getUpdateLendingMarketInstruction,
+  getUpdateLendingMarketOwnerInstruction,
+  getUpdateReserveConfigInstruction,
+  getWithdrawObligationCollateralAndRedeemReserveCollateralInstructionAsync,
+  getWithdrawObligationCollateralAndRedeemReserveCollateralV2InstructionAsync,
+  getWithdrawObligationCollateralInstructionAsync,
+  getWithdrawObligationCollateralV2InstructionAsync,
+  getWithdrawProtocolFeeInstructionAsync,
+  getWithdrawReferrerFeesInstructionAsync,
+  parseBorrowObligationLiquidityInstruction,
+  parseBorrowObligationLiquidityV2Instruction,
+  parseDeleteReferrerStateAndShortUrlInstruction,
+  parseDepositAndWithdrawInstruction,
+  parseDepositObligationCollateralInstruction,
+  parseDepositObligationCollateralV2Instruction,
+  parseDepositReserveLiquidityAndObligationCollateralInstruction,
+  parseDepositReserveLiquidityAndObligationCollateralV2Instruction,
+  parseDepositReserveLiquidityInstruction,
+  parseFlashBorrowReserveLiquidityInstruction,
+  parseFlashRepayReserveLiquidityInstruction,
+  parseIdlMissingTypesInstruction,
+  parseInitFarmsForReserveInstruction,
+  parseInitGlobalConfigInstruction,
+  parseInitLendingMarketInstruction,
+  parseInitObligationFarmsForReserveInstruction,
+  parseInitObligationInstruction,
+  parseInitReferrerStateAndShortUrlInstruction,
+  parseInitReferrerTokenStateInstruction,
+  parseInitReserveInstruction,
+  parseInitUserMetadataInstruction,
+  parseLiquidateObligationAndRedeemReserveCollateralInstruction,
+  parseLiquidateObligationAndRedeemReserveCollateralV2Instruction,
+  parseMarkObligationForDeleveragingInstruction,
+  parseRedeemFeesInstruction,
+  parseRedeemReserveCollateralInstruction,
+  parseRefreshObligationFarmsForReserveInstruction,
+  parseRefreshObligationInstruction,
+  parseRefreshReserveInstruction,
+  parseRefreshReservesBatchInstruction,
+  parseRepayAndWithdrawAndRedeemInstruction,
+  parseRepayObligationLiquidityInstruction,
+  parseRepayObligationLiquidityV2Instruction,
+  parseRequestElevationGroupInstruction,
+  parseSetObligationOrderInstruction,
+  parseSocializeLossInstruction,
+  parseSocializeLossV2Instruction,
+  parseUpdateGlobalConfigAdminInstruction,
+  parseUpdateGlobalConfigInstruction,
+  parseUpdateLendingMarketInstruction,
+  parseUpdateLendingMarketOwnerInstruction,
+  parseUpdateReserveConfigInstruction,
+  parseWithdrawObligationCollateralAndRedeemReserveCollateralInstruction,
+  parseWithdrawObligationCollateralAndRedeemReserveCollateralV2Instruction,
+  parseWithdrawObligationCollateralInstruction,
+  parseWithdrawObligationCollateralV2Instruction,
+  parseWithdrawProtocolFeeInstruction,
+  parseWithdrawReferrerFeesInstruction,
+} from "../instructions/index.js";
+import {
+  findLendingGlobalConfigStatePda,
+  findLendingMarketAuthPda,
+  findObligationPda,
+  findReferrerStatePda,
+  findReferrerTokenStatePda,
+  findReserveCollateralMintPda,
+  findReserveCollateralSupplyPda,
+  findReserveFeeVaultPda,
+  findReserveLiquiditySupplyPda,
+  findShortUrlPda,
+  findUserMetadataPda,
+} from "../pdas/index.js";
 
 export const KAMINO_LENDING_PROGRAM_ADDRESS =
   "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD" as Address<"KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD">;
@@ -177,8 +396,9 @@ export function identifyKaminoLendingAccount(
   ) {
     return KaminoLendingAccount.Reserve;
   }
-  throw new Error(
-    "The provided account could not be identified as a kaminoLending account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "kaminoLending" },
   );
 }
 
@@ -765,8 +985,9 @@ export function identifyKaminoLendingInstruction(
   ) {
     return KaminoLendingInstruction.IdlMissingTypes;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a kaminoLending instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "kaminoLending" },
   );
 }
 
@@ -917,3 +1138,942 @@ export type ParsedKaminoLendingInstruction<
   | ({
       instructionType: KaminoLendingInstruction.IdlMissingTypes;
     } & ParsedIdlMissingTypesInstruction<TProgram>);
+
+export function parseKaminoLendingInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedKaminoLendingInstruction<TProgram> {
+  const instructionType = identifyKaminoLendingInstruction(instruction);
+  switch (instructionType) {
+    case KaminoLendingInstruction.InitLendingMarket: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitLendingMarket,
+        ...parseInitLendingMarketInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.UpdateLendingMarket: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.UpdateLendingMarket,
+        ...parseUpdateLendingMarketInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.UpdateLendingMarketOwner: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.UpdateLendingMarketOwner,
+        ...parseUpdateLendingMarketOwnerInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitReserve: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitReserve,
+        ...parseInitReserveInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitFarmsForReserve: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitFarmsForReserve,
+        ...parseInitFarmsForReserveInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.UpdateReserveConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.UpdateReserveConfig,
+        ...parseUpdateReserveConfigInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RedeemFees: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RedeemFees,
+        ...parseRedeemFeesInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.WithdrawProtocolFee: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.WithdrawProtocolFee,
+        ...parseWithdrawProtocolFeeInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.SocializeLoss: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.SocializeLoss,
+        ...parseSocializeLossInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.SocializeLossV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.SocializeLossV2,
+        ...parseSocializeLossV2Instruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.MarkObligationForDeleveraging: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.MarkObligationForDeleveraging,
+        ...parseMarkObligationForDeleveragingInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RefreshReserve: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RefreshReserve,
+        ...parseRefreshReserveInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RefreshReservesBatch: {
+      return {
+        instructionType: KaminoLendingInstruction.RefreshReservesBatch,
+        ...parseRefreshReservesBatchInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.DepositReserveLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.DepositReserveLiquidity,
+        ...parseDepositReserveLiquidityInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RedeemReserveCollateral: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RedeemReserveCollateral,
+        ...parseRedeemReserveCollateralInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitObligation: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitObligation,
+        ...parseInitObligationInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitObligationFarmsForReserve: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitObligationFarmsForReserve,
+        ...parseInitObligationFarmsForReserveInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RefreshObligationFarmsForReserve: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.RefreshObligationFarmsForReserve,
+        ...parseRefreshObligationFarmsForReserveInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RefreshObligation: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RefreshObligation,
+        ...parseRefreshObligationInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.DepositObligationCollateral: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.DepositObligationCollateral,
+        ...parseDepositObligationCollateralInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.DepositObligationCollateralV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.DepositObligationCollateralV2,
+        ...parseDepositObligationCollateralV2Instruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.WithdrawObligationCollateral: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.WithdrawObligationCollateral,
+        ...parseWithdrawObligationCollateralInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.WithdrawObligationCollateralV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.WithdrawObligationCollateralV2,
+        ...parseWithdrawObligationCollateralV2Instruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.BorrowObligationLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.BorrowObligationLiquidity,
+        ...parseBorrowObligationLiquidityInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.BorrowObligationLiquidityV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.BorrowObligationLiquidityV2,
+        ...parseBorrowObligationLiquidityV2Instruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RepayObligationLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RepayObligationLiquidity,
+        ...parseRepayObligationLiquidityInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RepayObligationLiquidityV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RepayObligationLiquidityV2,
+        ...parseRepayObligationLiquidityV2Instruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RepayAndWithdrawAndRedeem: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RepayAndWithdrawAndRedeem,
+        ...parseRepayAndWithdrawAndRedeemInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.DepositAndWithdraw: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.DepositAndWithdraw,
+        ...parseDepositAndWithdrawInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateral: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateral,
+        ...parseDepositReserveLiquidityAndObligationCollateralInstruction(
+          instruction,
+        ),
+      };
+    }
+    case KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateralV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateralV2,
+        ...parseDepositReserveLiquidityAndObligationCollateralV2Instruction(
+          instruction,
+        ),
+      };
+    }
+    case KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateral: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateral,
+        ...parseWithdrawObligationCollateralAndRedeemReserveCollateralInstruction(
+          instruction,
+        ),
+      };
+    }
+    case KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateralV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateralV2,
+        ...parseWithdrawObligationCollateralAndRedeemReserveCollateralV2Instruction(
+          instruction,
+        ),
+      };
+    }
+    case KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateral: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateral,
+        ...parseLiquidateObligationAndRedeemReserveCollateralInstruction(
+          instruction,
+        ),
+      };
+    }
+    case KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateralV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateralV2,
+        ...parseLiquidateObligationAndRedeemReserveCollateralV2Instruction(
+          instruction,
+        ),
+      };
+    }
+    case KaminoLendingInstruction.FlashRepayReserveLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.FlashRepayReserveLiquidity,
+        ...parseFlashRepayReserveLiquidityInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.FlashBorrowReserveLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.FlashBorrowReserveLiquidity,
+        ...parseFlashBorrowReserveLiquidityInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.RequestElevationGroup: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.RequestElevationGroup,
+        ...parseRequestElevationGroupInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitReferrerTokenState: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitReferrerTokenState,
+        ...parseInitReferrerTokenStateInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitUserMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitUserMetadata,
+        ...parseInitUserMetadataInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.WithdrawReferrerFees: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.WithdrawReferrerFees,
+        ...parseWithdrawReferrerFeesInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitReferrerStateAndShortUrl: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitReferrerStateAndShortUrl,
+        ...parseInitReferrerStateAndShortUrlInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.DeleteReferrerStateAndShortUrl: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          KaminoLendingInstruction.DeleteReferrerStateAndShortUrl,
+        ...parseDeleteReferrerStateAndShortUrlInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.SetObligationOrder: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.SetObligationOrder,
+        ...parseSetObligationOrderInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.InitGlobalConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.InitGlobalConfig,
+        ...parseInitGlobalConfigInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.UpdateGlobalConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.UpdateGlobalConfig,
+        ...parseUpdateGlobalConfigInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.UpdateGlobalConfigAdmin: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.UpdateGlobalConfigAdmin,
+        ...parseUpdateGlobalConfigAdminInstruction(instruction),
+      };
+    }
+    case KaminoLendingInstruction.IdlMissingTypes: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: KaminoLendingInstruction.IdlMissingTypes,
+        ...parseIdlMissingTypesInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "kaminoLending",
+        },
+      );
+  }
+}
+
+export interface KaminoLendingPlugin {
+  accounts: KaminoLendingPluginAccounts;
+  instructions: KaminoLendingPluginInstructions;
+  pdas: KaminoLendingPluginPdas;
+}
+
+export interface KaminoLendingPluginAccounts {
+  userState: ReturnType<typeof getUserStateCodec> &
+    SelfFetchFunctions<UserStateArgs, UserState>;
+  lendingGlobalConfig: ReturnType<typeof getLendingGlobalConfigCodec> &
+    SelfFetchFunctions<LendingGlobalConfigArgs, LendingGlobalConfig>;
+  lendingMarket: ReturnType<typeof getLendingMarketCodec> &
+    SelfFetchFunctions<LendingMarketArgs, LendingMarket>;
+  obligation: ReturnType<typeof getObligationCodec> &
+    SelfFetchFunctions<ObligationArgs, Obligation>;
+  referrerState: ReturnType<typeof getReferrerStateCodec> &
+    SelfFetchFunctions<ReferrerStateArgs, ReferrerState>;
+  referrerTokenState: ReturnType<typeof getReferrerTokenStateCodec> &
+    SelfFetchFunctions<ReferrerTokenStateArgs, ReferrerTokenState>;
+  shortUrl: ReturnType<typeof getShortUrlCodec> &
+    SelfFetchFunctions<ShortUrlArgs, ShortUrl>;
+  userMetadata: ReturnType<typeof getUserMetadataCodec> &
+    SelfFetchFunctions<UserMetadataArgs, UserMetadata>;
+  reserve: ReturnType<typeof getReserveCodec> &
+    SelfFetchFunctions<ReserveArgs, Reserve>;
+}
+
+export interface KaminoLendingPluginInstructions {
+  initLendingMarket: (
+    input: InitLendingMarketAsyncInput,
+  ) => ReturnType<typeof getInitLendingMarketInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateLendingMarket: (
+    input: UpdateLendingMarketInput,
+  ) => ReturnType<typeof getUpdateLendingMarketInstruction> &
+    SelfPlanAndSendFunctions;
+  updateLendingMarketOwner: (
+    input: UpdateLendingMarketOwnerInput,
+  ) => ReturnType<typeof getUpdateLendingMarketOwnerInstruction> &
+    SelfPlanAndSendFunctions;
+  initReserve: (
+    input: InitReserveAsyncInput,
+  ) => ReturnType<typeof getInitReserveInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initFarmsForReserve: (
+    input: InitFarmsForReserveAsyncInput,
+  ) => ReturnType<typeof getInitFarmsForReserveInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateReserveConfig: (
+    input: UpdateReserveConfigInput,
+  ) => ReturnType<typeof getUpdateReserveConfigInstruction> &
+    SelfPlanAndSendFunctions;
+  redeemFees: (
+    input: RedeemFeesAsyncInput,
+  ) => ReturnType<typeof getRedeemFeesInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawProtocolFee: (
+    input: WithdrawProtocolFeeAsyncInput,
+  ) => ReturnType<typeof getWithdrawProtocolFeeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  socializeLoss: (
+    input: SocializeLossInput,
+  ) => ReturnType<typeof getSocializeLossInstruction> &
+    SelfPlanAndSendFunctions;
+  socializeLossV2: (
+    input: SocializeLossV2AsyncInput,
+  ) => ReturnType<typeof getSocializeLossV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  markObligationForDeleveraging: (
+    input: MarkObligationForDeleveragingInput,
+  ) => ReturnType<typeof getMarkObligationForDeleveragingInstruction> &
+    SelfPlanAndSendFunctions;
+  refreshReserve: (
+    input: RefreshReserveInput,
+  ) => ReturnType<typeof getRefreshReserveInstruction> &
+    SelfPlanAndSendFunctions;
+  refreshReservesBatch: (
+    input: RefreshReservesBatchInput,
+  ) => ReturnType<typeof getRefreshReservesBatchInstruction> &
+    SelfPlanAndSendFunctions;
+  depositReserveLiquidity: (
+    input: DepositReserveLiquidityAsyncInput,
+  ) => ReturnType<typeof getDepositReserveLiquidityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  redeemReserveCollateral: (
+    input: RedeemReserveCollateralAsyncInput,
+  ) => ReturnType<typeof getRedeemReserveCollateralInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initObligation: (
+    input: MakeOptional<InitObligationInput, "feePayer">,
+  ) => ReturnType<typeof getInitObligationInstruction> &
+    SelfPlanAndSendFunctions;
+  initObligationFarmsForReserve: (
+    input: MakeOptional<InitObligationFarmsForReserveAsyncInput, "payer">,
+  ) => ReturnType<typeof getInitObligationFarmsForReserveInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  refreshObligationFarmsForReserve: (
+    input: RefreshObligationFarmsForReserveAsyncInput,
+  ) => ReturnType<typeof getRefreshObligationFarmsForReserveInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  refreshObligation: (
+    input: RefreshObligationInput,
+  ) => ReturnType<typeof getRefreshObligationInstruction> &
+    SelfPlanAndSendFunctions;
+  depositObligationCollateral: (
+    input: DepositObligationCollateralInput,
+  ) => ReturnType<typeof getDepositObligationCollateralInstruction> &
+    SelfPlanAndSendFunctions;
+  depositObligationCollateralV2: (
+    input: DepositObligationCollateralV2AsyncInput,
+  ) => ReturnType<typeof getDepositObligationCollateralV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawObligationCollateral: (
+    input: WithdrawObligationCollateralAsyncInput,
+  ) => ReturnType<typeof getWithdrawObligationCollateralInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawObligationCollateralV2: (
+    input: WithdrawObligationCollateralV2AsyncInput,
+  ) => ReturnType<typeof getWithdrawObligationCollateralV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  borrowObligationLiquidity: (
+    input: BorrowObligationLiquidityAsyncInput,
+  ) => ReturnType<typeof getBorrowObligationLiquidityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  borrowObligationLiquidityV2: (
+    input: BorrowObligationLiquidityV2AsyncInput,
+  ) => ReturnType<typeof getBorrowObligationLiquidityV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  repayObligationLiquidity: (
+    input: RepayObligationLiquidityInput,
+  ) => ReturnType<typeof getRepayObligationLiquidityInstruction> &
+    SelfPlanAndSendFunctions;
+  repayObligationLiquidityV2: (
+    input: RepayObligationLiquidityV2AsyncInput,
+  ) => ReturnType<typeof getRepayObligationLiquidityV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  repayAndWithdrawAndRedeem: (
+    input: RepayAndWithdrawAndRedeemInput,
+  ) => ReturnType<typeof getRepayAndWithdrawAndRedeemInstruction> &
+    SelfPlanAndSendFunctions;
+  depositAndWithdraw: (
+    input: DepositAndWithdrawInput,
+  ) => ReturnType<typeof getDepositAndWithdrawInstruction> &
+    SelfPlanAndSendFunctions;
+  depositReserveLiquidityAndObligationCollateral: (
+    input: DepositReserveLiquidityAndObligationCollateralAsyncInput,
+  ) => ReturnType<
+    typeof getDepositReserveLiquidityAndObligationCollateralInstructionAsync
+  > &
+    SelfPlanAndSendFunctions;
+  depositReserveLiquidityAndObligationCollateralV2: (
+    input: DepositReserveLiquidityAndObligationCollateralV2AsyncInput,
+  ) => ReturnType<
+    typeof getDepositReserveLiquidityAndObligationCollateralV2InstructionAsync
+  > &
+    SelfPlanAndSendFunctions;
+  withdrawObligationCollateralAndRedeemReserveCollateral: (
+    input: WithdrawObligationCollateralAndRedeemReserveCollateralAsyncInput,
+  ) => ReturnType<
+    typeof getWithdrawObligationCollateralAndRedeemReserveCollateralInstructionAsync
+  > &
+    SelfPlanAndSendFunctions;
+  withdrawObligationCollateralAndRedeemReserveCollateralV2: (
+    input: WithdrawObligationCollateralAndRedeemReserveCollateralV2AsyncInput,
+  ) => ReturnType<
+    typeof getWithdrawObligationCollateralAndRedeemReserveCollateralV2InstructionAsync
+  > &
+    SelfPlanAndSendFunctions;
+  liquidateObligationAndRedeemReserveCollateral: (
+    input: LiquidateObligationAndRedeemReserveCollateralAsyncInput,
+  ) => ReturnType<
+    typeof getLiquidateObligationAndRedeemReserveCollateralInstructionAsync
+  > &
+    SelfPlanAndSendFunctions;
+  liquidateObligationAndRedeemReserveCollateralV2: (
+    input: LiquidateObligationAndRedeemReserveCollateralV2Input,
+  ) => ReturnType<
+    typeof getLiquidateObligationAndRedeemReserveCollateralV2Instruction
+  > &
+    SelfPlanAndSendFunctions;
+  flashRepayReserveLiquidity: (
+    input: FlashRepayReserveLiquidityAsyncInput,
+  ) => ReturnType<typeof getFlashRepayReserveLiquidityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  flashBorrowReserveLiquidity: (
+    input: FlashBorrowReserveLiquidityAsyncInput,
+  ) => ReturnType<typeof getFlashBorrowReserveLiquidityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  requestElevationGroup: (
+    input: RequestElevationGroupInput,
+  ) => ReturnType<typeof getRequestElevationGroupInstruction> &
+    SelfPlanAndSendFunctions;
+  initReferrerTokenState: (
+    input: MakeOptional<InitReferrerTokenStateInput, "payer">,
+  ) => ReturnType<typeof getInitReferrerTokenStateInstruction> &
+    SelfPlanAndSendFunctions;
+  initUserMetadata: (
+    input: MakeOptional<InitUserMetadataInput, "feePayer">,
+  ) => ReturnType<typeof getInitUserMetadataInstruction> &
+    SelfPlanAndSendFunctions;
+  withdrawReferrerFees: (
+    input: WithdrawReferrerFeesAsyncInput,
+  ) => ReturnType<typeof getWithdrawReferrerFeesInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initReferrerStateAndShortUrl: (
+    input: InitReferrerStateAndShortUrlInput,
+  ) => ReturnType<typeof getInitReferrerStateAndShortUrlInstruction> &
+    SelfPlanAndSendFunctions;
+  deleteReferrerStateAndShortUrl: (
+    input: DeleteReferrerStateAndShortUrlInput,
+  ) => ReturnType<typeof getDeleteReferrerStateAndShortUrlInstruction> &
+    SelfPlanAndSendFunctions;
+  setObligationOrder: (
+    input: SetObligationOrderInput,
+  ) => ReturnType<typeof getSetObligationOrderInstruction> &
+    SelfPlanAndSendFunctions;
+  initGlobalConfig: (
+    input: MakeOptional<InitGlobalConfigAsyncInput, "payer">,
+  ) => ReturnType<typeof getInitGlobalConfigInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateGlobalConfig: (
+    input: UpdateGlobalConfigInput,
+  ) => ReturnType<typeof getUpdateGlobalConfigInstruction> &
+    SelfPlanAndSendFunctions;
+  updateGlobalConfigAdmin: (
+    input: UpdateGlobalConfigAdminInput,
+  ) => ReturnType<typeof getUpdateGlobalConfigAdminInstruction> &
+    SelfPlanAndSendFunctions;
+  idlMissingTypes: (
+    input: IdlMissingTypesInput,
+  ) => ReturnType<typeof getIdlMissingTypesInstruction> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface KaminoLendingPluginPdas {
+  lendingGlobalConfigState: typeof findLendingGlobalConfigStatePda;
+  obligation: typeof findObligationPda;
+  lendingMarketAuth: typeof findLendingMarketAuthPda;
+  reserveLiquiditySupply: typeof findReserveLiquiditySupplyPda;
+  reserveFeeVault: typeof findReserveFeeVaultPda;
+  reserveCollateralMint: typeof findReserveCollateralMintPda;
+  reserveCollateralSupply: typeof findReserveCollateralSupplyPda;
+  userMetadata: typeof findUserMetadataPda;
+  referrerTokenState: typeof findReferrerTokenStatePda;
+  referrerState: typeof findReferrerStatePda;
+  shortUrl: typeof findShortUrlPda;
+}
+
+export type KaminoLendingPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function kaminoLendingProgram() {
+  return <T extends KaminoLendingPluginRequirements>(
+    client: T,
+  ): Omit<T, "kaminoLending"> & { kaminoLending: KaminoLendingPlugin } => {
+    return extendClient(client, {
+      kaminoLending: <KaminoLendingPlugin>{
+        accounts: {
+          userState: addSelfFetchFunctions(client, getUserStateCodec()),
+          lendingGlobalConfig: addSelfFetchFunctions(
+            client,
+            getLendingGlobalConfigCodec(),
+          ),
+          lendingMarket: addSelfFetchFunctions(client, getLendingMarketCodec()),
+          obligation: addSelfFetchFunctions(client, getObligationCodec()),
+          referrerState: addSelfFetchFunctions(client, getReferrerStateCodec()),
+          referrerTokenState: addSelfFetchFunctions(
+            client,
+            getReferrerTokenStateCodec(),
+          ),
+          shortUrl: addSelfFetchFunctions(client, getShortUrlCodec()),
+          userMetadata: addSelfFetchFunctions(client, getUserMetadataCodec()),
+          reserve: addSelfFetchFunctions(client, getReserveCodec()),
+        },
+        instructions: {
+          initLendingMarket: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitLendingMarketInstructionAsync(input),
+            ),
+          updateLendingMarket: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateLendingMarketInstruction(input),
+            ),
+          updateLendingMarketOwner: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateLendingMarketOwnerInstruction(input),
+            ),
+          initReserve: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitReserveInstructionAsync(input),
+            ),
+          initFarmsForReserve: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitFarmsForReserveInstructionAsync(input),
+            ),
+          updateReserveConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateReserveConfigInstruction(input),
+            ),
+          redeemFees: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemFeesInstructionAsync(input),
+            ),
+          withdrawProtocolFee: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawProtocolFeeInstructionAsync(input),
+            ),
+          socializeLoss: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSocializeLossInstruction(input),
+            ),
+          socializeLossV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSocializeLossV2InstructionAsync(input),
+            ),
+          markObligationForDeleveraging: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMarkObligationForDeleveragingInstruction(input),
+            ),
+          refreshReserve: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshReserveInstruction(input),
+            ),
+          refreshReservesBatch: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshReservesBatchInstruction(input),
+            ),
+          depositReserveLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositReserveLiquidityInstructionAsync(input),
+            ),
+          redeemReserveCollateral: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemReserveCollateralInstructionAsync(input),
+            ),
+          initObligation: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitObligationInstruction({
+                ...input,
+                feePayer: input.feePayer ?? client.payer,
+              }),
+            ),
+          initObligationFarmsForReserve: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitObligationFarmsForReserveInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          refreshObligationFarmsForReserve: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshObligationFarmsForReserveInstructionAsync(input),
+            ),
+          refreshObligation: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshObligationInstruction(input),
+            ),
+          depositObligationCollateral: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositObligationCollateralInstruction(input),
+            ),
+          depositObligationCollateralV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositObligationCollateralV2InstructionAsync(input),
+            ),
+          withdrawObligationCollateral: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawObligationCollateralInstructionAsync(input),
+            ),
+          withdrawObligationCollateralV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawObligationCollateralV2InstructionAsync(input),
+            ),
+          borrowObligationLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBorrowObligationLiquidityInstructionAsync(input),
+            ),
+          borrowObligationLiquidityV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBorrowObligationLiquidityV2InstructionAsync(input),
+            ),
+          repayObligationLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRepayObligationLiquidityInstruction(input),
+            ),
+          repayObligationLiquidityV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRepayObligationLiquidityV2InstructionAsync(input),
+            ),
+          repayAndWithdrawAndRedeem: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRepayAndWithdrawAndRedeemInstruction(input),
+            ),
+          depositAndWithdraw: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositAndWithdrawInstruction(input),
+            ),
+          depositReserveLiquidityAndObligationCollateral: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositReserveLiquidityAndObligationCollateralInstructionAsync(
+                input,
+              ),
+            ),
+          depositReserveLiquidityAndObligationCollateralV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositReserveLiquidityAndObligationCollateralV2InstructionAsync(
+                input,
+              ),
+            ),
+          withdrawObligationCollateralAndRedeemReserveCollateral: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawObligationCollateralAndRedeemReserveCollateralInstructionAsync(
+                input,
+              ),
+            ),
+          withdrawObligationCollateralAndRedeemReserveCollateralV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawObligationCollateralAndRedeemReserveCollateralV2InstructionAsync(
+                input,
+              ),
+            ),
+          liquidateObligationAndRedeemReserveCollateral: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLiquidateObligationAndRedeemReserveCollateralInstructionAsync(
+                input,
+              ),
+            ),
+          liquidateObligationAndRedeemReserveCollateralV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLiquidateObligationAndRedeemReserveCollateralV2Instruction(
+                input,
+              ),
+            ),
+          flashRepayReserveLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFlashRepayReserveLiquidityInstructionAsync(input),
+            ),
+          flashBorrowReserveLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFlashBorrowReserveLiquidityInstructionAsync(input),
+            ),
+          requestElevationGroup: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRequestElevationGroupInstruction(input),
+            ),
+          initReferrerTokenState: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitReferrerTokenStateInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initUserMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitUserMetadataInstruction({
+                ...input,
+                feePayer: input.feePayer ?? client.payer,
+              }),
+            ),
+          withdrawReferrerFees: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawReferrerFeesInstructionAsync(input),
+            ),
+          initReferrerStateAndShortUrl: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitReferrerStateAndShortUrlInstruction(input),
+            ),
+          deleteReferrerStateAndShortUrl: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeleteReferrerStateAndShortUrlInstruction(input),
+            ),
+          setObligationOrder: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetObligationOrderInstruction(input),
+            ),
+          initGlobalConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitGlobalConfigInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          updateGlobalConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateGlobalConfigInstruction(input),
+            ),
+          updateGlobalConfigAdmin: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateGlobalConfigAdminInstruction(input),
+            ),
+          idlMissingTypes: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIdlMissingTypesInstruction(input),
+            ),
+        },
+        pdas: {
+          lendingGlobalConfigState: findLendingGlobalConfigStatePda,
+          obligation: findObligationPda,
+          lendingMarketAuth: findLendingMarketAuthPda,
+          reserveLiquiditySupply: findReserveLiquiditySupplyPda,
+          reserveFeeVault: findReserveFeeVaultPda,
+          reserveCollateralMint: findReserveCollateralMintPda,
+          reserveCollateralSupply: findReserveCollateralSupplyPda,
+          userMetadata: findUserMetadataPda,
+          referrerTokenState: findReferrerTokenStatePda,
+          referrerState: findReferrerStatePda,
+          shortUrl: findShortUrlPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

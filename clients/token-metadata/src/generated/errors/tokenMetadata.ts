@@ -627,7 +627,7 @@ export type TokenMetadataError =
   | typeof TOKEN_METADATA_ERROR__USE_AUTHORITY_RECORD_ALREADY_REVOKED;
 
 let tokenMetadataErrorMessages: Record<TokenMetadataError, string> | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   tokenMetadataErrorMessages = {
     [TOKEN_METADATA_ERROR__ACCOUNT_ALREADY_RESIZED]:
       "Account has already been resized",
@@ -959,7 +959,7 @@ if (true) {
 }
 
 export function getTokenMetadataErrorMessage(code: TokenMetadataError): string {
-  if (true) {
+  if (process.env.NODE_ENV !== "production") {
     return tokenMetadataErrorMessages![code];
   }
 

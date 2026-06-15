@@ -77,7 +77,7 @@ export interface VestingArgs {
   totalReleasedLiquidity: number | bigint;
   numberOfPeriod: number;
   padding: number[];
-  padding2: (number | bigint)[];
+  padding2: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link VestingArgs} account data. */

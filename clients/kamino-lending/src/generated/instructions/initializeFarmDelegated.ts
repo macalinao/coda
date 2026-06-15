@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,11 +32,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_FARM_DELEGATED_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([250, 84, 101, 25, 51, 77, 204, 91]);
@@ -96,7 +101,7 @@ export interface InitializeFarmDelegatedInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitializeFarmDelegatedInstructionDataArgs {}
+export type InitializeFarmDelegatedInstructionDataArgs = {};
 
 export function getInitializeFarmDelegatedInstructionDataEncoder(): FixedSizeEncoder<InitializeFarmDelegatedInstructionDataArgs> {
   return transformEncoder(
@@ -192,13 +197,16 @@ export async function getInitializeFarmDelegatedInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.farmVaultsAuthority.value) {
     accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: expectAddress(accounts.farmState.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -213,13 +221,13 @@ export async function getInitializeFarmDelegatedInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.farmAdmin),
-      getAccountMeta(accounts.farmDelegate),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("farmAdmin", accounts.farmAdmin),
+      getAccountMeta("farmDelegate", accounts.farmDelegate),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializeFarmDelegatedInstructionDataEncoder().encode({}),
     programAddress,
@@ -301,7 +309,7 @@ export function getInitializeFarmDelegatedInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -317,13 +325,13 @@ export function getInitializeFarmDelegatedInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.farmAdmin),
-      getAccountMeta(accounts.farmDelegate),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("farmAdmin", accounts.farmAdmin),
+      getAccountMeta("farmDelegate", accounts.farmDelegate),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializeFarmDelegatedInstructionDataEncoder().encode({}),
     programAddress,
@@ -365,8 +373,13 @@ export function parseInitializeFarmDelegatedInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeFarmDelegatedInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

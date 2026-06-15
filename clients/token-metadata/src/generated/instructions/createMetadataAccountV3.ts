@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   CreateMetadataAccountArgsV3,
   CreateMetadataAccountArgsV3Args,
@@ -35,11 +35,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getCreateMetadataAccountArgsV3Decoder,
   getCreateMetadataAccountArgsV3Encoder,
@@ -219,7 +224,7 @@ export async function getCreateMetadataAccountV3InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -229,7 +234,10 @@ export async function getCreateMetadataAccountV3InstructionAsync<
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -240,13 +248,13 @@ export async function getCreateMetadataAccountV3InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.mintAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("mintAuthority", accounts.mintAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getCreateMetadataAccountV3InstructionDataEncoder().encode(
       args as CreateMetadataAccountV3InstructionDataArgs,
@@ -347,7 +355,7 @@ export function getCreateMetadataAccountV3Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -362,13 +370,13 @@ export function getCreateMetadataAccountV3Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.mintAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("mintAuthority", accounts.mintAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getCreateMetadataAccountV3InstructionDataEncoder().encode(
       args as CreateMetadataAccountV3InstructionDataArgs,
@@ -422,8 +430,13 @@ export function parseCreateMetadataAccountV3Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateMetadataAccountV3Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -434,7 +447,7 @@ export function parseCreateMetadataAccountV3Instruction<
   let optionalAccountsRemaining = instruction.accounts.length - 6;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

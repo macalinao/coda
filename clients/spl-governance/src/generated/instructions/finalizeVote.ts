@@ -19,17 +19,19 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const FINALIZE_VOTE_DISCRIMINATOR = 14;
 
@@ -80,7 +82,7 @@ export interface FinalizeVoteInstructionData {
   discriminator: number;
 }
 
-export interface FinalizeVoteInstructionDataArgs {}
+export type FinalizeVoteInstructionDataArgs = {};
 
 export function getFinalizeVoteInstructionDataEncoder(): FixedSizeEncoder<FinalizeVoteInstructionDataArgs> {
   return transformEncoder(
@@ -182,19 +184,19 @@ export function getFinalizeVoteInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.governingTokenMint),
-      getAccountMeta(accounts.realmConfig),
-      getAccountMeta(accounts.maxVoterWeightRecord),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta("governingTokenMint", accounts.governingTokenMint),
+      getAccountMeta("realmConfig", accounts.realmConfig),
+      getAccountMeta("maxVoterWeightRecord", accounts.maxVoterWeightRecord),
     ],
     data: getFinalizeVoteInstructionDataEncoder().encode({}),
     programAddress,
@@ -239,8 +241,13 @@ export function parseFinalizeVoteInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFinalizeVoteInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

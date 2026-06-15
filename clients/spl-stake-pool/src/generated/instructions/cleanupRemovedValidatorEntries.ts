@@ -19,17 +19,19 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CLEANUP_REMOVED_VALIDATOR_ENTRIES_DISCRIMINATOR = 8;
 
@@ -60,7 +62,7 @@ export interface CleanupRemovedValidatorEntriesInstructionData {
   discriminator: number;
 }
 
-export interface CleanupRemovedValidatorEntriesInstructionDataArgs {}
+export type CleanupRemovedValidatorEntriesInstructionDataArgs = {};
 
 export function getCleanupRemovedValidatorEntriesInstructionDataEncoder(): FixedSizeEncoder<CleanupRemovedValidatorEntriesInstructionDataArgs> {
   return transformEncoder(
@@ -120,14 +122,14 @@ export function getCleanupRemovedValidatorEntriesInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.validatorList),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("validatorList", accounts.validatorList),
     ],
     data: getCleanupRemovedValidatorEntriesInstructionDataEncoder().encode({}),
     programAddress,
@@ -159,8 +161,13 @@ export function parseCleanupRemovedValidatorEntriesInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCleanupRemovedValidatorEntriesInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

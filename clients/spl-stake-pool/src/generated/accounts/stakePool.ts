@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type {
   Fee,
@@ -59,9 +60,9 @@ import {
   getLockupEncoder,
 } from "../types/index.js";
 
-export const STAKE_POOL_ACCOUNT_TYPE = AccountType.StakePool;
+export const STAKE_POOL_ACCOUNT_TYPE: AccountType = AccountType.StakePool;
 
-export function getStakePoolAccountTypeBytes() {
+export function getStakePoolAccountTypeBytes(): ReadonlyUint8Array {
   return getAccountTypeEncoder().encode(STAKE_POOL_ACCOUNT_TYPE);
 }
 

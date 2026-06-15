@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,19 +33,21 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+  getNonNullResolvedInstructionInput,
+} from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findRewardVaultPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  expectSome,
-  getAccountMetaFactory,
-} from "../shared/index.js";
 
 export const CLAIM_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   149, 95, 181, 242, 94, 90, 158, 162,
@@ -59,22 +61,22 @@ export function getClaimRewardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClaimRewardInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPoolAuthority extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountRewardVault extends string | AccountMeta = string,
-  TAccountRewardMint extends string | AccountMeta = string,
-  TAccountUserTokenAccount extends string | AccountMeta = string,
-  TAccountPositionNftAccount extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
+  TAccountPoolAuthority extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountRewardVault extends string | AccountMeta<string> = string,
+  TAccountRewardMint extends string | AccountMeta<string> = string,
+  TAccountUserTokenAccount extends string | AccountMeta<string> = string,
+  TAccountPositionNftAccount extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -257,7 +259,7 @@ export async function getClaimRewardInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -269,8 +271,14 @@ export async function getClaimRewardInstructionAsync<
   }
   if (!accounts.rewardVault.value) {
     accounts.rewardVault.value = await findRewardVaultPda({
-      pool: expectAddress(accounts.pool.value),
-      rewardIndex: expectSome(args.rewardIndex),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
+      rewardIndex: getNonNullResolvedInstructionInput(
+        "rewardIndex",
+        args.rewardIndex,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -288,17 +296,17 @@ export async function getClaimRewardInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.userTokenAccount),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("userTokenAccount", accounts.userTokenAccount),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getClaimRewardInstructionDataEncoder().encode(
       args as ClaimRewardInstructionDataArgs,
@@ -418,7 +426,7 @@ export function getClaimRewardInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -437,17 +445,17 @@ export function getClaimRewardInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.userTokenAccount),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("userTokenAccount", accounts.userTokenAccount),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getClaimRewardInstructionDataEncoder().encode(
       args as ClaimRewardInstructionDataArgs,
@@ -502,8 +510,13 @@ export function parseClaimRewardInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClaimRewardInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

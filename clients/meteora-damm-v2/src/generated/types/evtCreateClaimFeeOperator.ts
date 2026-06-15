@@ -20,7 +20,6 @@ import {
   getStructEncoder,
 } from "@solana/kit";
 
-/** Create claim fee operator */
 export interface EvtCreateClaimFeeOperator {
   operator: Address;
 }

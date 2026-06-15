@@ -6,9 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
+export * from "./approveLockPrivilegeEvent.js";
+export * from "./exitEscrowEvent.js";
 export * from "./governanceParameters.js";
+export * from "./governorCreateEvent.js";
+export * from "./governorSetElectorateEvent.js";
+export * from "./governorSetParamsEvent.js";
+export * from "./lockEvent.js";
 export * from "./lockerParams.js";
+export * from "./lockerSetParamsEvent.js";
+export * from "./newEscrowEvent.js";
+export * from "./newLockerEvent.js";
 export * from "./proposalAccountMeta.js";
+export * from "./proposalActivateEvent.js";
+export * from "./proposalCancelEvent.js";
+export * from "./proposalCreateEvent.js";
 export * from "./proposalInstruction.js";
+export * from "./proposalMetaCreateEvent.js";
+export * from "./proposalQueueEvent.js";
 export * from "./proposalState.js";
+export * from "./revokeLockPrivilegeEvent.js";
+export * from "./setVoteDelegateEvent.js";
+export * from "./voteSetEvent.js";
 export * from "./voteSide.js";

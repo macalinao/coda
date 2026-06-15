@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,14 +33,19 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
 } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_OBLIGATION_COLLATERAL_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([137, 145, 151, 94, 167, 113, 4, 145]);
@@ -271,7 +276,7 @@ export async function getDepositObligationCollateralV2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -288,7 +293,10 @@ export async function getDepositObligationCollateralV2InstructionAsync<
   }
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      lendingMarket: getAddressFromResolvedInstructionAccount(
+        "lendingMarket",
+        accounts.lendingMarket.value,
+      ),
     });
   }
   if (!accounts.farmsProgram.value) {
@@ -299,18 +307,27 @@ export async function getDepositObligationCollateralV2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.depositReserve),
-      getAccountMeta(accounts.reserveDestinationCollateral),
-      getAccountMeta(accounts.userSourceCollateral),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.obligationFarmUserState),
-      getAccountMeta(accounts.reserveFarmState),
-      getAccountMeta(accounts.farmsProgram),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("obligation", accounts.obligation),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("depositReserve", accounts.depositReserve),
+      getAccountMeta(
+        "reserveDestinationCollateral",
+        accounts.reserveDestinationCollateral,
+      ),
+      getAccountMeta("userSourceCollateral", accounts.userSourceCollateral),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta(
+        "obligationFarmUserState",
+        accounts.obligationFarmUserState,
+      ),
+      getAccountMeta("reserveFarmState", accounts.reserveFarmState),
+      getAccountMeta("farmsProgram", accounts.farmsProgram),
     ],
     data: getDepositObligationCollateralV2InstructionDataEncoder().encode(
       args as DepositObligationCollateralV2InstructionDataArgs,
@@ -446,7 +463,7 @@ export function getDepositObligationCollateralV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -469,18 +486,27 @@ export function getDepositObligationCollateralV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.depositReserve),
-      getAccountMeta(accounts.reserveDestinationCollateral),
-      getAccountMeta(accounts.userSourceCollateral),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.obligationFarmUserState),
-      getAccountMeta(accounts.reserveFarmState),
-      getAccountMeta(accounts.farmsProgram),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("obligation", accounts.obligation),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("depositReserve", accounts.depositReserve),
+      getAccountMeta(
+        "reserveDestinationCollateral",
+        accounts.reserveDestinationCollateral,
+      ),
+      getAccountMeta("userSourceCollateral", accounts.userSourceCollateral),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta(
+        "obligationFarmUserState",
+        accounts.obligationFarmUserState,
+      ),
+      getAccountMeta("reserveFarmState", accounts.reserveFarmState),
+      getAccountMeta("farmsProgram", accounts.farmsProgram),
     ],
     data: getDepositObligationCollateralV2InstructionDataEncoder().encode(
       args as DepositObligationCollateralV2InstructionDataArgs,
@@ -534,8 +560,13 @@ export function parseDepositObligationCollateralV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDepositObligationCollateralV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 12) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 12,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -40,7 +40,7 @@ export interface TickArgs {
   liquidityGross: number | bigint;
   feeGrowthOutsideA: number | bigint;
   feeGrowthOutsideB: number | bigint;
-  rewardGrowthsOutside: (number | bigint)[];
+  rewardGrowthsOutside: Array<number | bigint>;
 }
 
 export function getTickEncoder(): FixedSizeEncoder<TickArgs> {

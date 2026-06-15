@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_TO_FARM_VAULT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([131, 166, 64, 94, 108, 213, 114, 183]);
@@ -172,7 +174,7 @@ export function getDepositToFarmVaultInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -187,11 +189,11 @@ export function getDepositToFarmVaultInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.depositor),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.farmVault),
-      getAccountMeta(accounts.depositorAta),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("depositor", accounts.depositor),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("farmVault", accounts.farmVault),
+      getAccountMeta("depositorAta", accounts.depositorAta),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getDepositToFarmVaultInstructionDataEncoder().encode(
       args as DepositToFarmVaultInstructionDataArgs,
@@ -231,8 +233,13 @@ export function parseDepositToFarmVaultInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDepositToFarmVaultInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

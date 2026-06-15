@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +34,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_REGISTRAR_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([132, 235, 36, 49, 139, 66, 202, 69]);
@@ -212,7 +214,7 @@ export function getCreateRegistrarInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -235,14 +237,17 @@ export function getCreateRegistrarInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.realm),
-      getAccountMeta(accounts.governanceProgramId),
-      getAccountMeta(accounts.realmGoverningTokenMint),
-      getAccountMeta(accounts.realmAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("realm", accounts.realm),
+      getAccountMeta("governanceProgramId", accounts.governanceProgramId),
+      getAccountMeta(
+        "realmGoverningTokenMint",
+        accounts.realmGoverningTokenMint,
+      ),
+      getAccountMeta("realmAuthority", accounts.realmAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getCreateRegistrarInstructionDataEncoder().encode(
       args as CreateRegistrarInstructionDataArgs,
@@ -288,8 +293,13 @@ export function parseCreateRegistrarInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateRegistrarInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

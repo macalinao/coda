@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import {
   ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
   BPF_UPGRADEABLE_LOADER_PROGRAM_VALUE_NODE,
+  eventsToDefinedTypesVisitor,
   fixDocsVisitor,
   MEMO_PROGRAM_VALUE_NODE,
   SYSVAR_INSTRUCTIONS_VALUE_NODE,
@@ -22,6 +23,11 @@ import { createCodamaFromIdls } from "./create-codama-from-idls.js";
 import { loadConfig } from "./load-config.js";
 import { loadIdls } from "./load-idls.js";
 import { resolveIdlPaths } from "./resolve-idl-paths.js";
+
+const ASSOCIATED_TOKEN_PROGRAM_ACCOUNT_REGEX =
+  /associatedTokenProgram|ataProgram|splAtaProgram/;
+const TOKEN_PROGRAM_ACCOUNT_REGEX =
+  /(?!associatedTokenProgram)([\w]+)TokenProgram/;
 
 /**
  * Process IDLs with the common workflow:
@@ -56,6 +62,11 @@ export async function processIdls(options: {
 
   codama.update(fixDocsVisitor());
 
+  // Emit Anchor events as defined types. Newer Codama parses events into
+  // dedicated event nodes that the JS renderer no longer renders, so lift
+  // them back into defined types to keep generating event codecs.
+  codama.update(eventsToDefinedTypesVisitor());
+
   // Default instruction accounts
   codama.update(
     setInstructionAccountDefaultValuesVisitor([
@@ -77,7 +88,7 @@ export async function processIdls(options: {
         defaultValue: TOKEN_2022_PROGRAM_VALUE_NODE,
       },
       {
-        account: /associatedTokenProgram|ataProgram|splAtaProgram/,
+        account: ASSOCIATED_TOKEN_PROGRAM_ACCOUNT_REGEX,
         defaultValue: ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
       },
       {
@@ -91,7 +102,7 @@ export async function processIdls(options: {
         defaultValue: SYSVAR_INSTRUCTIONS_VALUE_NODE,
       },
       {
-        account: /(?!associatedTokenProgram)([\w]+)TokenProgram/,
+        account: TOKEN_PROGRAM_ACCOUNT_REGEX,
         defaultValue: TOKEN_PROGRAM_VALUE_NODE,
       },
       ...(config.instructionAccountDefaultValues ?? []),

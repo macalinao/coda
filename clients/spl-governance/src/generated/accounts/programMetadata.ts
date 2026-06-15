@@ -17,6 +17,7 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { Slot, SlotArgs } from "../types/index.js";
 import {
@@ -48,10 +49,10 @@ import {
   getSlotEncoder,
 } from "../types/index.js";
 
-export const PROGRAM_METADATA_ACCOUNT_TYPE =
+export const PROGRAM_METADATA_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.ProgramMetadata;
 
-export function getProgramMetadataAccountTypeBytes() {
+export function getProgramMetadataAccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(
     PROGRAM_METADATA_ACCOUNT_TYPE,
   );

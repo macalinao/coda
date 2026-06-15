@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,11 +32,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findOperatorPda } from "../pdas/index.js";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_OPERATOR_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([179, 106, 174, 35, 45, 26, 10, 67]);
@@ -49,18 +54,18 @@ export function getCreateOperatorV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateOperatorV2Instruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountBase extends string | AccountMeta = string,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountBase extends string | AccountMeta<string> = string,
+  TAccountOperator extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
+    | AccountMeta<string> = "11111111111111111111111111111111",
   TAccountQuarryMineProgram extends
     | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,7 +100,7 @@ export interface CreateOperatorV2InstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CreateOperatorV2InstructionDataArgs {}
+export type CreateOperatorV2InstructionDataArgs = {};
 
 export function getCreateOperatorV2InstructionDataEncoder(): FixedSizeEncoder<CreateOperatorV2InstructionDataArgs> {
   return transformEncoder(
@@ -189,13 +194,16 @@ export async function getCreateOperatorV2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.operator.value) {
     accounts.operator.value = await findOperatorPda({
-      base: expectAddress(accounts.base.value),
+      base: getAddressFromResolvedInstructionAccount(
+        "base",
+        accounts.base.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -210,13 +218,13 @@ export async function getCreateOperatorV2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.quarryMineProgram),
+      getAccountMeta("base", accounts.base),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("quarryMineProgram", accounts.quarryMineProgram),
     ],
     data: getCreateOperatorV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -299,7 +307,7 @@ export function getCreateOperatorV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -315,13 +323,13 @@ export function getCreateOperatorV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.quarryMineProgram),
+      getAccountMeta("base", accounts.base),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("quarryMineProgram", accounts.quarryMineProgram),
     ],
     data: getCreateOperatorV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -363,8 +371,13 @@ export function parseCreateOperatorV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateOperatorV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

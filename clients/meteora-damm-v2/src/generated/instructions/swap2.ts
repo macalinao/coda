@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { SwapParameters2, SwapParameters2Args } from "../types/index.js";
 import {
   combineCodec,
@@ -32,15 +32,20 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getSwapParameters2Decoder,
   getSwapParameters2Encoder,
@@ -56,27 +61,27 @@ export function getSwap2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type Swap2Instruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPoolAuthority extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountInputTokenAccount extends string | AccountMeta = string,
-  TAccountOutputTokenAccount extends string | AccountMeta = string,
-  TAccountTokenAVault extends string | AccountMeta = string,
-  TAccountTokenBVault extends string | AccountMeta = string,
-  TAccountTokenAMint extends string | AccountMeta = string,
-  TAccountTokenBMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountPoolAuthority extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountInputTokenAccount extends string | AccountMeta<string> = string,
+  TAccountOutputTokenAccount extends string | AccountMeta<string> = string,
+  TAccountTokenAVault extends string | AccountMeta<string> = string,
+  TAccountTokenBVault extends string | AccountMeta<string> = string,
+  TAccountTokenAMint extends string | AccountMeta<string> = string,
+  TAccountTokenBMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountTokenAProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenBProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountReferralTokenAccount extends string | AccountMeta = string,
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountReferralTokenAccount extends string | AccountMeta<string> = string,
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -292,7 +297,7 @@ export async function getSwap2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -304,14 +309,26 @@ export async function getSwap2InstructionAsync<
   }
   if (!accounts.tokenAVault.value) {
     accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenAMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenBVault.value) {
     accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenBMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenAProgram.value) {
@@ -333,20 +350,20 @@ export async function getSwap2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.inputTokenAccount),
-      getAccountMeta(accounts.outputTokenAccount),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.referralTokenAccount),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("inputTokenAccount", accounts.inputTokenAccount),
+      getAccountMeta("outputTokenAccount", accounts.outputTokenAccount),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("referralTokenAccount", accounts.referralTokenAccount),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getSwap2InstructionDataEncoder().encode(
       args as Swap2InstructionDataArgs,
@@ -497,7 +514,7 @@ export function getSwap2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -520,20 +537,20 @@ export function getSwap2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.inputTokenAccount),
-      getAccountMeta(accounts.outputTokenAccount),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.referralTokenAccount),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("inputTokenAccount", accounts.inputTokenAccount),
+      getAccountMeta("outputTokenAccount", accounts.outputTokenAccount),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("referralTokenAccount", accounts.referralTokenAccount),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getSwap2InstructionDataEncoder().encode(
       args as Swap2InstructionDataArgs,
@@ -602,8 +619,13 @@ export function parseSwap2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSwap2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 14) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 14,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

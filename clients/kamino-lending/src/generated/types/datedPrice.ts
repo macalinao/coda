@@ -38,7 +38,7 @@ export interface DatedPriceArgs {
   price: PriceArgs;
   lastUpdatedSlot: number | bigint;
   unixTimestamp: number | bigint;
-  reserved: (number | bigint)[];
+  reserved: Array<number | bigint>;
   reserved2: number[];
   index: number;
 }

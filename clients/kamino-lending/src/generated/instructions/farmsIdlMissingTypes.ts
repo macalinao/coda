@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   FarmConfigOption,
   FarmConfigOptionArgs,
@@ -42,10 +42,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getFarmConfigOptionDecoder,
   getFarmConfigOptionEncoder,
@@ -178,7 +180,7 @@ export function getFarmsIdlMissingTypesInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -187,8 +189,8 @@ export function getFarmsIdlMissingTypesInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalAdmin),
-      getAccountMeta(accounts.globalConfig),
+      getAccountMeta("globalAdmin", accounts.globalAdmin),
+      getAccountMeta("globalConfig", accounts.globalConfig),
     ],
     data: getFarmsIdlMissingTypesInstructionDataEncoder().encode(
       args as FarmsIdlMissingTypesInstructionDataArgs,
@@ -222,8 +224,13 @@ export function parseFarmsIdlMissingTypesInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedFarmsIdlMissingTypesInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

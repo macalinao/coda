@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { VerificationArgs, VerificationArgsArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -30,10 +30,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getVerificationArgsDecoder,
   getVerificationArgsEncoder,
@@ -203,7 +205,7 @@ export function getUnverifyInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -222,13 +224,13 @@ export function getUnverifyInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.delegateRecord),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.collectionMint),
-      getAccountMeta(accounts.collectionMetadata),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.sysvarInstructions),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("delegateRecord", accounts.delegateRecord),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("collectionMint", accounts.collectionMint),
+      getAccountMeta("collectionMetadata", accounts.collectionMetadata),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("sysvarInstructions", accounts.sysvarInstructions),
     ],
     data: getUnverifyInstructionDataEncoder().encode(
       args as UnverifyInstructionDataArgs,
@@ -279,8 +281,13 @@ export function parseUnverifyInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUnverifyInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

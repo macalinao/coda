@@ -1,15 +1,31 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
   "root": false,
   "extends": ["@macalinao/biome-config/base"],
   "linter": {
     "domains": {
-      "next": "recommended"
+      "next": "recommended",
     },
     "rules": {
       "correctness": {
-        "useImportExtensions": "off"
-      }
-    }
-  }
+        "useImportExtensions": "off",
+        // Next.js 16 typed-route globals (LayoutProps, PageProps) are provided
+        // by generated types that Biome cannot see; TypeScript validates them.
+        "noUndeclaredVariables": "off",
+      },
+    },
+  },
+  "overrides": [
+    {
+      // Build-time scripts intentionally log progress to the console.
+      "includes": ["scripts/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off",
+          },
+        },
+      },
+    },
+  ],
 }

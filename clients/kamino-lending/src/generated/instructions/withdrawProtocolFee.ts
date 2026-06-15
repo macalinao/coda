@@ -19,7 +19,7 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -30,11 +30,16 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_PROTOCOL_FEE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([158, 201, 158, 189, 33, 93, 162, 103]);
@@ -208,7 +213,7 @@ export async function getWithdrawProtocolFeeInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -217,7 +222,10 @@ export async function getWithdrawProtocolFeeInstructionAsync<
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      lendingMarket: getAddressFromResolvedInstructionAccount(
+        "lendingMarket",
+        accounts.lendingMarket.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -228,14 +236,14 @@ export async function getWithdrawProtocolFeeInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.reserveLiquidityMint),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.feeVault),
-      getAccountMeta(accounts.feeCollectorAta),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("reserveLiquidityMint", accounts.reserveLiquidityMint),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("feeVault", accounts.feeVault),
+      getAccountMeta("feeCollectorAta", accounts.feeCollectorAta),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawProtocolFeeInstructionDataEncoder().encode(
       args as WithdrawProtocolFeeInstructionDataArgs,
@@ -331,7 +339,7 @@ export function getWithdrawProtocolFeeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -346,14 +354,14 @@ export function getWithdrawProtocolFeeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.reserveLiquidityMint),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.feeVault),
-      getAccountMeta(accounts.feeCollectorAta),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("reserveLiquidityMint", accounts.reserveLiquidityMint),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("feeVault", accounts.feeVault),
+      getAccountMeta("feeCollectorAta", accounts.feeCollectorAta),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawProtocolFeeInstructionDataEncoder().encode(
       args as WithdrawProtocolFeeInstructionDataArgs,
@@ -399,8 +407,13 @@ export function parseWithdrawProtocolFeeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawProtocolFeeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -91,7 +91,7 @@ export interface PoolFeesStructArgs {
   /** dynamic fee */
   dynamicFee: DynamicFeeStructArgs;
   /** padding */
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 export function getPoolFeesStructEncoder(): FixedSizeEncoder<PoolFeesStructArgs> {

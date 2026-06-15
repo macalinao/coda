@@ -19,7 +19,7 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -28,10 +28,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SYNC_QUARRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   48, 99, 184, 151, 219, 101, 253, 170,
@@ -43,9 +45,9 @@ export function getSyncQuarryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SyncQuarryInstruction<
   TProgram extends string = typeof QUARRY_REGISTRY_PROGRAM_ADDRESS,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountRegistry extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountRegistry extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -64,7 +66,7 @@ export interface SyncQuarryInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface SyncQuarryInstructionDataArgs {}
+export type SyncQuarryInstructionDataArgs = {};
 
 export function getSyncQuarryInstructionDataEncoder(): FixedSizeEncoder<SyncQuarryInstructionDataArgs> {
   return transformEncoder(
@@ -116,14 +118,14 @@ export function getSyncQuarryInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.registry),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("registry", accounts.registry),
     ],
     data: getSyncQuarryInstructionDataEncoder().encode({}),
     programAddress,
@@ -155,8 +157,13 @@ export function parseSyncQuarryInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSyncQuarryInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

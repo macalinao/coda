@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_VOTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   117, 35, 234, 247, 206, 131, 182, 149,
@@ -82,7 +84,7 @@ export interface CloseVoterInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CloseVoterInstructionDataArgs {}
+export type CloseVoterInstructionDataArgs = {};
 
 export function getCloseVoterInstructionDataEncoder(): FixedSizeEncoder<CloseVoterInstructionDataArgs> {
   return transformEncoder(
@@ -159,7 +161,7 @@ export function getCloseVoterInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -171,11 +173,11 @@ export function getCloseVoterInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.voterAuthority),
-      getAccountMeta(accounts.solDestination),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("voterAuthority", accounts.voterAuthority),
+      getAccountMeta("solDestination", accounts.solDestination),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getCloseVoterInstructionDataEncoder().encode({}),
     programAddress,
@@ -213,8 +215,13 @@ export function parseCloseVoterInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseVoterInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

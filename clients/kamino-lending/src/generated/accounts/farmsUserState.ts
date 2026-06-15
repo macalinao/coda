@@ -113,10 +113,10 @@ export interface FarmsUserStateArgs {
    * Rewards tally used for computation of gained rewards
    * (scaled from `Decimal` representation).
    */
-  rewardsTallyScaled: (number | bigint)[];
+  rewardsTallyScaled: Array<number | bigint>;
   /** Number of reward tokens ready for claim */
-  rewardsIssuedUnclaimed: (number | bigint)[];
-  lastClaimTs: (number | bigint)[];
+  rewardsIssuedUnclaimed: Array<number | bigint>;
+  lastClaimTs: Array<number | bigint>;
   /**
    * User stake deposited and usable, generating rewards and fees.
    * (scaled from `Decimal` representation).
@@ -144,7 +144,7 @@ export interface FarmsUserStateArgs {
   /** Delegatee used for initialisation - useful to check against */
   delegatee: Address;
   lastStakeTs: number | bigint;
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link FarmsUserStateArgs} account data. */

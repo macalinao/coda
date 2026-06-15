@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,15 +31,20 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findPositionNftAccountPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   123, 134, 81, 0, 49, 68, 98, 98,
@@ -53,21 +58,21 @@ export function getClosePositionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClosePositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPositionNftMint extends string | AccountMeta = string,
-  TAccountPositionNftAccount extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPoolAuthority extends string | AccountMeta = string,
-  TAccountRentReceiver extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
+  TAccountPositionNftMint extends string | AccountMeta<string> = string,
+  TAccountPositionNftAccount extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPoolAuthority extends string | AccountMeta<string> = string,
+  TAccountRentReceiver extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -111,7 +116,7 @@ export interface ClosePositionInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface ClosePositionInstructionDataArgs {}
+export type ClosePositionInstructionDataArgs = {};
 
 export function getClosePositionInstructionDataEncoder(): FixedSizeEncoder<ClosePositionInstructionDataArgs> {
   return transformEncoder(
@@ -226,13 +231,16 @@ export async function getClosePositionInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
     accounts.positionNftAccount.value = await findPositionNftAccountPda({
-      positionNftMint: expectAddress(accounts.positionNftMint.value),
+      positionNftMint: getAddressFromResolvedInstructionAccount(
+        "positionNftMint",
+        accounts.positionNftMint.value,
+      ),
     });
   }
   if (!accounts.poolAuthority.value) {
@@ -253,16 +261,16 @@ export async function getClosePositionInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.rentReceiver),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("rentReceiver", accounts.rentReceiver),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getClosePositionInstructionDataEncoder().encode({}),
     programAddress,
@@ -369,7 +377,7 @@ export function getClosePositionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -385,16 +393,16 @@ export function getClosePositionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.rentReceiver),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("rentReceiver", accounts.rentReceiver),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getClosePositionInstructionDataEncoder().encode({}),
     programAddress,
@@ -446,8 +454,13 @@ export function parseClosePositionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClosePositionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 10,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

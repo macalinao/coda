@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,11 +34,16 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMinerPda, findMinterPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CLAIM_REWARDS_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([69, 49, 158, 229, 212, 133, 136, 227]);
@@ -51,22 +56,22 @@ export function getClaimRewardsV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClaimRewardsV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountMintWrapper extends string | AccountMeta = string,
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
   TAccountMintWrapperProgram extends
     | string
-    | AccountMeta = "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
-  TAccountMinter extends string | AccountMeta = string,
-  TAccountRewardsTokenMint extends string | AccountMeta = string,
-  TAccountRewardsTokenAccount extends string | AccountMeta = string,
-  TAccountClaimFeeTokenAccount extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
+    | AccountMeta<string> = "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
+  TAccountMinter extends string | AccountMeta<string> = string,
+  TAccountRewardsTokenMint extends string | AccountMeta<string> = string,
+  TAccountRewardsTokenAccount extends string | AccountMeta<string> = string,
+  TAccountClaimFeeTokenAccount extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountQuarry extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRewarder extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -113,7 +118,7 @@ export interface ClaimRewardsV2InstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface ClaimRewardsV2InstructionDataArgs {}
+export type ClaimRewardsV2InstructionDataArgs = {};
 
 export function getClaimRewardsV2InstructionDataEncoder(): FixedSizeEncoder<ClaimRewardsV2InstructionDataArgs> {
   return transformEncoder(
@@ -239,7 +244,7 @@ export async function getClaimRewardsV2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -249,8 +254,14 @@ export async function getClaimRewardsV2InstructionAsync<
   }
   if (!accounts.minter.value) {
     accounts.minter.value = await findMinterPda({
-      wrapper: expectAddress(accounts.mintWrapper.value),
-      authority: expectAddress(accounts.rewarder.value),
+      wrapper: getAddressFromResolvedInstructionAccount(
+        "mintWrapper",
+        accounts.mintWrapper.value,
+      ),
+      authority: getAddressFromResolvedInstructionAccount(
+        "rewarder",
+        accounts.rewarder.value,
+      ),
     });
   }
   if (!accounts.claimFeeTokenAccount.value) {
@@ -258,20 +269,34 @@ export async function getClaimRewardsV2InstructionAsync<
       programAddress:
         "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
       seeds: [
-        getAddressEncoder().encode(expectAddress(accounts.rewarder.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "rewarder",
+            accounts.rewarder.value,
+          ),
+        ),
         getAddressEncoder().encode(
           address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
         ),
         getAddressEncoder().encode(
-          expectAddress(accounts.rewardsTokenMint.value),
+          getAddressFromResolvedInstructionAccount(
+            "rewardsTokenMint",
+            accounts.rewardsTokenMint.value,
+          ),
         ),
       ],
     });
   }
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({
-      quarry: expectAddress(accounts.quarry.value),
-      authority: expectAddress(accounts.authority.value),
+      quarry: getAddressFromResolvedInstructionAccount(
+        "quarry",
+        accounts.quarry.value,
+      ),
+      authority: getAddressFromResolvedInstructionAccount(
+        "authority",
+        accounts.authority.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -282,17 +307,17 @@ export async function getClaimRewardsV2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.mintWrapperProgram),
-      getAccountMeta(accounts.minter),
-      getAccountMeta(accounts.rewardsTokenMint),
-      getAccountMeta(accounts.rewardsTokenAccount),
-      getAccountMeta(accounts.claimFeeTokenAccount),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("mintWrapperProgram", accounts.mintWrapperProgram),
+      getAccountMeta("minter", accounts.minter),
+      getAccountMeta("rewardsTokenMint", accounts.rewardsTokenMint),
+      getAccountMeta("rewardsTokenAccount", accounts.rewardsTokenAccount),
+      getAccountMeta("claimFeeTokenAccount", accounts.claimFeeTokenAccount),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("rewarder", accounts.rewarder),
     ],
     data: getClaimRewardsV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -411,7 +436,7 @@ export function getClaimRewardsV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -427,17 +452,17 @@ export function getClaimRewardsV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.mintWrapperProgram),
-      getAccountMeta(accounts.minter),
-      getAccountMeta(accounts.rewardsTokenMint),
-      getAccountMeta(accounts.rewardsTokenAccount),
-      getAccountMeta(accounts.claimFeeTokenAccount),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("mintWrapperProgram", accounts.mintWrapperProgram),
+      getAccountMeta("minter", accounts.minter),
+      getAccountMeta("rewardsTokenMint", accounts.rewardsTokenMint),
+      getAccountMeta("rewardsTokenAccount", accounts.rewardsTokenAccount),
+      getAccountMeta("claimFeeTokenAccount", accounts.claimFeeTokenAccount),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("rewarder", accounts.rewarder),
     ],
     data: getClaimRewardsV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -487,8 +512,13 @@ export function parseClaimRewardsV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClaimRewardsV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

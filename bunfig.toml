@@ -1,0 +1,12 @@
+[install]
+# Supply-chain hardening: only install package versions published at least
+# 7 days ago, giving time for malicious releases to be caught and yanked.
+minimumReleaseAge = 604800 # 7 days, in seconds
+
+# First-party packages exempted from the age gate so toolchain updates land
+# immediately.
+minimumReleaseAgeExcludes = [
+  "typescript",
+  "@types/node",
+  "@types/bun",
+]

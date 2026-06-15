@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,10 +37,12 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SWAP_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   248, 198, 158, 145, 225, 117, 135, 200,
@@ -258,7 +260,7 @@ export function getSwapInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -273,17 +275,17 @@ export function getSwapInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.tokenAuthority),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.tokenOwnerAccountA),
-      getAccountMeta(accounts.tokenVaultA),
-      getAccountMeta(accounts.tokenOwnerAccountB),
-      getAccountMeta(accounts.tokenVaultB),
-      getAccountMeta(accounts.tickArray0),
-      getAccountMeta(accounts.tickArray1),
-      getAccountMeta(accounts.tickArray2),
-      getAccountMeta(accounts.oracle),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("tokenAuthority", accounts.tokenAuthority),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("tokenOwnerAccountA", accounts.tokenOwnerAccountA),
+      getAccountMeta("tokenVaultA", accounts.tokenVaultA),
+      getAccountMeta("tokenOwnerAccountB", accounts.tokenOwnerAccountB),
+      getAccountMeta("tokenVaultB", accounts.tokenVaultB),
+      getAccountMeta("tickArray0", accounts.tickArray0),
+      getAccountMeta("tickArray1", accounts.tickArray1),
+      getAccountMeta("tickArray2", accounts.tickArray2),
+      getAccountMeta("oracle", accounts.oracle),
     ],
     data: getSwapInstructionDataEncoder().encode(
       args as SwapInstructionDataArgs,
@@ -335,8 +337,13 @@ export function parseSwapInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSwapInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

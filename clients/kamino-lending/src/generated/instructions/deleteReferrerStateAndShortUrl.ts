@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DELETE_REFERRER_STATE_AND_SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([153, 185, 99, 28, 228, 179, 187, 150]);
@@ -85,7 +87,7 @@ export interface DeleteReferrerStateAndShortUrlInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface DeleteReferrerStateAndShortUrlInstructionDataArgs {}
+export type DeleteReferrerStateAndShortUrlInstructionDataArgs = {};
 
 export function getDeleteReferrerStateAndShortUrlInstructionDataEncoder(): FixedSizeEncoder<DeleteReferrerStateAndShortUrlInstructionDataArgs> {
   return transformEncoder(
@@ -165,7 +167,7 @@ export function getDeleteReferrerStateAndShortUrlInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -181,11 +183,11 @@ export function getDeleteReferrerStateAndShortUrlInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.referrer),
-      getAccountMeta(accounts.referrerState),
-      getAccountMeta(accounts.shortUrl),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("referrer", accounts.referrer),
+      getAccountMeta("referrerState", accounts.referrerState),
+      getAccountMeta("shortUrl", accounts.shortUrl),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getDeleteReferrerStateAndShortUrlInstructionDataEncoder().encode({}),
     programAddress,
@@ -223,8 +225,13 @@ export function parseDeleteReferrerStateAndShortUrlInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDeleteReferrerStateAndShortUrlInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

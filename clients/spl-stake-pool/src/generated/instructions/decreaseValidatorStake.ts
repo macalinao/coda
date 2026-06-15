@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,11 +31,16 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const DECREASE_VALIDATOR_STAKE_DISCRIMINATOR = 3;
 
@@ -238,7 +243,7 @@ export async function getDecreaseValidatorStakeInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -247,7 +252,10 @@ export async function getDecreaseValidatorStakeInstructionAsync<
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
     accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: expectAddress(accounts.stakePool.value),
+      stakePoolAddress: getAddressFromResolvedInstructionAccount(
+        "stakePool",
+        accounts.stakePool.value,
+      ),
     });
   }
   if (!accounts.clockSysvar.value) {
@@ -270,16 +278,16 @@ export async function getDecreaseValidatorStakeInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.staker),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.validatorList),
-      getAccountMeta(accounts.stakeAccount),
-      getAccountMeta(accounts.transientStakeAccount),
-      getAccountMeta(accounts.clockSysvar),
-      getAccountMeta(accounts.rentSysvar),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.stakeProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("staker", accounts.staker),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("validatorList", accounts.validatorList),
+      getAccountMeta("stakeAccount", accounts.stakeAccount),
+      getAccountMeta("transientStakeAccount", accounts.transientStakeAccount),
+      getAccountMeta("clockSysvar", accounts.clockSysvar),
+      getAccountMeta("rentSysvar", accounts.rentSysvar),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("stakeProgram", accounts.stakeProgram),
     ],
     data: getDecreaseValidatorStakeInstructionDataEncoder().encode(
       args as DecreaseValidatorStakeInstructionDataArgs,
@@ -390,7 +398,7 @@ export function getDecreaseValidatorStakeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -417,16 +425,16 @@ export function getDecreaseValidatorStakeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.staker),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.validatorList),
-      getAccountMeta(accounts.stakeAccount),
-      getAccountMeta(accounts.transientStakeAccount),
-      getAccountMeta(accounts.clockSysvar),
-      getAccountMeta(accounts.rentSysvar),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.stakeProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("staker", accounts.staker),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("validatorList", accounts.validatorList),
+      getAccountMeta("stakeAccount", accounts.stakeAccount),
+      getAccountMeta("transientStakeAccount", accounts.transientStakeAccount),
+      getAccountMeta("clockSysvar", accounts.clockSysvar),
+      getAccountMeta("rentSysvar", accounts.rentSysvar),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("stakeProgram", accounts.stakeProgram),
     ],
     data: getDecreaseValidatorStakeInstructionDataEncoder().encode(
       args as DecreaseValidatorStakeInstructionDataArgs,
@@ -476,8 +484,13 @@ export function parseDecreaseValidatorStakeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDecreaseValidatorStakeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 10) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 10,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

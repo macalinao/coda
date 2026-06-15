@@ -26,7 +26,6 @@ import {
   getPoolFeeParametersEncoder,
 } from "./index.js";
 
-/** Create static config */
 export interface EvtCreateConfig {
   poolFees: PoolFeeParameters;
   vaultConfigKey: Address;

@@ -23,17 +23,19 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const VERIFY_SIZED_COLLECTION_ITEM_DISCRIMINATOR = 30;
 
@@ -93,7 +95,7 @@ export interface VerifySizedCollectionItemInstructionData {
   discriminator: number;
 }
 
-export interface VerifySizedCollectionItemInstructionDataArgs {}
+export type VerifySizedCollectionItemInstructionDataArgs = {};
 
 export function getVerifySizedCollectionItemInstructionDataEncoder(): FixedSizeEncoder<VerifySizedCollectionItemInstructionDataArgs> {
   return transformEncoder(
@@ -199,19 +201,25 @@ export function getVerifySizedCollectionItemInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.collectionAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.collectionMint),
-      getAccountMeta(accounts.collection),
-      getAccountMeta(accounts.collectionMasterEditionAccount),
-      getAccountMeta(accounts.collectionAuthorityRecord),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("collectionAuthority", accounts.collectionAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("collectionMint", accounts.collectionMint),
+      getAccountMeta("collection", accounts.collection),
+      getAccountMeta(
+        "collectionMasterEditionAccount",
+        accounts.collectionMasterEditionAccount,
+      ),
+      getAccountMeta(
+        "collectionAuthorityRecord",
+        accounts.collectionAuthorityRecord,
+      ),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getVerifySizedCollectionItemInstructionDataEncoder().encode({}),
     programAddress,
@@ -260,8 +268,13 @@ export function parseVerifySizedCollectionItemInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedVerifySizedCollectionItemInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -272,7 +285,7 @@ export function parseVerifySizedCollectionItemInstruction<
   let optionalAccountsRemaining = instruction.accounts.length - 6;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

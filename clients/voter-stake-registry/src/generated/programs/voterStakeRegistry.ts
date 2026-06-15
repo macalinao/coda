@@ -6,8 +6,43 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  Registrar,
+  RegistrarArgs,
+  Voter,
+  VoterArgs,
+  VoterWeightRecord,
+  VoterWeightRecordArgs,
+} from "../accounts/index.js";
+import type {
+  ClawbackInput,
+  CloseDepositEntryInput,
+  CloseVoterInput,
+  ConfigureVotingMintInput,
+  CreateDepositEntryInput,
+  CreateRegistrarInput,
+  CreateVoterAsyncInput,
+  DepositInput,
+  GrantInput,
+  InternalTransferLockedInput,
+  InternalTransferUnlockedInput,
+  LogVoterInfoInput,
   ParsedClawbackInstruction,
   ParsedCloseDepositEntryInstruction,
   ParsedCloseVoterInstruction,
@@ -25,8 +60,73 @@ import type {
   ParsedUpdateMaxVoteWeightInstruction,
   ParsedUpdateVoterWeightRecordInstruction,
   ParsedWithdrawInstruction,
+  ResetLockupInput,
+  SetTimeOffsetInput,
+  UpdateMaxVoteWeightInput,
+  UpdateVoterWeightRecordInput,
+  WithdrawInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getRegistrarCodec,
+  getVoterCodec,
+  getVoterWeightRecordCodec,
+} from "../accounts/index.js";
+import {
+  getClawbackInstruction,
+  getCloseDepositEntryInstruction,
+  getCloseVoterInstruction,
+  getConfigureVotingMintInstruction,
+  getCreateDepositEntryInstruction,
+  getCreateRegistrarInstruction,
+  getCreateVoterInstructionAsync,
+  getDepositInstruction,
+  getGrantInstruction,
+  getInternalTransferLockedInstruction,
+  getInternalTransferUnlockedInstruction,
+  getLogVoterInfoInstruction,
+  getResetLockupInstruction,
+  getSetTimeOffsetInstruction,
+  getUpdateMaxVoteWeightInstruction,
+  getUpdateVoterWeightRecordInstruction,
+  getWithdrawInstruction,
+  parseClawbackInstruction,
+  parseCloseDepositEntryInstruction,
+  parseCloseVoterInstruction,
+  parseConfigureVotingMintInstruction,
+  parseCreateDepositEntryInstruction,
+  parseCreateRegistrarInstruction,
+  parseCreateVoterInstruction,
+  parseDepositInstruction,
+  parseGrantInstruction,
+  parseInternalTransferLockedInstruction,
+  parseInternalTransferUnlockedInstruction,
+  parseLogVoterInfoInstruction,
+  parseResetLockupInstruction,
+  parseSetTimeOffsetInstruction,
+  parseUpdateMaxVoteWeightInstruction,
+  parseUpdateVoterWeightRecordInstruction,
+  parseWithdrawInstruction,
+} from "../instructions/index.js";
+import {
+  findRegistrarPda,
+  findVoterPda,
+  findVoterWeightRecordPda,
+} from "../pdas/index.js";
 
 export const VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS =
   "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ" as Address<"vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ">;
@@ -74,8 +174,9 @@ export function identifyVoterStakeRegistryAccount(
   ) {
     return VoterStakeRegistryAccount.VoterWeightRecord;
   }
-  throw new Error(
-    "The provided account could not be identified as a voterStakeRegistry account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "voterStakeRegistry" },
   );
 }
 
@@ -290,8 +391,9 @@ export function identifyVoterStakeRegistryInstruction(
   ) {
     return VoterStakeRegistryInstruction.SetTimeOffset;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a voterStakeRegistry instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "voterStakeRegistry" },
   );
 }
 
@@ -349,3 +451,348 @@ export type ParsedVoterStakeRegistryInstruction<
   | ({
       instructionType: VoterStakeRegistryInstruction.SetTimeOffset;
     } & ParsedSetTimeOffsetInstruction<TProgram>);
+
+export function parseVoterStakeRegistryInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedVoterStakeRegistryInstruction<TProgram> {
+  const instructionType = identifyVoterStakeRegistryInstruction(instruction);
+  switch (instructionType) {
+    case VoterStakeRegistryInstruction.CreateRegistrar: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.CreateRegistrar,
+        ...parseCreateRegistrarInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.ConfigureVotingMint: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.ConfigureVotingMint,
+        ...parseConfigureVotingMintInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.CreateVoter: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.CreateVoter,
+        ...parseCreateVoterInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.CreateDepositEntry: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.CreateDepositEntry,
+        ...parseCreateDepositEntryInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.Deposit: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.Deposit,
+        ...parseDepositInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.Withdraw: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.Withdraw,
+        ...parseWithdrawInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.Grant: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.Grant,
+        ...parseGrantInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.Clawback: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.Clawback,
+        ...parseClawbackInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.CloseDepositEntry: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.CloseDepositEntry,
+        ...parseCloseDepositEntryInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.ResetLockup: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.ResetLockup,
+        ...parseResetLockupInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.InternalTransferLocked: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.InternalTransferLocked,
+        ...parseInternalTransferLockedInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.InternalTransferUnlocked: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.InternalTransferUnlocked,
+        ...parseInternalTransferUnlockedInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.UpdateVoterWeightRecord: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.UpdateVoterWeightRecord,
+        ...parseUpdateVoterWeightRecordInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.UpdateMaxVoteWeight: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.UpdateMaxVoteWeight,
+        ...parseUpdateMaxVoteWeightInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.CloseVoter: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.CloseVoter,
+        ...parseCloseVoterInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.LogVoterInfo: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.LogVoterInfo,
+        ...parseLogVoterInfoInstruction(instruction),
+      };
+    }
+    case VoterStakeRegistryInstruction.SetTimeOffset: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: VoterStakeRegistryInstruction.SetTimeOffset,
+        ...parseSetTimeOffsetInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "voterStakeRegistry",
+        },
+      );
+  }
+}
+
+export interface VoterStakeRegistryPlugin {
+  accounts: VoterStakeRegistryPluginAccounts;
+  instructions: VoterStakeRegistryPluginInstructions;
+  pdas: VoterStakeRegistryPluginPdas;
+}
+
+export interface VoterStakeRegistryPluginAccounts {
+  registrar: ReturnType<typeof getRegistrarCodec> &
+    SelfFetchFunctions<RegistrarArgs, Registrar>;
+  voter: ReturnType<typeof getVoterCodec> &
+    SelfFetchFunctions<VoterArgs, Voter>;
+  voterWeightRecord: ReturnType<typeof getVoterWeightRecordCodec> &
+    SelfFetchFunctions<VoterWeightRecordArgs, VoterWeightRecord>;
+}
+
+export interface VoterStakeRegistryPluginInstructions {
+  createRegistrar: (
+    input: MakeOptional<CreateRegistrarInput, "payer">,
+  ) => ReturnType<typeof getCreateRegistrarInstruction> &
+    SelfPlanAndSendFunctions;
+  configureVotingMint: (
+    input: ConfigureVotingMintInput,
+  ) => ReturnType<typeof getConfigureVotingMintInstruction> &
+    SelfPlanAndSendFunctions;
+  createVoter: (
+    input: MakeOptional<CreateVoterAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateVoterInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createDepositEntry: (
+    input: MakeOptional<CreateDepositEntryInput, "payer">,
+  ) => ReturnType<typeof getCreateDepositEntryInstruction> &
+    SelfPlanAndSendFunctions;
+  deposit: (
+    input: DepositInput,
+  ) => ReturnType<typeof getDepositInstruction> & SelfPlanAndSendFunctions;
+  withdraw: (
+    input: WithdrawInput,
+  ) => ReturnType<typeof getWithdrawInstruction> & SelfPlanAndSendFunctions;
+  grant: (
+    input: MakeOptional<GrantInput, "payer">,
+  ) => ReturnType<typeof getGrantInstruction> & SelfPlanAndSendFunctions;
+  clawback: (
+    input: ClawbackInput,
+  ) => ReturnType<typeof getClawbackInstruction> & SelfPlanAndSendFunctions;
+  closeDepositEntry: (
+    input: CloseDepositEntryInput,
+  ) => ReturnType<typeof getCloseDepositEntryInstruction> &
+    SelfPlanAndSendFunctions;
+  resetLockup: (
+    input: ResetLockupInput,
+  ) => ReturnType<typeof getResetLockupInstruction> & SelfPlanAndSendFunctions;
+  internalTransferLocked: (
+    input: InternalTransferLockedInput,
+  ) => ReturnType<typeof getInternalTransferLockedInstruction> &
+    SelfPlanAndSendFunctions;
+  internalTransferUnlocked: (
+    input: InternalTransferUnlockedInput,
+  ) => ReturnType<typeof getInternalTransferUnlockedInstruction> &
+    SelfPlanAndSendFunctions;
+  updateVoterWeightRecord: (
+    input: UpdateVoterWeightRecordInput,
+  ) => ReturnType<typeof getUpdateVoterWeightRecordInstruction> &
+    SelfPlanAndSendFunctions;
+  updateMaxVoteWeight: (
+    input: UpdateMaxVoteWeightInput,
+  ) => ReturnType<typeof getUpdateMaxVoteWeightInstruction> &
+    SelfPlanAndSendFunctions;
+  closeVoter: (
+    input: CloseVoterInput,
+  ) => ReturnType<typeof getCloseVoterInstruction> & SelfPlanAndSendFunctions;
+  logVoterInfo: (
+    input: LogVoterInfoInput,
+  ) => ReturnType<typeof getLogVoterInfoInstruction> & SelfPlanAndSendFunctions;
+  setTimeOffset: (
+    input: SetTimeOffsetInput,
+  ) => ReturnType<typeof getSetTimeOffsetInstruction> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface VoterStakeRegistryPluginPdas {
+  registrar: typeof findRegistrarPda;
+  voter: typeof findVoterPda;
+  voterWeightRecord: typeof findVoterWeightRecordPda;
+}
+
+export type VoterStakeRegistryPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function voterStakeRegistryProgram() {
+  return <T extends VoterStakeRegistryPluginRequirements>(
+    client: T,
+  ): Omit<T, "voterStakeRegistry"> & {
+    voterStakeRegistry: VoterStakeRegistryPlugin;
+  } => {
+    return extendClient(client, {
+      voterStakeRegistry: <VoterStakeRegistryPlugin>{
+        accounts: {
+          registrar: addSelfFetchFunctions(client, getRegistrarCodec()),
+          voter: addSelfFetchFunctions(client, getVoterCodec()),
+          voterWeightRecord: addSelfFetchFunctions(
+            client,
+            getVoterWeightRecordCodec(),
+          ),
+        },
+        instructions: {
+          createRegistrar: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateRegistrarInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          configureVotingMint: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getConfigureVotingMintInstruction(input),
+            ),
+          createVoter: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateVoterInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createDepositEntry: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateDepositEntryInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          deposit: (input) =>
+            addSelfPlanAndSendFunctions(client, getDepositInstruction(input)),
+          withdraw: (input) =>
+            addSelfPlanAndSendFunctions(client, getWithdrawInstruction(input)),
+          grant: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getGrantInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          clawback: (input) =>
+            addSelfPlanAndSendFunctions(client, getClawbackInstruction(input)),
+          closeDepositEntry: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseDepositEntryInstruction(input),
+            ),
+          resetLockup: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getResetLockupInstruction(input),
+            ),
+          internalTransferLocked: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInternalTransferLockedInstruction(input),
+            ),
+          internalTransferUnlocked: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInternalTransferUnlockedInstruction(input),
+            ),
+          updateVoterWeightRecord: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateVoterWeightRecordInstruction(input),
+            ),
+          updateMaxVoteWeight: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateMaxVoteWeightInstruction(input),
+            ),
+          closeVoter: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseVoterInstruction(input),
+            ),
+          logVoterInfo: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLogVoterInfoInstruction(input),
+            ),
+          setTimeOffset: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetTimeOffsetInstruction(input),
+            ),
+        },
+        pdas: {
+          registrar: findRegistrarPda,
+          voter: findVoterPda,
+          voterWeightRecord: findVoterWeightRecordPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

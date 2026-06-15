@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { Vote, VoteArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -30,10 +30,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import { getVoteDecoder, getVoteEncoder } from "../types/index.js";
 
 export const CAST_VOTE_DISCRIMINATOR = 13;
@@ -287,7 +289,7 @@ export function getCastVoteInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -302,19 +304,22 @@ export function getCastVoteInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.proposalTokenOwnerRecord),
-      getAccountMeta(accounts.voterTokenOwnerRecord),
-      getAccountMeta(accounts.governanceAuthority),
-      getAccountMeta(accounts.proposalVoteRecord),
-      getAccountMeta(accounts.governingTokenMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.realmConfigAccount),
-      getAccountMeta(accounts.voterWeightRecord),
-      getAccountMeta(accounts.maxVoterWeightRecord),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta(
+        "proposalTokenOwnerRecord",
+        accounts.proposalTokenOwnerRecord,
+      ),
+      getAccountMeta("voterTokenOwnerRecord", accounts.voterTokenOwnerRecord),
+      getAccountMeta("governanceAuthority", accounts.governanceAuthority),
+      getAccountMeta("proposalVoteRecord", accounts.proposalVoteRecord),
+      getAccountMeta("governingTokenMint", accounts.governingTokenMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("realmConfigAccount", accounts.realmConfigAccount),
+      getAccountMeta("voterWeightRecord", accounts.voterWeightRecord),
+      getAccountMeta("maxVoterWeightRecord", accounts.maxVoterWeightRecord),
     ],
     data: getCastVoteInstructionDataEncoder().encode(
       args as CastVoteInstructionDataArgs,
@@ -384,8 +389,13 @@ export function parseCastVoteInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCastVoteInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 13) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 13,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

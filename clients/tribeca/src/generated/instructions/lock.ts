@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +35,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const LOCK_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   21, 19, 208, 43, 237, 62, 255, 87,
@@ -185,7 +187,7 @@ export function getLockInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -200,12 +202,12 @@ export function getLockInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.locker),
-      getAccountMeta(accounts.escrow),
-      getAccountMeta(accounts.escrowTokens),
-      getAccountMeta(accounts.escrowOwner),
-      getAccountMeta(accounts.sourceTokens),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("locker", accounts.locker),
+      getAccountMeta("escrow", accounts.escrow),
+      getAccountMeta("escrowTokens", accounts.escrowTokens),
+      getAccountMeta("escrowOwner", accounts.escrowOwner),
+      getAccountMeta("sourceTokens", accounts.sourceTokens),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getLockInstructionDataEncoder().encode(
       args as LockInstructionDataArgs,
@@ -247,8 +249,13 @@ export function parseLockInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedLockInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

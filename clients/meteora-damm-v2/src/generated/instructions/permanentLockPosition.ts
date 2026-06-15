@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,11 +33,13 @@ import {
   getStructEncoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const PERMANENT_LOCK_POSITION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([165, 176, 125, 6, 231, 171, 186, 213]);
@@ -50,15 +52,15 @@ export function getPermanentLockPositionDiscriminatorBytes(): ReadonlyUint8Array
 
 export type PermanentLockPositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPositionNftAccount extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountEventAuthority extends string | AccountMeta = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPositionNftAccount extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -190,7 +192,7 @@ export async function getPermanentLockPositionInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -208,12 +210,12 @@ export async function getPermanentLockPositionInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getPermanentLockPositionInstructionDataEncoder().encode(
       args as PermanentLockPositionInstructionDataArgs,
@@ -293,7 +295,7 @@ export function getPermanentLockPositionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -308,12 +310,12 @@ export function getPermanentLockPositionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getPermanentLockPositionInstructionDataEncoder().encode(
       args as PermanentLockPositionInstructionDataArgs,
@@ -357,8 +359,13 @@ export function parsePermanentLockPositionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedPermanentLockPositionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

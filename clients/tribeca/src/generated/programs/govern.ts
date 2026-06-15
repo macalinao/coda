@@ -6,8 +6,39 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  Governor,
+  GovernorArgs,
+  Proposal,
+  ProposalArgs,
+  ProposalMeta,
+  ProposalMetaArgs,
+  Vote,
+  VoteArgs,
+} from "../accounts/index.js";
+import type {
+  ActivateProposalInput,
+  CancelProposalInput,
+  CreateGovernorInput,
+  CreateProposalInput,
+  CreateProposalMetaInput,
+  NewVoteInput,
   ParsedActivateProposalInstruction,
   ParsedCancelProposalInstruction,
   ParsedCreateGovernorInstruction,
@@ -18,8 +49,60 @@ import type {
   ParsedSetElectorateInstruction,
   ParsedSetGovernanceParamsInstruction,
   ParsedSetVoteInstruction,
+  QueueProposalInput,
+  SetElectorateInput,
+  SetGovernanceParamsInput,
+  SetVoteInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getGovernorCodec,
+  getProposalCodec,
+  getProposalMetaCodec,
+  getVoteCodec,
+} from "../accounts/index.js";
+import {
+  getActivateProposalInstruction,
+  getCancelProposalInstruction,
+  getCreateGovernorInstruction,
+  getCreateProposalInstruction,
+  getCreateProposalMetaInstruction,
+  getNewVoteInstruction,
+  getQueueProposalInstruction,
+  getSetElectorateInstruction,
+  getSetGovernanceParamsInstruction,
+  getSetVoteInstruction,
+  parseActivateProposalInstruction,
+  parseCancelProposalInstruction,
+  parseCreateGovernorInstruction,
+  parseCreateProposalInstruction,
+  parseCreateProposalMetaInstruction,
+  parseNewVoteInstruction,
+  parseQueueProposalInstruction,
+  parseSetElectorateInstruction,
+  parseSetGovernanceParamsInstruction,
+  parseSetVoteInstruction,
+} from "../instructions/index.js";
+import {
+  findGovernorPda,
+  findProposalMetaPda,
+  findProposalPda,
+  findVotePda,
+} from "../pdas/index.js";
 
 export const GOVERN_PROGRAM_ADDRESS =
   "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw" as Address<"Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw">;
@@ -79,8 +162,9 @@ export function identifyGovernAccount(
   ) {
     return GovernAccount.Vote;
   }
-  throw new Error(
-    "The provided account could not be identified as a govern account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "govern" },
   );
 }
 
@@ -211,8 +295,9 @@ export function identifyGovernInstruction(
   ) {
     return GovernInstruction.CreateProposalMeta;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a govern instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "govern" },
   );
 }
 
@@ -249,3 +334,246 @@ export type ParsedGovernInstruction<
   | ({
       instructionType: GovernInstruction.CreateProposalMeta;
     } & ParsedCreateProposalMetaInstruction<TProgram>);
+
+export function parseGovernInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedGovernInstruction<TProgram> {
+  const instructionType = identifyGovernInstruction(instruction);
+  switch (instructionType) {
+    case GovernInstruction.CreateGovernor: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.CreateGovernor,
+        ...parseCreateGovernorInstruction(instruction),
+      };
+    }
+    case GovernInstruction.CreateProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.CreateProposal,
+        ...parseCreateProposalInstruction(instruction),
+      };
+    }
+    case GovernInstruction.ActivateProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.ActivateProposal,
+        ...parseActivateProposalInstruction(instruction),
+      };
+    }
+    case GovernInstruction.CancelProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.CancelProposal,
+        ...parseCancelProposalInstruction(instruction),
+      };
+    }
+    case GovernInstruction.QueueProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.QueueProposal,
+        ...parseQueueProposalInstruction(instruction),
+      };
+    }
+    case GovernInstruction.NewVote: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.NewVote,
+        ...parseNewVoteInstruction(instruction),
+      };
+    }
+    case GovernInstruction.SetVote: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.SetVote,
+        ...parseSetVoteInstruction(instruction),
+      };
+    }
+    case GovernInstruction.SetGovernanceParams: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.SetGovernanceParams,
+        ...parseSetGovernanceParamsInstruction(instruction),
+      };
+    }
+    case GovernInstruction.SetElectorate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.SetElectorate,
+        ...parseSetElectorateInstruction(instruction),
+      };
+    }
+    case GovernInstruction.CreateProposalMeta: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: GovernInstruction.CreateProposalMeta,
+        ...parseCreateProposalMetaInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        { instructionType: instructionType as string, programName: "govern" },
+      );
+  }
+}
+
+export interface GovernPlugin {
+  accounts: GovernPluginAccounts;
+  instructions: GovernPluginInstructions;
+  pdas: GovernPluginPdas;
+}
+
+export interface GovernPluginAccounts {
+  governor: ReturnType<typeof getGovernorCodec> &
+    SelfFetchFunctions<GovernorArgs, Governor>;
+  proposal: ReturnType<typeof getProposalCodec> &
+    SelfFetchFunctions<ProposalArgs, Proposal>;
+  proposalMeta: ReturnType<typeof getProposalMetaCodec> &
+    SelfFetchFunctions<ProposalMetaArgs, ProposalMeta>;
+  vote: ReturnType<typeof getVoteCodec> & SelfFetchFunctions<VoteArgs, Vote>;
+}
+
+export interface GovernPluginInstructions {
+  createGovernor: (
+    input: MakeOptional<CreateGovernorInput, "payer">,
+  ) => ReturnType<typeof getCreateGovernorInstruction> &
+    SelfPlanAndSendFunctions;
+  createProposal: (
+    input: MakeOptional<CreateProposalInput, "payer">,
+  ) => ReturnType<typeof getCreateProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  activateProposal: (
+    input: ActivateProposalInput,
+  ) => ReturnType<typeof getActivateProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  cancelProposal: (
+    input: CancelProposalInput,
+  ) => ReturnType<typeof getCancelProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  queueProposal: (
+    input: MakeOptional<QueueProposalInput, "payer">,
+  ) => ReturnType<typeof getQueueProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  newVote: (
+    input: MakeOptional<NewVoteInput, "payer">,
+  ) => ReturnType<typeof getNewVoteInstruction> & SelfPlanAndSendFunctions;
+  setVote: (
+    input: SetVoteInput,
+  ) => ReturnType<typeof getSetVoteInstruction> & SelfPlanAndSendFunctions;
+  setGovernanceParams: (
+    input: SetGovernanceParamsInput,
+  ) => ReturnType<typeof getSetGovernanceParamsInstruction> &
+    SelfPlanAndSendFunctions;
+  setElectorate: (
+    input: SetElectorateInput,
+  ) => ReturnType<typeof getSetElectorateInstruction> &
+    SelfPlanAndSendFunctions;
+  createProposalMeta: (
+    input: MakeOptional<CreateProposalMetaInput, "payer">,
+  ) => ReturnType<typeof getCreateProposalMetaInstruction> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface GovernPluginPdas {
+  governor: typeof findGovernorPda;
+  proposal: typeof findProposalPda;
+  vote: typeof findVotePda;
+  proposalMeta: typeof findProposalMetaPda;
+}
+
+export type GovernPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function governProgram() {
+  return <T extends GovernPluginRequirements>(
+    client: T,
+  ): Omit<T, "govern"> & { govern: GovernPlugin } => {
+    return extendClient(client, {
+      govern: <GovernPlugin>{
+        accounts: {
+          governor: addSelfFetchFunctions(client, getGovernorCodec()),
+          proposal: addSelfFetchFunctions(client, getProposalCodec()),
+          proposalMeta: addSelfFetchFunctions(client, getProposalMetaCodec()),
+          vote: addSelfFetchFunctions(client, getVoteCodec()),
+        },
+        instructions: {
+          createGovernor: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateGovernorInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateProposalInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          activateProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getActivateProposalInstruction(input),
+            ),
+          cancelProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCancelProposalInstruction(input),
+            ),
+          queueProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getQueueProposalInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          newVote: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewVoteInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setVote: (input) =>
+            addSelfPlanAndSendFunctions(client, getSetVoteInstruction(input)),
+          setGovernanceParams: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetGovernanceParamsInstruction(input),
+            ),
+          setElectorate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetElectorateInstruction(input),
+            ),
+          createProposalMeta: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateProposalMetaInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+        },
+        pdas: {
+          governor: findGovernorPda,
+          proposal: findProposalPda,
+          vote: findVotePda,
+          proposalMeta: findProposalMetaPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

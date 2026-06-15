@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { LockerParams, LockerParamsArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -32,10 +32,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getLockerParamsDecoder,
   getLockerParamsEncoder,
@@ -150,7 +152,7 @@ export function getSetLockerParamsInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -159,9 +161,9 @@ export function getSetLockerParamsInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.locker),
-      getAccountMeta(accounts.governor),
-      getAccountMeta(accounts.smartWallet),
+      getAccountMeta("locker", accounts.locker),
+      getAccountMeta("governor", accounts.governor),
+      getAccountMeta("smartWallet", accounts.smartWallet),
     ],
     data: getSetLockerParamsInstructionDataEncoder().encode(
       args as SetLockerParamsInstructionDataArgs,
@@ -197,8 +199,13 @@ export function parseSetLockerParamsInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetLockerParamsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

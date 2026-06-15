@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,11 +32,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findFarmsUserStatePda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_USER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [111, 17, 185, 250, 60, 122, 38, 254],
@@ -101,7 +106,7 @@ export interface InitializeUserInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitializeUserInstructionDataArgs {}
+export type InitializeUserInstructionDataArgs = {};
 
 export function getInitializeUserInstructionDataEncoder(): FixedSizeEncoder<InitializeUserInstructionDataArgs> {
   return transformEncoder(
@@ -197,14 +202,20 @@ export async function getInitializeUserInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.userState.value) {
     accounts.userState.value = await findFarmsUserStatePda({
-      farmState: expectAddress(accounts.farmState.value),
-      owner: expectAddress(accounts.delegatee.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
+      owner: getAddressFromResolvedInstructionAccount(
+        "delegatee",
+        accounts.delegatee.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -219,14 +230,14 @@ export async function getInitializeUserInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.delegatee),
-      getAccountMeta(accounts.userState),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("delegatee", accounts.delegatee),
+      getAccountMeta("userState", accounts.userState),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializeUserInstructionDataEncoder().encode({}),
     programAddress,
@@ -312,7 +323,7 @@ export function getInitializeUserInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -328,14 +339,14 @@ export function getInitializeUserInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.delegatee),
-      getAccountMeta(accounts.userState),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("delegatee", accounts.delegatee),
+      getAccountMeta("userState", accounts.userState),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializeUserInstructionDataEncoder().encode({}),
     programAddress,
@@ -379,8 +390,13 @@ export function parseInitializeUserInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeUserInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

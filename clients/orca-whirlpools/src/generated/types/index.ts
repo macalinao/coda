@@ -7,13 +7,17 @@
  */
 
 export * from "./accountsType.js";
+export * from "./liquidityDecreased.js";
+export * from "./liquidityIncreased.js";
 export * from "./lockType.js";
 export * from "./lockTypeLabel.js";
 export * from "./openPositionBumps.js";
 export * from "./openPositionWithMetadataBumps.js";
+export * from "./poolInitialized.js";
 export * from "./positionRewardInfo.js";
 export * from "./remainingAccountsInfo.js";
 export * from "./remainingAccountsSlice.js";
 export * from "./tick.js";
+export * from "./traded.js";
 export * from "./whirlpoolBumps.js";
 export * from "./whirlpoolRewardInfo.js";

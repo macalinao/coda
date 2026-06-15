@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,11 +32,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findQuarryPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_QUARRY_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([46, 84, 33, 67, 174, 252, 67, 148]);
@@ -49,15 +54,15 @@ export function getCreateQuarryV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateQuarryV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountTokenMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountTokenMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -90,7 +95,7 @@ export interface CreateQuarryV2InstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CreateQuarryV2InstructionDataArgs {}
+export type CreateQuarryV2InstructionDataArgs = {};
 
 export function getCreateQuarryV2InstructionDataEncoder(): FixedSizeEncoder<CreateQuarryV2InstructionDataArgs> {
   return transformEncoder(
@@ -174,14 +179,20 @@ export async function getCreateQuarryV2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.quarry.value) {
     accounts.quarry.value = await findQuarryPda({
-      rewarder: expectAddress(accounts.rewarder.value),
-      tokenMint: expectAddress(accounts.tokenMint.value),
+      rewarder: getAddressFromResolvedInstructionAccount(
+        "rewarder",
+        accounts.rewarder.value,
+      ),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenMint",
+        accounts.tokenMint.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -192,12 +203,12 @@ export async function getCreateQuarryV2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateQuarryV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -269,7 +280,7 @@ export function getCreateQuarryV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -281,12 +292,12 @@ export function getCreateQuarryV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateQuarryV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -326,8 +337,13 @@ export function parseCreateQuarryV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateQuarryV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

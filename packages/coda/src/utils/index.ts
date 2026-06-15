@@ -1,5 +1,6 @@
 export { applyCustomVisitors } from "./apply-custom-visitors.js";
 export { createCodamaFromIdls } from "./create-codama-from-idls.js";
+export { ensureEntryBarrel } from "./ensure-entry-barrel.js";
 export { fileExists } from "./file-exists.js";
 export { loadConfig } from "./load-config.js";
 export { loadIdls } from "./load-idls.js";

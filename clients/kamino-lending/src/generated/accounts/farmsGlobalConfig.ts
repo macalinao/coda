@@ -68,7 +68,7 @@ export interface FarmsGlobalConfigArgs {
   treasuryVaultsAuthority: Address;
   treasuryVaultsAuthorityBump: number | bigint;
   pendingGlobalAdmin: Address;
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link FarmsGlobalConfigArgs} account data. */

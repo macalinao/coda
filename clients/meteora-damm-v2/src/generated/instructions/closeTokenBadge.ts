@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,13 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_TOKEN_BADGE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([108, 146, 86, 110, 179, 254, 10, 104]);
@@ -48,14 +50,14 @@ export function getCloseTokenBadgeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CloseTokenBadgeInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountTokenBadge extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountRentReceiver extends string | AccountMeta = string,
-  TAccountEventAuthority extends string | AccountMeta = string,
+  TAccountTokenBadge extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountRentReceiver extends string | AccountMeta<string> = string,
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -84,7 +86,7 @@ export interface CloseTokenBadgeInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CloseTokenBadgeInstructionDataArgs {}
+export type CloseTokenBadgeInstructionDataArgs = {};
 
 export function getCloseTokenBadgeInstructionDataEncoder(): FixedSizeEncoder<CloseTokenBadgeInstructionDataArgs> {
   return transformEncoder(
@@ -162,7 +164,7 @@ export async function getCloseTokenBadgeInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -177,11 +179,11 @@ export async function getCloseTokenBadgeInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.tokenBadge),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.rentReceiver),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("tokenBadge", accounts.tokenBadge),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("rentReceiver", accounts.rentReceiver),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCloseTokenBadgeInstructionDataEncoder().encode({}),
     programAddress,
@@ -246,7 +248,7 @@ export function getCloseTokenBadgeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -258,11 +260,11 @@ export function getCloseTokenBadgeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.tokenBadge),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.rentReceiver),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("tokenBadge", accounts.tokenBadge),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("rentReceiver", accounts.rentReceiver),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCloseTokenBadgeInstructionDataEncoder().encode({}),
     programAddress,
@@ -300,8 +302,13 @@ export function parseCloseTokenBadgeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseTokenBadgeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

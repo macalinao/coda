@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_FAMINE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   30, 50, 21, 169, 103, 68, 155, 192,
@@ -48,10 +50,10 @@ export function getSetFamineDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetFamineInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -142,7 +144,7 @@ export function getSetFamineInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -151,9 +153,9 @@ export function getSetFamineInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarry),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarry", accounts.quarry),
     ],
     data: getSetFamineInstructionDataEncoder().encode(
       args as SetFamineInstructionDataArgs,
@@ -189,8 +191,13 @@ export function parseSetFamineInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetFamineInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

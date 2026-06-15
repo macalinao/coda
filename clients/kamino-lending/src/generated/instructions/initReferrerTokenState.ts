@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_REFERRER_TOKEN_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([116, 45, 66, 148, 58, 13, 218, 115]);
@@ -93,7 +95,7 @@ export interface InitReferrerTokenStateInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitReferrerTokenStateInstructionDataArgs {}
+export type InitReferrerTokenStateInstructionDataArgs = {};
 
 export function getInitReferrerTokenStateInstructionDataEncoder(): FixedSizeEncoder<InitReferrerTokenStateInstructionDataArgs> {
   return transformEncoder(
@@ -188,7 +190,7 @@ export function getInitReferrerTokenStateInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -204,13 +206,13 @@ export function getInitReferrerTokenStateInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.referrer),
-      getAccountMeta(accounts.referrerTokenState),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("referrer", accounts.referrer),
+      getAccountMeta("referrerTokenState", accounts.referrerTokenState),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitReferrerTokenStateInstructionDataEncoder().encode({}),
     programAddress,
@@ -252,8 +254,13 @@ export function parseInitReferrerTokenStateInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitReferrerTokenStateInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

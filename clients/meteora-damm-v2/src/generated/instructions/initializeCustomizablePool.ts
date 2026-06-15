@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   InitializeCustomizablePoolParameters,
   InitializeCustomizablePoolParametersArgs,
@@ -37,8 +37,14 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findCustomizablePoolPda,
   findEventAuthorityPda,
@@ -47,7 +53,6 @@ import {
   findTokenVaultPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getInitializeCustomizablePoolParametersDecoder,
   getInitializeCustomizablePoolParametersEncoder,
@@ -64,36 +69,36 @@ export function getInitializeCustomizablePoolDiscriminatorBytes(): ReadonlyUint8
 
 export type InitializeCustomizablePoolInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountCreator extends string | AccountMeta = string,
-  TAccountPositionNftMint extends string | AccountMeta = string,
-  TAccountPositionNftAccount extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountPoolAuthority extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountTokenAMint extends string | AccountMeta = string,
-  TAccountTokenBMint extends string | AccountMeta = string,
-  TAccountTokenAVault extends string | AccountMeta = string,
-  TAccountTokenBVault extends string | AccountMeta = string,
-  TAccountPayerTokenA extends string | AccountMeta = string,
-  TAccountPayerTokenB extends string | AccountMeta = string,
+  TAccountCreator extends string | AccountMeta<string> = string,
+  TAccountPositionNftMint extends string | AccountMeta<string> = string,
+  TAccountPositionNftAccount extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountPoolAuthority extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountTokenAMint extends string | AccountMeta<string> = string,
+  TAccountTokenBMint extends string | AccountMeta<string> = string,
+  TAccountTokenAVault extends string | AccountMeta<string> = string,
+  TAccountTokenBVault extends string | AccountMeta<string> = string,
+  TAccountPayerTokenA extends string | AccountMeta<string> = string,
+  TAccountPayerTokenB extends string | AccountMeta<string> = string,
   TAccountTokenAProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenBProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountToken2022Program extends
     | string
-    | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    | AccountMeta<string> = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -357,7 +362,7 @@ export async function getInitializeCustomizablePoolInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -366,7 +371,10 @@ export async function getInitializeCustomizablePoolInstructionAsync<
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
     accounts.positionNftAccount.value = await findPositionNftAccountPda({
-      positionNftMint: expectAddress(accounts.positionNftMint.value),
+      positionNftMint: getAddressFromResolvedInstructionAccount(
+        "positionNftMint",
+        accounts.positionNftMint.value,
+      ),
     });
   }
   if (!accounts.poolAuthority.value) {
@@ -374,8 +382,14 @@ export async function getInitializeCustomizablePoolInstructionAsync<
   }
   if (!accounts.pool.value) {
     accounts.pool.value = await findCustomizablePoolPda({
-      tokenAMint: expectAddress(accounts.tokenAMint.value),
-      tokenBMint: expectAddress(accounts.tokenBMint.value),
+      tokenAMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      tokenBMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
     });
   }
   if (!accounts.position.value) {
@@ -386,21 +400,36 @@ export async function getInitializeCustomizablePoolInstructionAsync<
           new Uint8Array([112, 111, 115, 105, 116, 105, 111, 110]),
         ),
         getAddressEncoder().encode(
-          expectAddress(accounts.positionNftMint.value),
+          getAddressFromResolvedInstructionAccount(
+            "positionNftMint",
+            accounts.positionNftMint.value,
+          ),
         ),
       ],
     });
   }
   if (!accounts.tokenAVault.value) {
     accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenAMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenBVault.value) {
     accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenBMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenAProgram.value) {
@@ -430,25 +459,25 @@ export async function getInitializeCustomizablePoolInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.creator),
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.payerTokenA),
-      getAccountMeta(accounts.payerTokenB),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.token2022Program),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("creator", accounts.creator),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("payerTokenA", accounts.payerTokenA),
+      getAccountMeta("payerTokenB", accounts.payerTokenB),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("token2022Program", accounts.token2022Program),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getInitializeCustomizablePoolInstructionDataEncoder().encode(
       args as InitializeCustomizablePoolInstructionDataArgs,
@@ -633,7 +662,7 @@ export function getInitializeCustomizablePoolInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -664,25 +693,25 @@ export function getInitializeCustomizablePoolInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.creator),
-      getAccountMeta(accounts.positionNftMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.payerTokenA),
-      getAccountMeta(accounts.payerTokenB),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.token2022Program),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("creator", accounts.creator),
+      getAccountMeta("positionNftMint", accounts.positionNftMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("payerTokenA", accounts.payerTokenA),
+      getAccountMeta("payerTokenB", accounts.payerTokenB),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("token2022Program", accounts.token2022Program),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getInitializeCustomizablePoolInstructionDataEncoder().encode(
       args as InitializeCustomizablePoolInstructionDataArgs,
@@ -763,8 +792,13 @@ export function parseInitializeCustomizablePoolInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeCustomizablePoolInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 19) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 19,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

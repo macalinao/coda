@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_SLASHED_AMOUNT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([202, 217, 67, 74, 172, 22, 140, 216]);
@@ -88,7 +93,7 @@ export interface WithdrawSlashedAmountInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface WithdrawSlashedAmountInstructionDataArgs {}
+export type WithdrawSlashedAmountInstructionDataArgs = {};
 
 export function getWithdrawSlashedAmountInstructionDataEncoder(): FixedSizeEncoder<WithdrawSlashedAmountInstructionDataArgs> {
   return transformEncoder(
@@ -181,13 +186,16 @@ export async function getWithdrawSlashedAmountInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.farmVaultsAuthority.value) {
     accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: expectAddress(accounts.farmState.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -198,12 +206,15 @@ export async function getWithdrawSlashedAmountInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.crank),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.slashedAmountSpillAddress),
-      getAccountMeta(accounts.farmVault),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("crank", accounts.crank),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta(
+        "slashedAmountSpillAddress",
+        accounts.slashedAmountSpillAddress,
+      ),
+      getAccountMeta("farmVault", accounts.farmVault),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawSlashedAmountInstructionDataEncoder().encode({}),
     programAddress,
@@ -281,7 +292,7 @@ export function getWithdrawSlashedAmountInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -293,12 +304,15 @@ export function getWithdrawSlashedAmountInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.crank),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.slashedAmountSpillAddress),
-      getAccountMeta(accounts.farmVault),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("crank", accounts.crank),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta(
+        "slashedAmountSpillAddress",
+        accounts.slashedAmountSpillAddress,
+      ),
+      getAccountMeta("farmVault", accounts.farmVault),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawSlashedAmountInstructionDataEncoder().encode({}),
     programAddress,
@@ -338,8 +352,13 @@ export function parseWithdrawSlashedAmountInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawSlashedAmountInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

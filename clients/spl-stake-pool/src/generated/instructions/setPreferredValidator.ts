@@ -24,7 +24,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   PreferredValidatorType,
   PreferredValidatorTypeArgs,
@@ -39,10 +39,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getPreferredValidatorTypeDecoder,
   getPreferredValidatorTypeEncoder,
@@ -163,7 +165,7 @@ export function getSetPreferredValidatorInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -172,9 +174,9 @@ export function getSetPreferredValidatorInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.staker),
-      getAccountMeta(accounts.validatorList),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("staker", accounts.staker),
+      getAccountMeta("validatorList", accounts.validatorList),
     ],
     data: getSetPreferredValidatorInstructionDataEncoder().encode(
       args as SetPreferredValidatorInstructionDataArgs,
@@ -210,8 +212,13 @@ export function parseSetPreferredValidatorInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetPreferredValidatorInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

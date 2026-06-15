@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +36,12 @@ import {
   getStructEncoder,
   getU16Decoder,
   getU16Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const OPEN_BUNDLED_POSITION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([169, 113, 126, 171, 213, 172, 212, 49]);
@@ -224,7 +226,7 @@ export function getOpenBundledPositionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -243,14 +245,20 @@ export function getOpenBundledPositionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.bundledPosition),
-      getAccountMeta(accounts.positionBundle),
-      getAccountMeta(accounts.positionBundleTokenAccount),
-      getAccountMeta(accounts.positionBundleAuthority),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("bundledPosition", accounts.bundledPosition),
+      getAccountMeta("positionBundle", accounts.positionBundle),
+      getAccountMeta(
+        "positionBundleTokenAccount",
+        accounts.positionBundleTokenAccount,
+      ),
+      getAccountMeta(
+        "positionBundleAuthority",
+        accounts.positionBundleAuthority,
+      ),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getOpenBundledPositionInstructionDataEncoder().encode(
       args as OpenBundledPositionInstructionDataArgs,
@@ -296,8 +304,13 @@ export function parseOpenBundledPositionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedOpenBundledPositionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

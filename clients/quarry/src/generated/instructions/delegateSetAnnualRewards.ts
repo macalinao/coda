@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DELEGATE_SET_ANNUAL_REWARDS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([121, 174, 85, 150, 174, 18, 13, 31]);
@@ -49,13 +51,13 @@ export function getDelegateSetAnnualRewardsDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type DelegateSetAnnualRewardsInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
+  TAccountOperator extends string | AccountMeta<string> = string,
+  TAccountDelegate extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
   TAccountQuarryMineProgram extends
     | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -166,7 +168,7 @@ export function getDelegateSetAnnualRewardsInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -181,10 +183,10 @@ export function getDelegateSetAnnualRewardsInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("delegate", accounts.delegate),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarryMineProgram", accounts.quarryMineProgram),
     ],
     data: getDelegateSetAnnualRewardsInstructionDataEncoder().encode(
       args as DelegateSetAnnualRewardsInstructionDataArgs,
@@ -222,8 +224,13 @@ export function parseDelegateSetAnnualRewardsInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDelegateSetAnnualRewardsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

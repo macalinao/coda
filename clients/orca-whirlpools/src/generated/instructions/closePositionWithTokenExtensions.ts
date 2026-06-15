@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_POSITION_WITH_TOKEN_EXTENSIONS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([1, 182, 135, 59, 155, 25, 99, 223]);
@@ -87,7 +89,7 @@ export interface ClosePositionWithTokenExtensionsInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface ClosePositionWithTokenExtensionsInstructionDataArgs {}
+export type ClosePositionWithTokenExtensionsInstructionDataArgs = {};
 
 export function getClosePositionWithTokenExtensionsInstructionDataEncoder(): FixedSizeEncoder<ClosePositionWithTokenExtensionsInstructionDataArgs> {
   return transformEncoder(
@@ -181,7 +183,7 @@ export function getClosePositionWithTokenExtensionsInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -193,12 +195,12 @@ export function getClosePositionWithTokenExtensionsInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.positionAuthority),
-      getAccountMeta(accounts.receiver),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.positionMint),
-      getAccountMeta(accounts.positionTokenAccount),
-      getAccountMeta(accounts.token2022Program),
+      getAccountMeta("positionAuthority", accounts.positionAuthority),
+      getAccountMeta("receiver", accounts.receiver),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("positionMint", accounts.positionMint),
+      getAccountMeta("positionTokenAccount", accounts.positionTokenAccount),
+      getAccountMeta("token2022Program", accounts.token2022Program),
     ],
     data: getClosePositionWithTokenExtensionsInstructionDataEncoder().encode(
       {},
@@ -240,8 +242,13 @@ export function parseClosePositionWithTokenExtensionsInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClosePositionWithTokenExtensionsInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

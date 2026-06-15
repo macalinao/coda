@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +35,14 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findClaimFeeOperatorPda,
   findEventAuthorityPda,
@@ -44,7 +50,6 @@ import {
   findTokenVaultPda,
 } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CLAIM_PROTOCOL_FEE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([165, 228, 133, 48, 99, 249, 255, 33]);
@@ -57,27 +62,27 @@ export function getClaimProtocolFeeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClaimProtocolFeeInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPoolAuthority extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountTokenAVault extends string | AccountMeta = string,
-  TAccountTokenBVault extends string | AccountMeta = string,
-  TAccountTokenAMint extends string | AccountMeta = string,
-  TAccountTokenBMint extends string | AccountMeta = string,
-  TAccountTokenAAccount extends string | AccountMeta = string,
-  TAccountTokenBAccount extends string | AccountMeta = string,
-  TAccountClaimFeeOperator extends string | AccountMeta = string,
-  TAccountOperator extends string | AccountMeta = string,
+  TAccountPoolAuthority extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountTokenAVault extends string | AccountMeta<string> = string,
+  TAccountTokenBVault extends string | AccountMeta<string> = string,
+  TAccountTokenAMint extends string | AccountMeta<string> = string,
+  TAccountTokenBMint extends string | AccountMeta<string> = string,
+  TAccountTokenAAccount extends string | AccountMeta<string> = string,
+  TAccountTokenBAccount extends string | AccountMeta<string> = string,
+  TAccountClaimFeeOperator extends string | AccountMeta<string> = string,
+  TAccountOperator extends string | AccountMeta<string> = string,
   TAccountTokenAProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenBProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -291,7 +296,7 @@ export async function getClaimProtocolFeeInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -303,14 +308,26 @@ export async function getClaimProtocolFeeInstructionAsync<
   }
   if (!accounts.tokenAVault.value) {
     accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenAMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenBVault.value) {
     accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenBMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenAProgram.value) {
@@ -329,8 +346,18 @@ export async function getClaimProtocolFeeInstructionAsync<
             188, 85,
           ]),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.tokenAProgram.value)),
-        getAddressEncoder().encode(expectAddress(accounts.tokenAMint.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "tokenAProgram",
+            accounts.tokenAProgram.value,
+          ),
+        ),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "tokenAMint",
+            accounts.tokenAMint.value,
+          ),
+        ),
       ],
     });
   }
@@ -350,14 +377,27 @@ export async function getClaimProtocolFeeInstructionAsync<
             188, 85,
           ]),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.tokenBProgram.value)),
-        getAddressEncoder().encode(expectAddress(accounts.tokenBMint.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "tokenBProgram",
+            accounts.tokenBProgram.value,
+          ),
+        ),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "tokenBMint",
+            accounts.tokenBMint.value,
+          ),
+        ),
       ],
     });
   }
   if (!accounts.claimFeeOperator.value) {
     accounts.claimFeeOperator.value = await findClaimFeeOperatorPda({
-      operator: expectAddress(accounts.operator.value),
+      operator: getAddressFromResolvedInstructionAccount(
+        "operator",
+        accounts.operator.value,
+      ),
     });
   }
   if (!accounts.eventAuthority.value) {
@@ -371,20 +411,20 @@ export async function getClaimProtocolFeeInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.tokenAAccount),
-      getAccountMeta(accounts.tokenBAccount),
-      getAccountMeta(accounts.claimFeeOperator),
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("tokenAAccount", accounts.tokenAAccount),
+      getAccountMeta("tokenBAccount", accounts.tokenBAccount),
+      getAccountMeta("claimFeeOperator", accounts.claimFeeOperator),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getClaimProtocolFeeInstructionDataEncoder().encode(
       args as ClaimProtocolFeeInstructionDataArgs,
@@ -529,7 +569,7 @@ export function getClaimProtocolFeeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -552,20 +592,20 @@ export function getClaimProtocolFeeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.poolAuthority),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.tokenAAccount),
-      getAccountMeta(accounts.tokenBAccount),
-      getAccountMeta(accounts.claimFeeOperator),
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("poolAuthority", accounts.poolAuthority),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("tokenAAccount", accounts.tokenAAccount),
+      getAccountMeta("tokenBAccount", accounts.tokenBAccount),
+      getAccountMeta("claimFeeOperator", accounts.claimFeeOperator),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getClaimProtocolFeeInstructionDataEncoder().encode(
       args as ClaimProtocolFeeInstructionDataArgs,
@@ -633,8 +673,13 @@ export function parseClaimProtocolFeeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClaimProtocolFeeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 14) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 14,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

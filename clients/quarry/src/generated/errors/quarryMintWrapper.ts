@@ -15,11 +15,11 @@ import { isProgramError } from "@solana/kit";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: You are not authorized to perform this action. */
-export const QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED = 0x1770; // 6000
+export const QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED = 0x17_70; // 6000
 /** HardcapExceeded: Cannot mint over hard cap. */
-export const QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED = 0x1771; // 6001
+export const QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED = 0x17_71; // 6001
 /** MinterAllowanceExceeded: Minter allowance exceeded. */
-export const QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED = 0x1772; // 6002
+export const QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED = 0x17_72; // 6002
 
 export type QuarryMintWrapperError =
   | typeof QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED
@@ -29,7 +29,7 @@ export type QuarryMintWrapperError =
 let quarryMintWrapperErrorMessages:
   | Record<QuarryMintWrapperError, string>
   | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   quarryMintWrapperErrorMessages = {
     [QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED]: "Cannot mint over hard cap.",
     [QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED]:
@@ -42,8 +42,10 @@ if (true) {
 export function getQuarryMintWrapperErrorMessage(
   code: QuarryMintWrapperError,
 ): string {
-  if (true) {
-    return quarryMintWrapperErrorMessages![code];
+  if (process.env.NODE_ENV !== "production") {
+    return (
+      quarryMintWrapperErrorMessages as Record<QuarryMintWrapperError, string>
+    )[code];
   }
 
   return "Error message not available in production bundles.";

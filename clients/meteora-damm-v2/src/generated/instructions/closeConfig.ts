@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,13 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   145, 9, 72, 157, 95, 125, 61, 85,
@@ -49,14 +51,14 @@ export function getCloseConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CloseConfigInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountConfig extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountRentReceiver extends string | AccountMeta = string,
-  TAccountEventAuthority extends string | AccountMeta = string,
+  TAccountConfig extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountRentReceiver extends string | AccountMeta<string> = string,
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -85,7 +87,7 @@ export interface CloseConfigInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CloseConfigInstructionDataArgs {}
+export type CloseConfigInstructionDataArgs = {};
 
 export function getCloseConfigInstructionDataEncoder(): FixedSizeEncoder<CloseConfigInstructionDataArgs> {
   return transformEncoder(
@@ -163,7 +165,7 @@ export async function getCloseConfigInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -178,11 +180,11 @@ export async function getCloseConfigInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.config),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.rentReceiver),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("config", accounts.config),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("rentReceiver", accounts.rentReceiver),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCloseConfigInstructionDataEncoder().encode({}),
     programAddress,
@@ -247,7 +249,7 @@ export function getCloseConfigInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -259,11 +261,11 @@ export function getCloseConfigInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.config),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.rentReceiver),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("config", accounts.config),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("rentReceiver", accounts.rentReceiver),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCloseConfigInstructionDataEncoder().encode({}),
     programAddress,
@@ -301,8 +303,13 @@ export function parseCloseConfigInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseConfigInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

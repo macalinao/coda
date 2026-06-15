@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_NATIVE_TREASURY_DISCRIMINATOR = 25;
 
@@ -74,7 +76,7 @@ export interface CreateNativeTreasuryInstructionData {
   discriminator: number;
 }
 
-export interface CreateNativeTreasuryInstructionDataArgs {}
+export type CreateNativeTreasuryInstructionDataArgs = {};
 
 export function getCreateNativeTreasuryInstructionDataEncoder(): FixedSizeEncoder<CreateNativeTreasuryInstructionDataArgs> {
   return transformEncoder(
@@ -154,7 +156,7 @@ export function getCreateNativeTreasuryInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -166,10 +168,10 @@ export function getCreateNativeTreasuryInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.governanceAccount),
-      getAccountMeta(accounts.nativeTreasuryAccount),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("governanceAccount", accounts.governanceAccount),
+      getAccountMeta("nativeTreasuryAccount", accounts.nativeTreasuryAccount),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateNativeTreasuryInstructionDataEncoder().encode({}),
     programAddress,
@@ -207,8 +209,13 @@ export function parseCreateNativeTreasuryInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateNativeTreasuryInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

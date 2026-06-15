@@ -22,18 +22,23 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR = 23;
 
@@ -83,7 +88,7 @@ export interface CreateTokenOwnerRecordInstructionData {
   discriminator: number;
 }
 
-export interface CreateTokenOwnerRecordInstructionDataArgs {}
+export type CreateTokenOwnerRecordInstructionDataArgs = {};
 
 export function getCreateTokenOwnerRecordInstructionDataEncoder(): FixedSizeEncoder<CreateTokenOwnerRecordInstructionDataArgs> {
   return transformEncoder(
@@ -179,15 +184,22 @@ export async function getCreateTokenOwnerRecordInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.tokenOwnerRecord.value) {
     accounts.tokenOwnerRecord.value = await findTokenOwnerRecordPda({
-      realm: expectAddress(accounts.realmAccount.value),
-      governingTokenMint: expectAddress(accounts.governingTokenMint.value),
-      governingTokenOwner: expectAddress(
+      realm: getAddressFromResolvedInstructionAccount(
+        "realmAccount",
+        accounts.realmAccount.value,
+      ),
+      governingTokenMint: getAddressFromResolvedInstructionAccount(
+        "governingTokenMint",
+        accounts.governingTokenMint.value,
+      ),
+      governingTokenOwner: getAddressFromResolvedInstructionAccount(
+        "governingTokenOwnerAccount",
         accounts.governingTokenOwnerAccount.value,
       ),
     });
@@ -200,12 +212,15 @@ export async function getCreateTokenOwnerRecordInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governingTokenOwnerAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.governingTokenMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta(
+        "governingTokenOwnerAccount",
+        accounts.governingTokenOwnerAccount,
+      ),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta("governingTokenMint", accounts.governingTokenMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateTokenOwnerRecordInstructionDataEncoder().encode({}),
     programAddress,
@@ -288,7 +303,7 @@ export function getCreateTokenOwnerRecordInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -300,12 +315,15 @@ export function getCreateTokenOwnerRecordInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.governingTokenOwnerAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.governingTokenMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta(
+        "governingTokenOwnerAccount",
+        accounts.governingTokenOwnerAccount,
+      ),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta("governingTokenMint", accounts.governingTokenMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateTokenOwnerRecordInstructionDataEncoder().encode({}),
     programAddress,
@@ -346,8 +364,13 @@ export function parseCreateTokenOwnerRecordInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateTokenOwnerRecordInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

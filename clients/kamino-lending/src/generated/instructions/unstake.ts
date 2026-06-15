@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,11 +33,16 @@ import {
   getStructEncoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findFarmsUserStatePda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const UNSTAKE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   90, 95, 107, 42, 205, 124, 50, 225,
@@ -159,7 +164,7 @@ export async function getUnstakeInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -168,18 +173,24 @@ export async function getUnstakeInstructionAsync<
   // Resolve default values.
   if (!accounts.userState.value) {
     accounts.userState.value = await findFarmsUserStatePda({
-      farmState: expectAddress(accounts.farmState.value),
-      owner: expectAddress(accounts.owner.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
+      owner: getAddressFromResolvedInstructionAccount(
+        "owner",
+        accounts.owner.value,
+      ),
     });
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.userState),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.scopePrices),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("userState", accounts.userState),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("scopePrices", accounts.scopePrices),
     ],
     data: getUnstakeInstructionDataEncoder().encode(
       args as UnstakeInstructionDataArgs,
@@ -240,7 +251,7 @@ export function getUnstakeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -249,10 +260,10 @@ export function getUnstakeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.userState),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.scopePrices),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("userState", accounts.userState),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("scopePrices", accounts.scopePrices),
     ],
     data: getUnstakeInstructionDataEncoder().encode(
       args as UnstakeInstructionDataArgs,
@@ -290,8 +301,13 @@ export function parseUnstakeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUnstakeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { PrintArgs, PrintArgsArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -31,10 +31,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import { getPrintArgsDecoder, getPrintArgsEncoder } from "../types/index.js";
 
 export const PRINT_DISCRIMINATOR = 55;
@@ -356,7 +358,7 @@ export function getPrintInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -383,24 +385,30 @@ export function getPrintInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.editionMetadata),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.editionMint),
-      getAccountMeta(accounts.editionTokenAccountOwner),
-      getAccountMeta(accounts.editionTokenAccount),
-      getAccountMeta(accounts.editionMintAuthority),
-      getAccountMeta(accounts.editionTokenRecord),
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.editionMarkerPda),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.masterTokenAccountOwner),
-      getAccountMeta(accounts.masterTokenAccount),
-      getAccountMeta(accounts.masterMetadata),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.splTokenProgram),
-      getAccountMeta(accounts.splAtaProgram),
-      getAccountMeta(accounts.sysvarInstructions),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("editionMetadata", accounts.editionMetadata),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("editionMint", accounts.editionMint),
+      getAccountMeta(
+        "editionTokenAccountOwner",
+        accounts.editionTokenAccountOwner,
+      ),
+      getAccountMeta("editionTokenAccount", accounts.editionTokenAccount),
+      getAccountMeta("editionMintAuthority", accounts.editionMintAuthority),
+      getAccountMeta("editionTokenRecord", accounts.editionTokenRecord),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("editionMarkerPda", accounts.editionMarkerPda),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta(
+        "masterTokenAccountOwner",
+        accounts.masterTokenAccountOwner,
+      ),
+      getAccountMeta("masterTokenAccount", accounts.masterTokenAccount),
+      getAccountMeta("masterMetadata", accounts.masterMetadata),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("splTokenProgram", accounts.splTokenProgram),
+      getAccountMeta("splAtaProgram", accounts.splAtaProgram),
+      getAccountMeta("sysvarInstructions", accounts.sysvarInstructions),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getPrintInstructionDataEncoder().encode(
       args as PrintInstructionDataArgs,
@@ -487,8 +495,13 @@ export function parsePrintInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedPrintInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 18) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 18,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

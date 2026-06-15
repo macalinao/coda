@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_FEE_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([31, 1, 50, 87, 237, 101, 97, 132]);
@@ -73,7 +75,7 @@ export interface SetFeeAuthorityInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface SetFeeAuthorityInstructionDataArgs {}
+export type SetFeeAuthorityInstructionDataArgs = {};
 
 export function getSetFeeAuthorityInstructionDataEncoder(): FixedSizeEncoder<SetFeeAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -143,15 +145,15 @@ export function getSetFeeAuthorityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.feeAuthority),
-      getAccountMeta(accounts.newFeeAuthority),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta("feeAuthority", accounts.feeAuthority),
+      getAccountMeta("newFeeAuthority", accounts.newFeeAuthority),
     ],
     data: getSetFeeAuthorityInstructionDataEncoder().encode({}),
     programAddress,
@@ -185,8 +187,13 @@ export function parseSetFeeAuthorityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetFeeAuthorityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

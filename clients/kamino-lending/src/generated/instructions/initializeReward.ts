@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,8 +31,14 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findFarmVaultsAuthorityPda,
   findRewardTreasuryVaultPda,
@@ -40,7 +46,6 @@ import {
   findTreasuryVaultsAuthorityPda,
 } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const INITIALIZE_REWARD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([95, 135, 192, 196, 242, 129, 230, 68]);
@@ -117,7 +122,7 @@ export interface InitializeRewardInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitializeRewardInstructionDataArgs {}
+export type InitializeRewardInstructionDataArgs = {};
 
 export function getInitializeRewardInstructionDataEncoder(): FixedSizeEncoder<InitializeRewardInstructionDataArgs> {
   return transformEncoder(
@@ -240,31 +245,49 @@ export async function getInitializeRewardInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.rewardVault.value) {
     accounts.rewardVault.value = await findRewardVaultPda({
-      farmState: expectAddress(accounts.farmState.value),
-      rewardMint: expectAddress(accounts.rewardMint.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
+      rewardMint: getAddressFromResolvedInstructionAccount(
+        "rewardMint",
+        accounts.rewardMint.value,
+      ),
     });
   }
   if (!accounts.rewardTreasuryVault.value) {
     accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda({
-      globalConfig: expectAddress(accounts.globalConfig.value),
-      rewardMint: expectAddress(accounts.rewardMint.value),
+      globalConfig: getAddressFromResolvedInstructionAccount(
+        "globalConfig",
+        accounts.globalConfig.value,
+      ),
+      rewardMint: getAddressFromResolvedInstructionAccount(
+        "rewardMint",
+        accounts.rewardMint.value,
+      ),
     });
   }
   if (!accounts.farmVaultsAuthority.value) {
     accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: expectAddress(accounts.farmState.value),
+      farmState: getAddressFromResolvedInstructionAccount(
+        "farmState",
+        accounts.farmState.value,
+      ),
     });
   }
   if (!accounts.treasuryVaultsAuthority.value) {
     accounts.treasuryVaultsAuthority.value =
       await findTreasuryVaultsAuthorityPda({
-        globalConfig: expectAddress(accounts.globalConfig.value),
+        globalConfig: getAddressFromResolvedInstructionAccount(
+          "globalConfig",
+          accounts.globalConfig.value,
+        ),
       });
   }
   if (!accounts.tokenProgram.value) {
@@ -283,17 +306,20 @@ export async function getInitializeRewardInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.farmAdmin),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardTreasuryVault),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.treasuryVaultsAuthority),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("farmAdmin", accounts.farmAdmin),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardTreasuryVault", accounts.rewardTreasuryVault),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta(
+        "treasuryVaultsAuthority",
+        accounts.treasuryVaultsAuthority,
+      ),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializeRewardInstructionDataEncoder().encode({}),
     programAddress,
@@ -409,7 +435,7 @@ export function getInitializeRewardInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -429,17 +455,20 @@ export function getInitializeRewardInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.farmAdmin),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.rewardVault),
-      getAccountMeta(accounts.rewardTreasuryVault),
-      getAccountMeta(accounts.farmVaultsAuthority),
-      getAccountMeta(accounts.treasuryVaultsAuthority),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("farmAdmin", accounts.farmAdmin),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("rewardVault", accounts.rewardVault),
+      getAccountMeta("rewardTreasuryVault", accounts.rewardTreasuryVault),
+      getAccountMeta("farmVaultsAuthority", accounts.farmVaultsAuthority),
+      getAccountMeta(
+        "treasuryVaultsAuthority",
+        accounts.treasuryVaultsAuthority,
+      ),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitializeRewardInstructionDataEncoder().encode({}),
     programAddress,
@@ -489,8 +518,13 @@ export function parseInitializeRewardInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitializeRewardInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -22,7 +22,6 @@ import {
   getU64Encoder,
 } from "@solana/kit";
 
-/** Create dynamic config */
 export interface EvtCreateDynamicConfig {
   config: Address;
   poolCreatorAuthority: Address;

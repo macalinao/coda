@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,11 +33,16 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_CLAIM_FEE_OPERATOR_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([169, 62, 207, 107, 58, 187, 162, 109]);
@@ -50,17 +55,17 @@ export function getCreateClaimFeeOperatorDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type CreateClaimFeeOperatorInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountClaimFeeOperator extends string | AccountMeta = string,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
+  TAccountClaimFeeOperator extends string | AccountMeta<string> = string,
+  TAccountOperator extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -92,7 +97,7 @@ export interface CreateClaimFeeOperatorInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface CreateClaimFeeOperatorInstructionDataArgs {}
+export type CreateClaimFeeOperatorInstructionDataArgs = {};
 
 export function getCreateClaimFeeOperatorInstructionDataEncoder(): FixedSizeEncoder<CreateClaimFeeOperatorInstructionDataArgs> {
   return transformEncoder(
@@ -182,7 +187,7 @@ export async function getCreateClaimFeeOperatorInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -193,7 +198,12 @@ export async function getCreateClaimFeeOperatorInstructionAsync<
         getBytesEncoder().encode(
           new Uint8Array([99, 102, 95, 111, 112, 101, 114, 97, 116, 111, 114]),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.operator.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "operator",
+            accounts.operator.value,
+          ),
+        ),
       ],
     });
   }
@@ -212,12 +222,12 @@ export async function getCreateClaimFeeOperatorInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.claimFeeOperator),
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("claimFeeOperator", accounts.claimFeeOperator),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCreateClaimFeeOperatorInstructionDataEncoder().encode({}),
     programAddress,
@@ -292,7 +302,7 @@ export function getCreateClaimFeeOperatorInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -308,12 +318,12 @@ export function getCreateClaimFeeOperatorInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.claimFeeOperator),
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("claimFeeOperator", accounts.claimFeeOperator),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getCreateClaimFeeOperatorInstructionDataEncoder().encode({}),
     programAddress,
@@ -353,8 +363,13 @@ export function parseCreateClaimFeeOperatorInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateClaimFeeOperatorInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

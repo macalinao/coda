@@ -19,7 +19,7 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -30,11 +30,16 @@ import {
   getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const UPDATE_VALIDATOR_LIST_BALANCE_DISCRIMINATOR = 6;
 
@@ -204,7 +209,7 @@ export async function getUpdateValidatorListBalanceInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -213,7 +218,10 @@ export async function getUpdateValidatorListBalanceInstructionAsync<
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
     accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: expectAddress(accounts.stakePool.value),
+      stakePoolAddress: getAddressFromResolvedInstructionAccount(
+        "stakePool",
+        accounts.stakePool.value,
+      ),
     });
   }
   if (!accounts.clockSysvar.value) {
@@ -232,13 +240,13 @@ export async function getUpdateValidatorListBalanceInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.validatorList),
-      getAccountMeta(accounts.reserveStake),
-      getAccountMeta(accounts.clockSysvar),
-      getAccountMeta(accounts.stakeHistorySysvar),
-      getAccountMeta(accounts.stakeProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("validatorList", accounts.validatorList),
+      getAccountMeta("reserveStake", accounts.reserveStake),
+      getAccountMeta("clockSysvar", accounts.clockSysvar),
+      getAccountMeta("stakeHistorySysvar", accounts.stakeHistorySysvar),
+      getAccountMeta("stakeProgram", accounts.stakeProgram),
     ],
     data: getUpdateValidatorListBalanceInstructionDataEncoder().encode(
       args as UpdateValidatorListBalanceInstructionDataArgs,
@@ -328,7 +336,7 @@ export function getUpdateValidatorListBalanceInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -351,13 +359,13 @@ export function getUpdateValidatorListBalanceInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.stakePool),
-      getAccountMeta(accounts.withdrawAuthority),
-      getAccountMeta(accounts.validatorList),
-      getAccountMeta(accounts.reserveStake),
-      getAccountMeta(accounts.clockSysvar),
-      getAccountMeta(accounts.stakeHistorySysvar),
-      getAccountMeta(accounts.stakeProgram),
+      getAccountMeta("stakePool", accounts.stakePool),
+      getAccountMeta("withdrawAuthority", accounts.withdrawAuthority),
+      getAccountMeta("validatorList", accounts.validatorList),
+      getAccountMeta("reserveStake", accounts.reserveStake),
+      getAccountMeta("clockSysvar", accounts.clockSysvar),
+      getAccountMeta("stakeHistorySysvar", accounts.stakeHistorySysvar),
+      getAccountMeta("stakeProgram", accounts.stakeProgram),
     ],
     data: getUpdateValidatorListBalanceInstructionDataEncoder().encode(
       args as UpdateValidatorListBalanceInstructionDataArgs,
@@ -401,8 +409,13 @@ export function parseUpdateValidatorListBalanceInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateValidatorListBalanceInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

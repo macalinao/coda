@@ -58,7 +58,7 @@ export interface ObligationCollateralArgs {
    * If the obligation have multiple collateral this value is the same for all of them.
    */
   borrowedAmountAgainstThisCollateralInElevationGroup: number | bigint;
-  padding: (number | bigint)[];
+  padding: Array<number | bigint>;
 }
 
 export function getObligationCollateralEncoder(): FixedSizeEncoder<ObligationCollateralArgs> {

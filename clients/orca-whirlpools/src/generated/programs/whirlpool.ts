@@ -6,8 +6,73 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  FeeTier,
+  FeeTierArgs,
+  LockConfig,
+  LockConfigArgs,
+  Position,
+  PositionArgs,
+  PositionBundle,
+  PositionBundleArgs,
+  TickArray,
+  TickArrayArgs,
+  TokenBadge,
+  TokenBadgeArgs,
+  Whirlpool,
+  WhirlpoolArgs,
+  WhirlpoolsConfig,
+  WhirlpoolsConfigArgs,
+  WhirlpoolsConfigExtension,
+  WhirlpoolsConfigExtensionArgs,
+} from "../accounts/index.js";
+import type {
+  CloseBundledPositionInput,
+  ClosePositionInput,
+  ClosePositionWithTokenExtensionsInput,
+  CollectFeesInput,
+  CollectFeesV2Input,
+  CollectProtocolFeesInput,
+  CollectProtocolFeesV2Input,
+  CollectRewardInput,
+  CollectRewardV2Input,
+  DecreaseLiquidityInput,
+  DecreaseLiquidityV2Input,
+  DeletePositionBundleInput,
+  DeleteTokenBadgeInput,
+  IncreaseLiquidityInput,
+  IncreaseLiquidityV2Input,
+  InitializeConfigExtensionInput,
+  InitializeConfigInput,
+  InitializeFeeTierInput,
+  InitializePoolInput,
+  InitializePoolV2Input,
+  InitializePositionBundleInput,
+  InitializePositionBundleWithMetadataInput,
+  InitializeRewardInput,
+  InitializeRewardV2Input,
+  InitializeTickArrayInput,
+  InitializeTokenBadgeInput,
+  LockPositionInput,
+  OpenBundledPositionInput,
+  OpenPositionInput,
+  OpenPositionWithMetadataInput,
+  OpenPositionWithTokenExtensionsInput,
   ParsedCloseBundledPositionInstruction,
   ParsedClosePositionInstruction,
   ParsedClosePositionWithTokenExtensionsInstruction,
@@ -57,8 +122,151 @@ import type {
   ParsedTwoHopSwapInstruction,
   ParsedTwoHopSwapV2Instruction,
   ParsedUpdateFeesAndRewardsInstruction,
+  SetCollectProtocolFeesAuthorityInput,
+  SetConfigExtensionAuthorityInput,
+  SetDefaultFeeRateInput,
+  SetDefaultProtocolFeeRateInput,
+  SetFeeAuthorityInput,
+  SetFeeRateInput,
+  SetProtocolFeeRateInput,
+  SetRewardAuthorityBySuperAuthorityInput,
+  SetRewardAuthorityInput,
+  SetRewardEmissionsInput,
+  SetRewardEmissionsSuperAuthorityInput,
+  SetRewardEmissionsV2Input,
+  SetTokenBadgeAuthorityInput,
+  SwapInput,
+  SwapV2Input,
+  TwoHopSwapInput,
+  TwoHopSwapV2Input,
+  UpdateFeesAndRewardsInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getFeeTierCodec,
+  getLockConfigCodec,
+  getPositionBundleCodec,
+  getPositionCodec,
+  getTickArrayCodec,
+  getTokenBadgeCodec,
+  getWhirlpoolCodec,
+  getWhirlpoolsConfigCodec,
+  getWhirlpoolsConfigExtensionCodec,
+} from "../accounts/index.js";
+import {
+  getCloseBundledPositionInstruction,
+  getClosePositionInstruction,
+  getClosePositionWithTokenExtensionsInstruction,
+  getCollectFeesInstruction,
+  getCollectFeesV2Instruction,
+  getCollectProtocolFeesInstruction,
+  getCollectProtocolFeesV2Instruction,
+  getCollectRewardInstruction,
+  getCollectRewardV2Instruction,
+  getDecreaseLiquidityInstruction,
+  getDecreaseLiquidityV2Instruction,
+  getDeletePositionBundleInstruction,
+  getDeleteTokenBadgeInstruction,
+  getIncreaseLiquidityInstruction,
+  getIncreaseLiquidityV2Instruction,
+  getInitializeConfigExtensionInstruction,
+  getInitializeConfigInstruction,
+  getInitializeFeeTierInstruction,
+  getInitializePoolInstruction,
+  getInitializePoolV2Instruction,
+  getInitializePositionBundleInstruction,
+  getInitializePositionBundleWithMetadataInstruction,
+  getInitializeRewardInstruction,
+  getInitializeRewardV2Instruction,
+  getInitializeTickArrayInstruction,
+  getInitializeTokenBadgeInstruction,
+  getLockPositionInstruction,
+  getOpenBundledPositionInstruction,
+  getOpenPositionInstruction,
+  getOpenPositionWithMetadataInstruction,
+  getOpenPositionWithTokenExtensionsInstruction,
+  getSetCollectProtocolFeesAuthorityInstruction,
+  getSetConfigExtensionAuthorityInstruction,
+  getSetDefaultFeeRateInstruction,
+  getSetDefaultProtocolFeeRateInstruction,
+  getSetFeeAuthorityInstruction,
+  getSetFeeRateInstruction,
+  getSetProtocolFeeRateInstruction,
+  getSetRewardAuthorityBySuperAuthorityInstruction,
+  getSetRewardAuthorityInstruction,
+  getSetRewardEmissionsInstruction,
+  getSetRewardEmissionsSuperAuthorityInstruction,
+  getSetRewardEmissionsV2Instruction,
+  getSetTokenBadgeAuthorityInstruction,
+  getSwapInstruction,
+  getSwapV2Instruction,
+  getTwoHopSwapInstruction,
+  getTwoHopSwapV2Instruction,
+  getUpdateFeesAndRewardsInstruction,
+  parseCloseBundledPositionInstruction,
+  parseClosePositionInstruction,
+  parseClosePositionWithTokenExtensionsInstruction,
+  parseCollectFeesInstruction,
+  parseCollectFeesV2Instruction,
+  parseCollectProtocolFeesInstruction,
+  parseCollectProtocolFeesV2Instruction,
+  parseCollectRewardInstruction,
+  parseCollectRewardV2Instruction,
+  parseDecreaseLiquidityInstruction,
+  parseDecreaseLiquidityV2Instruction,
+  parseDeletePositionBundleInstruction,
+  parseDeleteTokenBadgeInstruction,
+  parseIncreaseLiquidityInstruction,
+  parseIncreaseLiquidityV2Instruction,
+  parseInitializeConfigExtensionInstruction,
+  parseInitializeConfigInstruction,
+  parseInitializeFeeTierInstruction,
+  parseInitializePoolInstruction,
+  parseInitializePoolV2Instruction,
+  parseInitializePositionBundleInstruction,
+  parseInitializePositionBundleWithMetadataInstruction,
+  parseInitializeRewardInstruction,
+  parseInitializeRewardV2Instruction,
+  parseInitializeTickArrayInstruction,
+  parseInitializeTokenBadgeInstruction,
+  parseLockPositionInstruction,
+  parseOpenBundledPositionInstruction,
+  parseOpenPositionInstruction,
+  parseOpenPositionWithMetadataInstruction,
+  parseOpenPositionWithTokenExtensionsInstruction,
+  parseSetCollectProtocolFeesAuthorityInstruction,
+  parseSetConfigExtensionAuthorityInstruction,
+  parseSetDefaultFeeRateInstruction,
+  parseSetDefaultProtocolFeeRateInstruction,
+  parseSetFeeAuthorityInstruction,
+  parseSetFeeRateInstruction,
+  parseSetProtocolFeeRateInstruction,
+  parseSetRewardAuthorityBySuperAuthorityInstruction,
+  parseSetRewardAuthorityInstruction,
+  parseSetRewardEmissionsInstruction,
+  parseSetRewardEmissionsSuperAuthorityInstruction,
+  parseSetRewardEmissionsV2Instruction,
+  parseSetTokenBadgeAuthorityInstruction,
+  parseSwapInstruction,
+  parseSwapV2Instruction,
+  parseTwoHopSwapInstruction,
+  parseTwoHopSwapV2Instruction,
+  parseUpdateFeesAndRewardsInstruction,
+} from "../instructions/index.js";
 
 export const WHIRLPOOL_PROGRAM_ADDRESS =
   "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc" as Address<"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc">;
@@ -178,8 +386,9 @@ export function identifyWhirlpoolAccount(
   ) {
     return WhirlpoolAccount.Whirlpool;
   }
-  throw new Error(
-    "The provided account could not be identified as a whirlpool account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "whirlpool" },
   );
 }
 
@@ -778,8 +987,9 @@ export function identifyWhirlpoolInstruction(
   ) {
     return WhirlpoolInstruction.DeleteTokenBadge;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a whirlpool instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "whirlpool" },
   );
 }
 
@@ -933,3 +1143,864 @@ export type ParsedWhirlpoolInstruction<
   | ({
       instructionType: WhirlpoolInstruction.DeleteTokenBadge;
     } & ParsedDeleteTokenBadgeInstruction<TProgram>);
+
+export function parseWhirlpoolInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedWhirlpoolInstruction<TProgram> {
+  const instructionType = identifyWhirlpoolInstruction(instruction);
+  switch (instructionType) {
+    case WhirlpoolInstruction.InitializeConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializeConfig,
+        ...parseInitializeConfigInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializePool: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializePool,
+        ...parseInitializePoolInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializeTickArray: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializeTickArray,
+        ...parseInitializeTickArrayInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializeFeeTier: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializeFeeTier,
+        ...parseInitializeFeeTierInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializeReward: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializeReward,
+        ...parseInitializeRewardInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetRewardEmissions: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetRewardEmissions,
+        ...parseSetRewardEmissionsInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.OpenPosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.OpenPosition,
+        ...parseOpenPositionInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.OpenPositionWithMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.OpenPositionWithMetadata,
+        ...parseOpenPositionWithMetadataInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.IncreaseLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.IncreaseLiquidity,
+        ...parseIncreaseLiquidityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.DecreaseLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.DecreaseLiquidity,
+        ...parseDecreaseLiquidityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.UpdateFeesAndRewards: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.UpdateFeesAndRewards,
+        ...parseUpdateFeesAndRewardsInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.CollectFees: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.CollectFees,
+        ...parseCollectFeesInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.CollectReward: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.CollectReward,
+        ...parseCollectRewardInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.CollectProtocolFees: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.CollectProtocolFees,
+        ...parseCollectProtocolFeesInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.Swap: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.Swap,
+        ...parseSwapInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.ClosePosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.ClosePosition,
+        ...parseClosePositionInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetDefaultFeeRate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetDefaultFeeRate,
+        ...parseSetDefaultFeeRateInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetDefaultProtocolFeeRate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetDefaultProtocolFeeRate,
+        ...parseSetDefaultProtocolFeeRateInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetFeeRate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetFeeRate,
+        ...parseSetFeeRateInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetProtocolFeeRate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetProtocolFeeRate,
+        ...parseSetProtocolFeeRateInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetFeeAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetFeeAuthority,
+        ...parseSetFeeAuthorityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetCollectProtocolFeesAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetCollectProtocolFeesAuthority,
+        ...parseSetCollectProtocolFeesAuthorityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetRewardAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetRewardAuthority,
+        ...parseSetRewardAuthorityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetRewardAuthorityBySuperAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          WhirlpoolInstruction.SetRewardAuthorityBySuperAuthority,
+        ...parseSetRewardAuthorityBySuperAuthorityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetRewardEmissionsSuperAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetRewardEmissionsSuperAuthority,
+        ...parseSetRewardEmissionsSuperAuthorityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.TwoHopSwap: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.TwoHopSwap,
+        ...parseTwoHopSwapInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializePositionBundle: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializePositionBundle,
+        ...parseInitializePositionBundleInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializePositionBundleWithMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          WhirlpoolInstruction.InitializePositionBundleWithMetadata,
+        ...parseInitializePositionBundleWithMetadataInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.DeletePositionBundle: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.DeletePositionBundle,
+        ...parseDeletePositionBundleInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.OpenBundledPosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.OpenBundledPosition,
+        ...parseOpenBundledPositionInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.CloseBundledPosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.CloseBundledPosition,
+        ...parseCloseBundledPositionInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.OpenPositionWithTokenExtensions: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.OpenPositionWithTokenExtensions,
+        ...parseOpenPositionWithTokenExtensionsInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.ClosePositionWithTokenExtensions: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.ClosePositionWithTokenExtensions,
+        ...parseClosePositionWithTokenExtensionsInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.LockPosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.LockPosition,
+        ...parseLockPositionInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.CollectFeesV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.CollectFeesV2,
+        ...parseCollectFeesV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.CollectProtocolFeesV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.CollectProtocolFeesV2,
+        ...parseCollectProtocolFeesV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.CollectRewardV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.CollectRewardV2,
+        ...parseCollectRewardV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.DecreaseLiquidityV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.DecreaseLiquidityV2,
+        ...parseDecreaseLiquidityV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.IncreaseLiquidityV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.IncreaseLiquidityV2,
+        ...parseIncreaseLiquidityV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializePoolV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializePoolV2,
+        ...parseInitializePoolV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializeRewardV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializeRewardV2,
+        ...parseInitializeRewardV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetRewardEmissionsV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetRewardEmissionsV2,
+        ...parseSetRewardEmissionsV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SwapV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SwapV2,
+        ...parseSwapV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.TwoHopSwapV2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.TwoHopSwapV2,
+        ...parseTwoHopSwapV2Instruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializeConfigExtension: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializeConfigExtension,
+        ...parseInitializeConfigExtensionInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetConfigExtensionAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetConfigExtensionAuthority,
+        ...parseSetConfigExtensionAuthorityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.SetTokenBadgeAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.SetTokenBadgeAuthority,
+        ...parseSetTokenBadgeAuthorityInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.InitializeTokenBadge: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.InitializeTokenBadge,
+        ...parseInitializeTokenBadgeInstruction(instruction),
+      };
+    }
+    case WhirlpoolInstruction.DeleteTokenBadge: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: WhirlpoolInstruction.DeleteTokenBadge,
+        ...parseDeleteTokenBadgeInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "whirlpool",
+        },
+      );
+  }
+}
+
+export interface WhirlpoolPlugin {
+  accounts: WhirlpoolPluginAccounts;
+  instructions: WhirlpoolPluginInstructions;
+}
+
+export interface WhirlpoolPluginAccounts {
+  whirlpoolsConfig: ReturnType<typeof getWhirlpoolsConfigCodec> &
+    SelfFetchFunctions<WhirlpoolsConfigArgs, WhirlpoolsConfig>;
+  whirlpoolsConfigExtension: ReturnType<
+    typeof getWhirlpoolsConfigExtensionCodec
+  > &
+    SelfFetchFunctions<
+      WhirlpoolsConfigExtensionArgs,
+      WhirlpoolsConfigExtension
+    >;
+  feeTier: ReturnType<typeof getFeeTierCodec> &
+    SelfFetchFunctions<FeeTierArgs, FeeTier>;
+  lockConfig: ReturnType<typeof getLockConfigCodec> &
+    SelfFetchFunctions<LockConfigArgs, LockConfig>;
+  position: ReturnType<typeof getPositionCodec> &
+    SelfFetchFunctions<PositionArgs, Position>;
+  positionBundle: ReturnType<typeof getPositionBundleCodec> &
+    SelfFetchFunctions<PositionBundleArgs, PositionBundle>;
+  tickArray: ReturnType<typeof getTickArrayCodec> &
+    SelfFetchFunctions<TickArrayArgs, TickArray>;
+  tokenBadge: ReturnType<typeof getTokenBadgeCodec> &
+    SelfFetchFunctions<TokenBadgeArgs, TokenBadge>;
+  whirlpool: ReturnType<typeof getWhirlpoolCodec> &
+    SelfFetchFunctions<WhirlpoolArgs, Whirlpool>;
+}
+
+export interface WhirlpoolPluginInstructions {
+  initializeConfig: (
+    input: InitializeConfigInput,
+  ) => ReturnType<typeof getInitializeConfigInstruction> &
+    SelfPlanAndSendFunctions;
+  initializePool: (
+    input: InitializePoolInput,
+  ) => ReturnType<typeof getInitializePoolInstruction> &
+    SelfPlanAndSendFunctions;
+  initializeTickArray: (
+    input: InitializeTickArrayInput,
+  ) => ReturnType<typeof getInitializeTickArrayInstruction> &
+    SelfPlanAndSendFunctions;
+  initializeFeeTier: (
+    input: InitializeFeeTierInput,
+  ) => ReturnType<typeof getInitializeFeeTierInstruction> &
+    SelfPlanAndSendFunctions;
+  initializeReward: (
+    input: InitializeRewardInput,
+  ) => ReturnType<typeof getInitializeRewardInstruction> &
+    SelfPlanAndSendFunctions;
+  setRewardEmissions: (
+    input: SetRewardEmissionsInput,
+  ) => ReturnType<typeof getSetRewardEmissionsInstruction> &
+    SelfPlanAndSendFunctions;
+  openPosition: (
+    input: OpenPositionInput,
+  ) => ReturnType<typeof getOpenPositionInstruction> & SelfPlanAndSendFunctions;
+  openPositionWithMetadata: (
+    input: OpenPositionWithMetadataInput,
+  ) => ReturnType<typeof getOpenPositionWithMetadataInstruction> &
+    SelfPlanAndSendFunctions;
+  increaseLiquidity: (
+    input: IncreaseLiquidityInput,
+  ) => ReturnType<typeof getIncreaseLiquidityInstruction> &
+    SelfPlanAndSendFunctions;
+  decreaseLiquidity: (
+    input: DecreaseLiquidityInput,
+  ) => ReturnType<typeof getDecreaseLiquidityInstruction> &
+    SelfPlanAndSendFunctions;
+  updateFeesAndRewards: (
+    input: UpdateFeesAndRewardsInput,
+  ) => ReturnType<typeof getUpdateFeesAndRewardsInstruction> &
+    SelfPlanAndSendFunctions;
+  collectFees: (
+    input: CollectFeesInput,
+  ) => ReturnType<typeof getCollectFeesInstruction> & SelfPlanAndSendFunctions;
+  collectReward: (
+    input: CollectRewardInput,
+  ) => ReturnType<typeof getCollectRewardInstruction> &
+    SelfPlanAndSendFunctions;
+  collectProtocolFees: (
+    input: CollectProtocolFeesInput,
+  ) => ReturnType<typeof getCollectProtocolFeesInstruction> &
+    SelfPlanAndSendFunctions;
+  swap: (
+    input: SwapInput,
+  ) => ReturnType<typeof getSwapInstruction> & SelfPlanAndSendFunctions;
+  closePosition: (
+    input: ClosePositionInput,
+  ) => ReturnType<typeof getClosePositionInstruction> &
+    SelfPlanAndSendFunctions;
+  setDefaultFeeRate: (
+    input: SetDefaultFeeRateInput,
+  ) => ReturnType<typeof getSetDefaultFeeRateInstruction> &
+    SelfPlanAndSendFunctions;
+  setDefaultProtocolFeeRate: (
+    input: SetDefaultProtocolFeeRateInput,
+  ) => ReturnType<typeof getSetDefaultProtocolFeeRateInstruction> &
+    SelfPlanAndSendFunctions;
+  setFeeRate: (
+    input: SetFeeRateInput,
+  ) => ReturnType<typeof getSetFeeRateInstruction> & SelfPlanAndSendFunctions;
+  setProtocolFeeRate: (
+    input: SetProtocolFeeRateInput,
+  ) => ReturnType<typeof getSetProtocolFeeRateInstruction> &
+    SelfPlanAndSendFunctions;
+  setFeeAuthority: (
+    input: SetFeeAuthorityInput,
+  ) => ReturnType<typeof getSetFeeAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  setCollectProtocolFeesAuthority: (
+    input: SetCollectProtocolFeesAuthorityInput,
+  ) => ReturnType<typeof getSetCollectProtocolFeesAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  setRewardAuthority: (
+    input: SetRewardAuthorityInput,
+  ) => ReturnType<typeof getSetRewardAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  setRewardAuthorityBySuperAuthority: (
+    input: SetRewardAuthorityBySuperAuthorityInput,
+  ) => ReturnType<typeof getSetRewardAuthorityBySuperAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  setRewardEmissionsSuperAuthority: (
+    input: SetRewardEmissionsSuperAuthorityInput,
+  ) => ReturnType<typeof getSetRewardEmissionsSuperAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  twoHopSwap: (
+    input: TwoHopSwapInput,
+  ) => ReturnType<typeof getTwoHopSwapInstruction> & SelfPlanAndSendFunctions;
+  initializePositionBundle: (
+    input: InitializePositionBundleInput,
+  ) => ReturnType<typeof getInitializePositionBundleInstruction> &
+    SelfPlanAndSendFunctions;
+  initializePositionBundleWithMetadata: (
+    input: InitializePositionBundleWithMetadataInput,
+  ) => ReturnType<typeof getInitializePositionBundleWithMetadataInstruction> &
+    SelfPlanAndSendFunctions;
+  deletePositionBundle: (
+    input: DeletePositionBundleInput,
+  ) => ReturnType<typeof getDeletePositionBundleInstruction> &
+    SelfPlanAndSendFunctions;
+  openBundledPosition: (
+    input: OpenBundledPositionInput,
+  ) => ReturnType<typeof getOpenBundledPositionInstruction> &
+    SelfPlanAndSendFunctions;
+  closeBundledPosition: (
+    input: CloseBundledPositionInput,
+  ) => ReturnType<typeof getCloseBundledPositionInstruction> &
+    SelfPlanAndSendFunctions;
+  openPositionWithTokenExtensions: (
+    input: OpenPositionWithTokenExtensionsInput,
+  ) => ReturnType<typeof getOpenPositionWithTokenExtensionsInstruction> &
+    SelfPlanAndSendFunctions;
+  closePositionWithTokenExtensions: (
+    input: ClosePositionWithTokenExtensionsInput,
+  ) => ReturnType<typeof getClosePositionWithTokenExtensionsInstruction> &
+    SelfPlanAndSendFunctions;
+  lockPosition: (
+    input: LockPositionInput,
+  ) => ReturnType<typeof getLockPositionInstruction> & SelfPlanAndSendFunctions;
+  collectFeesV2: (
+    input: CollectFeesV2Input,
+  ) => ReturnType<typeof getCollectFeesV2Instruction> &
+    SelfPlanAndSendFunctions;
+  collectProtocolFeesV2: (
+    input: CollectProtocolFeesV2Input,
+  ) => ReturnType<typeof getCollectProtocolFeesV2Instruction> &
+    SelfPlanAndSendFunctions;
+  collectRewardV2: (
+    input: CollectRewardV2Input,
+  ) => ReturnType<typeof getCollectRewardV2Instruction> &
+    SelfPlanAndSendFunctions;
+  decreaseLiquidityV2: (
+    input: DecreaseLiquidityV2Input,
+  ) => ReturnType<typeof getDecreaseLiquidityV2Instruction> &
+    SelfPlanAndSendFunctions;
+  increaseLiquidityV2: (
+    input: IncreaseLiquidityV2Input,
+  ) => ReturnType<typeof getIncreaseLiquidityV2Instruction> &
+    SelfPlanAndSendFunctions;
+  initializePoolV2: (
+    input: InitializePoolV2Input,
+  ) => ReturnType<typeof getInitializePoolV2Instruction> &
+    SelfPlanAndSendFunctions;
+  initializeRewardV2: (
+    input: InitializeRewardV2Input,
+  ) => ReturnType<typeof getInitializeRewardV2Instruction> &
+    SelfPlanAndSendFunctions;
+  setRewardEmissionsV2: (
+    input: SetRewardEmissionsV2Input,
+  ) => ReturnType<typeof getSetRewardEmissionsV2Instruction> &
+    SelfPlanAndSendFunctions;
+  swapV2: (
+    input: SwapV2Input,
+  ) => ReturnType<typeof getSwapV2Instruction> & SelfPlanAndSendFunctions;
+  twoHopSwapV2: (
+    input: TwoHopSwapV2Input,
+  ) => ReturnType<typeof getTwoHopSwapV2Instruction> & SelfPlanAndSendFunctions;
+  initializeConfigExtension: (
+    input: InitializeConfigExtensionInput,
+  ) => ReturnType<typeof getInitializeConfigExtensionInstruction> &
+    SelfPlanAndSendFunctions;
+  setConfigExtensionAuthority: (
+    input: SetConfigExtensionAuthorityInput,
+  ) => ReturnType<typeof getSetConfigExtensionAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  setTokenBadgeAuthority: (
+    input: SetTokenBadgeAuthorityInput,
+  ) => ReturnType<typeof getSetTokenBadgeAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  initializeTokenBadge: (
+    input: InitializeTokenBadgeInput,
+  ) => ReturnType<typeof getInitializeTokenBadgeInstruction> &
+    SelfPlanAndSendFunctions;
+  deleteTokenBadge: (
+    input: DeleteTokenBadgeInput,
+  ) => ReturnType<typeof getDeleteTokenBadgeInstruction> &
+    SelfPlanAndSendFunctions;
+}
+
+export type WhirlpoolPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function whirlpoolProgram() {
+  return <T extends WhirlpoolPluginRequirements>(
+    client: T,
+  ): Omit<T, "whirlpool"> & { whirlpool: WhirlpoolPlugin } => {
+    return extendClient(client, {
+      whirlpool: <WhirlpoolPlugin>{
+        accounts: {
+          whirlpoolsConfig: addSelfFetchFunctions(
+            client,
+            getWhirlpoolsConfigCodec(),
+          ),
+          whirlpoolsConfigExtension: addSelfFetchFunctions(
+            client,
+            getWhirlpoolsConfigExtensionCodec(),
+          ),
+          feeTier: addSelfFetchFunctions(client, getFeeTierCodec()),
+          lockConfig: addSelfFetchFunctions(client, getLockConfigCodec()),
+          position: addSelfFetchFunctions(client, getPositionCodec()),
+          positionBundle: addSelfFetchFunctions(
+            client,
+            getPositionBundleCodec(),
+          ),
+          tickArray: addSelfFetchFunctions(client, getTickArrayCodec()),
+          tokenBadge: addSelfFetchFunctions(client, getTokenBadgeCodec()),
+          whirlpool: addSelfFetchFunctions(client, getWhirlpoolCodec()),
+        },
+        instructions: {
+          initializeConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeConfigInstruction(input),
+            ),
+          initializePool: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePoolInstruction(input),
+            ),
+          initializeTickArray: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeTickArrayInstruction(input),
+            ),
+          initializeFeeTier: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeFeeTierInstruction(input),
+            ),
+          initializeReward: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeRewardInstruction(input),
+            ),
+          setRewardEmissions: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRewardEmissionsInstruction(input),
+            ),
+          openPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getOpenPositionInstruction(input),
+            ),
+          openPositionWithMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getOpenPositionWithMetadataInstruction(input),
+            ),
+          increaseLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIncreaseLiquidityInstruction(input),
+            ),
+          decreaseLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecreaseLiquidityInstruction(input),
+            ),
+          updateFeesAndRewards: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateFeesAndRewardsInstruction(input),
+            ),
+          collectFees: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCollectFeesInstruction(input),
+            ),
+          collectReward: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCollectRewardInstruction(input),
+            ),
+          collectProtocolFees: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCollectProtocolFeesInstruction(input),
+            ),
+          swap: (input) =>
+            addSelfPlanAndSendFunctions(client, getSwapInstruction(input)),
+          closePosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClosePositionInstruction(input),
+            ),
+          setDefaultFeeRate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetDefaultFeeRateInstruction(input),
+            ),
+          setDefaultProtocolFeeRate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetDefaultProtocolFeeRateInstruction(input),
+            ),
+          setFeeRate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetFeeRateInstruction(input),
+            ),
+          setProtocolFeeRate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetProtocolFeeRateInstruction(input),
+            ),
+          setFeeAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetFeeAuthorityInstruction(input),
+            ),
+          setCollectProtocolFeesAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetCollectProtocolFeesAuthorityInstruction(input),
+            ),
+          setRewardAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRewardAuthorityInstruction(input),
+            ),
+          setRewardAuthorityBySuperAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRewardAuthorityBySuperAuthorityInstruction(input),
+            ),
+          setRewardEmissionsSuperAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRewardEmissionsSuperAuthorityInstruction(input),
+            ),
+          twoHopSwap: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTwoHopSwapInstruction(input),
+            ),
+          initializePositionBundle: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePositionBundleInstruction(input),
+            ),
+          initializePositionBundleWithMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePositionBundleWithMetadataInstruction(input),
+            ),
+          deletePositionBundle: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeletePositionBundleInstruction(input),
+            ),
+          openBundledPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getOpenBundledPositionInstruction(input),
+            ),
+          closeBundledPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseBundledPositionInstruction(input),
+            ),
+          openPositionWithTokenExtensions: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getOpenPositionWithTokenExtensionsInstruction(input),
+            ),
+          closePositionWithTokenExtensions: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClosePositionWithTokenExtensionsInstruction(input),
+            ),
+          lockPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockPositionInstruction(input),
+            ),
+          collectFeesV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCollectFeesV2Instruction(input),
+            ),
+          collectProtocolFeesV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCollectProtocolFeesV2Instruction(input),
+            ),
+          collectRewardV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCollectRewardV2Instruction(input),
+            ),
+          decreaseLiquidityV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecreaseLiquidityV2Instruction(input),
+            ),
+          increaseLiquidityV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIncreaseLiquidityV2Instruction(input),
+            ),
+          initializePoolV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePoolV2Instruction(input),
+            ),
+          initializeRewardV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeRewardV2Instruction(input),
+            ),
+          setRewardEmissionsV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetRewardEmissionsV2Instruction(input),
+            ),
+          swapV2: (input) =>
+            addSelfPlanAndSendFunctions(client, getSwapV2Instruction(input)),
+          twoHopSwapV2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTwoHopSwapV2Instruction(input),
+            ),
+          initializeConfigExtension: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeConfigExtensionInstruction(input),
+            ),
+          setConfigExtensionAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetConfigExtensionAuthorityInstruction(input),
+            ),
+          setTokenBadgeAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetTokenBadgeAuthorityInstruction(input),
+            ),
+          initializeTokenBadge: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeTokenBadgeInstruction(input),
+            ),
+          deleteTokenBadge: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeleteTokenBadgeInstruction(input),
+            ),
+        },
+      },
+    });
+  };
+}

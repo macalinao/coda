@@ -20,7 +20,6 @@ import {
   getStructEncoder,
 } from "@solana/kit";
 
-/** Create token badge */
 export interface EvtCreateTokenBadge {
   tokenMint: Address;
 }

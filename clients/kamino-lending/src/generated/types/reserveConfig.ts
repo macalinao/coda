@@ -224,7 +224,7 @@ export interface ReserveConfigArgs {
    * - u64::MAX for inf
    * - 0 to disable borrows in this elevation group (expected value for the debt asset)
    */
-  borrowLimitAgainstThisCollateralInElevationGroup: (number | bigint)[];
+  borrowLimitAgainstThisCollateralInElevationGroup: Array<number | bigint>;
   /**
    * The rate at which the deleveraging-related liquidation bonus increases, in bps per day.
    * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.

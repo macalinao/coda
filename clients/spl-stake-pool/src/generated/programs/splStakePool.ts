@@ -6,8 +6,42 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  StakePool,
+  StakePoolArgs,
+  ValidatorList,
+  ValidatorListArgs,
+} from "../accounts/index.js";
+import type {
+  AddValidatorToPoolAsyncInput,
+  CleanupRemovedValidatorEntriesInput,
+  CreateTokenMetadataAsyncInput,
+  DecreaseAdditionalValidatorStakeAsyncInput,
+  DecreaseValidatorStakeAsyncInput,
+  DecreaseValidatorStakeWithReserveAsyncInput,
+  DepositSolAsyncInput,
+  DepositSolWithSlippageAsyncInput,
+  DepositStakeAsyncInput,
+  DepositStakeWithSlippageAsyncInput,
+  IncreaseAdditionalValidatorStakeAsyncInput,
+  IncreaseValidatorStakeAsyncInput,
+  InitializeAsyncInput,
   ParsedAddValidatorToPoolInstruction,
   ParsedCleanupRemovedValidatorEntriesInstruction,
   ParsedCreateTokenMetadataInstruction,
@@ -35,8 +69,98 @@ import type {
   ParsedWithdrawSolWithSlippageInstruction,
   ParsedWithdrawStakeInstruction,
   ParsedWithdrawStakeWithSlippageInstruction,
+  RedelegateAsyncInput,
+  RemoveValidatorFromPoolAsyncInput,
+  SetFeeInput,
+  SetFundingAuthorityInput,
+  SetManagerInput,
+  SetPreferredValidatorInput,
+  SetStakerInput,
+  UpdateStakePoolBalanceAsyncInput,
+  UpdateTokenMetadataAsyncInput,
+  UpdateValidatorListBalanceAsyncInput,
+  WithdrawSolAsyncInput,
+  WithdrawSolWithSlippageAsyncInput,
+  WithdrawStakeAsyncInput,
+  WithdrawStakeWithSlippageAsyncInput,
 } from "../instructions/index.js";
-import { containsBytes, getU8Encoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import { getStakePoolCodec, getValidatorListCodec } from "../accounts/index.js";
+import {
+  getAddValidatorToPoolInstructionAsync,
+  getCleanupRemovedValidatorEntriesInstruction,
+  getCreateTokenMetadataInstructionAsync,
+  getDecreaseAdditionalValidatorStakeInstructionAsync,
+  getDecreaseValidatorStakeInstructionAsync,
+  getDecreaseValidatorStakeWithReserveInstructionAsync,
+  getDepositSolInstructionAsync,
+  getDepositSolWithSlippageInstructionAsync,
+  getDepositStakeInstructionAsync,
+  getDepositStakeWithSlippageInstructionAsync,
+  getIncreaseAdditionalValidatorStakeInstructionAsync,
+  getIncreaseValidatorStakeInstructionAsync,
+  getInitializeInstructionAsync,
+  getRedelegateInstructionAsync,
+  getRemoveValidatorFromPoolInstructionAsync,
+  getSetFeeInstruction,
+  getSetFundingAuthorityInstruction,
+  getSetManagerInstruction,
+  getSetPreferredValidatorInstruction,
+  getSetStakerInstruction,
+  getUpdateStakePoolBalanceInstructionAsync,
+  getUpdateTokenMetadataInstructionAsync,
+  getUpdateValidatorListBalanceInstructionAsync,
+  getWithdrawSolInstructionAsync,
+  getWithdrawSolWithSlippageInstructionAsync,
+  getWithdrawStakeInstructionAsync,
+  getWithdrawStakeWithSlippageInstructionAsync,
+  parseAddValidatorToPoolInstruction,
+  parseCleanupRemovedValidatorEntriesInstruction,
+  parseCreateTokenMetadataInstruction,
+  parseDecreaseAdditionalValidatorStakeInstruction,
+  parseDecreaseValidatorStakeInstruction,
+  parseDecreaseValidatorStakeWithReserveInstruction,
+  parseDepositSolInstruction,
+  parseDepositSolWithSlippageInstruction,
+  parseDepositStakeInstruction,
+  parseDepositStakeWithSlippageInstruction,
+  parseIncreaseAdditionalValidatorStakeInstruction,
+  parseIncreaseValidatorStakeInstruction,
+  parseInitializeInstruction,
+  parseRedelegateInstruction,
+  parseRemoveValidatorFromPoolInstruction,
+  parseSetFeeInstruction,
+  parseSetFundingAuthorityInstruction,
+  parseSetManagerInstruction,
+  parseSetPreferredValidatorInstruction,
+  parseSetStakerInstruction,
+  parseUpdateStakePoolBalanceInstruction,
+  parseUpdateTokenMetadataInstruction,
+  parseUpdateValidatorListBalanceInstruction,
+  parseWithdrawSolInstruction,
+  parseWithdrawSolWithSlippageInstruction,
+  parseWithdrawStakeInstruction,
+  parseWithdrawStakeWithSlippageInstruction,
+} from "../instructions/index.js";
+import {
+  findEphemeralStakePda,
+  findStakePda,
+  findTransientStakePda,
+  findWithdrawAuthorityPda,
+} from "../pdas/index.js";
 import { AccountType, getAccountTypeEncoder } from "../types/index.js";
 
 export const SPL_STAKE_POOL_PROGRAM_ADDRESS =
@@ -69,8 +193,9 @@ export function identifySplStakePoolAccount(
   ) {
     return SplStakePoolAccount.ValidatorList;
   }
-  throw new Error(
-    "The provided account could not be identified as a splStakePool account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "splStakePool" },
   );
 }
 
@@ -189,8 +314,9 @@ export function identifySplStakePoolInstruction(
   if (containsBytes(data, getU8Encoder().encode(26), 0)) {
     return SplStakePoolInstruction.WithdrawSolWithSlippage;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a splStakePool instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "splStakePool" },
   );
 }
 
@@ -278,3 +404,509 @@ export type ParsedSplStakePoolInstruction<
   | ({
       instructionType: SplStakePoolInstruction.WithdrawSolWithSlippage;
     } & ParsedWithdrawSolWithSlippageInstruction<TProgram>);
+
+export function parseSplStakePoolInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedSplStakePoolInstruction<TProgram> {
+  const instructionType = identifySplStakePoolInstruction(instruction);
+  switch (instructionType) {
+    case SplStakePoolInstruction.Initialize: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.Initialize,
+        ...parseInitializeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.AddValidatorToPool: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.AddValidatorToPool,
+        ...parseAddValidatorToPoolInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.RemoveValidatorFromPool: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.RemoveValidatorFromPool,
+        ...parseRemoveValidatorFromPoolInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.DecreaseValidatorStake: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.DecreaseValidatorStake,
+        ...parseDecreaseValidatorStakeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.IncreaseValidatorStake: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.IncreaseValidatorStake,
+        ...parseIncreaseValidatorStakeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.SetPreferredValidator: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.SetPreferredValidator,
+        ...parseSetPreferredValidatorInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.UpdateValidatorListBalance: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.UpdateValidatorListBalance,
+        ...parseUpdateValidatorListBalanceInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.UpdateStakePoolBalance: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.UpdateStakePoolBalance,
+        ...parseUpdateStakePoolBalanceInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.CleanupRemovedValidatorEntries: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.CleanupRemovedValidatorEntries,
+        ...parseCleanupRemovedValidatorEntriesInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.DepositStake: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.DepositStake,
+        ...parseDepositStakeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.WithdrawStake: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.WithdrawStake,
+        ...parseWithdrawStakeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.SetManager: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.SetManager,
+        ...parseSetManagerInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.SetFee: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.SetFee,
+        ...parseSetFeeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.SetStaker: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.SetStaker,
+        ...parseSetStakerInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.DepositSol: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.DepositSol,
+        ...parseDepositSolInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.SetFundingAuthority: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.SetFundingAuthority,
+        ...parseSetFundingAuthorityInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.WithdrawSol: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.WithdrawSol,
+        ...parseWithdrawSolInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.CreateTokenMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.CreateTokenMetadata,
+        ...parseCreateTokenMetadataInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.UpdateTokenMetadata: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.UpdateTokenMetadata,
+        ...parseUpdateTokenMetadataInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.IncreaseAdditionalValidatorStake: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          SplStakePoolInstruction.IncreaseAdditionalValidatorStake,
+        ...parseIncreaseAdditionalValidatorStakeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.DecreaseAdditionalValidatorStake: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          SplStakePoolInstruction.DecreaseAdditionalValidatorStake,
+        ...parseDecreaseAdditionalValidatorStakeInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.DecreaseValidatorStakeWithReserve: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType:
+          SplStakePoolInstruction.DecreaseValidatorStakeWithReserve,
+        ...parseDecreaseValidatorStakeWithReserveInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.Redelegate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.Redelegate,
+        ...parseRedelegateInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.DepositStakeWithSlippage: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.DepositStakeWithSlippage,
+        ...parseDepositStakeWithSlippageInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.WithdrawStakeWithSlippage: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.WithdrawStakeWithSlippage,
+        ...parseWithdrawStakeWithSlippageInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.DepositSolWithSlippage: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.DepositSolWithSlippage,
+        ...parseDepositSolWithSlippageInstruction(instruction),
+      };
+    }
+    case SplStakePoolInstruction.WithdrawSolWithSlippage: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: SplStakePoolInstruction.WithdrawSolWithSlippage,
+        ...parseWithdrawSolWithSlippageInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "splStakePool",
+        },
+      );
+  }
+}
+
+export interface SplStakePoolPlugin {
+  accounts: SplStakePoolPluginAccounts;
+  instructions: SplStakePoolPluginInstructions;
+  pdas: SplStakePoolPluginPdas;
+}
+
+export interface SplStakePoolPluginAccounts {
+  stakePool: ReturnType<typeof getStakePoolCodec> &
+    SelfFetchFunctions<StakePoolArgs, StakePool>;
+  validatorList: ReturnType<typeof getValidatorListCodec> &
+    SelfFetchFunctions<ValidatorListArgs, ValidatorList>;
+}
+
+export interface SplStakePoolPluginInstructions {
+  initialize: (
+    input: InitializeAsyncInput,
+  ) => ReturnType<typeof getInitializeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  addValidatorToPool: (
+    input: AddValidatorToPoolAsyncInput,
+  ) => ReturnType<typeof getAddValidatorToPoolInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  removeValidatorFromPool: (
+    input: RemoveValidatorFromPoolAsyncInput,
+  ) => ReturnType<typeof getRemoveValidatorFromPoolInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  decreaseValidatorStake: (
+    input: DecreaseValidatorStakeAsyncInput,
+  ) => ReturnType<typeof getDecreaseValidatorStakeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  increaseValidatorStake: (
+    input: IncreaseValidatorStakeAsyncInput,
+  ) => ReturnType<typeof getIncreaseValidatorStakeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setPreferredValidator: (
+    input: SetPreferredValidatorInput,
+  ) => ReturnType<typeof getSetPreferredValidatorInstruction> &
+    SelfPlanAndSendFunctions;
+  updateValidatorListBalance: (
+    input: UpdateValidatorListBalanceAsyncInput,
+  ) => ReturnType<typeof getUpdateValidatorListBalanceInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateStakePoolBalance: (
+    input: UpdateStakePoolBalanceAsyncInput,
+  ) => ReturnType<typeof getUpdateStakePoolBalanceInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  cleanupRemovedValidatorEntries: (
+    input: CleanupRemovedValidatorEntriesInput,
+  ) => ReturnType<typeof getCleanupRemovedValidatorEntriesInstruction> &
+    SelfPlanAndSendFunctions;
+  depositStake: (
+    input: DepositStakeAsyncInput,
+  ) => ReturnType<typeof getDepositStakeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawStake: (
+    input: WithdrawStakeAsyncInput,
+  ) => ReturnType<typeof getWithdrawStakeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setManager: (
+    input: SetManagerInput,
+  ) => ReturnType<typeof getSetManagerInstruction> & SelfPlanAndSendFunctions;
+  setFee: (
+    input: SetFeeInput,
+  ) => ReturnType<typeof getSetFeeInstruction> & SelfPlanAndSendFunctions;
+  setStaker: (
+    input: SetStakerInput,
+  ) => ReturnType<typeof getSetStakerInstruction> & SelfPlanAndSendFunctions;
+  depositSol: (
+    input: MakeOptional<DepositSolAsyncInput, "payer">,
+  ) => ReturnType<typeof getDepositSolInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setFundingAuthority: (
+    input: SetFundingAuthorityInput,
+  ) => ReturnType<typeof getSetFundingAuthorityInstruction> &
+    SelfPlanAndSendFunctions;
+  withdrawSol: (
+    input: WithdrawSolAsyncInput,
+  ) => ReturnType<typeof getWithdrawSolInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createTokenMetadata: (
+    input: MakeOptional<CreateTokenMetadataAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateTokenMetadataInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateTokenMetadata: (
+    input: UpdateTokenMetadataAsyncInput,
+  ) => ReturnType<typeof getUpdateTokenMetadataInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  increaseAdditionalValidatorStake: (
+    input: IncreaseAdditionalValidatorStakeAsyncInput,
+  ) => ReturnType<typeof getIncreaseAdditionalValidatorStakeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  decreaseAdditionalValidatorStake: (
+    input: DecreaseAdditionalValidatorStakeAsyncInput,
+  ) => ReturnType<typeof getDecreaseAdditionalValidatorStakeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  decreaseValidatorStakeWithReserve: (
+    input: DecreaseValidatorStakeWithReserveAsyncInput,
+  ) => ReturnType<typeof getDecreaseValidatorStakeWithReserveInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  redelegate: (
+    input: RedelegateAsyncInput,
+  ) => ReturnType<typeof getRedelegateInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  depositStakeWithSlippage: (
+    input: DepositStakeWithSlippageAsyncInput,
+  ) => ReturnType<typeof getDepositStakeWithSlippageInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawStakeWithSlippage: (
+    input: WithdrawStakeWithSlippageAsyncInput,
+  ) => ReturnType<typeof getWithdrawStakeWithSlippageInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  depositSolWithSlippage: (
+    input: MakeOptional<DepositSolWithSlippageAsyncInput, "payer">,
+  ) => ReturnType<typeof getDepositSolWithSlippageInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawSolWithSlippage: (
+    input: WithdrawSolWithSlippageAsyncInput,
+  ) => ReturnType<typeof getWithdrawSolWithSlippageInstructionAsync> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface SplStakePoolPluginPdas {
+  withdrawAuthority: typeof findWithdrawAuthorityPda;
+  stake: typeof findStakePda;
+  transientStake: typeof findTransientStakePda;
+  ephemeralStake: typeof findEphemeralStakePda;
+}
+
+export type SplStakePoolPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function splStakePoolProgram() {
+  return <T extends SplStakePoolPluginRequirements>(
+    client: T,
+  ): Omit<T, "splStakePool"> & { splStakePool: SplStakePoolPlugin } => {
+    return extendClient(client, {
+      splStakePool: <SplStakePoolPlugin>{
+        accounts: {
+          stakePool: addSelfFetchFunctions(client, getStakePoolCodec()),
+          validatorList: addSelfFetchFunctions(client, getValidatorListCodec()),
+        },
+        instructions: {
+          initialize: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeInstructionAsync(input),
+            ),
+          addValidatorToPool: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddValidatorToPoolInstructionAsync(input),
+            ),
+          removeValidatorFromPool: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveValidatorFromPoolInstructionAsync(input),
+            ),
+          decreaseValidatorStake: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecreaseValidatorStakeInstructionAsync(input),
+            ),
+          increaseValidatorStake: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIncreaseValidatorStakeInstructionAsync(input),
+            ),
+          setPreferredValidator: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetPreferredValidatorInstruction(input),
+            ),
+          updateValidatorListBalance: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateValidatorListBalanceInstructionAsync(input),
+            ),
+          updateStakePoolBalance: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateStakePoolBalanceInstructionAsync(input),
+            ),
+          cleanupRemovedValidatorEntries: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCleanupRemovedValidatorEntriesInstruction(input),
+            ),
+          depositStake: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositStakeInstructionAsync(input),
+            ),
+          withdrawStake: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawStakeInstructionAsync(input),
+            ),
+          setManager: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetManagerInstruction(input),
+            ),
+          setFee: (input) =>
+            addSelfPlanAndSendFunctions(client, getSetFeeInstruction(input)),
+          setStaker: (input) =>
+            addSelfPlanAndSendFunctions(client, getSetStakerInstruction(input)),
+          depositSol: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositSolInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          setFundingAuthority: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetFundingAuthorityInstruction(input),
+            ),
+          withdrawSol: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawSolInstructionAsync(input),
+            ),
+          createTokenMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTokenMetadataInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          updateTokenMetadata: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateTokenMetadataInstructionAsync(input),
+            ),
+          increaseAdditionalValidatorStake: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIncreaseAdditionalValidatorStakeInstructionAsync(input),
+            ),
+          decreaseAdditionalValidatorStake: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecreaseAdditionalValidatorStakeInstructionAsync(input),
+            ),
+          decreaseValidatorStakeWithReserve: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecreaseValidatorStakeWithReserveInstructionAsync(input),
+            ),
+          redelegate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedelegateInstructionAsync(input),
+            ),
+          depositStakeWithSlippage: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositStakeWithSlippageInstructionAsync(input),
+            ),
+          withdrawStakeWithSlippage: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawStakeWithSlippageInstructionAsync(input),
+            ),
+          depositSolWithSlippage: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositSolWithSlippageInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          withdrawSolWithSlippage: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawSolWithSlippageInstructionAsync(input),
+            ),
+        },
+        pdas: {
+          withdrawAuthority: findWithdrawAuthorityPda,
+          stake: findStakePda,
+          transientStake: findTransientStakePda,
+          ephemeralStake: findEphemeralStakePda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

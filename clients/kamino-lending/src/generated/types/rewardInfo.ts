@@ -71,7 +71,7 @@ export interface RewardInfoArgs {
   rewardType: number;
   rewardsPerSecondDecimals: number;
   padding0: number[];
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 export function getRewardInfoEncoder(): FixedSizeEncoder<RewardInfoArgs> {

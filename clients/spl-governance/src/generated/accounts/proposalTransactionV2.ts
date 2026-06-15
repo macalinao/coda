@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { ProposalTransactionSeeds } from "../pdas/index.js";
 import type {
@@ -65,10 +66,10 @@ import {
   getUnixTimestampEncoder,
 } from "../types/index.js";
 
-export const PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE =
+export const PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.ProposalTransactionV2;
 
-export function getProposalTransactionV2AccountTypeBytes() {
+export function getProposalTransactionV2AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(
     PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE,
   );

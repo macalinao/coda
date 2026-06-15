@@ -6,8 +6,41 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  Escrow,
+  EscrowArgs,
+  Locker,
+  LockerArgs,
+  LockerWhitelistEntry,
+  LockerWhitelistEntryArgs,
+} from "../accounts/index.js";
+import type {
+  ActivateProposalInput,
+  ApproveProgramLockPrivilegeInput,
+  CastVoteInput,
+  ExitInput,
+  LockInput,
+  LockPermissionlessInput,
+  LockWithWhitelistEntryInput,
+  LockWithWhitelistInput,
+  NewEscrowInput,
+  NewLockerInput,
   ParsedActivateProposalInstruction,
   ParsedApproveProgramLockPrivilegeInstruction,
   ParsedCastVoteInstruction,
@@ -21,8 +54,63 @@ import type {
   ParsedRevokeProgramLockPrivilegeInstruction,
   ParsedSetLockerParamsInstruction,
   ParsedSetVoteDelegateInstruction,
+  RevokeProgramLockPrivilegeInput,
+  SetLockerParamsInput,
+  SetVoteDelegateInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getEscrowCodec,
+  getLockerCodec,
+  getLockerWhitelistEntryCodec,
+} from "../accounts/index.js";
+import {
+  getActivateProposalInstruction,
+  getApproveProgramLockPrivilegeInstruction,
+  getCastVoteInstruction,
+  getExitInstruction,
+  getLockInstruction,
+  getLockPermissionlessInstruction,
+  getLockWithWhitelistEntryInstruction,
+  getLockWithWhitelistInstruction,
+  getNewEscrowInstruction,
+  getNewLockerInstruction,
+  getRevokeProgramLockPrivilegeInstruction,
+  getSetLockerParamsInstruction,
+  getSetVoteDelegateInstruction,
+  parseActivateProposalInstruction,
+  parseApproveProgramLockPrivilegeInstruction,
+  parseCastVoteInstruction,
+  parseExitInstruction,
+  parseLockInstruction,
+  parseLockPermissionlessInstruction,
+  parseLockWithWhitelistEntryInstruction,
+  parseLockWithWhitelistInstruction,
+  parseNewEscrowInstruction,
+  parseNewLockerInstruction,
+  parseRevokeProgramLockPrivilegeInstruction,
+  parseSetLockerParamsInstruction,
+  parseSetVoteDelegateInstruction,
+} from "../instructions/index.js";
+import {
+  findEscrowPda,
+  findLockerPda,
+  findWhitelistPda,
+} from "../pdas/index.js";
 
 export const LOCKED_VOTER_PROGRAM_ADDRESS =
   "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">;
@@ -70,8 +158,9 @@ export function identifyLockedVoterAccount(
   ) {
     return LockedVoterAccount.Escrow;
   }
-  throw new Error(
-    "The provided account could not be identified as a lockedVoter account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "lockedVoter" },
   );
 }
 
@@ -238,8 +327,9 @@ export function identifyLockedVoterInstruction(
   ) {
     return LockedVoterInstruction.RevokeProgramLockPrivilege;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a lockedVoter instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "lockedVoter" },
   );
 }
 
@@ -285,3 +375,290 @@ export type ParsedLockedVoterInstruction<
   | ({
       instructionType: LockedVoterInstruction.RevokeProgramLockPrivilege;
     } & ParsedRevokeProgramLockPrivilegeInstruction<TProgram>);
+
+export function parseLockedVoterInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedLockedVoterInstruction<TProgram> {
+  const instructionType = identifyLockedVoterInstruction(instruction);
+  switch (instructionType) {
+    case LockedVoterInstruction.NewLocker: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.NewLocker,
+        ...parseNewLockerInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.NewEscrow: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.NewEscrow,
+        ...parseNewEscrowInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.Lock: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.Lock,
+        ...parseLockInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.LockWithWhitelist: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.LockWithWhitelist,
+        ...parseLockWithWhitelistInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.LockWithWhitelistEntry: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.LockWithWhitelistEntry,
+        ...parseLockWithWhitelistEntryInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.LockPermissionless: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.LockPermissionless,
+        ...parseLockPermissionlessInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.Exit: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.Exit,
+        ...parseExitInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.ActivateProposal: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.ActivateProposal,
+        ...parseActivateProposalInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.CastVote: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.CastVote,
+        ...parseCastVoteInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.SetVoteDelegate: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.SetVoteDelegate,
+        ...parseSetVoteDelegateInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.SetLockerParams: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.SetLockerParams,
+        ...parseSetLockerParamsInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.ApproveProgramLockPrivilege: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.ApproveProgramLockPrivilege,
+        ...parseApproveProgramLockPrivilegeInstruction(instruction),
+      };
+    }
+    case LockedVoterInstruction.RevokeProgramLockPrivilege: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: LockedVoterInstruction.RevokeProgramLockPrivilege,
+        ...parseRevokeProgramLockPrivilegeInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "lockedVoter",
+        },
+      );
+  }
+}
+
+export interface LockedVoterPlugin {
+  accounts: LockedVoterPluginAccounts;
+  instructions: LockedVoterPluginInstructions;
+  pdas: LockedVoterPluginPdas;
+}
+
+export interface LockedVoterPluginAccounts {
+  locker: ReturnType<typeof getLockerCodec> &
+    SelfFetchFunctions<LockerArgs, Locker>;
+  lockerWhitelistEntry: ReturnType<typeof getLockerWhitelistEntryCodec> &
+    SelfFetchFunctions<LockerWhitelistEntryArgs, LockerWhitelistEntry>;
+  escrow: ReturnType<typeof getEscrowCodec> &
+    SelfFetchFunctions<EscrowArgs, Escrow>;
+}
+
+export interface LockedVoterPluginInstructions {
+  newLocker: (
+    input: MakeOptional<NewLockerInput, "payer">,
+  ) => ReturnType<typeof getNewLockerInstruction> & SelfPlanAndSendFunctions;
+  newEscrow: (
+    input: MakeOptional<NewEscrowInput, "payer">,
+  ) => ReturnType<typeof getNewEscrowInstruction> & SelfPlanAndSendFunctions;
+  lock: (
+    input: LockInput,
+  ) => ReturnType<typeof getLockInstruction> & SelfPlanAndSendFunctions;
+  lockWithWhitelist: (
+    input: LockWithWhitelistInput,
+  ) => ReturnType<typeof getLockWithWhitelistInstruction> &
+    SelfPlanAndSendFunctions;
+  lockWithWhitelistEntry: (
+    input: LockWithWhitelistEntryInput,
+  ) => ReturnType<typeof getLockWithWhitelistEntryInstruction> &
+    SelfPlanAndSendFunctions;
+  lockPermissionless: (
+    input: LockPermissionlessInput,
+  ) => ReturnType<typeof getLockPermissionlessInstruction> &
+    SelfPlanAndSendFunctions;
+  exit: (
+    input: MakeOptional<ExitInput, "payer">,
+  ) => ReturnType<typeof getExitInstruction> & SelfPlanAndSendFunctions;
+  activateProposal: (
+    input: ActivateProposalInput,
+  ) => ReturnType<typeof getActivateProposalInstruction> &
+    SelfPlanAndSendFunctions;
+  castVote: (
+    input: CastVoteInput,
+  ) => ReturnType<typeof getCastVoteInstruction> & SelfPlanAndSendFunctions;
+  setVoteDelegate: (
+    input: SetVoteDelegateInput,
+  ) => ReturnType<typeof getSetVoteDelegateInstruction> &
+    SelfPlanAndSendFunctions;
+  setLockerParams: (
+    input: SetLockerParamsInput,
+  ) => ReturnType<typeof getSetLockerParamsInstruction> &
+    SelfPlanAndSendFunctions;
+  approveProgramLockPrivilege: (
+    input: MakeOptional<ApproveProgramLockPrivilegeInput, "payer">,
+  ) => ReturnType<typeof getApproveProgramLockPrivilegeInstruction> &
+    SelfPlanAndSendFunctions;
+  revokeProgramLockPrivilege: (
+    input: MakeOptional<RevokeProgramLockPrivilegeInput, "payer">,
+  ) => ReturnType<typeof getRevokeProgramLockPrivilegeInstruction> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface LockedVoterPluginPdas {
+  locker: typeof findLockerPda;
+  escrow: typeof findEscrowPda;
+  whitelist: typeof findWhitelistPda;
+}
+
+export type LockedVoterPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function lockedVoterProgram() {
+  return <T extends LockedVoterPluginRequirements>(
+    client: T,
+  ): Omit<T, "lockedVoter"> & { lockedVoter: LockedVoterPlugin } => {
+    return extendClient(client, {
+      lockedVoter: <LockedVoterPlugin>{
+        accounts: {
+          locker: addSelfFetchFunctions(client, getLockerCodec()),
+          lockerWhitelistEntry: addSelfFetchFunctions(
+            client,
+            getLockerWhitelistEntryCodec(),
+          ),
+          escrow: addSelfFetchFunctions(client, getEscrowCodec()),
+        },
+        instructions: {
+          newLocker: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewLockerInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          newEscrow: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewEscrowInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          lock: (input) =>
+            addSelfPlanAndSendFunctions(client, getLockInstruction(input)),
+          lockWithWhitelist: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockWithWhitelistInstruction(input),
+            ),
+          lockWithWhitelistEntry: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockWithWhitelistEntryInstruction(input),
+            ),
+          lockPermissionless: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockPermissionlessInstruction(input),
+            ),
+          exit: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getExitInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          activateProposal: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getActivateProposalInstruction(input),
+            ),
+          castVote: (input) =>
+            addSelfPlanAndSendFunctions(client, getCastVoteInstruction(input)),
+          setVoteDelegate: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetVoteDelegateInstruction(input),
+            ),
+          setLockerParams: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetLockerParamsInstruction(input),
+            ),
+          approveProgramLockPrivilege: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getApproveProgramLockPrivilegeInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          revokeProgramLockPrivilege: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeProgramLockPrivilegeInstruction({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+        },
+        pdas: {
+          locker: findLockerPda,
+          escrow: findEscrowPda,
+          whitelist: findWhitelistPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

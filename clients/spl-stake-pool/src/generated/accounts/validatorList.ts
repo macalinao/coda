@@ -17,6 +17,7 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type {
   ValidatorStakeInfo,
@@ -45,9 +46,10 @@ import {
   getValidatorStakeInfoEncoder,
 } from "../types/index.js";
 
-export const VALIDATOR_LIST_ACCOUNT_TYPE = AccountType.ValidatorList;
+export const VALIDATOR_LIST_ACCOUNT_TYPE: AccountType =
+  AccountType.ValidatorList;
 
-export function getValidatorListAccountTypeBytes() {
+export function getValidatorListAccountTypeBytes(): ReadonlyUint8Array {
   return getAccountTypeEncoder().encode(VALIDATOR_LIST_ACCOUNT_TYPE);
 }
 

@@ -108,20 +108,20 @@ export interface ReserveArgs {
   farmDebt: Address;
   /** Reserve liquidity */
   liquidity: ReserveLiquidityArgs;
-  reserveLiquidityPadding: (number | bigint)[];
+  reserveLiquidityPadding: Array<number | bigint>;
   /** Reserve collateral */
   collateral: ReserveCollateralArgs;
-  reserveCollateralPadding: (number | bigint)[];
+  reserveCollateralPadding: Array<number | bigint>;
   /** Reserve configuration values */
   config: ReserveConfigArgs;
-  configPadding: (number | bigint)[];
+  configPadding: Array<number | bigint>;
   borrowedAmountOutsideElevationGroup: number | bigint;
   /**
    * Amount of token borrowed in lamport of debt asset in the given
    * elevation group when this reserve is part of the collaterals.
    */
-  borrowedAmountsAgainstThisReserveInElevationGroups: (number | bigint)[];
-  padding: (number | bigint)[];
+  borrowedAmountsAgainstThisReserveInElevationGroups: Array<number | bigint>;
+  padding: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link ReserveArgs} account data. */

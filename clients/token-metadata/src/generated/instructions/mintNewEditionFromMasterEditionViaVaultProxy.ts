@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   MintNewEditionFromMasterEditionViaTokenArgs,
   MintNewEditionFromMasterEditionViaTokenArgsArgs,
@@ -34,10 +34,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getMintNewEditionFromMasterEditionViaTokenArgsDecoder,
   getMintNewEditionFromMasterEditionViaTokenArgsEncoder,
@@ -344,7 +346,7 @@ export function getMintNewEditionFromMasterEditionViaVaultProxyInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -363,23 +365,26 @@ export function getMintNewEditionFromMasterEditionViaVaultProxyInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.newMetadata),
-      getAccountMeta(accounts.newEdition),
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.newMint),
-      getAccountMeta(accounts.editionMarkPda),
-      getAccountMeta(accounts.newMintAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.vaultAuthority),
-      getAccountMeta(accounts.safetyDepositStore),
-      getAccountMeta(accounts.safetyDepositBox),
-      getAccountMeta(accounts.vault),
-      getAccountMeta(accounts.newMetadataUpdateAuthority),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.tokenVaultProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("newMetadata", accounts.newMetadata),
+      getAccountMeta("newEdition", accounts.newEdition),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("newMint", accounts.newMint),
+      getAccountMeta("editionMarkPda", accounts.editionMarkPda),
+      getAccountMeta("newMintAuthority", accounts.newMintAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("vaultAuthority", accounts.vaultAuthority),
+      getAccountMeta("safetyDepositStore", accounts.safetyDepositStore),
+      getAccountMeta("safetyDepositBox", accounts.safetyDepositBox),
+      getAccountMeta("vault", accounts.vault),
+      getAccountMeta(
+        "newMetadataUpdateAuthority",
+        accounts.newMetadataUpdateAuthority,
+      ),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("tokenVaultProgram", accounts.tokenVaultProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getMintNewEditionFromMasterEditionViaVaultProxyInstructionDataEncoder().encode(
       args as MintNewEditionFromMasterEditionViaVaultProxyInstructionDataArgs,
@@ -463,8 +468,13 @@ export function parseMintNewEditionFromMasterEditionViaVaultProxyInstruction<
   TAccountMetas
 > {
   if (instruction.accounts.length < 16) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 16,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -475,7 +485,7 @@ export function parseMintNewEditionFromMasterEditionViaVaultProxyInstruction<
   let optionalAccountsRemaining = instruction.accounts.length - 16;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

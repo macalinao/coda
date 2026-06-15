@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,11 +32,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findQuarryPda } from "../pdas/index.js";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const DELEGATE_CREATE_QUARRY_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([69, 180, 9, 212, 75, 142, 202, 62]);
@@ -49,19 +54,19 @@ export function getDelegateCreateQuarryV2DiscriminatorBytes(): ReadonlyUint8Arra
 
 export type DelegateCreateQuarryV2Instruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
+  TAccountOperator extends string | AccountMeta<string> = string,
+  TAccountDelegate extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
   TAccountQuarryMineProgram extends
     | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountTokenMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountTokenMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -100,7 +105,7 @@ export interface DelegateCreateQuarryV2InstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface DelegateCreateQuarryV2InstructionDataArgs {}
+export type DelegateCreateQuarryV2InstructionDataArgs = {};
 
 export function getDelegateCreateQuarryV2InstructionDataEncoder(): FixedSizeEncoder<DelegateCreateQuarryV2InstructionDataArgs> {
   return transformEncoder(
@@ -203,7 +208,7 @@ export async function getDelegateCreateQuarryV2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -213,8 +218,14 @@ export async function getDelegateCreateQuarryV2InstructionAsync<
   }
   if (!accounts.quarry.value) {
     accounts.quarry.value = await findQuarryPda({
-      rewarder: expectAddress(accounts.rewarder.value),
-      tokenMint: expectAddress(accounts.tokenMint.value),
+      rewarder: getAddressFromResolvedInstructionAccount(
+        "rewarder",
+        accounts.rewarder.value,
+      ),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenMint",
+        accounts.tokenMint.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -225,14 +236,14 @@ export async function getDelegateCreateQuarryV2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("delegate", accounts.delegate),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarryMineProgram", accounts.quarryMineProgram),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getDelegateCreateQuarryV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -322,7 +333,7 @@ export function getDelegateCreateQuarryV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -338,14 +349,14 @@ export function getDelegateCreateQuarryV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.delegate),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarryMineProgram),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("delegate", accounts.delegate),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarryMineProgram", accounts.quarryMineProgram),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getDelegateCreateQuarryV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -389,8 +400,13 @@ export function parseDelegateCreateQuarryV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDelegateCreateQuarryV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +35,12 @@ import {
   getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const DEPOSIT_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   242, 35, 198, 137, 82, 225, 242, 182,
@@ -189,7 +191,7 @@ export function getDepositInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -204,12 +206,12 @@ export function getDepositInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.vault),
-      getAccountMeta(accounts.depositToken),
-      getAccountMeta(accounts.depositAuthority),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("vault", accounts.vault),
+      getAccountMeta("depositToken", accounts.depositToken),
+      getAccountMeta("depositAuthority", accounts.depositAuthority),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getDepositInstructionDataEncoder().encode(
       args as DepositInstructionDataArgs,
@@ -251,8 +253,13 @@ export function parseDepositInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedDepositInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

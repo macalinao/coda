@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -31,11 +31,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_MASTER_EDITION_DISCRIMINATOR = 10;
 
@@ -103,7 +108,7 @@ export interface CreateMasterEditionInstructionData {
   discriminator: number;
 }
 
-export interface CreateMasterEditionInstructionDataArgs {}
+export type CreateMasterEditionInstructionDataArgs = {};
 
 export function getCreateMasterEditionInstructionDataEncoder(): FixedSizeEncoder<CreateMasterEditionInstructionDataArgs> {
   return transformEncoder(
@@ -219,14 +224,17 @@ export async function getCreateMasterEditionInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -245,15 +253,15 @@ export async function getCreateMasterEditionInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.mintAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("mintAuthority", accounts.mintAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getCreateMasterEditionInstructionDataEncoder().encode({}),
     programAddress,
@@ -359,7 +367,7 @@ export function getCreateMasterEditionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -379,15 +387,15 @@ export function getCreateMasterEditionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.mintAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("mintAuthority", accounts.mintAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getCreateMasterEditionInstructionDataEncoder().encode({}),
     programAddress,
@@ -442,8 +450,13 @@ export function parseCreateMasterEditionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateMasterEditionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

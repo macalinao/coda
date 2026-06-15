@@ -147,7 +147,7 @@ export type SplStakePoolError =
   | typeof SPL_STAKE_POOL_ERROR__WRONG_STAKE_STAKE;
 
 let splStakePoolErrorMessages: Record<SplStakePoolError, string> | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   splStakePoolErrorMessages = {
     [SPL_STAKE_POOL_ERROR__ALREADY_IN_USE]: "AlreadyInUse",
     [SPL_STAKE_POOL_ERROR__CALCULATION_FAILURE]: "CalculationFailure",
@@ -214,7 +214,7 @@ if (true) {
 }
 
 export function getSplStakePoolErrorMessage(code: SplStakePoolError): string {
-  if (true) {
+  if (process.env.NODE_ENV !== "production") {
     return splStakePoolErrorMessages![code];
   }
 

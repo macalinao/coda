@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,11 +33,16 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const LIQUIDATE_OBLIGATION_AND_REDEEM_RESERVE_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([177, 71, 154, 188, 226, 133, 74, 55]);
@@ -390,7 +395,7 @@ export async function getLiquidateObligationAndRedeemReserveCollateralInstructio
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -399,7 +404,10 @@ export async function getLiquidateObligationAndRedeemReserveCollateralInstructio
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      lendingMarket: getAddressFromResolvedInstructionAccount(
+        "lendingMarket",
+        accounts.lendingMarket.value,
+      ),
     });
   }
   if (!accounts.collateralTokenProgram.value) {
@@ -422,26 +430,62 @@ export async function getLiquidateObligationAndRedeemReserveCollateralInstructio
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.liquidator),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.repayReserve),
-      getAccountMeta(accounts.repayReserveLiquidityMint),
-      getAccountMeta(accounts.repayReserveLiquiditySupply),
-      getAccountMeta(accounts.withdrawReserve),
-      getAccountMeta(accounts.withdrawReserveLiquidityMint),
-      getAccountMeta(accounts.withdrawReserveCollateralMint),
-      getAccountMeta(accounts.withdrawReserveCollateralSupply),
-      getAccountMeta(accounts.withdrawReserveLiquiditySupply),
-      getAccountMeta(accounts.withdrawReserveLiquidityFeeReceiver),
-      getAccountMeta(accounts.userSourceLiquidity),
-      getAccountMeta(accounts.userDestinationCollateral),
-      getAccountMeta(accounts.userDestinationLiquidity),
-      getAccountMeta(accounts.collateralTokenProgram),
-      getAccountMeta(accounts.repayLiquidityTokenProgram),
-      getAccountMeta(accounts.withdrawLiquidityTokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta("liquidator", accounts.liquidator),
+      getAccountMeta("obligation", accounts.obligation),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("repayReserve", accounts.repayReserve),
+      getAccountMeta(
+        "repayReserveLiquidityMint",
+        accounts.repayReserveLiquidityMint,
+      ),
+      getAccountMeta(
+        "repayReserveLiquiditySupply",
+        accounts.repayReserveLiquiditySupply,
+      ),
+      getAccountMeta("withdrawReserve", accounts.withdrawReserve),
+      getAccountMeta(
+        "withdrawReserveLiquidityMint",
+        accounts.withdrawReserveLiquidityMint,
+      ),
+      getAccountMeta(
+        "withdrawReserveCollateralMint",
+        accounts.withdrawReserveCollateralMint,
+      ),
+      getAccountMeta(
+        "withdrawReserveCollateralSupply",
+        accounts.withdrawReserveCollateralSupply,
+      ),
+      getAccountMeta(
+        "withdrawReserveLiquiditySupply",
+        accounts.withdrawReserveLiquiditySupply,
+      ),
+      getAccountMeta(
+        "withdrawReserveLiquidityFeeReceiver",
+        accounts.withdrawReserveLiquidityFeeReceiver,
+      ),
+      getAccountMeta("userSourceLiquidity", accounts.userSourceLiquidity),
+      getAccountMeta(
+        "userDestinationCollateral",
+        accounts.userDestinationCollateral,
+      ),
+      getAccountMeta(
+        "userDestinationLiquidity",
+        accounts.userDestinationLiquidity,
+      ),
+      getAccountMeta("collateralTokenProgram", accounts.collateralTokenProgram),
+      getAccountMeta(
+        "repayLiquidityTokenProgram",
+        accounts.repayLiquidityTokenProgram,
+      ),
+      getAccountMeta(
+        "withdrawLiquidityTokenProgram",
+        accounts.withdrawLiquidityTokenProgram,
+      ),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
     ],
     data: getLiquidateObligationAndRedeemReserveCollateralInstructionDataEncoder().encode(
       args as LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs,
@@ -662,7 +706,7 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -689,26 +733,62 @@ export function getLiquidateObligationAndRedeemReserveCollateralInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.liquidator),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.repayReserve),
-      getAccountMeta(accounts.repayReserveLiquidityMint),
-      getAccountMeta(accounts.repayReserveLiquiditySupply),
-      getAccountMeta(accounts.withdrawReserve),
-      getAccountMeta(accounts.withdrawReserveLiquidityMint),
-      getAccountMeta(accounts.withdrawReserveCollateralMint),
-      getAccountMeta(accounts.withdrawReserveCollateralSupply),
-      getAccountMeta(accounts.withdrawReserveLiquiditySupply),
-      getAccountMeta(accounts.withdrawReserveLiquidityFeeReceiver),
-      getAccountMeta(accounts.userSourceLiquidity),
-      getAccountMeta(accounts.userDestinationCollateral),
-      getAccountMeta(accounts.userDestinationLiquidity),
-      getAccountMeta(accounts.collateralTokenProgram),
-      getAccountMeta(accounts.repayLiquidityTokenProgram),
-      getAccountMeta(accounts.withdrawLiquidityTokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta("liquidator", accounts.liquidator),
+      getAccountMeta("obligation", accounts.obligation),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("repayReserve", accounts.repayReserve),
+      getAccountMeta(
+        "repayReserveLiquidityMint",
+        accounts.repayReserveLiquidityMint,
+      ),
+      getAccountMeta(
+        "repayReserveLiquiditySupply",
+        accounts.repayReserveLiquiditySupply,
+      ),
+      getAccountMeta("withdrawReserve", accounts.withdrawReserve),
+      getAccountMeta(
+        "withdrawReserveLiquidityMint",
+        accounts.withdrawReserveLiquidityMint,
+      ),
+      getAccountMeta(
+        "withdrawReserveCollateralMint",
+        accounts.withdrawReserveCollateralMint,
+      ),
+      getAccountMeta(
+        "withdrawReserveCollateralSupply",
+        accounts.withdrawReserveCollateralSupply,
+      ),
+      getAccountMeta(
+        "withdrawReserveLiquiditySupply",
+        accounts.withdrawReserveLiquiditySupply,
+      ),
+      getAccountMeta(
+        "withdrawReserveLiquidityFeeReceiver",
+        accounts.withdrawReserveLiquidityFeeReceiver,
+      ),
+      getAccountMeta("userSourceLiquidity", accounts.userSourceLiquidity),
+      getAccountMeta(
+        "userDestinationCollateral",
+        accounts.userDestinationCollateral,
+      ),
+      getAccountMeta(
+        "userDestinationLiquidity",
+        accounts.userDestinationLiquidity,
+      ),
+      getAccountMeta("collateralTokenProgram", accounts.collateralTokenProgram),
+      getAccountMeta(
+        "repayLiquidityTokenProgram",
+        accounts.repayLiquidityTokenProgram,
+      ),
+      getAccountMeta(
+        "withdrawLiquidityTokenProgram",
+        accounts.withdrawLiquidityTokenProgram,
+      ),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
     ],
     data: getLiquidateObligationAndRedeemReserveCollateralInstructionDataEncoder().encode(
       args as LiquidateObligationAndRedeemReserveCollateralInstructionDataArgs,
@@ -781,8 +861,13 @@ export function parseLiquidateObligationAndRedeemReserveCollateralInstruction<
   TAccountMetas
 > {
   if (instruction.accounts.length < 20) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 20,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

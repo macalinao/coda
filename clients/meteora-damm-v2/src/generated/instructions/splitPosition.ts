@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   SplitPositionParameters,
   SplitPositionParametersArgs,
@@ -35,11 +35,13 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getSplitPositionParametersDecoder,
   getSplitPositionParametersEncoder,
@@ -57,18 +59,20 @@ export function getSplitPositionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SplitPositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountFirstPosition extends string | AccountMeta = string,
-  TAccountFirstPositionNftAccount extends string | AccountMeta = string,
-  TAccountSecondPosition extends string | AccountMeta = string,
-  TAccountSecondPositionNftAccount extends string | AccountMeta = string,
-  TAccountFirstOwner extends string | AccountMeta = string,
-  TAccountSecondOwner extends string | AccountMeta = string,
-  TAccountEventAuthority extends string | AccountMeta = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountFirstPosition extends string | AccountMeta<string> = string,
+  TAccountFirstPositionNftAccount extends string | AccountMeta<string> = string,
+  TAccountSecondPosition extends string | AccountMeta<string> = string,
+  TAccountSecondPositionNftAccount extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountFirstOwner extends string | AccountMeta<string> = string,
+  TAccountSecondOwner extends string | AccountMeta<string> = string,
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -232,7 +236,7 @@ export async function getSplitPositionInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -250,15 +254,21 @@ export async function getSplitPositionInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.firstPosition),
-      getAccountMeta(accounts.firstPositionNftAccount),
-      getAccountMeta(accounts.secondPosition),
-      getAccountMeta(accounts.secondPositionNftAccount),
-      getAccountMeta(accounts.firstOwner),
-      getAccountMeta(accounts.secondOwner),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("firstPosition", accounts.firstPosition),
+      getAccountMeta(
+        "firstPositionNftAccount",
+        accounts.firstPositionNftAccount,
+      ),
+      getAccountMeta("secondPosition", accounts.secondPosition),
+      getAccountMeta(
+        "secondPositionNftAccount",
+        accounts.secondPositionNftAccount,
+      ),
+      getAccountMeta("firstOwner", accounts.firstOwner),
+      getAccountMeta("secondOwner", accounts.secondOwner),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getSplitPositionInstructionDataEncoder().encode(
       args as SplitPositionInstructionDataArgs,
@@ -366,7 +376,7 @@ export function getSplitPositionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -381,15 +391,21 @@ export function getSplitPositionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.firstPosition),
-      getAccountMeta(accounts.firstPositionNftAccount),
-      getAccountMeta(accounts.secondPosition),
-      getAccountMeta(accounts.secondPositionNftAccount),
-      getAccountMeta(accounts.firstOwner),
-      getAccountMeta(accounts.secondOwner),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("firstPosition", accounts.firstPosition),
+      getAccountMeta(
+        "firstPositionNftAccount",
+        accounts.firstPositionNftAccount,
+      ),
+      getAccountMeta("secondPosition", accounts.secondPosition),
+      getAccountMeta(
+        "secondPositionNftAccount",
+        accounts.secondPositionNftAccount,
+      ),
+      getAccountMeta("firstOwner", accounts.firstOwner),
+      getAccountMeta("secondOwner", accounts.secondOwner),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getSplitPositionInstructionDataEncoder().encode(
       args as SplitPositionInstructionDataArgs,
@@ -443,8 +459,13 @@ export function parseSplitPositionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSplitPositionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

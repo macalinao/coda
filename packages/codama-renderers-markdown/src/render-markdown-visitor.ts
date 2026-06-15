@@ -1,4 +1,3 @@
-import type { RootNode } from "@codama/nodes";
 import type { RenderMarkdownOptions } from "./types.js";
 import { getAllPrograms } from "@codama/nodes";
 import {
@@ -15,6 +14,9 @@ import {
 import * as prettier from "prettier";
 import { renderProgram } from "./renderers/renderProgram.js";
 
+const CAPITAL_LETTER_REGEX = /([A-Z])/g;
+const LEADING_DASH_REGEX = /^-/;
+
 export function renderMarkdownVisitor(
   outputDir: string,
   options: RenderMarkdownOptions = {},
@@ -26,7 +28,7 @@ export function renderMarkdownVisitor(
     visit(root, getRecordLinkablesVisitor(linkables));
 
     let map = createRenderMap();
-    const programs = getAllPrograms(root as unknown as RootNode);
+    const programs = getAllPrograms(root);
 
     // Generate markdown for each program
     for (const program of programs) {
@@ -46,9 +48,9 @@ export function renderMarkdownVisitor(
 
       // Convert camelCase to kebab-case for filename
       const kebabCase = program.name
-        .replace(/([A-Z])/g, "-$1") // Add dash before capitals
+        .replace(CAPITAL_LETTER_REGEX, "-$1") // Add dash before capitals
         .toLowerCase()
-        .replace(/^-/, ""); // Remove leading dash if present
+        .replace(LEADING_DASH_REGEX, ""); // Remove leading dash if present
       const filename = `${kebabCase}.md`;
       map = addToRenderMap(map, filename, { content: markdown });
     }

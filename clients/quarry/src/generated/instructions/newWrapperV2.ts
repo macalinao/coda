@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,15 +34,17 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+  getResolvedInstructionAccountAsTransactionSigner,
+} from "@solana/program-client-core";
 import { findMintWrapperPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  expectAddress,
-  expectTransactionSigner,
-  getAccountMetaFactory,
-} from "../shared/index.js";
 
 export const NEW_WRAPPER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   140, 106, 205, 202, 15, 176, 85, 19,
@@ -56,18 +58,18 @@ export function getNewWrapperV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewWrapperV2Instruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
-  TAccountBase extends string | AccountMeta = string,
-  TAccountMintWrapper extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountTokenMint extends string | AccountMeta = string,
+  TAccountBase extends string | AccountMeta<string> = string,
+  TAccountMintWrapper extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountTokenMint extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountPayer extends string | AccountMeta = string,
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -201,7 +203,7 @@ export async function getNewWrapperV2InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -210,11 +212,15 @@ export async function getNewWrapperV2InstructionAsync<
   // Resolve default values.
   if (!accounts.mintWrapper.value) {
     accounts.mintWrapper.value = await findMintWrapperPda({
-      base: expectAddress(accounts.base.value),
+      base: getAddressFromResolvedInstructionAccount(
+        "base",
+        accounts.base.value,
+      ),
     });
   }
   if (!accounts.admin.value) {
-    accounts.admin.value = expectTransactionSigner(
+    accounts.admin.value = getResolvedInstructionAccountAsTransactionSigner(
+      "payer",
       accounts.payer.value,
     ).address;
   }
@@ -230,13 +236,13 @@ export async function getNewWrapperV2InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("base", accounts.base),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewWrapperV2InstructionDataEncoder().encode(
       args as NewWrapperV2InstructionDataArgs,
@@ -319,7 +325,7 @@ export function getNewWrapperV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -327,7 +333,8 @@ export function getNewWrapperV2Instruction<
 
   // Resolve default values.
   if (!accounts.admin.value) {
-    accounts.admin.value = expectTransactionSigner(
+    accounts.admin.value = getResolvedInstructionAccountAsTransactionSigner(
+      "payer",
       accounts.payer.value,
     ).address;
   }
@@ -343,13 +350,13 @@ export function getNewWrapperV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.base),
-      getAccountMeta(accounts.mintWrapper),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("base", accounts.base),
+      getAccountMeta("mintWrapper", accounts.mintWrapper),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getNewWrapperV2InstructionDataEncoder().encode(
       args as NewWrapperV2InstructionDataArgs,
@@ -393,8 +400,13 @@ export function parseNewWrapperV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedNewWrapperV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

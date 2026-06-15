@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_MINER_M_M_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([189, 125, 116, 157, 73, 4, 253, 156]);
@@ -47,24 +49,24 @@ export function getInitMinerMMV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitMinerMMV2Instruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountTokenMint extends string | AccountMeta = string,
-  TAccountMinerVault extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountMm extends string | AccountMeta<string> = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountTokenMint extends string | AccountMeta<string> = string,
+  TAccountMinerVault extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountMineProgram extends
     | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
+    | AccountMeta<string> = "11111111111111111111111111111111",
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -109,7 +111,7 @@ export interface InitMinerMMV2InstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitMinerMMV2InstructionDataArgs {}
+export type InitMinerMMV2InstructionDataArgs = {};
 
 export function getInitMinerMMV2InstructionDataEncoder(): FixedSizeEncoder<InitMinerMMV2InstructionDataArgs> {
   return transformEncoder(
@@ -222,7 +224,7 @@ export function getInitMinerMMV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -242,17 +244,17 @@ export function getInitMinerMMV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.tokenMint),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.mineProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("tokenMint", accounts.tokenMint),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("mineProgram", accounts.mineProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getInitMinerMMV2InstructionDataEncoder().encode({}),
     programAddress,
@@ -302,8 +304,13 @@ export function parseInitMinerMMV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitMinerMMV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -114,8 +114,8 @@ export interface ReserveLiquidityArgs {
   absoluteReferralRateSf: number | bigint;
   /** Token program of the liquidity mint */
   tokenProgram: Address;
-  padding2: (number | bigint)[];
-  padding3: (number | bigint)[];
+  padding2: Array<number | bigint>;
+  padding3: Array<number | bigint>;
 }
 
 export function getReserveLiquidityEncoder(): FixedSizeEncoder<ReserveLiquidityArgs> {

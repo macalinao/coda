@@ -71,7 +71,7 @@ export interface MergePoolArgs {
   mmCount: number | bigint;
   totalPrimaryBalance: number | bigint;
   totalReplicaBalance: number | bigint;
-  reserved: (number | bigint)[];
+  reserved: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link MergePoolArgs} account data. */

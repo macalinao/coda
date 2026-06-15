@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   UpdateGlobalConfigMode,
   UpdateGlobalConfigModeArgs,
@@ -38,10 +38,12 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getUpdateGlobalConfigModeDecoder,
   getUpdateGlobalConfigModeEncoder,
@@ -152,7 +154,7 @@ export function getUpdateGlobalConfigInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -161,8 +163,8 @@ export function getUpdateGlobalConfigInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalAdmin),
-      getAccountMeta(accounts.globalConfig),
+      getAccountMeta("globalAdmin", accounts.globalAdmin),
+      getAccountMeta("globalConfig", accounts.globalConfig),
     ],
     data: getUpdateGlobalConfigInstructionDataEncoder().encode(
       args as UpdateGlobalConfigInstructionDataArgs,
@@ -196,8 +198,13 @@ export function parseUpdateGlobalConfigInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedUpdateGlobalConfigInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

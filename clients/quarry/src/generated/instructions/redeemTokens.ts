@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -36,10 +36,15 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REDEEM_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   246, 98, 134, 41, 152, 33, 120, 69,
@@ -53,16 +58,16 @@ export function getRedeemTokensDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RedeemTokensInstruction<
   TProgram extends string = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
-  TAccountRedeemer extends string | AccountMeta = string,
-  TAccountSourceAuthority extends string | AccountMeta = string,
-  TAccountIouMint extends string | AccountMeta = string,
-  TAccountIouSource extends string | AccountMeta = string,
-  TAccountRedemptionVault extends string | AccountMeta = string,
-  TAccountRedemptionDestination extends string | AccountMeta = string,
+  TAccountRedeemer extends string | AccountMeta<string> = string,
+  TAccountSourceAuthority extends string | AccountMeta<string> = string,
+  TAccountIouMint extends string | AccountMeta<string> = string,
+  TAccountIouSource extends string | AccountMeta<string> = string,
+  TAccountRedemptionVault extends string | AccountMeta<string> = string,
+  TAccountRedemptionDestination extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -202,7 +207,7 @@ export async function getRedeemTokensInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -215,12 +220,20 @@ export async function getRedeemTokensInstructionAsync<
         "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
       seeds: [
         getAddressEncoder().encode(
-          expectAddress(accounts.sourceAuthority.value),
+          getAddressFromResolvedInstructionAccount(
+            "sourceAuthority",
+            accounts.sourceAuthority.value,
+          ),
         ),
         getAddressEncoder().encode(
           address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.iouMint.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "iouMint",
+            accounts.iouMint.value,
+          ),
+        ),
       ],
     });
   }
@@ -232,13 +245,13 @@ export async function getRedeemTokensInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.redeemer),
-      getAccountMeta(accounts.sourceAuthority),
-      getAccountMeta(accounts.iouMint),
-      getAccountMeta(accounts.iouSource),
-      getAccountMeta(accounts.redemptionVault),
-      getAccountMeta(accounts.redemptionDestination),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("redeemer", accounts.redeemer),
+      getAccountMeta("sourceAuthority", accounts.sourceAuthority),
+      getAccountMeta("iouMint", accounts.iouMint),
+      getAccountMeta("iouSource", accounts.iouSource),
+      getAccountMeta("redemptionVault", accounts.redemptionVault),
+      getAccountMeta("redemptionDestination", accounts.redemptionDestination),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getRedeemTokensInstructionDataEncoder().encode(
       args as RedeemTokensInstructionDataArgs,
@@ -327,7 +340,7 @@ export function getRedeemTokensInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -342,13 +355,13 @@ export function getRedeemTokensInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.redeemer),
-      getAccountMeta(accounts.sourceAuthority),
-      getAccountMeta(accounts.iouMint),
-      getAccountMeta(accounts.iouSource),
-      getAccountMeta(accounts.redemptionVault),
-      getAccountMeta(accounts.redemptionDestination),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("redeemer", accounts.redeemer),
+      getAccountMeta("sourceAuthority", accounts.sourceAuthority),
+      getAccountMeta("iouMint", accounts.iouMint),
+      getAccountMeta("iouSource", accounts.iouSource),
+      getAccountMeta("redemptionVault", accounts.redemptionVault),
+      getAccountMeta("redemptionDestination", accounts.redemptionDestination),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getRedeemTokensInstructionDataEncoder().encode(
       args as RedeemTokensInstructionDataArgs,
@@ -392,8 +405,13 @@ export function parseRedeemTokensInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRedeemTokensInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

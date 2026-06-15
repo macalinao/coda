@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_TOKEN_BADGE_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([207, 202, 4, 32, 205, 79, 13, 178]);
@@ -77,7 +79,7 @@ export interface SetTokenBadgeAuthorityInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface SetTokenBadgeAuthorityInstructionDataArgs {}
+export type SetTokenBadgeAuthorityInstructionDataArgs = {};
 
 export function getSetTokenBadgeAuthorityInstructionDataEncoder(): FixedSizeEncoder<SetTokenBadgeAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -162,16 +164,22 @@ export function getSetTokenBadgeAuthorityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.whirlpoolsConfigExtension),
-      getAccountMeta(accounts.configExtensionAuthority),
-      getAccountMeta(accounts.newTokenBadgeAuthority),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta(
+        "whirlpoolsConfigExtension",
+        accounts.whirlpoolsConfigExtension,
+      ),
+      getAccountMeta(
+        "configExtensionAuthority",
+        accounts.configExtensionAuthority,
+      ),
+      getAccountMeta("newTokenBadgeAuthority", accounts.newTokenBadgeAuthority),
     ],
     data: getSetTokenBadgeAuthorityInstructionDataEncoder().encode({}),
     programAddress,
@@ -207,8 +215,13 @@ export function parseSetTokenBadgeAuthorityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetTokenBadgeAuthorityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 4,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

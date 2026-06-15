@@ -25,7 +25,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { LockupKind, LockupKindArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -45,10 +45,12 @@ import {
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import { getLockupKindDecoder, getLockupKindEncoder } from "../types/index.js";
 
 export const GRANT_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -316,7 +318,7 @@ export function getGrantInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -343,20 +345,20 @@ export function getGrantInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.voterAuthority),
-      getAccountMeta(accounts.voterWeightRecord),
-      getAccountMeta(accounts.vault),
-      getAccountMeta(accounts.depositToken),
-      getAccountMeta(accounts.tokenAuthority),
-      getAccountMeta(accounts.grantAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.depositMint),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.associatedTokenProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("voterAuthority", accounts.voterAuthority),
+      getAccountMeta("voterWeightRecord", accounts.voterWeightRecord),
+      getAccountMeta("vault", accounts.vault),
+      getAccountMeta("depositToken", accounts.depositToken),
+      getAccountMeta("tokenAuthority", accounts.tokenAuthority),
+      getAccountMeta("grantAuthority", accounts.grantAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("depositMint", accounts.depositMint),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getGrantInstructionDataEncoder().encode(
       args as GrantInstructionDataArgs,
@@ -414,8 +416,13 @@ export function parseGrantInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedGrantInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 14) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 14,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

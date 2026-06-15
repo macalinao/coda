@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -31,11 +31,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const RESIZE_DISCRIMINATOR = 56;
 
@@ -89,7 +94,7 @@ export interface ResizeInstructionData {
   discriminator: number;
 }
 
-export interface ResizeInstructionDataArgs {}
+export type ResizeInstructionDataArgs = {};
 
 export function getResizeInstructionDataEncoder(): FixedSizeEncoder<ResizeInstructionDataArgs> {
   return transformEncoder(
@@ -187,14 +192,17 @@ export async function getResizeInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -205,13 +213,13 @@ export async function getResizeInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.token),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("token", accounts.token),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getResizeInstructionDataEncoder().encode({}),
     programAddress,
@@ -302,7 +310,7 @@ export function getResizeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -314,13 +322,13 @@ export function getResizeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.token),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("token", accounts.token),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getResizeInstructionDataEncoder().encode({}),
     programAddress,
@@ -371,8 +379,13 @@ export function parseResizeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedResizeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

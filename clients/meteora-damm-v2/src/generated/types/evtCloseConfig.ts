@@ -20,7 +20,6 @@ import {
   getStructEncoder,
 } from "@solana/kit";
 
-/** Close config */
 export interface EvtCloseConfig {
   /** Config pubkey */
   config: Address;

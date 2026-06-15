@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   SetCollectionSizeArgs,
   SetCollectionSizeArgsArgs,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getSetCollectionSizeArgsDecoder,
   getSetCollectionSizeArgsEncoder,
@@ -179,7 +181,7 @@ export function getSetCollectionSizeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -188,10 +190,13 @@ export function getSetCollectionSizeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.collectionMetadata),
-      getAccountMeta(accounts.collectionAuthority),
-      getAccountMeta(accounts.collectionMint),
-      getAccountMeta(accounts.collectionAuthorityRecord),
+      getAccountMeta("collectionMetadata", accounts.collectionMetadata),
+      getAccountMeta("collectionAuthority", accounts.collectionAuthority),
+      getAccountMeta("collectionMint", accounts.collectionMint),
+      getAccountMeta(
+        "collectionAuthorityRecord",
+        accounts.collectionAuthorityRecord,
+      ),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getSetCollectionSizeInstructionDataEncoder().encode(
       args as SetCollectionSizeInstructionDataArgs,
@@ -233,8 +238,13 @@ export function parseSetCollectionSizeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetCollectionSizeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -245,7 +255,7 @@ export function parseSetCollectionSizeInstruction<
   let optionalAccountsRemaining = instruction.accounts.length - 3;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

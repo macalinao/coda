@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -30,10 +30,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const ACCEPT_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([107, 86, 198, 91, 33, 12, 107, 160]);
@@ -46,9 +48,9 @@ export function getAcceptAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type AcceptAuthorityInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -68,7 +70,7 @@ export interface AcceptAuthorityInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface AcceptAuthorityInstructionDataArgs {}
+export type AcceptAuthorityInstructionDataArgs = {};
 
 export function getAcceptAuthorityInstructionDataEncoder(): FixedSizeEncoder<AcceptAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -123,14 +125,14 @@ export function getAcceptAuthorityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.rewarder),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("rewarder", accounts.rewarder),
     ],
     data: getAcceptAuthorityInstructionDataEncoder().encode({}),
     programAddress,
@@ -162,8 +164,13 @@ export function parseAcceptAuthorityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedAcceptAuthorityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

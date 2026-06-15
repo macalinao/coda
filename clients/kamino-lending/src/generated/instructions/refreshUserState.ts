@@ -19,7 +19,7 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -28,10 +28,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REFRESH_USER_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([1, 135, 12, 62, 243, 140, 77, 108]);
@@ -69,7 +71,7 @@ export interface RefreshUserStateInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface RefreshUserStateInstructionDataArgs {}
+export type RefreshUserStateInstructionDataArgs = {};
 
 export function getRefreshUserStateInstructionDataEncoder(): FixedSizeEncoder<RefreshUserStateInstructionDataArgs> {
   return transformEncoder(
@@ -133,15 +135,15 @@ export function getRefreshUserStateInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.userState),
-      getAccountMeta(accounts.farmState),
-      getAccountMeta(accounts.scopePrices),
+      getAccountMeta("userState", accounts.userState),
+      getAccountMeta("farmState", accounts.farmState),
+      getAccountMeta("scopePrices", accounts.scopePrices),
     ],
     data: getRefreshUserStateInstructionDataEncoder().encode({}),
     programAddress,
@@ -175,8 +177,13 @@ export function parseRefreshUserStateInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRefreshUserStateInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

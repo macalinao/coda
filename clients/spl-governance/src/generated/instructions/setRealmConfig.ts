@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   RealmConfigParams,
   RealmConfigParamsArgs,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getRealmConfigParamsDecoder,
   getRealmConfigParamsEncoder,
@@ -271,7 +273,7 @@ export function getSetRealmConfigInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -286,17 +288,32 @@ export function getSetRealmConfigInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.realmAccount),
-      getAccountMeta(accounts.realmAuthority),
-      getAccountMeta(accounts.councilTokenMint),
-      getAccountMeta(accounts.councilTokenHoldingAccount),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.realmConfig),
-      getAccountMeta(accounts.communityVoterWeightAddinProgramId),
-      getAccountMeta(accounts.maxCommunityVoterWeightAddinProgramId),
-      getAccountMeta(accounts.councilVoterWeightAddinProgramId),
-      getAccountMeta(accounts.maxCouncilVoterWeightAddinProgramId),
-      getAccountMeta(accounts.payer),
+      getAccountMeta("realmAccount", accounts.realmAccount),
+      getAccountMeta("realmAuthority", accounts.realmAuthority),
+      getAccountMeta("councilTokenMint", accounts.councilTokenMint),
+      getAccountMeta(
+        "councilTokenHoldingAccount",
+        accounts.councilTokenHoldingAccount,
+      ),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("realmConfig", accounts.realmConfig),
+      getAccountMeta(
+        "communityVoterWeightAddinProgramId",
+        accounts.communityVoterWeightAddinProgramId,
+      ),
+      getAccountMeta(
+        "maxCommunityVoterWeightAddinProgramId",
+        accounts.maxCommunityVoterWeightAddinProgramId,
+      ),
+      getAccountMeta(
+        "councilVoterWeightAddinProgramId",
+        accounts.councilVoterWeightAddinProgramId,
+      ),
+      getAccountMeta(
+        "maxCouncilVoterWeightAddinProgramId",
+        accounts.maxCouncilVoterWeightAddinProgramId,
+      ),
+      getAccountMeta("payer", accounts.payer),
     ],
     data: getSetRealmConfigInstructionDataEncoder().encode(
       args as SetRealmConfigInstructionDataArgs,
@@ -361,8 +378,13 @@ export function parseSetRealmConfigInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetRealmConfigInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

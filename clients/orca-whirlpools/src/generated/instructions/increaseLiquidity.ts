@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +35,12 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INCREASE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([46, 156, 243, 118, 13, 205, 251, 178]);
@@ -253,7 +255,7 @@ export function getIncreaseLiquidityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -268,17 +270,17 @@ export function getIncreaseLiquidityInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.positionAuthority),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.positionTokenAccount),
-      getAccountMeta(accounts.tokenOwnerAccountA),
-      getAccountMeta(accounts.tokenOwnerAccountB),
-      getAccountMeta(accounts.tokenVaultA),
-      getAccountMeta(accounts.tokenVaultB),
-      getAccountMeta(accounts.tickArrayLower),
-      getAccountMeta(accounts.tickArrayUpper),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("positionAuthority", accounts.positionAuthority),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("positionTokenAccount", accounts.positionTokenAccount),
+      getAccountMeta("tokenOwnerAccountA", accounts.tokenOwnerAccountA),
+      getAccountMeta("tokenOwnerAccountB", accounts.tokenOwnerAccountB),
+      getAccountMeta("tokenVaultA", accounts.tokenVaultA),
+      getAccountMeta("tokenVaultB", accounts.tokenVaultB),
+      getAccountMeta("tickArrayLower", accounts.tickArrayLower),
+      getAccountMeta("tickArrayUpper", accounts.tickArrayUpper),
     ],
     data: getIncreaseLiquidityInstructionDataEncoder().encode(
       args as IncreaseLiquidityInstructionDataArgs,
@@ -330,8 +332,13 @@ export function parseIncreaseLiquidityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedIncreaseLiquidityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   Option,
   OptionOrNullable,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { ProposalSeeds } from "../pdas/index.js";
 import type {
@@ -77,9 +78,10 @@ import {
   getVoteThresholdEncoder,
 } from "../types/index.js";
 
-export const PROPOSAL_V1_ACCOUNT_TYPE = GovernanceAccountType.ProposalV1;
+export const PROPOSAL_V1_ACCOUNT_TYPE: GovernanceAccountType =
+  GovernanceAccountType.ProposalV1;
 
-export function getProposalV1AccountTypeBytes() {
+export function getProposalV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(PROPOSAL_V1_ACCOUNT_TYPE);
 }
 

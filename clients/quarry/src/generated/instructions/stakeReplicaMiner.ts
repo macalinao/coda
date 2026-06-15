@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,8 +34,14 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findMergeMinerPda,
   findMinerPda,
@@ -43,7 +49,6 @@ import {
   findReplicaMintPda,
 } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const STAKE_REPLICA_MINER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([246, 171, 25, 201, 242, 145, 94, 47]);
@@ -56,22 +61,22 @@ export function getStakeReplicaMinerDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type StakeReplicaMinerInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountMmOwner extends string | AccountMeta = string,
-  TAccountReplicaMint extends string | AccountMeta = string,
-  TAccountReplicaMintTokenAccount extends string | AccountMeta = string,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountRewarder extends string | AccountMeta = string,
-  TAccountQuarry extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountMinerVault extends string | AccountMeta = string,
+  TAccountMmOwner extends string | AccountMeta<string> = string,
+  TAccountReplicaMint extends string | AccountMeta<string> = string,
+  TAccountReplicaMintTokenAccount extends string | AccountMeta<string> = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountMm extends string | AccountMeta<string> = string,
+  TAccountRewarder extends string | AccountMeta<string> = string,
+  TAccountQuarry extends string | AccountMeta<string> = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountMinerVault extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountMineProgram extends
     | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -116,7 +121,7 @@ export interface StakeReplicaMinerInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface StakeReplicaMinerInstructionDataArgs {}
+export type StakeReplicaMinerInstructionDataArgs = {};
 
 export function getStakeReplicaMinerInstructionDataEncoder(): FixedSizeEncoder<StakeReplicaMinerInstructionDataArgs> {
   return transformEncoder(
@@ -234,19 +239,28 @@ export async function getStakeReplicaMinerInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.replicaMint.value) {
     accounts.replicaMint.value = await findReplicaMintPda({
-      pool: expectAddress(accounts.pool.value),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.mm.value) {
     accounts.mm.value = await findMergeMinerPda({
-      pool: expectAddress(accounts.pool.value),
-      owner: expectAddress(accounts.mmOwner.value),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
+      owner: getAddressFromResolvedInstructionAccount(
+        "mmOwner",
+        accounts.mmOwner.value,
+      ),
     });
   }
   if (!accounts.replicaMintTokenAccount.value) {
@@ -254,24 +268,43 @@ export async function getStakeReplicaMinerInstructionAsync<
       programAddress:
         "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
       seeds: [
-        getAddressEncoder().encode(expectAddress(accounts.mm.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount("mm", accounts.mm.value),
+        ),
         getAddressEncoder().encode(
           address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.replicaMint.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "replicaMint",
+            accounts.replicaMint.value,
+          ),
+        ),
       ],
     });
   }
   if (!accounts.quarry.value) {
     accounts.quarry.value = await findQuarryPda({
-      rewarder: expectAddress(accounts.rewarder.value),
-      tokenMint: expectAddress(accounts.replicaMint.value),
+      rewarder: getAddressFromResolvedInstructionAccount(
+        "rewarder",
+        accounts.rewarder.value,
+      ),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "replicaMint",
+        accounts.replicaMint.value,
+      ),
     });
   }
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({
-      quarry: expectAddress(accounts.quarry.value),
-      authority: expectAddress(accounts.mm.value),
+      quarry: getAddressFromResolvedInstructionAccount(
+        "quarry",
+        accounts.quarry.value,
+      ),
+      authority: getAddressFromResolvedInstructionAccount(
+        "mm",
+        accounts.mm.value,
+      ),
     });
   }
   if (!accounts.minerVault.value) {
@@ -279,11 +312,21 @@ export async function getStakeReplicaMinerInstructionAsync<
       programAddress:
         "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
       seeds: [
-        getAddressEncoder().encode(expectAddress(accounts.miner.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "miner",
+            accounts.miner.value,
+          ),
+        ),
         getAddressEncoder().encode(
           address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.replicaMint.value)),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "replicaMint",
+            accounts.replicaMint.value,
+          ),
+        ),
       ],
     });
   }
@@ -299,17 +342,20 @@ export async function getStakeReplicaMinerInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mmOwner),
-      getAccountMeta(accounts.replicaMint),
-      getAccountMeta(accounts.replicaMintTokenAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.mineProgram),
+      getAccountMeta("mmOwner", accounts.mmOwner),
+      getAccountMeta("replicaMint", accounts.replicaMint),
+      getAccountMeta(
+        "replicaMintTokenAccount",
+        accounts.replicaMintTokenAccount,
+      ),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("mineProgram", accounts.mineProgram),
     ],
     data: getStakeReplicaMinerInstructionDataEncoder().encode({}),
     programAddress,
@@ -420,7 +466,7 @@ export function getStakeReplicaMinerInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -436,17 +482,20 @@ export function getStakeReplicaMinerInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mmOwner),
-      getAccountMeta(accounts.replicaMint),
-      getAccountMeta(accounts.replicaMintTokenAccount),
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.rewarder),
-      getAccountMeta(accounts.quarry),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.minerVault),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.mineProgram),
+      getAccountMeta("mmOwner", accounts.mmOwner),
+      getAccountMeta("replicaMint", accounts.replicaMint),
+      getAccountMeta(
+        "replicaMintTokenAccount",
+        accounts.replicaMintTokenAccount,
+      ),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("rewarder", accounts.rewarder),
+      getAccountMeta("quarry", accounts.quarry),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("minerVault", accounts.minerVault),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("mineProgram", accounts.mineProgram),
     ],
     data: getStakeReplicaMinerInstructionDataEncoder().encode({}),
     programAddress,
@@ -496,8 +545,13 @@ export function parseStakeReplicaMinerInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedStakeReplicaMinerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 11) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 11,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

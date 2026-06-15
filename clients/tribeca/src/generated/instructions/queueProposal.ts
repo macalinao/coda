@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const QUEUE_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   168, 219, 139, 211, 205, 152, 125, 110,
@@ -193,7 +195,7 @@ export function getQueueProposalInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -208,13 +210,13 @@ export function getQueueProposalInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.governor),
-      getAccountMeta(accounts.proposal),
-      getAccountMeta(accounts.transaction),
-      getAccountMeta(accounts.smartWallet),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.smartWalletProgram),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("governor", accounts.governor),
+      getAccountMeta("proposal", accounts.proposal),
+      getAccountMeta("transaction", accounts.transaction),
+      getAccountMeta("smartWallet", accounts.smartWallet),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("smartWalletProgram", accounts.smartWalletProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getQueueProposalInstructionDataEncoder().encode(
       args as QueueProposalInstructionDataArgs,
@@ -258,8 +260,13 @@ export function parseQueueProposalInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedQueueProposalInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

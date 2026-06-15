@@ -197,7 +197,7 @@ export interface PoolArgs {
   /** pool creator */
   creator: Address;
   /** Padding for further use */
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
   /** Farming reward information */
   rewardInfos: RewardInfoArgs[];
 }

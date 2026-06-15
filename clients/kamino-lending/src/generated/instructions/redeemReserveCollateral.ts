@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,15 +33,20 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findLendingMarketAuthPda,
   findReserveCollateralMintPda,
   findReserveLiquiditySupplyPda,
 } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const REDEEM_RESERVE_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([234, 117, 181, 125, 185, 142, 220, 29]);
@@ -281,7 +286,7 @@ export async function getRedeemReserveCollateralInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -290,20 +295,35 @@ export async function getRedeemReserveCollateralInstructionAsync<
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      lendingMarket: getAddressFromResolvedInstructionAccount(
+        "lendingMarket",
+        accounts.lendingMarket.value,
+      ),
     });
   }
   if (!accounts.reserveCollateralMint.value) {
     accounts.reserveCollateralMint.value = await findReserveCollateralMintPda({
-      lendingMarket: expectAddress(accounts.lendingMarket.value),
-      mint: expectAddress(accounts.reserveLiquidityMint.value),
+      lendingMarket: getAddressFromResolvedInstructionAccount(
+        "lendingMarket",
+        accounts.lendingMarket.value,
+      ),
+      mint: getAddressFromResolvedInstructionAccount(
+        "reserveLiquidityMint",
+        accounts.reserveLiquidityMint.value,
+      ),
     });
   }
   if (!accounts.reserveLiquiditySupply.value) {
     accounts.reserveLiquiditySupply.value = await findReserveLiquiditySupplyPda(
       {
-        lendingMarket: expectAddress(accounts.lendingMarket.value),
-        mint: expectAddress(accounts.reserveLiquidityMint.value),
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+        mint: getAddressFromResolvedInstructionAccount(
+          "reserveLiquidityMint",
+          accounts.reserveLiquidityMint.value,
+        ),
       },
     );
   }
@@ -323,18 +343,24 @@ export async function getRedeemReserveCollateralInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.reserveLiquidityMint),
-      getAccountMeta(accounts.reserveCollateralMint),
-      getAccountMeta(accounts.reserveLiquiditySupply),
-      getAccountMeta(accounts.userSourceCollateral),
-      getAccountMeta(accounts.userDestinationLiquidity),
-      getAccountMeta(accounts.collateralTokenProgram),
-      getAccountMeta(accounts.liquidityTokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("reserveLiquidityMint", accounts.reserveLiquidityMint),
+      getAccountMeta("reserveCollateralMint", accounts.reserveCollateralMint),
+      getAccountMeta("reserveLiquiditySupply", accounts.reserveLiquiditySupply),
+      getAccountMeta("userSourceCollateral", accounts.userSourceCollateral),
+      getAccountMeta(
+        "userDestinationLiquidity",
+        accounts.userDestinationLiquidity,
+      ),
+      getAccountMeta("collateralTokenProgram", accounts.collateralTokenProgram),
+      getAccountMeta("liquidityTokenProgram", accounts.liquidityTokenProgram),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
     ],
     data: getRedeemReserveCollateralInstructionDataEncoder().encode(
       args as RedeemReserveCollateralInstructionDataArgs,
@@ -479,7 +505,7 @@ export function getRedeemReserveCollateralInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -502,18 +528,24 @@ export function getRedeemReserveCollateralInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.reserveLiquidityMint),
-      getAccountMeta(accounts.reserveCollateralMint),
-      getAccountMeta(accounts.reserveLiquiditySupply),
-      getAccountMeta(accounts.userSourceCollateral),
-      getAccountMeta(accounts.userDestinationLiquidity),
-      getAccountMeta(accounts.collateralTokenProgram),
-      getAccountMeta(accounts.liquidityTokenProgram),
-      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("reserveLiquidityMint", accounts.reserveLiquidityMint),
+      getAccountMeta("reserveCollateralMint", accounts.reserveCollateralMint),
+      getAccountMeta("reserveLiquiditySupply", accounts.reserveLiquiditySupply),
+      getAccountMeta("userSourceCollateral", accounts.userSourceCollateral),
+      getAccountMeta(
+        "userDestinationLiquidity",
+        accounts.userDestinationLiquidity,
+      ),
+      getAccountMeta("collateralTokenProgram", accounts.collateralTokenProgram),
+      getAccountMeta("liquidityTokenProgram", accounts.liquidityTokenProgram),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
     ],
     data: getRedeemReserveCollateralInstructionDataEncoder().encode(
       args as RedeemReserveCollateralInstructionDataArgs,
@@ -567,8 +599,13 @@ export function parseRedeemReserveCollateralInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRedeemReserveCollateralInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 12) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 12,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

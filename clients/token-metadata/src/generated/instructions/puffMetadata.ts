@@ -18,17 +18,19 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const PUFF_METADATA_DISCRIMINATOR = 14;
 
@@ -55,7 +57,7 @@ export interface PuffMetadataInstructionData {
   discriminator: number;
 }
 
-export interface PuffMetadataInstructionDataArgs {}
+export type PuffMetadataInstructionDataArgs = {};
 
 export function getPuffMetadataInstructionDataEncoder(): FixedSizeEncoder<PuffMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -100,12 +102,12 @@ export function getPuffMetadataInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
-    accounts: [getAccountMeta(accounts.metadata)],
+    accounts: [getAccountMeta("metadata", accounts.metadata)],
     data: getPuffMetadataInstructionDataEncoder().encode({}),
     programAddress,
   } as PuffMetadataInstruction<TProgramAddress, TAccountMetadata>);
@@ -131,9 +133,14 @@ export function parsePuffMetadataInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedPuffMetadataInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 1) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+  if (instruction.accounts.length === 0) {
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 1,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

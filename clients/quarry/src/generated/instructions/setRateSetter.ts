@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SET_RATE_SETTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [59, 193, 107, 111, 94, 23, 64, 107],
@@ -48,10 +50,10 @@ export function getSetRateSetterDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetRateSetterInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
-  TAccountOperator extends string | AccountMeta = string,
-  TAccountAdmin extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountOperator extends string | AccountMeta<string> = string,
+  TAccountAdmin extends string | AccountMeta<string> = string,
+  TAccountDelegate extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -74,7 +76,7 @@ export interface SetRateSetterInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface SetRateSetterInstructionDataArgs {}
+export type SetRateSetterInstructionDataArgs = {};
 
 export function getSetRateSetterInstructionDataEncoder(): FixedSizeEncoder<SetRateSetterInstructionDataArgs> {
   return transformEncoder(
@@ -135,15 +137,15 @@ export function getSetRateSetterInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.operator),
-      getAccountMeta(accounts.admin),
-      getAccountMeta(accounts.delegate),
+      getAccountMeta("operator", accounts.operator),
+      getAccountMeta("admin", accounts.admin),
+      getAccountMeta("delegate", accounts.delegate),
     ],
     data: getSetRateSetterInstructionDataEncoder().encode({}),
     programAddress,
@@ -177,8 +179,13 @@ export function parseSetRateSetterInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetRateSetterInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

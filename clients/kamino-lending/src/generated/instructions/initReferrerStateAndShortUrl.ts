@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -37,10 +37,12 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_REFERRER_STATE_AND_SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([165, 19, 25, 127, 100, 55, 31, 90]);
@@ -195,7 +197,7 @@ export function getInitReferrerStateAndShortUrlInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -214,12 +216,12 @@ export function getInitReferrerStateAndShortUrlInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.referrer),
-      getAccountMeta(accounts.referrerState),
-      getAccountMeta(accounts.referrerShortUrl),
-      getAccountMeta(accounts.referrerUserMetadata),
-      getAccountMeta(accounts.rent),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("referrer", accounts.referrer),
+      getAccountMeta("referrerState", accounts.referrerState),
+      getAccountMeta("referrerShortUrl", accounts.referrerShortUrl),
+      getAccountMeta("referrerUserMetadata", accounts.referrerUserMetadata),
+      getAccountMeta("rent", accounts.rent),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getInitReferrerStateAndShortUrlInstructionDataEncoder().encode(
       args as InitReferrerStateAndShortUrlInstructionDataArgs,
@@ -261,8 +263,13 @@ export function parseInitReferrerStateAndShortUrlInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitReferrerStateAndShortUrlInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 6,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

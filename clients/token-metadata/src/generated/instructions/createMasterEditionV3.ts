@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   CreateMasterEditionArgs,
   CreateMasterEditionArgsArgs,
@@ -35,11 +35,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getCreateMasterEditionArgsDecoder,
   getCreateMasterEditionArgsEncoder,
@@ -239,7 +244,7 @@ export async function getCreateMasterEditionV3InstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -249,7 +254,10 @@ export async function getCreateMasterEditionV3InstructionAsync<
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -264,15 +272,15 @@ export async function getCreateMasterEditionV3InstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.mintAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("mintAuthority", accounts.mintAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getCreateMasterEditionV3InstructionDataEncoder().encode(
       args as CreateMasterEditionV3InstructionDataArgs,
@@ -381,7 +389,7 @@ export function getCreateMasterEditionV3Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -400,15 +408,15 @@ export function getCreateMasterEditionV3Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.updateAuthority),
-      getAccountMeta(accounts.mintAuthority),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("updateAuthority", accounts.updateAuthority),
+      getAccountMeta("mintAuthority", accounts.mintAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getCreateMasterEditionV3InstructionDataEncoder().encode(
       args as CreateMasterEditionV3InstructionDataArgs,
@@ -465,8 +473,13 @@ export function parseCreateMasterEditionV3Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateMasterEditionV3Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -477,7 +490,7 @@ export function parseCreateMasterEditionV3Instruction<
   let optionalAccountsRemaining = instruction.accounts.length - 8;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

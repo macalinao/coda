@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +34,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const APPROVE_PROGRAM_LOCK_PRIVILEGE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([75, 202, 1, 4, 122, 110, 102, 148]);
@@ -207,7 +209,7 @@ export function getApproveProgramLockPrivilegeInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -222,14 +224,14 @@ export function getApproveProgramLockPrivilegeInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.locker),
-      getAccountMeta(accounts.whitelistEntry),
-      getAccountMeta(accounts.governor),
-      getAccountMeta(accounts.smartWallet),
-      getAccountMeta(accounts.executableId),
-      getAccountMeta(accounts.whitelistedOwner),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("locker", accounts.locker),
+      getAccountMeta("whitelistEntry", accounts.whitelistEntry),
+      getAccountMeta("governor", accounts.governor),
+      getAccountMeta("smartWallet", accounts.smartWallet),
+      getAccountMeta("executableId", accounts.executableId),
+      getAccountMeta("whitelistedOwner", accounts.whitelistedOwner),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getApproveProgramLockPrivilegeInstructionDataEncoder().encode(
       args as ApproveProgramLockPrivilegeInstructionDataArgs,
@@ -275,8 +277,13 @@ export function parseApproveProgramLockPrivilegeInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedApproveProgramLockPrivilegeInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

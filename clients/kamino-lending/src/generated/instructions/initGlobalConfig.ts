@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,13 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { findLendingGlobalConfigStatePda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const INIT_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([140, 136, 214, 48, 87, 0, 120, 255]);
@@ -86,7 +88,7 @@ export interface InitGlobalConfigInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface InitGlobalConfigInstructionDataArgs {}
+export type InitGlobalConfigInstructionDataArgs = {};
 
 export function getInitGlobalConfigInstructionDataEncoder(): FixedSizeEncoder<InitGlobalConfigInstructionDataArgs> {
   return transformEncoder(
@@ -165,7 +167,7 @@ export async function getInitGlobalConfigInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -184,11 +186,11 @@ export async function getInitGlobalConfigInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.programData),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("programData", accounts.programData),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitGlobalConfigInstructionDataEncoder().encode({}),
     programAddress,
@@ -254,7 +256,7 @@ export function getInitGlobalConfigInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -270,11 +272,11 @@ export function getInitGlobalConfigInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.programData),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.rent),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("programData", accounts.programData),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("rent", accounts.rent),
     ],
     data: getInitGlobalConfigInstructionDataEncoder().encode({}),
     programAddress,
@@ -312,8 +314,13 @@ export function parseInitGlobalConfigInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitGlobalConfigInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

@@ -6,13 +6,56 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type { Redeemer, RedeemerArgs } from "../accounts/index.js";
+import type {
+  CreateRedeemerAsyncInput,
   ParsedCreateRedeemerInstruction,
   ParsedRedeemAllTokensInstruction,
   ParsedRedeemTokensInstruction,
+  RedeemAllTokensAsyncInput,
+  RedeemTokensAsyncInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import { getRedeemerCodec } from "../accounts/index.js";
+import {
+  getCreateRedeemerInstructionAsync,
+  getRedeemAllTokensInstructionAsync,
+  getRedeemTokensInstructionAsync,
+  parseCreateRedeemerInstruction,
+  parseRedeemAllTokensInstruction,
+  parseRedeemTokensInstruction,
+} from "../instructions/index.js";
+import { findRedeemerPda } from "../pdas/index.js";
 
 export const QUARRY_REDEEMER_PROGRAM_ADDRESS =
   "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9" as Address<"QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9">;
@@ -36,8 +79,9 @@ export function identifyQuarryRedeemerAccount(
   ) {
     return QuarryRedeemerAccount.Redeemer;
   }
-  throw new Error(
-    "The provided account could not be identified as a quarryRedeemer account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "quarryRedeemer" },
   );
 }
 
@@ -84,8 +128,9 @@ export function identifyQuarryRedeemerInstruction(
   ) {
     return QuarryRedeemerInstruction.RedeemAllTokens;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a quarryRedeemer instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "quarryRedeemer" },
   );
 }
 
@@ -101,3 +146,114 @@ export type ParsedQuarryRedeemerInstruction<
   | ({
       instructionType: QuarryRedeemerInstruction.RedeemAllTokens;
     } & ParsedRedeemAllTokensInstruction<TProgram>);
+
+export function parseQuarryRedeemerInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedQuarryRedeemerInstruction<TProgram> {
+  const instructionType = identifyQuarryRedeemerInstruction(instruction);
+  switch (instructionType) {
+    case QuarryRedeemerInstruction.CreateRedeemer: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryRedeemerInstruction.CreateRedeemer,
+        ...parseCreateRedeemerInstruction(instruction),
+      };
+    }
+    case QuarryRedeemerInstruction.RedeemTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryRedeemerInstruction.RedeemTokens,
+        ...parseRedeemTokensInstruction(instruction),
+      };
+    }
+    case QuarryRedeemerInstruction.RedeemAllTokens: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryRedeemerInstruction.RedeemAllTokens,
+        ...parseRedeemAllTokensInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "quarryRedeemer",
+        },
+      );
+  }
+}
+
+export interface QuarryRedeemerPlugin {
+  accounts: QuarryRedeemerPluginAccounts;
+  instructions: QuarryRedeemerPluginInstructions;
+  pdas: QuarryRedeemerPluginPdas;
+}
+
+export interface QuarryRedeemerPluginAccounts {
+  redeemer: ReturnType<typeof getRedeemerCodec> &
+    SelfFetchFunctions<RedeemerArgs, Redeemer>;
+}
+
+export interface QuarryRedeemerPluginInstructions {
+  createRedeemer: (
+    input: MakeOptional<CreateRedeemerAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateRedeemerInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  redeemTokens: (
+    input: RedeemTokensAsyncInput,
+  ) => ReturnType<typeof getRedeemTokensInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  redeemAllTokens: (
+    input: RedeemAllTokensAsyncInput,
+  ) => ReturnType<typeof getRedeemAllTokensInstructionAsync> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface QuarryRedeemerPluginPdas {
+  redeemer: typeof findRedeemerPda;
+}
+
+export type QuarryRedeemerPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function quarryRedeemerProgram() {
+  return <T extends QuarryRedeemerPluginRequirements>(
+    client: T,
+  ): Omit<T, "quarryRedeemer"> & { quarryRedeemer: QuarryRedeemerPlugin } => {
+    return extendClient(client, {
+      quarryRedeemer: <QuarryRedeemerPlugin>{
+        accounts: {
+          redeemer: addSelfFetchFunctions(client, getRedeemerCodec()),
+        },
+        instructions: {
+          createRedeemer: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateRedeemerInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          redeemTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemTokensInstructionAsync(input),
+            ),
+          redeemAllTokens: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemAllTokensInstructionAsync(input),
+            ),
+        },
+        pdas: { redeemer: findRedeemerPda },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

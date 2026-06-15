@@ -24,7 +24,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   RemainingAccountsInfo,
   RemainingAccountsInfoArgs,
@@ -39,10 +39,12 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
@@ -270,7 +272,7 @@ export function getCollectProtocolFeesV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -285,18 +287,21 @@ export function getCollectProtocolFeesV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolsConfig),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.collectProtocolFeesAuthority),
-      getAccountMeta(accounts.tokenMintA),
-      getAccountMeta(accounts.tokenMintB),
-      getAccountMeta(accounts.tokenVaultA),
-      getAccountMeta(accounts.tokenVaultB),
-      getAccountMeta(accounts.tokenDestinationA),
-      getAccountMeta(accounts.tokenDestinationB),
-      getAccountMeta(accounts.tokenProgramA),
-      getAccountMeta(accounts.tokenProgramB),
-      getAccountMeta(accounts.memoProgram),
+      getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta(
+        "collectProtocolFeesAuthority",
+        accounts.collectProtocolFeesAuthority,
+      ),
+      getAccountMeta("tokenMintA", accounts.tokenMintA),
+      getAccountMeta("tokenMintB", accounts.tokenMintB),
+      getAccountMeta("tokenVaultA", accounts.tokenVaultA),
+      getAccountMeta("tokenVaultB", accounts.tokenVaultB),
+      getAccountMeta("tokenDestinationA", accounts.tokenDestinationA),
+      getAccountMeta("tokenDestinationB", accounts.tokenDestinationB),
+      getAccountMeta("tokenProgramA", accounts.tokenProgramA),
+      getAccountMeta("tokenProgramB", accounts.tokenProgramB),
+      getAccountMeta("memoProgram", accounts.memoProgram),
     ],
     data: getCollectProtocolFeesV2InstructionDataEncoder().encode(
       args as CollectProtocolFeesV2InstructionDataArgs,
@@ -350,8 +355,13 @@ export function parseCollectProtocolFeesV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCollectProtocolFeesV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 12) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 12,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

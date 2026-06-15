@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +35,15 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const CREATE_REDEEMER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [137, 228, 81, 63, 209, 33, 131, 195],
@@ -52,14 +57,14 @@ export function getCreateRedeemerDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateRedeemerInstruction<
   TProgram extends string = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
-  TAccountRedeemer extends string | AccountMeta = string,
-  TAccountIouMint extends string | AccountMeta = string,
-  TAccountRedemptionMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
+  TAccountRedeemer extends string | AccountMeta<string> = string,
+  TAccountIouMint extends string | AccountMeta<string> = string,
+  TAccountRedemptionMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -175,7 +180,7 @@ export async function getCreateRedeemerInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -189,9 +194,17 @@ export async function getCreateRedeemerInstructionAsync<
         getBytesEncoder().encode(
           new Uint8Array([34, 82, 101, 100, 101, 101, 109, 101, 114, 34]),
         ),
-        getAddressEncoder().encode(expectAddress(accounts.iouMint.value)),
         getAddressEncoder().encode(
-          expectAddress(accounts.redemptionMint.value),
+          getAddressFromResolvedInstructionAccount(
+            "iouMint",
+            accounts.iouMint.value,
+          ),
+        ),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "redemptionMint",
+            accounts.redemptionMint.value,
+          ),
         ),
       ],
     });
@@ -204,11 +217,11 @@ export async function getCreateRedeemerInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.redeemer),
-      getAccountMeta(accounts.iouMint),
-      getAccountMeta(accounts.redemptionMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("redeemer", accounts.redeemer),
+      getAccountMeta("iouMint", accounts.iouMint),
+      getAccountMeta("redemptionMint", accounts.redemptionMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateRedeemerInstructionDataEncoder().encode(
       args as CreateRedeemerInstructionDataArgs,
@@ -277,7 +290,7 @@ export function getCreateRedeemerInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -292,11 +305,11 @@ export function getCreateRedeemerInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.redeemer),
-      getAccountMeta(accounts.iouMint),
-      getAccountMeta(accounts.redemptionMint),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("redeemer", accounts.redeemer),
+      getAccountMeta("iouMint", accounts.iouMint),
+      getAccountMeta("redemptionMint", accounts.redemptionMint),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getCreateRedeemerInstructionDataEncoder().encode(
       args as CreateRedeemerInstructionDataArgs,
@@ -336,8 +349,13 @@ export function parseCreateRedeemerInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateRedeemerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

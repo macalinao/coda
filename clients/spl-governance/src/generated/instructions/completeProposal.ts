@@ -22,17 +22,19 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const COMPLETE_PROPOSAL_DISCRIMINATOR = 28;
 
@@ -68,7 +70,7 @@ export interface CompleteProposalInstructionData {
   discriminator: number;
 }
 
-export interface CompleteProposalInstructionDataArgs {}
+export type CompleteProposalInstructionDataArgs = {};
 
 export function getCompleteProposalInstructionDataEncoder(): FixedSizeEncoder<CompleteProposalInstructionDataArgs> {
   return transformEncoder(
@@ -139,15 +141,18 @@ export function getCompleteProposalInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.tokenOwnerRecord),
-      getAccountMeta(accounts.completeProposalAuthority),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta("tokenOwnerRecord", accounts.tokenOwnerRecord),
+      getAccountMeta(
+        "completeProposalAuthority",
+        accounts.completeProposalAuthority,
+      ),
     ],
     data: getCompleteProposalInstructionDataEncoder().encode({}),
     programAddress,
@@ -183,8 +188,13 @@ export function parseCompleteProposalInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCompleteProposalInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

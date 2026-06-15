@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   TransferOutOfEscrowArgs,
   TransferOutOfEscrowArgsArgs,
@@ -34,10 +34,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getTransferOutOfEscrowArgsDecoder,
   getTransferOutOfEscrowArgsEncoder,
@@ -282,7 +284,7 @@ export function getTransferOutOfEscrowInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -309,19 +311,19 @@ export function getTransferOutOfEscrowInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.escrow),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.attributeMint),
-      getAccountMeta(accounts.attributeSrc),
-      getAccountMeta(accounts.attributeDst),
-      getAccountMeta(accounts.escrowMint),
-      getAccountMeta(accounts.escrowAccount),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.ataProgram),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.sysvarInstructions),
-      getAccountMeta(accounts.authority),
+      getAccountMeta("escrow", accounts.escrow),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("attributeMint", accounts.attributeMint),
+      getAccountMeta("attributeSrc", accounts.attributeSrc),
+      getAccountMeta("attributeDst", accounts.attributeDst),
+      getAccountMeta("escrowMint", accounts.escrowMint),
+      getAccountMeta("escrowAccount", accounts.escrowAccount),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("ataProgram", accounts.ataProgram),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("sysvarInstructions", accounts.sysvarInstructions),
+      getAccountMeta("authority", accounts.authority),
     ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     data: getTransferOutOfEscrowInstructionDataEncoder().encode(
       args as TransferOutOfEscrowInstructionDataArgs,
@@ -390,8 +392,13 @@ export function parseTransferOutOfEscrowInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedTransferOutOfEscrowInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 12) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 12,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
@@ -402,7 +409,7 @@ export function parseTransferOutOfEscrowInstruction<
   let optionalAccountsRemaining = instruction.accounts.length - 12;
   const getNextOptionalAccount = () => {
     if (optionalAccountsRemaining === 0) {
-      return undefined;
+      return;
     }
     optionalAccountsRemaining -= 1;
     return getNextAccount();

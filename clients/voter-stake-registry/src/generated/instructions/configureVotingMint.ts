@@ -24,7 +24,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -43,10 +43,12 @@ import {
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CONFIGURE_VOTING_MINT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([113, 153, 141, 236, 184, 9, 135, 15]);
@@ -186,7 +188,7 @@ export function getConfigureVotingMintInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -195,9 +197,9 @@ export function getConfigureVotingMintInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.realmAuthority),
-      getAccountMeta(accounts.mint),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("realmAuthority", accounts.realmAuthority),
+      getAccountMeta("mint", accounts.mint),
     ],
     data: getConfigureVotingMintInstructionDataEncoder().encode(
       args as ConfigureVotingMintInstructionDataArgs,
@@ -233,8 +235,13 @@ export function parseConfigureVotingMintInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedConfigureVotingMintInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

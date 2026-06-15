@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   AddLiquidityParameters,
   AddLiquidityParametersArgs,
@@ -35,11 +35,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda, findTokenVaultPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import {
   getAddLiquidityParametersDecoder,
   getAddLiquidityParametersEncoder,
@@ -57,27 +62,27 @@ export function getAddLiquidityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type AddLiquidityInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
-  TAccountPool extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountTokenAAccount extends string | AccountMeta = string,
-  TAccountTokenBAccount extends string | AccountMeta = string,
-  TAccountTokenAVault extends string | AccountMeta = string,
-  TAccountTokenBVault extends string | AccountMeta = string,
-  TAccountTokenAMint extends string | AccountMeta = string,
-  TAccountTokenBMint extends string | AccountMeta = string,
-  TAccountPositionNftAccount extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
+  TAccountPool extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountTokenAAccount extends string | AccountMeta<string> = string,
+  TAccountTokenBAccount extends string | AccountMeta<string> = string,
+  TAccountTokenAVault extends string | AccountMeta<string> = string,
+  TAccountTokenBVault extends string | AccountMeta<string> = string,
+  TAccountTokenAMint extends string | AccountMeta<string> = string,
+  TAccountTokenBMint extends string | AccountMeta<string> = string,
+  TAccountPositionNftAccount extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
   TAccountTokenAProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenBProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountEventAuthority extends string | AccountMeta = string,
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountEventAuthority extends string | AccountMeta<string> = string,
   TAccountProgram extends
     | string
-    | AccountMeta = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -286,7 +291,7 @@ export async function getAddLiquidityInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -295,14 +300,26 @@ export async function getAddLiquidityInstructionAsync<
   // Resolve default values.
   if (!accounts.tokenAVault.value) {
     accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenAMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenAMint",
+        accounts.tokenAMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenBVault.value) {
     accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: expectAddress(accounts.tokenBMint.value),
-      pool: expectAddress(accounts.pool.value),
+      tokenMint: getAddressFromResolvedInstructionAccount(
+        "tokenBMint",
+        accounts.tokenBMint.value,
+      ),
+      pool: getAddressFromResolvedInstructionAccount(
+        "pool",
+        accounts.pool.value,
+      ),
     });
   }
   if (!accounts.tokenAProgram.value) {
@@ -324,20 +341,20 @@ export async function getAddLiquidityInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAAccount),
-      getAccountMeta(accounts.tokenBAccount),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAAccount", accounts.tokenAAccount),
+      getAccountMeta("tokenBAccount", accounts.tokenBAccount),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getAddLiquidityInstructionDataEncoder().encode(
       args as AddLiquidityInstructionDataArgs,
@@ -481,7 +498,7 @@ export function getAddLiquidityInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -504,20 +521,20 @@ export function getAddLiquidityInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.pool),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.tokenAAccount),
-      getAccountMeta(accounts.tokenBAccount),
-      getAccountMeta(accounts.tokenAVault),
-      getAccountMeta(accounts.tokenBVault),
-      getAccountMeta(accounts.tokenAMint),
-      getAccountMeta(accounts.tokenBMint),
-      getAccountMeta(accounts.positionNftAccount),
-      getAccountMeta(accounts.owner),
-      getAccountMeta(accounts.tokenAProgram),
-      getAccountMeta(accounts.tokenBProgram),
-      getAccountMeta(accounts.eventAuthority),
-      getAccountMeta(accounts.program),
+      getAccountMeta("pool", accounts.pool),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("tokenAAccount", accounts.tokenAAccount),
+      getAccountMeta("tokenBAccount", accounts.tokenBAccount),
+      getAccountMeta("tokenAVault", accounts.tokenAVault),
+      getAccountMeta("tokenBVault", accounts.tokenBVault),
+      getAccountMeta("tokenAMint", accounts.tokenAMint),
+      getAccountMeta("tokenBMint", accounts.tokenBMint),
+      getAccountMeta("positionNftAccount", accounts.positionNftAccount),
+      getAccountMeta("owner", accounts.owner),
+      getAccountMeta("tokenAProgram", accounts.tokenAProgram),
+      getAccountMeta("tokenBProgram", accounts.tokenBProgram),
+      getAccountMeta("eventAuthority", accounts.eventAuthority),
+      getAccountMeta("program", accounts.program),
     ],
     data: getAddLiquidityInstructionDataEncoder().encode(
       args as AddLiquidityInstructionDataArgs,
@@ -585,8 +602,13 @@ export function parseAddLiquidityInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedAddLiquidityInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 14) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 14,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

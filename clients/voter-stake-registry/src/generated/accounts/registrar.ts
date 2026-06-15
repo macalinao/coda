@@ -84,7 +84,7 @@ export interface RegistrarArgs {
   timeOffset: number | bigint;
   bump: number;
   reserved2: number[];
-  reserved3: (number | bigint)[];
+  reserved3: Array<number | bigint>;
 }
 
 /** Gets the encoder for {@link RegistrarArgs} account data. */

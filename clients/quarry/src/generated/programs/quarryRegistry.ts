@@ -6,12 +6,52 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type { Registry, RegistryArgs } from "../accounts/index.js";
+import type {
+  NewRegistryAsyncInput,
   ParsedNewRegistryInstruction,
   ParsedSyncQuarryInstruction,
+  SyncQuarryInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import { getRegistryCodec } from "../accounts/index.js";
+import {
+  getNewRegistryInstructionAsync,
+  getSyncQuarryInstruction,
+  parseNewRegistryInstruction,
+  parseSyncQuarryInstruction,
+} from "../instructions/index.js";
+import { findRegistryPda } from "../pdas/index.js";
 
 export const QUARRY_REGISTRY_PROGRAM_ADDRESS =
   "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc" as Address<"QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc">;
@@ -35,8 +75,9 @@ export function identifyQuarryRegistryAccount(
   ) {
     return QuarryRegistryAccount.Registry;
   }
-  throw new Error(
-    "The provided account could not be identified as a quarryRegistry account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "quarryRegistry" },
   );
 }
 
@@ -71,8 +112,9 @@ export function identifyQuarryRegistryInstruction(
   ) {
     return QuarryRegistryInstruction.SyncQuarry;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a quarryRegistry instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "quarryRegistry" },
   );
 }
 
@@ -85,3 +127,97 @@ export type ParsedQuarryRegistryInstruction<
   | ({
       instructionType: QuarryRegistryInstruction.SyncQuarry;
     } & ParsedSyncQuarryInstruction<TProgram>);
+
+export function parseQuarryRegistryInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedQuarryRegistryInstruction<TProgram> {
+  const instructionType = identifyQuarryRegistryInstruction(instruction);
+  switch (instructionType) {
+    case QuarryRegistryInstruction.NewRegistry: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryRegistryInstruction.NewRegistry,
+        ...parseNewRegistryInstruction(instruction),
+      };
+    }
+    case QuarryRegistryInstruction.SyncQuarry: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: QuarryRegistryInstruction.SyncQuarry,
+        ...parseSyncQuarryInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        {
+          instructionType: instructionType as string,
+          programName: "quarryRegistry",
+        },
+      );
+  }
+}
+
+export interface QuarryRegistryPlugin {
+  accounts: QuarryRegistryPluginAccounts;
+  instructions: QuarryRegistryPluginInstructions;
+  pdas: QuarryRegistryPluginPdas;
+}
+
+export interface QuarryRegistryPluginAccounts {
+  registry: ReturnType<typeof getRegistryCodec> &
+    SelfFetchFunctions<RegistryArgs, Registry>;
+}
+
+export interface QuarryRegistryPluginInstructions {
+  newRegistry: (
+    input: MakeOptional<NewRegistryAsyncInput, "payer">,
+  ) => ReturnType<typeof getNewRegistryInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  syncQuarry: (
+    input: SyncQuarryInput,
+  ) => ReturnType<typeof getSyncQuarryInstruction> & SelfPlanAndSendFunctions;
+}
+
+export interface QuarryRegistryPluginPdas {
+  registry: typeof findRegistryPda;
+}
+
+export type QuarryRegistryPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function quarryRegistryProgram() {
+  return <T extends QuarryRegistryPluginRequirements>(
+    client: T,
+  ): Omit<T, "quarryRegistry"> & { quarryRegistry: QuarryRegistryPlugin } => {
+    return extendClient(client, {
+      quarryRegistry: <QuarryRegistryPlugin>{
+        accounts: {
+          registry: addSelfFetchFunctions(client, getRegistryCodec()),
+        },
+        instructions: {
+          newRegistry: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewRegistryInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          syncQuarry: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSyncQuarryInstruction(input),
+            ),
+        },
+        pdas: { registry: findRegistryPda },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

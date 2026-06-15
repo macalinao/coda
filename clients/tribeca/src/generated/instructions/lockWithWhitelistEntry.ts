@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +35,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const LOCK_WITH_WHITELIST_ENTRY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([138, 248, 185, 79, 3, 115, 115, 57]);
@@ -214,7 +216,7 @@ export function getLockWithWhitelistEntryInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -233,14 +235,14 @@ export function getLockWithWhitelistEntryInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.locker),
-      getAccountMeta(accounts.escrow),
-      getAccountMeta(accounts.escrowTokens),
-      getAccountMeta(accounts.escrowOwner),
-      getAccountMeta(accounts.sourceTokens),
-      getAccountMeta(accounts.tokenProgram),
-      getAccountMeta(accounts.instructionsSysvar),
-      getAccountMeta(accounts.whitelistEntry),
+      getAccountMeta("locker", accounts.locker),
+      getAccountMeta("escrow", accounts.escrow),
+      getAccountMeta("escrowTokens", accounts.escrowTokens),
+      getAccountMeta("escrowOwner", accounts.escrowOwner),
+      getAccountMeta("sourceTokens", accounts.sourceTokens),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("instructionsSysvar", accounts.instructionsSysvar),
+      getAccountMeta("whitelistEntry", accounts.whitelistEntry),
     ],
     data: getLockWithWhitelistEntryInstructionDataEncoder().encode(
       args as LockWithWhitelistEntryInstructionDataArgs,
@@ -286,8 +288,13 @@ export function parseLockWithWhitelistEntryInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedLockWithWhitelistEntryInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

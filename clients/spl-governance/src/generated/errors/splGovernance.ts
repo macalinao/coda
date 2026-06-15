@@ -15,255 +15,255 @@ import { isProgramError } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** InvalidInstruction: Invalid instruction passed to program */
-export const SPL_GOVERNANCE_ERROR__INVALID_INSTRUCTION = 0x1f4; // 500
+export const SPL_GOVERNANCE_ERROR__INVALID_INSTRUCTION = 0x1_f4; // 500
 /** RealmAlreadyExists: Realm with the given name and governing mints already exists */
-export const SPL_GOVERNANCE_ERROR__REALM_ALREADY_EXISTS = 0x1f5; // 501
+export const SPL_GOVERNANCE_ERROR__REALM_ALREADY_EXISTS = 0x1_f5; // 501
 /** InvalidRealm: Invalid realm */
-export const SPL_GOVERNANCE_ERROR__INVALID_REALM = 0x1f6; // 502
+export const SPL_GOVERNANCE_ERROR__INVALID_REALM = 0x1_f6; // 502
 /** InvalidGoverningTokenMint: Invalid Governing Token Mint */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_MINT = 0x1f7; // 503
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_MINT = 0x1_f7; // 503
 /** GoverningTokenOwnerMustSign: Governing Token Owner must sign transaction */
-export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_OWNER_MUST_SIGN = 0x1f8; // 504
+export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_OWNER_MUST_SIGN = 0x1_f8; // 504
 /** GoverningTokenOwnerOrDelegateMustSign: Governing Token Owner or Delegate  must sign transaction */
-export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_OWNER_OR_DELEGATE_MUST_SIGN = 0x1f9; // 505
+export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_OWNER_OR_DELEGATE_MUST_SIGN = 0x1_f9; // 505
 /** AllVotesMustBeRelinquishedToWithdrawGoverningTokens: All votes must be relinquished to withdraw governing tokens */
-export const SPL_GOVERNANCE_ERROR__ALL_VOTES_MUST_BE_RELINQUISHED_TO_WITHDRAW_GOVERNING_TOKENS = 0x1fa; // 506
+export const SPL_GOVERNANCE_ERROR__ALL_VOTES_MUST_BE_RELINQUISHED_TO_WITHDRAW_GOVERNING_TOKENS = 0x1_fa; // 506
 /** InvalidTokenOwnerRecordAccountAddress: Invalid Token Owner Record account address */
-export const SPL_GOVERNANCE_ERROR__INVALID_TOKEN_OWNER_RECORD_ACCOUNT_ADDRESS = 0x1fb; // 507
+export const SPL_GOVERNANCE_ERROR__INVALID_TOKEN_OWNER_RECORD_ACCOUNT_ADDRESS = 0x1_fb; // 507
 /** InvalidGoverningMintForTokenOwnerRecord: Invalid GoverningMint for TokenOwnerRecord */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_MINT_FOR_TOKEN_OWNER_RECORD = 0x1fc; // 508
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_MINT_FOR_TOKEN_OWNER_RECORD = 0x1_fc; // 508
 /** InvalidRealmForTokenOwnerRecord: Invalid Realm for TokenOwnerRecord */
-export const SPL_GOVERNANCE_ERROR__INVALID_REALM_FOR_TOKEN_OWNER_RECORD = 0x1fd; // 509
+export const SPL_GOVERNANCE_ERROR__INVALID_REALM_FOR_TOKEN_OWNER_RECORD = 0x1_fd; // 509
 /** InvalidProposalForProposalTransaction: Invalid Proposal for ProposalTransaction, */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_FOR_PROPOSAL_TRANSACTION = 0x1fe; // 510
+export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_FOR_PROPOSAL_TRANSACTION = 0x1_fe; // 510
 /** InvalidSignatoryAddress: Invalid Signatory account address */
-export const SPL_GOVERNANCE_ERROR__INVALID_SIGNATORY_ADDRESS = 0x1ff; // 511
+export const SPL_GOVERNANCE_ERROR__INVALID_SIGNATORY_ADDRESS = 0x1_ff; // 511
 /** SignatoryAlreadySignedOff: Signatory already signed off */
-export const SPL_GOVERNANCE_ERROR__SIGNATORY_ALREADY_SIGNED_OFF = 0x200; // 512
+export const SPL_GOVERNANCE_ERROR__SIGNATORY_ALREADY_SIGNED_OFF = 0x2_00; // 512
 /** SignatoryMustSign: Signatory must sign */
-export const SPL_GOVERNANCE_ERROR__SIGNATORY_MUST_SIGN = 0x201; // 513
+export const SPL_GOVERNANCE_ERROR__SIGNATORY_MUST_SIGN = 0x2_01; // 513
 /** InvalidProposalOwnerAccount: Invalid Proposal Owner */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_OWNER_ACCOUNT = 0x202; // 514
+export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_OWNER_ACCOUNT = 0x2_02; // 514
 /** InvalidProposalForVoterRecord: Invalid Proposal for VoterRecord */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_FOR_VOTER_RECORD = 0x203; // 515
+export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_FOR_VOTER_RECORD = 0x2_03; // 515
 /** InvalidGoverningTokenOwnerForVoteRecord: Invalid GoverningTokenOwner for VoteRecord */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_OWNER_FOR_VOTE_RECORD = 0x204; // 516
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_OWNER_FOR_VOTE_RECORD = 0x2_04; // 516
 /** InvalidVoteThresholdPercentage: Invalid Governance config: Vote threshold percentage out of range */
-export const SPL_GOVERNANCE_ERROR__INVALID_VOTE_THRESHOLD_PERCENTAGE = 0x205; // 517
+export const SPL_GOVERNANCE_ERROR__INVALID_VOTE_THRESHOLD_PERCENTAGE = 0x2_05; // 517
 /** ProposalAlreadyExists: Proposal for the given Governance, Governing Token Mint and index already exists */
-export const SPL_GOVERNANCE_ERROR__PROPOSAL_ALREADY_EXISTS = 0x206; // 518
+export const SPL_GOVERNANCE_ERROR__PROPOSAL_ALREADY_EXISTS = 0x2_06; // 518
 /** VoteAlreadyExists: Token Owner already voted on the Proposal */
-export const SPL_GOVERNANCE_ERROR__VOTE_ALREADY_EXISTS = 0x207; // 519
+export const SPL_GOVERNANCE_ERROR__VOTE_ALREADY_EXISTS = 0x2_07; // 519
 /** NotEnoughTokensToCreateProposal: Owner doesn't have enough governing tokens to create Proposal */
-export const SPL_GOVERNANCE_ERROR__NOT_ENOUGH_TOKENS_TO_CREATE_PROPOSAL = 0x208; // 520
+export const SPL_GOVERNANCE_ERROR__NOT_ENOUGH_TOKENS_TO_CREATE_PROPOSAL = 0x2_08; // 520
 /** InvalidStateCannotEditSignatories: Invalid State: Can't edit Signatories */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_EDIT_SIGNATORIES = 0x209; // 521
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_EDIT_SIGNATORIES = 0x2_09; // 521
 /** InvalidProposalState: Invalid Proposal state */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_STATE = 0x20a; // 522
+export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_STATE = 0x2_0a; // 522
 /** InvalidStateCannotEditTransactions: Invalid State: Can't edit transactions */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_EDIT_TRANSACTIONS = 0x20b; // 523
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_EDIT_TRANSACTIONS = 0x2_0b; // 523
 /** InvalidStateCannotExecuteTransaction: Invalid State: Can't execute transaction */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_EXECUTE_TRANSACTION = 0x20c; // 524
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_EXECUTE_TRANSACTION = 0x2_0c; // 524
 /** CannotExecuteTransactionWithinHoldUpTime: Can't execute transaction within its hold up time */
-export const SPL_GOVERNANCE_ERROR__CANNOT_EXECUTE_TRANSACTION_WITHIN_HOLD_UP_TIME = 0x20d; // 525
+export const SPL_GOVERNANCE_ERROR__CANNOT_EXECUTE_TRANSACTION_WITHIN_HOLD_UP_TIME = 0x2_0d; // 525
 /** TransactionAlreadyExecuted: Transaction already executed */
-export const SPL_GOVERNANCE_ERROR__TRANSACTION_ALREADY_EXECUTED = 0x20e; // 526
+export const SPL_GOVERNANCE_ERROR__TRANSACTION_ALREADY_EXECUTED = 0x2_0e; // 526
 /** InvalidTransactionIndex: Invalid Transaction index */
-export const SPL_GOVERNANCE_ERROR__INVALID_TRANSACTION_INDEX = 0x20f; // 527
+export const SPL_GOVERNANCE_ERROR__INVALID_TRANSACTION_INDEX = 0x2_0f; // 527
 /** TransactionHoldUpTimeBelowRequiredMin: Transaction hold up time is below the min specified by Governance */
-export const SPL_GOVERNANCE_ERROR__TRANSACTION_HOLD_UP_TIME_BELOW_REQUIRED_MIN = 0x210; // 528
+export const SPL_GOVERNANCE_ERROR__TRANSACTION_HOLD_UP_TIME_BELOW_REQUIRED_MIN = 0x2_10; // 528
 /** TransactionAlreadyExists: Transaction at the given index for the Proposal already exists */
-export const SPL_GOVERNANCE_ERROR__TRANSACTION_ALREADY_EXISTS = 0x211; // 529
+export const SPL_GOVERNANCE_ERROR__TRANSACTION_ALREADY_EXISTS = 0x2_11; // 529
 /** InvalidStateCannotSignOff: Invalid State: Can't sign off */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_SIGN_OFF = 0x212; // 530
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_SIGN_OFF = 0x2_12; // 530
 /** InvalidStateCannotVote: Invalid State: Can't vote */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_VOTE = 0x213; // 531
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_VOTE = 0x2_13; // 531
 /** InvalidStateCannotFinalize: Invalid State: Can't finalize vote */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_FINALIZE = 0x214; // 532
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_FINALIZE = 0x2_14; // 532
 /** InvalidStateCannotCancelProposal: Invalid State: Can't cancel Proposal */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_CANCEL_PROPOSAL = 0x215; // 533
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_CANNOT_CANCEL_PROPOSAL = 0x2_15; // 533
 /** VoteAlreadyRelinquished: Vote already relinquished */
-export const SPL_GOVERNANCE_ERROR__VOTE_ALREADY_RELINQUISHED = 0x216; // 534
+export const SPL_GOVERNANCE_ERROR__VOTE_ALREADY_RELINQUISHED = 0x2_16; // 534
 /** CannotFinalizeVotingInProgress: Can't finalize vote. Voting still in progress */
-export const SPL_GOVERNANCE_ERROR__CANNOT_FINALIZE_VOTING_IN_PROGRESS = 0x217; // 535
+export const SPL_GOVERNANCE_ERROR__CANNOT_FINALIZE_VOTING_IN_PROGRESS = 0x2_17; // 535
 /** ProposalVotingTimeExpired: Proposal voting time expired */
-export const SPL_GOVERNANCE_ERROR__PROPOSAL_VOTING_TIME_EXPIRED = 0x218; // 536
+export const SPL_GOVERNANCE_ERROR__PROPOSAL_VOTING_TIME_EXPIRED = 0x2_18; // 536
 /** InvalidSignatoryMint: Invalid Signatory Mint */
-export const SPL_GOVERNANCE_ERROR__INVALID_SIGNATORY_MINT = 0x219; // 537
+export const SPL_GOVERNANCE_ERROR__INVALID_SIGNATORY_MINT = 0x2_19; // 537
 /** InvalidGovernanceForProposal: Proposal does not belong to the given Governance */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNANCE_FOR_PROPOSAL = 0x21a; // 538
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNANCE_FOR_PROPOSAL = 0x2_1a; // 538
 /** InvalidGoverningMintForProposal: Proposal does not belong to given Governing Mint */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_MINT_FOR_PROPOSAL = 0x21b; // 539
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_MINT_FOR_PROPOSAL = 0x2_1b; // 539
 /** MintAuthorityMustSign: Current mint authority must sign transaction */
-export const SPL_GOVERNANCE_ERROR__MINT_AUTHORITY_MUST_SIGN = 0x21c; // 540
+export const SPL_GOVERNANCE_ERROR__MINT_AUTHORITY_MUST_SIGN = 0x2_1c; // 540
 /** InvalidMintAuthority: Invalid mint authority */
-export const SPL_GOVERNANCE_ERROR__INVALID_MINT_AUTHORITY = 0x21d; // 541
+export const SPL_GOVERNANCE_ERROR__INVALID_MINT_AUTHORITY = 0x2_1d; // 541
 /** MintHasNoAuthority: Mint has no authority */
-export const SPL_GOVERNANCE_ERROR__MINT_HAS_NO_AUTHORITY = 0x21e; // 542
+export const SPL_GOVERNANCE_ERROR__MINT_HAS_NO_AUTHORITY = 0x2_1e; // 542
 /** SplTokenAccountWithInvalidOwner: Invalid Token account owner */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_ACCOUNT_WITH_INVALID_OWNER = 0x21f; // 543
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_ACCOUNT_WITH_INVALID_OWNER = 0x2_1f; // 543
 /** SplTokenMintWithInvalidOwner: Invalid Mint account owner */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_MINT_WITH_INVALID_OWNER = 0x220; // 544
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_MINT_WITH_INVALID_OWNER = 0x2_20; // 544
 /** SplTokenAccountNotInitialized: Token Account is not initialized */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_ACCOUNT_NOT_INITIALIZED = 0x221; // 545
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_ACCOUNT_NOT_INITIALIZED = 0x2_21; // 545
 /** SplTokenAccountDoesNotExist: Token Account doesn't exist */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_ACCOUNT_DOES_NOT_EXIST = 0x222; // 546
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_ACCOUNT_DOES_NOT_EXIST = 0x2_22; // 546
 /** SplTokenInvalidTokenAccountData: Token account data is invalid */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_INVALID_TOKEN_ACCOUNT_DATA = 0x223; // 547
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_INVALID_TOKEN_ACCOUNT_DATA = 0x2_23; // 547
 /** SplTokenInvalidMintAccountData: Token mint account data is invalid */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_INVALID_MINT_ACCOUNT_DATA = 0x224; // 548
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_INVALID_MINT_ACCOUNT_DATA = 0x2_24; // 548
 /** SplTokenMintNotInitialized: Token Mint account is not initialized */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_MINT_NOT_INITIALIZED = 0x225; // 549
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_MINT_NOT_INITIALIZED = 0x2_25; // 549
 /** SplTokenMintDoesNotExist: Token Mint account doesn't exist */
-export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_MINT_DOES_NOT_EXIST = 0x226; // 550
+export const SPL_GOVERNANCE_ERROR__SPL_TOKEN_MINT_DOES_NOT_EXIST = 0x2_26; // 550
 /** InvalidProgramDataAccountAddress: Invalid ProgramData account address */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROGRAM_DATA_ACCOUNT_ADDRESS = 0x227; // 551
+export const SPL_GOVERNANCE_ERROR__INVALID_PROGRAM_DATA_ACCOUNT_ADDRESS = 0x2_27; // 551
 /** InvalidProgramDataAccountData: Invalid ProgramData account Data */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROGRAM_DATA_ACCOUNT_DATA = 0x228; // 552
+export const SPL_GOVERNANCE_ERROR__INVALID_PROGRAM_DATA_ACCOUNT_DATA = 0x2_28; // 552
 /** InvalidUpgradeAuthority: Provided upgrade authority doesn't match current program upgrade authority */
-export const SPL_GOVERNANCE_ERROR__INVALID_UPGRADE_AUTHORITY = 0x229; // 553
+export const SPL_GOVERNANCE_ERROR__INVALID_UPGRADE_AUTHORITY = 0x2_29; // 553
 /** UpgradeAuthorityMustSign: Current program upgrade authority must sign transaction */
-export const SPL_GOVERNANCE_ERROR__UPGRADE_AUTHORITY_MUST_SIGN = 0x22a; // 554
+export const SPL_GOVERNANCE_ERROR__UPGRADE_AUTHORITY_MUST_SIGN = 0x2_2a; // 554
 /** ProgramNotUpgradable: Given program is not upgradable */
-export const SPL_GOVERNANCE_ERROR__PROGRAM_NOT_UPGRADABLE = 0x22b; // 555
+export const SPL_GOVERNANCE_ERROR__PROGRAM_NOT_UPGRADABLE = 0x2_2b; // 555
 /** InvalidTokenOwner: Invalid token owner */
-export const SPL_GOVERNANCE_ERROR__INVALID_TOKEN_OWNER = 0x22c; // 556
+export const SPL_GOVERNANCE_ERROR__INVALID_TOKEN_OWNER = 0x2_2c; // 556
 /** TokenOwnerMustSign: Current token owner must sign transaction */
-export const SPL_GOVERNANCE_ERROR__TOKEN_OWNER_MUST_SIGN = 0x22d; // 557
+export const SPL_GOVERNANCE_ERROR__TOKEN_OWNER_MUST_SIGN = 0x2_2d; // 557
 /** VoteThresholdTypeNotSupported: Given VoteThresholdType is not supported */
-export const SPL_GOVERNANCE_ERROR__VOTE_THRESHOLD_TYPE_NOT_SUPPORTED = 0x22e; // 558
+export const SPL_GOVERNANCE_ERROR__VOTE_THRESHOLD_TYPE_NOT_SUPPORTED = 0x2_2e; // 558
 /** VoteWeightSourceNotSupported: Given VoteWeightSource is not supported */
-export const SPL_GOVERNANCE_ERROR__VOTE_WEIGHT_SOURCE_NOT_SUPPORTED = 0x22f; // 559
+export const SPL_GOVERNANCE_ERROR__VOTE_WEIGHT_SOURCE_NOT_SUPPORTED = 0x2_2f; // 559
 /** Legacy1: Legacy1 */
-export const SPL_GOVERNANCE_ERROR__LEGACY1 = 0x230; // 560
+export const SPL_GOVERNANCE_ERROR__LEGACY1 = 0x2_30; // 560
 /** GovernancePdaMustSign: Governance PDA must sign */
-export const SPL_GOVERNANCE_ERROR__GOVERNANCE_PDA_MUST_SIGN = 0x231; // 561
+export const SPL_GOVERNANCE_ERROR__GOVERNANCE_PDA_MUST_SIGN = 0x2_31; // 561
 /** TransactionAlreadyFlaggedWithError: Transaction already flagged with error */
-export const SPL_GOVERNANCE_ERROR__TRANSACTION_ALREADY_FLAGGED_WITH_ERROR = 0x232; // 562
+export const SPL_GOVERNANCE_ERROR__TRANSACTION_ALREADY_FLAGGED_WITH_ERROR = 0x2_32; // 562
 /** InvalidRealmForGovernance: Invalid Realm for Governance */
-export const SPL_GOVERNANCE_ERROR__INVALID_REALM_FOR_GOVERNANCE = 0x233; // 563
+export const SPL_GOVERNANCE_ERROR__INVALID_REALM_FOR_GOVERNANCE = 0x2_33; // 563
 /** InvalidAuthorityForRealm: Invalid Authority for Realm */
-export const SPL_GOVERNANCE_ERROR__INVALID_AUTHORITY_FOR_REALM = 0x234; // 564
+export const SPL_GOVERNANCE_ERROR__INVALID_AUTHORITY_FOR_REALM = 0x2_34; // 564
 /** RealmHasNoAuthority: Realm has no authority */
-export const SPL_GOVERNANCE_ERROR__REALM_HAS_NO_AUTHORITY = 0x235; // 565
+export const SPL_GOVERNANCE_ERROR__REALM_HAS_NO_AUTHORITY = 0x2_35; // 565
 /** RealmAuthorityMustSign: Realm authority must sign */
-export const SPL_GOVERNANCE_ERROR__REALM_AUTHORITY_MUST_SIGN = 0x236; // 566
+export const SPL_GOVERNANCE_ERROR__REALM_AUTHORITY_MUST_SIGN = 0x2_36; // 566
 /** InvalidGoverningTokenHoldingAccount: Invalid governing token holding account */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_HOLDING_ACCOUNT = 0x237; // 567
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_HOLDING_ACCOUNT = 0x2_37; // 567
 /** RealmCouncilMintChangeIsNotSupported: Realm council mint change is not supported */
-export const SPL_GOVERNANCE_ERROR__REALM_COUNCIL_MINT_CHANGE_IS_NOT_SUPPORTED = 0x238; // 568
+export const SPL_GOVERNANCE_ERROR__REALM_COUNCIL_MINT_CHANGE_IS_NOT_SUPPORTED = 0x2_38; // 568
 /** InvalidMaxVoterWeightAbsoluteValue: Invalid max voter weight absolute value */
-export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_ABSOLUTE_VALUE = 0x239; // 569
+export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_ABSOLUTE_VALUE = 0x2_39; // 569
 /** InvalidMaxVoterWeightSupplyFraction: Invalid max voter weight supply fraction */
-export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_SUPPLY_FRACTION = 0x23a; // 570
+export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_SUPPLY_FRACTION = 0x2_3a; // 570
 /** NotEnoughTokensToCreateGovernance: Owner doesn't have enough governing tokens to create Governance */
-export const SPL_GOVERNANCE_ERROR__NOT_ENOUGH_TOKENS_TO_CREATE_GOVERNANCE = 0x23b; // 571
+export const SPL_GOVERNANCE_ERROR__NOT_ENOUGH_TOKENS_TO_CREATE_GOVERNANCE = 0x2_3b; // 571
 /** TooManyOutstandingProposals: Too many outstanding proposals */
-export const SPL_GOVERNANCE_ERROR__TOO_MANY_OUTSTANDING_PROPOSALS = 0x23c; // 572
+export const SPL_GOVERNANCE_ERROR__TOO_MANY_OUTSTANDING_PROPOSALS = 0x2_3c; // 572
 /** AllProposalsMustBeFinalisedToWithdrawGoverningTokens: All proposals must be finalized to withdraw governing tokens */
-export const SPL_GOVERNANCE_ERROR__ALL_PROPOSALS_MUST_BE_FINALISED_TO_WITHDRAW_GOVERNING_TOKENS = 0x23d; // 573
+export const SPL_GOVERNANCE_ERROR__ALL_PROPOSALS_MUST_BE_FINALISED_TO_WITHDRAW_GOVERNING_TOKENS = 0x2_3d; // 573
 /** InvalidVoterWeightRecordForRealm: Invalid VoterWeightRecord for Realm */
-export const SPL_GOVERNANCE_ERROR__INVALID_VOTER_WEIGHT_RECORD_FOR_REALM = 0x23e; // 574
+export const SPL_GOVERNANCE_ERROR__INVALID_VOTER_WEIGHT_RECORD_FOR_REALM = 0x2_3e; // 574
 /** InvalidVoterWeightRecordForGoverningTokenMint: Invalid VoterWeightRecord for GoverningTokenMint */
-export const SPL_GOVERNANCE_ERROR__INVALID_VOTER_WEIGHT_RECORD_FOR_GOVERNING_TOKEN_MINT = 0x23f; // 575
+export const SPL_GOVERNANCE_ERROR__INVALID_VOTER_WEIGHT_RECORD_FOR_GOVERNING_TOKEN_MINT = 0x2_3f; // 575
 /** InvalidVoterWeightRecordForTokenOwner: Invalid VoterWeightRecord for TokenOwner */
-export const SPL_GOVERNANCE_ERROR__INVALID_VOTER_WEIGHT_RECORD_FOR_TOKEN_OWNER = 0x240; // 576
+export const SPL_GOVERNANCE_ERROR__INVALID_VOTER_WEIGHT_RECORD_FOR_TOKEN_OWNER = 0x2_40; // 576
 /** VoterWeightRecordExpired: VoterWeightRecord expired */
-export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_RECORD_EXPIRED = 0x241; // 577
+export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_RECORD_EXPIRED = 0x2_41; // 577
 /** InvalidRealmConfigForRealm: Invalid RealmConfig for Realm */
-export const SPL_GOVERNANCE_ERROR__INVALID_REALM_CONFIG_FOR_REALM = 0x242; // 578
+export const SPL_GOVERNANCE_ERROR__INVALID_REALM_CONFIG_FOR_REALM = 0x2_42; // 578
 /** TokenOwnerRecordAlreadyExists: TokenOwnerRecord already exists */
-export const SPL_GOVERNANCE_ERROR__TOKEN_OWNER_RECORD_ALREADY_EXISTS = 0x243; // 579
+export const SPL_GOVERNANCE_ERROR__TOKEN_OWNER_RECORD_ALREADY_EXISTS = 0x2_43; // 579
 /** GoverningTokenDepositsNotAllowed: Governing token deposits not allowed */
-export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_DEPOSITS_NOT_ALLOWED = 0x244; // 580
+export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_DEPOSITS_NOT_ALLOWED = 0x2_44; // 580
 /** InvalidVoteChoiceWeightPercentage: Invalid vote choice weight percentage */
-export const SPL_GOVERNANCE_ERROR__INVALID_VOTE_CHOICE_WEIGHT_PERCENTAGE = 0x245; // 581
+export const SPL_GOVERNANCE_ERROR__INVALID_VOTE_CHOICE_WEIGHT_PERCENTAGE = 0x2_45; // 581
 /** VoteTypeNotSupported: Vote type not supported */
-export const SPL_GOVERNANCE_ERROR__VOTE_TYPE_NOT_SUPPORTED = 0x246; // 582
+export const SPL_GOVERNANCE_ERROR__VOTE_TYPE_NOT_SUPPORTED = 0x2_46; // 582
 /** InvalidProposalOptions: Invalid proposal options */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_OPTIONS = 0x247; // 583
+export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_OPTIONS = 0x2_47; // 583
 /** ProposalIsNotExecutable: Proposal is not not executable */
-export const SPL_GOVERNANCE_ERROR__PROPOSAL_IS_NOT_EXECUTABLE = 0x248; // 584
+export const SPL_GOVERNANCE_ERROR__PROPOSAL_IS_NOT_EXECUTABLE = 0x2_48; // 584
 /** DenyVoteIsNotAllowed: Deny vote is not allowed */
-export const SPL_GOVERNANCE_ERROR__DENY_VOTE_IS_NOT_ALLOWED = 0x249; // 585
+export const SPL_GOVERNANCE_ERROR__DENY_VOTE_IS_NOT_ALLOWED = 0x2_49; // 585
 /** CannotExecuteDefeatedOption: Cannot execute defeated option */
-export const SPL_GOVERNANCE_ERROR__CANNOT_EXECUTE_DEFEATED_OPTION = 0x24a; // 586
+export const SPL_GOVERNANCE_ERROR__CANNOT_EXECUTE_DEFEATED_OPTION = 0x2_4a; // 586
 /** VoterWeightRecordInvalidAction: VoterWeightRecord invalid action */
-export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_RECORD_INVALID_ACTION = 0x24b; // 587
+export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_RECORD_INVALID_ACTION = 0x2_4b; // 587
 /** VoterWeightRecordInvalidActionTarget: VoterWeightRecord invalid action target */
-export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_RECORD_INVALID_ACTION_TARGET = 0x24c; // 588
+export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_RECORD_INVALID_ACTION_TARGET = 0x2_4c; // 588
 /** InvalidMaxVoterWeightRecordForRealm: Invalid MaxVoterWeightRecord for Realm */
-export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_RECORD_FOR_REALM = 0x24d; // 589
+export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_RECORD_FOR_REALM = 0x2_4d; // 589
 /** InvalidMaxVoterWeightRecordForGoverningTokenMint: Invalid MaxVoterWeightRecord for GoverningTokenMint */
-export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_RECORD_FOR_GOVERNING_TOKEN_MINT = 0x24e; // 590
+export const SPL_GOVERNANCE_ERROR__INVALID_MAX_VOTER_WEIGHT_RECORD_FOR_GOVERNING_TOKEN_MINT = 0x2_4e; // 590
 /** MaxVoterWeightRecordExpired: MaxVoterWeightRecord expired */
-export const SPL_GOVERNANCE_ERROR__MAX_VOTER_WEIGHT_RECORD_EXPIRED = 0x24f; // 591
+export const SPL_GOVERNANCE_ERROR__MAX_VOTER_WEIGHT_RECORD_EXPIRED = 0x2_4f; // 591
 /** NotSupportedVoteType: Not supported VoteType */
-export const SPL_GOVERNANCE_ERROR__NOT_SUPPORTED_VOTE_TYPE = 0x250; // 592
+export const SPL_GOVERNANCE_ERROR__NOT_SUPPORTED_VOTE_TYPE = 0x2_50; // 592
 /** RealmConfigChangeNotAllowed: RealmConfig change not allowed */
-export const SPL_GOVERNANCE_ERROR__REALM_CONFIG_CHANGE_NOT_ALLOWED = 0x251; // 593
+export const SPL_GOVERNANCE_ERROR__REALM_CONFIG_CHANGE_NOT_ALLOWED = 0x2_51; // 593
 /** GovernanceConfigChangeNotAllowed: GovernanceConfig change not allowed */
-export const SPL_GOVERNANCE_ERROR__GOVERNANCE_CONFIG_CHANGE_NOT_ALLOWED = 0x252; // 594
+export const SPL_GOVERNANCE_ERROR__GOVERNANCE_CONFIG_CHANGE_NOT_ALLOWED = 0x2_52; // 594
 /** AtLeastOneVoteThresholdRequired: At least one VoteThreshold is required */
-export const SPL_GOVERNANCE_ERROR__AT_LEAST_ONE_VOTE_THRESHOLD_REQUIRED = 0x253; // 595
+export const SPL_GOVERNANCE_ERROR__AT_LEAST_ONE_VOTE_THRESHOLD_REQUIRED = 0x2_53; // 595
 /** ReservedBufferMustBeEmpty: Reserved buffer must be empty */
-export const SPL_GOVERNANCE_ERROR__RESERVED_BUFFER_MUST_BE_EMPTY = 0x254; // 596
+export const SPL_GOVERNANCE_ERROR__RESERVED_BUFFER_MUST_BE_EMPTY = 0x2_54; // 596
 /** CannotRelinquishInFinalizingState: Cannot Relinquish in Finalizing state */
-export const SPL_GOVERNANCE_ERROR__CANNOT_RELINQUISH_IN_FINALIZING_STATE = 0x255; // 597
+export const SPL_GOVERNANCE_ERROR__CANNOT_RELINQUISH_IN_FINALIZING_STATE = 0x2_55; // 597
 /** InvalidRealmConfigAddress: Invalid RealmConfig account address */
-export const SPL_GOVERNANCE_ERROR__INVALID_REALM_CONFIG_ADDRESS = 0x256; // 598
+export const SPL_GOVERNANCE_ERROR__INVALID_REALM_CONFIG_ADDRESS = 0x2_56; // 598
 /** CannotDepositDormantTokens: Cannot deposit dormant tokens */
-export const SPL_GOVERNANCE_ERROR__CANNOT_DEPOSIT_DORMANT_TOKENS = 0x257; // 599
+export const SPL_GOVERNANCE_ERROR__CANNOT_DEPOSIT_DORMANT_TOKENS = 0x2_57; // 599
 /** CannotWithdrawMembershipTokens: Cannot withdraw membership tokens */
-export const SPL_GOVERNANCE_ERROR__CANNOT_WITHDRAW_MEMBERSHIP_TOKENS = 0x258; // 600
+export const SPL_GOVERNANCE_ERROR__CANNOT_WITHDRAW_MEMBERSHIP_TOKENS = 0x2_58; // 600
 /** CannotRevokeGoverningTokens: Cannot revoke GoverningTokens */
-export const SPL_GOVERNANCE_ERROR__CANNOT_REVOKE_GOVERNING_TOKENS = 0x259; // 601
+export const SPL_GOVERNANCE_ERROR__CANNOT_REVOKE_GOVERNING_TOKENS = 0x2_59; // 601
 /** InvalidRevokeAmount: Invalid Revoke amount */
-export const SPL_GOVERNANCE_ERROR__INVALID_REVOKE_AMOUNT = 0x25a; // 602
+export const SPL_GOVERNANCE_ERROR__INVALID_REVOKE_AMOUNT = 0x2_5a; // 602
 /** InvalidGoverningTokenSource: Invalid GoverningToken source */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_SOURCE = 0x25b; // 603
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNING_TOKEN_SOURCE = 0x2_5b; // 603
 /** CannotChangeCommunityTokenTypeToMembership: Cannot change community TokenType to Membership */
-export const SPL_GOVERNANCE_ERROR__CANNOT_CHANGE_COMMUNITY_TOKEN_TYPE_TO_MEMBERSHIP = 0x25c; // 604
+export const SPL_GOVERNANCE_ERROR__CANNOT_CHANGE_COMMUNITY_TOKEN_TYPE_TO_MEMBERSHIP = 0x2_5c; // 604
 /** VoterWeightThresholdDisabled: Voter weight threshold disabled */
-export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_THRESHOLD_DISABLED = 0x25d; // 605
+export const SPL_GOVERNANCE_ERROR__VOTER_WEIGHT_THRESHOLD_DISABLED = 0x2_5d; // 605
 /** VoteNotAllowedInCoolOffTime: Vote not allowed in cool off time */
-export const SPL_GOVERNANCE_ERROR__VOTE_NOT_ALLOWED_IN_COOL_OFF_TIME = 0x25e; // 606
+export const SPL_GOVERNANCE_ERROR__VOTE_NOT_ALLOWED_IN_COOL_OFF_TIME = 0x2_5e; // 606
 /** CannotRefundProposalDeposit: Cannot refund ProposalDeposit */
-export const SPL_GOVERNANCE_ERROR__CANNOT_REFUND_PROPOSAL_DEPOSIT = 0x25f; // 607
+export const SPL_GOVERNANCE_ERROR__CANNOT_REFUND_PROPOSAL_DEPOSIT = 0x2_5f; // 607
 /** InvalidProposalForProposalDeposit: Invalid Proposal for ProposalDeposit */
-export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_FOR_PROPOSAL_DEPOSIT = 0x260; // 608
+export const SPL_GOVERNANCE_ERROR__INVALID_PROPOSAL_FOR_PROPOSAL_DEPOSIT = 0x2_60; // 608
 /** InvalidDepositExemptProposalCount: Invalid deposit_exempt_proposal_count */
-export const SPL_GOVERNANCE_ERROR__INVALID_DEPOSIT_EXEMPT_PROPOSAL_COUNT = 0x261; // 609
+export const SPL_GOVERNANCE_ERROR__INVALID_DEPOSIT_EXEMPT_PROPOSAL_COUNT = 0x2_61; // 609
 /** GoverningTokenMintNotAllowedToVote: GoverningTokenMint not allowed to vote */
-export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_MINT_NOT_ALLOWED_TO_VOTE = 0x262; // 610
+export const SPL_GOVERNANCE_ERROR__GOVERNING_TOKEN_MINT_NOT_ALLOWED_TO_VOTE = 0x2_62; // 610
 /** InvalidDepositPayerForProposalDeposit: Invalid deposit Payer for ProposalDeposit */
-export const SPL_GOVERNANCE_ERROR__INVALID_DEPOSIT_PAYER_FOR_PROPOSAL_DEPOSIT = 0x263; // 611
+export const SPL_GOVERNANCE_ERROR__INVALID_DEPOSIT_PAYER_FOR_PROPOSAL_DEPOSIT = 0x2_63; // 611
 /** InvalidStateNotFinal: Invalid State: Proposal is not in final state */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_NOT_FINAL = 0x264; // 612
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_NOT_FINAL = 0x2_64; // 612
 /** InvalidStateToCompleteProposal: Invalid state for proposal state transition to Completed */
-export const SPL_GOVERNANCE_ERROR__INVALID_STATE_TO_COMPLETE_PROPOSAL = 0x265; // 613
+export const SPL_GOVERNANCE_ERROR__INVALID_STATE_TO_COMPLETE_PROPOSAL = 0x2_65; // 613
 /** InvalidNumberOfVoteChoices: Invalid number of vote choices */
-export const SPL_GOVERNANCE_ERROR__INVALID_NUMBER_OF_VOTE_CHOICES = 0x266; // 614
+export const SPL_GOVERNANCE_ERROR__INVALID_NUMBER_OF_VOTE_CHOICES = 0x2_66; // 614
 /** RankedVoteIsNotSupported: Ranked vote is not supported */
-export const SPL_GOVERNANCE_ERROR__RANKED_VOTE_IS_NOT_SUPPORTED = 0x267; // 615
+export const SPL_GOVERNANCE_ERROR__RANKED_VOTE_IS_NOT_SUPPORTED = 0x2_67; // 615
 /** ChoiceWeightMustBe100Percent: Choice weight must be 100% */
-export const SPL_GOVERNANCE_ERROR__CHOICE_WEIGHT_MUST_BE100_PERCENT = 0x268; // 616
+export const SPL_GOVERNANCE_ERROR__CHOICE_WEIGHT_MUST_BE100_PERCENT = 0x2_68; // 616
 /** SingleChoiceOnlyIsAllowed: Single choice only is allowed */
-export const SPL_GOVERNANCE_ERROR__SINGLE_CHOICE_ONLY_IS_ALLOWED = 0x269; // 617
+export const SPL_GOVERNANCE_ERROR__SINGLE_CHOICE_ONLY_IS_ALLOWED = 0x2_69; // 617
 /** AtLeastSingleChoiceIsRequired: At least single choice is required */
-export const SPL_GOVERNANCE_ERROR__AT_LEAST_SINGLE_CHOICE_IS_REQUIRED = 0x26a; // 618
+export const SPL_GOVERNANCE_ERROR__AT_LEAST_SINGLE_CHOICE_IS_REQUIRED = 0x2_6a; // 618
 /** TotalVoteWeightMustBe100Percent: Total vote weight must be 100% */
-export const SPL_GOVERNANCE_ERROR__TOTAL_VOTE_WEIGHT_MUST_BE100_PERCENT = 0x26b; // 619
+export const SPL_GOVERNANCE_ERROR__TOTAL_VOTE_WEIGHT_MUST_BE100_PERCENT = 0x2_6b; // 619
 /** InvalidMultiChoiceProposalParameters: Invalid multi choice proposal parameters */
-export const SPL_GOVERNANCE_ERROR__INVALID_MULTI_CHOICE_PROPOSAL_PARAMETERS = 0x26c; // 620
+export const SPL_GOVERNANCE_ERROR__INVALID_MULTI_CHOICE_PROPOSAL_PARAMETERS = 0x2_6c; // 620
 /** InvalidGovernanceForRequiredSignatory: Invalid Governance for RequiredSignatory */
-export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNANCE_FOR_REQUIRED_SIGNATORY = 0x26d; // 621
+export const SPL_GOVERNANCE_ERROR__INVALID_GOVERNANCE_FOR_REQUIRED_SIGNATORY = 0x2_6d; // 621
 /** SignatoryRecordAlreadyExists: Signatory Record has already been created */
-export const SPL_GOVERNANCE_ERROR__SIGNATORY_RECORD_ALREADY_EXISTS = 0x26e; // 622
+export const SPL_GOVERNANCE_ERROR__SIGNATORY_RECORD_ALREADY_EXISTS = 0x2_6e; // 622
 /** InstructionDeprecated: Instruction has been removed */
-export const SPL_GOVERNANCE_ERROR__INSTRUCTION_DEPRECATED = 0x26f; // 623
+export const SPL_GOVERNANCE_ERROR__INSTRUCTION_DEPRECATED = 0x2_6f; // 623
 /** MissingRequiredSignatories: Proposal is missing required signatories */
-export const SPL_GOVERNANCE_ERROR__MISSING_REQUIRED_SIGNATORIES = 0x270; // 624
+export const SPL_GOVERNANCE_ERROR__MISSING_REQUIRED_SIGNATORIES = 0x2_70; // 624
 
 export type SplGovernanceError =
   | typeof SPL_GOVERNANCE_ERROR__ALL_PROPOSALS_MUST_BE_FINALISED_TO_WITHDRAW_GOVERNING_TOKENS
@@ -393,7 +393,7 @@ export type SplGovernanceError =
   | typeof SPL_GOVERNANCE_ERROR__VOTE_WEIGHT_SOURCE_NOT_SUPPORTED;
 
 let splGovernanceErrorMessages: Record<SplGovernanceError, string> | undefined;
-if (true) {
+if (process.env.NODE_ENV !== "production") {
   splGovernanceErrorMessages = {
     [SPL_GOVERNANCE_ERROR__ALL_PROPOSALS_MUST_BE_FINALISED_TO_WITHDRAW_GOVERNING_TOKENS]:
       "All proposals must be finalized to withdraw governing tokens",
@@ -623,7 +623,7 @@ if (true) {
 }
 
 export function getSplGovernanceErrorMessage(code: SplGovernanceError): string {
-  if (true) {
+  if (process.env.NODE_ENV !== "production") {
     return splGovernanceErrorMessages![code];
   }
 

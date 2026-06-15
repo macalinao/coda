@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { BurnArgs, BurnArgsArgs } from "../types/index.js";
 import {
   address,
@@ -31,11 +31,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import { getBurnArgsDecoder, getBurnArgsEncoder } from "../types/index.js";
 
 export const BURN_DISCRIMINATOR = 41;
@@ -292,7 +297,7 @@ export async function getBurnInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -302,7 +307,10 @@ export async function getBurnInstructionAsync<
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -321,20 +329,20 @@ export async function getBurnInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.collectionMetadata),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.token),
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.masterEditionMint),
-      getAccountMeta(accounts.masterEditionToken),
-      getAccountMeta(accounts.editionMarker),
-      getAccountMeta(accounts.tokenRecord),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.sysvarInstructions),
-      getAccountMeta(accounts.splTokenProgram),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("collectionMetadata", accounts.collectionMetadata),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("token", accounts.token),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("masterEditionMint", accounts.masterEditionMint),
+      getAccountMeta("masterEditionToken", accounts.masterEditionToken),
+      getAccountMeta("editionMarker", accounts.editionMarker),
+      getAccountMeta("tokenRecord", accounts.tokenRecord),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("sysvarInstructions", accounts.sysvarInstructions),
+      getAccountMeta("splTokenProgram", accounts.splTokenProgram),
     ],
     data: getBurnInstructionDataEncoder().encode(
       args as BurnInstructionDataArgs,
@@ -495,7 +503,7 @@ export function getBurnInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -518,20 +526,20 @@ export function getBurnInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.collectionMetadata),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.edition),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.token),
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.masterEditionMint),
-      getAccountMeta(accounts.masterEditionToken),
-      getAccountMeta(accounts.editionMarker),
-      getAccountMeta(accounts.tokenRecord),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.sysvarInstructions),
-      getAccountMeta(accounts.splTokenProgram),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("collectionMetadata", accounts.collectionMetadata),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("edition", accounts.edition),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("token", accounts.token),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("masterEditionMint", accounts.masterEditionMint),
+      getAccountMeta("masterEditionToken", accounts.masterEditionToken),
+      getAccountMeta("editionMarker", accounts.editionMarker),
+      getAccountMeta("tokenRecord", accounts.tokenRecord),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("sysvarInstructions", accounts.sysvarInstructions),
+      getAccountMeta("splTokenProgram", accounts.splTokenProgram),
     ],
     data: getBurnInstructionDataEncoder().encode(
       args as BurnInstructionDataArgs,
@@ -603,8 +611,13 @@ export function parseBurnInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedBurnInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 14) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 14,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

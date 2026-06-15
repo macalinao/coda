@@ -19,17 +19,19 @@ import type {
   ReadonlyUint8Array,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const REFUND_PROPOSAL_DEPOSIT_DISCRIMINATOR = 27;
 
@@ -64,7 +66,7 @@ export interface RefundProposalDepositInstructionData {
   discriminator: number;
 }
 
-export interface RefundProposalDepositInstructionDataArgs {}
+export type RefundProposalDepositInstructionDataArgs = {};
 
 export function getRefundProposalDepositInstructionDataEncoder(): FixedSizeEncoder<RefundProposalDepositInstructionDataArgs> {
   return transformEncoder(
@@ -141,15 +143,15 @@ export function getRefundProposalDepositInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.proposalAccount),
-      getAccountMeta(accounts.proposalDepositAccount),
-      getAccountMeta(accounts.proposalDepositPayer),
+      getAccountMeta("proposalAccount", accounts.proposalAccount),
+      getAccountMeta("proposalDepositAccount", accounts.proposalDepositAccount),
+      getAccountMeta("proposalDepositPayer", accounts.proposalDepositPayer),
     ],
     data: getRefundProposalDepositInstructionDataEncoder().encode({}),
     programAddress,
@@ -185,8 +187,13 @@ export function parseRefundProposalDepositInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRefundProposalDepositInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 3) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 3,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

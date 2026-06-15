@@ -18,7 +18,7 @@ import type {
   ReadonlyAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -29,10 +29,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const LOG_VOTER_INFO_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   171, 72, 233, 90, 143, 151, 113, 51,
@@ -132,7 +134,7 @@ export function getLogVoterInfoInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -141,8 +143,8 @@ export function getLogVoterInfoInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.registrar),
-      getAccountMeta(accounts.voter),
+      getAccountMeta("registrar", accounts.registrar),
+      getAccountMeta("voter", accounts.voter),
     ],
     data: getLogVoterInfoInstructionDataEncoder().encode(
       args as LogVoterInfoInstructionDataArgs,
@@ -176,8 +178,13 @@ export function parseLogVoterInfoInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedLogVoterInfoInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

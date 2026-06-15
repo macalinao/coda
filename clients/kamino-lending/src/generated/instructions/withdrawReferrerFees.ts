@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,11 +31,16 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_REFERRER_FEES_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([171, 118, 121, 201, 233, 140, 23, 228]);
@@ -100,7 +105,7 @@ export interface WithdrawReferrerFeesInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface WithdrawReferrerFeesInstructionDataArgs {}
+export type WithdrawReferrerFeesInstructionDataArgs = {};
 
 export function getWithdrawReferrerFeesInstructionDataEncoder(): FixedSizeEncoder<WithdrawReferrerFeesInstructionDataArgs> {
   return transformEncoder(
@@ -221,13 +226,16 @@ export async function getWithdrawReferrerFeesInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
     accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: expectAddress(accounts.lendingMarket.value),
+      lendingMarket: getAddressFromResolvedInstructionAccount(
+        "lendingMarket",
+        accounts.lendingMarket.value,
+      ),
     });
   }
   if (!accounts.tokenProgram.value) {
@@ -238,15 +246,15 @@ export async function getWithdrawReferrerFeesInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.referrer),
-      getAccountMeta(accounts.referrerTokenState),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.reserveLiquidityMint),
-      getAccountMeta(accounts.reserveSupplyLiquidity),
-      getAccountMeta(accounts.referrerTokenAccount),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("referrer", accounts.referrer),
+      getAccountMeta("referrerTokenState", accounts.referrerTokenState),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("reserveLiquidityMint", accounts.reserveLiquidityMint),
+      getAccountMeta("reserveSupplyLiquidity", accounts.reserveSupplyLiquidity),
+      getAccountMeta("referrerTokenAccount", accounts.referrerTokenAccount),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawReferrerFeesInstructionDataEncoder().encode({}),
     programAddress,
@@ -355,7 +363,7 @@ export function getWithdrawReferrerFeesInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -367,15 +375,15 @@ export function getWithdrawReferrerFeesInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.referrer),
-      getAccountMeta(accounts.referrerTokenState),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.reserveLiquidityMint),
-      getAccountMeta(accounts.reserveSupplyLiquidity),
-      getAccountMeta(accounts.referrerTokenAccount),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.lendingMarketAuthority),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("referrer", accounts.referrer),
+      getAccountMeta("referrerTokenState", accounts.referrerTokenState),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta("reserveLiquidityMint", accounts.reserveLiquidityMint),
+      getAccountMeta("reserveSupplyLiquidity", accounts.reserveSupplyLiquidity),
+      getAccountMeta("referrerTokenAccount", accounts.referrerTokenAccount),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("lendingMarketAuthority", accounts.lendingMarketAuthority),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawReferrerFeesInstructionDataEncoder().encode({}),
     programAddress,
@@ -421,8 +429,13 @@ export function parseWithdrawReferrerFeesInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawReferrerFeesInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

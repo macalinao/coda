@@ -6,8 +6,57 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ReadonlyUint8Array } from "@solana/kit";
 import type {
+  Address,
+  ClientWithPayer,
+  ClientWithRpc,
+  ClientWithTransactionPlanning,
+  ClientWithTransactionSending,
+  GetAccountInfoApi,
+  GetMultipleAccountsApi,
+  Instruction,
+  InstructionWithData,
+  ReadonlyUint8Array,
+} from "@solana/kit";
+import type {
+  SelfFetchFunctions,
+  SelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import type {
+  ClaimFeeOperator,
+  ClaimFeeOperatorArgs,
+  Config,
+  ConfigArgs,
+  Pool,
+  PoolArgs,
+  Position,
+  PositionArgs,
+  TokenBadge,
+  TokenBadgeArgs,
+  Vesting,
+  VestingArgs,
+} from "../accounts/index.js";
+import type {
+  AddLiquidityAsyncInput,
+  ClaimPartnerFeeAsyncInput,
+  ClaimPositionFeeAsyncInput,
+  ClaimProtocolFeeAsyncInput,
+  ClaimRewardAsyncInput,
+  CloseClaimFeeOperatorAsyncInput,
+  CloseConfigAsyncInput,
+  ClosePositionAsyncInput,
+  CloseTokenBadgeAsyncInput,
+  CreateClaimFeeOperatorAsyncInput,
+  CreateConfigAsyncInput,
+  CreateDynamicConfigAsyncInput,
+  CreatePositionAsyncInput,
+  CreateTokenBadgeAsyncInput,
+  FundRewardAsyncInput,
+  InitializeCustomizablePoolAsyncInput,
+  InitializePoolAsyncInput,
+  InitializePoolWithDynamicConfigAsyncInput,
+  InitializeRewardAsyncInput,
+  LockPositionAsyncInput,
   ParsedAddLiquidityInstruction,
   ParsedClaimPartnerFeeInstruction,
   ParsedClaimPositionFeeInstruction,
@@ -40,8 +89,121 @@ import type {
   ParsedUpdateRewardDurationInstruction,
   ParsedUpdateRewardFunderInstruction,
   ParsedWithdrawIneligibleRewardInstruction,
+  PermanentLockPositionAsyncInput,
+  RefreshVestingInput,
+  RemoveAllLiquidityAsyncInput,
+  RemoveLiquidityAsyncInput,
+  SetPoolStatusAsyncInput,
+  SplitPosition2AsyncInput,
+  SplitPositionAsyncInput,
+  Swap2AsyncInput,
+  SwapAsyncInput,
+  UpdateRewardDurationAsyncInput,
+  UpdateRewardFunderAsyncInput,
+  WithdrawIneligibleRewardAsyncInput,
 } from "../instructions/index.js";
-import { containsBytes, fixEncoderSize, getBytesEncoder } from "@solana/kit";
+import {
+  assertIsInstructionWithAccounts,
+  containsBytes,
+  extendClient,
+  fixEncoderSize,
+  getBytesEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+  SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+  SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+  SolanaError,
+} from "@solana/kit";
+import {
+  addSelfFetchFunctions,
+  addSelfPlanAndSendFunctions,
+} from "@solana/program-client-core";
+import {
+  getClaimFeeOperatorCodec,
+  getConfigCodec,
+  getPoolCodec,
+  getPositionCodec,
+  getTokenBadgeCodec,
+  getVestingCodec,
+} from "../accounts/index.js";
+import {
+  getAddLiquidityInstructionAsync,
+  getClaimPartnerFeeInstructionAsync,
+  getClaimPositionFeeInstructionAsync,
+  getClaimProtocolFeeInstructionAsync,
+  getClaimRewardInstructionAsync,
+  getCloseClaimFeeOperatorInstructionAsync,
+  getCloseConfigInstructionAsync,
+  getClosePositionInstructionAsync,
+  getCloseTokenBadgeInstructionAsync,
+  getCreateClaimFeeOperatorInstructionAsync,
+  getCreateConfigInstructionAsync,
+  getCreateDynamicConfigInstructionAsync,
+  getCreatePositionInstructionAsync,
+  getCreateTokenBadgeInstructionAsync,
+  getFundRewardInstructionAsync,
+  getInitializeCustomizablePoolInstructionAsync,
+  getInitializePoolInstructionAsync,
+  getInitializePoolWithDynamicConfigInstructionAsync,
+  getInitializeRewardInstructionAsync,
+  getLockPositionInstructionAsync,
+  getPermanentLockPositionInstructionAsync,
+  getRefreshVestingInstruction,
+  getRemoveAllLiquidityInstructionAsync,
+  getRemoveLiquidityInstructionAsync,
+  getSetPoolStatusInstructionAsync,
+  getSplitPosition2InstructionAsync,
+  getSplitPositionInstructionAsync,
+  getSwap2InstructionAsync,
+  getSwapInstructionAsync,
+  getUpdateRewardDurationInstructionAsync,
+  getUpdateRewardFunderInstructionAsync,
+  getWithdrawIneligibleRewardInstructionAsync,
+  parseAddLiquidityInstruction,
+  parseClaimPartnerFeeInstruction,
+  parseClaimPositionFeeInstruction,
+  parseClaimProtocolFeeInstruction,
+  parseClaimRewardInstruction,
+  parseCloseClaimFeeOperatorInstruction,
+  parseCloseConfigInstruction,
+  parseClosePositionInstruction,
+  parseCloseTokenBadgeInstruction,
+  parseCreateClaimFeeOperatorInstruction,
+  parseCreateConfigInstruction,
+  parseCreateDynamicConfigInstruction,
+  parseCreatePositionInstruction,
+  parseCreateTokenBadgeInstruction,
+  parseFundRewardInstruction,
+  parseInitializeCustomizablePoolInstruction,
+  parseInitializePoolInstruction,
+  parseInitializePoolWithDynamicConfigInstruction,
+  parseInitializeRewardInstruction,
+  parseLockPositionInstruction,
+  parsePermanentLockPositionInstruction,
+  parseRefreshVestingInstruction,
+  parseRemoveAllLiquidityInstruction,
+  parseRemoveLiquidityInstruction,
+  parseSetPoolStatusInstruction,
+  parseSplitPosition2Instruction,
+  parseSplitPositionInstruction,
+  parseSwap2Instruction,
+  parseSwapInstruction,
+  parseUpdateRewardDurationInstruction,
+  parseUpdateRewardFunderInstruction,
+  parseWithdrawIneligibleRewardInstruction,
+} from "../instructions/index.js";
+import {
+  findClaimFeeOperatorPda,
+  findConfigPda,
+  findCustomizablePoolPda,
+  findEventAuthorityPda,
+  findPoolAuthorityPda,
+  findPoolPda,
+  findPositionNftAccountPda,
+  findPositionPda,
+  findRewardVaultPda,
+  findTokenBadgePda,
+  findTokenVaultPda,
+} from "../pdas/index.js";
 
 export const CP_AMM_PROGRAM_ADDRESS =
   "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
@@ -125,8 +287,9 @@ export function identifyCpAmmAccount(
   ) {
     return CpAmmAccount.Vesting;
   }
-  throw new Error(
-    "The provided account could not be identified as a cpAmm account.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT,
+    { accountData: data, programName: "cpAmm" },
   );
 }
 
@@ -521,8 +684,9 @@ export function identifyCpAmmInstruction(
   ) {
     return CpAmmInstruction.WithdrawIneligibleReward;
   }
-  throw new Error(
-    "The provided instruction could not be identified as a cpAmm instruction.",
+  throw new SolanaError(
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    { instructionData: data, programName: "cpAmm" },
   );
 }
 
@@ -625,3 +789,633 @@ export type ParsedCpAmmInstruction<
   | ({
       instructionType: CpAmmInstruction.WithdrawIneligibleReward;
     } & ParsedWithdrawIneligibleRewardInstruction<TProgram>);
+
+export function parseCpAmmInstruction<TProgram extends string>(
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedCpAmmInstruction<TProgram> {
+  const instructionType = identifyCpAmmInstruction(instruction);
+  switch (instructionType) {
+    case CpAmmInstruction.AddLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.AddLiquidity,
+        ...parseAddLiquidityInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.ClaimPartnerFee: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.ClaimPartnerFee,
+        ...parseClaimPartnerFeeInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.ClaimPositionFee: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.ClaimPositionFee,
+        ...parseClaimPositionFeeInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.ClaimProtocolFee: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.ClaimProtocolFee,
+        ...parseClaimProtocolFeeInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.ClaimReward: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.ClaimReward,
+        ...parseClaimRewardInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CloseClaimFeeOperator: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CloseClaimFeeOperator,
+        ...parseCloseClaimFeeOperatorInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CloseConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CloseConfig,
+        ...parseCloseConfigInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.ClosePosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.ClosePosition,
+        ...parseClosePositionInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CloseTokenBadge: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CloseTokenBadge,
+        ...parseCloseTokenBadgeInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CreateClaimFeeOperator: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CreateClaimFeeOperator,
+        ...parseCreateClaimFeeOperatorInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CreateConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CreateConfig,
+        ...parseCreateConfigInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CreateDynamicConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CreateDynamicConfig,
+        ...parseCreateDynamicConfigInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CreatePosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CreatePosition,
+        ...parseCreatePositionInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.CreateTokenBadge: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.CreateTokenBadge,
+        ...parseCreateTokenBadgeInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.FundReward: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.FundReward,
+        ...parseFundRewardInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.InitializeCustomizablePool: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.InitializeCustomizablePool,
+        ...parseInitializeCustomizablePoolInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.InitializePool: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.InitializePool,
+        ...parseInitializePoolInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.InitializePoolWithDynamicConfig: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.InitializePoolWithDynamicConfig,
+        ...parseInitializePoolWithDynamicConfigInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.InitializeReward: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.InitializeReward,
+        ...parseInitializeRewardInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.LockPosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.LockPosition,
+        ...parseLockPositionInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.PermanentLockPosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.PermanentLockPosition,
+        ...parsePermanentLockPositionInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.RefreshVesting: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.RefreshVesting,
+        ...parseRefreshVestingInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.RemoveAllLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.RemoveAllLiquidity,
+        ...parseRemoveAllLiquidityInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.RemoveLiquidity: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.RemoveLiquidity,
+        ...parseRemoveLiquidityInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.SetPoolStatus: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.SetPoolStatus,
+        ...parseSetPoolStatusInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.SplitPosition: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.SplitPosition,
+        ...parseSplitPositionInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.SplitPosition2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.SplitPosition2,
+        ...parseSplitPosition2Instruction(instruction),
+      };
+    }
+    case CpAmmInstruction.Swap: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.Swap,
+        ...parseSwapInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.Swap2: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.Swap2,
+        ...parseSwap2Instruction(instruction),
+      };
+    }
+    case CpAmmInstruction.UpdateRewardDuration: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.UpdateRewardDuration,
+        ...parseUpdateRewardDurationInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.UpdateRewardFunder: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.UpdateRewardFunder,
+        ...parseUpdateRewardFunderInstruction(instruction),
+      };
+    }
+    case CpAmmInstruction.WithdrawIneligibleReward: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: CpAmmInstruction.WithdrawIneligibleReward,
+        ...parseWithdrawIneligibleRewardInstruction(instruction),
+      };
+    }
+    default:
+      throw new SolanaError(
+        SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+        { instructionType: instructionType as string, programName: "cpAmm" },
+      );
+  }
+}
+
+export interface CpAmmPlugin {
+  accounts: CpAmmPluginAccounts;
+  instructions: CpAmmPluginInstructions;
+  pdas: CpAmmPluginPdas;
+}
+
+export interface CpAmmPluginAccounts {
+  claimFeeOperator: ReturnType<typeof getClaimFeeOperatorCodec> &
+    SelfFetchFunctions<ClaimFeeOperatorArgs, ClaimFeeOperator>;
+  config: ReturnType<typeof getConfigCodec> &
+    SelfFetchFunctions<ConfigArgs, Config>;
+  pool: ReturnType<typeof getPoolCodec> & SelfFetchFunctions<PoolArgs, Pool>;
+  position: ReturnType<typeof getPositionCodec> &
+    SelfFetchFunctions<PositionArgs, Position>;
+  tokenBadge: ReturnType<typeof getTokenBadgeCodec> &
+    SelfFetchFunctions<TokenBadgeArgs, TokenBadge>;
+  vesting: ReturnType<typeof getVestingCodec> &
+    SelfFetchFunctions<VestingArgs, Vesting>;
+}
+
+export interface CpAmmPluginInstructions {
+  addLiquidity: (
+    input: AddLiquidityAsyncInput,
+  ) => ReturnType<typeof getAddLiquidityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  claimPartnerFee: (
+    input: ClaimPartnerFeeAsyncInput,
+  ) => ReturnType<typeof getClaimPartnerFeeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  claimPositionFee: (
+    input: ClaimPositionFeeAsyncInput,
+  ) => ReturnType<typeof getClaimPositionFeeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  claimProtocolFee: (
+    input: ClaimProtocolFeeAsyncInput,
+  ) => ReturnType<typeof getClaimProtocolFeeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  claimReward: (
+    input: ClaimRewardAsyncInput,
+  ) => ReturnType<typeof getClaimRewardInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  closeClaimFeeOperator: (
+    input: CloseClaimFeeOperatorAsyncInput,
+  ) => ReturnType<typeof getCloseClaimFeeOperatorInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  closeConfig: (
+    input: CloseConfigAsyncInput,
+  ) => ReturnType<typeof getCloseConfigInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  closePosition: (
+    input: ClosePositionAsyncInput,
+  ) => ReturnType<typeof getClosePositionInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  closeTokenBadge: (
+    input: CloseTokenBadgeAsyncInput,
+  ) => ReturnType<typeof getCloseTokenBadgeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createClaimFeeOperator: (
+    input: CreateClaimFeeOperatorAsyncInput,
+  ) => ReturnType<typeof getCreateClaimFeeOperatorInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createConfig: (
+    input: CreateConfigAsyncInput,
+  ) => ReturnType<typeof getCreateConfigInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createDynamicConfig: (
+    input: CreateDynamicConfigAsyncInput,
+  ) => ReturnType<typeof getCreateDynamicConfigInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createPosition: (
+    input: MakeOptional<CreatePositionAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreatePositionInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  createTokenBadge: (
+    input: CreateTokenBadgeAsyncInput,
+  ) => ReturnType<typeof getCreateTokenBadgeInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  fundReward: (
+    input: FundRewardAsyncInput,
+  ) => ReturnType<typeof getFundRewardInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initializeCustomizablePool: (
+    input: MakeOptional<InitializeCustomizablePoolAsyncInput, "payer">,
+  ) => ReturnType<typeof getInitializeCustomizablePoolInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initializePool: (
+    input: MakeOptional<InitializePoolAsyncInput, "payer">,
+  ) => ReturnType<typeof getInitializePoolInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initializePoolWithDynamicConfig: (
+    input: MakeOptional<InitializePoolWithDynamicConfigAsyncInput, "payer">,
+  ) => ReturnType<typeof getInitializePoolWithDynamicConfigInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  initializeReward: (
+    input: MakeOptional<InitializeRewardAsyncInput, "payer">,
+  ) => ReturnType<typeof getInitializeRewardInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  lockPosition: (
+    input: MakeOptional<LockPositionAsyncInput, "payer">,
+  ) => ReturnType<typeof getLockPositionInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  permanentLockPosition: (
+    input: PermanentLockPositionAsyncInput,
+  ) => ReturnType<typeof getPermanentLockPositionInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  refreshVesting: (
+    input: RefreshVestingInput,
+  ) => ReturnType<typeof getRefreshVestingInstruction> &
+    SelfPlanAndSendFunctions;
+  removeAllLiquidity: (
+    input: RemoveAllLiquidityAsyncInput,
+  ) => ReturnType<typeof getRemoveAllLiquidityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  removeLiquidity: (
+    input: RemoveLiquidityAsyncInput,
+  ) => ReturnType<typeof getRemoveLiquidityInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  setPoolStatus: (
+    input: SetPoolStatusAsyncInput,
+  ) => ReturnType<typeof getSetPoolStatusInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  splitPosition: (
+    input: SplitPositionAsyncInput,
+  ) => ReturnType<typeof getSplitPositionInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  splitPosition2: (
+    input: SplitPosition2AsyncInput,
+  ) => ReturnType<typeof getSplitPosition2InstructionAsync> &
+    SelfPlanAndSendFunctions;
+  swap: (
+    input: MakeOptional<SwapAsyncInput, "payer">,
+  ) => ReturnType<typeof getSwapInstructionAsync> & SelfPlanAndSendFunctions;
+  swap2: (
+    input: MakeOptional<Swap2AsyncInput, "payer">,
+  ) => ReturnType<typeof getSwap2InstructionAsync> & SelfPlanAndSendFunctions;
+  updateRewardDuration: (
+    input: UpdateRewardDurationAsyncInput,
+  ) => ReturnType<typeof getUpdateRewardDurationInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  updateRewardFunder: (
+    input: UpdateRewardFunderAsyncInput,
+  ) => ReturnType<typeof getUpdateRewardFunderInstructionAsync> &
+    SelfPlanAndSendFunctions;
+  withdrawIneligibleReward: (
+    input: WithdrawIneligibleRewardAsyncInput,
+  ) => ReturnType<typeof getWithdrawIneligibleRewardInstructionAsync> &
+    SelfPlanAndSendFunctions;
+}
+
+export interface CpAmmPluginPdas {
+  poolAuthority: typeof findPoolAuthorityPda;
+  config: typeof findConfigPda;
+  pool: typeof findPoolPda;
+  position: typeof findPositionPda;
+  tokenVault: typeof findTokenVaultPda;
+  rewardVault: typeof findRewardVaultPda;
+  customizablePool: typeof findCustomizablePoolPda;
+  tokenBadge: typeof findTokenBadgePda;
+  claimFeeOperator: typeof findClaimFeeOperatorPda;
+  positionNftAccount: typeof findPositionNftAccountPda;
+  eventAuthority: typeof findEventAuthorityPda;
+}
+
+export type CpAmmPluginRequirements = ClientWithRpc<
+  GetAccountInfoApi & GetMultipleAccountsApi
+> &
+  ClientWithPayer &
+  ClientWithTransactionPlanning &
+  ClientWithTransactionSending;
+
+export function cpAmmProgram() {
+  return <T extends CpAmmPluginRequirements>(
+    client: T,
+  ): Omit<T, "cpAmm"> & { cpAmm: CpAmmPlugin } => {
+    return extendClient(client, {
+      cpAmm: <CpAmmPlugin>{
+        accounts: {
+          claimFeeOperator: addSelfFetchFunctions(
+            client,
+            getClaimFeeOperatorCodec(),
+          ),
+          config: addSelfFetchFunctions(client, getConfigCodec()),
+          pool: addSelfFetchFunctions(client, getPoolCodec()),
+          position: addSelfFetchFunctions(client, getPositionCodec()),
+          tokenBadge: addSelfFetchFunctions(client, getTokenBadgeCodec()),
+          vesting: addSelfFetchFunctions(client, getVestingCodec()),
+        },
+        instructions: {
+          addLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddLiquidityInstructionAsync(input),
+            ),
+          claimPartnerFee: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimPartnerFeeInstructionAsync(input),
+            ),
+          claimPositionFee: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimPositionFeeInstructionAsync(input),
+            ),
+          claimProtocolFee: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimProtocolFeeInstructionAsync(input),
+            ),
+          claimReward: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimRewardInstructionAsync(input),
+            ),
+          closeClaimFeeOperator: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseClaimFeeOperatorInstructionAsync(input),
+            ),
+          closeConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseConfigInstructionAsync(input),
+            ),
+          closePosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClosePositionInstructionAsync(input),
+            ),
+          closeTokenBadge: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseTokenBadgeInstructionAsync(input),
+            ),
+          createClaimFeeOperator: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateClaimFeeOperatorInstructionAsync(input),
+            ),
+          createConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateConfigInstructionAsync(input),
+            ),
+          createDynamicConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateDynamicConfigInstructionAsync(input),
+            ),
+          createPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreatePositionInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          createTokenBadge: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTokenBadgeInstructionAsync(input),
+            ),
+          fundReward: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFundRewardInstructionAsync(input),
+            ),
+          initializeCustomizablePool: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeCustomizablePoolInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initializePool: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePoolInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initializePoolWithDynamicConfig: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePoolWithDynamicConfigInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          initializeReward: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeRewardInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          lockPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockPositionInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          permanentLockPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getPermanentLockPositionInstructionAsync(input),
+            ),
+          refreshVesting: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshVestingInstruction(input),
+            ),
+          removeAllLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveAllLiquidityInstructionAsync(input),
+            ),
+          removeLiquidity: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveLiquidityInstructionAsync(input),
+            ),
+          setPoolStatus: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetPoolStatusInstructionAsync(input),
+            ),
+          splitPosition: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSplitPositionInstructionAsync(input),
+            ),
+          splitPosition2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSplitPosition2InstructionAsync(input),
+            ),
+          swap: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSwapInstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          swap2: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSwap2InstructionAsync({
+                ...input,
+                payer: input.payer ?? client.payer,
+              }),
+            ),
+          updateRewardDuration: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateRewardDurationInstructionAsync(input),
+            ),
+          updateRewardFunder: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateRewardFunderInstructionAsync(input),
+            ),
+          withdrawIneligibleReward: (input) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawIneligibleRewardInstructionAsync(input),
+            ),
+        },
+        pdas: {
+          poolAuthority: findPoolAuthorityPda,
+          config: findConfigPda,
+          pool: findPoolPda,
+          position: findPositionPda,
+          tokenVault: findTokenVaultPda,
+          rewardVault: findRewardVaultPda,
+          customizablePool: findCustomizablePoolPda,
+          tokenBadge: findTokenBadgePda,
+          claimFeeOperator: findClaimFeeOperatorPda,
+          positionNftAccount: findPositionNftAccountPda,
+          eventAuthority: findEventAuthorityPda,
+        },
+      },
+    });
+  };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

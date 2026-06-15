@@ -24,7 +24,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   RemainingAccountsInfo,
   RemainingAccountsInfoArgs,
@@ -45,10 +45,12 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
@@ -450,7 +452,7 @@ export function getTwoHopSwapV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -465,30 +467,42 @@ export function getTwoHopSwapV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.whirlpoolOne),
-      getAccountMeta(accounts.whirlpoolTwo),
-      getAccountMeta(accounts.tokenMintInput),
-      getAccountMeta(accounts.tokenMintIntermediate),
-      getAccountMeta(accounts.tokenMintOutput),
-      getAccountMeta(accounts.tokenProgramInput),
-      getAccountMeta(accounts.tokenProgramIntermediate),
-      getAccountMeta(accounts.tokenProgramOutput),
-      getAccountMeta(accounts.tokenOwnerAccountInput),
-      getAccountMeta(accounts.tokenVaultOneInput),
-      getAccountMeta(accounts.tokenVaultOneIntermediate),
-      getAccountMeta(accounts.tokenVaultTwoIntermediate),
-      getAccountMeta(accounts.tokenVaultTwoOutput),
-      getAccountMeta(accounts.tokenOwnerAccountOutput),
-      getAccountMeta(accounts.tokenAuthority),
-      getAccountMeta(accounts.tickArrayOne0),
-      getAccountMeta(accounts.tickArrayOne1),
-      getAccountMeta(accounts.tickArrayOne2),
-      getAccountMeta(accounts.tickArrayTwo0),
-      getAccountMeta(accounts.tickArrayTwo1),
-      getAccountMeta(accounts.tickArrayTwo2),
-      getAccountMeta(accounts.oracleOne),
-      getAccountMeta(accounts.oracleTwo),
-      getAccountMeta(accounts.memoProgram),
+      getAccountMeta("whirlpoolOne", accounts.whirlpoolOne),
+      getAccountMeta("whirlpoolTwo", accounts.whirlpoolTwo),
+      getAccountMeta("tokenMintInput", accounts.tokenMintInput),
+      getAccountMeta("tokenMintIntermediate", accounts.tokenMintIntermediate),
+      getAccountMeta("tokenMintOutput", accounts.tokenMintOutput),
+      getAccountMeta("tokenProgramInput", accounts.tokenProgramInput),
+      getAccountMeta(
+        "tokenProgramIntermediate",
+        accounts.tokenProgramIntermediate,
+      ),
+      getAccountMeta("tokenProgramOutput", accounts.tokenProgramOutput),
+      getAccountMeta("tokenOwnerAccountInput", accounts.tokenOwnerAccountInput),
+      getAccountMeta("tokenVaultOneInput", accounts.tokenVaultOneInput),
+      getAccountMeta(
+        "tokenVaultOneIntermediate",
+        accounts.tokenVaultOneIntermediate,
+      ),
+      getAccountMeta(
+        "tokenVaultTwoIntermediate",
+        accounts.tokenVaultTwoIntermediate,
+      ),
+      getAccountMeta("tokenVaultTwoOutput", accounts.tokenVaultTwoOutput),
+      getAccountMeta(
+        "tokenOwnerAccountOutput",
+        accounts.tokenOwnerAccountOutput,
+      ),
+      getAccountMeta("tokenAuthority", accounts.tokenAuthority),
+      getAccountMeta("tickArrayOne0", accounts.tickArrayOne0),
+      getAccountMeta("tickArrayOne1", accounts.tickArrayOne1),
+      getAccountMeta("tickArrayOne2", accounts.tickArrayOne2),
+      getAccountMeta("tickArrayTwo0", accounts.tickArrayTwo0),
+      getAccountMeta("tickArrayTwo1", accounts.tickArrayTwo1),
+      getAccountMeta("tickArrayTwo2", accounts.tickArrayTwo2),
+      getAccountMeta("oracleOne", accounts.oracleOne),
+      getAccountMeta("oracleTwo", accounts.oracleTwo),
+      getAccountMeta("memoProgram", accounts.memoProgram),
     ],
     data: getTwoHopSwapV2InstructionDataEncoder().encode(
       args as TwoHopSwapV2InstructionDataArgs,
@@ -566,8 +580,13 @@ export function parseTwoHopSwapV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedTwoHopSwapV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 24) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 24,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

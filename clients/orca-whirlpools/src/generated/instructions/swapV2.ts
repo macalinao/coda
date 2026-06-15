@@ -24,7 +24,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type {
   RemainingAccountsInfo,
   RemainingAccountsInfoArgs,
@@ -45,10 +45,12 @@ import {
   getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
@@ -321,7 +323,7 @@ export function getSwapV2Instruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -336,21 +338,21 @@ export function getSwapV2Instruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.tokenProgramA),
-      getAccountMeta(accounts.tokenProgramB),
-      getAccountMeta(accounts.memoProgram),
-      getAccountMeta(accounts.tokenAuthority),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.tokenMintA),
-      getAccountMeta(accounts.tokenMintB),
-      getAccountMeta(accounts.tokenOwnerAccountA),
-      getAccountMeta(accounts.tokenVaultA),
-      getAccountMeta(accounts.tokenOwnerAccountB),
-      getAccountMeta(accounts.tokenVaultB),
-      getAccountMeta(accounts.tickArray0),
-      getAccountMeta(accounts.tickArray1),
-      getAccountMeta(accounts.tickArray2),
-      getAccountMeta(accounts.oracle),
+      getAccountMeta("tokenProgramA", accounts.tokenProgramA),
+      getAccountMeta("tokenProgramB", accounts.tokenProgramB),
+      getAccountMeta("memoProgram", accounts.memoProgram),
+      getAccountMeta("tokenAuthority", accounts.tokenAuthority),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("tokenMintA", accounts.tokenMintA),
+      getAccountMeta("tokenMintB", accounts.tokenMintB),
+      getAccountMeta("tokenOwnerAccountA", accounts.tokenOwnerAccountA),
+      getAccountMeta("tokenVaultA", accounts.tokenVaultA),
+      getAccountMeta("tokenOwnerAccountB", accounts.tokenOwnerAccountB),
+      getAccountMeta("tokenVaultB", accounts.tokenVaultB),
+      getAccountMeta("tickArray0", accounts.tickArray0),
+      getAccountMeta("tickArray1", accounts.tickArray1),
+      getAccountMeta("tickArray2", accounts.tickArray2),
+      getAccountMeta("oracle", accounts.oracle),
     ],
     data: getSwapV2InstructionDataEncoder().encode(
       args as SwapV2InstructionDataArgs,
@@ -410,8 +412,13 @@ export function parseSwapV2Instruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSwapV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 15) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 15,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

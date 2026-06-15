@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { LockType, LockTypeArgs } from "../types/index.js";
 import {
   combineCodec,
@@ -33,10 +33,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 import { getLockTypeDecoder, getLockTypeEncoder } from "../types/index.js";
 
 export const LOCK_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -223,7 +225,7 @@ export function getLockPositionInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -242,15 +244,15 @@ export function getLockPositionInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.funder),
-      getAccountMeta(accounts.positionAuthority),
-      getAccountMeta(accounts.position),
-      getAccountMeta(accounts.positionMint),
-      getAccountMeta(accounts.positionTokenAccount),
-      getAccountMeta(accounts.lockConfig),
-      getAccountMeta(accounts.whirlpool),
-      getAccountMeta(accounts.token2022Program),
-      getAccountMeta(accounts.systemProgram),
+      getAccountMeta("funder", accounts.funder),
+      getAccountMeta("positionAuthority", accounts.positionAuthority),
+      getAccountMeta("position", accounts.position),
+      getAccountMeta("positionMint", accounts.positionMint),
+      getAccountMeta("positionTokenAccount", accounts.positionTokenAccount),
+      getAccountMeta("lockConfig", accounts.lockConfig),
+      getAccountMeta("whirlpool", accounts.whirlpool),
+      getAccountMeta("token2022Program", accounts.token2022Program),
+      getAccountMeta("systemProgram", accounts.systemProgram),
     ],
     data: getLockPositionInstructionDataEncoder().encode(
       args as LockPositionInstructionDataArgs,
@@ -298,8 +300,13 @@ export function parseLockPositionInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedLockPositionInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 9) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 9,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

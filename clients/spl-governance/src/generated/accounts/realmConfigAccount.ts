@@ -17,6 +17,7 @@ import type {
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
+  ReadonlyUint8Array,
 } from "@solana/kit";
 import type { RealmConfigSeeds } from "../pdas/index.js";
 import type {
@@ -49,10 +50,10 @@ import {
   getReserved110Encoder,
 } from "../types/index.js";
 
-export const REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE =
+export const REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.RealmConfig;
 
-export function getRealmConfigAccountAccountTypeBytes() {
+export function getRealmConfigAccountAccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(
     REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE,
   );

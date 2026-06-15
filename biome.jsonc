@@ -1,8 +1,8 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
   "extends": ["@macalinao/biome-config/base"],
   "files": {
-    "includes": ["!**/out", "!**/.next"]
+    "includes": ["!**/out", "!**/.next"],
   },
   "overrides": [
     {
@@ -10,22 +10,41 @@
       "linter": {
         "rules": {
           "nursery": {
-            "noUnnecessaryConditions": "off"
+            "noUnnecessaryConditions": "off",
+            "useAwaitThenable": "off",
           },
           "style": {
-            "noNonNullAssertion": "off"
+            "noNonNullAssertion": "off",
+            "useFilenamingConvention": "off",
           },
           "suspicious": {
-            "noEmptyInterface": "off"
+            "noEmptyInterface": "off",
           },
           "complexity": {
-            "noBannedTypes": "off"
+            "noBannedTypes": "off",
+            "noExcessiveCognitiveComplexity": "off",
+            "noForEach": "off",
           },
           "correctness": {
-            "noConstantCondition": "off"
-          }
-        }
-      }
-    }
-  ]
+            "noConstantCondition": "off",
+          },
+          "performance": {
+            "useTopLevelRegex": "off",
+          },
+        },
+      },
+    },
+    {
+      // The coda and create-coda CLIs intentionally write user-facing output
+      // to the console.
+      "includes": ["packages/coda/**", "packages/create-coda/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off",
+          },
+        },
+      },
+    },
+  ],
 }

@@ -23,7 +23,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { MintArgs, MintArgsArgs } from "../types/index.js";
 import {
   address,
@@ -32,11 +32,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 import { getMintArgsDecoder, getMintArgsEncoder } from "../types/index.js";
 
 export const MINT_DISCRIMINATOR = 43;
@@ -304,7 +309,7 @@ export async function getMintInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -314,7 +319,10 @@ export async function getMintInstructionAsync<
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: expectAddress(accounts.mint.value),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -337,21 +345,24 @@ export async function getMintInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.token),
-      getAccountMeta(accounts.tokenOwner),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.tokenRecord),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.delegateRecord),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.sysvarInstructions),
-      getAccountMeta(accounts.splTokenProgram),
-      getAccountMeta(accounts.splAtaProgram),
-      getAccountMeta(accounts.authorizationRulesProgram),
-      getAccountMeta(accounts.authorizationRules),
+      getAccountMeta("token", accounts.token),
+      getAccountMeta("tokenOwner", accounts.tokenOwner),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("tokenRecord", accounts.tokenRecord),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("delegateRecord", accounts.delegateRecord),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("sysvarInstructions", accounts.sysvarInstructions),
+      getAccountMeta("splTokenProgram", accounts.splTokenProgram),
+      getAccountMeta("splAtaProgram", accounts.splAtaProgram),
+      getAccountMeta(
+        "authorizationRulesProgram",
+        accounts.authorizationRulesProgram,
+      ),
+      getAccountMeta("authorizationRules", accounts.authorizationRules),
     ],
     data: getMintInstructionDataEncoder().encode(
       args as MintInstructionDataArgs,
@@ -517,7 +528,7 @@ export function getMintInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -544,21 +555,24 @@ export function getMintInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.token),
-      getAccountMeta(accounts.tokenOwner),
-      getAccountMeta(accounts.metadata),
-      getAccountMeta(accounts.masterEdition),
-      getAccountMeta(accounts.tokenRecord),
-      getAccountMeta(accounts.mint),
-      getAccountMeta(accounts.authority),
-      getAccountMeta(accounts.delegateRecord),
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.systemProgram),
-      getAccountMeta(accounts.sysvarInstructions),
-      getAccountMeta(accounts.splTokenProgram),
-      getAccountMeta(accounts.splAtaProgram),
-      getAccountMeta(accounts.authorizationRulesProgram),
-      getAccountMeta(accounts.authorizationRules),
+      getAccountMeta("token", accounts.token),
+      getAccountMeta("tokenOwner", accounts.tokenOwner),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("tokenRecord", accounts.tokenRecord),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("delegateRecord", accounts.delegateRecord),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("sysvarInstructions", accounts.sysvarInstructions),
+      getAccountMeta("splTokenProgram", accounts.splTokenProgram),
+      getAccountMeta("splAtaProgram", accounts.splAtaProgram),
+      getAccountMeta(
+        "authorizationRulesProgram",
+        accounts.authorizationRulesProgram,
+      ),
+      getAccountMeta("authorizationRules", accounts.authorizationRules),
     ],
     data: getMintInstructionDataEncoder().encode(
       args as MintInstructionDataArgs,
@@ -633,8 +647,13 @@ export function parseMintInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedMintInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 15) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 15,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

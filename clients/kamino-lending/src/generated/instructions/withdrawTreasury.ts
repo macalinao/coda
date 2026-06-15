@@ -22,7 +22,7 @@ import type {
   WritableAccount,
   WritableSignerAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,14 +33,19 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import {
   findRewardTreasuryVaultPda,
   findTreasuryVaultsAuthorityPda,
 } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
-import { expectAddress, getAccountMetaFactory } from "../shared/index.js";
 
 export const WITHDRAW_TREASURY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([40, 63, 122, 158, 144, 216, 83, 96]);
@@ -204,7 +209,7 @@ export async function getWithdrawTreasuryInstructionAsync<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -213,14 +218,23 @@ export async function getWithdrawTreasuryInstructionAsync<
   // Resolve default values.
   if (!accounts.rewardTreasuryVault.value) {
     accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda({
-      globalConfig: expectAddress(accounts.globalConfig.value),
-      rewardMint: expectAddress(accounts.rewardMint.value),
+      globalConfig: getAddressFromResolvedInstructionAccount(
+        "globalConfig",
+        accounts.globalConfig.value,
+      ),
+      rewardMint: getAddressFromResolvedInstructionAccount(
+        "rewardMint",
+        accounts.rewardMint.value,
+      ),
     });
   }
   if (!accounts.treasuryVaultAuthority.value) {
     accounts.treasuryVaultAuthority.value =
       await findTreasuryVaultsAuthorityPda({
-        globalConfig: expectAddress(accounts.globalConfig.value),
+        globalConfig: getAddressFromResolvedInstructionAccount(
+          "globalConfig",
+          accounts.globalConfig.value,
+        ),
       });
   }
   if (!accounts.tokenProgram.value) {
@@ -231,13 +245,16 @@ export async function getWithdrawTreasuryInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalAdmin),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.rewardTreasuryVault),
-      getAccountMeta(accounts.treasuryVaultAuthority),
-      getAccountMeta(accounts.withdrawDestinationTokenAccount),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("globalAdmin", accounts.globalAdmin),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("rewardTreasuryVault", accounts.rewardTreasuryVault),
+      getAccountMeta("treasuryVaultAuthority", accounts.treasuryVaultAuthority),
+      getAccountMeta(
+        "withdrawDestinationTokenAccount",
+        accounts.withdrawDestinationTokenAccount,
+      ),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawTreasuryInstructionDataEncoder().encode(
       args as WithdrawTreasuryInstructionDataArgs,
@@ -328,7 +345,7 @@ export function getWithdrawTreasuryInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -343,13 +360,16 @@ export function getWithdrawTreasuryInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.globalAdmin),
-      getAccountMeta(accounts.globalConfig),
-      getAccountMeta(accounts.rewardMint),
-      getAccountMeta(accounts.rewardTreasuryVault),
-      getAccountMeta(accounts.treasuryVaultAuthority),
-      getAccountMeta(accounts.withdrawDestinationTokenAccount),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("globalAdmin", accounts.globalAdmin),
+      getAccountMeta("globalConfig", accounts.globalConfig),
+      getAccountMeta("rewardMint", accounts.rewardMint),
+      getAccountMeta("rewardTreasuryVault", accounts.rewardTreasuryVault),
+      getAccountMeta("treasuryVaultAuthority", accounts.treasuryVaultAuthority),
+      getAccountMeta(
+        "withdrawDestinationTokenAccount",
+        accounts.withdrawDestinationTokenAccount,
+      ),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getWithdrawTreasuryInstructionDataEncoder().encode(
       args as WithdrawTreasuryInstructionDataArgs,
@@ -393,8 +413,13 @@ export function parseWithdrawTreasuryInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawTreasuryInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 7) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 7,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

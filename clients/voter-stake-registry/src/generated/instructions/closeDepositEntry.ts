@@ -21,7 +21,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,10 +32,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const CLOSE_DEPOSIT_ENTRY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([236, 190, 87, 34, 251, 131, 138, 237]);
@@ -134,7 +136,7 @@ export function getCloseDepositEntryInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -143,8 +145,8 @@ export function getCloseDepositEntryInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.voter),
-      getAccountMeta(accounts.voterAuthority),
+      getAccountMeta("voter", accounts.voter),
+      getAccountMeta("voterAuthority", accounts.voterAuthority),
     ],
     data: getCloseDepositEntryInstructionDataEncoder().encode(
       args as CloseDepositEntryInstructionDataArgs,
@@ -178,8 +180,13 @@ export function parseCloseDepositEntryInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCloseDepositEntryInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 2,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

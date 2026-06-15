@@ -51,7 +51,7 @@ export interface ElevationGroupArgs {
   padding0: number;
   /** Mandatory debt reserve for this elevation group */
   debtReserve: Address;
-  padding1: (number | bigint)[];
+  padding1: Array<number | bigint>;
 }
 
 export function getElevationGroupEncoder(): FixedSizeEncoder<ElevationGroupArgs> {

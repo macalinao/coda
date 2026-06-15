@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +31,12 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const RESCUE_TOKENS_M_M_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([222, 81, 199, 209, 182, 62, 62, 186]);
@@ -47,19 +49,19 @@ export function getRescueTokensMMDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RescueTokensMMInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
-  TAccountMmOwner extends string | AccountMeta = string,
-  TAccountMergePool extends string | AccountMeta = string,
-  TAccountMm extends string | AccountMeta = string,
-  TAccountMiner extends string | AccountMeta = string,
-  TAccountMinerTokenAccount extends string | AccountMeta = string,
-  TAccountDestinationTokenAccount extends string | AccountMeta = string,
+  TAccountMmOwner extends string | AccountMeta<string> = string,
+  TAccountMergePool extends string | AccountMeta<string> = string,
+  TAccountMm extends string | AccountMeta<string> = string,
+  TAccountMiner extends string | AccountMeta<string> = string,
+  TAccountMinerTokenAccount extends string | AccountMeta<string> = string,
+  TAccountDestinationTokenAccount extends string | AccountMeta<string> = string,
   TAccountQuarryMineProgram extends
     | string
-    | AccountMeta = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,7 +97,7 @@ export interface RescueTokensMMInstructionData {
   discriminator: ReadonlyUint8Array;
 }
 
-export interface RescueTokensMMInstructionDataArgs {}
+export type RescueTokensMMInstructionDataArgs = {};
 
 export function getRescueTokensMMInstructionDataEncoder(): FixedSizeEncoder<RescueTokensMMInstructionDataArgs> {
   return transformEncoder(
@@ -199,7 +201,7 @@ export function getRescueTokensMMInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Resolve default values.
@@ -215,14 +217,17 @@ export function getRescueTokensMMInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.mmOwner),
-      getAccountMeta(accounts.mergePool),
-      getAccountMeta(accounts.mm),
-      getAccountMeta(accounts.miner),
-      getAccountMeta(accounts.minerTokenAccount),
-      getAccountMeta(accounts.destinationTokenAccount),
-      getAccountMeta(accounts.quarryMineProgram),
-      getAccountMeta(accounts.tokenProgram),
+      getAccountMeta("mmOwner", accounts.mmOwner),
+      getAccountMeta("mergePool", accounts.mergePool),
+      getAccountMeta("mm", accounts.mm),
+      getAccountMeta("miner", accounts.miner),
+      getAccountMeta("minerTokenAccount", accounts.minerTokenAccount),
+      getAccountMeta(
+        "destinationTokenAccount",
+        accounts.destinationTokenAccount,
+      ),
+      getAccountMeta("quarryMineProgram", accounts.quarryMineProgram),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
     ],
     data: getRescueTokensMMInstructionDataEncoder().encode({}),
     programAddress,
@@ -266,8 +271,13 @@ export function parseRescueTokensMMInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRescueTokensMMInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 8,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {

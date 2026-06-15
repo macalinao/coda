@@ -22,7 +22,7 @@ import type {
   TransactionSigner,
   WritableAccount,
 } from "@solana/kit";
-import type { ResolvedAccount } from "../shared/index.js";
+import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,10 +33,12 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+  SolanaError,
   transformEncoder,
 } from "@solana/kit";
+import { getAccountMetaFactory } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getAccountMetaFactory } from "../shared/index.js";
 
 export const SOCIALIZE_LOSS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   245, 75, 91, 0, 236, 97, 19, 3,
@@ -174,7 +176,7 @@ export function getSocializeLossInstruction<
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
-    ResolvedAccount
+    ResolvedInstructionAccount
   >;
 
   // Original args.
@@ -189,11 +191,14 @@ export function getSocializeLossInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.riskCouncil),
-      getAccountMeta(accounts.obligation),
-      getAccountMeta(accounts.lendingMarket),
-      getAccountMeta(accounts.reserve),
-      getAccountMeta(accounts.instructionSysvarAccount),
+      getAccountMeta("riskCouncil", accounts.riskCouncil),
+      getAccountMeta("obligation", accounts.obligation),
+      getAccountMeta("lendingMarket", accounts.lendingMarket),
+      getAccountMeta("reserve", accounts.reserve),
+      getAccountMeta(
+        "instructionSysvarAccount",
+        accounts.instructionSysvarAccount,
+      ),
     ],
     data: getSocializeLossInstructionDataEncoder().encode(
       args as SocializeLossInstructionDataArgs,
@@ -233,8 +238,13 @@ export function parseSocializeLossInstruction<
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSocializeLossInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
-    // TODO: Coded error.
-    throw new Error("Not enough accounts");
+    throw new SolanaError(
+      SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+      {
+        actualAccountMetas: instruction.accounts.length,
+        expectedAccountMetas: 5,
+      },
+    );
   }
   let accountIndex = 0;
   const getNextAccount = () => {
