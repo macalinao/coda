@@ -15,6 +15,8 @@ export default [
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/prefer-nullish-coalescing": "off",
       "@typescript-eslint/no-unnecessary-type-assertion": "off",
+      "@typescript-eslint/no-unnecessary-type-arguments": "off",
+      "@typescript-eslint/non-nullable-type-assertion-style": "off",
       "@typescript-eslint/consistent-type-assertions": "off",
     },
   },
