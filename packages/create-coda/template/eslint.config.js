@@ -1,4 +1,5 @@
 import { configs } from "@macalinao/eslint-config";
+import tseslint from "typescript-eslint";
 
 export default [
   ...configs.fast,
@@ -29,5 +30,11 @@ export default [
       "no-constant-condition": "off",
       "@typescript-eslint/no-empty-object-type": "off",
     },
+  },
+  // The coda config is loaded directly by Node and is not part of the
+  // package's TypeScript build, so type-aware linting cannot resolve it.
+  {
+    ...tseslint.configs.disableTypeChecked,
+    files: ["coda.config.ts"],
   },
 ];

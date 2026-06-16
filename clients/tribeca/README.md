@@ -46,7 +46,7 @@ bun run build
 
 ### Configuration
 
-The `coda.config.mjs` file includes custom PDAs for both programs and links accounts to their corresponding PDA helpers.
+The `coda.config.ts` file includes custom PDAs for both programs and links accounts to their corresponding PDA helpers.
 
 ## Usage
 

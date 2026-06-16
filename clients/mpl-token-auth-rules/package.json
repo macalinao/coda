@@ -48,7 +48,8 @@
     "@solana/kit": "catalog:",
     "@solana/program-client-core": "catalog:",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   },
   "publishConfig": {
     "access": "public"

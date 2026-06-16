@@ -33,7 +33,7 @@ bun run build:watch:packages # Watch mode for packages only
 # Code Generation
 bun run codegen             # Run code generation for all clients
 coda generate               # Generate client with Coda CLI
-coda init                  # Initialize coda.config.mjs
+coda init                  # Initialize coda.config.ts
 
 # Code Quality
 bun run lint                 # Run biome check + eslint
@@ -74,7 +74,7 @@ coda/
 ### 1. **@macalinao/coda** - CLI for client generation
 
 - Works out of the box (looks for `./idls/*.json` by default)
-- Configurable via `coda.config.mjs`
+- Configurable via `coda.config.ts`
 - Generates TypeScript clients with full type safety
 - Built on Codama for extensibility
 - Supports glob patterns for IDL discovery
@@ -106,7 +106,7 @@ coda/
 4. **Generate Code**: Renders TypeScript with ESM support
 5. **Output Files**: Creates organized file structure with types, instructions, accounts, etc.
 
-## Configuration (coda.config.mjs)
+## Configuration (coda.config.ts)
 
 ### Default Configuration
 
@@ -232,7 +232,7 @@ Tasks are defined in turbo.json:
 ## Adding a New Client
 
 1. **Add IDL file**: Place in `clients/[program-name]/idls/`
-2. **Create config**: Add `coda.config.mjs` with any custom visitors
+2. **Create config**: Add `coda.config.ts` with any custom visitors
 3. **Add package.json**: Include build and codegen scripts
 4. **Generate client**: Run `bun run codegen`
 5. **Build**: Run `bun run build`
@@ -381,7 +381,7 @@ bun run build   # Build for production
 ### Common Issues
 
 1. **IDL not found**: Ensure Anchor program is built (`anchor build`)
-2. **Config not loading**: Check file is named `coda.config.mjs` with `.mjs` extension
+2. **Config not loading**: Check file is named `coda.config.ts` with `.ts` extension
 3. **Import errors**: Ensure all imports use `.js` extensions for local files
 4. **Type errors**: Run `bun run build` to check TypeScript compilation
 
@@ -392,7 +392,7 @@ bun run build   # Build for production
 ls -la ./src/generated/
 
 # Verify config is valid
-node -e "import('./coda.config.mjs').then(c => console.log(c.default))"
+node -e "import('./coda.config.ts').then(c => console.log(c.default))"
 
 # Clean and rebuild
 bun run clean && bun run codegen && bun run build
