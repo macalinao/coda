@@ -32,5 +32,5 @@ export async function resolveIdlPaths(
   }
 
   // Remove duplicates and sort for consistent ordering
-  return [...new Set(resolvedPaths)].sort();
+  return [...new Set(resolvedPaths)].toSorted();
 }

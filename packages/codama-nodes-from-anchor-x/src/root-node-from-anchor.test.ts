@@ -13,11 +13,11 @@ describe("rootNodeFromAnchor", () => {
   });
 
   const createMockIdlV01 = (name: string): AnchorIdl => ({
-    version: "0.1.0",
+    address: "11111111111111111111111111111111",
     metadata: {
-      spec: "0.1.0",
-      address: "11111111111111111111111111111111",
       name,
+      spec: "0.1.0",
+      version: "0.1.0",
     },
     instructions: [],
     accounts: [],
@@ -30,7 +30,7 @@ describe("rootNodeFromAnchor", () => {
     const root = rootNodeFromAnchor(idl);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("testProgram");
+    expect(root.program.name as string).toBe("testProgram");
     expect(root.additionalPrograms).toHaveLength(0);
   });
 
@@ -39,7 +39,7 @@ describe("rootNodeFromAnchor", () => {
     const root = rootNodeFromAnchor(idl);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("newFormatProgram");
+    expect(root.program.name as string).toBe("newFormatProgram");
     expect(root.additionalPrograms).toHaveLength(0);
   });
 
@@ -47,7 +47,7 @@ describe("rootNodeFromAnchor", () => {
     const idl = createMockIdl("my_snake_case_program");
     const root = rootNodeFromAnchor(idl);
 
-    expect(root.program.name).toBe("mySnakeCaseProgram");
+    expect(root.program.name as string).toBe("mySnakeCaseProgram");
   });
 
   it("should handle IDLs with instructions and accounts", () => {
@@ -91,12 +91,12 @@ describe("rootNodeFromAnchor", () => {
     const root = rootNodeFromAnchor(idl);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("complexProgram");
+    expect(root.program.name as string).toBe("complexProgram");
     expect(root.program.instructions).toHaveLength(2);
-    expect(root.program.instructions[0].name).toBe("initialize");
-    expect(root.program.instructions[1].name).toBe("transfer");
+    expect(root.program.instructions[0]!.name as string).toBe("initialize");
+    expect(root.program.instructions[1]!.name as string).toBe("transfer");
     expect(root.program.accounts).toHaveLength(1);
-    expect(root.program.accounts[0].name).toBe("myAccount");
+    expect(root.program.accounts[0]!.name as string).toBe("myAccount");
     expect(root.program.errors).toHaveLength(1);
   });
 
@@ -113,7 +113,7 @@ describe("rootNodeFromAnchor", () => {
     const root = rootNodeFromAnchor(idl);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("emptyProgram");
+    expect(root.program.name as string).toBe("emptyProgram");
     expect(root.program.instructions).toHaveLength(0);
     expect(root.program.accounts).toHaveLength(0);
     expect(root.program.errors).toHaveLength(0);

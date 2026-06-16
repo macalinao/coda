@@ -56,8 +56,7 @@ export default defineConfig({
     npmPackageName: "@macalinao/clients-token-metadata",
   },
   instructionAccountDefaultValues: [
-    ...[
-      "approveCollectionAuthority",
+    "approveCollectionAuthority",
       "approveUseAuthority",
       "burn",
       "burnNft",
@@ -94,7 +93,6 @@ export default defineConfig({
         pdaSeedValueNode("mint", accountValueNode("mint")),
       ]),
     })),
-  ],
   visitors: [
     updateAccountsVisitor({
       metadata: {

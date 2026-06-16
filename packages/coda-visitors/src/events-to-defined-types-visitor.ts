@@ -29,7 +29,7 @@ export function eventsToDefinedTypesVisitor() {
       select: "[programNode]",
       transform: (node) => {
         const program = node as ProgramNode;
-        if (!program.events || program.events.length === 0) {
+        if (program.events.length === 0) {
           return node;
         }
 
