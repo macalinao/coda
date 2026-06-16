@@ -64,7 +64,7 @@ my-client/
 ├── src/
 │   ├── generated/      # Generated client code (after codegen)
 │   └── index.ts        # Main entry point
-├── coda.config.mjs     # Coda configuration
+├── coda.config.ts     # Coda configuration
 ├── tsconfig.json       # TypeScript configuration
 ├── eslint.config.js    # ESLint configuration
 ├── package.json        # Dependencies and scripts
@@ -115,7 +115,7 @@ Extends `@macalinao/eslint-config` with:
 
 ### Coda Configuration
 
-Pre-configured `coda.config.mjs` with:
+Pre-configured `coda.config.ts` with:
 
 - Automatic IDL discovery from `./idls/*.json`
 - Output to `./src/generated`
@@ -130,7 +130,7 @@ The template is designed to be flexible:
 Default configuration works out of the box:
 
 ```javascript
-// coda.config.mjs
+// coda.config.ts
 export default defineConfig({
   // Automatically finds IDLs in ./idls/*.json
   outputDir: "./src/generated",
@@ -142,7 +142,7 @@ export default defineConfig({
 Configure for multiple programs:
 
 ```javascript
-// coda.config.mjs
+// coda.config.ts
 export default defineConfig({
   idlPath: "./idls/*.json", // Process all IDLs
   outputDir: "./src/generated",
@@ -154,7 +154,7 @@ export default defineConfig({
 Add Codama visitors for enhanced functionality:
 
 ```javascript
-// coda.config.mjs
+// coda.config.ts
 import { addPdasVisitor } from "codama";
 
 export default defineConfig({

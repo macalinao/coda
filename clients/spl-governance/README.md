@@ -29,7 +29,7 @@ bun run build
 
 ### Configuration
 
-The `coda.config.mjs` file defines custom PDAs for the SPL Governance program, including:
+The `coda.config.ts` file defines custom PDAs for the SPL Governance program, including:
 
 - Realm identified by its name
 - Token holding accounts for community and council tokens

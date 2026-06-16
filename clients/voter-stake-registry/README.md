@@ -24,7 +24,7 @@ bun run build
 
 ### Configuration
 
-The `coda.config.mjs` file defines custom PDAs for the Voter Stake Registry program, including:
+The `coda.config.ts` file defines custom PDAs for the Voter Stake Registry program, including:
 
 - **Registrar**: The voting registrar account - one per governance realm and governing mint
 - **Voter**: Individual voter accounts tied to a registrar and voter authority

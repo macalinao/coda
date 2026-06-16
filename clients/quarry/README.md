@@ -35,7 +35,7 @@ bun run build
 
 ### Configuration
 
-The `coda.config.mjs` file is configured to load all Quarry protocol IDLs and generate a unified client.
+The `coda.config.ts` file is configured to load all Quarry protocol IDLs and generate a unified client.
 
 ## Usage
 

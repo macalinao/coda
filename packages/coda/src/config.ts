@@ -81,7 +81,7 @@ export interface CodaConfig {
  *
  * @example
  * ```typescript
- * // coda.config.mjs
+ * // coda.config.ts
  * import { defineConfig } from "@macalinao/coda";
  * import { someCustomVisitor } from "./visitors/custom.js";
  *
