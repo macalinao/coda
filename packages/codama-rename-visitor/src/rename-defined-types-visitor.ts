@@ -1,4 +1,4 @@
-import type { DefinedTypeNode, Node } from "codama";
+import type { DefinedTypeNode, Node, Visitor } from "codama";
 import {
   assertIsNode,
   bottomUpTransformerVisitor,
@@ -46,8 +46,8 @@ export function renameDefinedTypeTransform(
  */
 export function renameDefinedTypesVisitor(
   mapping: Record<string, string>,
-): ReturnType<typeof rootNodeVisitor> {
-  return rootNodeVisitor((root) => {
+): Visitor<Node | null, "rootNode"> {
+  return rootNodeVisitor<Node | null>((root) => {
     const typeVisitor = bottomUpTransformerVisitor([
       {
         select: "[definedTypeNode]",

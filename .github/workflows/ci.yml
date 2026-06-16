@@ -39,5 +39,5 @@ jobs:
       - name: Run tests
         run: bun test
 
-      - name: Check TypeScript
-        run: bun run typecheck || true
+      - name: Typecheck coda.config.ts files
+        run: bun run typecheck

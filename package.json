@@ -45,6 +45,7 @@
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
     "codegen": "turbo run codegen",
+    "typecheck": "tsc -p tsconfig.configs.json",
     "docs:dev": "turbo dev --filter=coda-docs",
     "docs:build": "turbo build --filter=coda-docs",
     "format": "prettier --write \"**/*.{md,mdx}\""
