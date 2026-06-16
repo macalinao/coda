@@ -42,8 +42,8 @@
     "directory": "packages/coda"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
+    "build": "tsdown",
+    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "test": "bun test"
   },
@@ -66,6 +66,7 @@
     "@types/bun": "catalog:",
     "@types/node": "^25.9.2",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "tsdown": "catalog:"
   }
 }

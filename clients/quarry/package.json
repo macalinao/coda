@@ -39,8 +39,8 @@
     "directory": "clients/quarry"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
+    "build": "tsdown",
+    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "test": "echo 'No tests yet'",
     "codegen": "rm -fr src/generated/ && coda generate"
@@ -58,6 +58,7 @@
     "@solana/program-client-core": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:",
+    "tsdown": "catalog:",
     "typescript-eslint": "catalog:"
   }
 }

@@ -38,8 +38,8 @@
     "directory": "packages/codama-instruction-accounts-dedupe-visitor"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
+    "build": "tsdown",
+    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "test": "bun test src/"
   },
@@ -52,6 +52,7 @@
     "@macalinao/tsconfig": "catalog:",
     "@types/bun": "catalog:",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "tsdown": "catalog:"
   }
 }

@@ -37,8 +37,8 @@
     "directory": "packages/codama-renderers-js-esm"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
+    "build": "tsdown",
+    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache"
   },
   "dependencies": {
@@ -51,6 +51,7 @@
     "@macalinao/tsconfig": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:",
-    "@types/bun": "catalog:"
+    "@types/bun": "catalog:",
+    "tsdown": "catalog:"
   }
 }

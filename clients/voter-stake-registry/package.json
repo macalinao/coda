@@ -43,8 +43,8 @@
     "directory": "clients/voter-stake-registry"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
+    "build": "tsdown",
+    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint . --cache",
     "codegen": "coda generate"
   },
@@ -60,6 +60,7 @@
     "@solana/program-client-core": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:",
+    "tsdown": "catalog:",
     "typescript-eslint": "catalog:"
   }
 }
