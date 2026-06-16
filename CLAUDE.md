@@ -233,9 +233,11 @@ Tasks are defined in turbo.json:
 
 1. **Add IDL file**: Place in `clients/[program-name]/idls/`
 2. **Create config**: Add `coda.config.mjs` with any custom visitors
-3. **Add package.json**: Include build and codegen scripts
+3. **Add package.json**: Include build (`"build": "tsdown"`) and codegen scripts
 4. **Generate client**: Run `bun run codegen`
 5. **Build**: Run `bun run build`
+
+No per-package `tsdown.config.ts` is needed — tsdown walks up to the shared root `tsdown.config.ts`.
 
 Example package.json for a client:
 
@@ -243,7 +245,7 @@ Example package.json for a client:
 {
   "name": "@macalinao/clients-[program-name]",
   "scripts": {
-    "build": "tsc",
+    "build": "tsdown",
     "codegen": "coda generate",
     "clean": "rm -fr dist/"
   }
@@ -271,7 +273,7 @@ GitHub Actions workflow runs on push/PR to main:
 
 When creating new packages:
 
-- Use TypeScript directly with `tsc` for building (no tsup/rollup/etc)
+- Build with [tsdown](https://tsdown.dev). The shared root `tsdown.config.ts` is auto-resolved (tsdown walks up the directory tree), so packages need no config of their own. Only add a local `tsdown.config.ts` to override — e.g. extra `entry` points for a CLI binary, as `packages/coda` and `packages/create-coda` do
 - Follow the same structure as existing packages
 - Scripts should be: `build`, `clean`, `lint`, `test`, `codegen` (if applicable)
 - All packages use ES modules (`"type": "module"` in package.json)
