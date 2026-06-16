@@ -1,7 +1,7 @@
 import type { ConstantPdaSeedNode, PdaNode } from "@codama/nodes";
 import type { RenderContext } from "../types.js";
 import { isNode } from "@codama/nodes";
-import { renderTypeNode } from "./renderType.js";
+import { renderTypeNode } from "./render-type.js";
 
 export function renderPda(pda: PdaNode, context: RenderContext): string {
   const lines: string[] = [];

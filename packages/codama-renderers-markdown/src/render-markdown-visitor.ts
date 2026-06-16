@@ -12,7 +12,7 @@ import {
   visit,
 } from "@codama/visitors-core";
 import * as prettier from "prettier";
-import { renderProgram } from "./renderers/renderProgram.js";
+import { renderProgram } from "./renderers/render-program.js";
 
 const CAPITAL_LETTER_REGEX = /([A-Z])/g;
 const LEADING_DASH_REGEX = /^-/;

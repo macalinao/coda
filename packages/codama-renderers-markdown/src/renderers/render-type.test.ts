@@ -16,7 +16,7 @@ import {
 } from "@codama/nodes";
 import { LinkableDictionary } from "@codama/visitors-core";
 import * as prettier from "prettier";
-import { renderDefinedType } from "./renderType.js";
+import { renderDefinedType } from "./render-type.js";
 
 const mockContext: RenderContext = {
   linkables: new LinkableDictionary(),

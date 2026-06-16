@@ -2,7 +2,7 @@ import type { AccountNode } from "@codama/nodes";
 import type { RenderContext } from "../types.js";
 import { isNode, resolveNestedTypeNode } from "@codama/nodes";
 import { renderDiscriminators } from "./render-discriminators.js";
-import { renderTypeNode } from "./renderType.js";
+import { renderTypeNode } from "./render-type.js";
 
 export function renderAccount(
   account: AccountNode,
