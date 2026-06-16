@@ -25,8 +25,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
-    "clean": "tsc --build --clean && rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
+    "build": "tsdown",
+    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
     "lint": "eslint --ext js,ts,tsx src",
     "lint:fix": "eslint --ext js,ts,tsx src --fix",
     "test": "bun test src/",
@@ -44,7 +44,8 @@
     "@macalinao/tsconfig": "catalog:",
     "@types/bun": "catalog:",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "tsdown": "catalog:"
   },
   "repository": {
     "type": "git",
