@@ -44,9 +44,9 @@ export function getCollectV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CollectV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountDestination extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountDestination extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

@@ -35,7 +35,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_TREE_DELEGATE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,14 +53,14 @@ export function getSetTreeDelegateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetTreeDelegateInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountTreeCreator extends string | AccountMeta = string,
-  TAccountNewTreeDelegate extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountTreeCreator extends string | AccountMeta<string> = string,
+  TAccountNewTreeDelegate extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -108,6 +112,100 @@ export function getSetTreeDelegateInstructionDataCodec(): FixedSizeCodec<
     getSetTreeDelegateInstructionDataEncoder(),
     getSetTreeDelegateInstructionDataDecoder(),
   );
+}
+
+export interface SetTreeDelegateAsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountTreeCreator extends string = string,
+  TAccountNewTreeDelegate extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  treeCreator: TransactionSigner<TAccountTreeCreator>;
+  newTreeDelegate: Address<TAccountNewTreeDelegate>;
+  merkleTree: Address<TAccountMerkleTree>;
+  systemProgram?: Address<TAccountSystemProgram>;
+}
+
+export async function getSetTreeDelegateInstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountTreeCreator extends string,
+  TAccountNewTreeDelegate extends string,
+  TAccountMerkleTree extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: SetTreeDelegateAsyncInput<
+    TAccountTreeAuthority,
+    TAccountTreeCreator,
+    TAccountNewTreeDelegate,
+    TAccountMerkleTree,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  SetTreeDelegateInstruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountTreeCreator,
+    TAccountNewTreeDelegate,
+    TAccountMerkleTree,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
+    treeCreator: { value: input.treeCreator ?? null, isWritable: false },
+    newTreeDelegate: {
+      value: input.newTreeDelegate ?? null,
+      isWritable: false,
+    },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("treeCreator", accounts.treeCreator),
+      getAccountMeta("newTreeDelegate", accounts.newTreeDelegate),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getSetTreeDelegateInstructionDataEncoder().encode({}),
+    programAddress,
+  } as SetTreeDelegateInstruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountTreeCreator,
+    TAccountNewTreeDelegate,
+    TAccountMerkleTree,
+    TAccountSystemProgram
+  >);
 }
 
 export interface SetTreeDelegateInput<

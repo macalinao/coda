@@ -286,7 +286,7 @@ if (process.env.NODE_ENV !== "production") {
 
 export function getBubblegumErrorMessage(code: BubblegumError): string {
   if (process.env.NODE_ENV !== "production") {
-    return bubblegumErrorMessages![code];
+    return (bubblegumErrorMessages as Record<BubblegumError, string>)[code];
   }
 
   return "Error message not available in production bundles.";

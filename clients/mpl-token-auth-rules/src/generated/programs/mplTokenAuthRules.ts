@@ -27,14 +27,14 @@ import type {
   FrequencyAccountArgs,
 } from "../accounts/index.js";
 import type {
-  CreateOrUpdateInput,
+  CreateOrUpdateAsyncInput,
   ParsedCreateOrUpdateInstruction,
   ParsedPuffRuleSetInstruction,
   ParsedValidateInstruction,
   ParsedWriteToBufferInstruction,
   PuffRuleSetInput,
   ValidateInput,
-  WriteToBufferInput,
+  WriteToBufferAsyncInput,
 } from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
@@ -51,15 +51,16 @@ import {
 } from "@solana/program-client-core";
 import { getFrequencyAccountCodec } from "../accounts/index.js";
 import {
-  getCreateOrUpdateInstruction,
+  getCreateOrUpdateInstructionAsync,
   getPuffRuleSetInstruction,
   getValidateInstruction,
-  getWriteToBufferInstruction,
+  getWriteToBufferInstructionAsync,
   parseCreateOrUpdateInstruction,
   parsePuffRuleSetInstruction,
   parseValidateInstruction,
   parseWriteToBufferInstruction,
 } from "../instructions/index.js";
+import { findRuleSetBufferPda, findRuleSetPda } from "../pdas/index.js";
 
 export const MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS =
   "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg" as Address<"auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg">;
@@ -160,6 +161,7 @@ export function parseMplTokenAuthRulesInstruction<TProgram extends string>(
 export interface MplTokenAuthRulesPlugin {
   accounts: MplTokenAuthRulesPluginAccounts;
   instructions: MplTokenAuthRulesPluginInstructions;
+  pdas: MplTokenAuthRulesPluginPdas;
 }
 
 export interface MplTokenAuthRulesPluginAccounts {
@@ -169,19 +171,24 @@ export interface MplTokenAuthRulesPluginAccounts {
 
 export interface MplTokenAuthRulesPluginInstructions {
   createOrUpdate: (
-    input: MakeOptional<CreateOrUpdateInput, "payer">,
-  ) => ReturnType<typeof getCreateOrUpdateInstruction> &
+    input: MakeOptional<CreateOrUpdateAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateOrUpdateInstructionAsync> &
     SelfPlanAndSendFunctions;
   validate: (
     input: ValidateInput,
   ) => ReturnType<typeof getValidateInstruction> & SelfPlanAndSendFunctions;
   writeToBuffer: (
-    input: MakeOptional<WriteToBufferInput, "payer">,
-  ) => ReturnType<typeof getWriteToBufferInstruction> &
+    input: MakeOptional<WriteToBufferAsyncInput, "payer">,
+  ) => ReturnType<typeof getWriteToBufferInstructionAsync> &
     SelfPlanAndSendFunctions;
   puffRuleSet: (
     input: MakeOptional<PuffRuleSetInput, "payer">,
   ) => ReturnType<typeof getPuffRuleSetInstruction> & SelfPlanAndSendFunctions;
+}
+
+export interface MplTokenAuthRulesPluginPdas {
+  ruleSet: typeof findRuleSetPda;
+  ruleSetBuffer: typeof findRuleSetBufferPda;
 }
 
 export type MplTokenAuthRulesPluginRequirements = ClientWithRpc<
@@ -209,7 +216,7 @@ export function mplTokenAuthRulesProgram() {
           createOrUpdate: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateOrUpdateInstruction({
+              getCreateOrUpdateInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -219,7 +226,7 @@ export function mplTokenAuthRulesProgram() {
           writeToBuffer: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWriteToBufferInstruction({
+              getWriteToBufferInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -233,6 +240,7 @@ export function mplTokenAuthRulesProgram() {
               }),
             ),
         },
+        pdas: { ruleSet: findRuleSetPda, ruleSetBuffer: findRuleSetBufferPda },
       },
     });
   };

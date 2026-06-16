@@ -224,7 +224,9 @@ export function getMplTokenAuthRulesErrorMessage(
   code: MplTokenAuthRulesError,
 ): string {
   if (process.env.NODE_ENV !== "production") {
-    return mplTokenAuthRulesErrorMessages![code];
+    return (
+      mplTokenAuthRulesErrorMessages as Record<MplTokenAuthRulesError, string>
+    )[code];
   }
 
   return "Error message not available in production bundles.";

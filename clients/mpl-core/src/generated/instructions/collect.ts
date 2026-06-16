@@ -40,9 +40,9 @@ export function getCollectDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CollectInstruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
-  TAccountRecipient1 extends string | AccountMeta = string,
-  TAccountRecipient2 extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRecipient1 extends string | AccountMeta<string> = string,
+  TAccountRecipient2 extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

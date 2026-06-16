@@ -35,7 +35,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CLOSE_TREE_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -50,16 +54,20 @@ export function getCloseTreeV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CloseTreeV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
-  TAccountRecipient extends string | AccountMeta = string,
-  TAccountCompressionProgram extends string | AccountMeta = string,
-  TAccountLogWrapper extends string | AccountMeta = string,
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
+  TAccountRecipient extends string | AccountMeta<string> = string,
+  TAccountCompressionProgram extends
+    | string
+    | AccountMeta<string> = "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
+  TAccountLogWrapper extends
+    | string
+    | AccountMeta<string> = "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -119,6 +127,129 @@ export function getCloseTreeV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
+export interface CloseTreeV2AsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountRecipient extends string = string,
+  TAccountCompressionProgram extends string = string,
+  TAccountLogWrapper extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Tree creator or delegate. */
+  authority: TransactionSigner<TAccountAuthority>;
+  merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * Recipient for reclaimed lamports (tree + config PDA). Must be the creator
+   * or the delegate.
+   */
+  recipient: Address<TAccountRecipient>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  systemProgram?: Address<TAccountSystemProgram>;
+}
+
+export async function getCloseTreeV2InstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountAuthority extends string,
+  TAccountMerkleTree extends string,
+  TAccountRecipient extends string,
+  TAccountCompressionProgram extends string,
+  TAccountLogWrapper extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: CloseTreeV2AsyncInput<
+    TAccountTreeAuthority,
+    TAccountAuthority,
+    TAccountMerkleTree,
+    TAccountRecipient,
+    TAccountCompressionProgram,
+    TAccountLogWrapper,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CloseTreeV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountAuthority,
+    TAccountMerkleTree,
+    TAccountRecipient,
+    TAccountCompressionProgram,
+    TAccountLogWrapper,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
+    recipient: { value: input.recipient ?? null, isWritable: true },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isWritable: false,
+    },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("recipient", accounts.recipient),
+      getAccountMeta("compressionProgram", accounts.compressionProgram),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getCloseTreeV2InstructionDataEncoder().encode({}),
+    programAddress,
+  } as CloseTreeV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountAuthority,
+    TAccountMerkleTree,
+    TAccountRecipient,
+    TAccountCompressionProgram,
+    TAccountLogWrapper,
+    TAccountSystemProgram
+  >);
+}
+
 export interface CloseTreeV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountAuthority extends string = string,
@@ -137,8 +268,8 @@ export interface CloseTreeV2Input<
    * or the delegate.
    */
   recipient: Address<TAccountRecipient>;
-  compressionProgram: Address<TAccountCompressionProgram>;
-  logWrapper: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
   systemProgram?: Address<TAccountSystemProgram>;
 }
 
@@ -194,6 +325,14 @@ export function getCloseTreeV2Instruction<
   >;
 
   // Resolve default values.
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

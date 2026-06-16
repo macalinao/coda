@@ -51,9 +51,9 @@ export function getUpdateCollectionInfoV1DiscriminatorBytes(): ReadonlyUint8Arra
 
 export type UpdateCollectionInfoV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
-  TAccountCollection extends string | AccountMeta = string,
-  TAccountBubblegumSigner extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountCollection extends string | AccountMeta<string> = string,
+  TAccountBubblegumSigner extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

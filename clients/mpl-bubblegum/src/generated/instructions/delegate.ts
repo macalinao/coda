@@ -43,7 +43,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DELEGATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -56,17 +60,21 @@ export function getDelegateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DelegateInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountLeafOwner extends string | AccountMeta = string,
-  TAccountPreviousLeafDelegate extends string | AccountMeta = string,
-  TAccountNewLeafDelegate extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TAccountCompressionProgram extends string | AccountMeta = string,
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountLeafOwner extends string | AccountMeta<string> = string,
+  TAccountPreviousLeafDelegate extends string | AccountMeta<string> = string,
+  TAccountNewLeafDelegate extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
+  TAccountLogWrapper extends
+    | string
+    | AccountMeta<string> = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+  TAccountCompressionProgram extends
+    | string
+    | AccountMeta<string> = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -152,6 +160,148 @@ export function getDelegateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
+export interface DelegateAsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountLeafOwner extends string = string,
+  TAccountPreviousLeafDelegate extends string = string,
+  TAccountNewLeafDelegate extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountLogWrapper extends string = string,
+  TAccountCompressionProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  leafOwner: TransactionSigner<TAccountLeafOwner>;
+  previousLeafDelegate: Address<TAccountPreviousLeafDelegate>;
+  newLeafDelegate: Address<TAccountNewLeafDelegate>;
+  merkleTree: Address<TAccountMerkleTree>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  root: DelegateInstructionDataArgs["root"];
+  dataHash: DelegateInstructionDataArgs["dataHash"];
+  creatorHash: DelegateInstructionDataArgs["creatorHash"];
+  nonce: DelegateInstructionDataArgs["nonce"];
+  index: DelegateInstructionDataArgs["index"];
+}
+
+export async function getDelegateInstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountLeafOwner extends string,
+  TAccountPreviousLeafDelegate extends string,
+  TAccountNewLeafDelegate extends string,
+  TAccountMerkleTree extends string,
+  TAccountLogWrapper extends string,
+  TAccountCompressionProgram extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: DelegateAsyncInput<
+    TAccountTreeAuthority,
+    TAccountLeafOwner,
+    TAccountPreviousLeafDelegate,
+    TAccountNewLeafDelegate,
+    TAccountMerkleTree,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  DelegateInstruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountLeafOwner,
+    TAccountPreviousLeafDelegate,
+    TAccountNewLeafDelegate,
+    TAccountMerkleTree,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: false },
+    leafOwner: { value: input.leafOwner ?? null, isWritable: false },
+    previousLeafDelegate: {
+      value: input.previousLeafDelegate ?? null,
+      isWritable: false,
+    },
+    newLeafDelegate: {
+      value: input.newLeafDelegate ?? null,
+      isWritable: false,
+    },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK" as Address<"cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("leafOwner", accounts.leafOwner),
+      getAccountMeta("previousLeafDelegate", accounts.previousLeafDelegate),
+      getAccountMeta("newLeafDelegate", accounts.newLeafDelegate),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+      getAccountMeta("compressionProgram", accounts.compressionProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getDelegateInstructionDataEncoder().encode(
+      args as DelegateInstructionDataArgs,
+    ),
+    programAddress,
+  } as DelegateInstruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountLeafOwner,
+    TAccountPreviousLeafDelegate,
+    TAccountNewLeafDelegate,
+    TAccountMerkleTree,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >);
+}
+
 export interface DelegateInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
@@ -167,8 +317,8 @@ export interface DelegateInput<
   previousLeafDelegate: Address<TAccountPreviousLeafDelegate>;
   newLeafDelegate: Address<TAccountNewLeafDelegate>;
   merkleTree: Address<TAccountMerkleTree>;
-  logWrapper: Address<TAccountLogWrapper>;
-  compressionProgram: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   root: DelegateInstructionDataArgs["root"];
   dataHash: DelegateInstructionDataArgs["dataHash"];
@@ -242,6 +392,14 @@ export function getDelegateInstruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK" as Address<"cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

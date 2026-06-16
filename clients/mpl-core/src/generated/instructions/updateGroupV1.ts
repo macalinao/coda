@@ -53,14 +53,14 @@ export function getUpdateGroupV1DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
-  TAccountGroup extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountNewUpdateAuthority extends string | AccountMeta = string,
+  TAccountGroup extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountNewUpdateAuthority extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { TreeConfigSeeds } from "../pdas/index.js";
 import type {
   DecompressibleState,
   DecompressibleStateArgs,
@@ -46,6 +47,7 @@ import {
   getU64Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findTreeConfigPda } from "../pdas/index.js";
 import {
   getDecompressibleStateDecoder,
   getDecompressibleStateEncoder,
@@ -172,4 +174,24 @@ export async function fetchAllMaybeTreeConfig(
 ): Promise<MaybeAccount<TreeConfig>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeTreeConfig(maybeAccount));
+}
+
+export async function fetchTreeConfigFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: TreeConfigSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<TreeConfig>> {
+  const maybeAccount = await fetchMaybeTreeConfigFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeTreeConfigFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: TreeConfigSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<TreeConfig>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findTreeConfigPda(seeds, { programAddress });
+  return await fetchMaybeTreeConfig(rpc, address, fetchConfig);
 }

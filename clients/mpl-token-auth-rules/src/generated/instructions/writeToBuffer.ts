@@ -37,7 +37,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findRuleSetBufferPda } from "../pdas/index.js";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getWriteToBufferArgsDecoder,
@@ -52,12 +56,12 @@ export function getWriteToBufferDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WriteToBufferInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountBufferPda extends string | AccountMeta = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountBufferPda extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -110,6 +114,91 @@ export function getWriteToBufferInstructionDataCodec(): Codec<
     getWriteToBufferInstructionDataEncoder(),
     getWriteToBufferInstructionDataDecoder(),
   );
+}
+
+export interface WriteToBufferAsyncInput<
+  TAccountPayer extends string = string,
+  TAccountBufferPda extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  /** Payer and creator of the RuleSet */
+  payer: TransactionSigner<TAccountPayer>;
+  /** The PDA account where the RuleSet buffer is stored */
+  bufferPda?: Address<TAccountBufferPda>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  writeToBufferArgs: WriteToBufferInstructionDataArgs["writeToBufferArgs"];
+}
+
+export async function getWriteToBufferInstructionAsync<
+  TAccountPayer extends string,
+  TAccountBufferPda extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
+>(
+  input: WriteToBufferAsyncInput<
+    TAccountPayer,
+    TAccountBufferPda,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  WriteToBufferInstruction<
+    TProgramAddress,
+    TAccountPayer,
+    TAccountBufferPda,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    payer: { value: input.payer ?? null, isWritable: true },
+    bufferPda: { value: input.bufferPda ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.bufferPda.value) {
+    accounts.bufferPda.value = await findRuleSetBufferPda({
+      owner: getAddressFromResolvedInstructionAccount(
+        "payer",
+        accounts.payer.value,
+      ),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("bufferPda", accounts.bufferPda),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getWriteToBufferInstructionDataEncoder().encode(
+      args as WriteToBufferInstructionDataArgs,
+    ),
+    programAddress,
+  } as WriteToBufferInstruction<
+    TProgramAddress,
+    TAccountPayer,
+    TAccountBufferPda,
+    TAccountSystemProgram
+  >);
 }
 
 export interface WriteToBufferInput<

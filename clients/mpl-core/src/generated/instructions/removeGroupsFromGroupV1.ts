@@ -53,13 +53,13 @@ export function getRemoveGroupsFromGroupV1DiscriminatorBytes(): ReadonlyUint8Arr
 
 export type RemoveGroupsFromGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
-  TAccountParentGroup extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
+  TAccountParentGroup extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
