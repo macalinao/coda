@@ -72,9 +72,8 @@ export type CollectProtocolFeesV2Instruction<
   TAccountTokenDestinationB extends string | AccountMeta = string,
   TAccountTokenProgramA extends string | AccountMeta = string,
   TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends
-    | string
-    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+  TAccountMemoProgram extends string | AccountMeta =
+    "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

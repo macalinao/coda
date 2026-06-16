@@ -56,22 +56,17 @@ export type SetRealmConfigInstruction<
   TAccountRealmAuthority extends string | AccountMeta = string,
   TAccountCouncilTokenMint extends string | AccountMeta = string,
   TAccountCouncilTokenHoldingAccount extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountRealmConfig extends string | AccountMeta = string,
-  TAccountCommunityVoterWeightAddinProgramId extends
-    | string
-    | AccountMeta = string,
-  TAccountMaxCommunityVoterWeightAddinProgramId extends
-    | string
-    | AccountMeta = string,
-  TAccountCouncilVoterWeightAddinProgramId extends
-    | string
-    | AccountMeta = string,
-  TAccountMaxCouncilVoterWeightAddinProgramId extends
-    | string
-    | AccountMeta = string,
+  TAccountCommunityVoterWeightAddinProgramId extends string | AccountMeta =
+    string,
+  TAccountMaxCommunityVoterWeightAddinProgramId extends string | AccountMeta =
+    string,
+  TAccountCouncilVoterWeightAddinProgramId extends string | AccountMeta =
+    string,
+  TAccountMaxCouncilVoterWeightAddinProgramId extends string | AccountMeta =
+    string,
   TAccountPayer extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

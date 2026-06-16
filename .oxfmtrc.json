@@ -11,5 +11,21 @@
   "arrowParens": "always",
   "bracketSameLine": false,
   "bracketSpacing": true,
-  "ignorePatterns": ["**/out", "**/.next", "**/dist", "**/.source"]
+  "ignorePatterns": [
+    "**/out",
+    "**/.next",
+    "**/dist",
+    "**/.source",
+    "**/node_modules",
+    "packages/create-coda/template",
+    "**/*.json",
+    "**/*.jsonc",
+    "**/*.json5",
+    "**/*.yml",
+    "**/*.yaml",
+    "**/*.md",
+    "**/*.mdx",
+    "**/*.html",
+    "**/*.css"
+  ]
 }

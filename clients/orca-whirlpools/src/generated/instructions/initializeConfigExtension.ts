@@ -54,9 +54,8 @@ export type InitializeConfigExtensionInstruction<
   TAccountConfigExtension extends string | AccountMeta = string,
   TAccountFunder extends string | AccountMeta = string,
   TAccountFeeAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

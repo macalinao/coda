@@ -60,9 +60,8 @@ export type NewRewarderV2Instruction<
   TAccountRewarder extends string | AccountMeta<string> = string,
   TAccountInitialAuthority extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountMintWrapper extends string | AccountMeta<string> = string,
   TAccountRewardsTokenMint extends string | AccountMeta<string> = string,
   TAccountClaimFeeTokenAccount extends string | AccountMeta<string> = string,

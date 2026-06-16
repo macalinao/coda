@@ -80,12 +80,10 @@ export type MintV2Instruction<
   TAccountMplCoreCpiSigner extends string | AccountMeta = string,
   TAccountLogWrapper extends string | AccountMeta = string,
   TAccountCompressionProgram extends string | AccountMeta = string,
-  TAccountMplCoreProgram extends
-    | string
-    | AccountMeta = "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountMplCoreProgram extends string | AccountMeta =
+    "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

@@ -56,10 +56,8 @@ export type BubblegumSetCollectionSizeInstruction<
   TAccountCollectionAuthority extends string | AccountMeta = string,
   TAccountCollectionMint extends string | AccountMeta = string,
   TAccountBubblegumSigner extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends
-    | string
-    | AccountMeta
-    | undefined = undefined,
+  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
+    undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

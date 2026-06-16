@@ -54,13 +54,10 @@ export type BurnNftInstruction<
   TAccountMint extends string | AccountMeta = string,
   TAccountTokenAccount extends string | AccountMeta = string,
   TAccountMasterEditionAccount extends string | AccountMeta = string,
-  TAccountSplTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountCollectionMetadata extends
-    | string
-    | AccountMeta
-    | undefined = undefined,
+  TAccountSplTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountCollectionMetadata extends string | AccountMeta | undefined =
+    undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

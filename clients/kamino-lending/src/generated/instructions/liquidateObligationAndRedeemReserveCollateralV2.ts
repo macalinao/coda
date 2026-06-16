@@ -56,9 +56,8 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountLiquidationAccountsLiquidator extends string | AccountMeta = string,
   TAccountLiquidationAccountsObligation extends string | AccountMeta = string,
-  TAccountLiquidationAccountsLendingMarket extends
-    | string
-    | AccountMeta = string,
+  TAccountLiquidationAccountsLendingMarket extends string | AccountMeta =
+    string,
   TAccountLiquidationAccountsLendingMarketAuthority extends
     | string
     | AccountMeta = string,
@@ -69,9 +68,8 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
   TAccountLiquidationAccountsRepayReserveLiquiditySupply extends
     | string
     | AccountMeta = string,
-  TAccountLiquidationAccountsWithdrawReserve extends
-    | string
-    | AccountMeta = string,
+  TAccountLiquidationAccountsWithdrawReserve extends string | AccountMeta =
+    string,
   TAccountLiquidationAccountsWithdrawReserveLiquidityMint extends
     | string
     | AccountMeta = string,
@@ -87,9 +85,8 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
   TAccountLiquidationAccountsWithdrawReserveLiquidityFeeReceiver extends
     | string
     | AccountMeta = string,
-  TAccountLiquidationAccountsUserSourceLiquidity extends
-    | string
-    | AccountMeta = string,
+  TAccountLiquidationAccountsUserSourceLiquidity extends string | AccountMeta =
+    string,
   TAccountLiquidationAccountsUserDestinationCollateral extends
     | string
     | AccountMeta = string,
@@ -117,12 +114,10 @@ export type LiquidateObligationAndRedeemReserveCollateralV2Instruction<
   TAccountDebtFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
-  TAccountDebtFarmsAccountsReserveFarmState extends
-    | string
-    | AccountMeta = string,
-  TAccountFarmsProgram extends
-    | string
-    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+  TAccountDebtFarmsAccountsReserveFarmState extends string | AccountMeta =
+    string,
+  TAccountFarmsProgram extends string | AccountMeta =
+    "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -263,17 +258,17 @@ export interface LiquidateObligationAndRedeemReserveCollateralV2Input<
   TAccountLiquidationAccountsLendingMarketAuthority extends string = string,
   TAccountLiquidationAccountsRepayReserve extends string = string,
   TAccountLiquidationAccountsRepayReserveLiquidityMint extends string = string,
-  TAccountLiquidationAccountsRepayReserveLiquiditySupply extends
-    string = string,
+  TAccountLiquidationAccountsRepayReserveLiquiditySupply extends string =
+    string,
   TAccountLiquidationAccountsWithdrawReserve extends string = string,
-  TAccountLiquidationAccountsWithdrawReserveLiquidityMint extends
-    string = string,
-  TAccountLiquidationAccountsWithdrawReserveCollateralMint extends
-    string = string,
-  TAccountLiquidationAccountsWithdrawReserveCollateralSupply extends
-    string = string,
-  TAccountLiquidationAccountsWithdrawReserveLiquiditySupply extends
-    string = string,
+  TAccountLiquidationAccountsWithdrawReserveLiquidityMint extends string =
+    string,
+  TAccountLiquidationAccountsWithdrawReserveCollateralMint extends string =
+    string,
+  TAccountLiquidationAccountsWithdrawReserveCollateralSupply extends string =
+    string,
+  TAccountLiquidationAccountsWithdrawReserveLiquiditySupply extends string =
+    string,
   TAccountLiquidationAccountsWithdrawReserveLiquidityFeeReceiver extends
     string = string,
   TAccountLiquidationAccountsUserSourceLiquidity extends string = string,
@@ -281,11 +276,11 @@ export interface LiquidateObligationAndRedeemReserveCollateralV2Input<
   TAccountLiquidationAccountsUserDestinationLiquidity extends string = string,
   TAccountLiquidationAccountsCollateralTokenProgram extends string = string,
   TAccountLiquidationAccountsRepayLiquidityTokenProgram extends string = string,
-  TAccountLiquidationAccountsWithdrawLiquidityTokenProgram extends
-    string = string,
+  TAccountLiquidationAccountsWithdrawLiquidityTokenProgram extends string =
+    string,
   TAccountLiquidationAccountsInstructionSysvarAccount extends string = string,
-  TAccountCollateralFarmsAccountsV2ObligationFarmUserState extends
-    string = string,
+  TAccountCollateralFarmsAccountsV2ObligationFarmUserState extends string =
+    string,
   TAccountCollateralFarmsAccountsV2ReserveFarmState extends string = string,
   TAccountDebtFarmsAccountsObligationFarmUserState extends string = string,
   TAccountDebtFarmsAccountsReserveFarmState extends string = string,

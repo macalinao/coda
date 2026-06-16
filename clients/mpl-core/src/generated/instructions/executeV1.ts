@@ -55,12 +55,10 @@ export type ExecuteV1Instruction<
   TAccountAssetSigner extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountProgramId extends
-    | string
-    | AccountMeta = "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountProgramId extends string | AccountMeta =
+    "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

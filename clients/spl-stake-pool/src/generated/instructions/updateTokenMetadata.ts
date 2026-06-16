@@ -58,9 +58,8 @@ export type UpdateTokenMetadataInstruction<
   TAccountManager extends string | AccountMeta = string,
   TAccountWithdrawAuthority extends string | AccountMeta = string,
   TAccountMetadataAccount extends string | AccountMeta = string,
-  TAccountMetadataProgram extends
-    | string
-    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  TAccountMetadataProgram extends string | AccountMeta =
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

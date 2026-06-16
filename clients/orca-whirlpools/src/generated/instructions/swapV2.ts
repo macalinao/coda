@@ -68,9 +68,8 @@ export type SwapV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountTokenProgramA extends string | AccountMeta = string,
   TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends
-    | string
-    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+  TAccountMemoProgram extends string | AccountMeta =
+    "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TAccountTokenAuthority extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountTokenMintA extends string | AccountMeta = string,

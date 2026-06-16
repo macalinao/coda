@@ -58,12 +58,10 @@ export type CreateProgramGovernanceInstruction<
   TAccountCurrentUpgradeAuthority extends string | AccountMeta = string,
   TAccountGoverningTokenOwnerRecord extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountBpfUpgradeableLoaderProgram extends
-    | string
-    | AccountMeta = "BPFLoaderUpgradeab1e11111111111111111111111",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountBpfUpgradeableLoaderProgram extends string | AccountMeta =
+    "BPFLoaderUpgradeab1e11111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountGovernanceAuthority extends string | AccountMeta = string,
   TAccountRealmConfig extends string | AccountMeta = string,
   TAccountVoterWeightRecord extends string | AccountMeta = string,

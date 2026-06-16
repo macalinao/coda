@@ -57,9 +57,8 @@ export type UpdateCollectionV1Instruction<
   TAccountPayer extends string | AccountMeta = string,
   TAccountAuthority extends string | AccountMeta = string,
   TAccountNewUpdateAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountLogWrapper extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

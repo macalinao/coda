@@ -58,18 +58,14 @@ export type WithdrawSolWithSlippageInstruction<
   TAccountDestinationSystemAccount extends string | AccountMeta = string,
   TAccountFeeAccount extends string | AccountMeta = string,
   TAccountPoolMint extends string | AccountMeta = string,
-  TAccountClockSysvar extends
-    | string
-    | AccountMeta = "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends
-    | string
-    | AccountMeta = "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeProgram extends
-    | string
-    | AccountMeta = "Stake11111111111111111111111111111111111111",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountClockSysvar extends string | AccountMeta =
+    "SysvarC1ock11111111111111111111111111111111",
+  TAccountStakeHistorySysvar extends string | AccountMeta =
+    "SysvarStakeHistory1111111111111111111111111",
+  TAccountStakeProgram extends string | AccountMeta =
+    "Stake11111111111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountSolWithdrawAuthority extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

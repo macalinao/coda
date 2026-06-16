@@ -52,9 +52,8 @@ export type ValidateInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
   TAccountRuleSetPda extends string | AccountMeta = string,
   TAccountMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountPayer extends string | AccountMeta = string,
   TAccountRuleAuthority extends string | AccountMeta = string,
   TAccountRuleSetStatePda extends string | AccountMeta = string,

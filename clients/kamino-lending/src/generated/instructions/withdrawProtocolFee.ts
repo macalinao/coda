@@ -59,9 +59,8 @@ export type WithdrawProtocolFeeInstruction<
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountFeeVault extends string | AccountMeta = string,
   TAccountFeeCollectorAta extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

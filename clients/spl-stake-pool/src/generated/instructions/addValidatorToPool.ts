@@ -57,24 +57,18 @@ export type AddValidatorToPoolInstruction<
   TAccountValidatorStakeList extends string | AccountMeta = string,
   TAccountNewStakeAccount extends string | AccountMeta = string,
   TAccountValidatorVoteAccount extends string | AccountMeta = string,
-  TAccountRentSysvar extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountClockSysvar extends
-    | string
-    | AccountMeta = "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends
-    | string
-    | AccountMeta = "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeConfigSysvar extends
-    | string
-    | AccountMeta = "StakeConfig11111111111111111111111111111111",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountStakeProgram extends
-    | string
-    | AccountMeta = "Stake11111111111111111111111111111111111111",
+  TAccountRentSysvar extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
+  TAccountClockSysvar extends string | AccountMeta =
+    "SysvarC1ock11111111111111111111111111111111",
+  TAccountStakeHistorySysvar extends string | AccountMeta =
+    "SysvarStakeHistory1111111111111111111111111",
+  TAccountStakeConfigSysvar extends string | AccountMeta =
+    "StakeConfig11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountStakeProgram extends string | AccountMeta =
+    "Stake11111111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

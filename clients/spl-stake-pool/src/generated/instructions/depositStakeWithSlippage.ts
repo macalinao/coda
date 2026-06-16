@@ -61,18 +61,14 @@ export type DepositStakeWithSlippageInstruction<
   TAccountFeeAccount extends string | AccountMeta = string,
   TAccountReferralFeeAccount extends string | AccountMeta = string,
   TAccountPoolMint extends string | AccountMeta = string,
-  TAccountClockSysvar extends
-    | string
-    | AccountMeta = "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends
-    | string
-    | AccountMeta = "SysvarStakeHistory1111111111111111111111111",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountStakeProgram extends
-    | string
-    | AccountMeta = "Stake11111111111111111111111111111111111111",
+  TAccountClockSysvar extends string | AccountMeta =
+    "SysvarC1ock11111111111111111111111111111111",
+  TAccountStakeHistorySysvar extends string | AccountMeta =
+    "SysvarStakeHistory1111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountStakeProgram extends string | AccountMeta =
+    "Stake11111111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

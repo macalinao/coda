@@ -57,9 +57,8 @@ export function getClaimRewardsV2DiscriminatorBytes(): ReadonlyUint8Array {
 export type ClaimRewardsV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMintWrapper extends string | AccountMeta<string> = string,
-  TAccountMintWrapperProgram extends
-    | string
-    | AccountMeta<string> = "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
+  TAccountMintWrapperProgram extends string | AccountMeta<string> =
+    "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
   TAccountMinter extends string | AccountMeta<string> = string,
   TAccountRewardsTokenMint extends string | AccountMeta<string> = string,
   TAccountRewardsTokenAccount extends string | AccountMeta<string> = string,
@@ -67,9 +66,8 @@ export type ClaimRewardsV2Instruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountMiner extends string | AccountMeta<string> = string,
   TAccountQuarry extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRewarder extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &

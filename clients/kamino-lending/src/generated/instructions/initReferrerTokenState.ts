@@ -54,12 +54,10 @@ export type InitReferrerTokenStateInstruction<
   TAccountReserve extends string | AccountMeta = string,
   TAccountReferrer extends string | AccountMeta = string,
   TAccountReferrerTokenState extends string | AccountMeta = string,
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

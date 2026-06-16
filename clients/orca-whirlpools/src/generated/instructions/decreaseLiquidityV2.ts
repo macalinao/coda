@@ -68,9 +68,8 @@ export type DecreaseLiquidityV2Instruction<
   TAccountWhirlpool extends string | AccountMeta = string,
   TAccountTokenProgramA extends string | AccountMeta = string,
   TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends
-    | string
-    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+  TAccountMemoProgram extends string | AccountMeta =
+    "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TAccountPositionAuthority extends string | AccountMeta = string,
   TAccountPosition extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,

@@ -67,24 +67,19 @@ export type LiquidateObligationAndRedeemReserveCollateralInstruction<
   TAccountWithdrawReserveCollateralMint extends string | AccountMeta = string,
   TAccountWithdrawReserveCollateralSupply extends string | AccountMeta = string,
   TAccountWithdrawReserveLiquiditySupply extends string | AccountMeta = string,
-  TAccountWithdrawReserveLiquidityFeeReceiver extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawReserveLiquidityFeeReceiver extends string | AccountMeta =
+    string,
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
   TAccountUserDestinationCollateral extends string | AccountMeta = string,
   TAccountUserDestinationLiquidity extends string | AccountMeta = string,
-  TAccountCollateralTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRepayLiquidityTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountWithdrawLiquidityTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountCollateralTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRepayLiquidityTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountWithdrawLiquidityTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountInstructionSysvarAccount extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

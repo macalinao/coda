@@ -61,21 +61,16 @@ export type RedelegateInstruction<
   TAccountDestinationTransientStake extends string | AccountMeta = string,
   TAccountDestinationStake extends string | AccountMeta = string,
   TAccountDestinationVote extends string | AccountMeta = string,
-  TAccountClockSysvar extends
-    | string
-    | AccountMeta = "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends
-    | string
-    | AccountMeta = "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeConfigSysvar extends
-    | string
-    | AccountMeta = "StakeConfig11111111111111111111111111111111",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountStakeProgram extends
-    | string
-    | AccountMeta = "Stake11111111111111111111111111111111111111",
+  TAccountClockSysvar extends string | AccountMeta =
+    "SysvarC1ock11111111111111111111111111111111",
+  TAccountStakeHistorySysvar extends string | AccountMeta =
+    "SysvarStakeHistory1111111111111111111111111",
+  TAccountStakeConfigSysvar extends string | AccountMeta =
+    "StakeConfig11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountStakeProgram extends string | AccountMeta =
+    "Stake11111111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

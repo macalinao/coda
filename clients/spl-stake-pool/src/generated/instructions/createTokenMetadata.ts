@@ -61,12 +61,10 @@ export type CreateTokenMetadataInstruction<
   TAccountPoolMint extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountMetadataAccount extends string | AccountMeta = string,
-  TAccountMetadataProgram extends
-    | string
-    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountMetadataProgram extends string | AccountMeta =
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

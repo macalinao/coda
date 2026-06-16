@@ -70,12 +70,10 @@ export type CollectRewardV2Instruction<
   TAccountRewardOwnerAccount extends string | AccountMeta = string,
   TAccountRewardMint extends string | AccountMeta = string,
   TAccountRewardVault extends string | AccountMeta = string,
-  TAccountRewardTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountMemoProgram extends
-    | string
-    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+  TAccountRewardTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountMemoProgram extends string | AccountMeta =
+    "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
