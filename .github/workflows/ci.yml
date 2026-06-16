@@ -19,6 +19,14 @@ jobs:
         with:
           bun-version: latest
 
+      # Coda loads coda.config.ts via native Node.js type stripping, which
+      # requires Node >= 22.18 / 24. Pin a supported version for the native
+      # config-load verification step below.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - name: Cache dependencies
         uses: actions/cache@v5
         with:
@@ -41,3 +49,14 @@ jobs:
 
       - name: Typecheck coda.config.ts files
         run: bun run typecheck
+
+      # Gate the native Node.js config-load path: run the compiled CLI with
+      # `node` directly (not bun) against every client so each coda.config.ts
+      # must load and apply its visitors via native type stripping. `idl` is
+      # non-destructive (prints to stdout, writes no files).
+      - name: Verify coda.config.ts loads under native Node
+        run: |
+          for dir in clients/*/; do
+            echo "== ${dir} =="
+            ( cd "${dir}" && node "${GITHUB_WORKSPACE}/packages/coda/dist/bin/cli.js" idl > /dev/null )
+          done
