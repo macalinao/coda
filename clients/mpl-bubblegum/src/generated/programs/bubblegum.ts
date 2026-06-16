@@ -29,22 +29,22 @@ import type {
   VoucherArgs,
 } from "../accounts/index.js";
 import type {
-  BurnInput,
-  BurnV2Input,
-  CancelRedeemInput,
-  CloseTreeV2Input,
+  BurnAsyncInput,
+  BurnV2AsyncInput,
+  CancelRedeemAsyncInput,
+  CloseTreeV2AsyncInput,
   CollectV2Input,
-  CompressInput,
-  CreateTreeInput,
-  CreateTreeV2Input,
-  DecompressV1Input,
-  DelegateAndFreezeV2Input,
-  DelegateInput,
-  DelegateV2Input,
-  FreezeV2Input,
-  MintToCollectionV1Input,
-  MintV1Input,
-  MintV2Input,
+  CompressAsyncInput,
+  CreateTreeAsyncInput,
+  CreateTreeV2AsyncInput,
+  DecompressV1AsyncInput,
+  DelegateAndFreezeV2AsyncInput,
+  DelegateAsyncInput,
+  DelegateV2AsyncInput,
+  FreezeV2AsyncInput,
+  MintToCollectionV1AsyncInput,
+  MintV1AsyncInput,
+  MintV2AsyncInput,
   ParsedBurnInstruction,
   ParsedBurnV2Instruction,
   ParsedCancelRedeemInstruction,
@@ -81,26 +81,26 @@ import type {
   ParsedVerifyCollectionInstruction,
   ParsedVerifyCreatorInstruction,
   ParsedVerifyCreatorV2Instruction,
-  RedeemInput,
-  SetAndVerifyCollectionInput,
-  SetCollectionV2Input,
+  RedeemAsyncInput,
+  SetAndVerifyCollectionAsyncInput,
+  SetCollectionV2AsyncInput,
   SetDecompressableStateInput,
   SetDecompressibleStateInput,
-  SetNonTransferableV2Input,
-  SetTreeDelegateInput,
-  ThawAndRevokeV2Input,
-  ThawV2Input,
-  TransferInput,
-  TransferV2Input,
-  UnverifyCollectionInput,
-  UnverifyCreatorInput,
-  UnverifyCreatorV2Input,
-  UpdateAssetDataV2Input,
-  UpdateMetadataInput,
-  UpdateMetadataV2Input,
-  VerifyCollectionInput,
-  VerifyCreatorInput,
-  VerifyCreatorV2Input,
+  SetNonTransferableV2AsyncInput,
+  SetTreeDelegateAsyncInput,
+  ThawAndRevokeV2AsyncInput,
+  ThawV2AsyncInput,
+  TransferAsyncInput,
+  TransferV2AsyncInput,
+  UnverifyCollectionAsyncInput,
+  UnverifyCreatorAsyncInput,
+  UnverifyCreatorV2AsyncInput,
+  UpdateAssetDataV2AsyncInput,
+  UpdateMetadataAsyncInput,
+  UpdateMetadataV2AsyncInput,
+  VerifyCollectionAsyncInput,
+  VerifyCreatorAsyncInput,
+  VerifyCreatorV2AsyncInput,
 } from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
@@ -119,42 +119,42 @@ import {
 } from "@solana/program-client-core";
 import { getTreeConfigCodec, getVoucherCodec } from "../accounts/index.js";
 import {
-  getBurnInstruction,
-  getBurnV2Instruction,
-  getCancelRedeemInstruction,
-  getCloseTreeV2Instruction,
+  getBurnInstructionAsync,
+  getBurnV2InstructionAsync,
+  getCancelRedeemInstructionAsync,
+  getCloseTreeV2InstructionAsync,
   getCollectV2Instruction,
-  getCompressInstruction,
-  getCreateTreeInstruction,
-  getCreateTreeV2Instruction,
-  getDecompressV1Instruction,
-  getDelegateAndFreezeV2Instruction,
-  getDelegateInstruction,
-  getDelegateV2Instruction,
-  getFreezeV2Instruction,
-  getMintToCollectionV1Instruction,
-  getMintV1Instruction,
-  getMintV2Instruction,
-  getRedeemInstruction,
-  getSetAndVerifyCollectionInstruction,
-  getSetCollectionV2Instruction,
+  getCompressInstructionAsync,
+  getCreateTreeInstructionAsync,
+  getCreateTreeV2InstructionAsync,
+  getDecompressV1InstructionAsync,
+  getDelegateAndFreezeV2InstructionAsync,
+  getDelegateInstructionAsync,
+  getDelegateV2InstructionAsync,
+  getFreezeV2InstructionAsync,
+  getMintToCollectionV1InstructionAsync,
+  getMintV1InstructionAsync,
+  getMintV2InstructionAsync,
+  getRedeemInstructionAsync,
+  getSetAndVerifyCollectionInstructionAsync,
+  getSetCollectionV2InstructionAsync,
   getSetDecompressableStateInstruction,
   getSetDecompressibleStateInstruction,
-  getSetNonTransferableV2Instruction,
-  getSetTreeDelegateInstruction,
-  getThawAndRevokeV2Instruction,
-  getThawV2Instruction,
-  getTransferInstruction,
-  getTransferV2Instruction,
-  getUnverifyCollectionInstruction,
-  getUnverifyCreatorInstruction,
-  getUnverifyCreatorV2Instruction,
-  getUpdateAssetDataV2Instruction,
-  getUpdateMetadataInstruction,
-  getUpdateMetadataV2Instruction,
-  getVerifyCollectionInstruction,
-  getVerifyCreatorInstruction,
-  getVerifyCreatorV2Instruction,
+  getSetNonTransferableV2InstructionAsync,
+  getSetTreeDelegateInstructionAsync,
+  getThawAndRevokeV2InstructionAsync,
+  getThawV2InstructionAsync,
+  getTransferInstructionAsync,
+  getTransferV2InstructionAsync,
+  getUnverifyCollectionInstructionAsync,
+  getUnverifyCreatorInstructionAsync,
+  getUnverifyCreatorV2InstructionAsync,
+  getUpdateAssetDataV2InstructionAsync,
+  getUpdateMetadataInstructionAsync,
+  getUpdateMetadataV2InstructionAsync,
+  getVerifyCollectionInstructionAsync,
+  getVerifyCreatorInstructionAsync,
+  getVerifyCreatorV2InstructionAsync,
   parseBurnInstruction,
   parseBurnV2Instruction,
   parseCancelRedeemInstruction,
@@ -192,6 +192,13 @@ import {
   parseVerifyCreatorInstruction,
   parseVerifyCreatorV2Instruction,
 } from "../instructions/index.js";
+import {
+  findAssetIdPda,
+  findBubblegumSignerPda,
+  findMintAuthorityPda,
+  findTreeConfigPda,
+  findVoucherPda,
+} from "../pdas/index.js";
 
 export const BUBBLEGUM_PROGRAM_ADDRESS =
   "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">;
@@ -1061,6 +1068,7 @@ export function parseBubblegumInstruction<TProgram extends string>(
 export interface BubblegumPlugin {
   accounts: BubblegumPluginAccounts;
   instructions: BubblegumPluginInstructions;
+  pdas: BubblegumPluginPdas;
 }
 
 export interface BubblegumPluginAccounts {
@@ -1072,65 +1080,74 @@ export interface BubblegumPluginAccounts {
 
 export interface BubblegumPluginInstructions {
   burn: (
-    input: BurnInput,
-  ) => ReturnType<typeof getBurnInstruction> & SelfPlanAndSendFunctions;
+    input: BurnAsyncInput,
+  ) => ReturnType<typeof getBurnInstructionAsync> & SelfPlanAndSendFunctions;
   burnV2: (
-    input: MakeOptional<BurnV2Input, "payer">,
-  ) => ReturnType<typeof getBurnV2Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<BurnV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getBurnV2InstructionAsync> & SelfPlanAndSendFunctions;
   cancelRedeem: (
-    input: CancelRedeemInput,
-  ) => ReturnType<typeof getCancelRedeemInstruction> & SelfPlanAndSendFunctions;
+    input: CancelRedeemAsyncInput,
+  ) => ReturnType<typeof getCancelRedeemInstructionAsync> &
+    SelfPlanAndSendFunctions;
   closeTreeV2: (
-    input: CloseTreeV2Input,
-  ) => ReturnType<typeof getCloseTreeV2Instruction> & SelfPlanAndSendFunctions;
+    input: CloseTreeV2AsyncInput,
+  ) => ReturnType<typeof getCloseTreeV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
   collectV2: (
     input: CollectV2Input,
   ) => ReturnType<typeof getCollectV2Instruction> & SelfPlanAndSendFunctions;
   compress: (
-    input: MakeOptional<CompressInput, "payer">,
-  ) => ReturnType<typeof getCompressInstruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<CompressAsyncInput, "payer">,
+  ) => ReturnType<typeof getCompressInstructionAsync> &
+    SelfPlanAndSendFunctions;
   createTree: (
-    input: MakeOptional<CreateTreeInput, "payer">,
-  ) => ReturnType<typeof getCreateTreeInstruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<CreateTreeAsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateTreeInstructionAsync> &
+    SelfPlanAndSendFunctions;
   createTreeV2: (
-    input: MakeOptional<CreateTreeV2Input, "payer">,
-  ) => ReturnType<typeof getCreateTreeV2Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<CreateTreeV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getCreateTreeV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
   decompressV1: (
-    input: DecompressV1Input,
-  ) => ReturnType<typeof getDecompressV1Instruction> & SelfPlanAndSendFunctions;
+    input: DecompressV1AsyncInput,
+  ) => ReturnType<typeof getDecompressV1InstructionAsync> &
+    SelfPlanAndSendFunctions;
   delegate: (
-    input: DelegateInput,
-  ) => ReturnType<typeof getDelegateInstruction> & SelfPlanAndSendFunctions;
+    input: DelegateAsyncInput,
+  ) => ReturnType<typeof getDelegateInstructionAsync> &
+    SelfPlanAndSendFunctions;
   delegateAndFreezeV2: (
-    input: MakeOptional<DelegateAndFreezeV2Input, "payer">,
-  ) => ReturnType<typeof getDelegateAndFreezeV2Instruction> &
+    input: MakeOptional<DelegateAndFreezeV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getDelegateAndFreezeV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   delegateV2: (
-    input: MakeOptional<DelegateV2Input, "payer">,
-  ) => ReturnType<typeof getDelegateV2Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<DelegateV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getDelegateV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
   freezeV2: (
-    input: MakeOptional<FreezeV2Input, "payer">,
-  ) => ReturnType<typeof getFreezeV2Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<FreezeV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getFreezeV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
   mintToCollectionV1: (
-    input: MakeOptional<MintToCollectionV1Input, "payer">,
-  ) => ReturnType<typeof getMintToCollectionV1Instruction> &
+    input: MakeOptional<MintToCollectionV1AsyncInput, "payer">,
+  ) => ReturnType<typeof getMintToCollectionV1InstructionAsync> &
     SelfPlanAndSendFunctions;
   mintV1: (
-    input: MakeOptional<MintV1Input, "payer">,
-  ) => ReturnType<typeof getMintV1Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<MintV1AsyncInput, "payer">,
+  ) => ReturnType<typeof getMintV1InstructionAsync> & SelfPlanAndSendFunctions;
   mintV2: (
-    input: MakeOptional<MintV2Input, "payer">,
-  ) => ReturnType<typeof getMintV2Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<MintV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getMintV2InstructionAsync> & SelfPlanAndSendFunctions;
   redeem: (
-    input: RedeemInput,
-  ) => ReturnType<typeof getRedeemInstruction> & SelfPlanAndSendFunctions;
+    input: RedeemAsyncInput,
+  ) => ReturnType<typeof getRedeemInstructionAsync> & SelfPlanAndSendFunctions;
   setAndVerifyCollection: (
-    input: MakeOptional<SetAndVerifyCollectionInput, "payer">,
-  ) => ReturnType<typeof getSetAndVerifyCollectionInstruction> &
+    input: MakeOptional<SetAndVerifyCollectionAsyncInput, "payer">,
+  ) => ReturnType<typeof getSetAndVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   setCollectionV2: (
-    input: MakeOptional<SetCollectionV2Input, "payer">,
-  ) => ReturnType<typeof getSetCollectionV2Instruction> &
+    input: MakeOptional<SetCollectionV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getSetCollectionV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   setDecompressableState: (
     input: SetDecompressableStateInput,
@@ -1141,62 +1158,72 @@ export interface BubblegumPluginInstructions {
   ) => ReturnType<typeof getSetDecompressibleStateInstruction> &
     SelfPlanAndSendFunctions;
   setNonTransferableV2: (
-    input: MakeOptional<SetNonTransferableV2Input, "payer">,
-  ) => ReturnType<typeof getSetNonTransferableV2Instruction> &
+    input: MakeOptional<SetNonTransferableV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getSetNonTransferableV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   setTreeDelegate: (
-    input: SetTreeDelegateInput,
-  ) => ReturnType<typeof getSetTreeDelegateInstruction> &
+    input: SetTreeDelegateAsyncInput,
+  ) => ReturnType<typeof getSetTreeDelegateInstructionAsync> &
     SelfPlanAndSendFunctions;
   thawAndRevokeV2: (
-    input: MakeOptional<ThawAndRevokeV2Input, "payer">,
-  ) => ReturnType<typeof getThawAndRevokeV2Instruction> &
+    input: MakeOptional<ThawAndRevokeV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getThawAndRevokeV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   thawV2: (
-    input: MakeOptional<ThawV2Input, "payer">,
-  ) => ReturnType<typeof getThawV2Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<ThawV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getThawV2InstructionAsync> & SelfPlanAndSendFunctions;
   transfer: (
-    input: TransferInput,
-  ) => ReturnType<typeof getTransferInstruction> & SelfPlanAndSendFunctions;
+    input: TransferAsyncInput,
+  ) => ReturnType<typeof getTransferInstructionAsync> &
+    SelfPlanAndSendFunctions;
   transferV2: (
-    input: MakeOptional<TransferV2Input, "payer">,
-  ) => ReturnType<typeof getTransferV2Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<TransferV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getTransferV2InstructionAsync> &
+    SelfPlanAndSendFunctions;
   unverifyCollection: (
-    input: MakeOptional<UnverifyCollectionInput, "payer">,
-  ) => ReturnType<typeof getUnverifyCollectionInstruction> &
+    input: MakeOptional<UnverifyCollectionAsyncInput, "payer">,
+  ) => ReturnType<typeof getUnverifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifyCreator: (
-    input: MakeOptional<UnverifyCreatorInput, "payer">,
-  ) => ReturnType<typeof getUnverifyCreatorInstruction> &
+    input: MakeOptional<UnverifyCreatorAsyncInput, "payer">,
+  ) => ReturnType<typeof getUnverifyCreatorInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifyCreatorV2: (
-    input: MakeOptional<UnverifyCreatorV2Input, "payer">,
-  ) => ReturnType<typeof getUnverifyCreatorV2Instruction> &
+    input: MakeOptional<UnverifyCreatorV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getUnverifyCreatorV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   updateAssetDataV2: (
-    input: MakeOptional<UpdateAssetDataV2Input, "payer">,
-  ) => ReturnType<typeof getUpdateAssetDataV2Instruction> &
+    input: MakeOptional<UpdateAssetDataV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getUpdateAssetDataV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   updateMetadata: (
-    input: MakeOptional<UpdateMetadataInput, "payer">,
-  ) => ReturnType<typeof getUpdateMetadataInstruction> &
+    input: MakeOptional<UpdateMetadataAsyncInput, "payer">,
+  ) => ReturnType<typeof getUpdateMetadataInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateMetadataV2: (
-    input: MakeOptional<UpdateMetadataV2Input, "payer">,
-  ) => ReturnType<typeof getUpdateMetadataV2Instruction> &
+    input: MakeOptional<UpdateMetadataV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getUpdateMetadataV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCollection: (
-    input: MakeOptional<VerifyCollectionInput, "payer">,
-  ) => ReturnType<typeof getVerifyCollectionInstruction> &
+    input: MakeOptional<VerifyCollectionAsyncInput, "payer">,
+  ) => ReturnType<typeof getVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCreator: (
-    input: MakeOptional<VerifyCreatorInput, "payer">,
-  ) => ReturnType<typeof getVerifyCreatorInstruction> &
+    input: MakeOptional<VerifyCreatorAsyncInput, "payer">,
+  ) => ReturnType<typeof getVerifyCreatorInstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCreatorV2: (
-    input: MakeOptional<VerifyCreatorV2Input, "payer">,
-  ) => ReturnType<typeof getVerifyCreatorV2Instruction> &
+    input: MakeOptional<VerifyCreatorV2AsyncInput, "payer">,
+  ) => ReturnType<typeof getVerifyCreatorV2InstructionAsync> &
     SelfPlanAndSendFunctions;
+}
+
+export interface BubblegumPluginPdas {
+  treeConfig: typeof findTreeConfigPda;
+  voucher: typeof findVoucherPda;
+  assetId: typeof findAssetIdPda;
+  bubblegumSigner: typeof findBubblegumSignerPda;
+  mintAuthority: typeof findMintAuthorityPda;
 }
 
 export type BubblegumPluginRequirements = ClientWithRpc<
@@ -1218,11 +1245,11 @@ export function bubblegumProgram() {
         },
         instructions: {
           burn: (input) =>
-            addSelfPlanAndSendFunctions(client, getBurnInstruction(input)),
+            addSelfPlanAndSendFunctions(client, getBurnInstructionAsync(input)),
           burnV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getBurnV2Instruction({
+              getBurnV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1230,19 +1257,19 @@ export function bubblegumProgram() {
           cancelRedeem: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCancelRedeemInstruction(input),
+              getCancelRedeemInstructionAsync(input),
             ),
           closeTreeV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseTreeV2Instruction(input),
+              getCloseTreeV2InstructionAsync(input),
             ),
           collectV2: (input) =>
             addSelfPlanAndSendFunctions(client, getCollectV2Instruction(input)),
           compress: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCompressInstruction({
+              getCompressInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1250,7 +1277,7 @@ export function bubblegumProgram() {
           createTree: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateTreeInstruction({
+              getCreateTreeInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1258,7 +1285,7 @@ export function bubblegumProgram() {
           createTreeV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateTreeV2Instruction({
+              getCreateTreeV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1266,14 +1293,17 @@ export function bubblegumProgram() {
           decompressV1: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDecompressV1Instruction(input),
+              getDecompressV1InstructionAsync(input),
             ),
           delegate: (input) =>
-            addSelfPlanAndSendFunctions(client, getDelegateInstruction(input)),
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateInstructionAsync(input),
+            ),
           delegateAndFreezeV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateAndFreezeV2Instruction({
+              getDelegateAndFreezeV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1281,7 +1311,7 @@ export function bubblegumProgram() {
           delegateV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateV2Instruction({
+              getDelegateV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1289,7 +1319,7 @@ export function bubblegumProgram() {
           freezeV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getFreezeV2Instruction({
+              getFreezeV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1297,7 +1327,7 @@ export function bubblegumProgram() {
           mintToCollectionV1: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintToCollectionV1Instruction({
+              getMintToCollectionV1InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1305,7 +1335,7 @@ export function bubblegumProgram() {
           mintV1: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintV1Instruction({
+              getMintV1InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1313,17 +1343,20 @@ export function bubblegumProgram() {
           mintV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintV2Instruction({
+              getMintV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
             ),
           redeem: (input) =>
-            addSelfPlanAndSendFunctions(client, getRedeemInstruction(input)),
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemInstructionAsync(input),
+            ),
           setAndVerifyCollection: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetAndVerifyCollectionInstruction({
+              getSetAndVerifyCollectionInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1331,7 +1364,7 @@ export function bubblegumProgram() {
           setCollectionV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetCollectionV2Instruction({
+              getSetCollectionV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1349,7 +1382,7 @@ export function bubblegumProgram() {
           setNonTransferableV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetNonTransferableV2Instruction({
+              getSetNonTransferableV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1357,12 +1390,12 @@ export function bubblegumProgram() {
           setTreeDelegate: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetTreeDelegateInstruction(input),
+              getSetTreeDelegateInstructionAsync(input),
             ),
           thawAndRevokeV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getThawAndRevokeV2Instruction({
+              getThawAndRevokeV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1370,17 +1403,20 @@ export function bubblegumProgram() {
           thawV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getThawV2Instruction({
+              getThawV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
             ),
           transfer: (input) =>
-            addSelfPlanAndSendFunctions(client, getTransferInstruction(input)),
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferInstructionAsync(input),
+            ),
           transferV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTransferV2Instruction({
+              getTransferV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1388,7 +1424,7 @@ export function bubblegumProgram() {
           unverifyCollection: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifyCollectionInstruction({
+              getUnverifyCollectionInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1396,7 +1432,7 @@ export function bubblegumProgram() {
           unverifyCreator: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifyCreatorInstruction({
+              getUnverifyCreatorInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1404,7 +1440,7 @@ export function bubblegumProgram() {
           unverifyCreatorV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifyCreatorV2Instruction({
+              getUnverifyCreatorV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1412,7 +1448,7 @@ export function bubblegumProgram() {
           updateAssetDataV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateAssetDataV2Instruction({
+              getUpdateAssetDataV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1420,7 +1456,7 @@ export function bubblegumProgram() {
           updateMetadata: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateMetadataInstruction({
+              getUpdateMetadataInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1428,7 +1464,7 @@ export function bubblegumProgram() {
           updateMetadataV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateMetadataV2Instruction({
+              getUpdateMetadataV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1436,7 +1472,7 @@ export function bubblegumProgram() {
           verifyCollection: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getVerifyCollectionInstruction({
+              getVerifyCollectionInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1444,7 +1480,7 @@ export function bubblegumProgram() {
           verifyCreator: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getVerifyCreatorInstruction({
+              getVerifyCreatorInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1452,11 +1488,18 @@ export function bubblegumProgram() {
           verifyCreatorV2: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getVerifyCreatorV2Instruction({
+              getVerifyCreatorV2InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
             ),
+        },
+        pdas: {
+          treeConfig: findTreeConfigPda,
+          voucher: findVoucherPda,
+          assetId: findAssetIdPda,
+          bubblegumSigner: findBubblegumSignerPda,
+          mintAuthority: findMintAuthorityPda,
         },
       },
     });

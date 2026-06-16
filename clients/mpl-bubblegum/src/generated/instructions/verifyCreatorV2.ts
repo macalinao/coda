@@ -49,7 +49,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsV2Decoder,
@@ -67,18 +71,22 @@ export function getVerifyCreatorV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type VerifyCreatorV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountCreator extends string | AccountMeta = string,
-  TAccountLeafOwner extends string | AccountMeta = string,
-  TAccountLeafDelegate extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TAccountCompressionProgram extends string | AccountMeta = string,
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountCreator extends string | AccountMeta<string> = string,
+  TAccountLeafOwner extends string | AccountMeta<string> = string,
+  TAccountLeafDelegate extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
+  TAccountLogWrapper extends
+    | string
+    | AccountMeta<string> = "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
+  TAccountCompressionProgram extends
+    | string
+    | AccountMeta<string> = "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -178,6 +186,153 @@ export function getVerifyCreatorV2InstructionDataCodec(): Codec<
   );
 }
 
+export interface VerifyCreatorV2AsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountPayer extends string = string,
+  TAccountCreator extends string = string,
+  TAccountLeafOwner extends string = string,
+  TAccountLeafDelegate extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountLogWrapper extends string = string,
+  TAccountCompressionProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  payer: TransactionSigner<TAccountPayer>;
+  /** Optional creator, defaults to `payer` */
+  creator?: TransactionSigner<TAccountCreator>;
+  leafOwner: Address<TAccountLeafOwner>;
+  /** Defaults to `leaf_owner` */
+  leafDelegate?: Address<TAccountLeafDelegate>;
+  merkleTree: Address<TAccountMerkleTree>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  root: VerifyCreatorV2InstructionDataArgs["root"];
+  assetDataHash: VerifyCreatorV2InstructionDataArgs["assetDataHash"];
+  flags: VerifyCreatorV2InstructionDataArgs["flags"];
+  nonce: VerifyCreatorV2InstructionDataArgs["nonce"];
+  index: VerifyCreatorV2InstructionDataArgs["index"];
+  message: VerifyCreatorV2InstructionDataArgs["message"];
+}
+
+export async function getVerifyCreatorV2InstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountPayer extends string,
+  TAccountCreator extends string,
+  TAccountLeafOwner extends string,
+  TAccountLeafDelegate extends string,
+  TAccountMerkleTree extends string,
+  TAccountLogWrapper extends string,
+  TAccountCompressionProgram extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: VerifyCreatorV2AsyncInput<
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountCreator,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  VerifyCreatorV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountCreator,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    creator: { value: input.creator ?? null, isWritable: false },
+    leafOwner: { value: input.leafOwner ?? null, isWritable: false },
+    leafDelegate: { value: input.leafDelegate ?? null, isWritable: false },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("creator", accounts.creator),
+      getAccountMeta("leafOwner", accounts.leafOwner),
+      getAccountMeta("leafDelegate", accounts.leafDelegate),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+      getAccountMeta("compressionProgram", accounts.compressionProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getVerifyCreatorV2InstructionDataEncoder().encode(
+      args as VerifyCreatorV2InstructionDataArgs,
+    ),
+    programAddress,
+  } as VerifyCreatorV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountCreator,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >);
+}
+
 export interface VerifyCreatorV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
@@ -197,8 +352,8 @@ export interface VerifyCreatorV2Input<
   /** Defaults to `leaf_owner` */
   leafDelegate?: Address<TAccountLeafDelegate>;
   merkleTree: Address<TAccountMerkleTree>;
-  logWrapper: Address<TAccountLogWrapper>;
-  compressionProgram: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   root: VerifyCreatorV2InstructionDataArgs["root"];
   assetDataHash: VerifyCreatorV2InstructionDataArgs["assetDataHash"];
@@ -271,6 +426,14 @@ export function getVerifyCreatorV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

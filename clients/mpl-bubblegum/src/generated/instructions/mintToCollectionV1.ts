@@ -25,6 +25,7 @@ import type {
 import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { MetadataArgs, MetadataArgsArgs } from "../types/index.js";
 import {
+  address,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
@@ -36,7 +37,16 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import {
+  findBubblegumSignerPda,
+  findMasterEditionPda,
+  findMetadataPda,
+  findTreeConfigPda,
+} from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsDecoder,
@@ -54,27 +64,33 @@ export function getMintToCollectionV1DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type MintToCollectionV1Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountLeafOwner extends string | AccountMeta = string,
-  TAccountLeafDelegate extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountTreeDelegate extends string | AccountMeta = string,
-  TAccountCollectionAuthority extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecordPda extends string | AccountMeta = string,
-  TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountCollectionMetadata extends string | AccountMeta = string,
-  TAccountEditionAccount extends string | AccountMeta = string,
-  TAccountBubblegumSigner extends string | AccountMeta = string,
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TAccountCompressionProgram extends string | AccountMeta = string,
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountLeafOwner extends string | AccountMeta<string> = string,
+  TAccountLeafDelegate extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountTreeDelegate extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthorityRecordPda extends
+    | string
+    | AccountMeta<string> = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY",
+  TAccountCollectionMint extends string | AccountMeta<string> = string,
+  TAccountCollectionMetadata extends string | AccountMeta<string> = string,
+  TAccountEditionAccount extends string | AccountMeta<string> = string,
+  TAccountBubblegumSigner extends string | AccountMeta<string> = string,
+  TAccountLogWrapper extends
+    | string
+    | AccountMeta<string> = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+  TAccountCompressionProgram extends
+    | string
+    | AccountMeta<string> = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
   TAccountTokenMetadataProgram extends
     | string
-    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+    | AccountMeta<string> = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -173,6 +189,253 @@ export function getMintToCollectionV1InstructionDataCodec(): Codec<
   );
 }
 
+export interface MintToCollectionV1AsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountLeafOwner extends string = string,
+  TAccountLeafDelegate extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountPayer extends string = string,
+  TAccountTreeDelegate extends string = string,
+  TAccountCollectionAuthority extends string = string,
+  TAccountCollectionAuthorityRecordPda extends string = string,
+  TAccountCollectionMint extends string = string,
+  TAccountCollectionMetadata extends string = string,
+  TAccountEditionAccount extends string = string,
+  TAccountBubblegumSigner extends string = string,
+  TAccountLogWrapper extends string = string,
+  TAccountCompressionProgram extends string = string,
+  TAccountTokenMetadataProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  leafOwner: Address<TAccountLeafOwner>;
+  leafDelegate: Address<TAccountLeafDelegate>;
+  merkleTree: Address<TAccountMerkleTree>;
+  payer: TransactionSigner<TAccountPayer>;
+  treeDelegate: TransactionSigner<TAccountTreeDelegate>;
+  collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
+  /**
+   * If there is no collecton authority record PDA then
+   * this must be the Bubblegum program address.
+   */
+  collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
+  collectionMint: Address<TAccountCollectionMint>;
+  collectionMetadata?: Address<TAccountCollectionMetadata>;
+  editionAccount?: Address<TAccountEditionAccount>;
+  bubblegumSigner?: Address<TAccountBubblegumSigner>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  metadataArgs: MintToCollectionV1InstructionDataArgs["metadataArgs"];
+}
+
+export async function getMintToCollectionV1InstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountLeafOwner extends string,
+  TAccountLeafDelegate extends string,
+  TAccountMerkleTree extends string,
+  TAccountPayer extends string,
+  TAccountTreeDelegate extends string,
+  TAccountCollectionAuthority extends string,
+  TAccountCollectionAuthorityRecordPda extends string,
+  TAccountCollectionMint extends string,
+  TAccountCollectionMetadata extends string,
+  TAccountEditionAccount extends string,
+  TAccountBubblegumSigner extends string,
+  TAccountLogWrapper extends string,
+  TAccountCompressionProgram extends string,
+  TAccountTokenMetadataProgram extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: MintToCollectionV1AsyncInput<
+    TAccountTreeAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountPayer,
+    TAccountTreeDelegate,
+    TAccountCollectionAuthority,
+    TAccountCollectionAuthorityRecordPda,
+    TAccountCollectionMint,
+    TAccountCollectionMetadata,
+    TAccountEditionAccount,
+    TAccountBubblegumSigner,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountTokenMetadataProgram,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  MintToCollectionV1Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountPayer,
+    TAccountTreeDelegate,
+    TAccountCollectionAuthority,
+    TAccountCollectionAuthorityRecordPda,
+    TAccountCollectionMint,
+    TAccountCollectionMetadata,
+    TAccountEditionAccount,
+    TAccountBubblegumSigner,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountTokenMetadataProgram,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
+    leafOwner: { value: input.leafOwner ?? null, isWritable: false },
+    leafDelegate: { value: input.leafDelegate ?? null, isWritable: false },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: false },
+    treeDelegate: { value: input.treeDelegate ?? null, isWritable: false },
+    collectionAuthority: {
+      value: input.collectionAuthority ?? null,
+      isWritable: false,
+    },
+    collectionAuthorityRecordPda: {
+      value: input.collectionAuthorityRecordPda ?? null,
+      isWritable: false,
+    },
+    collectionMint: { value: input.collectionMint ?? null, isWritable: false },
+    collectionMetadata: {
+      value: input.collectionMetadata ?? null,
+      isWritable: true,
+    },
+    editionAccount: { value: input.editionAccount ?? null, isWritable: false },
+    bubblegumSigner: {
+      value: input.bubblegumSigner ?? null,
+      isWritable: false,
+    },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isWritable: false,
+    },
+    tokenMetadataProgram: {
+      value: input.tokenMetadataProgram ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.collectionAuthorityRecordPda.value) {
+    accounts.collectionAuthorityRecordPda.value = programAddress;
+    accounts.collectionAuthorityRecordPda.isWritable = false;
+  }
+  if (!accounts.collectionMetadata.value) {
+    accounts.collectionMetadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "collectionMint",
+        accounts.collectionMint.value,
+      ),
+    });
+  }
+  if (!accounts.editionAccount.value) {
+    accounts.editionAccount.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "collectionMint",
+        accounts.collectionMint.value,
+      ),
+    });
+  }
+  if (!accounts.bubblegumSigner.value) {
+    accounts.bubblegumSigner.value = await findBubblegumSignerPda();
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK" as Address<"cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK">;
+  }
+  if (!accounts.tokenMetadataProgram.value) {
+    accounts.tokenMetadataProgram.value =
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("leafOwner", accounts.leafOwner),
+      getAccountMeta("leafDelegate", accounts.leafDelegate),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("treeDelegate", accounts.treeDelegate),
+      getAccountMeta("collectionAuthority", accounts.collectionAuthority),
+      getAccountMeta(
+        "collectionAuthorityRecordPda",
+        accounts.collectionAuthorityRecordPda,
+      ),
+      getAccountMeta("collectionMint", accounts.collectionMint),
+      getAccountMeta("collectionMetadata", accounts.collectionMetadata),
+      getAccountMeta("editionAccount", accounts.editionAccount),
+      getAccountMeta("bubblegumSigner", accounts.bubblegumSigner),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+      getAccountMeta("compressionProgram", accounts.compressionProgram),
+      getAccountMeta("tokenMetadataProgram", accounts.tokenMetadataProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getMintToCollectionV1InstructionDataEncoder().encode(
+      args as MintToCollectionV1InstructionDataArgs,
+    ),
+    programAddress,
+  } as MintToCollectionV1Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountPayer,
+    TAccountTreeDelegate,
+    TAccountCollectionAuthority,
+    TAccountCollectionAuthorityRecordPda,
+    TAccountCollectionMint,
+    TAccountCollectionMetadata,
+    TAccountEditionAccount,
+    TAccountBubblegumSigner,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountTokenMetadataProgram,
+    TAccountSystemProgram
+  >);
+}
+
 export interface MintToCollectionV1Input<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
@@ -202,13 +465,13 @@ export interface MintToCollectionV1Input<
    * If there is no collecton authority record PDA then
    * this must be the Bubblegum program address.
    */
-  collectionAuthorityRecordPda: Address<TAccountCollectionAuthorityRecordPda>;
+  collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
   collectionMint: Address<TAccountCollectionMint>;
   collectionMetadata: Address<TAccountCollectionMetadata>;
   editionAccount: Address<TAccountEditionAccount>;
   bubblegumSigner: Address<TAccountBubblegumSigner>;
-  logWrapper: Address<TAccountLogWrapper>;
-  compressionProgram: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   metadataArgs: MintToCollectionV1InstructionDataArgs["metadataArgs"];
@@ -320,6 +583,18 @@ export function getMintToCollectionV1Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.collectionAuthorityRecordPda.value) {
+    accounts.collectionAuthorityRecordPda.value = programAddress;
+    accounts.collectionAuthorityRecordPda.isWritable = false;
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK" as Address<"cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK">;
+  }
   if (!accounts.tokenMetadataProgram.value) {
     accounts.tokenMetadataProgram.value =
       "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;

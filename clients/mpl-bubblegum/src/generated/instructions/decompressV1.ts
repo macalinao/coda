@@ -25,18 +25,29 @@ import type {
 import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import type { MetadataArgs, MetadataArgsArgs } from "../types/index.js";
 import {
+  address,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
+  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import {
+  findMasterEditionPda,
+  findMetadataPda,
+  findMintAuthorityPda,
+} from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsDecoder,
@@ -55,30 +66,32 @@ export function getDecompressV1DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DecompressV1Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountVoucher extends string | AccountMeta = string,
-  TAccountLeafOwner extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMintAuthority extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
+  TAccountVoucher extends string | AccountMeta<string> = string,
+  TAccountLeafOwner extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMintAuthority extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
+    | AccountMeta<string> = "11111111111111111111111111111111",
   TAccountSysvarRent extends
     | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+    | AccountMeta<string> = "SysvarRent111111111111111111111111111111111",
   TAccountTokenMetadataProgram extends
     | string
-    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+    | AccountMeta<string> = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
   TAccountTokenProgram extends
     | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountAssociatedTokenProgram extends
     | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountLogWrapper extends
+    | string
+    | AccountMeta<string> = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -163,6 +176,231 @@ export function getDecompressV1InstructionDataCodec(): Codec<
   );
 }
 
+export interface DecompressV1AsyncInput<
+  TAccountVoucher extends string = string,
+  TAccountLeafOwner extends string = string,
+  TAccountTokenAccount extends string = string,
+  TAccountMint extends string = string,
+  TAccountMintAuthority extends string = string,
+  TAccountMetadata extends string = string,
+  TAccountMasterEdition extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountSysvarRent extends string = string,
+  TAccountTokenMetadataProgram extends string = string,
+  TAccountTokenProgram extends string = string,
+  TAccountAssociatedTokenProgram extends string = string,
+  TAccountLogWrapper extends string = string,
+> {
+  voucher: Address<TAccountVoucher>;
+  leafOwner: TransactionSigner<TAccountLeafOwner>;
+  tokenAccount?: Address<TAccountTokenAccount>;
+  mint: Address<TAccountMint>;
+  mintAuthority?: Address<TAccountMintAuthority>;
+  metadata?: Address<TAccountMetadata>;
+  masterEdition?: Address<TAccountMasterEdition>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  sysvarRent?: Address<TAccountSysvarRent>;
+  tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  tokenProgram?: Address<TAccountTokenProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  metadataArg: DecompressV1InstructionDataArgs["metadata"];
+}
+
+export async function getDecompressV1InstructionAsync<
+  TAccountVoucher extends string,
+  TAccountLeafOwner extends string,
+  TAccountTokenAccount extends string,
+  TAccountMint extends string,
+  TAccountMintAuthority extends string,
+  TAccountMetadata extends string,
+  TAccountMasterEdition extends string,
+  TAccountSystemProgram extends string,
+  TAccountSysvarRent extends string,
+  TAccountTokenMetadataProgram extends string,
+  TAccountTokenProgram extends string,
+  TAccountAssociatedTokenProgram extends string,
+  TAccountLogWrapper extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: DecompressV1AsyncInput<
+    TAccountVoucher,
+    TAccountLeafOwner,
+    TAccountTokenAccount,
+    TAccountMint,
+    TAccountMintAuthority,
+    TAccountMetadata,
+    TAccountMasterEdition,
+    TAccountSystemProgram,
+    TAccountSysvarRent,
+    TAccountTokenMetadataProgram,
+    TAccountTokenProgram,
+    TAccountAssociatedTokenProgram,
+    TAccountLogWrapper
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  DecompressV1Instruction<
+    TProgramAddress,
+    TAccountVoucher,
+    TAccountLeafOwner,
+    TAccountTokenAccount,
+    TAccountMint,
+    TAccountMintAuthority,
+    TAccountMetadata,
+    TAccountMasterEdition,
+    TAccountSystemProgram,
+    TAccountSysvarRent,
+    TAccountTokenMetadataProgram,
+    TAccountTokenProgram,
+    TAccountAssociatedTokenProgram,
+    TAccountLogWrapper
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    voucher: { value: input.voucher ?? null, isWritable: true },
+    leafOwner: { value: input.leafOwner ?? null, isWritable: true },
+    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
+    mint: { value: input.mint ?? null, isWritable: true },
+    mintAuthority: { value: input.mintAuthority ?? null, isWritable: true },
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    masterEdition: { value: input.masterEdition ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    sysvarRent: { value: input.sysvarRent ?? null, isWritable: false },
+    tokenMetadataProgram: {
+      value: input.tokenMetadataProgram ?? null,
+      isWritable: false,
+    },
+    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    associatedTokenProgram: {
+      value: input.associatedTokenProgram ?? null,
+      isWritable: false,
+    },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input, metadata: input.metadataArg };
+
+  // Resolve default values.
+  if (!accounts.tokenAccount.value) {
+    accounts.tokenAccount.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "leafOwner",
+            accounts.leafOwner.value,
+          ),
+        ),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount("mint", accounts.mint.value),
+        ),
+      ],
+    });
+  }
+  if (!accounts.mintAuthority.value) {
+    accounts.mintAuthority.value = await findMintAuthorityPda({
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
+  if (!accounts.metadata.value) {
+    accounts.metadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
+  if (!accounts.masterEdition.value) {
+    accounts.masterEdition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.sysvarRent.value) {
+    accounts.sysvarRent.value =
+      "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
+  }
+  if (!accounts.tokenMetadataProgram.value) {
+    accounts.tokenMetadataProgram.value =
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
+  }
+  if (!accounts.tokenProgram.value) {
+    accounts.tokenProgram.value =
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
+  }
+  if (!accounts.associatedTokenProgram.value) {
+    accounts.associatedTokenProgram.value =
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("voucher", accounts.voucher),
+      getAccountMeta("leafOwner", accounts.leafOwner),
+      getAccountMeta("tokenAccount", accounts.tokenAccount),
+      getAccountMeta("mint", accounts.mint),
+      getAccountMeta("mintAuthority", accounts.mintAuthority),
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("masterEdition", accounts.masterEdition),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("sysvarRent", accounts.sysvarRent),
+      getAccountMeta("tokenMetadataProgram", accounts.tokenMetadataProgram),
+      getAccountMeta("tokenProgram", accounts.tokenProgram),
+      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+    ],
+    data: getDecompressV1InstructionDataEncoder().encode(
+      args as DecompressV1InstructionDataArgs,
+    ),
+    programAddress,
+  } as DecompressV1Instruction<
+    TProgramAddress,
+    TAccountVoucher,
+    TAccountLeafOwner,
+    TAccountTokenAccount,
+    TAccountMint,
+    TAccountMintAuthority,
+    TAccountMetadata,
+    TAccountMasterEdition,
+    TAccountSystemProgram,
+    TAccountSysvarRent,
+    TAccountTokenMetadataProgram,
+    TAccountTokenProgram,
+    TAccountAssociatedTokenProgram,
+    TAccountLogWrapper
+  >);
+}
+
 export interface DecompressV1Input<
   TAccountVoucher extends string = string,
   TAccountLeafOwner extends string = string,
@@ -190,7 +428,7 @@ export interface DecompressV1Input<
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-  logWrapper: Address<TAccountLogWrapper>;
+  logWrapper?: Address<TAccountLogWrapper>;
   metadataArg: DecompressV1InstructionDataArgs["metadata"];
 }
 
@@ -295,6 +533,10 @@ export function getDecompressV1Instruction<
   if (!accounts.associatedTokenProgram.value) {
     accounts.associatedTokenProgram.value =
       "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

@@ -56,9 +56,9 @@ export function getSetDecompressibleStateDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type SetDecompressibleStateInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountTreeCreator extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountTreeCreator extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

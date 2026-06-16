@@ -53,14 +53,14 @@ export function getRemoveCollectionPluginV1DiscriminatorBytes(): ReadonlyUint8Ar
 
 export type RemoveCollectionPluginV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
-  TAccountCollection extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
+  TAccountCollection extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountLogWrapper extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
