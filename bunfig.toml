@@ -9,4 +9,12 @@ minimumReleaseAgeExcludes = [
   "typescript",
   "@types/node",
   "@types/bun",
+  "oxlint",
+  "oxlint-tsgolint",
+  "oxfmt",
+  # Native binding subpackages publish alongside each oxc release, so they
+  # must also bypass the age gate or the platform binary fails to install.
+  "@oxlint/*",
+  "@oxfmt/*",
+  "@oxc-tsgolint/*",
 ]

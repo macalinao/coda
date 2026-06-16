@@ -26,9 +26,7 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
-    "lint": "eslint --ext js,ts,tsx src",
-    "lint:fix": "eslint --ext js,ts,tsx src --fix",
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
     "test": "bun test src/",
     "test:watch": "bun test src/ --watch"
   },
@@ -40,10 +38,8 @@
     "prettier": "^3.7.4"
   },
   "devDependencies": {
-    "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@types/bun": "catalog:",
-    "eslint": "catalog:",
     "typescript": "catalog:",
     "tsdown": "catalog:"
   },

@@ -38,8 +38,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
-    "lint": "eslint . --cache"
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@codama/renderers-core": "catalog:",
@@ -47,9 +46,7 @@
     "codama": "catalog:"
   },
   "devDependencies": {
-    "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
-    "eslint": "catalog:",
     "typescript": "catalog:",
     "@types/bun": "catalog:",
     "tsdown": "catalog:"

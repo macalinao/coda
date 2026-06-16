@@ -42,8 +42,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
-    "lint": "eslint . --cache",
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
     "codegen": "coda generate"
   },
   "peerDependencies": {
@@ -52,13 +51,10 @@
   },
   "devDependencies": {
     "@macalinao/coda": "workspace:^",
-    "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "catalog:",
     "@solana/program-client-core": "catalog:",
-    "eslint": "catalog:",
     "typescript": "catalog:",
-    "tsdown": "catalog:",
-    "typescript-eslint": "catalog:"
+    "tsdown": "catalog:"
   }
 }

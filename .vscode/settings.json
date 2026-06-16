@@ -12,16 +12,15 @@
     "**/.direnv": true
   },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
+  "[json][jsonc][markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.fixAll.biome": "explicit",
-    "source.action.organizeImports.biome": "explicit"
-  }
+    "source.fixAll.oxc": "explicit"
+  },
+  "oxc.fmt.experimental": true
 }
