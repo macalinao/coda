@@ -39,7 +39,7 @@ coda generate [options]
 Options:
   -i, --idl <path>      Path to Anchor IDL file (default: "./idls/*.json")
   -o, --output <path>   Output directory (default: "./src/generated")
-  -c, --config <path>   Path to config file (default: "./coda.config.mjs")
+  -c, --config <path>   Path to config file (default: "./coda.config.ts")
 ```
 
 ### Init Command
@@ -50,7 +50,7 @@ Initialize a new configuration file:
 coda init [options]
 
 Options:
-  -c, --config <path>   Path for config file (default: "./coda.config.mjs")
+  -c, --config <path>   Path for config file (default: "./coda.config.ts")
 ```
 
 ## Configuration
@@ -66,7 +66,7 @@ coda generate
 
 ### Configuration File
 
-Create a `coda.config.mjs` to customize generation:
+Create a `coda.config.ts` to customize generation:
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
@@ -345,7 +345,7 @@ coda docs [options]
 Options:
   -i, --idl <path>      Path to Anchor IDL file (default: "./idls/*.json")
   -o, --output <path>   Output directory (default: "./docs")
-  -c, --config <path>   Path to config file (default: "./coda.config.mjs")
+  -c, --config <path>   Path to config file (default: "./coda.config.ts")
 ```
 
 ### Basic Usage

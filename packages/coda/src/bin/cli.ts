@@ -21,8 +21,8 @@ program
   .description("Generate a client from an Anchor IDL")
   .option(
     "-c, --config <path>",
-    "Path to coda.config.mjs file",
-    "./coda.config.mjs",
+    "Path to coda config file (.ts or .mjs)",
+    "./coda.config.ts",
   )
   .action(async (options: { config: string }) => {
     try {
@@ -56,12 +56,8 @@ program
 
 program
   .command("init")
-  .description("Initialize a new coda.config.mjs file")
-  .option(
-    "-c, --config <path>",
-    "Path for the config file",
-    "./coda.config.mjs",
-  )
+  .description("Initialize a new coda.config.ts file")
+  .option("-c, --config <path>", "Path for the config file", "./coda.config.ts")
   .action(async (options: { config: string }) => {
     try {
       const configPath = resolve(options.config);
@@ -75,11 +71,9 @@ program
       // Write config file
       await writeFile(configPath, CONFIG_TEMPLATE, "utf-8");
 
-      console.log(`✅ Created coda.config.mjs at ${configPath}`);
+      console.log(`✅ Created coda.config.ts at ${configPath}`);
       console.log("\nNext steps:");
-      console.log(
-        "1. Edit coda.config.mjs to customize your client generation",
-      );
+      console.log("1. Edit coda.config.ts to customize your client generation");
       console.log("2. Run 'coda generate' to generate your Solana client");
     } catch (error) {
       console.error("Error creating config file:", error);
@@ -93,8 +87,8 @@ program
   .description("Generate a Rust client from an Anchor IDL")
   .option(
     "-c, --config <path>",
-    "Path to coda.config.mjs file",
-    "./coda.config.mjs",
+    "Path to coda config file (.ts or .mjs)",
+    "./coda.config.ts",
   )
   .action(async (options: { config: string }) => {
     try {
@@ -128,8 +122,8 @@ program
   )
   .option(
     "-c, --config <path>",
-    "Path to coda.config.mjs file",
-    "./coda.config.mjs",
+    "Path to coda config file (.ts or .mjs)",
+    "./coda.config.ts",
   )
   .action(async (options: { idl: string; config: string }) => {
     try {
@@ -161,8 +155,8 @@ program
   .description("Print the Codama IDL to stdout")
   .option(
     "-c, --config <path>",
-    "Path to coda.config.mjs file",
-    "./coda.config.mjs",
+    "Path to coda config file (.ts or .mjs)",
+    "./coda.config.ts",
   )
   .action(async (options: { config: string }) => {
     try {

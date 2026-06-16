@@ -27,7 +27,7 @@ TypeScript client for Solana program generated with [Coda](https://github.com/ma
 ├── src/
 │   ├── generated/      # Generated client code (do not edit)
 │   └── index.ts        # Main entry point
-├── coda.config.mjs     # Coda configuration
+├── coda.config.ts     # Coda configuration
 └── package.json
 ```
 
@@ -41,7 +41,7 @@ TypeScript client for Solana program generated with [Coda](https://github.com/ma
 
 ## Configuration
 
-Edit `coda.config.mjs` to customize:
+Edit `coda.config.ts` to customize:
 
 - IDL discovery patterns
 - Output directory

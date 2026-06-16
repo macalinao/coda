@@ -68,7 +68,7 @@ const updatedRoot = visit(root, visitor);
 
 ### With Coda Configuration
 
-Use it in your `coda.config.mjs`:
+Use it in your `coda.config.ts`:
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
@@ -307,7 +307,7 @@ renameVisitor({
 The Quarry client uses this visitor to handle conflicts between multiple programs:
 
 ```javascript
-// From clients/quarry/coda.config.mjs
+// From clients/quarry/coda.config.ts
 renameVisitor({
   quarryMine: {
     instructions: {

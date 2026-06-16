@@ -24,7 +24,7 @@ bun run build
 
 ### Configuration
 
-The `coda.config.mjs` file defines custom PDAs for the SPL Stake Pool program, including:
+The `coda.config.ts` file defines custom PDAs for the SPL Stake Pool program, including:
 
 - Withdraw authority for the stake pool
 - Stake accounts for validators

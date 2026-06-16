@@ -46,7 +46,7 @@ const visitor = addNodesVisitor({
 
 ## Usage with Coda
 
-This visitor is commonly used in `coda.config.mjs` to extend IDL-generated programs:
+This visitor is commonly used in `coda.config.ts` to extend IDL-generated programs:
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";

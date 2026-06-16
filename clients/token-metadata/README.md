@@ -24,7 +24,7 @@ bun run build
 
 ### Configuration
 
-The `coda.config.mjs` file adds custom PDAs to the generated client, including the standard metadata PDA derivation.
+The `coda.config.ts` file adds custom PDAs to the generated client, including the standard metadata PDA derivation.
 
 ## Usage
 

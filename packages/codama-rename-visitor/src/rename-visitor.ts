@@ -1,4 +1,4 @@
-import type { Node } from "codama";
+import type { Node, Visitor } from "codama";
 import type { ProgramRenameOptions } from "./types.js";
 import { bottomUpTransformerVisitor, rootNodeVisitor, visit } from "codama";
 import { renameAccountTransform } from "./rename-accounts-visitor.js";
@@ -62,8 +62,8 @@ function buildRenameTransforms(
 
 export function renameVisitor(
   renamesByProgram: Record<string, ProgramRenameOptions>,
-): ReturnType<typeof rootNodeVisitor> {
-  return rootNodeVisitor((root) => {
+): Visitor<Node | null, "rootNode"> {
+  return rootNodeVisitor<Node | null>((root) => {
     const transforms: RenameTransform[] = [];
 
     // Process each program's rename configuration
