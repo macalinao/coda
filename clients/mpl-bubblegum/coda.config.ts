@@ -198,12 +198,12 @@ const addTokenMetadataProgramVisitor = bottomUpTransformerVisitor([
 ]);
 
 // Helpers for the Token Metadata PDA default values.
-const metadataPdaOf = (mintAccount) =>
+const metadataPdaOf = (mintAccount: string) =>
   pdaValueNode(pdaLinkNode("metadata", "mplTokenMetadata"), [
     pdaSeedValueNode("programId", TOKEN_METADATA_PROGRAM_VALUE_NODE),
     pdaSeedValueNode("mint", accountValueNode(mintAccount)),
   ]);
-const masterEditionPdaOf = (mintAccount) =>
+const masterEditionPdaOf = (mintAccount: string) =>
   pdaValueNode(pdaLinkNode("masterEdition", "mplTokenMetadata"), [
     pdaSeedValueNode("programId", TOKEN_METADATA_PROGRAM_VALUE_NODE),
     pdaSeedValueNode("mint", accountValueNode(mintAccount)),
