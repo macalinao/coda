@@ -58,6 +58,7 @@
     "@solana/program-client-core": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }

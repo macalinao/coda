@@ -15,6 +15,7 @@
       "typescript": "^6.0.3",
       "@macalinao/eslint-config": "^8.1.0",
       "@macalinao/tsconfig": "^3.2.5",
+      "typescript-eslint": "^8.60.1",
       "@solana/kit": "^6.9.0",
       "@solana/program-client-core": "^6.9.0",
       "@types/bun": "^1.3.14",
@@ -45,6 +46,7 @@
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
     "codegen": "turbo run codegen",
+    "typecheck": "tsc -p tsconfig.configs.json",
     "docs:dev": "turbo dev --filter=coda-docs",
     "docs:build": "turbo build --filter=coda-docs",
     "format": "prettier --write \"**/*.{md,mdx}\""

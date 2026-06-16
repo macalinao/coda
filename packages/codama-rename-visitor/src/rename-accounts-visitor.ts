@@ -1,4 +1,4 @@
-import type { AccountNode, Node, rootNodeVisitor } from "codama";
+import type { AccountNode, Node, Visitor } from "codama";
 import { assertIsNode, bottomUpTransformerVisitor, camelCase } from "codama";
 
 /**
@@ -40,7 +40,7 @@ export function renameAccountTransform(
  */
 export function renameAccountsVisitor(
   mapping: Record<string, string>,
-): ReturnType<typeof rootNodeVisitor> {
+): Visitor<Node | null, "rootNode"> {
   return bottomUpTransformerVisitor([
     {
       select: "[accountNode]",

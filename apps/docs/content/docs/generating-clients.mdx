@@ -107,14 +107,14 @@ try {
 
 ## Configuration
 
-Client generation can be customized through `coda.config.mjs`. See the [Configuration](/docs/configuration) page for detailed options including:
+Client generation can be customized through `coda.config.ts`. See the [Configuration](/docs/configuration) page for detailed options including:
 
 - Custom IDL paths and output directories
 - Working with multiple programs
 - Adding custom PDAs with visitors
 - Handling naming conflicts between programs
 
-For a real-world example with multiple programs, see the [Quarry configuration](https://github.com/macalinao/coda/blob/master/clients/quarry/coda.config.mjs).
+For a real-world example with multiple programs, see the [Quarry configuration](https://github.com/macalinao/coda/blob/master/clients/quarry/coda.config.ts).
 
 ## ES Modules Support
 
@@ -199,7 +199,7 @@ const amount = 1_000_000_000n; // 1 billion lamports
 
 ## Best Practices
 
-1. **Version Control**: Commit your `coda.config.mjs` but consider gitignoring generated files
+1. **Version Control**: Commit your `coda.config.ts` but consider gitignoring generated files
 2. **CI/CD**: Regenerate clients in CI to ensure they're always up-to-date
 3. **Type Checking**: Use TypeScript strict mode for maximum type safety
 4. **Custom Types**: Define custom types in separate files that import from generated code

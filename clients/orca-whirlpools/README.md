@@ -28,7 +28,7 @@ bun run build
 
 ### Configuration
 
-The `coda.config.mjs` file can be customized to add PDAs and other Codama visitors for enhanced client functionality.
+The `coda.config.ts` file can be customized to add PDAs and other Codama visitors for enhanced client functionality.
 
 ## Usage
 
