@@ -86,7 +86,7 @@
     },
     "clients/mpl-bubblegum": {
       "name": "@macalinao/clients-mpl-bubblegum",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -105,7 +105,7 @@
     },
     "clients/mpl-core": {
       "name": "@macalinao/clients-mpl-core",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -124,7 +124,7 @@
     },
     "clients/mpl-token-auth-rules": {
       "name": "@macalinao/clients-mpl-token-auth-rules",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/eslint-config": "catalog:",
@@ -277,7 +277,7 @@
     },
     "packages/coda": {
       "name": "@macalinao/coda",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "bin": {
         "coda": "./dist/bin/cli.js",
       },
@@ -359,7 +359,7 @@
     },
     "packages/codama-rename-visitor": {
       "name": "@macalinao/codama-rename-visitor",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "dependencies": {
         "codama": "catalog:",
       },
@@ -410,7 +410,7 @@
     },
     "packages/create-coda": {
       "name": "@macalinao/create-coda",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "create-coda": "./dist/bin.js",
       },
