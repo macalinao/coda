@@ -7,3 +7,4 @@
  */
 
 export * from "./bubblegum.js";
+export * from "./mplTokenMetadata.js";

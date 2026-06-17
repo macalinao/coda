@@ -57,7 +57,7 @@ import type {
   CreateV1Input,
   CreateV2Input,
   DecompressV1Input,
-  ExecuteV1Input,
+  ExecuteV1AsyncInput,
   ParsedAddAssetsToGroupV1Instruction,
   ParsedAddCollectionExternalPluginAdapterV1Instruction,
   ParsedAddCollectionPluginV1Instruction,
@@ -164,7 +164,7 @@ import {
   getCreateV1Instruction,
   getCreateV2Instruction,
   getDecompressV1Instruction,
-  getExecuteV1Instruction,
+  getExecuteV1InstructionAsync,
   getRemoveAssetsFromGroupV1Instruction,
   getRemoveCollectionExternalPluginAdapterV1Instruction,
   getRemoveCollectionPluginV1Instruction,
@@ -229,6 +229,7 @@ import {
   parseWriteCollectionExternalPluginAdapterDataV1Instruction,
   parseWriteExternalPluginAdapterDataV1Instruction,
 } from "../instructions/index.js";
+import { findAssetSignerPda } from "../pdas/index.js";
 
 export const MPL_CORE_PROGRAM_PROGRAM_ADDRESS =
   "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d" as Address<"CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d">;
@@ -877,6 +878,7 @@ export function parseMplCoreProgramInstruction<TProgram extends string>(
 export interface MplCoreProgramPlugin {
   accounts: MplCoreProgramPluginAccounts;
   instructions: MplCoreProgramPluginInstructions;
+  pdas: MplCoreProgramPluginPdas;
 }
 
 export interface MplCoreProgramPluginAccounts {
@@ -1019,8 +1021,9 @@ export interface MplCoreProgramPluginInstructions {
     input: MakeOptional<UpdateV2Input, "payer">,
   ) => ReturnType<typeof getUpdateV2Instruction> & SelfPlanAndSendFunctions;
   executeV1: (
-    input: MakeOptional<ExecuteV1Input, "payer">,
-  ) => ReturnType<typeof getExecuteV1Instruction> & SelfPlanAndSendFunctions;
+    input: MakeOptional<ExecuteV1AsyncInput, "payer">,
+  ) => ReturnType<typeof getExecuteV1InstructionAsync> &
+    SelfPlanAndSendFunctions;
   updateCollectionInfoV1: (
     input: UpdateCollectionInfoV1Input,
   ) => ReturnType<typeof getUpdateCollectionInfoV1Instruction> &
@@ -1060,6 +1063,10 @@ export interface MplCoreProgramPluginInstructions {
     input: MakeOptional<UpdateGroupV1Input, "payer">,
   ) => ReturnType<typeof getUpdateGroupV1Instruction> &
     SelfPlanAndSendFunctions;
+}
+
+export interface MplCoreProgramPluginPdas {
+  assetSigner: typeof findAssetSignerPda;
 }
 
 export type MplCoreProgramPluginRequirements = ClientWithRpc<
@@ -1335,7 +1342,7 @@ export function mplCoreProgramProgram() {
           executeV1: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getExecuteV1Instruction({
+              getExecuteV1InstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1418,6 +1425,7 @@ export function mplCoreProgramProgram() {
               }),
             ),
         },
+        pdas: { assetSigner: findAssetSignerPda },
       },
     });
   };

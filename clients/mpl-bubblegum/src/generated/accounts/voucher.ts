@@ -19,6 +19,7 @@ import type {
   MaybeEncodedAccount,
   ReadonlyUint8Array,
 } from "@solana/kit";
+import type { VoucherSeeds } from "../pdas/index.js";
 import type { LeafSchema, LeafSchemaArgs } from "../types/index.js";
 import {
   assertAccountExists,
@@ -39,6 +40,7 @@ import {
   getU32Encoder,
   transformEncoder,
 } from "@solana/kit";
+import { findVoucherPda } from "../pdas/index.js";
 import { getLeafSchemaDecoder, getLeafSchemaEncoder } from "../types/index.js";
 
 export const VOUCHER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -141,4 +143,24 @@ export async function fetchAllMaybeVoucher(
 ): Promise<MaybeAccount<Voucher>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeVoucher(maybeAccount));
+}
+
+export async function fetchVoucherFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: VoucherSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<Account<Voucher>> {
+  const maybeAccount = await fetchMaybeVoucherFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeVoucherFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: VoucherSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {},
+): Promise<MaybeAccount<Voucher>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findVoucherPda(seeds, { programAddress });
+  return await fetchMaybeVoucher(rpc, address, fetchConfig);
 }

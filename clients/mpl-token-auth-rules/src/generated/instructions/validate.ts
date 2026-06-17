@@ -50,14 +50,14 @@ export function getValidateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ValidateInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
-  TAccountRuleSetPda extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRuleSetPda extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountRuleAuthority extends string | AccountMeta = string,
-  TAccountRuleSetStatePda extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountRuleAuthority extends string | AccountMeta<string> = string,
+  TAccountRuleSetStatePda extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<

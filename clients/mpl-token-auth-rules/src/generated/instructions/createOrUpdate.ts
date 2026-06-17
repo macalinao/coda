@@ -37,7 +37,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findRuleSetBufferPda } from "../pdas/index.js";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCreateOrUpdateArgsDecoder,
@@ -52,12 +56,12 @@ export function getCreateOrUpdateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateOrUpdateInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountRuleSetPda extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountRuleSetPda extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountBufferPda extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountBufferPda extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -113,6 +117,100 @@ export function getCreateOrUpdateInstructionDataCodec(): Codec<
     getCreateOrUpdateInstructionDataEncoder(),
     getCreateOrUpdateInstructionDataDecoder(),
   );
+}
+
+export interface CreateOrUpdateAsyncInput<
+  TAccountPayer extends string = string,
+  TAccountRuleSetPda extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountBufferPda extends string = string,
+> {
+  /** Payer and creator of the RuleSet */
+  payer: TransactionSigner<TAccountPayer>;
+  /** The PDA account where the RuleSet is stored */
+  ruleSetPda: Address<TAccountRuleSetPda>;
+  /** System program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** The buffer to copy a complete ruleset from */
+  bufferPda?: Address<TAccountBufferPda>;
+  createOrUpdateArgs: CreateOrUpdateInstructionDataArgs["createOrUpdateArgs"];
+}
+
+export async function getCreateOrUpdateInstructionAsync<
+  TAccountPayer extends string,
+  TAccountRuleSetPda extends string,
+  TAccountSystemProgram extends string,
+  TAccountBufferPda extends string,
+  TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
+>(
+  input: CreateOrUpdateAsyncInput<
+    TAccountPayer,
+    TAccountRuleSetPda,
+    TAccountSystemProgram,
+    TAccountBufferPda
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CreateOrUpdateInstruction<
+    TProgramAddress,
+    TAccountPayer,
+    TAccountRuleSetPda,
+    TAccountSystemProgram,
+    TAccountBufferPda
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    payer: { value: input.payer ?? null, isWritable: true },
+    ruleSetPda: { value: input.ruleSetPda ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    bufferPda: { value: input.bufferPda ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.bufferPda.value) {
+    accounts.bufferPda.value = await findRuleSetBufferPda({
+      owner: getAddressFromResolvedInstructionAccount(
+        "payer",
+        accounts.payer.value,
+      ),
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("ruleSetPda", accounts.ruleSetPda),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("bufferPda", accounts.bufferPda),
+    ],
+    data: getCreateOrUpdateInstructionDataEncoder().encode(
+      args as CreateOrUpdateInstructionDataArgs,
+    ),
+    programAddress,
+  } as CreateOrUpdateInstruction<
+    TProgramAddress,
+    TAccountPayer,
+    TAccountRuleSetPda,
+    TAccountSystemProgram,
+    TAccountBufferPda
+  >);
 }
 
 export interface CreateOrUpdateInput<

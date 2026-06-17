@@ -35,7 +35,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findAssetSignerPda } from "../pdas/index.js";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getExecuteV1ArgsDecoder,
@@ -50,16 +54,16 @@ export function getExecuteV1DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ExecuteV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
-  TAccountAsset extends string | AccountMeta = string,
-  TAccountCollection extends string | AccountMeta = string,
-  TAccountAssetSigner extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountAsset extends string | AccountMeta<string> = string,
+  TAccountCollection extends string | AccountMeta<string> = string,
+  TAccountAssetSigner extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountProgramId extends string | AccountMeta =
+  TAccountProgramId extends string | AccountMeta<string> =
     "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -124,6 +128,135 @@ export function getExecuteV1InstructionDataCodec(): Codec<
     getExecuteV1InstructionDataEncoder(),
     getExecuteV1InstructionDataDecoder(),
   );
+}
+
+export interface ExecuteV1AsyncInput<
+  TAccountAsset extends string = string,
+  TAccountCollection extends string = string,
+  TAccountAssetSigner extends string = string,
+  TAccountPayer extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountSystemProgram extends string = string,
+  TAccountProgramId extends string = string,
+> {
+  /** The address of the asset */
+  asset: Address<TAccountAsset>;
+  /** The collection to which the asset belongs */
+  collection?: Address<TAccountCollection>;
+  /** The signing PDA for the asset */
+  assetSigner?: Address<TAccountAssetSigner>;
+  /** The account paying for the storage fees */
+  payer: Address<TAccountPayer> | TransactionSigner<TAccountPayer>;
+  /** The owner or delegate of the asset */
+  authority?: TransactionSigner<TAccountAuthority>;
+  /** The system program */
+  systemProgram?: Address<TAccountSystemProgram>;
+  /** The program id of the instruction */
+  programId?: Address<TAccountProgramId>;
+  executeV1Args: ExecuteV1InstructionDataArgs["executeV1Args"];
+}
+
+export async function getExecuteV1InstructionAsync<
+  TAccountAsset extends string,
+  TAccountCollection extends string,
+  TAccountAssetSigner extends string,
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
+  TAccountSystemProgram extends string,
+  TAccountProgramId extends string,
+  TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
+>(
+  input: ExecuteV1AsyncInput<
+    TAccountAsset,
+    TAccountCollection,
+    TAccountAssetSigner,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountSystemProgram,
+    TAccountProgramId
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  ExecuteV1Instruction<
+    TProgramAddress,
+    TAccountAsset,
+    TAccountCollection,
+    TAccountAssetSigner,
+    (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
+      ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+      : TAccountPayer,
+    TAccountAuthority,
+    TAccountSystemProgram,
+    TAccountProgramId
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    asset: { value: input.asset ?? null, isWritable: true },
+    collection: { value: input.collection ?? null, isWritable: true },
+    assetSigner: { value: input.assetSigner ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    programId: { value: input.programId ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.assetSigner.value) {
+    accounts.assetSigner.value = await findAssetSignerPda({
+      asset: getAddressFromResolvedInstructionAccount(
+        "asset",
+        accounts.asset.value,
+      ),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+  if (!accounts.programId.value) {
+    accounts.programId.value = programAddress;
+    accounts.programId.isWritable = false;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("asset", accounts.asset),
+      getAccountMeta("collection", accounts.collection),
+      getAccountMeta("assetSigner", accounts.assetSigner),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("programId", accounts.programId),
+    ],
+    data: getExecuteV1InstructionDataEncoder().encode(
+      args as ExecuteV1InstructionDataArgs,
+    ),
+    programAddress,
+  } as ExecuteV1Instruction<
+    TProgramAddress,
+    TAccountAsset,
+    TAccountCollection,
+    TAccountAssetSigner,
+    (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
+      ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+      : TAccountPayer,
+    TAccountAuthority,
+    TAccountSystemProgram,
+    TAccountProgramId
+  >);
 }
 
 export interface ExecuteV1Input<

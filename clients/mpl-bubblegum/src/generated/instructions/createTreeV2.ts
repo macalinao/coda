@@ -44,7 +44,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CREATE_TREE_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -59,15 +63,17 @@ export function getCreateTreeV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateTreeV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountTreeCreator extends string | AccountMeta = string,
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TAccountCompressionProgram extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountTreeCreator extends string | AccountMeta<string> = string,
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -143,6 +149,133 @@ export function getCreateTreeV2InstructionDataCodec(): Codec<
   );
 }
 
+export interface CreateTreeV2AsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountPayer extends string = string,
+  TAccountTreeCreator extends string = string,
+  TAccountLogWrapper extends string = string,
+  TAccountCompressionProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  merkleTree: Address<TAccountMerkleTree>;
+  payer: TransactionSigner<TAccountPayer>;
+  /** Optional tree creator, defaults to `payer` */
+  treeCreator?: TransactionSigner<TAccountTreeCreator>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  maxDepth: CreateTreeV2InstructionDataArgs["maxDepth"];
+  maxBufferSize: CreateTreeV2InstructionDataArgs["maxBufferSize"];
+  public: CreateTreeV2InstructionDataArgs["public"];
+}
+
+export async function getCreateTreeV2InstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountMerkleTree extends string,
+  TAccountPayer extends string,
+  TAccountTreeCreator extends string,
+  TAccountLogWrapper extends string,
+  TAccountCompressionProgram extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: CreateTreeV2AsyncInput<
+    TAccountTreeAuthority,
+    TAccountMerkleTree,
+    TAccountPayer,
+    TAccountTreeCreator,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  CreateTreeV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountMerkleTree,
+    TAccountPayer,
+    TAccountTreeCreator,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    treeCreator: { value: input.treeCreator ?? null, isWritable: false },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("treeCreator", accounts.treeCreator),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+      getAccountMeta("compressionProgram", accounts.compressionProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getCreateTreeV2InstructionDataEncoder().encode(
+      args as CreateTreeV2InstructionDataArgs,
+    ),
+    programAddress,
+  } as CreateTreeV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountMerkleTree,
+    TAccountPayer,
+    TAccountTreeCreator,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >);
+}
+
 export interface CreateTreeV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountMerkleTree extends string = string,
@@ -157,8 +290,8 @@ export interface CreateTreeV2Input<
   payer: TransactionSigner<TAccountPayer>;
   /** Optional tree creator, defaults to `payer` */
   treeCreator?: TransactionSigner<TAccountTreeCreator>;
-  logWrapper: Address<TAccountLogWrapper>;
-  compressionProgram: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   maxDepth: CreateTreeV2InstructionDataArgs["maxDepth"];
   maxBufferSize: CreateTreeV2InstructionDataArgs["maxBufferSize"];
@@ -220,6 +353,14 @@ export function getCreateTreeV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

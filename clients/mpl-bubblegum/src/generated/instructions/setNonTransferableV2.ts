@@ -48,7 +48,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_NON_TRANSFERABLE_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -62,18 +66,20 @@ export function getSetNonTransferableV2DiscriminatorBytes(): ReadonlyUint8Array 
 
 export type SetNonTransferableV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountLeafOwner extends string | AccountMeta = string,
-  TAccountLeafDelegate extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
-  TAccountCoreCollection extends string | AccountMeta = string,
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TAccountCompressionProgram extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountLeafOwner extends string | AccountMeta<string> = string,
+  TAccountLeafDelegate extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
+  TAccountCoreCollection extends string | AccountMeta<string> = string,
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -183,6 +189,165 @@ export function getSetNonTransferableV2InstructionDataCodec(): Codec<
   );
 }
 
+export interface SetNonTransferableV2AsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountPayer extends string = string,
+  TAccountAuthority extends string = string,
+  TAccountLeafOwner extends string = string,
+  TAccountLeafDelegate extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountCoreCollection extends string = string,
+  TAccountLogWrapper extends string = string,
+  TAccountCompressionProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  payer: TransactionSigner<TAccountPayer>;
+  /**
+   * This authority must be a permanent freeze delegate on the collection
+   * Defaults to `payer`
+   */
+  authority?: TransactionSigner<TAccountAuthority>;
+  leafOwner: Address<TAccountLeafOwner>;
+  /** Defaults to `leaf_owner` */
+  leafDelegate?: Address<TAccountLeafDelegate>;
+  merkleTree: Address<TAccountMerkleTree>;
+  coreCollection: Address<TAccountCoreCollection>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  root: SetNonTransferableV2InstructionDataArgs["root"];
+  dataHash: SetNonTransferableV2InstructionDataArgs["dataHash"];
+  creatorHash: SetNonTransferableV2InstructionDataArgs["creatorHash"];
+  assetDataHash: SetNonTransferableV2InstructionDataArgs["assetDataHash"];
+  flags: SetNonTransferableV2InstructionDataArgs["flags"];
+  nonce: SetNonTransferableV2InstructionDataArgs["nonce"];
+  index: SetNonTransferableV2InstructionDataArgs["index"];
+}
+
+export async function getSetNonTransferableV2InstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
+  TAccountLeafOwner extends string,
+  TAccountLeafDelegate extends string,
+  TAccountMerkleTree extends string,
+  TAccountCoreCollection extends string,
+  TAccountLogWrapper extends string,
+  TAccountCompressionProgram extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: SetNonTransferableV2AsyncInput<
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountCoreCollection,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  SetNonTransferableV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountCoreCollection,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    leafOwner: { value: input.leafOwner ?? null, isWritable: false },
+    leafDelegate: { value: input.leafDelegate ?? null, isWritable: false },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
+    coreCollection: { value: input.coreCollection ?? null, isWritable: false },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("authority", accounts.authority),
+      getAccountMeta("leafOwner", accounts.leafOwner),
+      getAccountMeta("leafDelegate", accounts.leafDelegate),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("coreCollection", accounts.coreCollection),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+      getAccountMeta("compressionProgram", accounts.compressionProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getSetNonTransferableV2InstructionDataEncoder().encode(
+      args as SetNonTransferableV2InstructionDataArgs,
+    ),
+    programAddress,
+  } as SetNonTransferableV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountCoreCollection,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountSystemProgram
+  >);
+}
+
 export interface SetNonTransferableV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
@@ -207,8 +372,8 @@ export interface SetNonTransferableV2Input<
   leafDelegate?: Address<TAccountLeafDelegate>;
   merkleTree: Address<TAccountMerkleTree>;
   coreCollection: Address<TAccountCoreCollection>;
-  logWrapper: Address<TAccountLogWrapper>;
-  compressionProgram: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   root: SetNonTransferableV2InstructionDataArgs["root"];
   dataHash: SetNonTransferableV2InstructionDataArgs["dataHash"];
@@ -286,6 +451,14 @@ export function getSetNonTransferableV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;

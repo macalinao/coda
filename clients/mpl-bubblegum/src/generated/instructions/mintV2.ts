@@ -50,7 +50,11 @@ import {
   SolanaError,
   transformEncoder,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
+} from "@solana/program-client-core";
+import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAssetDataSchemaDecoder,
@@ -69,22 +73,24 @@ export function getMintV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type MintV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
-  TAccountTreeAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountTreeDelegate extends string | AccountMeta = string,
-  TAccountCollectionAuthority extends string | AccountMeta = string,
-  TAccountLeafOwner extends string | AccountMeta = string,
-  TAccountLeafDelegate extends string | AccountMeta = string,
-  TAccountMerkleTree extends string | AccountMeta = string,
-  TAccountCoreCollection extends string | AccountMeta = string,
-  TAccountMplCoreCpiSigner extends string | AccountMeta = string,
-  TAccountLogWrapper extends string | AccountMeta = string,
-  TAccountCompressionProgram extends string | AccountMeta = string,
-  TAccountMplCoreProgram extends string | AccountMeta =
+  TAccountTreeAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountTreeDelegate extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountLeafOwner extends string | AccountMeta<string> = string,
+  TAccountLeafDelegate extends string | AccountMeta<string> = string,
+  TAccountMerkleTree extends string | AccountMeta<string> = string,
+  TAccountCoreCollection extends string | AccountMeta<string> = string,
+  TAccountMplCoreCpiSigner extends string | AccountMeta<string> = string,
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
+  TAccountMplCoreProgram extends string | AccountMeta<string> =
     "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -189,6 +195,198 @@ export function getMintV2InstructionDataCodec(): Codec<
   );
 }
 
+export interface MintV2AsyncInput<
+  TAccountTreeAuthority extends string = string,
+  TAccountPayer extends string = string,
+  TAccountTreeDelegate extends string = string,
+  TAccountCollectionAuthority extends string = string,
+  TAccountLeafOwner extends string = string,
+  TAccountLeafDelegate extends string = string,
+  TAccountMerkleTree extends string = string,
+  TAccountCoreCollection extends string = string,
+  TAccountMplCoreCpiSigner extends string = string,
+  TAccountLogWrapper extends string = string,
+  TAccountCompressionProgram extends string = string,
+  TAccountMplCoreProgram extends string = string,
+  TAccountSystemProgram extends string = string,
+> {
+  treeAuthority?: Address<TAccountTreeAuthority>;
+  payer: TransactionSigner<TAccountPayer>;
+  /** Optional tree delegate, defaults to `payer` */
+  treeDelegate?: TransactionSigner<TAccountTreeDelegate>;
+  /** Optional collection authority, defaults to `tree_delegate` */
+  collectionAuthority?: TransactionSigner<TAccountCollectionAuthority>;
+  leafOwner: Address<TAccountLeafOwner>;
+  leafDelegate?: Address<TAccountLeafDelegate>;
+  merkleTree: Address<TAccountMerkleTree>;
+  coreCollection?: Address<TAccountCoreCollection>;
+  mplCoreCpiSigner?: Address<TAccountMplCoreCpiSigner>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
+  mplCoreProgram?: Address<TAccountMplCoreProgram>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  metadataArgs: MintV2InstructionDataArgs["metadataArgs"];
+  assetData: MintV2InstructionDataArgs["assetData"];
+  assetDataSchema: MintV2InstructionDataArgs["assetDataSchema"];
+}
+
+export async function getMintV2InstructionAsync<
+  TAccountTreeAuthority extends string,
+  TAccountPayer extends string,
+  TAccountTreeDelegate extends string,
+  TAccountCollectionAuthority extends string,
+  TAccountLeafOwner extends string,
+  TAccountLeafDelegate extends string,
+  TAccountMerkleTree extends string,
+  TAccountCoreCollection extends string,
+  TAccountMplCoreCpiSigner extends string,
+  TAccountLogWrapper extends string,
+  TAccountCompressionProgram extends string,
+  TAccountMplCoreProgram extends string,
+  TAccountSystemProgram extends string,
+  TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
+>(
+  input: MintV2AsyncInput<
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountTreeDelegate,
+    TAccountCollectionAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountCoreCollection,
+    TAccountMplCoreCpiSigner,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountMplCoreProgram,
+    TAccountSystemProgram
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  MintV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountTreeDelegate,
+    TAccountCollectionAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountCoreCollection,
+    TAccountMplCoreCpiSigner,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountMplCoreProgram,
+    TAccountSystemProgram
+  >
+> {
+  // Program address.
+  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    treeDelegate: { value: input.treeDelegate ?? null, isWritable: false },
+    collectionAuthority: {
+      value: input.collectionAuthority ?? null,
+      isWritable: false,
+    },
+    leafOwner: { value: input.leafOwner ?? null, isWritable: false },
+    leafDelegate: { value: input.leafDelegate ?? null, isWritable: false },
+    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
+    coreCollection: { value: input.coreCollection ?? null, isWritable: true },
+    mplCoreCpiSigner: {
+      value: input.mplCoreCpiSigner ?? null,
+      isWritable: false,
+    },
+    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isWritable: false,
+    },
+    mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.treeAuthority.value) {
+    accounts.treeAuthority.value = await findTreeConfigPda({
+      merkleTree: getAddressFromResolvedInstructionAccount(
+        "merkleTree",
+        accounts.merkleTree.value,
+      ),
+    });
+  }
+  if (!accounts.mplCoreCpiSigner.value) {
+    if (accounts.coreCollection.value) {
+      accounts.mplCoreCpiSigner.value =
+        "CbNY3JiXdXNE9tPNEk1aRZVEkWdj2v7kfJLNQwZZgpXk" as Address<"CbNY3JiXdXNE9tPNEk1aRZVEkWdj2v7kfJLNQwZZgpXk">;
+    }
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
+  if (!accounts.mplCoreProgram.value) {
+    accounts.mplCoreProgram.value =
+      "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d" as Address<"CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d">;
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("treeAuthority", accounts.treeAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("treeDelegate", accounts.treeDelegate),
+      getAccountMeta("collectionAuthority", accounts.collectionAuthority),
+      getAccountMeta("leafOwner", accounts.leafOwner),
+      getAccountMeta("leafDelegate", accounts.leafDelegate),
+      getAccountMeta("merkleTree", accounts.merkleTree),
+      getAccountMeta("coreCollection", accounts.coreCollection),
+      getAccountMeta("mplCoreCpiSigner", accounts.mplCoreCpiSigner),
+      getAccountMeta("logWrapper", accounts.logWrapper),
+      getAccountMeta("compressionProgram", accounts.compressionProgram),
+      getAccountMeta("mplCoreProgram", accounts.mplCoreProgram),
+      getAccountMeta("systemProgram", accounts.systemProgram),
+    ],
+    data: getMintV2InstructionDataEncoder().encode(
+      args as MintV2InstructionDataArgs,
+    ),
+    programAddress,
+  } as MintV2Instruction<
+    TProgramAddress,
+    TAccountTreeAuthority,
+    TAccountPayer,
+    TAccountTreeDelegate,
+    TAccountCollectionAuthority,
+    TAccountLeafOwner,
+    TAccountLeafDelegate,
+    TAccountMerkleTree,
+    TAccountCoreCollection,
+    TAccountMplCoreCpiSigner,
+    TAccountLogWrapper,
+    TAccountCompressionProgram,
+    TAccountMplCoreProgram,
+    TAccountSystemProgram
+  >);
+}
+
 export interface MintV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
@@ -215,8 +413,8 @@ export interface MintV2Input<
   merkleTree: Address<TAccountMerkleTree>;
   coreCollection?: Address<TAccountCoreCollection>;
   mplCoreCpiSigner?: Address<TAccountMplCoreCpiSigner>;
-  logWrapper: Address<TAccountLogWrapper>;
-  compressionProgram: Address<TAccountCompressionProgram>;
+  logWrapper?: Address<TAccountLogWrapper>;
+  compressionProgram?: Address<TAccountCompressionProgram>;
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   metadataArgs: MintV2InstructionDataArgs["metadataArgs"];
@@ -309,6 +507,20 @@ export function getMintV2Instruction<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.mplCoreCpiSigner.value) {
+    if (accounts.coreCollection.value) {
+      accounts.mplCoreCpiSigner.value =
+        "CbNY3JiXdXNE9tPNEk1aRZVEkWdj2v7kfJLNQwZZgpXk" as Address<"CbNY3JiXdXNE9tPNEk1aRZVEkWdj2v7kfJLNQwZZgpXk">;
+    }
+  }
+  if (!accounts.logWrapper.value) {
+    accounts.logWrapper.value =
+      "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3" as Address<"mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3">;
+  }
+  if (!accounts.compressionProgram.value) {
+    accounts.compressionProgram.value =
+      "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW" as Address<"mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW">;
+  }
   if (!accounts.mplCoreProgram.value) {
     accounts.mplCoreProgram.value =
       "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d" as Address<"CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d">;

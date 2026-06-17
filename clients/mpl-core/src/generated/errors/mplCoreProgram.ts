@@ -297,7 +297,9 @@ export function getMplCoreProgramErrorMessage(
   code: MplCoreProgramError,
 ): string {
   if (process.env.NODE_ENV !== "production") {
-    return mplCoreProgramErrorMessages![code];
+    return (mplCoreProgramErrorMessages as Record<MplCoreProgramError, string>)[
+      code
+    ];
   }
 
   return "Error message not available in production bundles.";

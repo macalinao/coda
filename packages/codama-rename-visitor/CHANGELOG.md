@@ -1,5 +1,13 @@
 # @macalinao/codama-rename-visitor
 
+## 0.4.1
+
+### Patch Changes
+
+- e3762dc: Fix visitor return types to be `Visitor<Node | null, "rootNode">` instead of
+  `Visitor<unknown, "rootNode">`, so the returned visitors are assignable to
+  `CodaConfig.visitors` without type errors.
+
 ## 0.4.0
 
 ### Minor Changes

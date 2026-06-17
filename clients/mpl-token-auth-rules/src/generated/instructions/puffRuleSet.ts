@@ -49,11 +49,11 @@ export function getPuffRuleSetDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type PuffRuleSetInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountRuleSetPda extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountRuleSetPda extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
