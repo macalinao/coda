@@ -1,5 +1,17 @@
 # @macalinao/grill-cli
 
+## 0.6.1
+
+### Patch Changes
+
+- d2bcecb: Migrate the toolchain from Biome + ESLint to the [oxc](https://oxc.rs) tooling (`oxlint` + `oxfmt`) with type-aware linting enabled. Source files were reformatted and some renderer modules renamed to kebab-case. No public API changes.
+- Updated dependencies [d2bcecb]
+- Updated dependencies [855858f]
+  - @macalinao/codama-nodes-from-anchor-x@0.2.1
+  - @macalinao/codama-renderers-js-esm@0.5.1
+  - @macalinao/codama-renderers-markdown@0.5.1
+  - @macalinao/coda-visitors@0.2.1
+
 ## 0.6.0
 
 ### Minor Changes

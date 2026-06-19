@@ -1,5 +1,11 @@
 # @macalinao/codama-instruction-accounts-dedupe-visitor
 
+## 0.5.1
+
+### Patch Changes
+
+- 855858f: Migrate the package build from `tsc` to [tsdown](https://tsdown.dev). Builds now resolve the shared root `tsdown.config.ts` automatically and emit ESM with type declarations, sourcemaps, and declaration maps (unbundled, preserving source structure). No public API changes.
+
 ## 0.5.0
 
 ### Minor Changes

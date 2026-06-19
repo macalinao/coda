@@ -1,5 +1,11 @@
 # @macalinao/clients-mpl-token-auth-rules
 
+## 0.3.1
+
+### Patch Changes
+
+- d2bcecb: Migrate the toolchain from Biome + ESLint to the [oxc](https://oxc.rs) tooling (`oxlint` + `oxfmt`) with type-aware linting enabled. Source files were reformatted and some renderer modules renamed to kebab-case. No public API changes.
+
 ## 0.3.0
 
 ### Minor Changes
