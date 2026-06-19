@@ -66,12 +66,10 @@ export type MintNewEditionFromMasterEditionViaTokenInstruction<
   TAccountTokenAccount extends string | AccountMeta = string,
   TAccountNewMetadataUpdateAuthority extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountRent extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

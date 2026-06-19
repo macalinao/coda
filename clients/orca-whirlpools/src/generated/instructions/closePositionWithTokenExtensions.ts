@@ -54,9 +54,8 @@ export type ClosePositionWithTokenExtensionsInstruction<
   TAccountPosition extends string | AccountMeta = string,
   TAccountPositionMint extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountToken2022Program extends
-    | string
-    | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  TAccountToken2022Program extends string | AccountMeta =
+    "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

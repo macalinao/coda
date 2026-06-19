@@ -57,12 +57,10 @@ export type CreateMintGovernanceInstruction<
   TAccountMintAuthority extends string | AccountMeta = string,
   TAccountGoverningTokenOwnerRecord extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountGovernanceAuthority extends string | AccountMeta = string,
   TAccountRealmConfig extends string | AccountMeta = string,
   TAccountVoterWeightRecord extends string | AccountMeta = string,

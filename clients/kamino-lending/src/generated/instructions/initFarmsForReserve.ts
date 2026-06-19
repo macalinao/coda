@@ -62,18 +62,15 @@ export type InitFarmsForReserveInstruction<
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountLendingMarketAuthority extends string | AccountMeta = string,
   TAccountReserve extends string | AccountMeta = string,
-  TAccountFarmsProgram extends
-    | string
-    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+  TAccountFarmsProgram extends string | AccountMeta =
+    "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TAccountFarmsGlobalConfig extends string | AccountMeta = string,
   TAccountFarmState extends string | AccountMeta = string,
   TAccountFarmsVaultAuthority extends string | AccountMeta = string,
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

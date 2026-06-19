@@ -54,9 +54,8 @@ export type DeletePositionBundleInstruction<
   TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
   TAccountPositionBundleOwner extends string | AccountMeta = string,
   TAccountReceiver extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

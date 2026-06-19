@@ -74,9 +74,8 @@ export type InitializePoolInstruction<
   TAccountPositionNftAccount extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountConfig extends string | AccountMeta<string> = string,
-  TAccountPoolAuthority extends
-    | string
-    | AccountMeta<string> = "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
+  TAccountPoolAuthority extends string | AccountMeta<string> =
+    "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
   TAccountPool extends string | AccountMeta<string> = string,
   TAccountPosition extends string | AccountMeta<string> = string,
   TAccountTokenAMint extends string | AccountMeta<string> = string,
@@ -85,22 +84,17 @@ export type InitializePoolInstruction<
   TAccountTokenBVault extends string | AccountMeta<string> = string,
   TAccountPayerTokenA extends string | AccountMeta<string> = string,
   TAccountPayerTokenB extends string | AccountMeta<string> = string,
-  TAccountTokenAProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountTokenBProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountToken2022Program extends
-    | string
-    | AccountMeta<string> = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountTokenAProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenBProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountToken2022Program extends string | AccountMeta<string> =
+    "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountEventAuthority extends string | AccountMeta<string> = string,
-  TAccountProgram extends
-    | string
-    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TAccountProgram extends string | AccountMeta<string> =
+    "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

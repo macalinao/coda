@@ -53,9 +53,8 @@ export type BurnEditionNftInstruction<
   TAccountMasterEditionAccount extends string | AccountMeta = string,
   TAccountPrintEditionAccount extends string | AccountMeta = string,
   TAccountEditionMarkerAccount extends string | AccountMeta = string,
-  TAccountSplTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSplTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

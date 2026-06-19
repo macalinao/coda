@@ -55,10 +55,8 @@ export type SetCollectionSizeInstruction<
   TAccountCollectionMetadata extends string | AccountMeta = string,
   TAccountCollectionAuthority extends string | AccountMeta = string,
   TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends
-    | string
-    | AccountMeta
-    | undefined = undefined,
+  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
+    undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

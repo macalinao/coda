@@ -63,15 +63,13 @@ export type SplitPositionInstruction<
   TAccountFirstPosition extends string | AccountMeta<string> = string,
   TAccountFirstPositionNftAccount extends string | AccountMeta<string> = string,
   TAccountSecondPosition extends string | AccountMeta<string> = string,
-  TAccountSecondPositionNftAccount extends
-    | string
-    | AccountMeta<string> = string,
+  TAccountSecondPositionNftAccount extends string | AccountMeta<string> =
+    string,
   TAccountFirstOwner extends string | AccountMeta<string> = string,
   TAccountSecondOwner extends string | AccountMeta<string> = string,
   TAccountEventAuthority extends string | AccountMeta<string> = string,
-  TAccountProgram extends
-    | string
-    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TAccountProgram extends string | AccountMeta<string> =
+    "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

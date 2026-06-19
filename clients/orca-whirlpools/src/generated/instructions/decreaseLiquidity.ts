@@ -54,9 +54,8 @@ export function getDecreaseLiquidityDiscriminatorBytes(): ReadonlyUint8Array {
 export type DecreaseLiquidityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountPositionAuthority extends string | AccountMeta = string,
   TAccountPosition extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,

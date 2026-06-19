@@ -54,9 +54,8 @@ export type DelegateSetFamineInstruction<
   TAccountOperator extends string | AccountMeta<string> = string,
   TAccountDelegate extends string | AccountMeta<string> = string,
   TAccountRewarder extends string | AccountMeta<string> = string,
-  TAccountQuarryMineProgram extends
-    | string
-    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TAccountQuarryMineProgram extends string | AccountMeta<string> =
+    "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TAccountQuarry extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &

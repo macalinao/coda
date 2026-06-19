@@ -52,23 +52,19 @@ export type DeprecatedCreateMasterEditionInstruction<
   TAccountEdition extends string | AccountMeta = string,
   TAccountMint extends string | AccountMeta = string,
   TAccountPrintingMint extends string | AccountMeta = string,
-  TAccountOneTimePrintingAuthorizationMint extends
-    | string
-    | AccountMeta = string,
+  TAccountOneTimePrintingAuthorizationMint extends string | AccountMeta =
+    string,
   TAccountUpdateAuthority extends string | AccountMeta = string,
   TAccountPrintingMintAuthority extends string | AccountMeta = string,
   TAccountMintAuthority extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
   TAccountOneTimePrintingAuthorizationMintAuthority extends
     | string
     | AccountMeta = string,

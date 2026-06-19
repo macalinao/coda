@@ -73,24 +73,18 @@ export type DecompressV1Instruction<
   TAccountMintAuthority extends string | AccountMeta<string> = string,
   TAccountMetadata extends string | AccountMeta<string> = string,
   TAccountMasterEdition extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
-  TAccountSysvarRent extends
-    | string
-    | AccountMeta<string> = "SysvarRent111111111111111111111111111111111",
-  TAccountTokenMetadataProgram extends
-    | string
-    | AccountMeta<string> = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends
-    | string
-    | AccountMeta<string> = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountLogWrapper extends
-    | string
-    | AccountMeta<string> = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
+  TAccountSysvarRent extends string | AccountMeta<string> =
+    "SysvarRent111111111111111111111111111111111",
+  TAccountTokenMetadataProgram extends string | AccountMeta<string> =
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
+    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

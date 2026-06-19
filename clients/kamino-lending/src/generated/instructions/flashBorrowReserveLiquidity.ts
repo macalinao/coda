@@ -68,12 +68,10 @@ export type FlashBorrowReserveLiquidityInstruction<
   TAccountReserveLiquidityFeeReceiver extends string | AccountMeta = string,
   TAccountReferrerTokenState extends string | AccountMeta = string,
   TAccountReferrerAccount extends string | AccountMeta = string,
-  TAccountSysvarInfo extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSysvarInfo extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

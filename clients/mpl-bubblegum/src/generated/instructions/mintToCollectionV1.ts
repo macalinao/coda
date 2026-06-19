@@ -71,25 +71,20 @@ export type MintToCollectionV1Instruction<
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountTreeDelegate extends string | AccountMeta<string> = string,
   TAccountCollectionAuthority extends string | AccountMeta<string> = string,
-  TAccountCollectionAuthorityRecordPda extends
-    | string
-    | AccountMeta<string> = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY",
+  TAccountCollectionAuthorityRecordPda extends string | AccountMeta<string> =
+    "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY",
   TAccountCollectionMint extends string | AccountMeta<string> = string,
   TAccountCollectionMetadata extends string | AccountMeta<string> = string,
   TAccountEditionAccount extends string | AccountMeta<string> = string,
   TAccountBubblegumSigner extends string | AccountMeta<string> = string,
-  TAccountLogWrapper extends
-    | string
-    | AccountMeta<string> = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
-  TAccountCompressionProgram extends
-    | string
-    | AccountMeta<string> = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
-  TAccountTokenMetadataProgram extends
-    | string
-    | AccountMeta<string> = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
+  TAccountTokenMetadataProgram extends string | AccountMeta<string> =
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

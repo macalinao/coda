@@ -7,9 +7,6 @@
       "outputs": ["./dist/**", "./.next/**"],
       "env": ["NODE_ENV"]
     },
-    "lint": {
-      "dependsOn": ["^build"]
-    },
     "test": {
       "dependsOn": ["build"],
       "cache": false

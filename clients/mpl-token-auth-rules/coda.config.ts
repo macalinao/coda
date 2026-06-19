@@ -53,15 +53,15 @@ export default defineConfig({
       ],
     }),
 
-    setInstructionAccountDefaultValuesVisitor([
+    setInstructionAccountDefaultValuesVisitor(
       // The buffer PDA is fully derivable from the payer.
-      ...["createOrUpdate", "writeToBuffer"].map((instruction) => ({
+      ["createOrUpdate", "writeToBuffer"].map((instruction) => ({
         account: "bufferPda",
         instruction,
         defaultValue: pdaValueNode(pdaLinkNode("ruleSetBuffer"), [
           pdaSeedValueNode("owner", accountValueNode("payer")),
         ]),
       })),
-    ]),
+    ),
   ],
 });

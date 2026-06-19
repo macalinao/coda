@@ -57,86 +57,68 @@ export type DepositAndWithdrawInstruction<
   TAccountDepositAccountsOwner extends string | AccountMeta = string,
   TAccountDepositAccountsObligation extends string | AccountMeta = string,
   TAccountDepositAccountsLendingMarket extends string | AccountMeta = string,
-  TAccountDepositAccountsLendingMarketAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountDepositAccountsLendingMarketAuthority extends string | AccountMeta =
+    string,
   TAccountDepositAccountsReserve extends string | AccountMeta = string,
-  TAccountDepositAccountsReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
-  TAccountDepositAccountsReserveLiquiditySupply extends
-    | string
-    | AccountMeta = string,
-  TAccountDepositAccountsReserveCollateralMint extends
-    | string
-    | AccountMeta = string,
+  TAccountDepositAccountsReserveLiquidityMint extends string | AccountMeta =
+    string,
+  TAccountDepositAccountsReserveLiquiditySupply extends string | AccountMeta =
+    string,
+  TAccountDepositAccountsReserveCollateralMint extends string | AccountMeta =
+    string,
   TAccountDepositAccountsReserveDestinationDepositCollateral extends
     | string
     | AccountMeta = string,
-  TAccountDepositAccountsUserSourceLiquidity extends
-    | string
-    | AccountMeta = string,
+  TAccountDepositAccountsUserSourceLiquidity extends string | AccountMeta =
+    string,
   TAccountDepositAccountsPlaceholderUserDestinationCollateral extends
     | string
     | AccountMeta = string,
-  TAccountDepositAccountsCollateralTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountDepositAccountsLiquidityTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountDepositAccountsInstructionSysvarAccount extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountDepositAccountsCollateralTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountDepositAccountsLiquidityTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountDepositAccountsInstructionSysvarAccount extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
   TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
-  TAccountWithdrawAccountsLendingMarketAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawAccountsLendingMarketAuthority extends string | AccountMeta =
+    string,
   TAccountWithdrawAccountsWithdrawReserve extends string | AccountMeta = string,
-  TAccountWithdrawAccountsReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsReserveSourceCollateral extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsReserveCollateralMint extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsReserveLiquiditySupply extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawAccountsReserveLiquidityMint extends string | AccountMeta =
+    string,
+  TAccountWithdrawAccountsReserveSourceCollateral extends string | AccountMeta =
+    string,
+  TAccountWithdrawAccountsReserveCollateralMint extends string | AccountMeta =
+    string,
+  TAccountWithdrawAccountsReserveLiquiditySupply extends string | AccountMeta =
+    string,
   TAccountWithdrawAccountsUserDestinationLiquidity extends
     | string
     | AccountMeta = string,
   TAccountWithdrawAccountsPlaceholderUserDestinationCollateral extends
     | string
     | AccountMeta = string,
-  TAccountWithdrawAccountsCollateralTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountWithdrawAccountsLiquidityTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountWithdrawAccountsCollateralTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountWithdrawAccountsLiquidityTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountWithdrawAccountsInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountDepositFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
-  TAccountDepositFarmsAccountsReserveFarmState extends
-    | string
-    | AccountMeta = string,
+  TAccountDepositFarmsAccountsReserveFarmState extends string | AccountMeta =
+    string,
   TAccountWithdrawFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
-  TAccountWithdrawFarmsAccountsReserveFarmState extends
-    | string
-    | AccountMeta = string,
-  TAccountFarmsProgram extends
-    | string
-    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+  TAccountWithdrawFarmsAccountsReserveFarmState extends string | AccountMeta =
+    string,
+  TAccountFarmsProgram extends string | AccountMeta =
+    "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -299,11 +281,11 @@ export interface DepositAndWithdrawInput<
   TAccountDepositAccountsReserveLiquidityMint extends string = string,
   TAccountDepositAccountsReserveLiquiditySupply extends string = string,
   TAccountDepositAccountsReserveCollateralMint extends string = string,
-  TAccountDepositAccountsReserveDestinationDepositCollateral extends
-    string = string,
+  TAccountDepositAccountsReserveDestinationDepositCollateral extends string =
+    string,
   TAccountDepositAccountsUserSourceLiquidity extends string = string,
-  TAccountDepositAccountsPlaceholderUserDestinationCollateral extends
-    string = string,
+  TAccountDepositAccountsPlaceholderUserDestinationCollateral extends string =
+    string,
   TAccountDepositAccountsCollateralTokenProgram extends string = string,
   TAccountDepositAccountsLiquidityTokenProgram extends string = string,
   TAccountDepositAccountsInstructionSysvarAccount extends string = string,
@@ -317,8 +299,8 @@ export interface DepositAndWithdrawInput<
   TAccountWithdrawAccountsReserveCollateralMint extends string = string,
   TAccountWithdrawAccountsReserveLiquiditySupply extends string = string,
   TAccountWithdrawAccountsUserDestinationLiquidity extends string = string,
-  TAccountWithdrawAccountsPlaceholderUserDestinationCollateral extends
-    string = string,
+  TAccountWithdrawAccountsPlaceholderUserDestinationCollateral extends string =
+    string,
   TAccountWithdrawAccountsCollateralTokenProgram extends string = string,
   TAccountWithdrawAccountsLiquidityTokenProgram extends string = string,
   TAccountWithdrawAccountsInstructionSysvarAccount extends string = string,

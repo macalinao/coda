@@ -66,18 +66,14 @@ export type TransferInstruction<
   TAccountDestinationTokenRecord extends string | AccountMeta = string,
   TAccountAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSplAtaProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountSysvarInstructions extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
+  TAccountSplTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSplAtaProgram extends string | AccountMeta =
+    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
   TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
   TAccountAuthorizationRules extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],

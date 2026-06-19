@@ -91,9 +91,8 @@ export type TwoHopSwapV2Instruction<
   TAccountTickArrayTwo2 extends string | AccountMeta = string,
   TAccountOracleOne extends string | AccountMeta = string,
   TAccountOracleTwo extends string | AccountMeta = string,
-  TAccountMemoProgram extends
-    | string
-    | AccountMeta = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+  TAccountMemoProgram extends string | AccountMeta =
+    "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

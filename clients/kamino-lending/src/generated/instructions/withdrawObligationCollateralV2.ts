@@ -65,17 +65,14 @@ export type WithdrawObligationCollateralV2Instruction<
   TAccountWithdrawReserve extends string | AccountMeta = string,
   TAccountReserveSourceCollateral extends string | AccountMeta = string,
   TAccountUserDestinationCollateral extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountInstructionSysvarAccount extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TAccountObligationFarmUserState extends string | AccountMeta = string,
   TAccountReserveFarmState extends string | AccountMeta = string,
-  TAccountFarmsProgram extends
-    | string
-    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+  TAccountFarmsProgram extends string | AccountMeta =
+    "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

@@ -58,15 +58,12 @@ export type CloseTreeV2Instruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountMerkleTree extends string | AccountMeta<string> = string,
   TAccountRecipient extends string | AccountMeta<string> = string,
-  TAccountCompressionProgram extends
-    | string
-    | AccountMeta<string> = "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
-  TAccountLogWrapper extends
-    | string
-    | AccountMeta<string> = "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

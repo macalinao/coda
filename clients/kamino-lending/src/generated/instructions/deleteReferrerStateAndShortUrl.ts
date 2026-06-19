@@ -52,12 +52,10 @@ export type DeleteReferrerStateAndShortUrlInstruction<
   TAccountReferrer extends string | AccountMeta = string,
   TAccountReferrerState extends string | AccountMeta = string,
   TAccountShortUrl extends string | AccountMeta = string,
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

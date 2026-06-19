@@ -73,18 +73,14 @@ export type BurnV2Instruction<
   TAccountMerkleTree extends string | AccountMeta<string> = string,
   TAccountCoreCollection extends string | AccountMeta<string> = string,
   TAccountMplCoreCpiSigner extends string | AccountMeta<string> = string,
-  TAccountLogWrapper extends
-    | string
-    | AccountMeta<string> = "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
-  TAccountCompressionProgram extends
-    | string
-    | AccountMeta<string> = "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
-  TAccountMplCoreProgram extends
-    | string
-    | AccountMeta<string> = "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW",
+  TAccountMplCoreProgram extends string | AccountMeta<string> =
+    "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

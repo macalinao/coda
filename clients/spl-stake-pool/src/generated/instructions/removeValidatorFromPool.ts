@@ -54,12 +54,10 @@ export type RemoveValidatorFromPoolInstruction<
   TAccountValidatorStakeList extends string | AccountMeta = string,
   TAccountStakeAccount extends string | AccountMeta = string,
   TAccountTransientStakeAccount extends string | AccountMeta = string,
-  TAccountClockSysvar extends
-    | string
-    | AccountMeta = "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeProgram extends
-    | string
-    | AccountMeta = "Stake11111111111111111111111111111111111111",
+  TAccountClockSysvar extends string | AccountMeta =
+    "SysvarC1ock11111111111111111111111111111111",
+  TAccountStakeProgram extends string | AccountMeta =
+    "Stake11111111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

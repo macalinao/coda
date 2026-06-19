@@ -56,9 +56,8 @@ export type SocializeLossInstruction<
   TAccountObligation extends string | AccountMeta = string,
   TAccountLendingMarket extends string | AccountMeta = string,
   TAccountReserve extends string | AccountMeta = string,
-  TAccountInstructionSysvarAccount extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountInstructionSysvarAccount extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

@@ -18,7 +18,7 @@ The monorepo contains:
 - **Build System**: Turbo for monorepo orchestration
 - **Language**: TypeScript with ES modules
 - **Code Generation**: Codama for AST transformations
-- **Code Quality**: Biome for formatting, ESLint for linting
+- **Code Quality**: oxlint for linting (type-aware + type-checking via oxlint-tsgolint), oxfmt for formatting, Prettier for Markdown/JSON
 - **Testing**: Bun test runner
 
 ## Essential Commands
@@ -36,9 +36,9 @@ coda generate               # Generate client with Coda CLI
 coda init                  # Initialize coda.config.ts
 
 # Code Quality
-bun run lint                 # Run biome check + eslint
-bun run lint:fix            # Fix linting issues
-biome check --write         # Format with biome
+bun run lint                 # Run oxlint (lint + type-check) and check formatting
+bun run lint:fix            # Apply oxlint autofixes and format with oxfmt
+bun run format              # Format with oxfmt (code) + prettier (md/mdx)
 
 # Testing
 bun run test                # Run all tests
@@ -197,7 +197,7 @@ export default defineConfig({
 
 - Use specific types, avoid `any`
 - Prefer interfaces over type aliases for objects
-- Use `import type` for type-only imports (enforced by Biome)
+- Use `import type` for type-only imports (enforced by oxlint)
 - Arrays use shorthand syntax: `string[]` not `Array<string>`
 - **Use double quotes for strings** (not single quotes)
 - ES modules with `.js` extensions for imports
@@ -210,21 +210,29 @@ export default defineConfig({
 1. `bun run build` - Check for TypeScript errors
 2. `bun run lint:fix` - Fix linting and formatting issues
 
-### Biome/ESLint Configuration
+### oxlint Configuration
+
+Linting is configured in the root `.oxlintrc.json` and runs as a single
+pass over the whole repo via `oxlint --disable-nested-config`. It enables
+the `correctness`, `suspicious`, and `perf` categories plus a curated set
+of high-value type-aware rules, with `typeAware` and `typeCheck` on (so
+oxlint also reports TypeScript compiler errors). Overrides relax generated
+code (`clients/*/src/generated/**`), CLI console output, and tests.
 
 - No floating promises (must be handled)
-- Use const assertions where applicable
-- No non-null assertions are allowed
-- Simplified logic expressions required
-- No double equals (use === instead)
-- Imports are auto-organized on save
+- No explicit `any`
+- No non-null assertions outside tests
+- Type-only imports must use `import type` (separated)
+- No `console` outside the CLI packages and build scripts
+
+Formatting is handled by oxfmt (code) and Prettier (Markdown/JSON);
+oxfmt is scoped to code via `.oxfmtrc.json` ignorePatterns.
 
 ## Turborepo Configuration
 
 Tasks are defined in turbo.json:
 
 - `build`: Depends on upstream builds, outputs to `./dist/**`
-- `lint`: Depends on upstream builds
 - `test`: Depends on build, no caching
 - `codegen`: Outputs to `./src/generated/**`, no caching
 - Tasks run in topological order respecting dependencies
@@ -258,9 +266,9 @@ GitHub Actions workflow runs on push/PR to main:
 
 - Installs dependencies with frozen lockfile
 - Builds all packages
-- Runs linting (biome + eslint)
+- Runs oxlint (lint + type-aware type-checking) and checks formatting with oxfmt
 - Runs tests
-- Checks TypeScript compilation
+- Type-checks the coda.config.ts files
 
 ## Publishing Workflow
 
@@ -275,7 +283,7 @@ When creating new packages:
 
 - Build with [tsdown](https://tsdown.dev). The shared root `tsdown.config.ts` is auto-resolved (tsdown walks up the directory tree), so packages need no config of their own. Only add a local `tsdown.config.ts` to override — e.g. extra `entry` points for a CLI binary, as `packages/coda` and `packages/create-coda` do
 - Follow the same structure as existing packages
-- Scripts should be: `build`, `clean`, `lint`, `test`, `codegen` (if applicable)
+- Scripts should be: `build`, `clean`, `test`, `codegen` (if applicable). Linting is a single repo-wide `oxlint` pass run from the root, so packages do not need their own `lint` script
 - All packages use ES modules (`"type": "module"` in package.json)
 - Keep package.json scripts simple and consistent
 
@@ -347,7 +355,7 @@ The `apps/docs/` folder contains the documentation site built with Fumadocs and 
 - **Styling**: Tailwind CSS v4 (no config file needed, uses @source directives)
 - **MDX**: Fumadocs MDX with Shiki syntax highlighting
 - **Themes**: Catppuccin Latte (light) / Catppuccin Mocha (dark) for code blocks
-- **Linting**: Modern ESLint flat config (eslint.config.mjs)
+- **Linting**: oxlint (via the shared root `.oxlintrc.json`)
 
 ### Development
 

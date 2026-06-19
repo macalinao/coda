@@ -7,11 +7,11 @@ import {
   getAllInstructionsWithSubs,
   getAllPdas,
 } from "@codama/nodes";
-import { renderAccount } from "./renderAccount.js";
-import { renderError } from "./renderError.js";
-import { renderInstruction } from "./renderInstruction.js";
-import { renderPda } from "./renderPda.js";
-import { renderDefinedType } from "./renderType.js";
+import { renderAccount } from "./render-account.js";
+import { renderError } from "./render-error.js";
+import { renderInstruction } from "./render-instruction.js";
+import { renderPda } from "./render-pda.js";
+import { renderDefinedType } from "./render-type.js";
 
 const CAPITAL_LETTER_REGEX = /([A-Z])/g;
 const FIRST_CHAR_REGEX = /^./;

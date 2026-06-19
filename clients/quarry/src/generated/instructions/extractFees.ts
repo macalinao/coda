@@ -50,9 +50,8 @@ export type ExtractFeesInstruction<
   TAccountRewarder extends string | AccountMeta<string> = string,
   TAccountClaimFeeTokenAccount extends string | AccountMeta<string> = string,
   TAccountFeeToTokenAccount extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

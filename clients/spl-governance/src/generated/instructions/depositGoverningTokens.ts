@@ -51,17 +51,14 @@ export type DepositGoverningTokensInstruction<
   TAccountGoverningTokenHoldingAccount extends string | AccountMeta = string,
   TAccountGoverningTokenSourceAccount extends string | AccountMeta = string,
   TAccountGoverningTokenOwnerAccount extends string | AccountMeta = string,
-  TAccountGoverningTokenSourceAccountAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountGoverningTokenSourceAccountAuthority extends string | AccountMeta =
+    string,
   TAccountTokenOwnerRecord extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRealmConfigAccount extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

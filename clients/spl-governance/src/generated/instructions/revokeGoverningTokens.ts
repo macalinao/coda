@@ -50,13 +50,11 @@ export type RevokeGoverningTokensInstruction<
   TAccountGoverningTokenHoldingAccount extends string | AccountMeta = string,
   TAccountTokenOwnerRecord extends string | AccountMeta = string,
   TAccountGoverningTokenMint extends string | AccountMeta = string,
-  TAccountGoverningTokenMintAuthorityOrTokenOwner extends
-    | string
-    | AccountMeta = string,
+  TAccountGoverningTokenMintAuthorityOrTokenOwner extends string | AccountMeta =
+    string,
   TAccountRealmConfigAccount extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

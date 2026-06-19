@@ -61,12 +61,10 @@ export type InitializeUserInstruction<
   TAccountDelegatee extends string | AccountMeta = string,
   TAccountUserState extends string | AccountMeta = string,
   TAccountFarmState extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

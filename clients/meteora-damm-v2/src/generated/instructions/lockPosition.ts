@@ -66,13 +66,11 @@ export type LockPositionInstruction<
   TAccountPositionNftAccount extends string | AccountMeta<string> = string,
   TAccountOwner extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountEventAuthority extends string | AccountMeta<string> = string,
-  TAccountProgram extends
-    | string
-    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TAccountProgram extends string | AccountMeta<string> =
+    "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

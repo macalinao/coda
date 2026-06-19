@@ -48,19 +48,16 @@ export type DeprecatedMintPrintingTokensViaTokenInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountDestination extends string | AccountMeta = string,
   TAccountToken extends string | AccountMeta = string,
-  TAccountOneTimePrintingAuthorizationMint extends
-    | string
-    | AccountMeta = string,
+  TAccountOneTimePrintingAuthorizationMint extends string | AccountMeta =
+    string,
   TAccountPrintingMint extends string | AccountMeta = string,
   TAccountBurnAuthority extends string | AccountMeta = string,
   TAccountMetadata extends string | AccountMeta = string,
   TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

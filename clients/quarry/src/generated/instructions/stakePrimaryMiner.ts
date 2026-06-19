@@ -61,12 +61,10 @@ export type StakePrimaryMinerInstruction<
   TAccountQuarry extends string | AccountMeta<string> = string,
   TAccountMiner extends string | AccountMeta<string> = string,
   TAccountMinerVault extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountMineProgram extends
-    | string
-    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountMineProgram extends string | AccountMeta<string> =
+    "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

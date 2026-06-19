@@ -41,8 +41,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "clean": "rm -fr .eslintcache dist/ node_modules/ tsconfig.tsbuildinfo",
-    "lint": "eslint . --cache"
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@solana-program/memo": "^0.11.1",
@@ -53,9 +52,7 @@
     "codama": "catalog:"
   },
   "devDependencies": {
-    "@macalinao/eslint-config": "catalog:",
     "@macalinao/tsconfig": "catalog:",
-    "eslint": "catalog:",
     "@types/bun": "catalog:",
     "typescript": "catalog:",
     "tsdown": "catalog:"

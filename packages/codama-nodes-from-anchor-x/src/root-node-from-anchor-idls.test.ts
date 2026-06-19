@@ -13,11 +13,11 @@ describe("rootNodeFromAnchorIdls", () => {
   });
 
   const createMockIdlV01 = (name: string): AnchorIdl => ({
-    version: "0.1.0",
+    address: "11111111111111111111111111111111",
     metadata: {
-      spec: "0.1.0",
-      address: "11111111111111111111111111111111",
       name,
+      spec: "0.1.0",
+      version: "0.1.0",
     },
     instructions: [],
     accounts: [],
@@ -30,7 +30,7 @@ describe("rootNodeFromAnchorIdls", () => {
     const root = rootNodeFromAnchorIdls([idl]);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("testProgram");
+    expect(root.program.name as string).toBe("testProgram");
     expect(root.additionalPrograms).toHaveLength(0);
   });
 
@@ -42,10 +42,10 @@ describe("rootNodeFromAnchorIdls", () => {
     const root = rootNodeFromAnchorIdls([idl1, idl2, idl3]);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("programOne");
+    expect(root.program.name as string).toBe("programOne");
     expect(root.additionalPrograms).toHaveLength(2);
-    expect(root.additionalPrograms[0].name).toBe("programTwo");
-    expect(root.additionalPrograms[1].name).toBe("programThree");
+    expect(root.additionalPrograms[0]!.name as string).toBe("programTwo");
+    expect(root.additionalPrograms[1]!.name as string).toBe("programThree");
   });
 
   it("should handle IDL v0.1.0 format", () => {
@@ -53,9 +53,9 @@ describe("rootNodeFromAnchorIdls", () => {
     const root = rootNodeFromAnchorIdls([idl]);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("newFormatProgram");
+    expect(root.program.name as string).toBe("newFormatProgram");
     // V0.1.0 IDL includes address in metadata but the program node might not expose it directly
-    expect(root.program.name).toBe("newFormatProgram");
+    expect(root.program.name as string).toBe("newFormatProgram");
   });
 
   it("should handle mixed IDL versions", () => {
@@ -65,11 +65,11 @@ describe("rootNodeFromAnchorIdls", () => {
     const root = rootNodeFromAnchorIdls([idlV00, idlV01]);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("oldProgram");
+    expect(root.program.name as string).toBe("oldProgram");
     expect(root.additionalPrograms).toHaveLength(1);
-    expect(root.additionalPrograms[0].name).toBe("newProgram");
+    expect(root.additionalPrograms[0]!.name as string).toBe("newProgram");
     // V0.1.0 IDL includes address in metadata but might not be exposed in the program node
-    expect(root.additionalPrograms[0].name).toBe("newProgram");
+    expect(root.additionalPrograms[0]!.name as string).toBe("newProgram");
   });
 
   it("should throw an error when no IDLs are provided", () => {
@@ -82,7 +82,7 @@ describe("rootNodeFromAnchorIdls", () => {
     const idl = createMockIdl("my_snake_case_program");
     const root = rootNodeFromAnchorIdls([idl]);
 
-    expect(root.program.name).toBe("mySnakeCaseProgram");
+    expect(root.program.name as string).toBe("mySnakeCaseProgram");
   });
 
   it("should preserve the order of programs", () => {
@@ -95,10 +95,10 @@ describe("rootNodeFromAnchorIdls", () => {
 
     const root = rootNodeFromAnchorIdls(idls);
 
-    expect(root.program.name).toBe("first");
-    expect(root.additionalPrograms[0].name).toBe("second");
-    expect(root.additionalPrograms[1].name).toBe("third");
-    expect(root.additionalPrograms[2].name).toBe("fourth");
+    expect(root.program.name as string).toBe("first");
+    expect(root.additionalPrograms[0]!.name as string).toBe("second");
+    expect(root.additionalPrograms[1]!.name as string).toBe("third");
+    expect(root.additionalPrograms[2]!.name as string).toBe("fourth");
   });
 
   it("should handle IDLs with instructions and accounts", () => {
@@ -128,10 +128,10 @@ describe("rootNodeFromAnchorIdls", () => {
     const root = rootNodeFromAnchorIdls([idl]);
 
     expect(root.kind).toBe("rootNode");
-    expect(root.program.name).toBe("complexProgram");
+    expect(root.program.name as string).toBe("complexProgram");
     expect(root.program.instructions).toHaveLength(1);
-    expect(root.program.instructions[0].name).toBe("initialize");
+    expect(root.program.instructions[0]!.name as string).toBe("initialize");
     expect(root.program.accounts).toHaveLength(1);
-    expect(root.program.accounts[0].name).toBe("myAccount");
+    expect(root.program.accounts[0]!.name as string).toBe("myAccount");
   });
 });

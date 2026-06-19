@@ -5,7 +5,7 @@ import { describe, expect, test } from "bun:test";
 import { numberTypeNode, pdaNode, variablePdaSeedNode } from "@codama/nodes";
 import { LinkableDictionary } from "@codama/visitors-core";
 import * as prettier from "prettier";
-import { renderPda } from "./renderPda.js";
+import { renderPda } from "./render-pda.js";
 
 const mockContext: RenderContext = {
   linkables: new LinkableDictionary(),

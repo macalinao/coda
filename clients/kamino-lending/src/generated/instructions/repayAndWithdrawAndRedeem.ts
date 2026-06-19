@@ -59,70 +59,56 @@ export type RepayAndWithdrawAndRedeemInstruction<
   TAccountRepayAccountsObligation extends string | AccountMeta = string,
   TAccountRepayAccountsLendingMarket extends string | AccountMeta = string,
   TAccountRepayAccountsRepayReserve extends string | AccountMeta = string,
-  TAccountRepayAccountsReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
+  TAccountRepayAccountsReserveLiquidityMint extends string | AccountMeta =
+    string,
   TAccountRepayAccountsReserveDestinationLiquidity extends
     | string
     | AccountMeta = string,
-  TAccountRepayAccountsUserSourceLiquidity extends
-    | string
-    | AccountMeta = string,
-  TAccountRepayAccountsTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRepayAccountsInstructionSysvarAccount extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountRepayAccountsUserSourceLiquidity extends string | AccountMeta =
+    string,
+  TAccountRepayAccountsTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRepayAccountsInstructionSysvarAccount extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TAccountWithdrawAccountsOwner extends string | AccountMeta = string,
   TAccountWithdrawAccountsObligation extends string | AccountMeta = string,
   TAccountWithdrawAccountsLendingMarket extends string | AccountMeta = string,
-  TAccountWithdrawAccountsLendingMarketAuthority extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawAccountsLendingMarketAuthority extends string | AccountMeta =
+    string,
   TAccountWithdrawAccountsWithdrawReserve extends string | AccountMeta = string,
-  TAccountWithdrawAccountsReserveLiquidityMint extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsReserveSourceCollateral extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsReserveCollateralMint extends
-    | string
-    | AccountMeta = string,
-  TAccountWithdrawAccountsReserveLiquiditySupply extends
-    | string
-    | AccountMeta = string,
+  TAccountWithdrawAccountsReserveLiquidityMint extends string | AccountMeta =
+    string,
+  TAccountWithdrawAccountsReserveSourceCollateral extends string | AccountMeta =
+    string,
+  TAccountWithdrawAccountsReserveCollateralMint extends string | AccountMeta =
+    string,
+  TAccountWithdrawAccountsReserveLiquiditySupply extends string | AccountMeta =
+    string,
   TAccountWithdrawAccountsUserDestinationLiquidity extends
     | string
     | AccountMeta = string,
   TAccountWithdrawAccountsPlaceholderUserDestinationCollateral extends
     | string
     | AccountMeta = string,
-  TAccountWithdrawAccountsCollateralTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountWithdrawAccountsLiquidityTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountWithdrawAccountsCollateralTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountWithdrawAccountsLiquidityTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountWithdrawAccountsInstructionSysvarAccount extends
     | string
     | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
   TAccountCollateralFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
-  TAccountCollateralFarmsAccountsReserveFarmState extends
-    | string
-    | AccountMeta = string,
+  TAccountCollateralFarmsAccountsReserveFarmState extends string | AccountMeta =
+    string,
   TAccountRepayDebtFarmsAccountsObligationFarmUserState extends
     | string
     | AccountMeta = string,
-  TAccountRepayDebtFarmsAccountsReserveFarmState extends
-    | string
-    | AccountMeta = string,
-  TAccountFarmsProgram extends
-    | string
-    | AccountMeta = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+  TAccountRepayDebtFarmsAccountsReserveFarmState extends string | AccountMeta =
+    string,
+  TAccountFarmsProgram extends string | AccountMeta =
+    "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -281,13 +267,13 @@ export interface RepayAndWithdrawAndRedeemInput<
   TAccountWithdrawAccountsReserveCollateralMint extends string = string,
   TAccountWithdrawAccountsReserveLiquiditySupply extends string = string,
   TAccountWithdrawAccountsUserDestinationLiquidity extends string = string,
-  TAccountWithdrawAccountsPlaceholderUserDestinationCollateral extends
-    string = string,
+  TAccountWithdrawAccountsPlaceholderUserDestinationCollateral extends string =
+    string,
   TAccountWithdrawAccountsCollateralTokenProgram extends string = string,
   TAccountWithdrawAccountsLiquidityTokenProgram extends string = string,
   TAccountWithdrawAccountsInstructionSysvarAccount extends string = string,
-  TAccountCollateralFarmsAccountsObligationFarmUserState extends
-    string = string,
+  TAccountCollateralFarmsAccountsObligationFarmUserState extends string =
+    string,
   TAccountCollateralFarmsAccountsReserveFarmState extends string = string,
   TAccountRepayDebtFarmsAccountsObligationFarmUserState extends string = string,
   TAccountRepayDebtFarmsAccountsReserveFarmState extends string = string,

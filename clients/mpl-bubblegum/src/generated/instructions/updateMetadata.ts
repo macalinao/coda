@@ -78,25 +78,20 @@ export type UpdateMetadataInstruction<
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountCollectionMint extends string | AccountMeta<string> = string,
   TAccountCollectionMetadata extends string | AccountMeta<string> = string,
-  TAccountCollectionAuthorityRecordPda extends
-    | string
-    | AccountMeta<string> = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY",
+  TAccountCollectionAuthorityRecordPda extends string | AccountMeta<string> =
+    "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY",
   TAccountLeafOwner extends string | AccountMeta<string> = string,
   TAccountLeafDelegate extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountMerkleTree extends string | AccountMeta<string> = string,
-  TAccountLogWrapper extends
-    | string
-    | AccountMeta<string> = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
-  TAccountCompressionProgram extends
-    | string
-    | AccountMeta<string> = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
-  TAccountTokenMetadataProgram extends
-    | string
-    | AccountMeta<string> = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
+  TAccountTokenMetadataProgram extends string | AccountMeta<string> =
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

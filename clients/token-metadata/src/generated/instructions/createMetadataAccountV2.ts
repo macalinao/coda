@@ -55,9 +55,8 @@ export type CreateMetadataAccountV2Instruction<
   TAccountMintAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
   TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountRent extends string | AccountMeta | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

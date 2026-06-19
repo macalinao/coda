@@ -55,12 +55,10 @@ export type VerifyInstruction<
   TAccountCollectionMint extends string | AccountMeta = string,
   TAccountCollectionMetadata extends string | AccountMeta = string,
   TAccountCollectionMasterEdition extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountSysvarInstructions extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

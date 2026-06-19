@@ -60,15 +60,12 @@ export type MigrateInstruction<
   TAccountCollectionMetadata extends string | AccountMeta = string,
   TAccountDelegateRecord extends string | AccountMeta = string,
   TAccountTokenRecord extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountSysvarInstructions extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
+  TAccountSplTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
   TAccountAuthorizationRules extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],

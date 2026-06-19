@@ -66,21 +66,16 @@ export type OpenPositionWithMetadataInstruction<
   TAccountPositionMetadataAccount extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountMetadataProgram extends
-    | string
-    | AccountMeta = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
+  TAccountAssociatedTokenProgram extends string | AccountMeta =
+    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountMetadataProgram extends string | AccountMeta =
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
   TAccountMetadataUpdateAuth extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

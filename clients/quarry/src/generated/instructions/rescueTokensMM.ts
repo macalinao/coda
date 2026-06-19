@@ -55,12 +55,10 @@ export type RescueTokensMMInstruction<
   TAccountMiner extends string | AccountMeta<string> = string,
   TAccountMinerTokenAccount extends string | AccountMeta<string> = string,
   TAccountDestinationTokenAccount extends string | AccountMeta<string> = string,
-  TAccountQuarryMineProgram extends
-    | string
-    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountQuarryMineProgram extends string | AccountMeta<string> =
+    "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

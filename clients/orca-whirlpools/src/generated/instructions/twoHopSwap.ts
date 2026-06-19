@@ -56,9 +56,8 @@ export function getTwoHopSwapDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type TwoHopSwapInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountTokenAuthority extends string | AccountMeta = string,
   TAccountWhirlpoolOne extends string | AccountMeta = string,
   TAccountWhirlpoolTwo extends string | AccountMeta = string,

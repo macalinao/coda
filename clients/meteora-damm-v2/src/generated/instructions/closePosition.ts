@@ -65,13 +65,11 @@ export type ClosePositionInstruction<
   TAccountPoolAuthority extends string | AccountMeta<string> = string,
   TAccountRentReceiver extends string | AccountMeta<string> = string,
   TAccountOwner extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   TAccountEventAuthority extends string | AccountMeta<string> = string,
-  TAccountProgram extends
-    | string
-    | AccountMeta<string> = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  TAccountProgram extends string | AccountMeta<string> =
+    "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

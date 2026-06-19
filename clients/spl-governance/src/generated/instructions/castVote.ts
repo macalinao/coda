@@ -55,9 +55,8 @@ export type CastVoteInstruction<
   TAccountProposalVoteRecord extends string | AccountMeta = string,
   TAccountGoverningTokenMint extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountRealmConfigAccount extends string | AccountMeta = string,
   TAccountVoterWeightRecord extends string | AccountMeta = string,
   TAccountMaxVoterWeightRecord extends string | AccountMeta = string,

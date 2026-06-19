@@ -5,7 +5,7 @@ import type {
 } from "@codama/nodes";
 import type { RenderContext } from "../types.js";
 import { renderDiscriminators } from "./render-discriminators.js";
-import { renderTypeNode } from "./renderType.js";
+import { renderTypeNode } from "./render-type.js";
 
 export function renderInstruction(
   instruction: InstructionNode,

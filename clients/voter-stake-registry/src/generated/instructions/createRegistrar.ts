@@ -54,18 +54,15 @@ export type CreateRegistrarInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountRegistrar extends string | AccountMeta = string,
   TAccountRealm extends string | AccountMeta = string,
-  TAccountGovernanceProgramId extends
-    | string
-    | AccountMeta = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  TAccountGovernanceProgramId extends string | AccountMeta =
+    "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
   TAccountRealmGoverningTokenMint extends string | AccountMeta = string,
   TAccountRealmAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

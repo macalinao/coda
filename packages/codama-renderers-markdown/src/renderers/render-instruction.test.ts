@@ -10,7 +10,7 @@ import {
 } from "@codama/nodes";
 import { LinkableDictionary } from "@codama/visitors-core";
 import * as prettier from "prettier";
-import { renderInstruction } from "./renderInstruction.js";
+import { renderInstruction } from "./render-instruction.js";
 
 const mockContext: RenderContext = {
   linkables: new LinkableDictionary(),

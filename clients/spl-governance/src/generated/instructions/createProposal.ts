@@ -65,9 +65,8 @@ export type CreateProposalInstruction<
   TAccountGoverningTokenMint extends string | AccountMeta = string,
   TAccountGovernanceAuthority extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
   TAccountRealmConfig extends string | AccountMeta = string,
   TAccountVoterWeightRecord extends string | AccountMeta = string,
   TAccountProposalDepositAccount extends string | AccountMeta = string,

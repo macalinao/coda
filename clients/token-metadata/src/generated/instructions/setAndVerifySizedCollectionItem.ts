@@ -54,10 +54,8 @@ export type SetAndVerifySizedCollectionItemInstruction<
   TAccountCollectionMint extends string | AccountMeta = string,
   TAccountCollection extends string | AccountMeta = string,
   TAccountCollectionMasterEditionAccount extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends
-    | string
-    | AccountMeta
-    | undefined = undefined,
+  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
+    undefined,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

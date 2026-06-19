@@ -46,14 +46,12 @@ export type WithdrawGoverningTokensInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountRealmAccount extends string | AccountMeta = string,
   TAccountGoverningTokenHoldingAccount extends string | AccountMeta = string,
-  TAccountGoverningTokenDestinationAccount extends
-    | string
-    | AccountMeta = string,
+  TAccountGoverningTokenDestinationAccount extends string | AccountMeta =
+    string,
   TAccountGoverningTokenOwnerAccount extends string | AccountMeta = string,
   TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TAccountRealmConfigAccount extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

@@ -62,9 +62,8 @@ export type WithdrawTokensMMInstruction<
   TAccountWithdrawMint extends string | AccountMeta<string> = string,
   TAccountMmTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenDestination extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

@@ -58,9 +58,8 @@ export type CollectFeesInstruction<
   TAccountTokenVaultA extends string | AccountMeta = string,
   TAccountTokenOwnerAccountB extends string | AccountMeta = string,
   TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

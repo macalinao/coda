@@ -67,22 +67,17 @@ export type DepositReserveLiquidityAndObligationCollateralInstruction<
   TAccountReserveLiquidityMint extends string | AccountMeta = string,
   TAccountReserveLiquiditySupply extends string | AccountMeta = string,
   TAccountReserveCollateralMint extends string | AccountMeta = string,
-  TAccountReserveDestinationDepositCollateral extends
-    | string
-    | AccountMeta = string,
+  TAccountReserveDestinationDepositCollateral extends string | AccountMeta =
+    string,
   TAccountUserSourceLiquidity extends string | AccountMeta = string,
-  TAccountPlaceholderUserDestinationCollateral extends
-    | string
-    | AccountMeta = string,
-  TAccountCollateralTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountLiquidityTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountPlaceholderUserDestinationCollateral extends string | AccountMeta =
+    string,
+  TAccountCollateralTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountLiquidityTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountInstructionSysvarAccount extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

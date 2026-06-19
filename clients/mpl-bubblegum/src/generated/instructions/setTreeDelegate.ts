@@ -57,9 +57,8 @@ export type SetTreeDelegateInstruction<
   TAccountTreeCreator extends string | AccountMeta<string> = string,
   TAccountNewTreeDelegate extends string | AccountMeta<string> = string,
   TAccountMerkleTree extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

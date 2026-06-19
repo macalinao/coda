@@ -53,15 +53,12 @@ export type UpdateValidatorListBalanceInstruction<
   TAccountWithdrawAuthority extends string | AccountMeta = string,
   TAccountValidatorList extends string | AccountMeta = string,
   TAccountReserveStake extends string | AccountMeta = string,
-  TAccountClockSysvar extends
-    | string
-    | AccountMeta = "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends
-    | string
-    | AccountMeta = "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeProgram extends
-    | string
-    | AccountMeta = "Stake11111111111111111111111111111111111111",
+  TAccountClockSysvar extends string | AccountMeta =
+    "SysvarC1ock11111111111111111111111111111111",
+  TAccountStakeHistorySysvar extends string | AccountMeta =
+    "SysvarStakeHistory1111111111111111111111111",
+  TAccountStakeProgram extends string | AccountMeta =
+    "Stake11111111111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

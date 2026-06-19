@@ -36,8 +36,8 @@ export function renderESMTypeScriptVisitor(
       mapFragmentContent(index, (content) =>
         content.replace(
           /(export\s+\*\s+from\s+['"])(\.\/[^'"]+)(['"])/g,
-          (_: string, prefix: string, path: string, quote: string) =>
-            `${prefix}${path}/index.js${quote}`,
+          (_: string, prefix: string, importPath: string, quote: string) =>
+            `${prefix}${importPath}/index.js${quote}`,
         ),
       ),
     );
@@ -58,7 +58,8 @@ export function renderESMTypeScriptVisitor(
         )
         .replace(
           /(export\s+\*\s+from\s+['"])(\.\/[^'"]+?)(?<!\.(js|ts|mjs|cjs|json))(['"])/g,
-          (_: string, prefix: string, path: string) => `${prefix}${path}.js'`,
+          (_: string, prefix: string, importPath: string) =>
+            `${prefix}${importPath}.js'`,
         )
         .replace(/from\s+['"]\.['"]/g, 'from "./index.js"');
 

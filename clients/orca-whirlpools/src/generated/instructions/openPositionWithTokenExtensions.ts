@@ -59,15 +59,12 @@ export type OpenPositionWithTokenExtensionsInstruction<
   TAccountPositionMint extends string | AccountMeta = string,
   TAccountPositionTokenAccount extends string | AccountMeta = string,
   TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountToken2022Program extends
-    | string
-    | AccountMeta = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends
-    | string
-    | AccountMeta = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  TAccountToken2022Program extends string | AccountMeta =
+    "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountAssociatedTokenProgram extends string | AccountMeta =
+    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
   TAccountMetadataUpdateAuth extends string | AccountMeta = string,
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &

@@ -1,0 +1,58 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "promise", "node"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "options": {
+    "typeAware": true,
+    "typeCheck": true
+  },
+  "env": {
+    "builtin": true,
+    "es2024": true,
+    "node": true
+  },
+  "ignorePatterns": ["**/dist", "**/node_modules"],
+  "rules": {
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/await-thenable": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "fixStyle": "separate-type-imports" }
+    ],
+    "typescript/no-unsafe-type-assertion": "off",
+    "no-underscore-dangle": "off",
+    "no-await-in-loop": "off"
+  },
+  "overrides": [
+    {
+      "files": ["src/generated/**"],
+      "rules": {
+        "typescript/no-non-null-assertion": "off",
+        "typescript/no-unnecessary-condition": "off",
+        "typescript/no-explicit-any": "off",
+        "typescript/no-empty-object-type": "off",
+        "typescript/no-unnecessary-type-arguments": "off",
+        "typescript/no-unnecessary-type-assertion": "off",
+        "typescript/non-nullable-type-assertion-style": "off",
+        "typescript/consistent-type-assertions": "off",
+        "typescript/prefer-nullish-coalescing": "off",
+        "no-constant-condition": "off",
+        "consistent-return": "off",
+        "no-shadow": "off",
+        "unicorn/no-useless-fallback-in-spread": "off"
+      }
+    },
+    {
+      "files": ["coda.config.ts"],
+      "rules": {
+        "typescript/no-floating-promises": "off"
+      }
+    }
+  ]
+}

@@ -62,17 +62,14 @@ export type BorrowObligationLiquidityInstruction<
   TAccountBorrowReserve extends string | AccountMeta = string,
   TAccountBorrowReserveLiquidityMint extends string | AccountMeta = string,
   TAccountReserveSourceLiquidity extends string | AccountMeta = string,
-  TAccountBorrowReserveLiquidityFeeReceiver extends
-    | string
-    | AccountMeta = string,
+  TAccountBorrowReserveLiquidityFeeReceiver extends string | AccountMeta =
+    string,
   TAccountUserDestinationLiquidity extends string | AccountMeta = string,
   TAccountReferrerTokenState extends string | AccountMeta = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends
-    | string
-    | AccountMeta = "Sysvar1nstructions1111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountInstructionSysvarAccount extends string | AccountMeta =
+    "Sysvar1nstructions1111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

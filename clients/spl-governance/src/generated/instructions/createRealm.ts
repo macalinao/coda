@@ -63,15 +63,12 @@ export type CreateRealmInstruction<
   TAccountCommunityTokenMint extends string | AccountMeta = string,
   TAccountCommunityTokenHoldingAccount extends string | AccountMeta = string,
   TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta = "11111111111111111111111111111111",
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRent extends
-    | string
-    | AccountMeta = "SysvarRent111111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta =
+    "11111111111111111111111111111111",
+  TAccountTokenProgram extends string | AccountMeta =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountRent extends string | AccountMeta =
+    "SysvarRent111111111111111111111111111111111",
   TAccountCouncilTokenMint extends string | AccountMeta = string,
   TAccountCouncilTokenHoldingAccount extends string | AccountMeta = string,
   TAccountRealmConfig extends string | AccountMeta = string,

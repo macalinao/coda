@@ -61,15 +61,13 @@ export type CreateMinerInstruction<
   TAccountMiner extends string | AccountMeta<string> = string,
   TAccountQuarry extends string | AccountMeta<string> = string,
   TAccountRewarder extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountTokenMint extends string | AccountMeta<string> = string,
   TAccountMinerVault extends string | AccountMeta<string> = string,
-  TAccountTokenProgram extends
-    | string
-    | AccountMeta<string> = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  TAccountTokenProgram extends string | AccountMeta<string> =
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

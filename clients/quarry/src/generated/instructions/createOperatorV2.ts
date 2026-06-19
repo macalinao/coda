@@ -59,12 +59,10 @@ export type CreateOperatorV2Instruction<
   TAccountRewarder extends string | AccountMeta<string> = string,
   TAccountAdmin extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
-  TAccountQuarryMineProgram extends
-    | string
-    | AccountMeta<string> = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
+  TAccountQuarryMineProgram extends string | AccountMeta<string> =
+    "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &

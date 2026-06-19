@@ -73,15 +73,12 @@ export type VerifyCreatorInstruction<
   TAccountMerkleTree extends string | AccountMeta<string> = string,
   TAccountPayer extends string | AccountMeta<string> = string,
   TAccountCreator extends string | AccountMeta<string> = string,
-  TAccountLogWrapper extends
-    | string
-    | AccountMeta<string> = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
-  TAccountCompressionProgram extends
-    | string
-    | AccountMeta<string> = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
-  TAccountSystemProgram extends
-    | string
-    | AccountMeta<string> = "11111111111111111111111111111111",
+  TAccountLogWrapper extends string | AccountMeta<string> =
+    "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+  TAccountCompressionProgram extends string | AccountMeta<string> =
+    "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK",
+  TAccountSystemProgram extends string | AccountMeta<string> =
+    "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
