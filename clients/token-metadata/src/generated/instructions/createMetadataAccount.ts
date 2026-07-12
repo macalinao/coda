@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,10 +16,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,16 +48,16 @@ export function getCreateMetadataAccountDiscriminatorBytes(): ReadonlyUint8Array
 
 export type CreateMetadataAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMintAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMintAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -91,9 +89,7 @@ export type CreateMetadataAccountInstruction<
     ]
   >;
 
-export interface CreateMetadataAccountInstructionData {
-  discriminator: number;
-}
+export type CreateMetadataAccountInstructionData = { discriminator: number };
 
 export type CreateMetadataAccountInstructionDataArgs = {};
 
@@ -121,7 +117,7 @@ export function getCreateMetadataAccountInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateMetadataAccountAsyncInput<
+export type CreateMetadataAccountAsyncInput<
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
   TAccountMintAuthority extends string = string,
@@ -129,7 +125,7 @@ export interface CreateMetadataAccountAsyncInput<
   TAccountUpdateAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Metadata key (pda of ['metadata', program id, mint id]) */
   metadata?: Address<TAccountMetadata>;
   /** Mint of token asset */
@@ -144,7 +140,7 @@ export interface CreateMetadataAccountAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getCreateMetadataAccountInstructionAsync<
   TAccountMetadata extends string,
@@ -244,7 +240,7 @@ export async function getCreateMetadataAccountInstructionAsync<
   >);
 }
 
-export interface CreateMetadataAccountInput<
+export type CreateMetadataAccountInput<
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
   TAccountMintAuthority extends string = string,
@@ -252,7 +248,7 @@ export interface CreateMetadataAccountInput<
   TAccountUpdateAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Metadata key (pda of ['metadata', program id, mint id]) */
   metadata: Address<TAccountMetadata>;
   /** Mint of token asset */
@@ -267,7 +263,7 @@ export interface CreateMetadataAccountInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getCreateMetadataAccountInstruction<
   TAccountMetadata extends string,
@@ -356,10 +352,10 @@ export function getCreateMetadataAccountInstruction<
   >);
 }
 
-export interface ParsedCreateMetadataAccountInstruction<
+export type ParsedCreateMetadataAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata key (pda of ['metadata', program id, mint id]) */
@@ -378,7 +374,7 @@ export interface ParsedCreateMetadataAccountInstruction<
     rent: TAccountMetas[6];
   };
   data: CreateMetadataAccountInstructionData;
-}
+};
 
 export function parseCreateMetadataAccountInstruction<
   TProgram extends string,

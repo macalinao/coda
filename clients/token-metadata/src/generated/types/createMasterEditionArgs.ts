@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
 import {
   combineCodec,
   getOptionDecoder,
@@ -21,15 +14,18 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 
-export interface CreateMasterEditionArgs {
-  maxSupply: Option<bigint>;
-}
+export type CreateMasterEditionArgs = { maxSupply: Option<bigint> };
 
-export interface CreateMasterEditionArgsArgs {
+export type CreateMasterEditionArgsArgs = {
   maxSupply: OptionOrNullable<number | bigint>;
-}
+};
 
 export function getCreateMasterEditionArgsEncoder(): Encoder<CreateMasterEditionArgsArgs> {
   return getStructEncoder([["maxSupply", getOptionEncoder(getU64Encoder())]]);

@@ -8,3 +8,4 @@
 
 export * from "./masterEdition.js";
 export * from "./metadata.js";
+export * from "./tokenRecord.js";

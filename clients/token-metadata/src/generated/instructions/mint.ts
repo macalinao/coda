@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { MintArgs, MintArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -35,14 +16,39 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import {
+  findMasterEditionPda,
+  findMetadataPda,
+  findTokenRecordPda,
+} from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getMintArgsDecoder, getMintArgsEncoder } from "../types/index.js";
+import {
+  getMintArgsDecoder,
+  getMintArgsEncoder,
+  type MintArgs,
+  type MintArgsArgs,
+} from "../types/index.js";
 
 export const MINT_DISCRIMINATOR = 43;
 
@@ -52,26 +58,27 @@ export function getMintDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type MintInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountTokenOwner extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountTokenRecord extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountDelegateRecord extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountTokenOwner extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountTokenRecord extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountDelegateRecord extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends string | AccountMeta =
+  TAccountSplTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSplAtaProgram extends string | AccountMeta =
+  TAccountSplAtaProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRules extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthorizationRulesProgram extends string | AccountMeta<string> =
+    string,
+  TAccountAuthorizationRules extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -127,14 +134,9 @@ export type MintInstruction<
     ]
   >;
 
-export interface MintInstructionData {
-  discriminator: number;
-  mintArgs: MintArgs;
-}
+export type MintInstructionData = { discriminator: number; mintArgs: MintArgs };
 
-export interface MintInstructionDataArgs {
-  mintArgs: MintArgsArgs;
-}
+export type MintInstructionDataArgs = { mintArgs: MintArgsArgs };
 
 export function getMintInstructionDataEncoder(): Encoder<MintInstructionDataArgs> {
   return transformEncoder(
@@ -163,7 +165,7 @@ export function getMintInstructionDataCodec(): Codec<
   );
 }
 
-export interface MintAsyncInput<
+export type MintAsyncInput<
   TAccountToken extends string = string,
   TAccountTokenOwner extends string = string,
   TAccountMetadata extends string = string,
@@ -179,7 +181,7 @@ export interface MintAsyncInput<
   TAccountSplAtaProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Token or Associated Token account */
   token: Address<TAccountToken>;
   /** Owner of the token account */
@@ -211,7 +213,7 @@ export interface MintAsyncInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   mintArgs: MintInstructionDataArgs["mintArgs"];
-}
+};
 
 export async function getMintInstructionAsync<
   TAccountToken extends string,
@@ -321,6 +323,28 @@ export async function getMintInstructionAsync<
       ),
     });
   }
+  if (!accounts.masterEdition.value) {
+    accounts.masterEdition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
+  if (!accounts.tokenRecord.value) {
+    accounts.tokenRecord.value = await findTokenRecordPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+      token: getAddressFromResolvedInstructionAccount(
+        "token",
+        accounts.token.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -384,7 +408,7 @@ export async function getMintInstructionAsync<
   >);
 }
 
-export interface MintInput<
+export type MintInput<
   TAccountToken extends string = string,
   TAccountTokenOwner extends string = string,
   TAccountMetadata extends string = string,
@@ -400,7 +424,7 @@ export interface MintInput<
   TAccountSplAtaProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Token or Associated Token account */
   token: Address<TAccountToken>;
   /** Owner of the token account */
@@ -432,7 +456,7 @@ export interface MintInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   mintArgs: MintInstructionDataArgs["mintArgs"];
-}
+};
 
 export function getMintInstruction<
   TAccountToken extends string,
@@ -594,10 +618,10 @@ export function getMintInstruction<
   >);
 }
 
-export interface ParsedMintInstruction<
+export type ParsedMintInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Token or Associated Token account */
@@ -632,7 +656,7 @@ export interface ParsedMintInstruction<
     authorizationRules?: TAccountMetas[14] | undefined;
   };
   data: MintInstructionData;
-}
+};
 
 export function parseMintInstruction<
   TProgram extends string,

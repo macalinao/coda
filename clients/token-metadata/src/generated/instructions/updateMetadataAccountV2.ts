@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  UpdateMetadataAccountArgsV2,
-  UpdateMetadataAccountArgsV2Args,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -35,12 +15,30 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getUpdateMetadataAccountArgsV2Decoder,
   getUpdateMetadataAccountArgsV2Encoder,
+  type UpdateMetadataAccountArgsV2,
+  type UpdateMetadataAccountArgsV2Args,
 } from "../types/index.js";
 
 export const UPDATE_METADATA_ACCOUNT_V2_DISCRIMINATOR = 15;
@@ -51,9 +49,9 @@ export function getUpdateMetadataAccountV2DiscriminatorBytes(): ReadonlyUint8Arr
 
 export type UpdateMetadataAccountV2Instruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -69,14 +67,14 @@ export type UpdateMetadataAccountV2Instruction<
     ]
   >;
 
-export interface UpdateMetadataAccountV2InstructionData {
+export type UpdateMetadataAccountV2InstructionData = {
   discriminator: number;
   updateMetadataAccountArgsV2: UpdateMetadataAccountArgsV2;
-}
+};
 
-export interface UpdateMetadataAccountV2InstructionDataArgs {
+export type UpdateMetadataAccountV2InstructionDataArgs = {
   updateMetadataAccountArgsV2: UpdateMetadataAccountArgsV2Args;
-}
+};
 
 export function getUpdateMetadataAccountV2InstructionDataEncoder(): Encoder<UpdateMetadataAccountV2InstructionDataArgs> {
   return transformEncoder(
@@ -108,16 +106,16 @@ export function getUpdateMetadataAccountV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateMetadataAccountV2Input<
+export type UpdateMetadataAccountV2Input<
   TAccountMetadata extends string = string,
   TAccountUpdateAuthority extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
   /** Update authority key */
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
   updateMetadataAccountArgsV2: UpdateMetadataAccountV2InstructionDataArgs["updateMetadataAccountArgsV2"];
-}
+};
 
 export function getUpdateMetadataAccountV2Instruction<
   TAccountMetadata extends string,
@@ -171,10 +169,10 @@ export function getUpdateMetadataAccountV2Instruction<
   >);
 }
 
-export interface ParsedUpdateMetadataAccountV2Instruction<
+export type ParsedUpdateMetadataAccountV2Instruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata account */
@@ -183,7 +181,7 @@ export interface ParsedUpdateMetadataAccountV2Instruction<
     updateAuthority: TAccountMetas[1];
   };
   data: UpdateMetadataAccountV2InstructionData;
-}
+};
 
 export function parseUpdateMetadataAccountV2Instruction<
   TProgram extends string,

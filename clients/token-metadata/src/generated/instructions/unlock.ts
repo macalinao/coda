@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { UnlockArgs, UnlockArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -35,14 +16,39 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import {
+  findMasterEditionPda,
+  findMetadataPda,
+  findTokenRecordPda,
+} from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getUnlockArgsDecoder, getUnlockArgsEncoder } from "../types/index.js";
+import {
+  getUnlockArgsDecoder,
+  getUnlockArgsEncoder,
+  type UnlockArgs,
+  type UnlockArgsArgs,
+} from "../types/index.js";
 
 export const UNLOCK_DISCRIMINATOR = 47;
 
@@ -52,22 +58,23 @@ export function getUnlockDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UnlockInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountTokenOwner extends string | AccountMeta = string,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountTokenRecord extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenOwner extends string | AccountMeta<string> = string,
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountTokenRecord extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRules extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSplTokenProgram extends string | AccountMeta<string> = string,
+  TAccountAuthorizationRulesProgram extends string | AccountMeta<string> =
+    string,
+  TAccountAuthorizationRules extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -117,14 +124,12 @@ export type UnlockInstruction<
     ]
   >;
 
-export interface UnlockInstructionData {
+export type UnlockInstructionData = {
   discriminator: number;
   unlockArgs: UnlockArgs;
-}
+};
 
-export interface UnlockInstructionDataArgs {
-  unlockArgs: UnlockArgsArgs;
-}
+export type UnlockInstructionDataArgs = { unlockArgs: UnlockArgsArgs };
 
 export function getUnlockInstructionDataEncoder(): Encoder<UnlockInstructionDataArgs> {
   return transformEncoder(
@@ -153,7 +158,7 @@ export function getUnlockInstructionDataCodec(): Codec<
   );
 }
 
-export interface UnlockAsyncInput<
+export type UnlockAsyncInput<
   TAccountAuthority extends string = string,
   TAccountTokenOwner extends string = string,
   TAccountToken extends string = string,
@@ -167,7 +172,7 @@ export interface UnlockAsyncInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Delegate or freeze authority */
   authority: TransactionSigner<TAccountAuthority>;
   /** Token owner account */
@@ -195,7 +200,7 @@ export interface UnlockAsyncInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   unlockArgs: UnlockInstructionDataArgs["unlockArgs"];
-}
+};
 
 export async function getUnlockInstructionAsync<
   TAccountAuthority extends string,
@@ -297,6 +302,28 @@ export async function getUnlockInstructionAsync<
       ),
     });
   }
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
+  if (!accounts.tokenRecord.value) {
+    accounts.tokenRecord.value = await findTokenRecordPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+      token: getAddressFromResolvedInstructionAccount(
+        "token",
+        accounts.token.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -348,7 +375,7 @@ export async function getUnlockInstructionAsync<
   >);
 }
 
-export interface UnlockInput<
+export type UnlockInput<
   TAccountAuthority extends string = string,
   TAccountTokenOwner extends string = string,
   TAccountToken extends string = string,
@@ -362,7 +389,7 @@ export interface UnlockInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Delegate or freeze authority */
   authority: TransactionSigner<TAccountAuthority>;
   /** Token owner account */
@@ -390,7 +417,7 @@ export interface UnlockInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   unlockArgs: UnlockInstructionDataArgs["unlockArgs"];
-}
+};
 
 export function getUnlockInstruction<
   TAccountAuthority extends string,
@@ -532,10 +559,10 @@ export function getUnlockInstruction<
   >);
 }
 
-export interface ParsedUnlockInstruction<
+export type ParsedUnlockInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Delegate or freeze authority */
@@ -566,7 +593,7 @@ export interface ParsedUnlockInstruction<
     authorizationRules?: TAccountMetas[12] | undefined;
   };
   data: UnlockInstructionData;
-}
+};
 
 export function parseUnlockInstruction<
   TProgram extends string,

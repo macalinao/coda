@@ -6,8 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { PayloadType, PayloadTypeArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -20,16 +18,20 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
-import { getPayloadTypeDecoder, getPayloadTypeEncoder } from "./index.js";
+import {
+  getPayloadTypeDecoder,
+  getPayloadTypeEncoder,
+  type PayloadType,
+  type PayloadTypeArgs,
+} from "./index.js";
 
-export interface Payload {
-  map: Map<string, PayloadType>;
-}
+export type Payload = { map: Map<string, PayloadType> };
 
-export interface PayloadArgs {
-  map: Map<string, PayloadTypeArgs>;
-}
+export type PayloadArgs = { map: Map<string, PayloadTypeArgs> };
 
 export function getPayloadEncoder(): Encoder<PayloadArgs> {
   return getStructEncoder([

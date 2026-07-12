@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const BURN_EDITION_NFT_DISCRIMINATOR = 37;
@@ -44,18 +44,20 @@ export function getBurnEditionNftDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type BurnEditionNftInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountPrintEditionMint extends string | AccountMeta = string,
-  TAccountMasterEditionMint extends string | AccountMeta = string,
-  TAccountPrintEditionTokenAccount extends string | AccountMeta = string,
-  TAccountMasterEditionTokenAccount extends string | AccountMeta = string,
-  TAccountMasterEditionAccount extends string | AccountMeta = string,
-  TAccountPrintEditionAccount extends string | AccountMeta = string,
-  TAccountEditionMarkerAccount extends string | AccountMeta = string,
-  TAccountSplTokenProgram extends string | AccountMeta =
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountPrintEditionMint extends string | AccountMeta<string> = string,
+  TAccountMasterEditionMint extends string | AccountMeta<string> = string,
+  TAccountPrintEditionTokenAccount extends string | AccountMeta<string> =
+    string,
+  TAccountMasterEditionTokenAccount extends string | AccountMeta<string> =
+    string,
+  TAccountMasterEditionAccount extends string | AccountMeta<string> = string,
+  TAccountPrintEditionAccount extends string | AccountMeta<string> = string,
+  TAccountEditionMarkerAccount extends string | AccountMeta<string> = string,
+  TAccountSplTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,9 +97,7 @@ export type BurnEditionNftInstruction<
     ]
   >;
 
-export interface BurnEditionNftInstructionData {
-  discriminator: number;
-}
+export type BurnEditionNftInstructionData = { discriminator: number };
 
 export type BurnEditionNftInstructionDataArgs = {};
 
@@ -122,7 +122,7 @@ export function getBurnEditionNftInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface BurnEditionNftInput<
+export type BurnEditionNftInput<
   TAccountMetadata extends string = string,
   TAccountOwner extends string = string,
   TAccountPrintEditionMint extends string = string,
@@ -133,7 +133,7 @@ export interface BurnEditionNftInput<
   TAccountPrintEditionAccount extends string = string,
   TAccountEditionMarkerAccount extends string = string,
   TAccountSplTokenProgram extends string = string,
-> {
+> = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
   metadata: Address<TAccountMetadata>;
   /** NFT owner */
@@ -154,7 +154,7 @@ export interface BurnEditionNftInput<
   editionMarkerAccount: Address<TAccountEditionMarkerAccount>;
   /** SPL Token Program */
   splTokenProgram?: Address<TAccountSplTokenProgram>;
-}
+};
 
 export function getBurnEditionNftInstruction<
   TAccountMetadata extends string,
@@ -284,10 +284,10 @@ export function getBurnEditionNftInstruction<
   >);
 }
 
-export interface ParsedBurnEditionNftInstruction<
+export type ParsedBurnEditionNftInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata (pda of ['metadata', program id, mint id]) */
@@ -312,7 +312,7 @@ export interface ParsedBurnEditionNftInstruction<
     splTokenProgram: TAccountMetas[9];
   };
   data: BurnEditionNftInstructionData;
-}
+};
 
 export function parseBurnEditionNftInstruction<
   TProgram extends string,

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -33,10 +16,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -49,17 +47,17 @@ export function getCloseEscrowAccountDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CloseEscrowAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -93,9 +91,7 @@ export type CloseEscrowAccountInstruction<
     ]
   >;
 
-export interface CloseEscrowAccountInstructionData {
-  discriminator: number;
-}
+export type CloseEscrowAccountInstructionData = { discriminator: number };
 
 export type CloseEscrowAccountInstructionDataArgs = {};
 
@@ -123,7 +119,7 @@ export function getCloseEscrowAccountInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseEscrowAccountAsyncInput<
+export type CloseEscrowAccountAsyncInput<
   TAccountEscrow extends string = string,
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
@@ -132,7 +128,7 @@ export interface CloseEscrowAccountAsyncInput<
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
-> {
+> = {
   /** Escrow account */
   escrow: Address<TAccountEscrow>;
   /** Metadata account */
@@ -149,7 +145,7 @@ export interface CloseEscrowAccountAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Instructions sysvar account */
   sysvarInstructions?: Address<TAccountSysvarInstructions>;
-}
+};
 
 export async function getCloseEscrowAccountInstructionAsync<
   TAccountEscrow extends string,
@@ -255,7 +251,7 @@ export async function getCloseEscrowAccountInstructionAsync<
   >);
 }
 
-export interface CloseEscrowAccountInput<
+export type CloseEscrowAccountInput<
   TAccountEscrow extends string = string,
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
@@ -264,7 +260,7 @@ export interface CloseEscrowAccountInput<
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
-> {
+> = {
   /** Escrow account */
   escrow: Address<TAccountEscrow>;
   /** Metadata account */
@@ -281,7 +277,7 @@ export interface CloseEscrowAccountInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Instructions sysvar account */
   sysvarInstructions?: Address<TAccountSysvarInstructions>;
-}
+};
 
 export function getCloseEscrowAccountInstruction<
   TAccountEscrow extends string,
@@ -376,10 +372,10 @@ export function getCloseEscrowAccountInstruction<
   >);
 }
 
-export interface ParsedCloseEscrowAccountInstruction<
+export type ParsedCloseEscrowAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Escrow account */
@@ -400,7 +396,7 @@ export interface ParsedCloseEscrowAccountInstruction<
     sysvarInstructions: TAccountMetas[7];
   };
   data: CloseEscrowAccountInstructionData;
-}
+};
 
 export function parseCloseEscrowAccountInstruction<
   TProgram extends string,

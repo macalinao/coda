@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -28,8 +15,21 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const PUFF_METADATA_DISCRIMINATOR = 14;
@@ -40,8 +40,8 @@ export function getPuffMetadataDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type PuffMetadataInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -53,9 +53,7 @@ export type PuffMetadataInstruction<
     ]
   >;
 
-export interface PuffMetadataInstructionData {
-  discriminator: number;
-}
+export type PuffMetadataInstructionData = { discriminator: number };
 
 export type PuffMetadataInstructionDataArgs = {};
 
@@ -80,10 +78,10 @@ export function getPuffMetadataInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface PuffMetadataInput<TAccountMetadata extends string = string> {
+export type PuffMetadataInput<TAccountMetadata extends string = string> = {
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
-}
+};
 
 export function getPuffMetadataInstruction<
   TAccountMetadata extends string,
@@ -113,17 +111,17 @@ export function getPuffMetadataInstruction<
   } as PuffMetadataInstruction<TProgramAddress, TAccountMetadata>);
 }
 
-export interface ParsedPuffMetadataInstruction<
+export type ParsedPuffMetadataInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata account */
     metadata: TAccountMetas[0];
   };
   data: PuffMetadataInstructionData;
-}
+};
 
 export function parsePuffMetadataInstruction<
   TProgram extends string,
@@ -133,7 +131,7 @@ export function parsePuffMetadataInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedPuffMetadataInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length === 0) {
+  if (instruction.accounts.length < 1) {
     throw new SolanaError(
       SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
       {

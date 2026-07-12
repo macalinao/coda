@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { UpdateArgs, UpdateArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -35,14 +16,35 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getUpdateArgsDecoder, getUpdateArgsEncoder } from "../types/index.js";
+import {
+  getUpdateArgsDecoder,
+  getUpdateArgsEncoder,
+  type UpdateArgs,
+  type UpdateArgsArgs,
+} from "../types/index.js";
 
 export const UPDATE_DISCRIMINATOR = 50;
 
@@ -52,20 +54,21 @@ export function getUpdateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountDelegateRecord extends string | AccountMeta = string,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountDelegateRecord extends string | AccountMeta<string> = string,
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRules extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthorizationRulesProgram extends string | AccountMeta<string> =
+    string,
+  TAccountAuthorizationRules extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -109,14 +112,12 @@ export type UpdateInstruction<
     ]
   >;
 
-export interface UpdateInstructionData {
+export type UpdateInstructionData = {
   discriminator: number;
   updateArgs: UpdateArgs;
-}
+};
 
-export interface UpdateInstructionDataArgs {
-  updateArgs: UpdateArgsArgs;
-}
+export type UpdateInstructionDataArgs = { updateArgs: UpdateArgsArgs };
 
 export function getUpdateInstructionDataEncoder(): Encoder<UpdateInstructionDataArgs> {
   return transformEncoder(
@@ -145,7 +146,7 @@ export function getUpdateInstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateAsyncInput<
+export type UpdateAsyncInput<
   TAccountAuthority extends string = string,
   TAccountDelegateRecord extends string = string,
   TAccountToken extends string = string,
@@ -157,7 +158,7 @@ export interface UpdateAsyncInput<
   TAccountSysvarInstructions extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Update authority or delegate */
   authority: TransactionSigner<TAccountAuthority>;
   /** Delegate record PDA */
@@ -181,7 +182,7 @@ export interface UpdateAsyncInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   updateArgs: UpdateInstructionDataArgs["updateArgs"];
-}
+};
 
 export async function getUpdateInstructionAsync<
   TAccountAuthority extends string,
@@ -272,6 +273,15 @@ export async function getUpdateInstructionAsync<
       ),
     });
   }
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -319,7 +329,7 @@ export async function getUpdateInstructionAsync<
   >);
 }
 
-export interface UpdateInput<
+export type UpdateInput<
   TAccountAuthority extends string = string,
   TAccountDelegateRecord extends string = string,
   TAccountToken extends string = string,
@@ -331,7 +341,7 @@ export interface UpdateInput<
   TAccountSysvarInstructions extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Update authority or delegate */
   authority: TransactionSigner<TAccountAuthority>;
   /** Delegate record PDA */
@@ -355,7 +365,7 @@ export interface UpdateInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   updateArgs: UpdateInstructionDataArgs["updateArgs"];
-}
+};
 
 export function getUpdateInstruction<
   TAccountAuthority extends string,
@@ -482,10 +492,10 @@ export function getUpdateInstruction<
   >);
 }
 
-export interface ParsedUpdateInstruction<
+export type ParsedUpdateInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Update authority or delegate */
@@ -512,7 +522,7 @@ export interface ParsedUpdateInstruction<
     authorizationRules?: TAccountMetas[10] | undefined;
   };
   data: UpdateInstructionData;
-}
+};
 
 export function parseUpdateInstruction<
   TProgram extends string,

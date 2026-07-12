@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  CollectionDetails,
-  CollectionDetailsArgs,
-  DataV2,
-  DataV2Args,
-} from "./index.js";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -27,25 +14,34 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getCollectionDetailsDecoder,
   getCollectionDetailsEncoder,
   getDataV2Decoder,
   getDataV2Encoder,
+  type CollectionDetails,
+  type CollectionDetailsArgs,
+  type DataV2,
+  type DataV2Args,
 } from "./index.js";
 
-export interface CreateMetadataAccountArgsV3 {
+export type CreateMetadataAccountArgsV3 = {
   data: DataV2;
   isMutable: boolean;
   collectionDetails: Option<CollectionDetails>;
-}
+};
 
-export interface CreateMetadataAccountArgsV3Args {
+export type CreateMetadataAccountArgsV3Args = {
   data: DataV2Args;
   isMutable: boolean;
   collectionDetails: OptionOrNullable<CollectionDetailsArgs>;
-}
+};
 
 export function getCreateMetadataAccountArgsV3Encoder(): Encoder<CreateMetadataAccountArgsV3Args> {
   return getStructEncoder([

@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  MintNewEditionFromMasterEditionViaTokenArgs,
-  MintNewEditionFromMasterEditionViaTokenArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMintNewEditionFromMasterEditionViaTokenArgsDecoder,
   getMintNewEditionFromMasterEditionViaTokenArgsEncoder,
+  type MintNewEditionFromMasterEditionViaTokenArgs,
+  type MintNewEditionFromMasterEditionViaTokenArgsArgs,
 } from "../types/index.js";
 
 export const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_DISCRIMINATOR = 11;
@@ -55,23 +53,24 @@ export function getMintNewEditionFromMasterEditionViaTokenDiscriminatorBytes(): 
 
 export type MintNewEditionFromMasterEditionViaTokenInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountNewMetadata extends string | AccountMeta = string,
-  TAccountNewEdition extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountNewMint extends string | AccountMeta = string,
-  TAccountEditionMarkPda extends string | AccountMeta = string,
-  TAccountNewMintAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountTokenAccountOwner extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountNewMetadataUpdateAuthority extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountNewMetadata extends string | AccountMeta<string> = string,
+  TAccountNewEdition extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountNewMint extends string | AccountMeta<string> = string,
+  TAccountEditionMarkPda extends string | AccountMeta<string> = string,
+  TAccountNewMintAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountTokenAccountOwner extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
+  TAccountNewMetadataUpdateAuthority extends string | AccountMeta<string> =
+    string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRent extends string | AccountMeta<string> | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -129,14 +128,14 @@ export type MintNewEditionFromMasterEditionViaTokenInstruction<
     ]
   >;
 
-export interface MintNewEditionFromMasterEditionViaTokenInstructionData {
+export type MintNewEditionFromMasterEditionViaTokenInstructionData = {
   discriminator: number;
   mintNewEditionFromMasterEditionViaTokenArgs: MintNewEditionFromMasterEditionViaTokenArgs;
-}
+};
 
-export interface MintNewEditionFromMasterEditionViaTokenInstructionDataArgs {
+export type MintNewEditionFromMasterEditionViaTokenInstructionDataArgs = {
   mintNewEditionFromMasterEditionViaTokenArgs: MintNewEditionFromMasterEditionViaTokenArgsArgs;
-}
+};
 
 export function getMintNewEditionFromMasterEditionViaTokenInstructionDataEncoder(): FixedSizeEncoder<MintNewEditionFromMasterEditionViaTokenInstructionDataArgs> {
   return transformEncoder(
@@ -175,7 +174,7 @@ export function getMintNewEditionFromMasterEditionViaTokenInstructionDataCodec()
   );
 }
 
-export interface MintNewEditionFromMasterEditionViaTokenInput<
+export type MintNewEditionFromMasterEditionViaTokenInput<
   TAccountNewMetadata extends string = string,
   TAccountNewEdition extends string = string,
   TAccountMasterEdition extends string = string,
@@ -190,7 +189,7 @@ export interface MintNewEditionFromMasterEditionViaTokenInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** New Metadata key (pda of ['metadata', program id, mint id]) */
   newMetadata: Address<TAccountNewMetadata>;
   /** New Edition (pda of ['metadata', program id, mint id, 'edition']) */
@@ -220,7 +219,7 @@ export interface MintNewEditionFromMasterEditionViaTokenInput<
   /** Rent info */
   rent?: Address<TAccountRent>;
   mintNewEditionFromMasterEditionViaTokenArgs: MintNewEditionFromMasterEditionViaTokenInstructionDataArgs["mintNewEditionFromMasterEditionViaTokenArgs"];
-}
+};
 
 export function getMintNewEditionFromMasterEditionViaTokenInstruction<
   TAccountNewMetadata extends string,
@@ -365,10 +364,10 @@ export function getMintNewEditionFromMasterEditionViaTokenInstruction<
   >);
 }
 
-export interface ParsedMintNewEditionFromMasterEditionViaTokenInstruction<
+export type ParsedMintNewEditionFromMasterEditionViaTokenInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** New Metadata key (pda of ['metadata', program id, mint id]) */
@@ -401,7 +400,7 @@ export interface ParsedMintNewEditionFromMasterEditionViaTokenInstruction<
     rent?: TAccountMetas[13] | undefined;
   };
   data: MintNewEditionFromMasterEditionViaTokenInstructionData;
-}
+};
 
 export function parseMintNewEditionFromMasterEditionViaTokenInstruction<
   TProgram extends string,
@@ -431,9 +430,7 @@ export function parseMintNewEditionFromMasterEditionViaTokenInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 13;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

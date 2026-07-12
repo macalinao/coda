@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,10 +16,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,18 +48,19 @@ export function getCreateEscrowAccountDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateEscrowAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountAuthority extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthority extends string | AccountMeta<string> | undefined =
+    undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -103,9 +102,7 @@ export type CreateEscrowAccountInstruction<
     ]
   >;
 
-export interface CreateEscrowAccountInstructionData {
-  discriminator: number;
-}
+export type CreateEscrowAccountInstructionData = { discriminator: number };
 
 export type CreateEscrowAccountInstructionDataArgs = {};
 
@@ -133,7 +130,7 @@ export function getCreateEscrowAccountInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateEscrowAccountAsyncInput<
+export type CreateEscrowAccountAsyncInput<
   TAccountEscrow extends string = string,
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
@@ -143,7 +140,7 @@ export interface CreateEscrowAccountAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
   TAccountAuthority extends string = string,
-> {
+> = {
   /** Escrow account */
   escrow: Address<TAccountEscrow>;
   /** Metadata account */
@@ -162,7 +159,7 @@ export interface CreateEscrowAccountAsyncInput<
   sysvarInstructions?: Address<TAccountSysvarInstructions>;
   /** Authority/creator of the escrow account */
   authority?: TransactionSigner<TAccountAuthority>;
-}
+};
 
 export async function getCreateEscrowAccountInstructionAsync<
   TAccountEscrow extends string,
@@ -274,7 +271,7 @@ export async function getCreateEscrowAccountInstructionAsync<
   >);
 }
 
-export interface CreateEscrowAccountInput<
+export type CreateEscrowAccountInput<
   TAccountEscrow extends string = string,
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
@@ -284,7 +281,7 @@ export interface CreateEscrowAccountInput<
   TAccountSystemProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
   TAccountAuthority extends string = string,
-> {
+> = {
   /** Escrow account */
   escrow: Address<TAccountEscrow>;
   /** Metadata account */
@@ -303,7 +300,7 @@ export interface CreateEscrowAccountInput<
   sysvarInstructions?: Address<TAccountSysvarInstructions>;
   /** Authority/creator of the escrow account */
   authority?: TransactionSigner<TAccountAuthority>;
-}
+};
 
 export function getCreateEscrowAccountInstruction<
   TAccountEscrow extends string,
@@ -404,10 +401,10 @@ export function getCreateEscrowAccountInstruction<
   >);
 }
 
-export interface ParsedCreateEscrowAccountInstruction<
+export type ParsedCreateEscrowAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Escrow account */
@@ -430,7 +427,7 @@ export interface ParsedCreateEscrowAccountInstruction<
     authority?: TAccountMetas[8] | undefined;
   };
   data: CreateEscrowAccountInstructionData;
-}
+};
 
 export function parseCreateEscrowAccountInstruction<
   TProgram extends string,
@@ -457,9 +454,7 @@ export function parseCreateEscrowAccountInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 8;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  ApproveUseAuthorityArgs,
-  ApproveUseAuthorityArgsArgs,
-} from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -37,16 +16,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getApproveUseAuthorityArgsDecoder,
   getApproveUseAuthorityArgsEncoder,
+  type ApproveUseAuthorityArgs,
+  type ApproveUseAuthorityArgsArgs,
 } from "../types/index.js";
 
 export const APPROVE_USE_AUTHORITY_DISCRIMINATOR = 20;
@@ -57,20 +53,20 @@ export function getApproveUseAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ApproveUseAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountUseAuthorityRecord extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountUser extends string | AccountMeta = string,
-  TAccountOwnerTokenAccount extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountBurner extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountUseAuthorityRecord extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountUser extends string | AccountMeta<string> = string,
+  TAccountOwnerTokenAccount extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountBurner extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRent extends string | AccountMeta<string> | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -118,14 +114,14 @@ export type ApproveUseAuthorityInstruction<
     ]
   >;
 
-export interface ApproveUseAuthorityInstructionData {
+export type ApproveUseAuthorityInstructionData = {
   discriminator: number;
   approveUseAuthorityArgs: ApproveUseAuthorityArgs;
-}
+};
 
-export interface ApproveUseAuthorityInstructionDataArgs {
+export type ApproveUseAuthorityInstructionDataArgs = {
   approveUseAuthorityArgs: ApproveUseAuthorityArgsArgs;
-}
+};
 
 export function getApproveUseAuthorityInstructionDataEncoder(): FixedSizeEncoder<ApproveUseAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -157,7 +153,7 @@ export function getApproveUseAuthorityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ApproveUseAuthorityAsyncInput<
+export type ApproveUseAuthorityAsyncInput<
   TAccountUseAuthorityRecord extends string = string,
   TAccountOwner extends string = string,
   TAccountPayer extends string = string,
@@ -169,7 +165,7 @@ export interface ApproveUseAuthorityAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Use Authority Record PDA */
   useAuthorityRecord: Address<TAccountUseAuthorityRecord>;
   /** Owner */
@@ -193,7 +189,7 @@ export interface ApproveUseAuthorityAsyncInput<
   /** Rent info */
   rent?: Address<TAccountRent>;
   approveUseAuthorityArgs: ApproveUseAuthorityInstructionDataArgs["approveUseAuthorityArgs"];
-}
+};
 
 export async function getApproveUseAuthorityInstructionAsync<
   TAccountUseAuthorityRecord extends string,
@@ -325,7 +321,7 @@ export async function getApproveUseAuthorityInstructionAsync<
   >);
 }
 
-export interface ApproveUseAuthorityInput<
+export type ApproveUseAuthorityInput<
   TAccountUseAuthorityRecord extends string = string,
   TAccountOwner extends string = string,
   TAccountPayer extends string = string,
@@ -337,7 +333,7 @@ export interface ApproveUseAuthorityInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Use Authority Record PDA */
   useAuthorityRecord: Address<TAccountUseAuthorityRecord>;
   /** Owner */
@@ -361,7 +357,7 @@ export interface ApproveUseAuthorityInput<
   /** Rent info */
   rent?: Address<TAccountRent>;
   approveUseAuthorityArgs: ApproveUseAuthorityInstructionDataArgs["approveUseAuthorityArgs"];
-}
+};
 
 export function getApproveUseAuthorityInstruction<
   TAccountUseAuthorityRecord extends string,
@@ -482,10 +478,10 @@ export function getApproveUseAuthorityInstruction<
   >);
 }
 
-export interface ParsedApproveUseAuthorityInstruction<
+export type ParsedApproveUseAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Use Authority Record PDA */
@@ -512,7 +508,7 @@ export interface ParsedApproveUseAuthorityInstruction<
     rent?: TAccountMetas[10] | undefined;
   };
   data: ApproveUseAuthorityInstructionData;
-}
+};
 
 export function parseApproveUseAuthorityInstruction<
   TProgram extends string,
@@ -539,9 +535,7 @@ export function parseApproveUseAuthorityInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 10;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

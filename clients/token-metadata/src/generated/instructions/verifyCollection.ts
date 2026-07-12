@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const VERIFY_COLLECTION_DISCRIMINATOR = 18;
@@ -44,15 +44,18 @@ export function getVerifyCollectionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type VerifyCollectionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountCollectionAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountCollection extends string | AccountMeta = string,
-  TAccountCollectionMasterEditionAccount extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
-    undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountCollectionMint extends string | AccountMeta<string> = string,
+  TAccountCollection extends string | AccountMeta<string> = string,
+  TAccountCollectionMasterEditionAccount extends string | AccountMeta<string> =
+    string,
+  TAccountCollectionAuthorityRecord extends
+    | string
+    | AccountMeta<string>
+    | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -88,9 +91,7 @@ export type VerifyCollectionInstruction<
     ]
   >;
 
-export interface VerifyCollectionInstructionData {
-  discriminator: number;
-}
+export type VerifyCollectionInstructionData = { discriminator: number };
 
 export type VerifyCollectionInstructionDataArgs = {};
 
@@ -115,7 +116,7 @@ export function getVerifyCollectionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface VerifyCollectionInput<
+export type VerifyCollectionInput<
   TAccountMetadata extends string = string,
   TAccountCollectionAuthority extends string = string,
   TAccountPayer extends string = string,
@@ -123,7 +124,7 @@ export interface VerifyCollectionInput<
   TAccountCollection extends string = string,
   TAccountCollectionMasterEditionAccount extends string = string,
   TAccountCollectionAuthorityRecord extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
   /** Collection Update authority */
@@ -138,7 +139,7 @@ export interface VerifyCollectionInput<
   collectionMasterEditionAccount: Address<TAccountCollectionMasterEditionAccount>;
   /** Collection Authority Record PDA */
   collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
-}
+};
 
 export function getVerifyCollectionInstruction<
   TAccountMetadata extends string,
@@ -229,10 +230,10 @@ export function getVerifyCollectionInstruction<
   >);
 }
 
-export interface ParsedVerifyCollectionInstruction<
+export type ParsedVerifyCollectionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata account */
@@ -251,7 +252,7 @@ export interface ParsedVerifyCollectionInstruction<
     collectionAuthorityRecord?: TAccountMetas[6] | undefined;
   };
   data: VerifyCollectionInstructionData;
-}
+};
 
 export function parseVerifyCollectionInstruction<
   TProgram extends string,
@@ -278,9 +279,7 @@ export function parseVerifyCollectionInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 6;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

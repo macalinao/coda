@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,20 +21,37 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface CollectionAuthorityRecord {
+export type CollectionAuthorityRecord = {
   key: Key;
   bump: number;
   updateAuthority: Option<Address>;
-}
+};
 
-export interface CollectionAuthorityRecordArgs {
+export type CollectionAuthorityRecordArgs = {
   key: KeyArgs;
   bump: number;
   updateAuthority: OptionOrNullable<Address>;
-}
+};
 
 /** Gets the encoder for {@link CollectionAuthorityRecordArgs} account data. */
 export function getCollectionAuthorityRecordEncoder(): Encoder<CollectionAuthorityRecordArgs> {
@@ -132,7 +134,7 @@ export async function fetchMaybeCollectionAuthorityRecord<
 
 export async function fetchAllCollectionAuthorityRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<CollectionAuthorityRecord>[]> {
   const maybeAccounts = await fetchAllMaybeCollectionAuthorityRecord(
@@ -146,7 +148,7 @@ export async function fetchAllCollectionAuthorityRecord(
 
 export async function fetchAllMaybeCollectionAuthorityRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<CollectionAuthorityRecord>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

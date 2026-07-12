@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -33,8 +15,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UNVERIFY_SIZED_COLLECTION_ITEM_DISCRIMINATOR = 31;
@@ -45,15 +45,18 @@ export function getUnverifySizedCollectionItemDiscriminatorBytes(): ReadonlyUint
 
 export type UnverifySizedCollectionItemInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountCollectionAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountCollection extends string | AccountMeta = string,
-  TAccountCollectionMasterEditionAccount extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
-    undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountCollectionMint extends string | AccountMeta<string> = string,
+  TAccountCollection extends string | AccountMeta<string> = string,
+  TAccountCollectionMasterEditionAccount extends string | AccountMeta<string> =
+    string,
+  TAccountCollectionAuthorityRecord extends
+    | string
+    | AccountMeta<string>
+    | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -89,9 +92,9 @@ export type UnverifySizedCollectionItemInstruction<
     ]
   >;
 
-export interface UnverifySizedCollectionItemInstructionData {
+export type UnverifySizedCollectionItemInstructionData = {
   discriminator: number;
-}
+};
 
 export type UnverifySizedCollectionItemInstructionDataArgs = {};
 
@@ -119,7 +122,7 @@ export function getUnverifySizedCollectionItemInstructionDataCodec(): FixedSizeC
   );
 }
 
-export interface UnverifySizedCollectionItemInput<
+export type UnverifySizedCollectionItemInput<
   TAccountMetadata extends string = string,
   TAccountCollectionAuthority extends string = string,
   TAccountPayer extends string = string,
@@ -127,7 +130,7 @@ export interface UnverifySizedCollectionItemInput<
   TAccountCollection extends string = string,
   TAccountCollectionMasterEditionAccount extends string = string,
   TAccountCollectionAuthorityRecord extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
   /** Collection Authority */
@@ -142,7 +145,7 @@ export interface UnverifySizedCollectionItemInput<
   collectionMasterEditionAccount: Address<TAccountCollectionMasterEditionAccount>;
   /** Collection Authority Record PDA */
   collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
-}
+};
 
 export function getUnverifySizedCollectionItemInstruction<
   TAccountMetadata extends string,
@@ -233,10 +236,10 @@ export function getUnverifySizedCollectionItemInstruction<
   >);
 }
 
-export interface ParsedUnverifySizedCollectionItemInstruction<
+export type ParsedUnverifySizedCollectionItemInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata account */
@@ -255,7 +258,7 @@ export interface ParsedUnverifySizedCollectionItemInstruction<
     collectionAuthorityRecord?: TAccountMetas[6] | undefined;
   };
   data: UnverifySizedCollectionItemInstructionData;
-}
+};
 
 export function parseUnverifySizedCollectionItemInstruction<
   TProgram extends string,
@@ -282,9 +285,7 @@ export function parseUnverifySizedCollectionItemInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 6;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Key,
-  KeyArgs,
-  TokenDelegateRole,
-  TokenDelegateRoleArgs,
-  TokenState,
-  TokenStateArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -41,10 +19,22 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getKeyDecoder,
@@ -53,9 +43,15 @@ import {
   getTokenDelegateRoleEncoder,
   getTokenStateDecoder,
   getTokenStateEncoder,
+  type Key,
+  type KeyArgs,
+  type TokenDelegateRole,
+  type TokenDelegateRoleArgs,
+  type TokenState,
+  type TokenStateArgs,
 } from "../types/index.js";
 
-export interface TokenRecord {
+export type TokenRecord = {
   key: Key;
   bump: number;
   state: TokenState;
@@ -63,9 +59,9 @@ export interface TokenRecord {
   delegate: Option<Address>;
   delegateRole: Option<TokenDelegateRole>;
   lockedTransfer: Option<Address>;
-}
+};
 
-export interface TokenRecordArgs {
+export type TokenRecordArgs = {
   key: KeyArgs;
   bump: number;
   state: TokenStateArgs;
@@ -73,7 +69,7 @@ export interface TokenRecordArgs {
   delegate: OptionOrNullable<Address>;
   delegateRole: OptionOrNullable<TokenDelegateRoleArgs>;
   lockedTransfer: OptionOrNullable<Address>;
-}
+};
 
 /** Gets the encoder for {@link TokenRecordArgs} account data. */
 export function getTokenRecordEncoder(): Encoder<TokenRecordArgs> {
@@ -142,7 +138,7 @@ export async function fetchMaybeTokenRecord<TAddress extends string = string>(
 
 export async function fetchAllTokenRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TokenRecord>[]> {
   const maybeAccounts = await fetchAllMaybeTokenRecord(rpc, addresses, config);
@@ -152,7 +148,7 @@ export async function fetchAllTokenRecord(
 
 export async function fetchAllMaybeTokenRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TokenRecord>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

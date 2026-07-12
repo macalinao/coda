@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  CreateMasterEditionArgs,
-  CreateMasterEditionArgsArgs,
-} from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -38,16 +16,34 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCreateMasterEditionArgsDecoder,
   getCreateMasterEditionArgsEncoder,
+  type CreateMasterEditionArgs,
+  type CreateMasterEditionArgsArgs,
 } from "../types/index.js";
 
 export const CREATE_MASTER_EDITION_V3_DISCRIMINATOR = 17;
@@ -58,18 +54,18 @@ export function getCreateMasterEditionV3DiscriminatorBytes(): ReadonlyUint8Array
 
 export type CreateMasterEditionV3Instruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountMintAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountMintAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRent extends string | AccountMeta<string> | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -112,14 +108,14 @@ export type CreateMasterEditionV3Instruction<
     ]
   >;
 
-export interface CreateMasterEditionV3InstructionData {
+export type CreateMasterEditionV3InstructionData = {
   discriminator: number;
   createMasterEditionArgs: CreateMasterEditionArgs;
-}
+};
 
-export interface CreateMasterEditionV3InstructionDataArgs {
+export type CreateMasterEditionV3InstructionDataArgs = {
   createMasterEditionArgs: CreateMasterEditionArgsArgs;
-}
+};
 
 export function getCreateMasterEditionV3InstructionDataEncoder(): Encoder<CreateMasterEditionV3InstructionDataArgs> {
   return transformEncoder(
@@ -151,7 +147,7 @@ export function getCreateMasterEditionV3InstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateMasterEditionV3AsyncInput<
+export type CreateMasterEditionV3AsyncInput<
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountUpdateAuthority extends string = string,
@@ -161,9 +157,9 @@ export interface CreateMasterEditionV3AsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition'] */
-  edition: Address<TAccountEdition>;
+  edition?: Address<TAccountEdition>;
   /** Metadata mint */
   mint: Address<TAccountMint>;
   /** Update authority */
@@ -181,7 +177,7 @@ export interface CreateMasterEditionV3AsyncInput<
   /** Rent info */
   rent?: Address<TAccountRent>;
   createMasterEditionArgs: CreateMasterEditionV3InstructionDataArgs["createMasterEditionArgs"];
-}
+};
 
 export async function getCreateMasterEditionV3InstructionAsync<
   TAccountEdition extends string,
@@ -249,6 +245,15 @@ export async function getCreateMasterEditionV3InstructionAsync<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
@@ -298,7 +303,7 @@ export async function getCreateMasterEditionV3InstructionAsync<
   >);
 }
 
-export interface CreateMasterEditionV3Input<
+export type CreateMasterEditionV3Input<
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountUpdateAuthority extends string = string,
@@ -308,7 +313,7 @@ export interface CreateMasterEditionV3Input<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition'] */
   edition: Address<TAccountEdition>;
   /** Metadata mint */
@@ -328,7 +333,7 @@ export interface CreateMasterEditionV3Input<
   /** Rent info */
   rent?: Address<TAccountRent>;
   createMasterEditionArgs: CreateMasterEditionV3InstructionDataArgs["createMasterEditionArgs"];
-}
+};
 
 export function getCreateMasterEditionV3Instruction<
   TAccountEdition extends string,
@@ -434,10 +439,10 @@ export function getCreateMasterEditionV3Instruction<
   >);
 }
 
-export interface ParsedCreateMasterEditionV3Instruction<
+export type ParsedCreateMasterEditionV3Instruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition'] */
@@ -460,7 +465,7 @@ export interface ParsedCreateMasterEditionV3Instruction<
     rent?: TAccountMetas[8] | undefined;
   };
   data: CreateMasterEditionV3InstructionData;
-}
+};
 
 export function parseCreateMasterEditionV3Instruction<
   TProgram extends string,
@@ -487,9 +492,7 @@ export function parseCreateMasterEditionV3Instruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 8;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

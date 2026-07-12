@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -35,18 +21,28 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface EditionMarkerV2 {
-  key: Key;
-  ledger: ReadonlyUint8Array;
-}
+export type EditionMarkerV2 = { key: Key; ledger: ReadonlyUint8Array };
 
-export interface EditionMarkerV2Args {
-  key: KeyArgs;
-  ledger: ReadonlyUint8Array;
-}
+export type EditionMarkerV2Args = { key: KeyArgs; ledger: ReadonlyUint8Array };
 
 /** Gets the encoder for {@link EditionMarkerV2Args} account data. */
 export function getEditionMarkerV2Encoder(): Encoder<EditionMarkerV2Args> {
@@ -112,7 +108,7 @@ export async function fetchMaybeEditionMarkerV2<
 
 export async function fetchAllEditionMarkerV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<EditionMarkerV2>[]> {
   const maybeAccounts = await fetchAllMaybeEditionMarkerV2(
@@ -126,7 +122,7 @@ export async function fetchAllEditionMarkerV2(
 
 export async function fetchAllMaybeEditionMarkerV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<EditionMarkerV2>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

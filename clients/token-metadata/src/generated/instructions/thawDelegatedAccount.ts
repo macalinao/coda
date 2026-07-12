@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const THAW_DELEGATED_ACCOUNT_DISCRIMINATOR = 27;
@@ -44,13 +44,13 @@ export function getThawDelegatedAccountDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type ThawDelegatedAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountDelegate extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -75,9 +75,7 @@ export type ThawDelegatedAccountInstruction<
     ]
   >;
 
-export interface ThawDelegatedAccountInstructionData {
-  discriminator: number;
-}
+export type ThawDelegatedAccountInstructionData = { discriminator: number };
 
 export type ThawDelegatedAccountInstructionDataArgs = {};
 
@@ -105,13 +103,13 @@ export function getThawDelegatedAccountInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ThawDelegatedAccountInput<
+export type ThawDelegatedAccountInput<
   TAccountDelegate extends string = string,
   TAccountTokenAccount extends string = string,
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   /** Delegate */
   delegate: TransactionSigner<TAccountDelegate>;
   /** Token account to thaw */
@@ -122,7 +120,7 @@ export interface ThawDelegatedAccountInput<
   mint: Address<TAccountMint>;
   /** Token Program */
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getThawDelegatedAccountInstruction<
   TAccountDelegate extends string,
@@ -192,10 +190,10 @@ export function getThawDelegatedAccountInstruction<
   >);
 }
 
-export interface ParsedThawDelegatedAccountInstruction<
+export type ParsedThawDelegatedAccountInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Delegate */
@@ -210,7 +208,7 @@ export interface ParsedThawDelegatedAccountInstruction<
     tokenProgram: TAccountMetas[4];
   };
   data: ThawDelegatedAccountInstructionData;
-}
+};
 
 export function parseThawDelegatedAccountInstruction<
   TProgram extends string,

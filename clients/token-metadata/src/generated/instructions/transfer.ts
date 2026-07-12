@@ -6,28 +6,11 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { TransferArgs, TransferArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
+  getAddressEncoder,
+  getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
@@ -35,16 +18,38 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import {
+  findMasterEditionPda,
+  findMetadataPda,
+  findTokenRecordPda,
+} from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getTransferArgsDecoder,
   getTransferArgsEncoder,
+  type TransferArgs,
+  type TransferArgsArgs,
 } from "../types/index.js";
 
 export const TRANSFER_DISCRIMINATOR = 49;
@@ -55,28 +60,29 @@ export function getTransferDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type TransferInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountTokenOwner extends string | AccountMeta = string,
-  TAccountDestination extends string | AccountMeta = string,
-  TAccountDestinationOwner extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountOwnerTokenRecord extends string | AccountMeta = string,
-  TAccountDestinationTokenRecord extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountTokenOwner extends string | AccountMeta<string> = string,
+  TAccountDestination extends string | AccountMeta<string> = string,
+  TAccountDestinationOwner extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountOwnerTokenRecord extends string | AccountMeta<string> = string,
+  TAccountDestinationTokenRecord extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends string | AccountMeta =
+  TAccountSplTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSplAtaProgram extends string | AccountMeta =
+  TAccountSplAtaProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRules extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthorizationRulesProgram extends string | AccountMeta<string> =
+    string,
+  TAccountAuthorizationRules extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -138,14 +144,12 @@ export type TransferInstruction<
     ]
   >;
 
-export interface TransferInstructionData {
+export type TransferInstructionData = {
   discriminator: number;
   transferArgs: TransferArgs;
-}
+};
 
-export interface TransferInstructionDataArgs {
-  transferArgs: TransferArgsArgs;
-}
+export type TransferInstructionDataArgs = { transferArgs: TransferArgsArgs };
 
 export function getTransferInstructionDataEncoder(): Encoder<TransferInstructionDataArgs> {
   return transformEncoder(
@@ -174,7 +178,7 @@ export function getTransferInstructionDataCodec(): Codec<
   );
 }
 
-export interface TransferAsyncInput<
+export type TransferAsyncInput<
   TAccountToken extends string = string,
   TAccountTokenOwner extends string = string,
   TAccountDestination extends string = string,
@@ -192,13 +196,13 @@ export interface TransferAsyncInput<
   TAccountSplAtaProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Token account */
-  token: Address<TAccountToken>;
+  token?: Address<TAccountToken>;
   /** Token account owner */
   tokenOwner: Address<TAccountTokenOwner>;
   /** Destination token account */
-  destination: Address<TAccountDestination>;
+  destination?: Address<TAccountDestination>;
   /** Destination token account owner */
   destinationOwner: Address<TAccountDestinationOwner>;
   /** Mint of token asset */
@@ -228,7 +232,7 @@ export interface TransferAsyncInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   transferArgs: TransferInstructionDataArgs["transferArgs"];
-}
+};
 
 export async function getTransferInstructionAsync<
   TAccountToken extends string,
@@ -346,12 +350,87 @@ export async function getTransferInstructionAsync<
   const args = { ...input };
 
   // Resolve default values.
+  if (!accounts.token.value) {
+    accounts.token.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "tokenOwner",
+            accounts.tokenOwner.value,
+          ),
+        ),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount("mint", accounts.mint.value),
+        ),
+      ],
+    });
+  }
+  if (!accounts.destination.value) {
+    accounts.destination.value = await getProgramDerivedAddress({
+      programAddress:
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
+      seeds: [
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount(
+            "destinationOwner",
+            accounts.destinationOwner.value,
+          ),
+        ),
+        getAddressEncoder().encode(
+          address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+        ),
+        getAddressEncoder().encode(
+          getAddressFromResolvedInstructionAccount("mint", accounts.mint.value),
+        ),
+      ],
+    });
+  }
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
       mint: getAddressFromResolvedInstructionAccount(
         "mint",
         accounts.mint.value,
+      ),
+    });
+  }
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
+  if (!accounts.ownerTokenRecord.value) {
+    accounts.ownerTokenRecord.value = await findTokenRecordPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+      token: getAddressFromResolvedInstructionAccount(
+        "token",
+        accounts.token.value,
+      ),
+    });
+  }
+  if (!accounts.destinationTokenRecord.value) {
+    accounts.destinationTokenRecord.value = await findTokenRecordPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+      token: getAddressFromResolvedInstructionAccount(
+        "destination",
+        accounts.destination.value,
       ),
     });
   }
@@ -422,7 +501,7 @@ export async function getTransferInstructionAsync<
   >);
 }
 
-export interface TransferInput<
+export type TransferInput<
   TAccountToken extends string = string,
   TAccountTokenOwner extends string = string,
   TAccountDestination extends string = string,
@@ -440,7 +519,7 @@ export interface TransferInput<
   TAccountSplAtaProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Token account */
   token: Address<TAccountToken>;
   /** Token account owner */
@@ -476,7 +555,7 @@ export interface TransferInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   transferArgs: TransferInstructionDataArgs["transferArgs"];
-}
+};
 
 export function getTransferInstruction<
   TAccountToken extends string,
@@ -659,10 +738,10 @@ export function getTransferInstruction<
   >);
 }
 
-export interface ParsedTransferInstruction<
+export type ParsedTransferInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Token account */
@@ -701,7 +780,7 @@ export interface ParsedTransferInstruction<
     authorizationRules?: TAccountMetas[16] | undefined;
   };
   data: TransferInstructionData;
-}
+};
 
 export function parseTransferInstruction<
   TProgram extends string,

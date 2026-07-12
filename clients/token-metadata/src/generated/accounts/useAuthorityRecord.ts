@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -28,24 +15,39 @@ import {
   fetchEncodedAccounts,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface UseAuthorityRecord {
+export type UseAuthorityRecord = {
   key: Key;
   allowedUses: bigint;
   bump: number;
-}
+};
 
-export interface UseAuthorityRecordArgs {
+export type UseAuthorityRecordArgs = {
   key: KeyArgs;
   allowedUses: number | bigint;
   bump: number;
-}
+};
 
 /** Gets the encoder for {@link UseAuthorityRecordArgs} account data. */
 export function getUseAuthorityRecordEncoder(): FixedSizeEncoder<UseAuthorityRecordArgs> {
@@ -116,7 +118,7 @@ export async function fetchMaybeUseAuthorityRecord<
 
 export async function fetchAllUseAuthorityRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<UseAuthorityRecord>[]> {
   const maybeAccounts = await fetchAllMaybeUseAuthorityRecord(
@@ -130,7 +132,7 @@ export async function fetchAllUseAuthorityRecord(
 
 export async function fetchAllMaybeUseAuthorityRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<UseAuthorityRecord>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

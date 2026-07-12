@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -34,20 +19,37 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface MasterEditionV2 {
+export type MasterEditionV2 = {
   key: Key;
   supply: bigint;
   maxSupply: Option<bigint>;
-}
+};
 
-export interface MasterEditionV2Args {
+export type MasterEditionV2Args = {
   key: KeyArgs;
   supply: number | bigint;
   maxSupply: OptionOrNullable<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link MasterEditionV2Args} account data. */
 export function getMasterEditionV2Encoder(): Encoder<MasterEditionV2Args> {
@@ -115,7 +117,7 @@ export async function fetchMaybeMasterEditionV2<
 
 export async function fetchAllMasterEditionV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MasterEditionV2>[]> {
   const maybeAccounts = await fetchAllMaybeMasterEditionV2(
@@ -129,7 +131,7 @@ export async function fetchAllMasterEditionV2(
 
 export async function fetchAllMaybeMasterEditionV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MasterEditionV2>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

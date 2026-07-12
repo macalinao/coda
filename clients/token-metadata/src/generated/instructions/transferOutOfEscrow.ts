@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  TransferOutOfEscrowArgs,
-  TransferOutOfEscrowArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getTransferOutOfEscrowArgsDecoder,
   getTransferOutOfEscrowArgsEncoder,
+  type TransferOutOfEscrowArgs,
+  type TransferOutOfEscrowArgsArgs,
 } from "../types/index.js";
 
 export const TRANSFER_OUT_OF_ESCROW_DISCRIMINATOR = 40;
@@ -53,24 +51,25 @@ export function getTransferOutOfEscrowDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type TransferOutOfEscrowInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountAttributeMint extends string | AccountMeta = string,
-  TAccountAttributeSrc extends string | AccountMeta = string,
-  TAccountAttributeDst extends string | AccountMeta = string,
-  TAccountEscrowMint extends string | AccountMeta = string,
-  TAccountEscrowAccount extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountAttributeMint extends string | AccountMeta<string> = string,
+  TAccountAttributeSrc extends string | AccountMeta<string> = string,
+  TAccountAttributeDst extends string | AccountMeta<string> = string,
+  TAccountEscrowMint extends string | AccountMeta<string> = string,
+  TAccountEscrowAccount extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountAtaProgram extends string | AccountMeta =
+  TAccountAtaProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountAuthority extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthority extends string | AccountMeta<string> | undefined =
+    undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -124,14 +123,14 @@ export type TransferOutOfEscrowInstruction<
     ]
   >;
 
-export interface TransferOutOfEscrowInstructionData {
+export type TransferOutOfEscrowInstructionData = {
   discriminator: number;
   transferOutOfEscrowArgs: TransferOutOfEscrowArgs;
-}
+};
 
-export interface TransferOutOfEscrowInstructionDataArgs {
+export type TransferOutOfEscrowInstructionDataArgs = {
   transferOutOfEscrowArgs: TransferOutOfEscrowArgsArgs;
-}
+};
 
 export function getTransferOutOfEscrowInstructionDataEncoder(): FixedSizeEncoder<TransferOutOfEscrowInstructionDataArgs> {
   return transformEncoder(
@@ -163,7 +162,7 @@ export function getTransferOutOfEscrowInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface TransferOutOfEscrowInput<
+export type TransferOutOfEscrowInput<
   TAccountEscrow extends string = string,
   TAccountMetadata extends string = string,
   TAccountPayer extends string = string,
@@ -177,7 +176,7 @@ export interface TransferOutOfEscrowInput<
   TAccountTokenProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
   TAccountAuthority extends string = string,
-> {
+> = {
   /** Escrow account */
   escrow: Address<TAccountEscrow>;
   /** Metadata account */
@@ -205,7 +204,7 @@ export interface TransferOutOfEscrowInput<
   /** Authority/creator of the escrow account */
   authority?: TransactionSigner<TAccountAuthority>;
   transferOutOfEscrowArgs: TransferOutOfEscrowInstructionDataArgs["transferOutOfEscrowArgs"];
-}
+};
 
 export function getTransferOutOfEscrowInstruction<
   TAccountEscrow extends string,
@@ -343,10 +342,10 @@ export function getTransferOutOfEscrowInstruction<
   >);
 }
 
-export interface ParsedTransferOutOfEscrowInstruction<
+export type ParsedTransferOutOfEscrowInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Escrow account */
@@ -377,7 +376,7 @@ export interface ParsedTransferOutOfEscrowInstruction<
     authority?: TAccountMetas[12] | undefined;
   };
   data: TransferOutOfEscrowInstructionData;
-}
+};
 
 export function parseTransferOutOfEscrowInstruction<
   TProgram extends string,
@@ -404,9 +403,7 @@ export function parseTransferOutOfEscrowInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 12;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

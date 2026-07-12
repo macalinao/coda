@@ -6,32 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  AuthorizationData,
-  AuthorizationDataArgs,
-  CollectionDetailsToggle,
-  CollectionDetailsToggleArgs,
-  CollectionToggle,
-  CollectionToggleArgs,
-  Data,
-  DataArgs,
-  RuleSetToggle,
-  RuleSetToggleArgs,
-  TokenStandard,
-  TokenStandardArgs,
-  UsesToggle,
-  UsesToggleArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -44,6 +18,14 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorizationDataDecoder,
@@ -60,6 +42,20 @@ import {
   getTokenStandardEncoder,
   getUsesToggleDecoder,
   getUsesToggleEncoder,
+  type AuthorizationData,
+  type AuthorizationDataArgs,
+  type CollectionDetailsToggle,
+  type CollectionDetailsToggleArgs,
+  type CollectionToggle,
+  type CollectionToggleArgs,
+  type Data,
+  type DataArgs,
+  type RuleSetToggle,
+  type RuleSetToggleArgs,
+  type TokenStandard,
+  type TokenStandardArgs,
+  type UsesToggle,
+  type UsesToggleArgs,
 } from "./index.js";
 
 export type UpdateArgs =

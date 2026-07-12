@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,8 +15,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DEPRECATED_SET_RESERVATION_LIST_DISCRIMINATOR = 5;
@@ -43,10 +43,10 @@ export function getDeprecatedSetReservationListDiscriminatorBytes(): ReadonlyUin
 
 export type DeprecatedSetReservationListInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountReservationList extends string | AccountMeta = string,
-  TAccountResource extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountReservationList extends string | AccountMeta<string> = string,
+  TAccountResource extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -65,9 +65,9 @@ export type DeprecatedSetReservationListInstruction<
     ]
   >;
 
-export interface DeprecatedSetReservationListInstructionData {
+export type DeprecatedSetReservationListInstructionData = {
   discriminator: number;
-}
+};
 
 export type DeprecatedSetReservationListInstructionDataArgs = {};
 
@@ -95,18 +95,18 @@ export function getDeprecatedSetReservationListInstructionDataCodec(): FixedSize
   );
 }
 
-export interface DeprecatedSetReservationListInput<
+export type DeprecatedSetReservationListInput<
   TAccountMasterEdition extends string = string,
   TAccountReservationList extends string = string,
   TAccountResource extends string = string,
-> {
+> = {
   /** Master Edition V1 key (pda of ['metadata', program id, mint id, 'edition']) */
   masterEdition: Address<TAccountMasterEdition>;
   /** PDA for ReservationList of ['metadata', program id, master edition key, 'reservation', resource-key] */
   reservationList: Address<TAccountReservationList>;
   /** The resource you tied the reservation list too */
   resource: TransactionSigner<TAccountResource>;
-}
+};
 
 export function getDeprecatedSetReservationListInstruction<
   TAccountMasterEdition extends string,
@@ -158,10 +158,10 @@ export function getDeprecatedSetReservationListInstruction<
   >);
 }
 
-export interface ParsedDeprecatedSetReservationListInstruction<
+export type ParsedDeprecatedSetReservationListInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Master Edition V1 key (pda of ['metadata', program id, mint id, 'edition']) */
@@ -172,7 +172,7 @@ export interface ParsedDeprecatedSetReservationListInstruction<
     resource: TAccountMetas[2];
   };
   data: DeprecatedSetReservationListInstructionData;
-}
+};
 
 export function parseDeprecatedSetReservationListInstruction<
   TProgram extends string,

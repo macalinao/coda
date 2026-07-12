@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Collection,
-  CollectionArgs,
-  CollectionDetails,
-  CollectionDetailsArgs,
-  Creator,
-  CreatorArgs,
-  TokenStandard,
-  TokenStandardArgs,
-  Uses,
-  UsesArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -46,6 +26,12 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getCollectionDecoder,
@@ -58,14 +44,24 @@ import {
   getTokenStandardEncoder,
   getUsesDecoder,
   getUsesEncoder,
+  type Collection,
+  type CollectionArgs,
+  type CollectionDetails,
+  type CollectionDetailsArgs,
+  type Creator,
+  type CreatorArgs,
+  type TokenStandard,
+  type TokenStandardArgs,
+  type Uses,
+  type UsesArgs,
 } from "./index.js";
 
-export interface AssetData {
+export type AssetData = {
   name: string;
   symbol: string;
   uri: string;
   sellerFeeBasisPoints: number;
-  creators: Option<Creator[]>;
+  creators: Option<Array<Creator>>;
   primarySaleHappened: boolean;
   isMutable: boolean;
   tokenStandard: TokenStandard;
@@ -73,14 +69,14 @@ export interface AssetData {
   uses: Option<Uses>;
   collectionDetails: Option<CollectionDetails>;
   ruleSet: Option<Address>;
-}
+};
 
-export interface AssetDataArgs {
+export type AssetDataArgs = {
   name: string;
   symbol: string;
   uri: string;
   sellerFeeBasisPoints: number;
-  creators: OptionOrNullable<CreatorArgs[]>;
+  creators: OptionOrNullable<Array<CreatorArgs>>;
   primarySaleHappened: boolean;
   isMutable: boolean;
   tokenStandard: TokenStandardArgs;
@@ -88,7 +84,7 @@ export interface AssetDataArgs {
   uses: OptionOrNullable<UsesArgs>;
   collectionDetails: OptionOrNullable<CollectionDetailsArgs>;
   ruleSet: OptionOrNullable<Address>;
-}
+};
 
 export function getAssetDataEncoder(): Encoder<AssetDataArgs> {
   return getStructEncoder([

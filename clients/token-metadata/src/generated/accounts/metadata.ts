@@ -6,37 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { MetadataSeeds } from "../pdas/index.js";
-import type {
-  Collection,
-  CollectionArgs,
-  CollectionDetails,
-  CollectionDetailsArgs,
-  Data,
-  DataArgs,
-  Key,
-  KeyArgs,
-  ProgrammableConfig,
-  ProgrammableConfigArgs,
-  TokenStandard,
-  TokenStandardArgs,
-  Uses,
-  UsesArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -54,7 +23,20 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
+import type { MetadataSeeds } from "../pdas/index.js";
 import { findMetadataPda } from "../pdas/index.js";
 import {
   getCollectionDecoder,
@@ -71,9 +53,23 @@ import {
   getTokenStandardEncoder,
   getUsesDecoder,
   getUsesEncoder,
+  type Collection,
+  type CollectionArgs,
+  type CollectionDetails,
+  type CollectionDetailsArgs,
+  type Data,
+  type DataArgs,
+  type Key,
+  type KeyArgs,
+  type ProgrammableConfig,
+  type ProgrammableConfigArgs,
+  type TokenStandard,
+  type TokenStandardArgs,
+  type Uses,
+  type UsesArgs,
 } from "../types/index.js";
 
-export interface Metadata {
+export type Metadata = {
   key: Key;
   updateAuthority: Address;
   mint: Address;
@@ -86,9 +82,9 @@ export interface Metadata {
   uses: Option<Uses>;
   collectionDetails: Option<CollectionDetails>;
   programmableConfig: Option<ProgrammableConfig>;
-}
+};
 
-export interface MetadataArgs {
+export type MetadataArgs = {
   key: KeyArgs;
   updateAuthority: Address;
   mint: Address;
@@ -101,7 +97,7 @@ export interface MetadataArgs {
   uses: OptionOrNullable<UsesArgs>;
   collectionDetails: OptionOrNullable<CollectionDetailsArgs>;
   programmableConfig: OptionOrNullable<ProgrammableConfigArgs>;
-}
+};
 
 /** Gets the encoder for {@link MetadataArgs} account data. */
 export function getMetadataEncoder(): Encoder<MetadataArgs> {
@@ -180,7 +176,7 @@ export async function fetchMaybeMetadata<TAddress extends string = string>(
 
 export async function fetchAllMetadata(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Metadata>[]> {
   const maybeAccounts = await fetchAllMaybeMetadata(rpc, addresses, config);
@@ -190,7 +186,7 @@ export async function fetchAllMetadata(
 
 export async function fetchAllMaybeMetadata(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Metadata>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

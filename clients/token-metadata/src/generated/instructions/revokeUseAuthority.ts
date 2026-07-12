@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -33,10 +16,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -49,18 +47,18 @@ export function getRevokeUseAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RevokeUseAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountUseAuthorityRecord extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountUser extends string | AccountMeta = string,
-  TAccountOwnerTokenAccount extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountUseAuthorityRecord extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountUser extends string | AccountMeta<string> = string,
+  TAccountOwnerTokenAccount extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRent extends string | AccountMeta<string> | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -101,9 +99,7 @@ export type RevokeUseAuthorityInstruction<
     ]
   >;
 
-export interface RevokeUseAuthorityInstructionData {
-  discriminator: number;
-}
+export type RevokeUseAuthorityInstructionData = { discriminator: number };
 
 export type RevokeUseAuthorityInstructionDataArgs = {};
 
@@ -131,7 +127,7 @@ export function getRevokeUseAuthorityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RevokeUseAuthorityAsyncInput<
+export type RevokeUseAuthorityAsyncInput<
   TAccountUseAuthorityRecord extends string = string,
   TAccountOwner extends string = string,
   TAccountUser extends string = string,
@@ -141,7 +137,7 @@ export interface RevokeUseAuthorityAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Use Authority Record PDA */
   useAuthorityRecord: Address<TAccountUseAuthorityRecord>;
   /** Owner */
@@ -160,7 +156,7 @@ export interface RevokeUseAuthorityAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getRevokeUseAuthorityInstructionAsync<
   TAccountUseAuthorityRecord extends string,
@@ -275,7 +271,7 @@ export async function getRevokeUseAuthorityInstructionAsync<
   >);
 }
 
-export interface RevokeUseAuthorityInput<
+export type RevokeUseAuthorityInput<
   TAccountUseAuthorityRecord extends string = string,
   TAccountOwner extends string = string,
   TAccountUser extends string = string,
@@ -285,7 +281,7 @@ export interface RevokeUseAuthorityInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Use Authority Record PDA */
   useAuthorityRecord: Address<TAccountUseAuthorityRecord>;
   /** Owner */
@@ -304,7 +300,7 @@ export interface RevokeUseAuthorityInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getRevokeUseAuthorityInstruction<
   TAccountUseAuthorityRecord extends string,
@@ -408,10 +404,10 @@ export function getRevokeUseAuthorityInstruction<
   >);
 }
 
-export interface ParsedRevokeUseAuthorityInstruction<
+export type ParsedRevokeUseAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Use Authority Record PDA */
@@ -434,7 +430,7 @@ export interface ParsedRevokeUseAuthorityInstruction<
     rent?: TAccountMetas[8] | undefined;
   };
   data: RevokeUseAuthorityInstructionData;
-}
+};
 
 export function parseRevokeUseAuthorityInstruction<
   TProgram extends string,
@@ -461,9 +457,7 @@ export function parseRevokeUseAuthorityInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 8;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

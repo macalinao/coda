@@ -6,19 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface MasterEditionSeeds {
+export type MasterEditionSeeds = {
   /** The address of the program */
   programId: Address;
   /** The address of the mint account */
   mint: Address;
-}
+};
 
 export async function findMasterEditionPda(
   seeds: MasterEditionSeeds,

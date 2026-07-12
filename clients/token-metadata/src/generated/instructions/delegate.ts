@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { DelegateArgs, DelegateArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -35,16 +16,34 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getDelegateArgsDecoder,
   getDelegateArgsEncoder,
+  type DelegateArgs,
+  type DelegateArgsArgs,
 } from "../types/index.js";
 
 export const DELEGATE_DISCRIMINATOR = 44;
@@ -55,23 +54,24 @@ export function getDelegateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DelegateInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountDelegateRecord extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountTokenRecord extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountDelegateRecord extends string | AccountMeta<string> = string,
+  TAccountDelegate extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountTokenRecord extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRules extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSplTokenProgram extends string | AccountMeta<string> = string,
+  TAccountAuthorizationRulesProgram extends string | AccountMeta<string> =
+    string,
+  TAccountAuthorizationRules extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -124,14 +124,12 @@ export type DelegateInstruction<
     ]
   >;
 
-export interface DelegateInstructionData {
+export type DelegateInstructionData = {
   discriminator: number;
   delegateArgs: DelegateArgs;
-}
+};
 
-export interface DelegateInstructionDataArgs {
-  delegateArgs: DelegateArgsArgs;
-}
+export type DelegateInstructionDataArgs = { delegateArgs: DelegateArgsArgs };
 
 export function getDelegateInstructionDataEncoder(): Encoder<DelegateInstructionDataArgs> {
   return transformEncoder(
@@ -160,7 +158,7 @@ export function getDelegateInstructionDataCodec(): Codec<
   );
 }
 
-export interface DelegateAsyncInput<
+export type DelegateAsyncInput<
   TAccountDelegateRecord extends string = string,
   TAccountDelegate extends string = string,
   TAccountMetadata extends string = string,
@@ -175,7 +173,7 @@ export interface DelegateAsyncInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Delegate record account */
   delegateRecord?: Address<TAccountDelegateRecord>;
   /** Owner of the delegated account */
@@ -205,7 +203,7 @@ export interface DelegateAsyncInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   delegateArgs: DelegateInstructionDataArgs["delegateArgs"];
-}
+};
 
 export async function getDelegateInstructionAsync<
   TAccountDelegateRecord extends string,
@@ -311,6 +309,15 @@ export async function getDelegateInstructionAsync<
       ),
     });
   }
+  if (!accounts.masterEdition.value) {
+    accounts.masterEdition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -364,7 +371,7 @@ export async function getDelegateInstructionAsync<
   >);
 }
 
-export interface DelegateInput<
+export type DelegateInput<
   TAccountDelegateRecord extends string = string,
   TAccountDelegate extends string = string,
   TAccountMetadata extends string = string,
@@ -379,7 +386,7 @@ export interface DelegateInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Delegate record account */
   delegateRecord?: Address<TAccountDelegateRecord>;
   /** Owner of the delegated account */
@@ -409,7 +416,7 @@ export interface DelegateInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   delegateArgs: DelegateInstructionDataArgs["delegateArgs"];
-}
+};
 
 export function getDelegateInstruction<
   TAccountDelegateRecord extends string,
@@ -557,10 +564,10 @@ export function getDelegateInstruction<
   >);
 }
 
-export interface ParsedDelegateInstruction<
+export type ParsedDelegateInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Delegate record account */
@@ -593,7 +600,7 @@ export interface ParsedDelegateInstruction<
     authorizationRules?: TAccountMetas[13] | undefined;
   };
   data: DelegateInstructionData;
-}
+};
 
 export function parseDelegateInstruction<
   TProgram extends string,

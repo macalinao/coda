@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { PrintArgs, PrintArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,10 +15,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getPrintArgsDecoder, getPrintArgsEncoder } from "../types/index.js";
+import {
+  getPrintArgsDecoder,
+  getPrintArgsEncoder,
+  type PrintArgs,
+  type PrintArgsArgs,
+} from "../types/index.js";
 
 export const PRINT_DISCRIMINATOR = 55;
 
@@ -47,29 +51,30 @@ export function getPrintDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type PrintInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountEditionMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountEditionMint extends string | AccountMeta = string,
-  TAccountEditionTokenAccountOwner extends string | AccountMeta = string,
-  TAccountEditionTokenAccount extends string | AccountMeta = string,
-  TAccountEditionMintAuthority extends string | AccountMeta = string,
-  TAccountEditionTokenRecord extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountEditionMarkerPda extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountMasterTokenAccountOwner extends string | AccountMeta = string,
-  TAccountMasterTokenAccount extends string | AccountMeta = string,
-  TAccountMasterMetadata extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountSplTokenProgram extends string | AccountMeta =
+  TAccountEditionMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountEditionMint extends string | AccountMeta<string> = string,
+  TAccountEditionTokenAccountOwner extends string | AccountMeta<string> =
+    string,
+  TAccountEditionTokenAccount extends string | AccountMeta<string> = string,
+  TAccountEditionMintAuthority extends string | AccountMeta<string> = string,
+  TAccountEditionTokenRecord extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountEditionMarkerPda extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountMasterTokenAccountOwner extends string | AccountMeta<string> = string,
+  TAccountMasterTokenAccount extends string | AccountMeta<string> = string,
+  TAccountMasterMetadata extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountSplTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSplAtaProgram extends string | AccountMeta =
+  TAccountSplAtaProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -134,14 +139,12 @@ export type PrintInstruction<
     ]
   >;
 
-export interface PrintInstructionData {
+export type PrintInstructionData = {
   discriminator: number;
   printArgs: PrintArgs;
-}
+};
 
-export interface PrintInstructionDataArgs {
-  printArgs: PrintArgsArgs;
-}
+export type PrintInstructionDataArgs = { printArgs: PrintArgsArgs };
 
 export function getPrintInstructionDataEncoder(): FixedSizeEncoder<PrintInstructionDataArgs> {
   return transformEncoder(
@@ -170,7 +173,7 @@ export function getPrintInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface PrintInput<
+export type PrintInput<
   TAccountEditionMetadata extends string = string,
   TAccountEdition extends string = string,
   TAccountEditionMint extends string = string,
@@ -189,7 +192,7 @@ export interface PrintInput<
   TAccountSplAtaProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** New Metadata key (pda of ['metadata', program id, mint id]) */
   editionMetadata: Address<TAccountEditionMetadata>;
   /** New Edition (pda of ['metadata', program id, mint id, 'edition']) */
@@ -229,7 +232,7 @@ export interface PrintInput<
   /** System program */
   systemProgram?: Address<TAccountSystemProgram>;
   printArgs: PrintInstructionDataArgs["printArgs"];
-}
+};
 
 export function getPrintInstruction<
   TAccountEditionMetadata extends string,
@@ -436,10 +439,10 @@ export function getPrintInstruction<
   >);
 }
 
-export interface ParsedPrintInstruction<
+export type ParsedPrintInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** New Metadata key (pda of ['metadata', program id, mint id]) */
@@ -480,7 +483,7 @@ export interface ParsedPrintInstruction<
     systemProgram: TAccountMetas[17];
   };
   data: PrintInstructionData;
-}
+};
 
 export function parsePrintInstruction<
   TProgram extends string,

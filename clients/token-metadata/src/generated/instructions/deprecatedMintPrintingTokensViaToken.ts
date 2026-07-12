@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_DISCRIMINATOR = 8;
@@ -46,19 +46,20 @@ export function getDeprecatedMintPrintingTokensViaTokenDiscriminatorBytes(): Rea
 
 export type DeprecatedMintPrintingTokensViaTokenInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountDestination extends string | AccountMeta = string,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountOneTimePrintingAuthorizationMint extends string | AccountMeta =
-    string,
-  TAccountPrintingMint extends string | AccountMeta = string,
-  TAccountBurnAuthority extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountDestination extends string | AccountMeta<string> = string,
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountOneTimePrintingAuthorizationMint extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountPrintingMint extends string | AccountMeta<string> = string,
+  TAccountBurnAuthority extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,9 +96,9 @@ export type DeprecatedMintPrintingTokensViaTokenInstruction<
     ]
   >;
 
-export interface DeprecatedMintPrintingTokensViaTokenInstructionData {
+export type DeprecatedMintPrintingTokensViaTokenInstructionData = {
   discriminator: number;
-}
+};
 
 export type DeprecatedMintPrintingTokensViaTokenInstructionDataArgs = {};
 
@@ -125,7 +126,7 @@ export function getDeprecatedMintPrintingTokensViaTokenInstructionDataCodec(): F
   );
 }
 
-export interface DeprecatedMintPrintingTokensViaTokenInput<
+export type DeprecatedMintPrintingTokensViaTokenInput<
   TAccountDestination extends string = string,
   TAccountToken extends string = string,
   TAccountOneTimePrintingAuthorizationMint extends string = string,
@@ -135,7 +136,7 @@ export interface DeprecatedMintPrintingTokensViaTokenInput<
   TAccountMasterEdition extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Destination account */
   destination: Address<TAccountDestination>;
   /** Token account containing one time authorization token */
@@ -154,7 +155,7 @@ export interface DeprecatedMintPrintingTokensViaTokenInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   /** Rent */
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getDeprecatedMintPrintingTokensViaTokenInstruction<
   TAccountDestination extends string,
@@ -260,10 +261,10 @@ export function getDeprecatedMintPrintingTokensViaTokenInstruction<
   >);
 }
 
-export interface ParsedDeprecatedMintPrintingTokensViaTokenInstruction<
+export type ParsedDeprecatedMintPrintingTokensViaTokenInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Destination account */
@@ -286,7 +287,7 @@ export interface ParsedDeprecatedMintPrintingTokensViaTokenInstruction<
     rent: TAccountMetas[8];
   };
   data: DeprecatedMintPrintingTokensViaTokenInstructionData;
-}
+};
 
 export function parseDeprecatedMintPrintingTokensViaTokenInstruction<
   TProgram extends string,

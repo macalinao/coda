@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -33,10 +16,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -49,12 +47,13 @@ export function getRevokeCollectionAuthorityDiscriminatorBytes(): ReadonlyUint8A
 
 export type RevokeCollectionAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountCollectionAuthorityRecord extends string | AccountMeta = string,
-  TAccountDelegateAuthority extends string | AccountMeta = string,
-  TAccountRevokeAuthority extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountCollectionAuthorityRecord extends string | AccountMeta<string> =
+    string,
+  TAccountDelegateAuthority extends string | AccountMeta<string> = string,
+  TAccountRevokeAuthority extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -79,9 +78,9 @@ export type RevokeCollectionAuthorityInstruction<
     ]
   >;
 
-export interface RevokeCollectionAuthorityInstructionData {
+export type RevokeCollectionAuthorityInstructionData = {
   discriminator: number;
-}
+};
 
 export type RevokeCollectionAuthorityInstructionDataArgs = {};
 
@@ -109,13 +108,13 @@ export function getRevokeCollectionAuthorityInstructionDataCodec(): FixedSizeCod
   );
 }
 
-export interface RevokeCollectionAuthorityAsyncInput<
+export type RevokeCollectionAuthorityAsyncInput<
   TAccountCollectionAuthorityRecord extends string = string,
   TAccountDelegateAuthority extends string = string,
   TAccountRevokeAuthority extends string = string,
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
-> {
+> = {
   /** Collection Authority Record PDA */
   collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
   /** Delegated Collection Authority */
@@ -126,7 +125,7 @@ export interface RevokeCollectionAuthorityAsyncInput<
   metadata?: Address<TAccountMetadata>;
   /** Mint of Metadata */
   mint: Address<TAccountMint>;
-}
+};
 
 export async function getRevokeCollectionAuthorityInstructionAsync<
   TAccountCollectionAuthorityRecord extends string,
@@ -212,13 +211,13 @@ export async function getRevokeCollectionAuthorityInstructionAsync<
   >);
 }
 
-export interface RevokeCollectionAuthorityInput<
+export type RevokeCollectionAuthorityInput<
   TAccountCollectionAuthorityRecord extends string = string,
   TAccountDelegateAuthority extends string = string,
   TAccountRevokeAuthority extends string = string,
   TAccountMetadata extends string = string,
   TAccountMint extends string = string,
-> {
+> = {
   /** Collection Authority Record PDA */
   collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
   /** Delegated Collection Authority */
@@ -229,7 +228,7 @@ export interface RevokeCollectionAuthorityInput<
   metadata: Address<TAccountMetadata>;
   /** Mint of Metadata */
   mint: Address<TAccountMint>;
-}
+};
 
 export function getRevokeCollectionAuthorityInstruction<
   TAccountCollectionAuthorityRecord extends string,
@@ -302,10 +301,10 @@ export function getRevokeCollectionAuthorityInstruction<
   >);
 }
 
-export interface ParsedRevokeCollectionAuthorityInstruction<
+export type ParsedRevokeCollectionAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Collection Authority Record PDA */
@@ -320,7 +319,7 @@ export interface ParsedRevokeCollectionAuthorityInstruction<
     mint: TAccountMetas[4];
   };
   data: RevokeCollectionAuthorityInstructionData;
-}
+};
 
 export function parseRevokeCollectionAuthorityInstruction<
   TProgram extends string,

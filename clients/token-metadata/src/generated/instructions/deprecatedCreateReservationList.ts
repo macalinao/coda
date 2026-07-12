@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DEPRECATED_CREATE_RESERVATION_LIST_DISCRIMINATOR = 6;
@@ -46,17 +46,17 @@ export function getDeprecatedCreateReservationListDiscriminatorBytes(): Readonly
 
 export type DeprecatedCreateReservationListInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountReservationList extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountResource extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountReservationList extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountResource extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -91,9 +91,9 @@ export type DeprecatedCreateReservationListInstruction<
     ]
   >;
 
-export interface DeprecatedCreateReservationListInstructionData {
+export type DeprecatedCreateReservationListInstructionData = {
   discriminator: number;
-}
+};
 
 export type DeprecatedCreateReservationListInstructionDataArgs = {};
 
@@ -121,7 +121,7 @@ export function getDeprecatedCreateReservationListInstructionDataCodec(): FixedS
   );
 }
 
-export interface DeprecatedCreateReservationListInput<
+export type DeprecatedCreateReservationListInput<
   TAccountReservationList extends string = string,
   TAccountPayer extends string = string,
   TAccountUpdateAuthority extends string = string,
@@ -130,7 +130,7 @@ export interface DeprecatedCreateReservationListInput<
   TAccountMetadata extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** PDA for ReservationList of ['metadata', program id, master edition key, 'reservation', resource-key] */
   reservationList: Address<TAccountReservationList>;
   /** Payer */
@@ -147,7 +147,7 @@ export interface DeprecatedCreateReservationListInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getDeprecatedCreateReservationListInstruction<
   TAccountReservationList extends string,
@@ -242,10 +242,10 @@ export function getDeprecatedCreateReservationListInstruction<
   >);
 }
 
-export interface ParsedDeprecatedCreateReservationListInstruction<
+export type ParsedDeprecatedCreateReservationListInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** PDA for ReservationList of ['metadata', program id, master edition key, 'reservation', resource-key] */
@@ -266,7 +266,7 @@ export interface ParsedDeprecatedCreateReservationListInstruction<
     rent: TAccountMetas[7];
   };
   data: DeprecatedCreateReservationListInstructionData;
-}
+};
 
 export function parseDeprecatedCreateReservationListInstruction<
   TProgram extends string,
