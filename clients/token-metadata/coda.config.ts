@@ -142,6 +142,25 @@ const MASTER_EDITION_AS_EDITION_INSTRUCTIONS = [
 // but their `token` account is optional and so cannot seed the PDA.)
 const TOKEN_RECORD_INSTRUCTIONS = ["mint", "lock", "unlock", "migrate"];
 
+// Legacy collection (un)verification instructions. Each takes a required
+// `collectionMint`, so the collection's Metadata (`collection`) and master
+// edition (`collectionMasterEditionAccount`) accounts are fully derivable.
+const COLLECTION_VERIFY_INSTRUCTIONS = [
+  "verifyCollection",
+  "unverifyCollection",
+  "setAndVerifyCollection",
+  "verifySizedCollectionItem",
+  "unverifySizedCollectionItem",
+  "setAndVerifySizedCollectionItem",
+];
+
+// Instructions whose `collectionMetadata` account is the Metadata PDA of the
+// required `collectionMint`.
+const COLLECTION_METADATA_INSTRUCTIONS = [
+  "setCollectionSize",
+  "bubblegumSetCollectionSize",
+];
+
 const metadataPdaOf = (mintAccount: string) =>
   pdaValueNode(pdaLinkNode("metadata"), [
     pdaSeedValueNode("programId", TOKEN_METADATA_PROGRAM_VALUE_NODE),
@@ -219,6 +238,28 @@ export default defineConfig({
       account: "destinationTokenRecord",
       defaultValue: tokenRecordPdaOf("mint", "destination"),
     },
+
+    // Legacy collection verification: derive the collection's Metadata and
+    // master edition accounts from the required `collectionMint`.
+    ...COLLECTION_VERIFY_INSTRUCTIONS.flatMap((instruction) => [
+      {
+        instruction,
+        account: "collection",
+        defaultValue: metadataPdaOf("collectionMint"),
+      },
+      {
+        instruction,
+        account: "collectionMasterEditionAccount",
+        defaultValue: masterEditionPdaOf("collectionMint"),
+      },
+    ]),
+
+    // `collectionMetadata` = Metadata PDA of the required `collectionMint`.
+    ...COLLECTION_METADATA_INSTRUCTIONS.map((instruction) => ({
+      instruction,
+      account: "collectionMetadata",
+      defaultValue: metadataPdaOf("collectionMint"),
+    })),
   ],
   visitors: [
     updateAccountsVisitor({

@@ -36,8 +36,7 @@ import {
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
-import type { MetadataSeeds } from "../pdas/index.js";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMetadataPda, type MetadataSeeds } from "../pdas/index.js";
 import {
   getCollectionDecoder,
   getCollectionDetailsDecoder,
