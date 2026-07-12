@@ -1,5 +1,26 @@
 # @macalinao/token-metadata-client
 
+## 0.6.0
+
+### Minor Changes
+
+- b3eed1a: Derive Metaplex Token Metadata PDAs and associated token accounts as
+  instruction account defaults. The master edition (`edition`/`masterEdition`),
+  token record (`tokenRecord`/`ownerTokenRecord`/`destinationTokenRecord`), and
+  transfer ATAs are now resolved automatically from the `mint` (and `token`)
+  accounts across the Digital Asset instructions (`create`, `mint`, `transfer`,
+  `delegate`, `revoke`, `lock`, `unlock`, `update`, `use`, `migrate`, `resize`,
+  `burn`) and the dedicated master-edition instructions, so callers no longer
+  need to compute them by hand.
+- 9b54a1e: Derive collection PDAs as instruction account defaults for the collection
+  verification instructions. The collection Metadata (`collection`) and master
+  edition (`collectionMasterEditionAccount`) accounts are now resolved
+  automatically from the required `collectionMint` across `verifyCollection`,
+  `unverifyCollection`, `setAndVerifyCollection`, `verifySizedCollectionItem`,
+  `unverifySizedCollectionItem`, and `setAndVerifySizedCollectionItem`, and the
+  `collectionMetadata` account is resolved for `setCollectionSize` and
+  `bubblegumSetCollectionSize`.
+
 ## 0.5.1
 
 ### Patch Changes
