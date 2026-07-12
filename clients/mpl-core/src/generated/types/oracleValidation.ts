@@ -6,17 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type {
-  ExternalValidationResult,
-  ExternalValidationResultArgs,
-} from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -25,12 +14,24 @@ import {
   getStructEncoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 import {
   getExternalValidationResultDecoder,
   getExternalValidationResultEncoder,
+  type ExternalValidationResult,
+  type ExternalValidationResultArgs,
 } from "./index.js";
 
+/**
+ * The result stored in an oracle account: `Uninitialized`, or
+ * `V1` with a separate `ExternalValidationResult` per lifecycle
+ * event.
+ */
 export type OracleValidation =
   | { __kind: "Uninitialized" }
   | {

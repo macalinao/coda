@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -28,8 +15,21 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const COLLECT_DISCRIMINATOR = 19;
@@ -57,9 +57,7 @@ export type CollectInstruction<
     ]
   >;
 
-export interface CollectInstructionData {
-  discriminator: number;
-}
+export type CollectInstructionData = { discriminator: number };
 
 export type CollectInstructionDataArgs = {};
 
@@ -84,16 +82,23 @@ export function getCollectInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CollectInput<
+export type CollectInput<
   TAccountRecipient1 extends string = string,
   TAccountRecipient2 extends string = string,
-> {
+> = {
   /** The address of the recipient 1 */
   recipient1: Address<TAccountRecipient1>;
   /** The address of the recipient 2 */
   recipient2: Address<TAccountRecipient2>;
-}
+};
 
+/**
+ * Sweeps SOL protocol fees accumulated by the program (e.g. from
+ * `CreateV1`) out to two fixed recipient accounts.
+ *
+ * A permissionless maintenance instruction — no signer is
+ * required.
+ */
 export function getCollectInstruction<
   TAccountRecipient1 extends string,
   TAccountRecipient2 extends string,
@@ -131,10 +136,10 @@ export function getCollectInstruction<
   >);
 }
 
-export interface ParsedCollectInstruction<
+export type ParsedCollectInstruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the recipient 1 */
@@ -143,7 +148,7 @@ export interface ParsedCollectInstruction<
     recipient2: TAccountMetas[1];
   };
   data: CollectInstructionData;
-}
+};
 
 export function parseCollectInstruction<
   TProgram extends string,

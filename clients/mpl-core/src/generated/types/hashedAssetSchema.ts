@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -15,12 +14,24 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface HashedAssetSchema {
-  assetHash: number[];
-  pluginHashes: number[][];
-}
+/**
+ * The schema hashed to produce a `HashedAssetV1`'s commitment:
+ * the asset's core data hash plus a hash per plugin.
+ */
+export type HashedAssetSchema = {
+  /**
+   * The hash of the asset's core data (owner, update authority,
+   * name, URI, sequence number).
+   */
+  assetHash: Array<number>;
+  /** The hash of each plugin attached to the asset, in registry order. */
+  pluginHashes: Array<Array<number>>;
+};
 
 export type HashedAssetSchemaArgs = HashedAssetSchema;
 

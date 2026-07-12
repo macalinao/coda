@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { AddPluginV1Args, AddPluginV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAddPluginV1ArgsDecoder,
   getAddPluginV1ArgsEncoder,
+  type AddPluginV1Args,
+  type AddPluginV1ArgsArgs,
 } from "../types/index.js";
 
 export const ADD_PLUGIN_V1_DISCRIMINATOR = 2;
@@ -86,14 +87,22 @@ export type AddPluginV1Instruction<
     ]
   >;
 
-export interface AddPluginV1InstructionData {
+export type AddPluginV1InstructionData = {
   discriminator: number;
+  /**
+   * The plugin to add, and the authority to assign it if not
+   * the default.
+   */
   addPluginV1Args: AddPluginV1Args;
-}
+};
 
-export interface AddPluginV1InstructionDataArgs {
+export type AddPluginV1InstructionDataArgs = {
+  /**
+   * The plugin to add, and the authority to assign it if not
+   * the default.
+   */
   addPluginV1Args: AddPluginV1ArgsArgs;
-}
+};
 
 export function getAddPluginV1InstructionDataEncoder(): Encoder<AddPluginV1InstructionDataArgs> {
   return transformEncoder(
@@ -122,14 +131,14 @@ export function getAddPluginV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface AddPluginV1Input<
+export type AddPluginV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -143,8 +152,15 @@ export interface AddPluginV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   addPluginV1Args: AddPluginV1InstructionDataArgs["addPluginV1Args"];
-}
+};
 
+/**
+ * Adds a new plugin to an asset.
+ *
+ * Fails if the asset already has a plugin of the same
+ * `PluginType`, or if the asset (or its collection) has an
+ * `AddBlocker` plugin active and the caller can't bypass it.
+ */
 export function getAddPluginV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -224,10 +240,10 @@ export function getAddPluginV1Instruction<
   >);
 }
 
-export interface ParsedAddPluginV1Instruction<
+export type ParsedAddPluginV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -244,7 +260,7 @@ export interface ParsedAddPluginV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: AddPluginV1InstructionData;
-}
+};
 
 export function parseAddPluginV1Instruction<
   TProgram extends string,

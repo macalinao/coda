@@ -6,20 +6,21 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getU64Encoder,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface AssetIdSeeds {
+export type AssetIdSeeds = {
   /** The address of the merkle tree account */
   merkleTree: Address;
   /** The nonce (leaf index) of the leaf */
   nonce: number | bigint;
-}
+};
 
 /** Deterministic asset id for a compressed NFT leaf */
 export async function findAssetIdPda(

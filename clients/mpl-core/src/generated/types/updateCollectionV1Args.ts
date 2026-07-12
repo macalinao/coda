@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -25,17 +18,27 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 
-export interface UpdateCollectionV1Args {
+/** Arguments for `updateCollectionV1`. */
+export type UpdateCollectionV1Args = {
+  /** The collection's new display name, if changing. */
   newName: Option<string>;
+  /** The collection's new metadata URI, if changing. */
   newUri: Option<string>;
-}
+};
 
-export interface UpdateCollectionV1ArgsArgs {
+export type UpdateCollectionV1ArgsArgs = {
+  /** The collection's new display name, if changing. */
   newName: OptionOrNullable<string>;
+  /** The collection's new metadata URI, if changing. */
   newUri: OptionOrNullable<string>;
-}
+};
 
 export function getUpdateCollectionV1ArgsEncoder(): Encoder<UpdateCollectionV1ArgsArgs> {
   return getStructEncoder([

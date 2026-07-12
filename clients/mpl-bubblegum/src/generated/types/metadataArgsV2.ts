@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Creator,
-  CreatorArgs,
-  TokenStandard,
-  TokenStandardArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -40,15 +26,32 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getCreatorDecoder,
   getCreatorEncoder,
   getTokenStandardDecoder,
   getTokenStandardEncoder,
+  type Creator,
+  type CreatorArgs,
+  type TokenStandard,
+  type TokenStandardArgs,
 } from "./index.js";
 
-export interface MetadataArgsV2 {
+/**
+ * Metadata for a `LeafSchema` V2 compressed NFT leaf.
+ *
+ * Streamlined relative to `MetadataArgs`: it drops `editionNonce` and
+ * `uses`, and its `collection` is a plain, always-verified `Pubkey`
+ * rather than a `Collection` struct with a separate verified flag.
+ */
+export type MetadataArgsV2 = {
   /** The name of the asset */
   name: string;
   /** The symbol for the asset */
@@ -64,12 +67,12 @@ export interface MetadataArgsV2 {
   /** Token standard.  Currently only `NonFungible` is allowed. */
   tokenStandard: Option<TokenStandard>;
   /** Creator array */
-  creators: Creator[];
+  creators: Array<Creator>;
   /** Collection.  Note in V2 its just a `Pubkey` and is always considered verified. */
   collection: Option<Address>;
-}
+};
 
-export interface MetadataArgsV2Args {
+export type MetadataArgsV2Args = {
   /** The name of the asset */
   name: string;
   /** The symbol for the asset */
@@ -85,10 +88,10 @@ export interface MetadataArgsV2Args {
   /** Token standard.  Currently only `NonFungible` is allowed. */
   tokenStandard: OptionOrNullable<TokenStandardArgs>;
   /** Creator array */
-  creators: CreatorArgs[];
+  creators: Array<CreatorArgs>;
   /** Collection.  Note in V2 its just a `Pubkey` and is always considered verified. */
   collection: OptionOrNullable<Address>;
-}
+};
 
 export function getMetadataArgsV2Encoder(): Encoder<MetadataArgsV2Args> {
   return getStructEncoder([

@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  LinkedDataKey,
-  LinkedDataKeyArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -32,14 +18,29 @@ import {
   getTupleEncoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getLinkedDataKeyDecoder,
   getLinkedDataKeyEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type LinkedDataKey,
+  type LinkedDataKeyArgs,
 } from "./index.js";
 
+/**
+ * Identifies a specific external plugin adapter instance, e.g.
+ * an `Oracle` by its account address or `AppData` by its data
+ * authority.
+ */
 export type ExternalPluginAdapterKey =
   | { __kind: "LifecycleHook"; fields: readonly [Address] }
   | { __kind: "Oracle"; fields: readonly [Address] }

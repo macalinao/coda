@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { UpdateAuthority, UpdateAuthorityArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -26,23 +18,37 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getUpdateAuthorityDecoder,
   getUpdateAuthorityEncoder,
+  type UpdateAuthority,
+  type UpdateAuthorityArgs,
 } from "./index.js";
 
-export interface UpdateV1Args {
+/** Arguments for `updateV1`. */
+export type UpdateV1Args = {
+  /** The asset's new display name, if changing. */
   newName: Option<string>;
+  /** The asset's new metadata URI, if changing. */
   newUri: Option<string>;
+  /** The asset's new update authority, if changing. */
   newUpdateAuthority: Option<UpdateAuthority>;
-}
+};
 
-export interface UpdateV1ArgsArgs {
+export type UpdateV1ArgsArgs = {
+  /** The asset's new display name, if changing. */
   newName: OptionOrNullable<string>;
+  /** The asset's new metadata URI, if changing. */
   newUri: OptionOrNullable<string>;
+  /** The asset's new update authority, if changing. */
   newUpdateAuthority: OptionOrNullable<UpdateAuthorityArgs>;
-}
+};
 
 export function getUpdateV1ArgsEncoder(): Encoder<UpdateV1ArgsArgs> {
   return getStructEncoder([

@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -17,11 +16,19 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface AgentIdentity {
+/**
+ * External plugin adapter that attaches an off-chain agent
+ * identity descriptor to the asset.
+ */
+export type AgentIdentity = {
+  /** The URI pointing to the agent's off-chain identity metadata. */
   uri: string;
-}
+};
 
 export type AgentIdentityArgs = AgentIdentity;
 

@@ -6,33 +6,48 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { Authority, AuthorityArgs, Plugin, PluginArgs } from "./index.js";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getPluginDecoder,
   getPluginEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type Plugin,
+  type PluginArgs,
 } from "./index.js";
 
-export interface HashablePluginSchema {
+/**
+ * A plugin's index, authority and data as included in a
+ * `HashedAssetSchema` hash.
+ */
+export type HashablePluginSchema = {
+  /** The plugin's position within the plugin registry at the time it was hashed. */
   index: bigint;
+  /** The plugin's authority at the time it was hashed. */
   authority: Authority;
+  /** The plugin variant and configuration at the time it was hashed. */
   plugin: Plugin;
-}
+};
 
-export interface HashablePluginSchemaArgs {
+export type HashablePluginSchemaArgs = {
+  /** The plugin's position within the plugin registry at the time it was hashed. */
   index: number | bigint;
+  /** The plugin's authority at the time it was hashed. */
   authority: AuthorityArgs;
+  /** The plugin variant and configuration at the time it was hashed. */
   plugin: PluginArgs;
-}
+};
 
 export function getHashablePluginSchemaEncoder(): Encoder<HashablePluginSchemaArgs> {
   return getStructEncoder([

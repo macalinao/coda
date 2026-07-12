@@ -6,13 +6,16 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 
+/** Arguments for `closeGroupV1`; currently carries no data. */
 export type CloseGroupV1Args = {};
 
 export type CloseGroupV1ArgsArgs = CloseGroupV1Args;

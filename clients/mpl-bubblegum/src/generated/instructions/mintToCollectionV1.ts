@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { MetadataArgs, MetadataArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -36,10 +18,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findBubblegumSignerPda,
@@ -51,6 +48,8 @@ import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
+  type MetadataArgs,
+  type MetadataArgsArgs,
 } from "../types/index.js";
 
 export const MINT_TO_COLLECTION_V1_DISCRIMINATOR: ReadonlyUint8Array =
@@ -145,14 +144,22 @@ export type MintToCollectionV1Instruction<
     ]
   >;
 
-export interface MintToCollectionV1InstructionData {
+export type MintToCollectionV1InstructionData = {
   discriminator: ReadonlyUint8Array;
+  /**
+   * Metadata for the newly minted compressed NFT, which will be added to
+   * the collection identified by `collectionMint`.
+   */
   metadataArgs: MetadataArgs;
-}
+};
 
-export interface MintToCollectionV1InstructionDataArgs {
+export type MintToCollectionV1InstructionDataArgs = {
+  /**
+   * Metadata for the newly minted compressed NFT, which will be added to
+   * the collection identified by `collectionMint`.
+   */
   metadataArgs: MetadataArgsArgs;
-}
+};
 
 export function getMintToCollectionV1InstructionDataEncoder(): Encoder<MintToCollectionV1InstructionDataArgs> {
   return transformEncoder(
@@ -184,7 +191,7 @@ export function getMintToCollectionV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface MintToCollectionV1AsyncInput<
+export type MintToCollectionV1AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -201,30 +208,80 @@ export interface MintToCollectionV1AsyncInput<
   TAccountCompressionProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * Delegate authority of the tree, authorized to mint into and manage
+   * the tree on the creator's behalf.
+   */
   treeDelegate: TransactionSigner<TAccountTreeDelegate>;
+  /**
+   * Authority of the collection the asset is being added to or removed
+   * from (typically the collection's update authority or a delegate).
+   */
   collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
   /**
-   * If there is no collecton authority record PDA then
-   * this must be the Bubblegum program address.
+   * If there is no collection authority record PDA, pass the Bubblegum
+   * program address instead.
    */
   collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
+  /** Mint account of the Token Metadata collection NFT. */
   collectionMint: Address<TAccountCollectionMint>;
+  /** Metadata account of the Token Metadata collection NFT. */
   collectionMetadata?: Address<TAccountCollectionMetadata>;
+  /** Master edition account of the Token Metadata collection NFT. */
   editionAccount?: Address<TAccountEditionAccount>;
+  /**
+   * PDA Bubblegum uses to sign the CPI into the Token Metadata program
+   * that (un)verifies the collection.
+   */
   bubblegumSigner?: Address<TAccountBubblegumSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   metadataArgs: MintToCollectionV1InstructionDataArgs["metadataArgs"];
-}
+};
 
+/**
+ * Mints a new compressed NFT (V1) leaf and adds it to a verified Token
+ * Metadata collection in the same instruction.
+ *
+ * Behaves like `mintV1`, but also CPIs into the Token Metadata program
+ * (via the `bubblegumSigner` PDA) to mark the collection as verified on
+ * the resulting leaf's metadata.
+ */
 export async function getMintToCollectionV1InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -431,7 +488,7 @@ export async function getMintToCollectionV1InstructionAsync<
   >);
 }
 
-export interface MintToCollectionV1Input<
+export type MintToCollectionV1Input<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -448,30 +505,80 @@ export interface MintToCollectionV1Input<
   TAccountCompressionProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * Delegate authority of the tree, authorized to mint into and manage
+   * the tree on the creator's behalf.
+   */
   treeDelegate: TransactionSigner<TAccountTreeDelegate>;
+  /**
+   * Authority of the collection the asset is being added to or removed
+   * from (typically the collection's update authority or a delegate).
+   */
   collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
   /**
-   * If there is no collecton authority record PDA then
-   * this must be the Bubblegum program address.
+   * If there is no collection authority record PDA, pass the Bubblegum
+   * program address instead.
    */
   collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
+  /** Mint account of the Token Metadata collection NFT. */
   collectionMint: Address<TAccountCollectionMint>;
+  /** Metadata account of the Token Metadata collection NFT. */
   collectionMetadata: Address<TAccountCollectionMetadata>;
+  /** Master edition account of the Token Metadata collection NFT. */
   editionAccount: Address<TAccountEditionAccount>;
+  /**
+   * PDA Bubblegum uses to sign the CPI into the Token Metadata program
+   * that (un)verifies the collection.
+   */
   bubblegumSigner: Address<TAccountBubblegumSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   metadataArgs: MintToCollectionV1InstructionDataArgs["metadataArgs"];
-}
+};
 
+/**
+ * Mints a new compressed NFT (V1) leaf and adds it to a verified Token
+ * Metadata collection in the same instruction.
+ *
+ * Behaves like `mintV1`, but also CPIs into the Token Metadata program
+ * (via the `bubblegumSigner` PDA) to mark the collection as verified on
+ * the resulting leaf's metadata.
+ */
 export function getMintToCollectionV1Instruction<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -647,35 +754,77 @@ export function getMintToCollectionV1Instruction<
   >);
 }
 
-export interface ParsedMintToCollectionV1Instruction<
+export type ParsedMintToCollectionV1Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[2];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[3];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[4];
+    /**
+     * Delegate authority of the tree, authorized to mint into and manage
+     * the tree on the creator's behalf.
+     */
     treeDelegate: TAccountMetas[5];
+    /**
+     * Authority of the collection the asset is being added to or removed
+     * from (typically the collection's update authority or a delegate).
+     */
     collectionAuthority: TAccountMetas[6];
     /**
-     * If there is no collecton authority record PDA then
-     * this must be the Bubblegum program address.
+     * If there is no collection authority record PDA, pass the Bubblegum
+     * program address instead.
      */
     collectionAuthorityRecordPda: TAccountMetas[7];
+    /** Mint account of the Token Metadata collection NFT. */
     collectionMint: TAccountMetas[8];
+    /** Metadata account of the Token Metadata collection NFT. */
     collectionMetadata: TAccountMetas[9];
+    /** Master edition account of the Token Metadata collection NFT. */
     editionAccount: TAccountMetas[10];
+    /**
+     * PDA Bubblegum uses to sign the CPI into the Token Metadata program
+     * that (un)verifies the collection.
+     */
     bubblegumSigner: TAccountMetas[11];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[12];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[13];
+    /**
+     * The Token Metadata program, invoked to read or (un)verify the
+     * legacy collection accounts.
+     */
     tokenMetadataProgram: TAccountMetas[14];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[15];
   };
   data: MintToCollectionV1InstructionData;
-}
+};
 
 export function parseMintToCollectionV1Instruction<
   TProgram extends string,

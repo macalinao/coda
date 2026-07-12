@@ -6,30 +6,49 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-  LinkedDataKey,
-  LinkedDataKeyArgs,
-} from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
 import {
   getExternalPluginAdapterSchemaDecoder,
   getExternalPluginAdapterSchemaEncoder,
   getLinkedDataKeyDecoder,
   getLinkedDataKeyEncoder,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
+  type LinkedDataKey,
+  type LinkedDataKeyArgs,
 } from "./index.js";
 
-export interface DataSection {
+/**
+ * Internal storage plugin holding the raw payload for a
+ * `LinkedAppData` or `LinkedLifecycleHook` adapter. Managed
+ * automatically; has no authority of its own.
+ */
+export type DataSection = {
+  /**
+   * The linked adapter (`LinkedAppData` or `LinkedLifecycleHook`)
+   * whose data this section stores.
+   */
   parentKey: LinkedDataKey;
+  /** The serialization format used for the stored data. */
   schema: ExternalPluginAdapterSchema;
-}
+};
 
-export interface DataSectionArgs {
+export type DataSectionArgs = {
+  /**
+   * The linked adapter (`LinkedAppData` or `LinkedLifecycleHook`)
+   * whose data this section stores.
+   */
   parentKey: LinkedDataKeyArgs;
+  /** The serialization format used for the stored data. */
   schema: ExternalPluginAdapterSchemaArgs;
-}
+};
 
 export function getDataSectionEncoder(): Encoder<DataSectionArgs> {
   return getStructEncoder([

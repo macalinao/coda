@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemoveGroupsFromGroupV1Args,
-  RemoveGroupsFromGroupV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemoveGroupsFromGroupV1ArgsDecoder,
   getRemoveGroupsFromGroupV1ArgsEncoder,
+  type RemoveGroupsFromGroupV1Args,
+  type RemoveGroupsFromGroupV1ArgsArgs,
 } from "../types/index.js";
 
 export const REMOVE_GROUPS_FROM_GROUP_V1_DISCRIMINATOR = 38;
@@ -81,14 +79,16 @@ export type RemoveGroupsFromGroupV1Instruction<
     ]
   >;
 
-export interface RemoveGroupsFromGroupV1InstructionData {
+export type RemoveGroupsFromGroupV1InstructionData = {
   discriminator: number;
+  /** The addresses of the child groups to remove from the parent. */
   removeGroupsFromGroupV1Args: RemoveGroupsFromGroupV1Args;
-}
+};
 
-export interface RemoveGroupsFromGroupV1InstructionDataArgs {
+export type RemoveGroupsFromGroupV1InstructionDataArgs = {
+  /** The addresses of the child groups to remove from the parent. */
   removeGroupsFromGroupV1Args: RemoveGroupsFromGroupV1ArgsArgs;
-}
+};
 
 export function getRemoveGroupsFromGroupV1InstructionDataEncoder(): Encoder<RemoveGroupsFromGroupV1InstructionDataArgs> {
   return transformEncoder(
@@ -120,12 +120,12 @@ export function getRemoveGroupsFromGroupV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface RemoveGroupsFromGroupV1Input<
+export type RemoveGroupsFromGroupV1Input<
   TAccountParentGroup extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The address of the parent group to modify */
   parentGroup: Address<TAccountParentGroup>;
   /** The account paying for storage fees */
@@ -135,8 +135,11 @@ export interface RemoveGroupsFromGroupV1Input<
   /** The system program */
   systemProgram?: Address<TAccountSystemProgram>;
   removeGroupsFromGroupV1Args: RemoveGroupsFromGroupV1InstructionDataArgs["removeGroupsFromGroupV1Args"];
-}
+};
 
+/**
+ * Removes one or more child groups from a parent group.
+ */
 export function getRemoveGroupsFromGroupV1Instruction<
   TAccountParentGroup extends string,
   TAccountPayer extends string,
@@ -204,10 +207,10 @@ export function getRemoveGroupsFromGroupV1Instruction<
   >);
 }
 
-export interface ParsedRemoveGroupsFromGroupV1Instruction<
+export type ParsedRemoveGroupsFromGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the parent group to modify */
@@ -220,7 +223,7 @@ export interface ParsedRemoveGroupsFromGroupV1Instruction<
     systemProgram: TAccountMetas[3];
   };
   data: RemoveGroupsFromGroupV1InstructionData;
-}
+};
 
 export function parseRemoveGroupsFromGroupV1Instruction<
   TProgram extends string,

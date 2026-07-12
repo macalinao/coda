@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-  ExtraAccount,
-  ExtraAccountArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -32,6 +16,12 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
@@ -40,21 +30,39 @@ import {
   getExternalPluginAdapterSchemaEncoder,
   getExtraAccountDecoder,
   getExtraAccountEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
+  type ExtraAccount,
+  type ExtraAccountArgs,
 } from "./index.js";
 
-export interface LinkedLifecycleHook {
+/**
+ * External plugin adapter like `LifecycleHook`, but for
+ * collections, sharing its data via a `DataSection`.
+ */
+export type LinkedLifecycleHook = {
+  /** The program invoked via CPI at the configured lifecycle events. */
   hookedProgram: Address;
-  extraAccounts: Option<ExtraAccount[]>;
+  /** Additional accounts to forward to the hooked program. */
+  extraAccounts: Option<Array<ExtraAccount>>;
+  /** The authority allowed to write data returned by the hook, if any. */
   dataAuthority: Option<Authority>;
+  /** The serialization format used for data returned by the hook. */
   schema: ExternalPluginAdapterSchema;
-}
+};
 
-export interface LinkedLifecycleHookArgs {
+export type LinkedLifecycleHookArgs = {
+  /** The program invoked via CPI at the configured lifecycle events. */
   hookedProgram: Address;
-  extraAccounts: OptionOrNullable<ExtraAccountArgs[]>;
+  /** Additional accounts to forward to the hooked program. */
+  extraAccounts: OptionOrNullable<Array<ExtraAccountArgs>>;
+  /** The authority allowed to write data returned by the hook, if any. */
   dataAuthority: OptionOrNullable<AuthorityArgs>;
+  /** The serialization format used for data returned by the hook. */
   schema: ExternalPluginAdapterSchemaArgs;
-}
+};
 
 export function getLinkedLifecycleHookEncoder(): Encoder<LinkedLifecycleHookArgs> {
   return getStructEncoder([

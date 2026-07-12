@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -30,19 +16,31 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -97,22 +95,64 @@ export type BurnInstruction<
     ]
   >;
 
-export interface BurnInstructionData {
+export type BurnInstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
-}
+};
 
-export interface BurnInstructionDataArgs {
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
+export type BurnInstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
-}
+};
 
 export function getBurnInstructionDataEncoder(): FixedSizeEncoder<BurnInstructionDataArgs> {
   return transformEncoder(
@@ -149,7 +189,7 @@ export function getBurnInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface BurnAsyncInput<
+export type BurnAsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -157,21 +197,51 @@ export interface BurnAsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: BurnInstructionDataArgs["root"];
   dataHash: BurnInstructionDataArgs["dataHash"];
   creatorHash: BurnInstructionDataArgs["creatorHash"];
   nonce: BurnInstructionDataArgs["nonce"];
   index: BurnInstructionDataArgs["index"];
-}
+};
 
+/**
+ * Burns a compressed NFT leaf, permanently removing it from the tree.
+ *
+ * The caller must be the leaf owner or delegate. The leaf's current state
+ * (root, dataHash, creatorHash, nonce, index) plus a Merkle proof passed
+ * as remaining accounts are required to prove the leaf exists before it
+ * is replaced with an empty node.
+ */
 export async function getBurnInstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -277,7 +347,7 @@ export async function getBurnInstructionAsync<
   >);
 }
 
-export interface BurnInput<
+export type BurnInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -285,21 +355,51 @@ export interface BurnInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: BurnInstructionDataArgs["root"];
   dataHash: BurnInstructionDataArgs["dataHash"];
   creatorHash: BurnInstructionDataArgs["creatorHash"];
   nonce: BurnInstructionDataArgs["nonce"];
   index: BurnInstructionDataArgs["index"];
-}
+};
 
+/**
+ * Burns a compressed NFT leaf, permanently removing it from the tree.
+ *
+ * The caller must be the leaf owner or delegate. The leaf's current state
+ * (root, dataHash, creatorHash, nonce, index) plus a Merkle proof passed
+ * as remaining accounts are required to prove the leaf exists before it
+ * is replaced with an empty node.
+ */
 export function getBurnInstruction<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -395,22 +495,44 @@ export function getBurnInstruction<
   >);
 }
 
-export interface ParsedBurnInstruction<
+export type ParsedBurnInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[2];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[3];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[4];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[5];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[6];
   };
   data: BurnInstructionData;
-}
+};
 
 export function parseBurnInstruction<
   TProgram extends string,

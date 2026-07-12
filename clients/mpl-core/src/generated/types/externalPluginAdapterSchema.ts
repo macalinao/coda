@@ -6,17 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * The serialization format used for an external plugin
+ * adapter's stored data: `Binary`, `Json` or `MsgPack`.
+ */
 export enum ExternalPluginAdapterSchema {
-  Binary = 0,
-  Json = 1,
-  MsgPack = 2,
+  Binary,
+  Json,
+  MsgPack,
 }
 
 export type ExternalPluginAdapterSchemaArgs = ExternalPluginAdapterSchema;

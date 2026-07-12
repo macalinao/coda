@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  DataState,
-  DataStateArgs,
-  PluginAuthorityPair,
-  PluginAuthorityPairArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -33,27 +20,51 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getDataStateDecoder,
   getDataStateEncoder,
   getPluginAuthorityPairDecoder,
   getPluginAuthorityPairEncoder,
+  type DataState,
+  type DataStateArgs,
+  type PluginAuthorityPair,
+  type PluginAuthorityPairArgs,
 } from "./index.js";
 
-export interface CreateV1Args {
+/** Arguments for `createV1`. */
+export type CreateV1Args = {
+  /**
+   * Whether the asset is created directly in `AccountState`
+   * (typical) or already-compressed `LedgerState`.
+   */
   dataState: DataState;
+  /** The asset's display name. */
   name: string;
+  /** The URI pointing to the asset's off-chain JSON metadata. */
   uri: string;
-  plugins: Option<PluginAuthorityPair[]>;
-}
+  /** Plugins to attach at creation, each paired with an optional authority override. */
+  plugins: Option<Array<PluginAuthorityPair>>;
+};
 
-export interface CreateV1ArgsArgs {
+export type CreateV1ArgsArgs = {
+  /**
+   * Whether the asset is created directly in `AccountState`
+   * (typical) or already-compressed `LedgerState`.
+   */
   dataState: DataStateArgs;
+  /** The asset's display name. */
   name: string;
+  /** The URI pointing to the asset's off-chain JSON metadata. */
   uri: string;
-  plugins: OptionOrNullable<PluginAuthorityPairArgs[]>;
-}
+  /** Plugins to attach at creation, each paired with an optional authority override. */
+  plugins: OptionOrNullable<Array<PluginAuthorityPairArgs>>;
+};
 
 export function getCreateV1ArgsEncoder(): Encoder<CreateV1ArgsArgs> {
   return getStructEncoder([

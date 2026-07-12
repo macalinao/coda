@@ -6,37 +6,49 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { Authority, AuthorityArgs, Plugin, PluginArgs } from "./index.js";
 import {
   combineCodec,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getPluginDecoder,
   getPluginEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type Plugin,
+  type PluginArgs,
 } from "./index.js";
 
-export interface AddPluginV1Args {
+/** Arguments for `addPluginV1`. */
+export type AddPluginV1Args = {
+  /** The plugin variant and its configuration to add. */
   plugin: Plugin;
+  /**
+   * The authority to manage the plugin; defaults to the plugin
+   * type's standard authority if omitted.
+   */
   initAuthority: Option<Authority>;
-}
+};
 
-export interface AddPluginV1ArgsArgs {
+export type AddPluginV1ArgsArgs = {
+  /** The plugin variant and its configuration to add. */
   plugin: PluginArgs;
+  /**
+   * The authority to manage the plugin; defaults to the plugin
+   * type's standard authority if omitted.
+   */
   initAuthority: OptionOrNullable<AuthorityArgs>;
-}
+};
 
 export function getAddPluginV1ArgsEncoder(): Encoder<AddPluginV1ArgsArgs> {
   return getStructEncoder([

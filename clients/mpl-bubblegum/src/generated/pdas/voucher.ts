@@ -6,20 +6,21 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getU64Encoder,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface VoucherSeeds {
+export type VoucherSeeds = {
   /** The address of the merkle tree account */
   merkleTree: Address;
   /** The nonce (leaf index) of the redeemed leaf */
   nonce: number | bigint;
-}
+};
 
 /** Redemption voucher PDA created when a leaf is redeemed */
 export async function findVoucherPda(

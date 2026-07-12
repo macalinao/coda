@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type {
-  ExternalRegistryRecord,
-  ExternalRegistryRecordArgs,
-  Key,
-  KeyArgs,
-  RegistryRecord,
-  RegistryRecordArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,6 +17,16 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
 import {
   getExternalRegistryRecordDecoder,
@@ -45,19 +35,42 @@ import {
   getKeyEncoder,
   getRegistryRecordDecoder,
   getRegistryRecordEncoder,
+  type ExternalRegistryRecord,
+  type ExternalRegistryRecordArgs,
+  type Key,
+  type KeyArgs,
+  type RegistryRecord,
+  type RegistryRecordArgs,
 } from "../types/index.js";
 
-export interface PluginRegistryV1 {
+/**
+ * The index of every internal plugin and external plugin adapter
+ * attached to an asset or collection, stored after the
+ * `PluginHeaderV1`.
+ */
+export type PluginRegistryV1 = {
+  /** Account discriminator; always `Key.PluginRegistryV1`. */
   key: Key;
-  registry: RegistryRecord[];
-  externalRegistry: ExternalRegistryRecord[];
-}
+  /** The internal plugins attached to the asset/collection, and where each one's data lives. */
+  registry: Array<RegistryRecord>;
+  /**
+   * The external plugin adapters attached to the asset/collection,
+   * and where each one's data lives.
+   */
+  externalRegistry: Array<ExternalRegistryRecord>;
+};
 
-export interface PluginRegistryV1Args {
+export type PluginRegistryV1Args = {
+  /** Account discriminator; always `Key.PluginRegistryV1`. */
   key: KeyArgs;
-  registry: RegistryRecordArgs[];
-  externalRegistry: ExternalRegistryRecordArgs[];
-}
+  /** The internal plugins attached to the asset/collection, and where each one's data lives. */
+  registry: Array<RegistryRecordArgs>;
+  /**
+   * The external plugin adapters attached to the asset/collection,
+   * and where each one's data lives.
+   */
+  externalRegistry: Array<ExternalRegistryRecordArgs>;
+};
 
 /** Gets the encoder for {@link PluginRegistryV1Args} account data. */
 export function getPluginRegistryV1Encoder(): Encoder<PluginRegistryV1Args> {
@@ -128,7 +141,7 @@ export async function fetchMaybePluginRegistryV1<
 
 export async function fetchAllPluginRegistryV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<PluginRegistryV1>[]> {
   const maybeAccounts = await fetchAllMaybePluginRegistryV1(
@@ -142,7 +155,7 @@ export async function fetchAllPluginRegistryV1(
 
 export async function fetchAllMaybePluginRegistryV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<PluginRegistryV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { MetadataArgsV2, MetadataArgsV2Args } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,25 +18,45 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsV2Decoder,
   getMetadataArgsV2Encoder,
+  type MetadataArgsV2,
+  type MetadataArgsV2Args,
 } from "../types/index.js";
 
 export const SET_COLLECTION_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -144,24 +143,74 @@ export type SetCollectionV2Instruction<
     ]
   >;
 
-export interface SetCollectionV2InstructionData {
+export type SetCollectionV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-  assetDataHash: Option<number[]>;
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: Option<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: Option<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current `MetadataArgsV2`, verified against `dataHash`
+   * before its collection is set.
+   */
   message: MetadataArgsV2;
-}
+};
 
-export interface SetCollectionV2InstructionDataArgs {
-  root: number[];
-  assetDataHash: OptionOrNullable<number[]>;
+export type SetCollectionV2InstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: OptionOrNullable<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: OptionOrNullable<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current `MetadataArgsV2`, verified against `dataHash`
+   * before its collection is set.
+   */
   message: MetadataArgsV2Args;
-}
+};
 
 export function getSetCollectionV2InstructionDataEncoder(): Encoder<SetCollectionV2InstructionDataArgs> {
   return transformEncoder(
@@ -206,7 +255,7 @@ export function getSetCollectionV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface SetCollectionV2AsyncInput<
+export type SetCollectionV2AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
@@ -221,30 +270,57 @@ export interface SetCollectionV2AsyncInput<
   TAccountCompressionProgram extends string = string,
   TAccountMplCoreProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * If item is not in a collection, then authority must be tree owner/delegate.  If item is
-   * getting removed from a collection, then this must be an authority for the existing
-   * collection.  Defaults to `payer`
+   * If the item is not currently in a collection, must be the tree
+   * owner/delegate. If the item is being removed from a collection,
+   * must be an authority for the existing collection. Defaults to
+   * `payer`.
    */
   authority?: TransactionSigner<TAccountAuthority>;
   /**
-   * If item is getting added to a new collection, then this must be the authority
-   * for the new collection.  Defaults to `authority`
+   * If the item is being added to a new collection, must be the
+   * authority for the new collection. Defaults to `authority`.
    */
   newCollectionAuthority?: TransactionSigner<TAccountNewCollectionAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
-  /** Defaults to `leaf_owner` */
+  /** Defaults to `leafOwner`. */
   leafDelegate?: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /** MPL Core collection account the asset is being moved into. */
   newCoreCollection?: Address<TAccountNewCoreCollection>;
+  /**
+   * PDA Bubblegum uses to sign CPIs into the MPL Core program on behalf
+   * of a core collection.
+   */
   mplCoreCpiSigner?: Address<TAccountMplCoreCpiSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The MPL Core program, invoked for V2 collection CPIs. */
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: SetCollectionV2InstructionDataArgs["root"];
   assetDataHash: SetCollectionV2InstructionDataArgs["assetDataHash"];
@@ -252,8 +328,15 @@ export interface SetCollectionV2AsyncInput<
   nonce: SetCollectionV2InstructionDataArgs["nonce"];
   index: SetCollectionV2InstructionDataArgs["index"];
   message: SetCollectionV2InstructionDataArgs["message"];
-}
+};
 
+/**
+ * Sets the collection on a `LeafSchema` V2 leaf node.
+ *
+ * Unlike the V1 flow, no separate verification step is required: any
+ * collection recorded on a V2 leaf is automatically considered
+ * verified.
+ */
 export async function getSetCollectionV2InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -418,7 +501,7 @@ export async function getSetCollectionV2InstructionAsync<
   >);
 }
 
-export interface SetCollectionV2Input<
+export type SetCollectionV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
@@ -433,30 +516,57 @@ export interface SetCollectionV2Input<
   TAccountCompressionProgram extends string = string,
   TAccountMplCoreProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * If item is not in a collection, then authority must be tree owner/delegate.  If item is
-   * getting removed from a collection, then this must be an authority for the existing
-   * collection.  Defaults to `payer`
+   * If the item is not currently in a collection, must be the tree
+   * owner/delegate. If the item is being removed from a collection,
+   * must be an authority for the existing collection. Defaults to
+   * `payer`.
    */
   authority?: TransactionSigner<TAccountAuthority>;
   /**
-   * If item is getting added to a new collection, then this must be the authority
-   * for the new collection.  Defaults to `authority`
+   * If the item is being added to a new collection, must be the
+   * authority for the new collection. Defaults to `authority`.
    */
   newCollectionAuthority?: TransactionSigner<TAccountNewCollectionAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
-  /** Defaults to `leaf_owner` */
+  /** Defaults to `leafOwner`. */
   leafDelegate?: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /** MPL Core collection account the asset is being moved into. */
   newCoreCollection?: Address<TAccountNewCoreCollection>;
+  /**
+   * PDA Bubblegum uses to sign CPIs into the MPL Core program on behalf
+   * of a core collection.
+   */
   mplCoreCpiSigner?: Address<TAccountMplCoreCpiSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The MPL Core program, invoked for V2 collection CPIs. */
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: SetCollectionV2InstructionDataArgs["root"];
   assetDataHash: SetCollectionV2InstructionDataArgs["assetDataHash"];
@@ -464,8 +574,15 @@ export interface SetCollectionV2Input<
   nonce: SetCollectionV2InstructionDataArgs["nonce"];
   index: SetCollectionV2InstructionDataArgs["index"];
   message: SetCollectionV2InstructionDataArgs["message"];
-}
+};
 
+/**
+ * Sets the collection on a `LeafSchema` V2 leaf node.
+ *
+ * Unlike the V1 flow, no separate verification step is required: any
+ * collection recorded on a V2 leaf is automatically considered
+ * verified.
+ */
 export function getSetCollectionV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -620,39 +737,66 @@ export function getSetCollectionV2Instruction<
   >);
 }
 
-export interface ParsedSetCollectionV2Instruction<
+export type ParsedSetCollectionV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[1];
     /**
-     * If item is not in a collection, then authority must be tree owner/delegate.  If item is
-     * getting removed from a collection, then this must be an authority for the existing
-     * collection.  Defaults to `payer`
+     * If the item is not currently in a collection, must be the tree
+     * owner/delegate. If the item is being removed from a collection,
+     * must be an authority for the existing collection. Defaults to
+     * `payer`.
      */
     authority?: TAccountMetas[2] | undefined;
     /**
-     * If item is getting added to a new collection, then this must be the authority
-     * for the new collection.  Defaults to `authority`
+     * If the item is being added to a new collection, must be the
+     * authority for the new collection. Defaults to `authority`.
      */
     newCollectionAuthority?: TAccountMetas[3] | undefined;
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[4];
-    /** Defaults to `leaf_owner` */
+    /** Defaults to `leafOwner`. */
     leafDelegate?: TAccountMetas[5] | undefined;
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[6];
+    /** MPL Core collection account the asset belongs to (V2 collections). */
     coreCollection?: TAccountMetas[7] | undefined;
+    /** MPL Core collection account the asset is being moved into. */
     newCoreCollection?: TAccountMetas[8] | undefined;
+    /**
+     * PDA Bubblegum uses to sign CPIs into the MPL Core program on behalf
+     * of a core collection.
+     */
     mplCoreCpiSigner: TAccountMetas[9];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[10];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[11];
+    /** The MPL Core program, invoked for V2 collection CPIs. */
     mplCoreProgram: TAccountMetas[12];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[13];
   };
   data: SetCollectionV2InstructionData;
-}
+};
 
 export function parseSetCollectionV2Instruction<
   TProgram extends string,

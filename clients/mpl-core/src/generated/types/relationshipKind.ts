@@ -6,18 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * The kind of relationship a `RelationshipEntry` records:
+ * membership in a `Collection`, a `ChildGroup`, a
+ * `ParentGroup`, or an `Asset`.
+ */
 export enum RelationshipKind {
-  Collection = 0,
-  ChildGroup = 1,
-  ParentGroup = 2,
-  Asset = 3,
+  Collection,
+  ChildGroup,
+  ParentGroup,
+  Asset,
 }
 
 export type RelationshipKindArgs = RelationshipKind;

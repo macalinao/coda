@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemovePluginV1Args,
-  RemovePluginV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemovePluginV1ArgsDecoder,
   getRemovePluginV1ArgsEncoder,
+  type RemovePluginV1Args,
+  type RemovePluginV1ArgsArgs,
 } from "../types/index.js";
 
 export const REMOVE_PLUGIN_V1_DISCRIMINATOR = 4;
@@ -89,14 +87,16 @@ export type RemovePluginV1Instruction<
     ]
   >;
 
-export interface RemovePluginV1InstructionData {
+export type RemovePluginV1InstructionData = {
   discriminator: number;
+  /** The type of plugin to remove. */
   removePluginV1Args: RemovePluginV1Args;
-}
+};
 
-export interface RemovePluginV1InstructionDataArgs {
+export type RemovePluginV1InstructionDataArgs = {
+  /** The type of plugin to remove. */
   removePluginV1Args: RemovePluginV1ArgsArgs;
-}
+};
 
 export function getRemovePluginV1InstructionDataEncoder(): FixedSizeEncoder<RemovePluginV1InstructionDataArgs> {
   return transformEncoder(
@@ -125,14 +125,14 @@ export function getRemovePluginV1InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RemovePluginV1Input<
+export type RemovePluginV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -146,8 +146,12 @@ export interface RemovePluginV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   removePluginV1Args: RemovePluginV1InstructionDataArgs["removePluginV1Args"];
-}
+};
 
+/**
+ * Removes a plugin from an asset by its `PluginType`, freeing the
+ * space it occupied in the asset's account.
+ */
 export function getRemovePluginV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -227,10 +231,10 @@ export function getRemovePluginV1Instruction<
   >);
 }
 
-export interface ParsedRemovePluginV1Instruction<
+export type ParsedRemovePluginV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -247,7 +251,7 @@ export interface ParsedRemovePluginV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: RemovePluginV1InstructionData;
-}
+};
 
 export function parseRemovePluginV1Instruction<
   TProgram extends string,

@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemoveAssetsFromGroupV1Args,
-  RemoveAssetsFromGroupV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemoveAssetsFromGroupV1ArgsDecoder,
   getRemoveAssetsFromGroupV1ArgsEncoder,
+  type RemoveAssetsFromGroupV1Args,
+  type RemoveAssetsFromGroupV1ArgsArgs,
 } from "../types/index.js";
 
 export const REMOVE_ASSETS_FROM_GROUP_V1_DISCRIMINATOR = 36;
@@ -81,14 +79,16 @@ export type RemoveAssetsFromGroupV1Instruction<
     ]
   >;
 
-export interface RemoveAssetsFromGroupV1InstructionData {
+export type RemoveAssetsFromGroupV1InstructionData = {
   discriminator: number;
+  /** The addresses of the assets to remove from the group. */
   removeAssetsFromGroupV1Args: RemoveAssetsFromGroupV1Args;
-}
+};
 
-export interface RemoveAssetsFromGroupV1InstructionDataArgs {
+export type RemoveAssetsFromGroupV1InstructionDataArgs = {
+  /** The addresses of the assets to remove from the group. */
   removeAssetsFromGroupV1Args: RemoveAssetsFromGroupV1ArgsArgs;
-}
+};
 
 export function getRemoveAssetsFromGroupV1InstructionDataEncoder(): Encoder<RemoveAssetsFromGroupV1InstructionDataArgs> {
   return transformEncoder(
@@ -120,12 +120,12 @@ export function getRemoveAssetsFromGroupV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface RemoveAssetsFromGroupV1Input<
+export type RemoveAssetsFromGroupV1Input<
   TAccountGroup extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The address of the group to modify */
   group: Address<TAccountGroup>;
   /** The account paying for storage fees */
@@ -135,8 +135,11 @@ export interface RemoveAssetsFromGroupV1Input<
   /** The system program */
   systemProgram?: Address<TAccountSystemProgram>;
   removeAssetsFromGroupV1Args: RemoveAssetsFromGroupV1InstructionDataArgs["removeAssetsFromGroupV1Args"];
-}
+};
 
+/**
+ * Removes one or more assets from a group.
+ */
 export function getRemoveAssetsFromGroupV1Instruction<
   TAccountGroup extends string,
   TAccountPayer extends string,
@@ -204,10 +207,10 @@ export function getRemoveAssetsFromGroupV1Instruction<
   >);
 }
 
-export interface ParsedRemoveAssetsFromGroupV1Instruction<
+export type ParsedRemoveAssetsFromGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the group to modify */
@@ -220,7 +223,7 @@ export interface ParsedRemoveAssetsFromGroupV1Instruction<
     systemProgram: TAccountMetas[3];
   };
   data: RemoveAssetsFromGroupV1InstructionData;
-}
+};
 
 export function parseRemoveAssetsFromGroupV1Instruction<
   TProgram extends string,

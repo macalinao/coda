@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { UpdateV2Args, UpdateV2ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getUpdateV2ArgsDecoder,
   getUpdateV2ArgsEncoder,
+  type UpdateV2Args,
+  type UpdateV2ArgsArgs,
 } from "../types/index.js";
 
 export const UPDATE_V2_DISCRIMINATOR = 30;
@@ -90,14 +91,16 @@ export type UpdateV2Instruction<
     ]
   >;
 
-export interface UpdateV2InstructionData {
+export type UpdateV2InstructionData = {
   discriminator: number;
+  /** The fields to change; omitted fields are left untouched. */
   updateV2Args: UpdateV2Args;
-}
+};
 
-export interface UpdateV2InstructionDataArgs {
+export type UpdateV2InstructionDataArgs = {
+  /** The fields to change; omitted fields are left untouched. */
   updateV2Args: UpdateV2ArgsArgs;
-}
+};
 
 export function getUpdateV2InstructionDataEncoder(): Encoder<UpdateV2InstructionDataArgs> {
   return transformEncoder(
@@ -126,7 +129,7 @@ export function getUpdateV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateV2Input<
+export type UpdateV2Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
@@ -134,7 +137,7 @@ export interface UpdateV2Input<
   TAccountNewCollection extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -150,8 +153,14 @@ export interface UpdateV2Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   updateV2Args: UpdateV2InstructionDataArgs["updateV2Args"];
-}
+};
 
+/**
+ * Updates an asset's name, URI and/or update authority, like
+ * `UpdateV1`, and additionally allows moving the asset into a
+ * different collection (or out of its collection) via
+ * `newCollection`.
+ */
 export function getUpdateV2Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -237,10 +246,10 @@ export function getUpdateV2Instruction<
   >);
 }
 
-export interface ParsedUpdateV2Instruction<
+export type ParsedUpdateV2Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -259,7 +268,7 @@ export interface ParsedUpdateV2Instruction<
     logWrapper?: TAccountMetas[6] | undefined;
   };
   data: UpdateV2InstructionData;
-}
+};
 
 export function parseUpdateV2Instruction<
   TProgram extends string,

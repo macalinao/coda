@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { CreateV1Args, CreateV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCreateV1ArgsDecoder,
   getCreateV1ArgsEncoder,
+  type CreateV1Args,
+  type CreateV1ArgsArgs,
 } from "../types/index.js";
 
 export const CREATE_V1_DISCRIMINATOR = 0;
@@ -95,14 +96,16 @@ export type CreateV1Instruction<
     ]
   >;
 
-export interface CreateV1InstructionData {
+export type CreateV1InstructionData = {
   discriminator: number;
+  /** The asset's initial data state, name, URI and plugins. */
   createV1Args: CreateV1Args;
-}
+};
 
-export interface CreateV1InstructionDataArgs {
+export type CreateV1InstructionDataArgs = {
+  /** The asset's initial data state, name, URI and plugins. */
   createV1Args: CreateV1ArgsArgs;
-}
+};
 
 export function getCreateV1InstructionDataEncoder(): Encoder<CreateV1InstructionDataArgs> {
   return transformEncoder(
@@ -131,7 +134,7 @@ export function getCreateV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateV1Input<
+export type CreateV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountAuthority extends string = string,
@@ -140,7 +143,7 @@ export interface CreateV1Input<
   TAccountUpdateAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the new asset */
   asset: TransactionSigner<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -158,8 +161,17 @@ export interface CreateV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   createV1Args: CreateV1InstructionDataArgs["createV1Args"];
-}
+};
 
+/**
+ * Creates a new Core asset — a single Solana account holding an
+ * NFT's owner, update authority, name, URI and plugins, with no
+ * separate mint, token account or metadata account.
+ *
+ * The asset account is a freshly generated keypair (not a PDA). If
+ * `collection` is provided, the asset is minted into that
+ * collection and inherits its collection-level plugins.
+ */
 export function getCreateV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -254,10 +266,10 @@ export function getCreateV1Instruction<
   >);
 }
 
-export interface ParsedCreateV1Instruction<
+export type ParsedCreateV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the new asset */
@@ -278,7 +290,7 @@ export interface ParsedCreateV1Instruction<
     logWrapper?: TAccountMetas[7] | undefined;
   };
   data: CreateV1InstructionData;
-}
+};
 
 export function parseCreateV1Instruction<
   TProgram extends string,

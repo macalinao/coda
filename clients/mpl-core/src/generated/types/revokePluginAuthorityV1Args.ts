@@ -6,22 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import type { PluginType, PluginTypeArgs } from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
-import { getPluginTypeDecoder, getPluginTypeEncoder } from "./index.js";
+import {
+  getPluginTypeDecoder,
+  getPluginTypeEncoder,
+  type PluginType,
+  type PluginTypeArgs,
+} from "./index.js";
 
-export interface RevokePluginAuthorityV1Args {
+/** Arguments for `revokePluginAuthorityV1`. */
+export type RevokePluginAuthorityV1Args = {
+  /**
+   * The type of plugin whose authority should be reset to its
+   * default.
+   */
   pluginType: PluginType;
-}
+};
 
-export interface RevokePluginAuthorityV1ArgsArgs {
+export type RevokePluginAuthorityV1ArgsArgs = {
+  /**
+   * The type of plugin whose authority should be reset to its
+   * default.
+   */
   pluginType: PluginTypeArgs;
-}
+};
 
 export function getRevokePluginAuthorityV1ArgsEncoder(): FixedSizeEncoder<RevokePluginAuthorityV1ArgsArgs> {
   return getStructEncoder([["pluginType", getPluginTypeEncoder()]]);

@@ -6,30 +6,42 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getExternalPluginAdapterSchemaDecoder,
   getExternalPluginAdapterSchemaEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
 } from "./index.js";
 
-export interface AppData {
+/**
+ * External plugin adapter storing arbitrary application data,
+ * writable only by its `dataAuthority`.
+ */
+export type AppData = {
+  /** The authority allowed to write this adapter's data. */
   dataAuthority: Authority;
+  /** The serialization format used for this adapter's stored data. */
   schema: ExternalPluginAdapterSchema;
-}
+};
 
-export interface AppDataArgs {
+export type AppDataArgs = {
+  /** The authority allowed to write this adapter's data. */
   dataAuthority: AuthorityArgs;
+  /** The serialization format used for this adapter's stored data. */
   schema: ExternalPluginAdapterSchemaArgs;
-}
+};
 
 export function getAppDataEncoder(): Encoder<AppDataArgs> {
   return getStructEncoder([

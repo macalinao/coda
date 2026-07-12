@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RevokeCollectionPluginAuthorityV1Args,
-  RevokeCollectionPluginAuthorityV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRevokeCollectionPluginAuthorityV1ArgsDecoder,
   getRevokeCollectionPluginAuthorityV1ArgsEncoder,
+  type RevokeCollectionPluginAuthorityV1Args,
+  type RevokeCollectionPluginAuthorityV1ArgsArgs,
 } from "../types/index.js";
 
 export const REVOKE_COLLECTION_PLUGIN_AUTHORITY_V1_DISCRIMINATOR = 11;
@@ -87,14 +85,16 @@ export type RevokeCollectionPluginAuthorityV1Instruction<
     ]
   >;
 
-export interface RevokeCollectionPluginAuthorityV1InstructionData {
+export type RevokeCollectionPluginAuthorityV1InstructionData = {
   discriminator: number;
+  /** The type of plugin whose authority should be revoked. */
   revokeCollectionPluginAuthorityV1Args: RevokeCollectionPluginAuthorityV1Args;
-}
+};
 
-export interface RevokeCollectionPluginAuthorityV1InstructionDataArgs {
+export type RevokeCollectionPluginAuthorityV1InstructionDataArgs = {
+  /** The type of plugin whose authority should be revoked. */
   revokeCollectionPluginAuthorityV1Args: RevokeCollectionPluginAuthorityV1ArgsArgs;
-}
+};
 
 export function getRevokeCollectionPluginAuthorityV1InstructionDataEncoder(): FixedSizeEncoder<RevokeCollectionPluginAuthorityV1InstructionDataArgs> {
   return transformEncoder(
@@ -132,13 +132,13 @@ export function getRevokeCollectionPluginAuthorityV1InstructionDataCodec(): Fixe
   );
 }
 
-export interface RevokeCollectionPluginAuthorityV1Input<
+export type RevokeCollectionPluginAuthorityV1Input<
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   collection: Address<TAccountCollection>;
   /** The account paying for the storage fees */
@@ -150,8 +150,11 @@ export interface RevokeCollectionPluginAuthorityV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   revokeCollectionPluginAuthorityV1Args: RevokeCollectionPluginAuthorityV1InstructionDataArgs["revokeCollectionPluginAuthorityV1Args"];
-}
+};
 
+/**
+ * Resets a plugin on a collection back to its default authority.
+ */
 export function getRevokeCollectionPluginAuthorityV1Instruction<
   TAccountCollection extends string,
   TAccountPayer extends string,
@@ -225,10 +228,10 @@ export function getRevokeCollectionPluginAuthorityV1Instruction<
   >);
 }
 
-export interface ParsedRevokeCollectionPluginAuthorityV1Instruction<
+export type ParsedRevokeCollectionPluginAuthorityV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -243,7 +246,7 @@ export interface ParsedRevokeCollectionPluginAuthorityV1Instruction<
     logWrapper?: TAccountMetas[4] | undefined;
   };
   data: RevokeCollectionPluginAuthorityV1InstructionData;
-}
+};
 
 export function parseRevokeCollectionPluginAuthorityV1Instruction<
   TProgram extends string,

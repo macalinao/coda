@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,19 +18,37 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -115,28 +113,94 @@ export type DelegateV2Instruction<
     ]
   >;
 
-export interface DelegateV2InstructionData {
+export type DelegateV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
-  collectionHash: Option<number[]>;
-  assetDataHash: Option<number[]>;
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Expected current `collectionHash` of the `LeafSchema` V2 leaf, if
+   * any, verified before this instruction updates the leaf.
+   */
+  collectionHash: Option<Array<number>>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: Option<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: Option<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
-}
+};
 
-export interface DelegateV2InstructionDataArgs {
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
-  collectionHash: OptionOrNullable<number[]>;
-  assetDataHash: OptionOrNullable<number[]>;
+export type DelegateV2InstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Expected current `collectionHash` of the `LeafSchema` V2 leaf, if
+   * any, verified before this instruction updates the leaf.
+   */
+  collectionHash: OptionOrNullable<Array<number>>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: OptionOrNullable<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: OptionOrNullable<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
-}
+};
 
 export function getDelegateV2InstructionDataEncoder(): Encoder<DelegateV2InstructionDataArgs> {
   return transformEncoder(
@@ -191,7 +255,7 @@ export function getDelegateV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface DelegateV2AsyncInput<
+export type DelegateV2AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountLeafOwner extends string = string,
@@ -201,17 +265,39 @@ export interface DelegateV2AsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
-  /** Optional leaf owner, defaults to `payer` */
+  /** Optional leaf owner, defaults to `payer`. */
   leafOwner?: TransactionSigner<TAccountLeafOwner>;
-  /** Defaults to `leaf_owner` */
+  /** Defaults to `leafOwner`. */
   previousLeafDelegate?: Address<TAccountPreviousLeafDelegate>;
+  /**
+   * Delegate to set on the leaf; pass the leaf owner to clear an
+   * existing delegate.
+   */
   newLeafDelegate: Address<TAccountNewLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: DelegateV2InstructionDataArgs["root"];
   dataHash: DelegateV2InstructionDataArgs["dataHash"];
@@ -221,8 +307,12 @@ export interface DelegateV2AsyncInput<
   flags: DelegateV2InstructionDataArgs["flags"];
   nonce: DelegateV2InstructionDataArgs["nonce"];
   index: DelegateV2InstructionDataArgs["index"];
-}
+};
 
+/**
+ * Sets (or clears) the delegate authority for a `LeafSchema` V2 leaf
+ * node.
+ */
 export async function getDelegateV2InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -346,7 +436,7 @@ export async function getDelegateV2InstructionAsync<
   >);
 }
 
-export interface DelegateV2Input<
+export type DelegateV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountLeafOwner extends string = string,
@@ -356,17 +446,39 @@ export interface DelegateV2Input<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
-  /** Optional leaf owner, defaults to `payer` */
+  /** Optional leaf owner, defaults to `payer`. */
   leafOwner?: TransactionSigner<TAccountLeafOwner>;
-  /** Defaults to `leaf_owner` */
+  /** Defaults to `leafOwner`. */
   previousLeafDelegate?: Address<TAccountPreviousLeafDelegate>;
+  /**
+   * Delegate to set on the leaf; pass the leaf owner to clear an
+   * existing delegate.
+   */
   newLeafDelegate: Address<TAccountNewLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: DelegateV2InstructionDataArgs["root"];
   dataHash: DelegateV2InstructionDataArgs["dataHash"];
@@ -376,8 +488,12 @@ export interface DelegateV2Input<
   flags: DelegateV2InstructionDataArgs["flags"];
   nonce: DelegateV2InstructionDataArgs["nonce"];
   index: DelegateV2InstructionDataArgs["index"];
-}
+};
 
+/**
+ * Sets (or clears) the delegate authority for a `LeafSchema` V2 leaf
+ * node.
+ */
 export function getDelegateV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -491,26 +607,48 @@ export function getDelegateV2Instruction<
   >);
 }
 
-export interface ParsedDelegateV2Instruction<
+export type ParsedDelegateV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[1];
-    /** Optional leaf owner, defaults to `payer` */
+    /** Optional leaf owner, defaults to `payer`. */
     leafOwner?: TAccountMetas[2] | undefined;
-    /** Defaults to `leaf_owner` */
+    /** Defaults to `leafOwner`. */
     previousLeafDelegate?: TAccountMetas[3] | undefined;
+    /**
+     * Delegate to set on the leaf; pass the leaf owner to clear an
+     * existing delegate.
+     */
     newLeafDelegate: TAccountMetas[4];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[5];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[6];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[7];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[8];
   };
   data: DelegateV2InstructionData;
-}
+};
 
 export function parseDelegateV2Instruction<
   TProgram extends string,

@@ -6,8 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { RelationshipEntry, RelationshipEntryArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -20,23 +18,41 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getRelationshipEntryDecoder,
   getRelationshipEntryEncoder,
+  type RelationshipEntry,
+  type RelationshipEntryArgs,
 } from "./index.js";
 
-export interface CreateGroupV1Args {
+/** Arguments for `createGroupV1`. */
+export type CreateGroupV1Args = {
+  /** The group's display name. */
   name: string;
+  /** The URI pointing to the group's off-chain JSON metadata. */
   uri: string;
-  relationships: RelationshipEntry[];
-}
+  /**
+   * Initial member relationships (assets, collections or child
+   * groups) to record on the group.
+   */
+  relationships: Array<RelationshipEntry>;
+};
 
-export interface CreateGroupV1ArgsArgs {
+export type CreateGroupV1ArgsArgs = {
+  /** The group's display name. */
   name: string;
+  /** The URI pointing to the group's off-chain JSON metadata. */
   uri: string;
-  relationships: RelationshipEntryArgs[];
-}
+  /**
+   * Initial member relationships (assets, collections or child
+   * groups) to record on the group.
+   */
+  relationships: Array<RelationshipEntryArgs>;
+};
 
 export function getCreateGroupV1ArgsEncoder(): Encoder<CreateGroupV1ArgsArgs> {
   return getStructEncoder([

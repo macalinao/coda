@@ -6,17 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * Format of the optional off-chain `assetData` blob attached to a
+ * `LeafSchema` V2 asset. Reserved for future use.
+ */
 export enum AssetDataSchema {
-  Binary = 0,
-  Json = 1,
-  MsgPack = 2,
+  Binary,
+  Json,
+  MsgPack,
 }
 
 export type AssetDataSchemaArgs = AssetDataSchema;

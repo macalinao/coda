@@ -6,13 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 
+/**
+ * Internal plugin whose authority is allowed to burn the asset
+ * on the owner's behalf.
+ */
 export type BurnDelegate = {};
 
 export type BurnDelegateArgs = BurnDelegate;

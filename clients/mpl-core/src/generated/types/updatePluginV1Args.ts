@@ -6,18 +6,31 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { Plugin, PluginArgs } from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
-import { getPluginDecoder, getPluginEncoder } from "./index.js";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
+import {
+  getPluginDecoder,
+  getPluginEncoder,
+  type Plugin,
+  type PluginArgs,
+} from "./index.js";
 
-export interface UpdatePluginV1Args {
+/** Arguments for `updatePluginV1`. */
+export type UpdatePluginV1Args = {
+  /** The plugin variant and its full replacement configuration. */
   plugin: Plugin;
-}
+};
 
-export interface UpdatePluginV1ArgsArgs {
+export type UpdatePluginV1ArgsArgs = {
+  /** The plugin variant and its full replacement configuration. */
   plugin: PluginArgs;
-}
+};
 
 export function getUpdatePluginV1ArgsEncoder(): Encoder<UpdatePluginV1ArgsArgs> {
   return getStructEncoder([["plugin", getPluginEncoder()]]);

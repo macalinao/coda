@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -25,12 +18,19 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 
-export interface PuffRuleSetArgs {
+/** Versioned arguments for the `puffRuleSet` instruction. */
+export type PuffRuleSetArgs = {
   __kind: "V1";
+  /** The name of the RuleSet to grow. */
   ruleSetName: string;
-}
+};
 
 export type PuffRuleSetArgsArgs = PuffRuleSetArgs;
 

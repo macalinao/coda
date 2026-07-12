@@ -6,30 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  VerifiedCreatorsSignature,
-  VerifiedCreatorsSignatureArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getVerifiedCreatorsSignatureDecoder,
   getVerifiedCreatorsSignatureEncoder,
+  type VerifiedCreatorsSignature,
+  type VerifiedCreatorsSignatureArgs,
 } from "./index.js";
 
-export interface VerifiedCreators {
-  signatures: VerifiedCreatorsSignature[];
-}
+/**
+ * Internal plugin listing creators who have cryptographically
+ * verified their inclusion, similar to the legacy Token
+ * Metadata creators array.
+ */
+export type VerifiedCreators = {
+  /** The list of creators and their verification status. */
+  signatures: Array<VerifiedCreatorsSignature>;
+};
 
-export interface VerifiedCreatorsArgs {
-  signatures: VerifiedCreatorsSignatureArgs[];
-}
+export type VerifiedCreatorsArgs = {
+  /** The list of creators and their verification status. */
+  signatures: Array<VerifiedCreatorsSignatureArgs>;
+};
 
 export function getVerifiedCreatorsEncoder(): Encoder<VerifiedCreatorsArgs> {
   return getStructEncoder([

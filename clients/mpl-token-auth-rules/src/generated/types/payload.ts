@@ -6,8 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { PayloadType, PayloadTypeArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -20,16 +18,30 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
-import { getPayloadTypeDecoder, getPayloadTypeEncoder } from "./index.js";
+import {
+  getPayloadTypeDecoder,
+  getPayloadTypeEncoder,
+  type PayloadType,
+  type PayloadTypeArgs,
+} from "./index.js";
 
-export interface Payload {
+/**
+ * The runtime values passed to `validate`, keyed by the field name a
+ * rule expects (e.g. the destination address, amount, or a Merkle proof).
+ */
+export type Payload = {
+  /** Field name to typed value expected by the operation's rules. */
   map: Map<string, PayloadType>;
-}
+};
 
-export interface PayloadArgs {
+export type PayloadArgs = {
+  /** Field name to typed value expected by the operation's rules. */
   map: Map<string, PayloadTypeArgs>;
-}
+};
 
 export function getPayloadEncoder(): Encoder<PayloadArgs> {
   return getStructEncoder([

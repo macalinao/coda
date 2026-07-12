@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -19,12 +18,19 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface AutographSignature {
+/** A single signature entry recorded by the `Autograph` plugin. */
+export type AutographSignature = {
+  /** The address that signed. */
   address: Address;
+  /** An optional message left alongside the signature. */
   message: string;
-}
+};
 
 export type AutographSignatureArgs = AutographSignature;
 

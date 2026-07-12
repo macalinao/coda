@@ -6,30 +6,43 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getExternalPluginAdapterSchemaDecoder,
   getExternalPluginAdapterSchemaEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
 } from "./index.js";
 
-export interface LinkedAppData {
+/**
+ * External plugin adapter like `AppData`, but for collections:
+ * its data is shared by every asset in the collection via a
+ * `DataSection`.
+ */
+export type LinkedAppData = {
+  /** The authority allowed to write this adapter's data. */
   dataAuthority: Authority;
+  /** The serialization format used for this adapter's stored data. */
   schema: ExternalPluginAdapterSchema;
-}
+};
 
-export interface LinkedAppDataArgs {
+export type LinkedAppDataArgs = {
+  /** The authority allowed to write this adapter's data. */
   dataAuthority: AuthorityArgs;
+  /** The serialization format used for this adapter's stored data. */
   schema: ExternalPluginAdapterSchemaArgs;
-}
+};
 
 export function getLinkedAppDataEncoder(): Encoder<LinkedAppDataArgs> {
   return getStructEncoder([

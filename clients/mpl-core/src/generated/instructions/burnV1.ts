@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { BurnV1Args, BurnV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,10 +15,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getBurnV1ArgsDecoder, getBurnV1ArgsEncoder } from "../types/index.js";
+import {
+  getBurnV1ArgsDecoder,
+  getBurnV1ArgsEncoder,
+  type BurnV1Args,
+  type BurnV1ArgsArgs,
+} from "../types/index.js";
 
 export const BURN_V1_DISCRIMINATOR = 12;
 
@@ -82,14 +86,22 @@ export type BurnV1Instruction<
     ]
   >;
 
-export interface BurnV1InstructionData {
+export type BurnV1InstructionData = {
   discriminator: number;
+  /**
+   * A compression proof, required only if the asset is
+   * currently compressed (`LedgerState`).
+   */
   burnV1Args: BurnV1Args;
-}
+};
 
-export interface BurnV1InstructionDataArgs {
+export type BurnV1InstructionDataArgs = {
+  /**
+   * A compression proof, required only if the asset is
+   * currently compressed (`LedgerState`).
+   */
   burnV1Args: BurnV1ArgsArgs;
-}
+};
 
 export function getBurnV1InstructionDataEncoder(): Encoder<BurnV1InstructionDataArgs> {
   return transformEncoder(
@@ -118,14 +130,14 @@ export function getBurnV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface BurnV1Input<
+export type BurnV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -139,8 +151,14 @@ export interface BurnV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   burnV1Args: BurnV1InstructionDataArgs["burnV1Args"];
-}
+};
 
+/**
+ * Permanently destroys an asset and refunds its rent to `payer`.
+ *
+ * Requires the owner, or a delegate approved via the
+ * `BurnDelegate` / `PermanentBurnDelegate` plugin.
+ */
 export function getBurnV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -214,10 +232,10 @@ export function getBurnV1Instruction<
   >);
 }
 
-export interface ParsedBurnV1Instruction<
+export type ParsedBurnV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -234,7 +252,7 @@ export interface ParsedBurnV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: BurnV1InstructionData;
-}
+};
 
 export function parseBurnV1Instruction<
   TProgram extends string,

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { MetadataArgs, MetadataArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -35,19 +17,34 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findBubblegumSignerPda,
@@ -59,6 +56,8 @@ import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
+  type MetadataArgs,
+  type MetadataArgsArgs,
 } from "../types/index.js";
 
 export const UNVERIFY_COLLECTION_DISCRIMINATOR: ReadonlyUint8Array =
@@ -152,24 +151,74 @@ export type UnverifyCollectionInstruction<
     ]
   >;
 
-export interface UnverifyCollectionInstructionData {
+export type UnverifyCollectionInstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current metadata args, verified against `dataHash` before
+   * its collection is marked unverified.
+   */
   message: MetadataArgs;
-}
+};
 
-export interface UnverifyCollectionInstructionDataArgs {
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
+export type UnverifyCollectionInstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current metadata args, verified against `dataHash` before
+   * its collection is marked unverified.
+   */
   message: MetadataArgsArgs;
-}
+};
 
 export function getUnverifyCollectionInstructionDataEncoder(): Encoder<UnverifyCollectionInstructionDataArgs> {
   return transformEncoder(
@@ -208,7 +257,7 @@ export function getUnverifyCollectionInstructionDataCodec(): Codec<
   );
 }
 
-export interface UnverifyCollectionAsyncInput<
+export type UnverifyCollectionAsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -225,31 +274,69 @@ export interface UnverifyCollectionAsyncInput<
   TAccountCompressionProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * This account is checked to be a signer in
-   * the case of `set_and_verify_collection` where
-   * we are actually changing the NFT metadata.
+   * Checked as a signer here because this instruction path shares logic
+   * with `setAndVerifyCollection`, which actually changes the leaf's
+   * metadata.
    */
   treeDelegate: Address<TAccountTreeDelegate>;
+  /**
+   * Authority of the collection the asset is being added to or removed
+   * from (typically the collection's update authority or a delegate).
+   */
   collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
   /**
-   * If there is no collecton authority record PDA then
-   * this must be the Bubblegum program address.
+   * If there is no collection authority record PDA, pass the Bubblegum
+   * program address instead.
    */
   collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
+  /** Mint account of the Token Metadata collection NFT. */
   collectionMint: Address<TAccountCollectionMint>;
+  /** Metadata account of the Token Metadata collection NFT. */
   collectionMetadata?: Address<TAccountCollectionMetadata>;
+  /** Master edition account of the Token Metadata collection NFT. */
   editionAccount?: Address<TAccountEditionAccount>;
+  /**
+   * PDA Bubblegum uses to sign the CPI into the Token Metadata program
+   * that (un)verifies the collection.
+   */
   bubblegumSigner?: Address<TAccountBubblegumSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: UnverifyCollectionInstructionDataArgs["root"];
   dataHash: UnverifyCollectionInstructionDataArgs["dataHash"];
@@ -257,8 +344,14 @@ export interface UnverifyCollectionAsyncInput<
   nonce: UnverifyCollectionInstructionDataArgs["nonce"];
   index: UnverifyCollectionInstructionDataArgs["index"];
   message: UnverifyCollectionInstructionDataArgs["message"];
-}
+};
 
+/**
+ * Unverifies a previously verified collection from a leaf node.
+ *
+ * Marks the `collection` field of the leaf's metadata as unverified,
+ * without removing the collection reference itself.
+ */
 export async function getUnverifyCollectionInstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -465,7 +558,7 @@ export async function getUnverifyCollectionInstructionAsync<
   >);
 }
 
-export interface UnverifyCollectionInput<
+export type UnverifyCollectionInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -482,31 +575,69 @@ export interface UnverifyCollectionInput<
   TAccountCompressionProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * This account is checked to be a signer in
-   * the case of `set_and_verify_collection` where
-   * we are actually changing the NFT metadata.
+   * Checked as a signer here because this instruction path shares logic
+   * with `setAndVerifyCollection`, which actually changes the leaf's
+   * metadata.
    */
   treeDelegate: Address<TAccountTreeDelegate>;
+  /**
+   * Authority of the collection the asset is being added to or removed
+   * from (typically the collection's update authority or a delegate).
+   */
   collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
   /**
-   * If there is no collecton authority record PDA then
-   * this must be the Bubblegum program address.
+   * If there is no collection authority record PDA, pass the Bubblegum
+   * program address instead.
    */
   collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
+  /** Mint account of the Token Metadata collection NFT. */
   collectionMint: Address<TAccountCollectionMint>;
+  /** Metadata account of the Token Metadata collection NFT. */
   collectionMetadata: Address<TAccountCollectionMetadata>;
+  /** Master edition account of the Token Metadata collection NFT. */
   editionAccount: Address<TAccountEditionAccount>;
+  /**
+   * PDA Bubblegum uses to sign the CPI into the Token Metadata program
+   * that (un)verifies the collection.
+   */
   bubblegumSigner: Address<TAccountBubblegumSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: UnverifyCollectionInstructionDataArgs["root"];
   dataHash: UnverifyCollectionInstructionDataArgs["dataHash"];
@@ -514,8 +645,14 @@ export interface UnverifyCollectionInput<
   nonce: UnverifyCollectionInstructionDataArgs["nonce"];
   index: UnverifyCollectionInstructionDataArgs["index"];
   message: UnverifyCollectionInstructionDataArgs["message"];
-}
+};
 
+/**
+ * Unverifies a previously verified collection from a leaf node.
+ *
+ * Marks the `collection` field of the leaf's metadata as unverified,
+ * without removing the collection reference itself.
+ */
 export function getUnverifyCollectionInstruction<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -691,40 +828,78 @@ export function getUnverifyCollectionInstruction<
   >);
 }
 
-export interface ParsedUnverifyCollectionInstruction<
+export type ParsedUnverifyCollectionInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[2];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[3];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[4];
     /**
-     * This account is checked to be a signer in
-     * the case of `set_and_verify_collection` where
-     * we are actually changing the NFT metadata.
+     * Checked as a signer here because this instruction path shares logic
+     * with `setAndVerifyCollection`, which actually changes the leaf's
+     * metadata.
      */
     treeDelegate: TAccountMetas[5];
+    /**
+     * Authority of the collection the asset is being added to or removed
+     * from (typically the collection's update authority or a delegate).
+     */
     collectionAuthority: TAccountMetas[6];
     /**
-     * If there is no collecton authority record PDA then
-     * this must be the Bubblegum program address.
+     * If there is no collection authority record PDA, pass the Bubblegum
+     * program address instead.
      */
     collectionAuthorityRecordPda: TAccountMetas[7];
+    /** Mint account of the Token Metadata collection NFT. */
     collectionMint: TAccountMetas[8];
+    /** Metadata account of the Token Metadata collection NFT. */
     collectionMetadata: TAccountMetas[9];
+    /** Master edition account of the Token Metadata collection NFT. */
     editionAccount: TAccountMetas[10];
+    /**
+     * PDA Bubblegum uses to sign the CPI into the Token Metadata program
+     * that (un)verifies the collection.
+     */
     bubblegumSigner: TAccountMetas[11];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[12];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[13];
+    /**
+     * The Token Metadata program, invoked to read or (un)verify the
+     * legacy collection accounts.
+     */
     tokenMetadataProgram: TAccountMetas[14];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[15];
   };
   data: UnverifyCollectionInstructionData;
-}
+};
 
 export function parseUnverifyCollectionInstruction<
   TProgram extends string,

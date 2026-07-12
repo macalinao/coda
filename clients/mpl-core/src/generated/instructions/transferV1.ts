@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { TransferV1Args, TransferV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getTransferV1ArgsDecoder,
   getTransferV1ArgsEncoder,
+  type TransferV1Args,
+  type TransferV1ArgsArgs,
 } from "../types/index.js";
 
 export const TRANSFER_V1_DISCRIMINATOR = 14;
@@ -89,14 +90,22 @@ export type TransferV1Instruction<
     ]
   >;
 
-export interface TransferV1InstructionData {
+export type TransferV1InstructionData = {
   discriminator: number;
+  /**
+   * A compression proof, required only if the asset is
+   * currently compressed.
+   */
   transferV1Args: TransferV1Args;
-}
+};
 
-export interface TransferV1InstructionDataArgs {
+export type TransferV1InstructionDataArgs = {
+  /**
+   * A compression proof, required only if the asset is
+   * currently compressed.
+   */
   transferV1Args: TransferV1ArgsArgs;
-}
+};
 
 export function getTransferV1InstructionDataEncoder(): Encoder<TransferV1InstructionDataArgs> {
   return transformEncoder(
@@ -125,7 +134,7 @@ export function getTransferV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface TransferV1Input<
+export type TransferV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
@@ -133,7 +142,7 @@ export interface TransferV1Input<
   TAccountNewOwner extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -149,8 +158,16 @@ export interface TransferV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   transferV1Args: TransferV1InstructionDataArgs["transferV1Args"];
-}
+};
 
+/**
+ * Transfers ownership of an asset to `newOwner`.
+ *
+ * Callable by the current owner, or a delegate approved via the
+ * `TransferDelegate` / `PermanentTransferDelegate` plugin. Fails
+ * if the asset is frozen by an active `FreezeDelegate` or
+ * `PermanentFreezeDelegate` plugin.
+ */
 export function getTransferV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -230,10 +247,10 @@ export function getTransferV1Instruction<
   >);
 }
 
-export interface ParsedTransferV1Instruction<
+export type ParsedTransferV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -252,7 +269,7 @@ export interface ParsedTransferV1Instruction<
     logWrapper?: TAccountMetas[6] | undefined;
   };
   data: TransferV1InstructionData;
-}
+};
 
 export function parseTransferV1Instruction<
   TProgram extends string,

@@ -6,21 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/** The kind of external plugin adapter, without its configuration or data. */
 export enum ExternalPluginAdapterType {
-  LifecycleHook = 0,
-  Oracle = 1,
-  AppData = 2,
-  LinkedLifecycleHook = 3,
-  LinkedAppData = 4,
-  DataSection = 5,
-  AgentIdentity = 6,
+  LifecycleHook,
+  Oracle,
+  AppData,
+  LinkedLifecycleHook,
+  LinkedAppData,
+  DataSection,
+  AgentIdentity,
 }
 
 export type ExternalPluginAdapterTypeArgs = ExternalPluginAdapterType;

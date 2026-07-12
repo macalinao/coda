@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -15,15 +14,21 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface RuleSetRevisionMapV1 {
-  ruleSetRevisions: bigint[];
-}
+/** Maps each RuleSet revision to its byte offset within the PDA. */
+export type RuleSetRevisionMapV1 = {
+  /** Byte offset of each revision, indexed by revision number. */
+  ruleSetRevisions: Array<bigint>;
+};
 
-export interface RuleSetRevisionMapV1Args {
+export type RuleSetRevisionMapV1Args = {
+  /** Byte offset of each revision, indexed by revision number. */
   ruleSetRevisions: Array<number | bigint>;
-}
+};
 
 export function getRuleSetRevisionMapV1Encoder(): Encoder<RuleSetRevisionMapV1Args> {
   return getStructEncoder([

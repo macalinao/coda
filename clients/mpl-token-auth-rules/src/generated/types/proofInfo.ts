@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -15,11 +14,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface ProofInfo {
-  proof: number[][];
-}
+/** A Merkle proof used to validate membership against a rule's root hash. */
+export type ProofInfo = {
+  /** The sibling hashes forming the Merkle proof. */
+  proof: Array<Array<number>>;
+};
 
 export type ProofInfoArgs = ProofInfo;
 

@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RevokePluginAuthorityV1Args,
-  RevokePluginAuthorityV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRevokePluginAuthorityV1ArgsDecoder,
   getRevokePluginAuthorityV1ArgsEncoder,
+  type RevokePluginAuthorityV1Args,
+  type RevokePluginAuthorityV1ArgsArgs,
 } from "../types/index.js";
 
 export const REVOKE_PLUGIN_AUTHORITY_V1_DISCRIMINATOR = 10;
@@ -89,14 +87,16 @@ export type RevokePluginAuthorityV1Instruction<
     ]
   >;
 
-export interface RevokePluginAuthorityV1InstructionData {
+export type RevokePluginAuthorityV1InstructionData = {
   discriminator: number;
+  /** The type of plugin whose authority should be revoked. */
   revokePluginAuthorityV1Args: RevokePluginAuthorityV1Args;
-}
+};
 
-export interface RevokePluginAuthorityV1InstructionDataArgs {
+export type RevokePluginAuthorityV1InstructionDataArgs = {
+  /** The type of plugin whose authority should be revoked. */
   revokePluginAuthorityV1Args: RevokePluginAuthorityV1ArgsArgs;
-}
+};
 
 export function getRevokePluginAuthorityV1InstructionDataEncoder(): FixedSizeEncoder<RevokePluginAuthorityV1InstructionDataArgs> {
   return transformEncoder(
@@ -128,14 +128,14 @@ export function getRevokePluginAuthorityV1InstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface RevokePluginAuthorityV1Input<
+export type RevokePluginAuthorityV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -149,8 +149,13 @@ export interface RevokePluginAuthorityV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   revokePluginAuthorityV1Args: RevokePluginAuthorityV1InstructionDataArgs["revokePluginAuthorityV1Args"];
-}
+};
 
+/**
+ * Resets a plugin on an asset back to its default authority,
+ * revoking any delegate previously approved with
+ * `ApprovePluginAuthorityV1`.
+ */
 export function getRevokePluginAuthorityV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -230,10 +235,10 @@ export function getRevokePluginAuthorityV1Instruction<
   >);
 }
 
-export interface ParsedRevokePluginAuthorityV1Instruction<
+export type ParsedRevokePluginAuthorityV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -250,7 +255,7 @@ export interface ParsedRevokePluginAuthorityV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: RevokePluginAuthorityV1InstructionData;
-}
+};
 
 export function parseRevokePluginAuthorityV1Instruction<
   TProgram extends string,

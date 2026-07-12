@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  WriteExternalPluginAdapterDataV1Args,
-  WriteExternalPluginAdapterDataV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getWriteExternalPluginAdapterDataV1ArgsDecoder,
   getWriteExternalPluginAdapterDataV1ArgsEncoder,
+  type WriteExternalPluginAdapterDataV1Args,
+  type WriteExternalPluginAdapterDataV1ArgsArgs,
 } from "../types/index.js";
 
 export const WRITE_EXTERNAL_PLUGIN_ADAPTER_DATA_V1_DISCRIMINATOR = 28;
@@ -95,14 +93,16 @@ export type WriteExternalPluginAdapterDataV1Instruction<
     ]
   >;
 
-export interface WriteExternalPluginAdapterDataV1InstructionData {
+export type WriteExternalPluginAdapterDataV1InstructionData = {
   discriminator: number;
+  /** The target adapter and the bytes to write, or `None` to clear it. */
   writeExternalPluginAdapterDataV1Args: WriteExternalPluginAdapterDataV1Args;
-}
+};
 
-export interface WriteExternalPluginAdapterDataV1InstructionDataArgs {
+export type WriteExternalPluginAdapterDataV1InstructionDataArgs = {
+  /** The target adapter and the bytes to write, or `None` to clear it. */
   writeExternalPluginAdapterDataV1Args: WriteExternalPluginAdapterDataV1ArgsArgs;
-}
+};
 
 export function getWriteExternalPluginAdapterDataV1InstructionDataEncoder(): Encoder<WriteExternalPluginAdapterDataV1InstructionDataArgs> {
   return transformEncoder(
@@ -140,7 +140,7 @@ export function getWriteExternalPluginAdapterDataV1InstructionDataCodec(): Codec
   );
 }
 
-export interface WriteExternalPluginAdapterDataV1Input<
+export type WriteExternalPluginAdapterDataV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
@@ -148,7 +148,7 @@ export interface WriteExternalPluginAdapterDataV1Input<
   TAccountBuffer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -164,8 +164,18 @@ export interface WriteExternalPluginAdapterDataV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   writeExternalPluginAdapterDataV1Args: WriteExternalPluginAdapterDataV1InstructionDataArgs["writeExternalPluginAdapterDataV1Args"];
-}
+};
 
+/**
+ * Writes (or clears) the raw bytes backing an `AppData`,
+ * `LinkedAppData` or `DataSection` external plugin adapter on an
+ * asset.
+ *
+ * Only the adapter's `dataAuthority` may call this. The payload
+ * can be supplied inline via `data`, or sourced from the optional
+ * `buffer` account for payloads too large for a single
+ * instruction.
+ */
 export function getWriteExternalPluginAdapterDataV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -251,10 +261,10 @@ export function getWriteExternalPluginAdapterDataV1Instruction<
   >);
 }
 
-export interface ParsedWriteExternalPluginAdapterDataV1Instruction<
+export type ParsedWriteExternalPluginAdapterDataV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -273,7 +283,7 @@ export interface ParsedWriteExternalPluginAdapterDataV1Instruction<
     logWrapper?: TAccountMetas[6] | undefined;
   };
   data: WriteExternalPluginAdapterDataV1InstructionData;
-}
+};
 
 export function parseWriteExternalPluginAdapterDataV1Instruction<
   TProgram extends string,

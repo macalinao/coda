@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface AssetSignerSeeds {
+export type AssetSignerSeeds = {
   /** The address of the asset account */
   asset: Address;
-}
+};
 
 /** The signing PDA for an asset, used by executeV1 */
 export async function findAssetSignerPda(

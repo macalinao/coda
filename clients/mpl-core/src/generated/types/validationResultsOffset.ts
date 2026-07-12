@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -25,8 +18,18 @@ import {
   getU64Encoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 
+/**
+ * Where within an oracle account to read its `OracleValidation`:
+ * no offset, past the 8-byte Anchor discriminator, or a
+ * `Custom` byte offset.
+ */
 export type ValidationResultsOffset =
   | { __kind: "NoOffset" }
   | { __kind: "Anchor" }

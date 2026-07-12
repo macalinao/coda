@@ -6,33 +6,41 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { CompressionProof, CompressionProofArgs } from "./index.js";
 import {
   combineCodec,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getCompressionProofDecoder,
   getCompressionProofEncoder,
+  type CompressionProof,
+  type CompressionProofArgs,
 } from "./index.js";
 
-export interface BurnV1Args {
+/** Arguments for `burnV1`. */
+export type BurnV1Args = {
+  /**
+   * Proof of the asset's current compressed state; required only
+   * if the asset is compressed.
+   */
   compressionProof: Option<CompressionProof>;
-}
+};
 
-export interface BurnV1ArgsArgs {
+export type BurnV1ArgsArgs = {
+  /**
+   * Proof of the asset's current compressed state; required only
+   * if the asset is compressed.
+   */
   compressionProof: OptionOrNullable<CompressionProofArgs>;
-}
+};
 
 export function getBurnV1ArgsEncoder(): Encoder<BurnV1ArgsArgs> {
   return getStructEncoder([

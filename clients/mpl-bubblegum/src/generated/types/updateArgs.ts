@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { Creator, CreatorArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -32,28 +24,57 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getCreatorDecoder, getCreatorEncoder } from "./index.js";
+import {
+  getCreatorDecoder,
+  getCreatorEncoder,
+  type Creator,
+  type CreatorArgs,
+} from "./index.js";
 
-export interface UpdateArgs {
+/**
+ * Metadata fields to change on a leaf via `updateMetadata` /
+ * `updateMetadataV2`. Every field is optional; omitted fields keep
+ * their current value.
+ */
+export type UpdateArgs = {
+  /** New name for the asset, or unset to keep the current name. */
   name: Option<string>;
+  /** New symbol for the asset, or unset to keep the current symbol. */
   symbol: Option<string>;
+  /** New metadata URI for the asset, or unset to keep the current URI. */
   uri: Option<string>;
-  creators: Option<Creator[]>;
+  /** New creators array for the asset, or unset to keep the current creators. */
+  creators: Option<Array<Creator>>;
+  /** New royalty basis points, or unset to keep the current value. */
   sellerFeeBasisPoints: Option<number>;
+  /** New primary sale flag, or unset to keep the current value. */
   primarySaleHappened: Option<boolean>;
+  /** New mutability flag, or unset to keep the current value. */
   isMutable: Option<boolean>;
-}
+};
 
-export interface UpdateArgsArgs {
+export type UpdateArgsArgs = {
+  /** New name for the asset, or unset to keep the current name. */
   name: OptionOrNullable<string>;
+  /** New symbol for the asset, or unset to keep the current symbol. */
   symbol: OptionOrNullable<string>;
+  /** New metadata URI for the asset, or unset to keep the current URI. */
   uri: OptionOrNullable<string>;
-  creators: OptionOrNullable<CreatorArgs[]>;
+  /** New creators array for the asset, or unset to keep the current creators. */
+  creators: OptionOrNullable<Array<CreatorArgs>>;
+  /** New royalty basis points, or unset to keep the current value. */
   sellerFeeBasisPoints: OptionOrNullable<number>;
+  /** New primary sale flag, or unset to keep the current value. */
   primarySaleHappened: OptionOrNullable<boolean>;
+  /** New mutability flag, or unset to keep the current value. */
   isMutable: OptionOrNullable<boolean>;
-}
+};
 
 export function getUpdateArgsEncoder(): Encoder<UpdateArgsArgs> {
   return getStructEncoder([

@@ -6,16 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * Discriminator for events Bubblegum logs via the noop program, read
+ * back by off-chain indexers to reconstruct tree state.
+ */
 export enum BubblegumEventType {
-  Uninitialized = 0,
-  LeafSchemaEvent = 1,
+  Uninitialized,
+  LeafSchemaEvent,
 }
 
 export type BubblegumEventTypeArgs = BubblegumEventType;

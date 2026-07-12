@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type {
-  ProofInfo,
-  ProofInfoArgs,
-  SeedsVec,
-  SeedsVecArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -32,14 +18,25 @@ import {
   getTupleEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 import {
   getProofInfoDecoder,
   getProofInfoEncoder,
   getSeedsVecDecoder,
   getSeedsVecEncoder,
+  type ProofInfo,
+  type ProofInfoArgs,
+  type SeedsVec,
+  type SeedsVecArgs,
 } from "./index.js";
 
+/** A single typed value supplied in a `validate` payload. */
 export type PayloadType =
   | { __kind: "Pubkey"; fields: readonly [Address] }
   | { __kind: "Seeds"; fields: readonly [SeedsVec] }

@@ -6,16 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * Whether leaves in a tree may be redeemed and decompressed into
+ * regular SPL/Token Metadata NFTs. Set per-tree with
+ * `setDecompressibleState`.
+ */
 export enum DecompressibleState {
-  Enabled = 0,
-  Disabled = 1,
+  Enabled,
+  Disabled,
 }
 
 export type DecompressibleStateArgs = DecompressibleState;

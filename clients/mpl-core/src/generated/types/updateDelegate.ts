@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -15,11 +14,24 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface UpdateDelegate {
-  additionalDelegates: Address[];
-}
+/**
+ * Internal plugin whose authority (and any `additionalDelegates`)
+ * can update the asset's metadata alongside the update
+ * authority.
+ */
+export type UpdateDelegate = {
+  /**
+   * Extra addresses, beyond the update authority, allowed to
+   * update the asset.
+   */
+  additionalDelegates: Array<Address>;
+};
 
 export type UpdateDelegateArgs = UpdateDelegate;
 

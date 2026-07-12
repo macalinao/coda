@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -15,11 +14,17 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface RemoveGroupsFromGroupV1Args {
-  groups: Address[];
-}
+/** Arguments for `removeGroupsFromGroupV1`. */
+export type RemoveGroupsFromGroupV1Args = {
+  /** The addresses of the child groups to remove from the parent. */
+  groups: Array<Address>;
+};
 
 export type RemoveGroupsFromGroupV1ArgsArgs = RemoveGroupsFromGroupV1Args;
 

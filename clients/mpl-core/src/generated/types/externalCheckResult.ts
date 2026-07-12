@@ -6,22 +6,28 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface ExternalCheckResult {
+/**
+ * A bitmask of the `ValidationResult` values an external plugin
+ * adapter may return for a checked lifecycle event.
+ */
+export type ExternalCheckResult = {
+  /**
+   * A bitmask of the `ValidationResult`s this adapter may return
+   * for the checked lifecycle event.
+   */
   flags: number;
-}
+};
 
 export type ExternalCheckResultArgs = ExternalCheckResult;
 

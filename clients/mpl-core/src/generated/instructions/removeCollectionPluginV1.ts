@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemoveCollectionPluginV1Args,
-  RemoveCollectionPluginV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemoveCollectionPluginV1ArgsDecoder,
   getRemoveCollectionPluginV1ArgsEncoder,
+  type RemoveCollectionPluginV1Args,
+  type RemoveCollectionPluginV1ArgsArgs,
 } from "../types/index.js";
 
 export const REMOVE_COLLECTION_PLUGIN_V1_DISCRIMINATOR = 5;
@@ -85,14 +83,16 @@ export type RemoveCollectionPluginV1Instruction<
     ]
   >;
 
-export interface RemoveCollectionPluginV1InstructionData {
+export type RemoveCollectionPluginV1InstructionData = {
   discriminator: number;
+  /** The type of plugin to remove. */
   removeCollectionPluginV1Args: RemoveCollectionPluginV1Args;
-}
+};
 
-export interface RemoveCollectionPluginV1InstructionDataArgs {
+export type RemoveCollectionPluginV1InstructionDataArgs = {
+  /** The type of plugin to remove. */
   removeCollectionPluginV1Args: RemoveCollectionPluginV1ArgsArgs;
-}
+};
 
 export function getRemoveCollectionPluginV1InstructionDataEncoder(): FixedSizeEncoder<RemoveCollectionPluginV1InstructionDataArgs> {
   return transformEncoder(
@@ -127,13 +127,13 @@ export function getRemoveCollectionPluginV1InstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface RemoveCollectionPluginV1Input<
+export type RemoveCollectionPluginV1Input<
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   collection: Address<TAccountCollection>;
   /** The account paying for the storage fees */
@@ -145,8 +145,11 @@ export interface RemoveCollectionPluginV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   removeCollectionPluginV1Args: RemoveCollectionPluginV1InstructionDataArgs["removeCollectionPluginV1Args"];
-}
+};
 
+/**
+ * Removes a plugin from a collection by its `PluginType`.
+ */
 export function getRemoveCollectionPluginV1Instruction<
   TAccountCollection extends string,
   TAccountPayer extends string,
@@ -220,10 +223,10 @@ export function getRemoveCollectionPluginV1Instruction<
   >);
 }
 
-export interface ParsedRemoveCollectionPluginV1Instruction<
+export type ParsedRemoveCollectionPluginV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -238,7 +241,7 @@ export interface ParsedRemoveCollectionPluginV1Instruction<
     logWrapper?: TAccountMetas[4] | undefined;
   };
   data: RemoveCollectionPluginV1InstructionData;
-}
+};
 
 export function parseRemoveCollectionPluginV1Instruction<
   TProgram extends string,

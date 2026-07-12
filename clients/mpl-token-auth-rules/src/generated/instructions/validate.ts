@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { ValidateArgs, ValidateArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getValidateArgsDecoder,
   getValidateArgsEncoder,
+  type ValidateArgs,
+  type ValidateArgsArgs,
 } from "../types/index.js";
 
 export const VALIDATE_DISCRIMINATOR = 1;
@@ -86,14 +87,16 @@ export type ValidateInstruction<
     ]
   >;
 
-export interface ValidateInstructionData {
+export type ValidateInstructionData = {
   discriminator: number;
+  /** The operation to validate together with its rule payload. */
   validateArgs: ValidateArgs;
-}
+};
 
-export interface ValidateInstructionDataArgs {
+export type ValidateInstructionDataArgs = {
+  /** The operation to validate together with its rule payload. */
   validateArgs: ValidateArgsArgs;
-}
+};
 
 export function getValidateInstructionDataEncoder(): Encoder<ValidateInstructionDataArgs> {
   return transformEncoder(
@@ -122,14 +125,14 @@ export function getValidateInstructionDataCodec(): Codec<
   );
 }
 
-export interface ValidateInput<
+export type ValidateInput<
   TAccountRuleSetPda extends string = string,
   TAccountMint extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountPayer extends string = string,
   TAccountRuleAuthority extends string = string,
   TAccountRuleSetStatePda extends string = string,
-> {
+> = {
   /** The PDA account where the RuleSet is stored */
   ruleSetPda: Address<TAccountRuleSetPda>;
   /** Mint of token asset */
@@ -143,8 +146,17 @@ export interface ValidateInput<
   /** The PDA account where any RuleSet state is stored */
   ruleSetStatePda?: Address<TAccountRuleSetStatePda>;
   validateArgs: ValidateInstructionDataArgs["validateArgs"];
-}
+};
 
+/**
+ * Validates an operation against a stored RuleSet.
+ *
+ * Normally invoked via CPI by another program (e.g. Token Metadata)
+ * to decide whether a token operation is permitted. Returns an error
+ * if any rule for the operation fails. When `updateRuleState` is set,
+ * stateful rules such as Frequency are advanced and persisted to the
+ * rule-set state PDA.
+ */
 export function getValidateInstruction<
   TAccountRuleSetPda extends string,
   TAccountMint extends string,
@@ -224,10 +236,10 @@ export function getValidateInstruction<
   >);
 }
 
-export interface ParsedValidateInstruction<
+export type ParsedValidateInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The PDA account where the RuleSet is stored */
@@ -244,7 +256,7 @@ export interface ParsedValidateInstruction<
     ruleSetStatePda?: TAccountMetas[5] | undefined;
   };
   data: ValidateInstructionData;
-}
+};
 
 export function parseValidateInstruction<
   TProgram extends string,

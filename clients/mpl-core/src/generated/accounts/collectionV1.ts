@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -36,26 +23,58 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface CollectionV1 {
+/**
+ * An MPL Core collection: a single account grouping assets under
+ * a shared update authority, with collection-level plugins
+ * stored afterward in the same account.
+ */
+export type CollectionV1 = {
+  /** Account discriminator; always `Key.CollectionV1`. */
   key: Key;
+  /** The authority allowed to update the collection and manage its plugins. */
   updateAuthority: Address;
+  /** The collection's display name. */
   name: string;
+  /** The URI pointing to the collection's off-chain JSON metadata. */
   uri: string;
+  /** The total number of assets ever minted into this collection. */
   numMinted: number;
+  /** The number of assets currently belonging to this collection. */
   currentSize: number;
-}
+};
 
-export interface CollectionV1Args {
+export type CollectionV1Args = {
+  /** Account discriminator; always `Key.CollectionV1`. */
   key: KeyArgs;
+  /** The authority allowed to update the collection and manage its plugins. */
   updateAuthority: Address;
+  /** The collection's display name. */
   name: string;
+  /** The URI pointing to the collection's off-chain JSON metadata. */
   uri: string;
+  /** The total number of assets ever minted into this collection. */
   numMinted: number;
+  /** The number of assets currently belonging to this collection. */
   currentSize: number;
-}
+};
 
 /** Gets the encoder for {@link CollectionV1Args} account data. */
 export function getCollectionV1Encoder(): Encoder<CollectionV1Args> {
@@ -122,7 +141,7 @@ export async function fetchMaybeCollectionV1<TAddress extends string = string>(
 
 export async function fetchAllCollectionV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<CollectionV1>[]> {
   const maybeAccounts = await fetchAllMaybeCollectionV1(rpc, addresses, config);
@@ -132,7 +151,7 @@ export async function fetchAllCollectionV1(
 
 export async function fetchAllMaybeCollectionV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<CollectionV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,13 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 
+/**
+ * Arguments for `addCollectionsToGroupV1`; the collections to
+ * add are passed as remaining accounts.
+ */
 export type AddCollectionsToGroupV1Args = {};
 
 export type AddCollectionsToGroupV1ArgsArgs = AddCollectionsToGroupV1Args;

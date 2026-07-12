@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,18 +16,25 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Creator {
+/** A single creator entry in a compressed NFT's metadata. */
+export type Creator = {
+  /** Public key of the creator. */
   address: Address;
+  /** Whether this creator has signed to verify their share. */
   verified: boolean;
   /**
-   * The percentage share.
+   * The creator's royalty share of the asset.
    *
-   * The value is a percentage, not basis points.
+   * The value is a percentage (0-100), not basis points.
    */
   share: number;
-}
+};
 
 export type CreatorArgs = Creator;
 

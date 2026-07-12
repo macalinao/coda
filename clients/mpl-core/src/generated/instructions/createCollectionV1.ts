@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  CreateCollectionV1Args,
-  CreateCollectionV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -35,12 +15,30 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCreateCollectionV1ArgsDecoder,
   getCreateCollectionV1ArgsEncoder,
+  type CreateCollectionV1Args,
+  type CreateCollectionV1ArgsArgs,
 } from "../types/index.js";
 
 export const CREATE_COLLECTION_V1_DISCRIMINATOR = 1;
@@ -79,14 +77,16 @@ export type CreateCollectionV1Instruction<
     ]
   >;
 
-export interface CreateCollectionV1InstructionData {
+export type CreateCollectionV1InstructionData = {
   discriminator: number;
+  /** The collection's name, URI and initial plugins. */
   createCollectionV1Args: CreateCollectionV1Args;
-}
+};
 
-export interface CreateCollectionV1InstructionDataArgs {
+export type CreateCollectionV1InstructionDataArgs = {
+  /** The collection's name, URI and initial plugins. */
   createCollectionV1Args: CreateCollectionV1ArgsArgs;
-}
+};
 
 export function getCreateCollectionV1InstructionDataEncoder(): Encoder<CreateCollectionV1InstructionDataArgs> {
   return transformEncoder(
@@ -118,12 +118,12 @@ export function getCreateCollectionV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateCollectionV1Input<
+export type CreateCollectionV1Input<
   TAccountCollection extends string = string,
   TAccountUpdateAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The address of the new asset */
   collection: TransactionSigner<TAccountCollection>;
   /** The authority of the new asset */
@@ -133,8 +133,16 @@ export interface CreateCollectionV1Input<
   /** The system program */
   systemProgram?: Address<TAccountSystemProgram>;
   createCollectionV1Args: CreateCollectionV1InstructionDataArgs["createCollectionV1Args"];
-}
+};
 
+/**
+ * Creates a new Core collection — a single account that groups
+ * assets under a shared update authority and collection-level
+ * plugins (e.g. shared royalties).
+ *
+ * Like assets, collections are keypair-generated accounts rather
+ * than PDAs.
+ */
 export function getCreateCollectionV1Instruction<
   TAccountCollection extends string,
   TAccountUpdateAuthority extends string,
@@ -205,10 +213,10 @@ export function getCreateCollectionV1Instruction<
   >);
 }
 
-export interface ParsedCreateCollectionV1Instruction<
+export type ParsedCreateCollectionV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the new asset */
@@ -221,7 +229,7 @@ export interface ParsedCreateCollectionV1Instruction<
     systemProgram: TAccountMetas[3];
   };
   data: CreateCollectionV1InstructionData;
-}
+};
 
 export function parseCreateCollectionV1Instruction<
   TProgram extends string,

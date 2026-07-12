@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  AddCollectionPluginV1Args,
-  AddCollectionPluginV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAddCollectionPluginV1ArgsDecoder,
   getAddCollectionPluginV1ArgsEncoder,
+  type AddCollectionPluginV1Args,
+  type AddCollectionPluginV1ArgsArgs,
 } from "../types/index.js";
 
 export const ADD_COLLECTION_PLUGIN_V1_DISCRIMINATOR = 3;
@@ -85,14 +83,22 @@ export type AddCollectionPluginV1Instruction<
     ]
   >;
 
-export interface AddCollectionPluginV1InstructionData {
+export type AddCollectionPluginV1InstructionData = {
   discriminator: number;
+  /**
+   * The plugin to add, and the authority to assign it if not
+   * the default.
+   */
   addCollectionPluginV1Args: AddCollectionPluginV1Args;
-}
+};
 
-export interface AddCollectionPluginV1InstructionDataArgs {
+export type AddCollectionPluginV1InstructionDataArgs = {
+  /**
+   * The plugin to add, and the authority to assign it if not
+   * the default.
+   */
   addCollectionPluginV1Args: AddCollectionPluginV1ArgsArgs;
-}
+};
 
 export function getAddCollectionPluginV1InstructionDataEncoder(): Encoder<AddCollectionPluginV1InstructionDataArgs> {
   return transformEncoder(
@@ -124,13 +130,13 @@ export function getAddCollectionPluginV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface AddCollectionPluginV1Input<
+export type AddCollectionPluginV1Input<
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   collection: Address<TAccountCollection>;
   /** The account paying for the storage fees */
@@ -142,8 +148,13 @@ export interface AddCollectionPluginV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   addCollectionPluginV1Args: AddCollectionPluginV1InstructionDataArgs["addCollectionPluginV1Args"];
-}
+};
 
+/**
+ * Adds a new plugin to a collection. It applies to every asset in
+ * the collection unless an asset defines its own plugin of the
+ * same type.
+ */
 export function getAddCollectionPluginV1Instruction<
   TAccountCollection extends string,
   TAccountPayer extends string,
@@ -217,10 +228,10 @@ export function getAddCollectionPluginV1Instruction<
   >);
 }
 
-export interface ParsedAddCollectionPluginV1Instruction<
+export type ParsedAddCollectionPluginV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -235,7 +246,7 @@ export interface ParsedAddCollectionPluginV1Instruction<
     logWrapper?: TAccountMetas[4] | undefined;
   };
   data: AddCollectionPluginV1InstructionData;
-}
+};
 
 export function parseAddCollectionPluginV1Instruction<
   TProgram extends string,

@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -38,30 +25,66 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface GroupV1 {
+/**
+ * An MPL Core group: a single account organizing assets,
+ * collections and other groups under a shared update authority,
+ * independent of the collection hierarchy.
+ */
+export type GroupV1 = {
+  /** Account discriminator; always `Key.GroupV1`. */
   key: Key;
+  /** The authority allowed to update the group and manage its membership. */
   updateAuthority: Address;
+  /** The group's display name. */
   name: string;
+  /** The URI pointing to the group's off-chain JSON metadata. */
   uri: string;
-  collections: Address[];
-  groups: Address[];
-  parentGroups: Address[];
-  assets: Address[];
-}
+  /** The addresses of the collections that are direct members of this group. */
+  collections: Array<Address>;
+  /** The addresses of the child groups nested under this group. */
+  groups: Array<Address>;
+  /** The addresses of the groups that this group is itself a member of. */
+  parentGroups: Array<Address>;
+  /** The addresses of the assets that are direct members of this group. */
+  assets: Array<Address>;
+};
 
-export interface GroupV1Args {
+export type GroupV1Args = {
+  /** Account discriminator; always `Key.GroupV1`. */
   key: KeyArgs;
+  /** The authority allowed to update the group and manage its membership. */
   updateAuthority: Address;
+  /** The group's display name. */
   name: string;
+  /** The URI pointing to the group's off-chain JSON metadata. */
   uri: string;
-  collections: Address[];
-  groups: Address[];
-  parentGroups: Address[];
-  assets: Address[];
-}
+  /** The addresses of the collections that are direct members of this group. */
+  collections: Array<Address>;
+  /** The addresses of the child groups nested under this group. */
+  groups: Array<Address>;
+  /** The addresses of the groups that this group is itself a member of. */
+  parentGroups: Array<Address>;
+  /** The addresses of the assets that are direct members of this group. */
+  assets: Array<Address>;
+};
 
 /** Gets the encoder for {@link GroupV1Args} account data. */
 export function getGroupV1Encoder(): Encoder<GroupV1Args> {
@@ -132,7 +155,7 @@ export async function fetchMaybeGroupV1<TAddress extends string = string>(
 
 export async function fetchAllGroupV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<GroupV1>[]> {
   const maybeAccounts = await fetchAllMaybeGroupV1(rpc, addresses, config);
@@ -142,7 +165,7 @@ export async function fetchAllGroupV1(
 
 export async function fetchAllMaybeGroupV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<GroupV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

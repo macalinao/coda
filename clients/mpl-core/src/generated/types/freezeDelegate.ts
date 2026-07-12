@@ -6,22 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getBooleanDecoder,
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface FreezeDelegate {
+/**
+ * Internal plugin whose authority can freeze the asset, blocking
+ * transfers while frozen.
+ */
+export type FreezeDelegate = {
+  /** Whether the asset is currently frozen. */
   frozen: boolean;
-}
+};
 
 export type FreezeDelegateArgs = FreezeDelegate;
 

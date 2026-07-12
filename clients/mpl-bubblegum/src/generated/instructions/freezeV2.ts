@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,19 +18,37 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -119,26 +117,84 @@ export type FreezeV2Instruction<
     ]
   >;
 
-export interface FreezeV2InstructionData {
+export type FreezeV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
-  assetDataHash: Option<number[]>;
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: Option<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: Option<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
-}
+};
 
-export interface FreezeV2InstructionDataArgs {
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
-  assetDataHash: OptionOrNullable<number[]>;
+export type FreezeV2InstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: OptionOrNullable<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: OptionOrNullable<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
-}
+};
 
 export function getFreezeV2InstructionDataEncoder(): Encoder<FreezeV2InstructionDataArgs> {
   return transformEncoder(
@@ -185,7 +241,7 @@ export function getFreezeV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface FreezeV2AsyncInput<
+export type FreezeV2AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
@@ -196,20 +252,44 @@ export interface FreezeV2AsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * Optional authority, defaults to `payer`.  Must be either
-   * the leaf delegate or collection permanent freeze delegate.
+   * Optional authority, defaults to `payer`. Must be either the leaf
+   * delegate or a permanent freeze delegate plugin on the collection.
    */
   authority?: TransactionSigner<TAccountAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: FreezeV2InstructionDataArgs["root"];
   dataHash: FreezeV2InstructionDataArgs["dataHash"];
@@ -218,8 +298,16 @@ export interface FreezeV2AsyncInput<
   flags: FreezeV2InstructionDataArgs["flags"];
   nonce: FreezeV2InstructionDataArgs["nonce"];
   index: FreezeV2InstructionDataArgs["index"];
-}
+};
 
+/**
+ * Freezes a `LeafSchema` V2 leaf node, preventing it from being
+ * transferred or burned until it is thawed.
+ *
+ * Must be signed by the leaf delegate or, when the asset belongs to an
+ * MPL Core collection, a permanent freeze delegate plugin on that
+ * collection.
+ */
 export async function getFreezeV2InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -343,7 +431,7 @@ export async function getFreezeV2InstructionAsync<
   >);
 }
 
-export interface FreezeV2Input<
+export type FreezeV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
@@ -354,20 +442,44 @@ export interface FreezeV2Input<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * Optional authority, defaults to `payer`.  Must be either
-   * the leaf delegate or collection permanent freeze delegate.
+   * Optional authority, defaults to `payer`. Must be either the leaf
+   * delegate or a permanent freeze delegate plugin on the collection.
    */
   authority?: TransactionSigner<TAccountAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: FreezeV2InstructionDataArgs["root"];
   dataHash: FreezeV2InstructionDataArgs["dataHash"];
@@ -376,8 +488,16 @@ export interface FreezeV2Input<
   flags: FreezeV2InstructionDataArgs["flags"];
   nonce: FreezeV2InstructionDataArgs["nonce"];
   index: FreezeV2InstructionDataArgs["index"];
-}
+};
 
+/**
+ * Freezes a `LeafSchema` V2 leaf node, preventing it from being
+ * transferred or burned until it is thawed.
+ *
+ * Must be signed by the leaf delegate or, when the asset belongs to an
+ * MPL Core collection, a permanent freeze delegate plugin on that
+ * collection.
+ */
 export function getFreezeV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -491,29 +611,53 @@ export function getFreezeV2Instruction<
   >);
 }
 
-export interface ParsedFreezeV2Instruction<
+export type ParsedFreezeV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[1];
     /**
-     * Optional authority, defaults to `payer`.  Must be either
-     * the leaf delegate or collection permanent freeze delegate.
+     * Optional authority, defaults to `payer`. Must be either the leaf
+     * delegate or a permanent freeze delegate plugin on the collection.
      */
     authority?: TAccountMetas[2] | undefined;
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[3];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[4];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[5];
+    /** MPL Core collection account the asset belongs to (V2 collections). */
     coreCollection?: TAccountMetas[6] | undefined;
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[7];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[8];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[9];
   };
   data: FreezeV2InstructionData;
-}
+};
 
 export function parseFreezeV2Instruction<
   TProgram extends string,

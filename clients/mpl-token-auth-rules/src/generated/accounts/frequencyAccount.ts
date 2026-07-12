@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -30,20 +17,31 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface FrequencyAccount {
-  key: Key;
-  lastUpdate: bigint;
-  period: bigint;
-}
+export type FrequencyAccount = { key: Key; lastUpdate: bigint; period: bigint };
 
-export interface FrequencyAccountArgs {
+export type FrequencyAccountArgs = {
   key: KeyArgs;
   lastUpdate: number | bigint;
   period: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link FrequencyAccountArgs} account data. */
 export function getFrequencyAccountEncoder(): FixedSizeEncoder<FrequencyAccountArgs> {
@@ -114,7 +112,7 @@ export async function fetchMaybeFrequencyAccount<
 
 export async function fetchAllFrequencyAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FrequencyAccount>[]> {
   const maybeAccounts = await fetchAllMaybeFrequencyAccount(
@@ -128,7 +126,7 @@ export async function fetchAllFrequencyAccount(
 
 export async function fetchAllMaybeFrequencyAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FrequencyAccount>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

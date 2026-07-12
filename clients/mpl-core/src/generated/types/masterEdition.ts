@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -25,19 +18,40 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 
-export interface MasterEdition {
+/**
+ * Internal plugin marking a collection as a template that assets
+ * can be printed from as numbered `Edition`s.
+ */
+export type MasterEdition = {
+  /**
+   * The maximum number of editions that may be printed from this
+   * master edition, if capped.
+   */
   maxSupply: Option<number>;
+  /** An override name to apply to editions printed from this master, if set. */
   name: Option<string>;
+  /** An override URI to apply to editions printed from this master, if set. */
   uri: Option<string>;
-}
+};
 
-export interface MasterEditionArgs {
+export type MasterEditionArgs = {
+  /**
+   * The maximum number of editions that may be printed from this
+   * master edition, if capped.
+   */
   maxSupply: OptionOrNullable<number>;
+  /** An override name to apply to editions printed from this master, if set. */
   name: OptionOrNullable<string>;
+  /** An override URI to apply to editions printed from this master, if set. */
   uri: OptionOrNullable<string>;
-}
+};
 
 export function getMasterEditionEncoder(): Encoder<MasterEditionArgs> {
   return getStructEncoder([

@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { DecompressV1Args, DecompressV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getDecompressV1ArgsDecoder,
   getDecompressV1ArgsEncoder,
+  type DecompressV1Args,
+  type DecompressV1ArgsArgs,
 } from "../types/index.js";
 
 export const DECOMPRESS_V1_DISCRIMINATOR = 18;
@@ -86,14 +87,22 @@ export type DecompressV1Instruction<
     ]
   >;
 
-export interface DecompressV1InstructionData {
+export type DecompressV1InstructionData = {
   discriminator: number;
+  /**
+   * The proof of the asset's pre-compression state, used to
+   * rebuild it.
+   */
   decompressV1Args: DecompressV1Args;
-}
+};
 
-export interface DecompressV1InstructionDataArgs {
+export type DecompressV1InstructionDataArgs = {
+  /**
+   * The proof of the asset's pre-compression state, used to
+   * rebuild it.
+   */
   decompressV1Args: DecompressV1ArgsArgs;
-}
+};
 
 export function getDecompressV1InstructionDataEncoder(): Encoder<DecompressV1InstructionDataArgs> {
   return transformEncoder(
@@ -122,14 +131,14 @@ export function getDecompressV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface DecompressV1Input<
+export type DecompressV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -143,8 +152,16 @@ export interface DecompressV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   decompressV1Args: DecompressV1InstructionDataArgs["decompressV1Args"];
-}
+};
 
+/**
+ * Restores a compressed (`LedgerState`) asset back to a full
+ * on-chain `AssetV1` account, verified against the supplied
+ * `CompressionProof`.
+ *
+ * Decompression is not currently enabled by the on-chain program;
+ * calling this instruction returns an error.
+ */
 export function getDecompressV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -224,10 +241,10 @@ export function getDecompressV1Instruction<
   >);
 }
 
-export interface ParsedDecompressV1Instruction<
+export type ParsedDecompressV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -244,7 +261,7 @@ export interface ParsedDecompressV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: DecompressV1InstructionData;
-}
+};
 
 export function parseDecompressV1Instruction<
   TProgram extends string,

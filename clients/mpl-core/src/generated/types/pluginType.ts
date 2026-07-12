@@ -6,33 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/** The kind of internal plugin, without its configuration or data. */
 export enum PluginType {
-  Royalties = 0,
-  FreezeDelegate = 1,
-  BurnDelegate = 2,
-  TransferDelegate = 3,
-  UpdateDelegate = 4,
-  PermanentFreezeDelegate = 5,
-  Attributes = 6,
-  PermanentTransferDelegate = 7,
-  PermanentBurnDelegate = 8,
-  Edition = 9,
-  MasterEdition = 10,
-  AddBlocker = 11,
-  ImmutableMetadata = 12,
-  VerifiedCreators = 13,
-  Autograph = 14,
-  BubblegumV2 = 15,
-  FreezeExecute = 16,
-  PermanentFreezeExecute = 17,
-  Groups = 18,
+  Royalties,
+  FreezeDelegate,
+  BurnDelegate,
+  TransferDelegate,
+  UpdateDelegate,
+  PermanentFreezeDelegate,
+  Attributes,
+  PermanentTransferDelegate,
+  PermanentBurnDelegate,
+  Edition,
+  MasterEdition,
+  AddBlocker,
+  ImmutableMetadata,
+  VerifiedCreators,
+  Autograph,
+  BubblegumV2,
+  FreezeExecute,
+  PermanentFreezeExecute,
+  Groups,
 }
 
 export type PluginTypeArgs = PluginType;

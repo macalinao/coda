@@ -6,32 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  AssetDataSchema,
-  AssetDataSchemaArgs,
-  MetadataArgsV2,
-  MetadataArgsV2Args,
-} from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -49,10 +23,28 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -61,6 +53,10 @@ import {
   getAssetDataSchemaEncoder,
   getMetadataArgsV2Decoder,
   getMetadataArgsV2Encoder,
+  type AssetDataSchema,
+  type AssetDataSchemaArgs,
+  type MetadataArgsV2,
+  type MetadataArgsV2Args,
 } from "../types/index.js";
 
 export const MINT_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -141,18 +137,36 @@ export type MintV2Instruction<
     ]
   >;
 
-export interface MintV2InstructionData {
+export type MintV2InstructionData = {
   discriminator: ReadonlyUint8Array;
+  /** Metadata for the newly minted `LeafSchema` V2 asset. */
   metadataArgs: MetadataArgsV2;
+  /**
+   * Optional raw asset data blob to associate with the newly minted
+   * asset. Reserved for future use.
+   */
   assetData: Option<ReadonlyUint8Array>;
+  /**
+   * Schema describing the format of `assetData`. Reserved for future
+   * use.
+   */
   assetDataSchema: Option<AssetDataSchema>;
-}
+};
 
-export interface MintV2InstructionDataArgs {
+export type MintV2InstructionDataArgs = {
+  /** Metadata for the newly minted `LeafSchema` V2 asset. */
   metadataArgs: MetadataArgsV2Args;
+  /**
+   * Optional raw asset data blob to associate with the newly minted
+   * asset. Reserved for future use.
+   */
   assetData: OptionOrNullable<ReadonlyUint8Array>;
+  /**
+   * Schema describing the format of `assetData`. Reserved for future
+   * use.
+   */
   assetDataSchema: OptionOrNullable<AssetDataSchemaArgs>;
-}
+};
 
 export function getMintV2InstructionDataEncoder(): Encoder<MintV2InstructionDataArgs> {
   return transformEncoder(
@@ -195,7 +209,7 @@ export function getMintV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface MintV2AsyncInput<
+export type MintV2AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountTreeDelegate extends string = string,
@@ -209,27 +223,75 @@ export interface MintV2AsyncInput<
   TAccountCompressionProgram extends string = string,
   TAccountMplCoreProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
-  /** Optional tree delegate, defaults to `payer` */
+  /** Optional tree delegate, defaults to `payer`. */
   treeDelegate?: TransactionSigner<TAccountTreeDelegate>;
-  /** Optional collection authority, defaults to `tree_delegate` */
+  /** Optional collection authority, defaults to `treeDelegate`. */
   collectionAuthority?: TransactionSigner<TAccountCollectionAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate?: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /**
+   * PDA Bubblegum uses to sign CPIs into the MPL Core program on behalf
+   * of a core collection.
+   */
   mplCoreCpiSigner?: Address<TAccountMplCoreCpiSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The MPL Core program, invoked for V2 collection CPIs. */
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   metadataArgs: MintV2InstructionDataArgs["metadataArgs"];
   assetData: MintV2InstructionDataArgs["assetData"];
   assetDataSchema: MintV2InstructionDataArgs["assetDataSchema"];
-}
+};
 
+/**
+ * Mints a new asset using `LeafSchema` V2 and optionally adds it to an
+ * MPL Core collection. Requires a tree created with `createTreeV2`.
+ *
+ * `LeafSchema` V2 enables new functionality over V1 minting:
+ *
+ * 1. Uses MPL Core collections instead of Token Metadata collections.
+ * 2. Uses the streamlined `MetadataArgsV2` arguments, which eliminate
+ *    the collection verified flag: any collection included is
+ *    automatically considered verified.
+ * 3. Allows plugins such as Royalties or Permanent Burn Delegate on the
+ *    MPL Core collection to authorize operations on the Bubblegum
+ *    asset. The `BubblegumV2` plugin must also be present on the MPL
+ *    Core collection for it to be usable with Bubblegum.
+ * 4. Allows freezing/thawing of the asset, as well as marking it
+ *    permanently non-transferable (soulbound).
+ * 5. Reserves (but does not yet use) an optional data blob and schema
+ *    that can be associated with the asset.
+ */
 export async function getMintV2InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -387,7 +449,7 @@ export async function getMintV2InstructionAsync<
   >);
 }
 
-export interface MintV2Input<
+export type MintV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountTreeDelegate extends string = string,
@@ -401,27 +463,75 @@ export interface MintV2Input<
   TAccountCompressionProgram extends string = string,
   TAccountMplCoreProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
-  /** Optional tree delegate, defaults to `payer` */
+  /** Optional tree delegate, defaults to `payer`. */
   treeDelegate?: TransactionSigner<TAccountTreeDelegate>;
-  /** Optional collection authority, defaults to `tree_delegate` */
+  /** Optional collection authority, defaults to `treeDelegate`. */
   collectionAuthority?: TransactionSigner<TAccountCollectionAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate?: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /**
+   * PDA Bubblegum uses to sign CPIs into the MPL Core program on behalf
+   * of a core collection.
+   */
   mplCoreCpiSigner?: Address<TAccountMplCoreCpiSigner>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The MPL Core program, invoked for V2 collection CPIs. */
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   metadataArgs: MintV2InstructionDataArgs["metadataArgs"];
   assetData: MintV2InstructionDataArgs["assetData"];
   assetDataSchema: MintV2InstructionDataArgs["assetDataSchema"];
-}
+};
 
+/**
+ * Mints a new asset using `LeafSchema` V2 and optionally adds it to an
+ * MPL Core collection. Requires a tree created with `createTreeV2`.
+ *
+ * `LeafSchema` V2 enables new functionality over V1 minting:
+ *
+ * 1. Uses MPL Core collections instead of Token Metadata collections.
+ * 2. Uses the streamlined `MetadataArgsV2` arguments, which eliminate
+ *    the collection verified flag: any collection included is
+ *    automatically considered verified.
+ * 3. Allows plugins such as Royalties or Permanent Burn Delegate on the
+ *    MPL Core collection to authorize operations on the Bubblegum
+ *    asset. The `BubblegumV2` plugin must also be present on the MPL
+ *    Core collection for it to be usable with Bubblegum.
+ * 4. Allows freezing/thawing of the asset, as well as marking it
+ *    permanently non-transferable (soulbound).
+ * 5. Reserves (but does not yet use) an optional data blob and schema
+ *    that can be associated with the asset.
+ */
 export function getMintV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -569,30 +679,59 @@ export function getMintV2Instruction<
   >);
 }
 
-export interface ParsedMintV2Instruction<
+export type ParsedMintV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[1];
-    /** Optional tree delegate, defaults to `payer` */
+    /** Optional tree delegate, defaults to `payer`. */
     treeDelegate?: TAccountMetas[2] | undefined;
-    /** Optional collection authority, defaults to `tree_delegate` */
+    /** Optional collection authority, defaults to `treeDelegate`. */
     collectionAuthority?: TAccountMetas[3] | undefined;
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[4];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate?: TAccountMetas[5] | undefined;
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[6];
+    /** MPL Core collection account the asset belongs to (V2 collections). */
     coreCollection?: TAccountMetas[7] | undefined;
+    /**
+     * PDA Bubblegum uses to sign CPIs into the MPL Core program on behalf
+     * of a core collection.
+     */
     mplCoreCpiSigner?: TAccountMetas[8] | undefined;
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[9];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[10];
+    /** The MPL Core program, invoked for V2 collection CPIs. */
     mplCoreProgram: TAccountMetas[11];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[12];
   };
   data: MintV2InstructionData;
-}
+};
 
 export function parseMintV2Instruction<
   TProgram extends string,

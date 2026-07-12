@@ -6,18 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  ExternalPluginAdapterKey,
-  ExternalPluginAdapterKeyArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -30,21 +18,34 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getExternalPluginAdapterKeyDecoder,
   getExternalPluginAdapterKeyEncoder,
+  type ExternalPluginAdapterKey,
+  type ExternalPluginAdapterKeyArgs,
 } from "./index.js";
 
-export interface WriteCollectionExternalPluginAdapterDataV1Args {
+/** Arguments for `writeCollectionExternalPluginAdapterDataV1`. */
+export type WriteCollectionExternalPluginAdapterDataV1Args = {
+  /** Identifies which external plugin adapter's data to write. */
   key: ExternalPluginAdapterKey;
+  /** The bytes to store, or `None` to clear the adapter's data. */
   data: Option<ReadonlyUint8Array>;
-}
+};
 
-export interface WriteCollectionExternalPluginAdapterDataV1ArgsArgs {
+export type WriteCollectionExternalPluginAdapterDataV1ArgsArgs = {
+  /** Identifies which external plugin adapter's data to write. */
   key: ExternalPluginAdapterKeyArgs;
+  /** The bytes to store, or `None` to clear the adapter's data. */
   data: OptionOrNullable<ReadonlyUint8Array>;
-}
+};
 
 export function getWriteCollectionExternalPluginAdapterDataV1ArgsEncoder(): Encoder<WriteCollectionExternalPluginAdapterDataV1ArgsArgs> {
   return getStructEncoder([

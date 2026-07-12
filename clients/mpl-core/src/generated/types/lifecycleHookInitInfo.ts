@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalCheckResult,
-  ExternalCheckResultArgs,
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-  ExtraAccount,
-  ExtraAccountArgs,
-  HookableLifecycleEvent,
-  HookableLifecycleEventArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -38,6 +18,12 @@ import {
   getStructEncoder,
   getTupleDecoder,
   getTupleEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
@@ -50,29 +36,64 @@ import {
   getExtraAccountEncoder,
   getHookableLifecycleEventDecoder,
   getHookableLifecycleEventEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalCheckResult,
+  type ExternalCheckResultArgs,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
+  type ExtraAccount,
+  type ExtraAccountArgs,
+  type HookableLifecycleEvent,
+  type HookableLifecycleEventArgs,
 } from "./index.js";
 
-export interface LifecycleHookInitInfo {
+/** Initialization data for the `LifecycleHook` external plugin adapter. */
+export type LifecycleHookInitInfo = {
+  /** The program to invoke via CPI at the configured lifecycle events. */
   hookedProgram: Address;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: Option<Authority>;
+  /**
+   * The lifecycle events that should trigger the hook, and how
+   * its result should be interpreted.
+   */
   lifecycleChecks: Array<
     readonly [HookableLifecycleEvent, ExternalCheckResult]
   >;
-  extraAccounts: Option<ExtraAccount[]>;
+  /** Additional accounts to forward to the hooked program. */
+  extraAccounts: Option<Array<ExtraAccount>>;
+  /** The authority allowed to write data returned by the hook, if any. */
   dataAuthority: Option<Authority>;
+  /** The serialization format to use for data returned by the hook. */
   schema: Option<ExternalPluginAdapterSchema>;
-}
+};
 
-export interface LifecycleHookInitInfoArgs {
+export type LifecycleHookInitInfoArgs = {
+  /** The program to invoke via CPI at the configured lifecycle events. */
   hookedProgram: Address;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: OptionOrNullable<AuthorityArgs>;
+  /**
+   * The lifecycle events that should trigger the hook, and how
+   * its result should be interpreted.
+   */
   lifecycleChecks: Array<
     readonly [HookableLifecycleEventArgs, ExternalCheckResultArgs]
   >;
-  extraAccounts: OptionOrNullable<ExtraAccountArgs[]>;
+  /** Additional accounts to forward to the hooked program. */
+  extraAccounts: OptionOrNullable<Array<ExtraAccountArgs>>;
+  /** The authority allowed to write data returned by the hook, if any. */
   dataAuthority: OptionOrNullable<AuthorityArgs>;
+  /** The serialization format to use for data returned by the hook. */
   schema: OptionOrNullable<ExternalPluginAdapterSchemaArgs>;
-}
+};
 
 export function getLifecycleHookInitInfoEncoder(): Encoder<LifecycleHookInitInfoArgs> {
   return getStructEncoder([

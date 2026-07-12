@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemoveCollectionExternalPluginAdapterV1Args,
-  RemoveCollectionExternalPluginAdapterV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemoveCollectionExternalPluginAdapterV1ArgsDecoder,
   getRemoveCollectionExternalPluginAdapterV1ArgsEncoder,
+  type RemoveCollectionExternalPluginAdapterV1Args,
+  type RemoveCollectionExternalPluginAdapterV1ArgsArgs,
 } from "../types/index.js";
 
 export const REMOVE_COLLECTION_EXTERNAL_PLUGIN_ADAPTER_V1_DISCRIMINATOR = 25;
@@ -87,14 +85,16 @@ export type RemoveCollectionExternalPluginAdapterV1Instruction<
     ]
   >;
 
-export interface RemoveCollectionExternalPluginAdapterV1InstructionData {
+export type RemoveCollectionExternalPluginAdapterV1InstructionData = {
   discriminator: number;
+  /** Identifies which adapter to remove. */
   removeCollectionExternalPluginAdapterV1Args: RemoveCollectionExternalPluginAdapterV1Args;
-}
+};
 
-export interface RemoveCollectionExternalPluginAdapterV1InstructionDataArgs {
+export type RemoveCollectionExternalPluginAdapterV1InstructionDataArgs = {
+  /** Identifies which adapter to remove. */
   removeCollectionExternalPluginAdapterV1Args: RemoveCollectionExternalPluginAdapterV1ArgsArgs;
-}
+};
 
 export function getRemoveCollectionExternalPluginAdapterV1InstructionDataEncoder(): Encoder<RemoveCollectionExternalPluginAdapterV1InstructionDataArgs> {
   return transformEncoder(
@@ -132,13 +132,13 @@ export function getRemoveCollectionExternalPluginAdapterV1InstructionDataCodec()
   );
 }
 
-export interface RemoveCollectionExternalPluginAdapterV1Input<
+export type RemoveCollectionExternalPluginAdapterV1Input<
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   collection: Address<TAccountCollection>;
   /** The account paying for the storage fees */
@@ -150,8 +150,12 @@ export interface RemoveCollectionExternalPluginAdapterV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   removeCollectionExternalPluginAdapterV1Args: RemoveCollectionExternalPluginAdapterV1InstructionDataArgs["removeCollectionExternalPluginAdapterV1Args"];
-}
+};
 
+/**
+ * Removes an external plugin adapter from a collection,
+ * identified by its key.
+ */
 export function getRemoveCollectionExternalPluginAdapterV1Instruction<
   TAccountCollection extends string,
   TAccountPayer extends string,
@@ -225,10 +229,10 @@ export function getRemoveCollectionExternalPluginAdapterV1Instruction<
   >);
 }
 
-export interface ParsedRemoveCollectionExternalPluginAdapterV1Instruction<
+export type ParsedRemoveCollectionExternalPluginAdapterV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -243,7 +247,7 @@ export interface ParsedRemoveCollectionExternalPluginAdapterV1Instruction<
     logWrapper?: TAccountMetas[4] | undefined;
   };
   data: RemoveCollectionExternalPluginAdapterV1InstructionData;
-}
+};
 
 export function parseRemoveCollectionExternalPluginAdapterV1Instruction<
   TProgram extends string,

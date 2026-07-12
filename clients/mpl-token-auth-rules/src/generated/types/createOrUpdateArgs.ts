@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -26,12 +18,20 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
-export interface CreateOrUpdateArgs {
+/** Versioned arguments for the `createOrUpdate` instruction. */
+export type CreateOrUpdateArgs = {
   __kind: "V1";
+  /** The CBOR-serialized RuleSet payload to store. */
   serializedRuleSet: ReadonlyUint8Array;
-}
+};
 
 export type CreateOrUpdateArgsArgs = CreateOrUpdateArgs;
 

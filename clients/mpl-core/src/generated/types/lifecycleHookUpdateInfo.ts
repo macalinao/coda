@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  ExternalCheckResult,
-  ExternalCheckResultArgs,
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-  ExtraAccount,
-  ExtraAccountArgs,
-  HookableLifecycleEvent,
-  HookableLifecycleEventArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -33,6 +16,11 @@ import {
   getStructEncoder,
   getTupleDecoder,
   getTupleEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getExternalCheckResultDecoder,
@@ -43,23 +31,38 @@ import {
   getExtraAccountEncoder,
   getHookableLifecycleEventDecoder,
   getHookableLifecycleEventEncoder,
+  type ExternalCheckResult,
+  type ExternalCheckResultArgs,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
+  type ExtraAccount,
+  type ExtraAccountArgs,
+  type HookableLifecycleEvent,
+  type HookableLifecycleEventArgs,
 } from "./index.js";
 
-export interface LifecycleHookUpdateInfo {
+/** Update data for the `LifecycleHook` external plugin adapter. */
+export type LifecycleHookUpdateInfo = {
+  /** The lifecycle events that should trigger the hook, if changing. */
   lifecycleChecks: Option<
     Array<readonly [HookableLifecycleEvent, ExternalCheckResult]>
   >;
-  extraAccounts: Option<ExtraAccount[]>;
+  /** Additional accounts to forward to the hooked program, if changing. */
+  extraAccounts: Option<Array<ExtraAccount>>;
+  /** The serialization format for hook data, if changing. */
   schema: Option<ExternalPluginAdapterSchema>;
-}
+};
 
-export interface LifecycleHookUpdateInfoArgs {
+export type LifecycleHookUpdateInfoArgs = {
+  /** The lifecycle events that should trigger the hook, if changing. */
   lifecycleChecks: OptionOrNullable<
     Array<readonly [HookableLifecycleEventArgs, ExternalCheckResultArgs]>
   >;
-  extraAccounts: OptionOrNullable<ExtraAccountArgs[]>;
+  /** Additional accounts to forward to the hooked program, if changing. */
+  extraAccounts: OptionOrNullable<Array<ExtraAccountArgs>>;
+  /** The serialization format for hook data, if changing. */
   schema: OptionOrNullable<ExternalPluginAdapterSchemaArgs>;
-}
+};
 
 export function getLifecycleHookUpdateInfoEncoder(): Encoder<LifecycleHookUpdateInfoArgs> {
   return getStructEncoder([

@@ -6,34 +6,47 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { RelationshipKind, RelationshipKindArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getRelationshipKindDecoder,
   getRelationshipKindEncoder,
+  type RelationshipKind,
+  type RelationshipKindArgs,
 } from "./index.js";
 
-export interface RelationshipEntry {
+/**
+ * A single membership relationship (e.g. to a collection or
+ * group) recorded in a `CreateGroupV1` call.
+ */
+export type RelationshipEntry = {
+  /**
+   * The kind of relationship this entry represents (e.g.
+   * collection membership, group nesting).
+   */
   kind: RelationshipKind;
+  /** The address of the related account. */
   key: Address;
-}
+};
 
-export interface RelationshipEntryArgs {
+export type RelationshipEntryArgs = {
+  /**
+   * The kind of relationship this entry represents (e.g.
+   * collection membership, group nesting).
+   */
   kind: RelationshipKindArgs;
+  /** The address of the related account. */
   key: Address;
-}
+};
 
 export function getRelationshipEntryEncoder(): FixedSizeEncoder<RelationshipEntryArgs> {
   return getStructEncoder([

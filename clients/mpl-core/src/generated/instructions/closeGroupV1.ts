@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { CloseGroupV1Args, CloseGroupV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -33,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCloseGroupV1ArgsDecoder,
   getCloseGroupV1ArgsEncoder,
+  type CloseGroupV1Args,
+  type CloseGroupV1ArgsArgs,
 } from "../types/index.js";
 
 export const CLOSE_GROUP_V1_DISCRIMINATOR = 40;
@@ -72,14 +73,16 @@ export type CloseGroupV1Instruction<
     ]
   >;
 
-export interface CloseGroupV1InstructionData {
+export type CloseGroupV1InstructionData = {
   discriminator: number;
+  /** Reserved for future use; currently carries no data. */
   closeGroupV1Args: CloseGroupV1Args;
-}
+};
 
-export interface CloseGroupV1InstructionDataArgs {
+export type CloseGroupV1InstructionDataArgs = {
+  /** Reserved for future use; currently carries no data. */
   closeGroupV1Args: CloseGroupV1ArgsArgs;
-}
+};
 
 export function getCloseGroupV1InstructionDataEncoder(): FixedSizeEncoder<CloseGroupV1InstructionDataArgs> {
   return transformEncoder(
@@ -108,11 +111,11 @@ export function getCloseGroupV1InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseGroupV1Input<
+export type CloseGroupV1Input<
   TAccountGroup extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
-> {
+> = {
   /** The address of the group to close */
   group: Address<TAccountGroup>;
   /** The account receiving reclaimed lamports */
@@ -120,8 +123,11 @@ export interface CloseGroupV1Input<
   /** The update authority of the group */
   authority?: TransactionSigner<TAccountAuthority>;
   closeGroupV1Args: CloseGroupV1InstructionDataArgs["closeGroupV1Args"];
-}
+};
 
+/**
+ * Closes an empty group account and refunds its rent to `payer`.
+ */
 export function getCloseGroupV1Instruction<
   TAccountGroup extends string,
   TAccountPayer extends string,
@@ -173,10 +179,10 @@ export function getCloseGroupV1Instruction<
   >);
 }
 
-export interface ParsedCloseGroupV1Instruction<
+export type ParsedCloseGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the group to close */
@@ -187,7 +193,7 @@ export interface ParsedCloseGroupV1Instruction<
     authority?: TAccountMetas[2] | undefined;
   };
   data: CloseGroupV1InstructionData;
-}
+};
 
 export function parseCloseGroupV1Instruction<
   TProgram extends string,

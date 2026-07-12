@@ -6,38 +6,54 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  PluginType,
-  PluginTypeArgs,
-} from "./index.js";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getPluginTypeDecoder,
   getPluginTypeEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type PluginType,
+  type PluginTypeArgs,
 } from "./index.js";
 
-export interface RegistryRecord {
+/**
+ * An entry in `PluginRegistryV1` describing one internal plugin
+ * and where its data lives in the account.
+ */
+export type RegistryRecord = {
+  /** The type of the internal plugin this record describes. */
   pluginType: PluginType;
+  /** The authority currently allowed to manage the plugin. */
   authority: Authority;
+  /**
+   * The byte offset, within the plugin registry, at which this
+   * plugin's data begins.
+   */
   offset: bigint;
-}
+};
 
-export interface RegistryRecordArgs {
+export type RegistryRecordArgs = {
+  /** The type of the internal plugin this record describes. */
   pluginType: PluginTypeArgs;
+  /** The authority currently allowed to manage the plugin. */
   authority: AuthorityArgs;
+  /**
+   * The byte offset, within the plugin registry, at which this
+   * plugin's data begins.
+   */
   offset: number | bigint;
-}
+};
 
 export function getRegistryRecordEncoder(): Encoder<RegistryRecordArgs> {
   return getStructEncoder([

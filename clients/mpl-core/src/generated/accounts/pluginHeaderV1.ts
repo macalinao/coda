@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -30,18 +17,48 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface PluginHeaderV1 {
+/**
+ * Marker account data written after an asset/collection's core
+ * fields once it has at least one plugin, pointing to the
+ * `PluginRegistryV1` that follows.
+ */
+export type PluginHeaderV1 = {
+  /** Account discriminator; always `Key.PluginHeaderV1`. */
   key: Key;
+  /**
+   * The byte offset, within the asset/collection account, at
+   * which the `PluginRegistryV1` data begins.
+   */
   pluginRegistryOffset: bigint;
-}
+};
 
-export interface PluginHeaderV1Args {
+export type PluginHeaderV1Args = {
+  /** Account discriminator; always `Key.PluginHeaderV1`. */
   key: KeyArgs;
+  /**
+   * The byte offset, within the asset/collection account, at
+   * which the `PluginRegistryV1` data begins.
+   */
   pluginRegistryOffset: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link PluginHeaderV1Args} account data. */
 export function getPluginHeaderV1Encoder(): FixedSizeEncoder<PluginHeaderV1Args> {
@@ -105,7 +122,7 @@ export async function fetchMaybePluginHeaderV1<
 
 export async function fetchAllPluginHeaderV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<PluginHeaderV1>[]> {
   const maybeAccounts = await fetchAllMaybePluginHeaderV1(
@@ -119,7 +136,7 @@ export async function fetchAllPluginHeaderV1(
 
 export async function fetchAllMaybePluginHeaderV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<PluginHeaderV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

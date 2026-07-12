@@ -6,22 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Edition {
+/**
+ * Internal plugin that assigns an edition number to an asset
+ * printed from a `MasterEdition`.
+ */
+export type Edition = {
+  /** The edition number assigned to this asset. */
   number: number;
-}
+};
 
 export type EditionArgs = Edition;
 
