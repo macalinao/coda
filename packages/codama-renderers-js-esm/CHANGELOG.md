@@ -1,5 +1,20 @@
 # @macalinao/codama-renderers-js-esm
 
+## 0.6.0
+
+### Minor Changes
+
+- a8a5159: Add documentation tooling for generated clients:
+
+  - `@macalinao/coda-visitors` now exports `setStructFieldDocsVisitor`, which
+    injects docs onto individual struct fields (account data fields and the
+    fields of instruction-argument structs) — something the built-in
+    `updateInstructionsVisitor` / `updateDefinedTypesVisitor` cannot reach.
+  - `@macalinao/codama-renderers-js-esm` now emits instruction-level `docs` as
+    JSDoc blocks above the generated `get<Name>Instruction` /
+    `get<Name>InstructionAsync` builder functions. The upstream
+    `@codama/renderers-js` templates dropped these.
+
 ## 0.5.1
 
 ### Patch Changes
