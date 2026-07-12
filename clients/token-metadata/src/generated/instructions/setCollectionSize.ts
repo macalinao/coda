@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  SetCollectionSizeArgs,
-  SetCollectionSizeArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -36,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getSetCollectionSizeArgsDecoder,
   getSetCollectionSizeArgsEncoder,
+  type SetCollectionSizeArgs,
+  type SetCollectionSizeArgsArgs,
 } from "../types/index.js";
 
 export const SET_COLLECTION_SIZE_DISCRIMINATOR = 34;
@@ -52,12 +50,14 @@ export function getSetCollectionSizeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetCollectionSizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountCollectionMetadata extends string | AccountMeta = string,
-  TAccountCollectionAuthority extends string | AccountMeta = string,
-  TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
-    undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountCollectionMetadata extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountCollectionMint extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthorityRecord extends
+    | string
+    | AccountMeta<string>
+    | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,14 +83,14 @@ export type SetCollectionSizeInstruction<
     ]
   >;
 
-export interface SetCollectionSizeInstructionData {
+export type SetCollectionSizeInstructionData = {
   discriminator: number;
   setCollectionSizeArgs: SetCollectionSizeArgs;
-}
+};
 
-export interface SetCollectionSizeInstructionDataArgs {
+export type SetCollectionSizeInstructionDataArgs = {
   setCollectionSizeArgs: SetCollectionSizeArgsArgs;
-}
+};
 
 export function getSetCollectionSizeInstructionDataEncoder(): FixedSizeEncoder<SetCollectionSizeInstructionDataArgs> {
   return transformEncoder(
@@ -119,12 +119,12 @@ export function getSetCollectionSizeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetCollectionSizeInput<
+export type SetCollectionSizeInput<
   TAccountCollectionMetadata extends string = string,
   TAccountCollectionAuthority extends string = string,
   TAccountCollectionMint extends string = string,
   TAccountCollectionAuthorityRecord extends string = string,
-> {
+> = {
   /** Collection Metadata account */
   collectionMetadata: Address<TAccountCollectionMetadata>;
   /** Collection Update authority */
@@ -134,7 +134,7 @@ export interface SetCollectionSizeInput<
   /** Collection Authority Record PDA */
   collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
   setCollectionSizeArgs: SetCollectionSizeInstructionDataArgs["setCollectionSizeArgs"];
-}
+};
 
 export function getSetCollectionSizeInstruction<
   TAccountCollectionMetadata extends string,
@@ -209,10 +209,10 @@ export function getSetCollectionSizeInstruction<
   >);
 }
 
-export interface ParsedSetCollectionSizeInstruction<
+export type ParsedSetCollectionSizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Collection Metadata account */
@@ -225,7 +225,7 @@ export interface ParsedSetCollectionSizeInstruction<
     collectionAuthorityRecord?: TAccountMetas[3] | undefined;
   };
   data: SetCollectionSizeInstructionData;
-}
+};
 
 export function parseSetCollectionSizeInstruction<
   TProgram extends string,
@@ -252,9 +252,7 @@ export function parseSetCollectionSizeInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 3;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

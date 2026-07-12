@@ -6,20 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum TokenStandard {
-  NonFungible = 0,
-  FungibleAsset = 1,
-  Fungible = 2,
-  NonFungibleEdition = 3,
-  ProgrammableNonFungible = 4,
-  ProgrammableNonFungibleEdition = 5,
+  NonFungible,
+  FungibleAsset,
+  Fungible,
+  NonFungibleEdition,
+  ProgrammableNonFungible,
+  ProgrammableNonFungibleEdition,
 }
 
 export type TokenStandardArgs = TokenStandard;

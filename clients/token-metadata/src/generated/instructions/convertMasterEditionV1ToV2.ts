@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -28,8 +15,21 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CONVERT_MASTER_EDITION_V1_TO_V2_DISCRIMINATOR = 12;
@@ -40,10 +40,10 @@ export function getConvertMasterEditionV1ToV2DiscriminatorBytes(): ReadonlyUint8
 
 export type ConvertMasterEditionV1ToV2Instruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountOneTimeAuth extends string | AccountMeta = string,
-  TAccountPrintingMint extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountOneTimeAuth extends string | AccountMeta<string> = string,
+  TAccountPrintingMint extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -61,9 +61,9 @@ export type ConvertMasterEditionV1ToV2Instruction<
     ]
   >;
 
-export interface ConvertMasterEditionV1ToV2InstructionData {
+export type ConvertMasterEditionV1ToV2InstructionData = {
   discriminator: number;
-}
+};
 
 export type ConvertMasterEditionV1ToV2InstructionDataArgs = {};
 
@@ -91,18 +91,18 @@ export function getConvertMasterEditionV1ToV2InstructionDataCodec(): FixedSizeCo
   );
 }
 
-export interface ConvertMasterEditionV1ToV2Input<
+export type ConvertMasterEditionV1ToV2Input<
   TAccountMasterEdition extends string = string,
   TAccountOneTimeAuth extends string = string,
   TAccountPrintingMint extends string = string,
-> {
+> = {
   /** Master Record Edition V1 (pda of ['metadata', program id, master metadata mint id, 'edition']) */
   masterEdition: Address<TAccountMasterEdition>;
   /** One time authorization mint */
   oneTimeAuth: Address<TAccountOneTimeAuth>;
   /** Printing mint */
   printingMint: Address<TAccountPrintingMint>;
-}
+};
 
 export function getConvertMasterEditionV1ToV2Instruction<
   TAccountMasterEdition extends string,
@@ -154,10 +154,10 @@ export function getConvertMasterEditionV1ToV2Instruction<
   >);
 }
 
-export interface ParsedConvertMasterEditionV1ToV2Instruction<
+export type ParsedConvertMasterEditionV1ToV2Instruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Master Record Edition V1 (pda of ['metadata', program id, master metadata mint id, 'edition']) */
@@ -168,7 +168,7 @@ export interface ParsedConvertMasterEditionV1ToV2Instruction<
     printingMint: TAccountMetas[2];
   };
   data: ConvertMasterEditionV1ToV2InstructionData;
-}
+};
 
 export function parseConvertMasterEditionV1ToV2Instruction<
   TProgram extends string,

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { UseArgs, UseArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -34,14 +16,34 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getUseArgsDecoder, getUseArgsEncoder } from "../types/index.js";
+import {
+  getUseArgsDecoder,
+  getUseArgsEncoder,
+  type UseArgs,
+  type UseArgsArgs,
+} from "../types/index.js";
 
 export const USE_DISCRIMINATOR = 51;
 
@@ -51,21 +53,22 @@ export function getUseDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UseInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountDelegateRecord extends string | AccountMeta = string,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountDelegateRecord extends string | AccountMeta<string> = string,
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRules extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSplTokenProgram extends string | AccountMeta<string> = string,
+  TAccountAuthorizationRulesProgram extends string | AccountMeta<string> =
+    string,
+  TAccountAuthorizationRules extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -112,14 +115,9 @@ export type UseInstruction<
     ]
   >;
 
-export interface UseInstructionData {
-  discriminator: number;
-  useArgs: UseArgs;
-}
+export type UseInstructionData = { discriminator: number; useArgs: UseArgs };
 
-export interface UseInstructionDataArgs {
-  useArgs: UseArgsArgs;
-}
+export type UseInstructionDataArgs = { useArgs: UseArgsArgs };
 
 export function getUseInstructionDataEncoder(): Encoder<UseInstructionDataArgs> {
   return transformEncoder(
@@ -148,7 +146,7 @@ export function getUseInstructionDataCodec(): Codec<
   );
 }
 
-export interface UseAsyncInput<
+export type UseAsyncInput<
   TAccountAuthority extends string = string,
   TAccountDelegateRecord extends string = string,
   TAccountToken extends string = string,
@@ -161,7 +159,7 @@ export interface UseAsyncInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Token owner or delegate */
   authority: TransactionSigner<TAccountAuthority>;
   /** Delegate record PDA */
@@ -187,7 +185,7 @@ export interface UseAsyncInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   useArgs: UseInstructionDataArgs["useArgs"];
-}
+};
 
 export async function getUseInstructionAsync<
   TAccountAuthority extends string,
@@ -285,6 +283,15 @@ export async function getUseInstructionAsync<
       ),
     });
   }
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -332,7 +339,7 @@ export async function getUseInstructionAsync<
   >);
 }
 
-export interface UseInput<
+export type UseInput<
   TAccountAuthority extends string = string,
   TAccountDelegateRecord extends string = string,
   TAccountToken extends string = string,
@@ -345,7 +352,7 @@ export interface UseInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Token owner or delegate */
   authority: TransactionSigner<TAccountAuthority>;
   /** Delegate record PDA */
@@ -371,7 +378,7 @@ export interface UseInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   useArgs: UseInstructionDataArgs["useArgs"];
-}
+};
 
 export function getUseInstruction<
   TAccountAuthority extends string,
@@ -505,10 +512,10 @@ export function getUseInstruction<
   >);
 }
 
-export interface ParsedUseInstruction<
+export type ParsedUseInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Token owner or delegate */
@@ -537,7 +544,7 @@ export interface ParsedUseInstruction<
     authorizationRules?: TAccountMetas[11] | undefined;
   };
   data: UseInstructionData;
-}
+};
 
 export function parseUseInstruction<
   TProgram extends string,

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type {
-  EscrowAuthority,
-  EscrowAuthorityArgs,
-  Key,
-  KeyArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,27 +19,41 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
 import {
   getEscrowAuthorityDecoder,
   getEscrowAuthorityEncoder,
   getKeyDecoder,
   getKeyEncoder,
+  type EscrowAuthority,
+  type EscrowAuthorityArgs,
+  type Key,
+  type KeyArgs,
 } from "../types/index.js";
 
-export interface TokenOwnedEscrow {
+export type TokenOwnedEscrow = {
   key: Key;
   baseToken: Address;
   authority: EscrowAuthority;
   bump: number;
-}
+};
 
-export interface TokenOwnedEscrowArgs {
+export type TokenOwnedEscrowArgs = {
   key: KeyArgs;
   baseToken: Address;
   authority: EscrowAuthorityArgs;
   bump: number;
-}
+};
 
 /** Gets the encoder for {@link TokenOwnedEscrowArgs} account data. */
 export function getTokenOwnedEscrowEncoder(): Encoder<TokenOwnedEscrowArgs> {
@@ -130,7 +126,7 @@ export async function fetchMaybeTokenOwnedEscrow<
 
 export async function fetchAllTokenOwnedEscrow(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TokenOwnedEscrow>[]> {
   const maybeAccounts = await fetchAllMaybeTokenOwnedEscrow(
@@ -144,7 +140,7 @@ export async function fetchAllTokenOwnedEscrow(
 
 export async function fetchAllMaybeTokenOwnedEscrow(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TokenOwnedEscrow>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

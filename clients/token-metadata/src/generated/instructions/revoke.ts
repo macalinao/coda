@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { RevokeArgs, RevokeArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -35,14 +16,35 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getRevokeArgsDecoder, getRevokeArgsEncoder } from "../types/index.js";
+import {
+  getRevokeArgsDecoder,
+  getRevokeArgsEncoder,
+  type RevokeArgs,
+  type RevokeArgsArgs,
+} from "../types/index.js";
 
 export const REVOKE_DISCRIMINATOR = 45;
 
@@ -52,23 +54,24 @@ export function getRevokeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RevokeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountDelegateRecord extends string | AccountMeta = string,
-  TAccountDelegate extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountTokenRecord extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountDelegateRecord extends string | AccountMeta<string> = string,
+  TAccountDelegate extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountTokenRecord extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRulesProgram extends string | AccountMeta = string,
-  TAccountAuthorizationRules extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSplTokenProgram extends string | AccountMeta<string> = string,
+  TAccountAuthorizationRulesProgram extends string | AccountMeta<string> =
+    string,
+  TAccountAuthorizationRules extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -121,14 +124,12 @@ export type RevokeInstruction<
     ]
   >;
 
-export interface RevokeInstructionData {
+export type RevokeInstructionData = {
   discriminator: number;
   revokeArgs: RevokeArgs;
-}
+};
 
-export interface RevokeInstructionDataArgs {
-  revokeArgs: RevokeArgsArgs;
-}
+export type RevokeInstructionDataArgs = { revokeArgs: RevokeArgsArgs };
 
 export function getRevokeInstructionDataEncoder(): FixedSizeEncoder<RevokeInstructionDataArgs> {
   return transformEncoder(
@@ -157,7 +158,7 @@ export function getRevokeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RevokeAsyncInput<
+export type RevokeAsyncInput<
   TAccountDelegateRecord extends string = string,
   TAccountDelegate extends string = string,
   TAccountMetadata extends string = string,
@@ -172,7 +173,7 @@ export interface RevokeAsyncInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Delegate record account */
   delegateRecord?: Address<TAccountDelegateRecord>;
   /** Owner of the delegated account */
@@ -202,7 +203,7 @@ export interface RevokeAsyncInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   revokeArgs: RevokeInstructionDataArgs["revokeArgs"];
-}
+};
 
 export async function getRevokeInstructionAsync<
   TAccountDelegateRecord extends string,
@@ -308,6 +309,15 @@ export async function getRevokeInstructionAsync<
       ),
     });
   }
+  if (!accounts.masterEdition.value) {
+    accounts.masterEdition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -361,7 +371,7 @@ export async function getRevokeInstructionAsync<
   >);
 }
 
-export interface RevokeInput<
+export type RevokeInput<
   TAccountDelegateRecord extends string = string,
   TAccountDelegate extends string = string,
   TAccountMetadata extends string = string,
@@ -376,7 +386,7 @@ export interface RevokeInput<
   TAccountSplTokenProgram extends string = string,
   TAccountAuthorizationRulesProgram extends string = string,
   TAccountAuthorizationRules extends string = string,
-> {
+> = {
   /** Delegate record account */
   delegateRecord?: Address<TAccountDelegateRecord>;
   /** Owner of the delegated account */
@@ -406,7 +416,7 @@ export interface RevokeInput<
   /** Token Authorization Rules account */
   authorizationRules?: Address<TAccountAuthorizationRules>;
   revokeArgs: RevokeInstructionDataArgs["revokeArgs"];
-}
+};
 
 export function getRevokeInstruction<
   TAccountDelegateRecord extends string,
@@ -554,10 +564,10 @@ export function getRevokeInstruction<
   >);
 }
 
-export interface ParsedRevokeInstruction<
+export type ParsedRevokeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Delegate record account */
@@ -590,7 +600,7 @@ export interface ParsedRevokeInstruction<
     authorizationRules?: TAccountMetas[13] | undefined;
   };
   data: RevokeInstructionData;
-}
+};
 
 export function parseRevokeInstruction<
   TProgram extends string,

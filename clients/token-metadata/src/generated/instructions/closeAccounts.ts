@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -32,10 +16,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -48,12 +46,12 @@ export function getCloseAccountsDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CloseAccountsInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountDestination extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountDestination extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -78,9 +76,7 @@ export type CloseAccountsInstruction<
     ]
   >;
 
-export interface CloseAccountsInstructionData {
-  discriminator: number;
-}
+export type CloseAccountsInstructionData = { discriminator: number };
 
 export type CloseAccountsInstructionDataArgs = {};
 
@@ -105,13 +101,13 @@ export function getCloseAccountsInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseAccountsAsyncInput<
+export type CloseAccountsAsyncInput<
   TAccountMetadata extends string = string,
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountAuthority extends string = string,
   TAccountDestination extends string = string,
-> {
+> = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
   metadata?: Address<TAccountMetadata>;
   /** Edition of the asset */
@@ -122,7 +118,7 @@ export interface CloseAccountsAsyncInput<
   authority: TransactionSigner<TAccountAuthority>;
   /** The destination account that will receive the rent. */
   destination: Address<TAccountDestination>;
-}
+};
 
 export async function getCloseAccountsInstructionAsync<
   TAccountMetadata extends string,
@@ -199,13 +195,13 @@ export async function getCloseAccountsInstructionAsync<
   >);
 }
 
-export interface CloseAccountsInput<
+export type CloseAccountsInput<
   TAccountMetadata extends string = string,
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountAuthority extends string = string,
   TAccountDestination extends string = string,
-> {
+> = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
   metadata: Address<TAccountMetadata>;
   /** Edition of the asset */
@@ -216,7 +212,7 @@ export interface CloseAccountsInput<
   authority: TransactionSigner<TAccountAuthority>;
   /** The destination account that will receive the rent. */
   destination: Address<TAccountDestination>;
-}
+};
 
 export function getCloseAccountsInstruction<
   TAccountMetadata extends string,
@@ -280,10 +276,10 @@ export function getCloseAccountsInstruction<
   >);
 }
 
-export interface ParsedCloseAccountsInstruction<
+export type ParsedCloseAccountsInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata (pda of ['metadata', program id, mint id]) */
@@ -298,7 +294,7 @@ export interface ParsedCloseAccountsInstruction<
     destination: TAccountMetas[4];
   };
   data: CloseAccountsInstructionData;
-}
+};
 
 export function parseCloseAccountsInstruction<
   TProgram extends string,

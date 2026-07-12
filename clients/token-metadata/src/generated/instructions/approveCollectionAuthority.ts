@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -33,10 +16,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -49,16 +47,17 @@ export function getApproveCollectionAuthorityDiscriminatorBytes(): ReadonlyUint8
 
 export type ApproveCollectionAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountCollectionAuthorityRecord extends string | AccountMeta = string,
-  TAccountNewCollectionAuthority extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountCollectionAuthorityRecord extends string | AccountMeta<string> =
+    string,
+  TAccountNewCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRent extends string | AccountMeta<string> | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -97,9 +96,9 @@ export type ApproveCollectionAuthorityInstruction<
     ]
   >;
 
-export interface ApproveCollectionAuthorityInstructionData {
+export type ApproveCollectionAuthorityInstructionData = {
   discriminator: number;
-}
+};
 
 export type ApproveCollectionAuthorityInstructionDataArgs = {};
 
@@ -127,7 +126,7 @@ export function getApproveCollectionAuthorityInstructionDataCodec(): FixedSizeCo
   );
 }
 
-export interface ApproveCollectionAuthorityAsyncInput<
+export type ApproveCollectionAuthorityAsyncInput<
   TAccountCollectionAuthorityRecord extends string = string,
   TAccountNewCollectionAuthority extends string = string,
   TAccountUpdateAuthority extends string = string,
@@ -136,7 +135,7 @@ export interface ApproveCollectionAuthorityAsyncInput<
   TAccountMint extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Collection Authority Record PDA */
   collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
   /** A Collection Authority */
@@ -153,7 +152,7 @@ export interface ApproveCollectionAuthorityAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getApproveCollectionAuthorityInstructionAsync<
   TAccountCollectionAuthorityRecord extends string,
@@ -261,7 +260,7 @@ export async function getApproveCollectionAuthorityInstructionAsync<
   >);
 }
 
-export interface ApproveCollectionAuthorityInput<
+export type ApproveCollectionAuthorityInput<
   TAccountCollectionAuthorityRecord extends string = string,
   TAccountNewCollectionAuthority extends string = string,
   TAccountUpdateAuthority extends string = string,
@@ -270,7 +269,7 @@ export interface ApproveCollectionAuthorityInput<
   TAccountMint extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Collection Authority Record PDA */
   collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
   /** A Collection Authority */
@@ -287,7 +286,7 @@ export interface ApproveCollectionAuthorityInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getApproveCollectionAuthorityInstruction<
   TAccountCollectionAuthorityRecord extends string,
@@ -384,10 +383,10 @@ export function getApproveCollectionAuthorityInstruction<
   >);
 }
 
-export interface ParsedApproveCollectionAuthorityInstruction<
+export type ParsedApproveCollectionAuthorityInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Collection Authority Record PDA */
@@ -408,7 +407,7 @@ export interface ParsedApproveCollectionAuthorityInstruction<
     rent?: TAccountMetas[7] | undefined;
   };
   data: ApproveCollectionAuthorityInstructionData;
-}
+};
 
 export function parseApproveCollectionAuthorityInstruction<
   TProgram extends string,
@@ -435,9 +434,7 @@ export function parseApproveCollectionAuthorityInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 7;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

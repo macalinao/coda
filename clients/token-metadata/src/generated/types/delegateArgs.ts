@@ -6,17 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { AuthorizationData, AuthorizationDataArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -29,10 +18,20 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorizationDataDecoder,
   getAuthorizationDataEncoder,
+  type AuthorizationData,
+  type AuthorizationDataArgs,
 } from "./index.js";
 
 export type DelegateArgs =

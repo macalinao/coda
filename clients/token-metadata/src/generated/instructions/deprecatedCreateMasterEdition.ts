@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -33,12 +16,27 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DEPRECATED_CREATE_MASTER_EDITION_DISCRIMINATOR = 2;
@@ -49,26 +47,27 @@ export function getDeprecatedCreateMasterEditionDiscriminatorBytes(): ReadonlyUi
 
 export type DeprecatedCreateMasterEditionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountPrintingMint extends string | AccountMeta = string,
-  TAccountOneTimePrintingAuthorizationMint extends string | AccountMeta =
-    string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountPrintingMintAuthority extends string | AccountMeta = string,
-  TAccountMintAuthority extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountPrintingMint extends string | AccountMeta<string> = string,
+  TAccountOneTimePrintingAuthorizationMint extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountPrintingMintAuthority extends string | AccountMeta<string> = string,
+  TAccountMintAuthority extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
   TAccountOneTimePrintingAuthorizationMintAuthority extends
     | string
-    | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+    | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -121,9 +120,9 @@ export type DeprecatedCreateMasterEditionInstruction<
     ]
   >;
 
-export interface DeprecatedCreateMasterEditionInstructionData {
+export type DeprecatedCreateMasterEditionInstructionData = {
   discriminator: number;
-}
+};
 
 export type DeprecatedCreateMasterEditionInstructionDataArgs = {};
 
@@ -151,7 +150,7 @@ export function getDeprecatedCreateMasterEditionInstructionDataCodec(): FixedSiz
   );
 }
 
-export interface DeprecatedCreateMasterEditionAsyncInput<
+export type DeprecatedCreateMasterEditionAsyncInput<
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountPrintingMint extends string = string,
@@ -165,9 +164,9 @@ export interface DeprecatedCreateMasterEditionAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
   TAccountOneTimePrintingAuthorizationMintAuthority extends string = string,
-> {
+> = {
   /** Unallocated edition V1 account with address as pda of ['metadata', program id, mint, 'edition'] */
-  edition: Address<TAccountEdition>;
+  edition?: Address<TAccountEdition>;
   /** Metadata mint */
   mint: Address<TAccountMint>;
   /** Printing mint - A mint you control that can mint tokens that can be exchanged for limited editions of your master edition via the MintNewEditionFromMasterEditionViaToken endpoint */
@@ -192,7 +191,7 @@ export interface DeprecatedCreateMasterEditionAsyncInput<
   rent?: Address<TAccountRent>;
   /** One time authorization printing mint authority - must be provided if using max supply. THIS WILL TRANSFER AUTHORITY AWAY FROM THIS KEY. */
   oneTimePrintingAuthorizationMintAuthority: TransactionSigner<TAccountOneTimePrintingAuthorizationMintAuthority>;
-}
+};
 
 export async function getDeprecatedCreateMasterEditionInstructionAsync<
   TAccountEdition extends string,
@@ -282,6 +281,15 @@ export async function getDeprecatedCreateMasterEditionInstructionAsync<
   >;
 
   // Resolve default values.
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
@@ -347,7 +355,7 @@ export async function getDeprecatedCreateMasterEditionInstructionAsync<
   >);
 }
 
-export interface DeprecatedCreateMasterEditionInput<
+export type DeprecatedCreateMasterEditionInput<
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountPrintingMint extends string = string,
@@ -361,7 +369,7 @@ export interface DeprecatedCreateMasterEditionInput<
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
   TAccountOneTimePrintingAuthorizationMintAuthority extends string = string,
-> {
+> = {
   /** Unallocated edition V1 account with address as pda of ['metadata', program id, mint, 'edition'] */
   edition: Address<TAccountEdition>;
   /** Metadata mint */
@@ -388,7 +396,7 @@ export interface DeprecatedCreateMasterEditionInput<
   rent?: Address<TAccountRent>;
   /** One time authorization printing mint authority - must be provided if using max supply. THIS WILL TRANSFER AUTHORITY AWAY FROM THIS KEY. */
   oneTimePrintingAuthorizationMintAuthority: TransactionSigner<TAccountOneTimePrintingAuthorizationMintAuthority>;
-}
+};
 
 export function getDeprecatedCreateMasterEditionInstruction<
   TAccountEdition extends string,
@@ -532,10 +540,10 @@ export function getDeprecatedCreateMasterEditionInstruction<
   >);
 }
 
-export interface ParsedDeprecatedCreateMasterEditionInstruction<
+export type ParsedDeprecatedCreateMasterEditionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Unallocated edition V1 account with address as pda of ['metadata', program id, mint, 'edition'] */
@@ -566,7 +574,7 @@ export interface ParsedDeprecatedCreateMasterEditionInstruction<
     oneTimePrintingAuthorizationMintAuthority: TAccountMetas[12];
   };
   data: DeprecatedCreateMasterEditionInstructionData;
-}
+};
 
 export function parseDeprecatedCreateMasterEditionInstruction<
   TProgram extends string,

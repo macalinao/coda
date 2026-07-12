@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,12 +16,28 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CREATE_MASTER_EDITION_DISCRIMINATOR = 10;
@@ -50,19 +48,19 @@ export function getCreateMasterEditionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateMasterEditionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountMintAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountMintAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -101,9 +99,7 @@ export type CreateMasterEditionInstruction<
     ]
   >;
 
-export interface CreateMasterEditionInstructionData {
-  discriminator: number;
-}
+export type CreateMasterEditionInstructionData = { discriminator: number };
 
 export type CreateMasterEditionInstructionDataArgs = {};
 
@@ -131,7 +127,7 @@ export function getCreateMasterEditionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateMasterEditionAsyncInput<
+export type CreateMasterEditionAsyncInput<
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountUpdateAuthority extends string = string,
@@ -141,9 +137,9 @@ export interface CreateMasterEditionAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition'] */
-  edition: Address<TAccountEdition>;
+  edition?: Address<TAccountEdition>;
   /** Metadata mint */
   mint: Address<TAccountMint>;
   /** Update authority */
@@ -160,7 +156,7 @@ export interface CreateMasterEditionAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getCreateMasterEditionInstructionAsync<
   TAccountEdition extends string,
@@ -225,6 +221,15 @@ export async function getCreateMasterEditionInstructionAsync<
   >;
 
   // Resolve default values.
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({
       programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
@@ -276,7 +281,7 @@ export async function getCreateMasterEditionInstructionAsync<
   >);
 }
 
-export interface CreateMasterEditionInput<
+export type CreateMasterEditionInput<
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
   TAccountUpdateAuthority extends string = string,
@@ -286,7 +291,7 @@ export interface CreateMasterEditionInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   /** Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition'] */
   edition: Address<TAccountEdition>;
   /** Metadata mint */
@@ -305,7 +310,7 @@ export interface CreateMasterEditionInput<
   systemProgram?: Address<TAccountSystemProgram>;
   /** Rent info */
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getCreateMasterEditionInstruction<
   TAccountEdition extends string,
@@ -410,10 +415,10 @@ export function getCreateMasterEditionInstruction<
   >);
 }
 
-export interface ParsedCreateMasterEditionInstruction<
+export type ParsedCreateMasterEditionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition'] */
@@ -436,7 +441,7 @@ export interface ParsedCreateMasterEditionInstruction<
     rent: TAccountMetas[8];
   };
   data: CreateMasterEditionInstructionData;
-}
+};
 
 export function parseCreateMasterEditionInstruction<
   TProgram extends string,

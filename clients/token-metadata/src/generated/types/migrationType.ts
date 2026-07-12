@@ -6,16 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum MigrationType {
-  CollectionV1 = 0,
-  ProgrammableV1 = 1,
+  CollectionV1,
+  ProgrammableV1,
 }
 
 export type MigrationTypeArgs = MigrationType;

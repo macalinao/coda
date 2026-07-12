@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  SetCollectionSizeArgs,
-  SetCollectionSizeArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -36,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getSetCollectionSizeArgsDecoder,
   getSetCollectionSizeArgsEncoder,
+  type SetCollectionSizeArgs,
+  type SetCollectionSizeArgsArgs,
 } from "../types/index.js";
 
 export const BUBBLEGUM_SET_COLLECTION_SIZE_DISCRIMINATOR = 36;
@@ -52,13 +50,15 @@ export function getBubblegumSetCollectionSizeDiscriminatorBytes(): ReadonlyUint8
 
 export type BubblegumSetCollectionSizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountCollectionMetadata extends string | AccountMeta = string,
-  TAccountCollectionAuthority extends string | AccountMeta = string,
-  TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountBubblegumSigner extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
-    undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountCollectionMetadata extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountCollectionMint extends string | AccountMeta<string> = string,
+  TAccountBubblegumSigner extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthorityRecord extends
+    | string
+    | AccountMeta<string>
+    | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -88,14 +88,14 @@ export type BubblegumSetCollectionSizeInstruction<
     ]
   >;
 
-export interface BubblegumSetCollectionSizeInstructionData {
+export type BubblegumSetCollectionSizeInstructionData = {
   discriminator: number;
   setCollectionSizeArgs: SetCollectionSizeArgs;
-}
+};
 
-export interface BubblegumSetCollectionSizeInstructionDataArgs {
+export type BubblegumSetCollectionSizeInstructionDataArgs = {
   setCollectionSizeArgs: SetCollectionSizeArgsArgs;
-}
+};
 
 export function getBubblegumSetCollectionSizeInstructionDataEncoder(): FixedSizeEncoder<BubblegumSetCollectionSizeInstructionDataArgs> {
   return transformEncoder(
@@ -127,13 +127,13 @@ export function getBubblegumSetCollectionSizeInstructionDataCodec(): FixedSizeCo
   );
 }
 
-export interface BubblegumSetCollectionSizeInput<
+export type BubblegumSetCollectionSizeInput<
   TAccountCollectionMetadata extends string = string,
   TAccountCollectionAuthority extends string = string,
   TAccountCollectionMint extends string = string,
   TAccountBubblegumSigner extends string = string,
   TAccountCollectionAuthorityRecord extends string = string,
-> {
+> = {
   /** Collection Metadata account */
   collectionMetadata: Address<TAccountCollectionMetadata>;
   /** Collection Update authority */
@@ -145,7 +145,7 @@ export interface BubblegumSetCollectionSizeInput<
   /** Collection Authority Record PDA */
   collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
   setCollectionSizeArgs: BubblegumSetCollectionSizeInstructionDataArgs["setCollectionSizeArgs"];
-}
+};
 
 export function getBubblegumSetCollectionSizeInstruction<
   TAccountCollectionMetadata extends string,
@@ -229,10 +229,10 @@ export function getBubblegumSetCollectionSizeInstruction<
   >);
 }
 
-export interface ParsedBubblegumSetCollectionSizeInstruction<
+export type ParsedBubblegumSetCollectionSizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Collection Metadata account */
@@ -247,7 +247,7 @@ export interface ParsedBubblegumSetCollectionSizeInstruction<
     collectionAuthorityRecord?: TAccountMetas[4] | undefined;
   };
   data: BubblegumSetCollectionSizeInstructionData;
-}
+};
 
 export function parseBubblegumSetCollectionSizeInstruction<
   TProgram extends string,
@@ -274,9 +274,7 @@ export function parseBubblegumSetCollectionSizeInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 4;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

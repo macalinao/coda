@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { VerificationArgs, VerificationArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -33,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getVerificationArgsDecoder,
   getVerificationArgsEncoder,
+  type VerificationArgs,
+  type VerificationArgsArgs,
 } from "../types/index.js";
 
 export const UNVERIFY_DISCRIMINATOR = 53;
@@ -49,16 +50,16 @@ export function getUnverifyDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UnverifyInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountDelegateRecord extends string | AccountMeta = string,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountCollectionMetadata extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountDelegateRecord extends string | AccountMeta<string> = string,
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountCollectionMint extends string | AccountMeta<string> = string,
+  TAccountCollectionMetadata extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -89,14 +90,14 @@ export type UnverifyInstruction<
     ]
   >;
 
-export interface UnverifyInstructionData {
+export type UnverifyInstructionData = {
   discriminator: number;
   verificationArgs: VerificationArgs;
-}
+};
 
-export interface UnverifyInstructionDataArgs {
+export type UnverifyInstructionDataArgs = {
   verificationArgs: VerificationArgsArgs;
-}
+};
 
 export function getUnverifyInstructionDataEncoder(): FixedSizeEncoder<UnverifyInstructionDataArgs> {
   return transformEncoder(
@@ -125,7 +126,7 @@ export function getUnverifyInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UnverifyInput<
+export type UnverifyInput<
   TAccountAuthority extends string = string,
   TAccountDelegateRecord extends string = string,
   TAccountMetadata extends string = string,
@@ -133,7 +134,7 @@ export interface UnverifyInput<
   TAccountCollectionMetadata extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
-> {
+> = {
   /** Creator to verify, collection (or metadata if parent burned) update authority or delegate */
   authority: TransactionSigner<TAccountAuthority>;
   /** Delegate record PDA */
@@ -149,7 +150,7 @@ export interface UnverifyInput<
   /** Instructions sysvar account */
   sysvarInstructions?: Address<TAccountSysvarInstructions>;
   verificationArgs: UnverifyInstructionDataArgs["verificationArgs"];
-}
+};
 
 export function getUnverifyInstruction<
   TAccountAuthority extends string,
@@ -246,10 +247,10 @@ export function getUnverifyInstruction<
   >);
 }
 
-export interface ParsedUnverifyInstruction<
+export type ParsedUnverifyInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Creator to verify, collection (or metadata if parent burned) update authority or delegate */
@@ -268,7 +269,7 @@ export interface ParsedUnverifyInstruction<
     sysvarInstructions: TAccountMetas[6];
   };
   data: UnverifyInstructionData;
-}
+};
 
 export function parseUnverifyInstruction<
   TProgram extends string,

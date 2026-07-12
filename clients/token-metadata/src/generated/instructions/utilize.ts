@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { UtilizeArgs, UtilizeArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -34,16 +16,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getUtilizeArgsDecoder,
   getUtilizeArgsEncoder,
+  type UtilizeArgs,
+  type UtilizeArgsArgs,
 } from "../types/index.js";
 
 export const UTILIZE_DISCRIMINATOR = 19;
@@ -54,23 +53,23 @@ export function getUtilizeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UtilizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountUseAuthority extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountUseAuthority extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAtaProgram extends string | AccountMeta =
+  TAccountAtaProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountUseAuthorityRecord extends string | AccountMeta | undefined =
+  TAccountUseAuthorityRecord extends string | AccountMeta<string> | undefined =
     undefined,
-  TAccountBurner extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountBurner extends string | AccountMeta<string> | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -121,14 +120,12 @@ export type UtilizeInstruction<
     ]
   >;
 
-export interface UtilizeInstructionData {
+export type UtilizeInstructionData = {
   discriminator: number;
   utilizeArgs: UtilizeArgs;
-}
+};
 
-export interface UtilizeInstructionDataArgs {
-  utilizeArgs: UtilizeArgsArgs;
-}
+export type UtilizeInstructionDataArgs = { utilizeArgs: UtilizeArgsArgs };
 
 export function getUtilizeInstructionDataEncoder(): FixedSizeEncoder<UtilizeInstructionDataArgs> {
   return transformEncoder(
@@ -157,7 +154,7 @@ export function getUtilizeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UtilizeAsyncInput<
+export type UtilizeAsyncInput<
   TAccountMetadata extends string = string,
   TAccountTokenAccount extends string = string,
   TAccountMint extends string = string,
@@ -169,7 +166,7 @@ export interface UtilizeAsyncInput<
   TAccountRent extends string = string,
   TAccountUseAuthorityRecord extends string = string,
   TAccountBurner extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata?: Address<TAccountMetadata>;
   /** Token Account Of NFT */
@@ -193,7 +190,7 @@ export interface UtilizeAsyncInput<
   /** Program As Signer (Burner) */
   burner?: Address<TAccountBurner>;
   utilizeArgs: UtilizeInstructionDataArgs["utilizeArgs"];
-}
+};
 
 export async function getUtilizeInstructionAsync<
   TAccountMetadata extends string,
@@ -330,7 +327,7 @@ export async function getUtilizeInstructionAsync<
   >);
 }
 
-export interface UtilizeInput<
+export type UtilizeInput<
   TAccountMetadata extends string = string,
   TAccountTokenAccount extends string = string,
   TAccountMint extends string = string,
@@ -342,7 +339,7 @@ export interface UtilizeInput<
   TAccountRent extends string = string,
   TAccountUseAuthorityRecord extends string = string,
   TAccountBurner extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
   /** Token Account Of NFT */
@@ -366,7 +363,7 @@ export interface UtilizeInput<
   /** Program As Signer (Burner) */
   burner?: Address<TAccountBurner>;
   utilizeArgs: UtilizeInstructionDataArgs["utilizeArgs"];
-}
+};
 
 export function getUtilizeInstruction<
   TAccountMetadata extends string,
@@ -492,10 +489,10 @@ export function getUtilizeInstruction<
   >);
 }
 
-export interface ParsedUtilizeInstruction<
+export type ParsedUtilizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata account */
@@ -522,7 +519,7 @@ export interface ParsedUtilizeInstruction<
     burner?: TAccountMetas[10] | undefined;
   };
   data: UtilizeInstructionData;
-}
+};
 
 export function parseUtilizeInstruction<
   TProgram extends string,
@@ -549,9 +546,7 @@ export function parseUtilizeInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 9;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

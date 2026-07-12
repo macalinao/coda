@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,8 +15,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SIGN_METADATA_DISCRIMINATOR = 7;
@@ -43,9 +43,9 @@ export function getSignMetadataDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SignMetadataInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountCreator extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountCreator extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -61,9 +61,7 @@ export type SignMetadataInstruction<
     ]
   >;
 
-export interface SignMetadataInstructionData {
-  discriminator: number;
-}
+export type SignMetadataInstructionData = { discriminator: number };
 
 export type SignMetadataInstructionDataArgs = {};
 
@@ -88,15 +86,15 @@ export function getSignMetadataInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SignMetadataInput<
+export type SignMetadataInput<
   TAccountMetadata extends string = string,
   TAccountCreator extends string = string,
-> {
+> = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
   metadata: Address<TAccountMetadata>;
   /** Creator */
   creator: TransactionSigner<TAccountCreator>;
-}
+};
 
 export function getSignMetadataInstruction<
   TAccountMetadata extends string,
@@ -135,10 +133,10 @@ export function getSignMetadataInstruction<
   >);
 }
 
-export interface ParsedSignMetadataInstruction<
+export type ParsedSignMetadataInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata (pda of ['metadata', program id, mint id]) */
@@ -147,7 +145,7 @@ export interface ParsedSignMetadataInstruction<
     creator: TAccountMetas[1];
   };
   data: SignMetadataInstructionData;
-}
+};
 
 export function parseSignMetadataInstruction<
   TProgram extends string,

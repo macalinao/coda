@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { CreateArgs, CreateArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -35,14 +16,35 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getCreateArgsDecoder, getCreateArgsEncoder } from "../types/index.js";
+import {
+  getCreateArgsDecoder,
+  getCreateArgsEncoder,
+  type CreateArgs,
+  type CreateArgsArgs,
+} from "../types/index.js";
 
 export const CREATE_DISCRIMINATOR = 42;
 
@@ -52,18 +54,18 @@ export function getCreateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountSysvarInstructions extends string | AccountMeta =
+  TAccountSysvarInstructions extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountSplTokenProgram extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSplTokenProgram extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -101,14 +103,12 @@ export type CreateInstruction<
     ]
   >;
 
-export interface CreateInstructionData {
+export type CreateInstructionData = {
   discriminator: number;
   createArgs: CreateArgs;
-}
+};
 
-export interface CreateInstructionDataArgs {
-  createArgs: CreateArgsArgs;
-}
+export type CreateInstructionDataArgs = { createArgs: CreateArgsArgs };
 
 export function getCreateInstructionDataEncoder(): Encoder<CreateInstructionDataArgs> {
   return transformEncoder(
@@ -137,7 +137,7 @@ export function getCreateInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateAsyncInput<
+export type CreateAsyncInput<
   TAccountMetadata extends string = string,
   TAccountMasterEdition extends string = string,
   TAccountMint extends string = string,
@@ -147,7 +147,7 @@ export interface CreateAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
   TAccountSplTokenProgram extends string = string,
-> {
+> = {
   /** Unallocated metadata account with address as pda of ['metadata', program id, mint id] */
   metadata?: Address<TAccountMetadata>;
   /** Unallocated edition account with address as pda of ['metadata', program id, mint, 'edition'] */
@@ -167,7 +167,7 @@ export interface CreateAsyncInput<
   /** SPL Token program */
   splTokenProgram?: Address<TAccountSplTokenProgram>;
   createArgs: CreateInstructionDataArgs["createArgs"];
-}
+};
 
 export async function getCreateInstructionAsync<
   TAccountMetadata extends string,
@@ -250,6 +250,15 @@ export async function getCreateInstructionAsync<
       ),
     });
   }
+  if (!accounts.masterEdition.value) {
+    accounts.masterEdition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -290,7 +299,7 @@ export async function getCreateInstructionAsync<
   >);
 }
 
-export interface CreateInput<
+export type CreateInput<
   TAccountMetadata extends string = string,
   TAccountMasterEdition extends string = string,
   TAccountMint extends string = string,
@@ -300,7 +309,7 @@ export interface CreateInput<
   TAccountSystemProgram extends string = string,
   TAccountSysvarInstructions extends string = string,
   TAccountSplTokenProgram extends string = string,
-> {
+> = {
   /** Unallocated metadata account with address as pda of ['metadata', program id, mint id] */
   metadata: Address<TAccountMetadata>;
   /** Unallocated edition account with address as pda of ['metadata', program id, mint, 'edition'] */
@@ -320,7 +329,7 @@ export interface CreateInput<
   /** SPL Token program */
   splTokenProgram?: Address<TAccountSplTokenProgram>;
   createArgs: CreateInstructionDataArgs["createArgs"];
-}
+};
 
 export function getCreateInstruction<
   TAccountMetadata extends string,
@@ -432,10 +441,10 @@ export function getCreateInstruction<
   >);
 }
 
-export interface ParsedCreateInstruction<
+export type ParsedCreateInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Unallocated metadata account with address as pda of ['metadata', program id, mint id] */
@@ -458,7 +467,7 @@ export interface ParsedCreateInstruction<
     splTokenProgram?: TAccountMetas[8] | undefined;
   };
   data: CreateInstructionData;
-}
+};
 
 export function parseCreateInstruction<
   TProgram extends string,

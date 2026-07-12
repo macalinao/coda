@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UNVERIFY_COLLECTION_DISCRIMINATOR = 22;
@@ -44,14 +44,17 @@ export function getUnverifyCollectionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UnverifyCollectionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountCollectionAuthority extends string | AccountMeta = string,
-  TAccountCollectionMint extends string | AccountMeta = string,
-  TAccountCollection extends string | AccountMeta = string,
-  TAccountCollectionMasterEditionAccount extends string | AccountMeta = string,
-  TAccountCollectionAuthorityRecord extends string | AccountMeta | undefined =
-    undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountCollectionAuthority extends string | AccountMeta<string> = string,
+  TAccountCollectionMint extends string | AccountMeta<string> = string,
+  TAccountCollection extends string | AccountMeta<string> = string,
+  TAccountCollectionMasterEditionAccount extends string | AccountMeta<string> =
+    string,
+  TAccountCollectionAuthorityRecord extends
+    | string
+    | AccountMeta<string>
+    | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,9 +86,7 @@ export type UnverifyCollectionInstruction<
     ]
   >;
 
-export interface UnverifyCollectionInstructionData {
-  discriminator: number;
-}
+export type UnverifyCollectionInstructionData = { discriminator: number };
 
 export type UnverifyCollectionInstructionDataArgs = {};
 
@@ -110,14 +111,14 @@ export function getUnverifyCollectionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UnverifyCollectionInput<
+export type UnverifyCollectionInput<
   TAccountMetadata extends string = string,
   TAccountCollectionAuthority extends string = string,
   TAccountCollectionMint extends string = string,
   TAccountCollection extends string = string,
   TAccountCollectionMasterEditionAccount extends string = string,
   TAccountCollectionAuthorityRecord extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
   /** Collection Authority */
@@ -130,7 +131,7 @@ export interface UnverifyCollectionInput<
   collectionMasterEditionAccount: Address<TAccountCollectionMasterEditionAccount>;
   /** Collection Authority Record PDA */
   collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
-}
+};
 
 export function getUnverifyCollectionInstruction<
   TAccountMetadata extends string,
@@ -215,10 +216,10 @@ export function getUnverifyCollectionInstruction<
   >);
 }
 
-export interface ParsedUnverifyCollectionInstruction<
+export type ParsedUnverifyCollectionInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata account */
@@ -235,7 +236,7 @@ export interface ParsedUnverifyCollectionInstruction<
     collectionAuthorityRecord?: TAccountMetas[5] | undefined;
   };
   data: UnverifyCollectionInstructionData;
-}
+};
 
 export function parseUnverifyCollectionInstruction<
   TProgram extends string,
@@ -262,9 +263,7 @@ export function parseUnverifyCollectionInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 5;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

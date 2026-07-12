@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -15,11 +14,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface ProofInfo {
-  proof: number[][];
-}
+export type ProofInfo = { proof: Array<Array<number>> };
 
 export type ProofInfoArgs = ProofInfo;
 

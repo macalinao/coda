@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,8 +15,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const COLLECT_DISCRIMINATOR = 54;
@@ -43,9 +43,9 @@ export function getCollectDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CollectInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountRecipient extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountRecipient extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -61,9 +61,7 @@ export type CollectInstruction<
     ]
   >;
 
-export interface CollectInstructionData {
-  discriminator: number;
-}
+export type CollectInstructionData = { discriminator: number };
 
 export type CollectInstructionDataArgs = {};
 
@@ -88,15 +86,15 @@ export function getCollectInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CollectInput<
+export type CollectInput<
   TAccountAuthority extends string = string,
   TAccountRecipient extends string = string,
-> {
+> = {
   /** Authority to collect fees */
   authority: TransactionSigner<TAccountAuthority>;
   /** The account to transfer collected fees to */
   recipient: Address<TAccountRecipient>;
-}
+};
 
 export function getCollectInstruction<
   TAccountAuthority extends string,
@@ -135,10 +133,10 @@ export function getCollectInstruction<
   >);
 }
 
-export interface ParsedCollectInstruction<
+export type ParsedCollectInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Authority to collect fees */
@@ -147,7 +145,7 @@ export interface ParsedCollectInstruction<
     recipient: TAccountMetas[1];
   };
   data: CollectInstructionData;
-}
+};
 
 export function parseCollectInstruction<
   TProgram extends string,

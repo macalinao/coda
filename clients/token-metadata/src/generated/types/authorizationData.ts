@@ -6,18 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { Payload, PayloadArgs } from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
-import { getPayloadDecoder, getPayloadEncoder } from "./index.js";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
+import {
+  getPayloadDecoder,
+  getPayloadEncoder,
+  type Payload,
+  type PayloadArgs,
+} from "./index.js";
 
-export interface AuthorizationData {
-  payload: Payload;
-}
+export type AuthorizationData = { payload: Payload };
 
-export interface AuthorizationDataArgs {
-  payload: PayloadArgs;
-}
+export type AuthorizationDataArgs = { payload: PayloadArgs };
 
 export function getAuthorizationDataEncoder(): Encoder<AuthorizationDataArgs> {
   return getStructEncoder([["payload", getPayloadEncoder()]]);

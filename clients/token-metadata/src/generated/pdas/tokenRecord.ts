@@ -14,15 +14,17 @@ import {
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export type MetadataSeeds = {
+export type TokenRecordSeeds = {
   /** The address of the program */
   programId: Address;
   /** The address of the mint account */
   mint: Address;
+  /** The address of the token account */
+  token: Address;
 };
 
-export async function findMetadataPda(
-  seeds: MetadataSeeds,
+export async function findTokenRecordPda(
+  seeds: TokenRecordSeeds,
   config: { programAddress?: Address | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
@@ -34,6 +36,8 @@ export async function findMetadataPda(
       getUtf8Encoder().encode("metadata"),
       getAddressEncoder().encode(seeds.programId),
       getAddressEncoder().encode(seeds.mint),
+      getUtf8Encoder().encode("token_record"),
+      getAddressEncoder().encode(seeds.token),
     ],
   });
 }

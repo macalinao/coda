@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -33,10 +16,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -51,26 +49,27 @@ export function getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenDisc
 
 export type DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountMasterEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountMintAuthority extends string | AccountMeta = string,
-  TAccountPrintingMint extends string | AccountMeta = string,
-  TAccountMasterTokenAccount extends string | AccountMeta = string,
-  TAccountEditionMarker extends string | AccountMeta = string,
-  TAccountBurnAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountMasterUpdateAuthority extends string | AccountMeta = string,
-  TAccountMasterMetadata extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountMasterEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountMintAuthority extends string | AccountMeta<string> = string,
+  TAccountPrintingMint extends string | AccountMeta<string> = string,
+  TAccountMasterTokenAccount extends string | AccountMeta<string> = string,
+  TAccountEditionMarker extends string | AccountMeta<string> = string,
+  TAccountBurnAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountMasterUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountMasterMetadata extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountReservationList extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountReservationList extends string | AccountMeta<string> | undefined =
+    undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -134,9 +133,8 @@ export type DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction
     ]
   >;
 
-export interface DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionData {
-  discriminator: number;
-}
+export type DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionData =
+  { discriminator: number };
 
 export type DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionDataArgs =
   {};
@@ -166,7 +164,7 @@ export function getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInst
   );
 }
 
-export interface DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAsyncInput<
+export type DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAsyncInput<
   TAccountMetadata extends string = string,
   TAccountEdition extends string = string,
   TAccountMasterEdition extends string = string,
@@ -183,7 +181,7 @@ export interface DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAsyncI
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
   TAccountReservationList extends string = string,
-> {
+> = {
   /** New Metadata key (pda of ['metadata', program id, mint id]) */
   metadata?: Address<TAccountMetadata>;
   /** New Edition V1 (pda of ['metadata', program id, mint id, 'edition']) */
@@ -216,7 +214,7 @@ export interface DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAsyncI
   rent?: Address<TAccountRent>;
   /** Reservation List - If present, and you are on this list, you can get an edition number given by your position on the list. */
   reservationList?: Address<TAccountReservationList>;
-}
+};
 
 export async function getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionAsync<
   TAccountMetadata extends string,
@@ -379,7 +377,7 @@ export async function getDeprecatedMintNewEditionFromMasterEditionViaPrintingTok
   >);
 }
 
-export interface DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInput<
+export type DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInput<
   TAccountMetadata extends string = string,
   TAccountEdition extends string = string,
   TAccountMasterEdition extends string = string,
@@ -396,7 +394,7 @@ export interface DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInput<
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
   TAccountReservationList extends string = string,
-> {
+> = {
   /** New Metadata key (pda of ['metadata', program id, mint id]) */
   metadata: Address<TAccountMetadata>;
   /** New Edition V1 (pda of ['metadata', program id, mint id, 'edition']) */
@@ -429,7 +427,7 @@ export interface DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInput<
   rent?: Address<TAccountRent>;
   /** Reservation List - If present, and you are on this list, you can get an edition number given by your position on the list. */
   reservationList?: Address<TAccountReservationList>;
-}
+};
 
 export function getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction<
   TAccountMetadata extends string,
@@ -581,10 +579,10 @@ export function getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInst
   >);
 }
 
-export interface ParsedDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction<
+export type ParsedDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** New Metadata key (pda of ['metadata', program id, mint id]) */
@@ -621,7 +619,7 @@ export interface ParsedDeprecatedMintNewEditionFromMasterEditionViaPrintingToken
     reservationList?: TAccountMetas[15] | undefined;
   };
   data: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionData;
-}
+};
 
 export function parseDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction<
   TProgram extends string,
@@ -651,9 +649,7 @@ export function parseDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIn
   };
   let optionalAccountsRemaining = instruction.accounts.length - 15;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

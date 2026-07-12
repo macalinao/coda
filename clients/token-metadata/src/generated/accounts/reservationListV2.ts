@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Key,
-  KeyArgs,
-  Reservation,
-  ReservationArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -43,31 +23,47 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getKeyDecoder,
   getKeyEncoder,
   getReservationDecoder,
   getReservationEncoder,
+  type Key,
+  type KeyArgs,
+  type Reservation,
+  type ReservationArgs,
 } from "../types/index.js";
 
-export interface ReservationListV2 {
+export type ReservationListV2 = {
   key: Key;
   masterEdition: Address;
   supplySnapshot: Option<bigint>;
-  reservations: Reservation[];
+  reservations: Array<Reservation>;
   totalReservationSpots: bigint;
   currentReservationSpots: bigint;
-}
+};
 
-export interface ReservationListV2Args {
+export type ReservationListV2Args = {
   key: KeyArgs;
   masterEdition: Address;
   supplySnapshot: OptionOrNullable<number | bigint>;
-  reservations: ReservationArgs[];
+  reservations: Array<ReservationArgs>;
   totalReservationSpots: number | bigint;
   currentReservationSpots: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link ReservationListV2Args} account data. */
 export function getReservationListV2Encoder(): Encoder<ReservationListV2Args> {
@@ -144,7 +140,7 @@ export async function fetchMaybeReservationListV2<
 
 export async function fetchAllReservationListV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ReservationListV2>[]> {
   const maybeAccounts = await fetchAllMaybeReservationListV2(
@@ -158,7 +154,7 @@ export async function fetchAllReservationListV2(
 
 export async function fetchAllMaybeReservationListV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ReservationListV2>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

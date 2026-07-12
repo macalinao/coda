@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,12 +16,28 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const RESIZE_DISCRIMINATOR = 56;
@@ -50,15 +48,15 @@ export function getResizeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ResizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountToken extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountToken extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -89,9 +87,7 @@ export type ResizeInstruction<
     ]
   >;
 
-export interface ResizeInstructionData {
-  discriminator: number;
-}
+export type ResizeInstructionData = { discriminator: number };
 
 export type ResizeInstructionDataArgs = {};
 
@@ -116,7 +112,7 @@ export function getResizeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ResizeAsyncInput<
+export type ResizeAsyncInput<
   TAccountMetadata extends string = string,
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
@@ -124,11 +120,11 @@ export interface ResizeAsyncInput<
   TAccountAuthority extends string = string,
   TAccountToken extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The metadata account of the digital asset */
   metadata?: Address<TAccountMetadata>;
   /** The master edition or edition account of the digital asset, an uninitialized account for fungible assets */
-  edition: Address<TAccountEdition>;
+  edition?: Address<TAccountEdition>;
   /** Mint of token asset */
   mint: Address<TAccountMint>;
   /** The recipient of the excess rent and authority if the authority account is not present */
@@ -139,7 +135,7 @@ export interface ResizeAsyncInput<
   token?: Address<TAccountToken>;
   /** System program */
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export async function getResizeInstructionAsync<
   TAccountMetadata extends string,
@@ -204,6 +200,15 @@ export async function getResizeInstructionAsync<
       ),
     });
   }
+  if (!accounts.edition.value) {
+    accounts.edition.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "mint",
+        accounts.mint.value,
+      ),
+    });
+  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -236,7 +241,7 @@ export async function getResizeInstructionAsync<
   >);
 }
 
-export interface ResizeInput<
+export type ResizeInput<
   TAccountMetadata extends string = string,
   TAccountEdition extends string = string,
   TAccountMint extends string = string,
@@ -244,7 +249,7 @@ export interface ResizeInput<
   TAccountAuthority extends string = string,
   TAccountToken extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The metadata account of the digital asset */
   metadata: Address<TAccountMetadata>;
   /** The master edition or edition account of the digital asset, an uninitialized account for fungible assets */
@@ -259,7 +264,7 @@ export interface ResizeInput<
   token?: Address<TAccountToken>;
   /** System program */
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getResizeInstruction<
   TAccountMetadata extends string,
@@ -345,10 +350,10 @@ export function getResizeInstruction<
   >);
 }
 
-export interface ParsedResizeInstruction<
+export type ParsedResizeInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The metadata account of the digital asset */
@@ -367,7 +372,7 @@ export interface ParsedResizeInstruction<
     systemProgram: TAccountMetas[6];
   };
   data: ResizeInstructionData;
-}
+};
 
 export function parseResizeInstruction<
   TProgram extends string,

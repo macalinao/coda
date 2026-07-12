@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type { Uses, UsesArgs } from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -24,8 +16,18 @@ import {
   getTupleEncoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
-import { getUsesDecoder, getUsesEncoder } from "./index.js";
+import {
+  getUsesDecoder,
+  getUsesEncoder,
+  type Uses,
+  type UsesArgs,
+} from "./index.js";
 
 export type UsesToggle =
   | { __kind: "None" }

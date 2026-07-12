@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -21,19 +14,24 @@ import {
   getDiscriminatedUnionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 
 export type CollectionDetails =
   | { __kind: "V1"; size: bigint }
-  | { __kind: "V2"; padding: number[] };
+  | { __kind: "V2"; padding: Array<number> };
 
 export type CollectionDetailsArgs =
   | { __kind: "V1"; size: number | bigint }
-  | { __kind: "V2"; padding: number[] };
+  | { __kind: "V2"; padding: Array<number> };
 
 export function getCollectionDetailsEncoder(): FixedSizeEncoder<CollectionDetailsArgs> {
   return getDiscriminatedUnionEncoder([

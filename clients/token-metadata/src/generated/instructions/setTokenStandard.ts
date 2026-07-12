@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -33,10 +16,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -49,11 +47,11 @@ export function getSetTokenStandardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetTokenStandardInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountUpdateAuthority extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TAccountEdition extends string | AccountMeta | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TAccountEdition extends string | AccountMeta<string> | undefined = undefined,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -79,9 +77,7 @@ export type SetTokenStandardInstruction<
     ]
   >;
 
-export interface SetTokenStandardInstructionData {
-  discriminator: number;
-}
+export type SetTokenStandardInstructionData = { discriminator: number };
 
 export type SetTokenStandardInstructionDataArgs = {};
 
@@ -106,12 +102,12 @@ export function getSetTokenStandardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetTokenStandardAsyncInput<
+export type SetTokenStandardAsyncInput<
   TAccountMetadata extends string = string,
   TAccountUpdateAuthority extends string = string,
   TAccountMint extends string = string,
   TAccountEdition extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata?: Address<TAccountMetadata>;
   /** Metadata update authority */
@@ -120,7 +116,7 @@ export interface SetTokenStandardAsyncInput<
   mint: Address<TAccountMint>;
   /** Edition account */
   edition?: Address<TAccountEdition>;
-}
+};
 
 export async function getSetTokenStandardInstructionAsync<
   TAccountMetadata extends string,
@@ -194,12 +190,12 @@ export async function getSetTokenStandardInstructionAsync<
   >);
 }
 
-export interface SetTokenStandardInput<
+export type SetTokenStandardInput<
   TAccountMetadata extends string = string,
   TAccountUpdateAuthority extends string = string,
   TAccountMint extends string = string,
   TAccountEdition extends string = string,
-> {
+> = {
   /** Metadata account */
   metadata: Address<TAccountMetadata>;
   /** Metadata update authority */
@@ -208,7 +204,7 @@ export interface SetTokenStandardInput<
   mint: Address<TAccountMint>;
   /** Edition account */
   edition?: Address<TAccountEdition>;
-}
+};
 
 export function getSetTokenStandardInstruction<
   TAccountMetadata extends string,
@@ -269,10 +265,10 @@ export function getSetTokenStandardInstruction<
   >);
 }
 
-export interface ParsedSetTokenStandardInstruction<
+export type ParsedSetTokenStandardInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata account */
@@ -285,7 +281,7 @@ export interface ParsedSetTokenStandardInstruction<
     edition?: TAccountMetas[3] | undefined;
   };
   data: SetTokenStandardInstructionData;
-}
+};
 
 export function parseSetTokenStandardInstruction<
   TProgram extends string,
@@ -312,9 +308,7 @@ export function parseSetTokenStandardInstruction<
   };
   let optionalAccountsRemaining = instruction.accounts.length - 3;
   const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) {
-      return;
-    }
+    if (optionalAccountsRemaining === 0) return undefined;
     optionalAccountsRemaining -= 1;
     return getNextAccount();
   };

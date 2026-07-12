@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,8 +15,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REMOVE_CREATOR_VERIFICATION_DISCRIMINATOR = 28;
@@ -43,9 +43,9 @@ export function getRemoveCreatorVerificationDiscriminatorBytes(): ReadonlyUint8A
 
 export type RemoveCreatorVerificationInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
-  TAccountMetadata extends string | AccountMeta = string,
-  TAccountCreator extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadata extends string | AccountMeta<string> = string,
+  TAccountCreator extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -61,9 +61,9 @@ export type RemoveCreatorVerificationInstruction<
     ]
   >;
 
-export interface RemoveCreatorVerificationInstructionData {
+export type RemoveCreatorVerificationInstructionData = {
   discriminator: number;
-}
+};
 
 export type RemoveCreatorVerificationInstructionDataArgs = {};
 
@@ -91,15 +91,15 @@ export function getRemoveCreatorVerificationInstructionDataCodec(): FixedSizeCod
   );
 }
 
-export interface RemoveCreatorVerificationInput<
+export type RemoveCreatorVerificationInput<
   TAccountMetadata extends string = string,
   TAccountCreator extends string = string,
-> {
+> = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
   metadata: Address<TAccountMetadata>;
   /** Creator */
   creator: TransactionSigner<TAccountCreator>;
-}
+};
 
 export function getRemoveCreatorVerificationInstruction<
   TAccountMetadata extends string,
@@ -142,10 +142,10 @@ export function getRemoveCreatorVerificationInstruction<
   >);
 }
 
-export interface ParsedRemoveCreatorVerificationInstruction<
+export type ParsedRemoveCreatorVerificationInstruction<
   TProgram extends string = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Metadata (pda of ['metadata', program id, mint id]) */
@@ -154,7 +154,7 @@ export interface ParsedRemoveCreatorVerificationInstruction<
     creator: TAccountMetas[1];
   };
   data: RemoveCreatorVerificationInstructionData;
-}
+};
 
 export function parseRemoveCreatorVerificationInstruction<
   TProgram extends string,

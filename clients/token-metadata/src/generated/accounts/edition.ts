@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -32,20 +19,31 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface Edition {
-  key: Key;
-  parent: Address;
-  edition: bigint;
-}
+export type Edition = { key: Key; parent: Address; edition: bigint };
 
-export interface EditionArgs {
+export type EditionArgs = {
   key: KeyArgs;
   parent: Address;
   edition: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link EditionArgs} account data. */
 export function getEditionEncoder(): FixedSizeEncoder<EditionArgs> {
@@ -106,7 +104,7 @@ export async function fetchMaybeEdition<TAddress extends string = string>(
 
 export async function fetchAllEdition(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Edition>[]> {
   const maybeAccounts = await fetchAllMaybeEdition(rpc, addresses, config);
@@ -116,7 +114,7 @@ export async function fetchAllEdition(
 
 export async function fetchAllMaybeEdition(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Edition>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
