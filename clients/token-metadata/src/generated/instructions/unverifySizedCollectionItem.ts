@@ -7,6 +7,7 @@
  */
 
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -33,8 +34,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UNVERIFY_SIZED_COLLECTION_ITEM_DISCRIMINATOR = 31;
@@ -120,6 +123,142 @@ export function getUnverifySizedCollectionItemInstructionDataCodec(): FixedSizeC
     getUnverifySizedCollectionItemInstructionDataEncoder(),
     getUnverifySizedCollectionItemInstructionDataDecoder(),
   );
+}
+
+export type UnverifySizedCollectionItemAsyncInput<
+  TAccountMetadata extends string = string,
+  TAccountCollectionAuthority extends string = string,
+  TAccountPayer extends string = string,
+  TAccountCollectionMint extends string = string,
+  TAccountCollection extends string = string,
+  TAccountCollectionMasterEditionAccount extends string = string,
+  TAccountCollectionAuthorityRecord extends string = string,
+> = {
+  /** Metadata account */
+  metadata: Address<TAccountMetadata>;
+  /** Collection Authority */
+  collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
+  /** payer */
+  payer: TransactionSigner<TAccountPayer>;
+  /** Mint of the Collection */
+  collectionMint: Address<TAccountCollectionMint>;
+  /** Metadata Account of the Collection */
+  collection?: Address<TAccountCollection>;
+  /** MasterEdition2 Account of the Collection Token */
+  collectionMasterEditionAccount?: Address<TAccountCollectionMasterEditionAccount>;
+  /** Collection Authority Record PDA */
+  collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
+};
+
+export async function getUnverifySizedCollectionItemInstructionAsync<
+  TAccountMetadata extends string,
+  TAccountCollectionAuthority extends string,
+  TAccountPayer extends string,
+  TAccountCollectionMint extends string,
+  TAccountCollection extends string,
+  TAccountCollectionMasterEditionAccount extends string,
+  TAccountCollectionAuthorityRecord extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: UnverifySizedCollectionItemAsyncInput<
+    TAccountMetadata,
+    TAccountCollectionAuthority,
+    TAccountPayer,
+    TAccountCollectionMint,
+    TAccountCollection,
+    TAccountCollectionMasterEditionAccount,
+    TAccountCollectionAuthorityRecord
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  UnverifySizedCollectionItemInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountCollectionAuthority,
+    TAccountPayer,
+    TAccountCollectionMint,
+    TAccountCollection,
+    TAccountCollectionMasterEditionAccount,
+    TAccountCollectionAuthorityRecord
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    metadata: { value: input.metadata ?? null, isWritable: true },
+    collectionAuthority: {
+      value: input.collectionAuthority ?? null,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isWritable: true },
+    collectionMint: { value: input.collectionMint ?? null, isWritable: false },
+    collection: { value: input.collection ?? null, isWritable: true },
+    collectionMasterEditionAccount: {
+      value: input.collectionMasterEditionAccount ?? null,
+      isWritable: false,
+    },
+    collectionAuthorityRecord: {
+      value: input.collectionAuthorityRecord ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Resolve default values.
+  if (!accounts.collection.value) {
+    accounts.collection.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "collectionMint",
+        accounts.collectionMint.value,
+      ),
+    });
+  }
+  if (!accounts.collectionMasterEditionAccount.value) {
+    accounts.collectionMasterEditionAccount.value = await findMasterEditionPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "collectionMint",
+        accounts.collectionMint.value,
+      ),
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("metadata", accounts.metadata),
+      getAccountMeta("collectionAuthority", accounts.collectionAuthority),
+      getAccountMeta("payer", accounts.payer),
+      getAccountMeta("collectionMint", accounts.collectionMint),
+      getAccountMeta("collection", accounts.collection),
+      getAccountMeta(
+        "collectionMasterEditionAccount",
+        accounts.collectionMasterEditionAccount,
+      ),
+      getAccountMeta(
+        "collectionAuthorityRecord",
+        accounts.collectionAuthorityRecord,
+      ),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getUnverifySizedCollectionItemInstructionDataEncoder().encode({}),
+    programAddress,
+  } as UnverifySizedCollectionItemInstruction<
+    TProgramAddress,
+    TAccountMetadata,
+    TAccountCollectionAuthority,
+    TAccountPayer,
+    TAccountCollectionMint,
+    TAccountCollection,
+    TAccountCollectionMasterEditionAccount,
+    TAccountCollectionAuthorityRecord
+  >);
 }
 
 export type UnverifySizedCollectionItemInput<

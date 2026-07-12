@@ -7,6 +7,7 @@
  */
 
 import {
+  address,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -32,8 +33,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
+import { findMetadataPda } from "../pdas/index.js";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getSetCollectionSizeArgsDecoder,
@@ -117,6 +120,109 @@ export function getSetCollectionSizeInstructionDataCodec(): FixedSizeCodec<
     getSetCollectionSizeInstructionDataEncoder(),
     getSetCollectionSizeInstructionDataDecoder(),
   );
+}
+
+export type SetCollectionSizeAsyncInput<
+  TAccountCollectionMetadata extends string = string,
+  TAccountCollectionAuthority extends string = string,
+  TAccountCollectionMint extends string = string,
+  TAccountCollectionAuthorityRecord extends string = string,
+> = {
+  /** Collection Metadata account */
+  collectionMetadata?: Address<TAccountCollectionMetadata>;
+  /** Collection Update authority */
+  collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
+  /** Mint of the Collection */
+  collectionMint: Address<TAccountCollectionMint>;
+  /** Collection Authority Record PDA */
+  collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
+  setCollectionSizeArgs: SetCollectionSizeInstructionDataArgs["setCollectionSizeArgs"];
+};
+
+export async function getSetCollectionSizeInstructionAsync<
+  TAccountCollectionMetadata extends string,
+  TAccountCollectionAuthority extends string,
+  TAccountCollectionMint extends string,
+  TAccountCollectionAuthorityRecord extends string,
+  TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
+>(
+  input: SetCollectionSizeAsyncInput<
+    TAccountCollectionMetadata,
+    TAccountCollectionAuthority,
+    TAccountCollectionMint,
+    TAccountCollectionAuthorityRecord
+  >,
+  config?: { programAddress?: TProgramAddress },
+): Promise<
+  SetCollectionSizeInstruction<
+    TProgramAddress,
+    TAccountCollectionMetadata,
+    TAccountCollectionAuthority,
+    TAccountCollectionMint,
+    TAccountCollectionAuthorityRecord
+  >
+> {
+  // Program address.
+  const programAddress =
+    config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+
+  // Original accounts.
+  const originalAccounts = {
+    collectionMetadata: {
+      value: input.collectionMetadata ?? null,
+      isWritable: true,
+    },
+    collectionAuthority: {
+      value: input.collectionAuthority ?? null,
+      isWritable: true,
+    },
+    collectionMint: { value: input.collectionMint ?? null, isWritable: false },
+    collectionAuthorityRecord: {
+      value: input.collectionAuthorityRecord ?? null,
+      isWritable: false,
+    },
+  };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedInstructionAccount
+  >;
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.collectionMetadata.value) {
+    accounts.collectionMetadata.value = await findMetadataPda({
+      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+      mint: getAddressFromResolvedInstructionAccount(
+        "collectionMint",
+        accounts.collectionMint.value,
+      ),
+    });
+  }
+
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
+  return Object.freeze({
+    accounts: [
+      getAccountMeta("collectionMetadata", accounts.collectionMetadata),
+      getAccountMeta("collectionAuthority", accounts.collectionAuthority),
+      getAccountMeta("collectionMint", accounts.collectionMint),
+      getAccountMeta(
+        "collectionAuthorityRecord",
+        accounts.collectionAuthorityRecord,
+      ),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+    data: getSetCollectionSizeInstructionDataEncoder().encode(
+      args as SetCollectionSizeInstructionDataArgs,
+    ),
+    programAddress,
+  } as SetCollectionSizeInstruction<
+    TProgramAddress,
+    TAccountCollectionMetadata,
+    TAccountCollectionAuthority,
+    TAccountCollectionMint,
+    TAccountCollectionAuthorityRecord
+  >);
 }
 
 export type SetCollectionSizeInput<

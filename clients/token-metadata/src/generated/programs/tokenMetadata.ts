@@ -78,7 +78,7 @@ import {
 import {
   getApproveCollectionAuthorityInstructionAsync,
   getApproveUseAuthorityInstructionAsync,
-  getBubblegumSetCollectionSizeInstruction,
+  getBubblegumSetCollectionSizeInstructionAsync,
   getBurnEditionNftInstruction,
   getBurnInstructionAsync,
   getBurnNftInstructionAsync,
@@ -113,27 +113,27 @@ import {
   getRevokeCollectionAuthorityInstructionAsync,
   getRevokeInstructionAsync,
   getRevokeUseAuthorityInstructionAsync,
-  getSetAndVerifyCollectionInstruction,
-  getSetAndVerifySizedCollectionItemInstruction,
-  getSetCollectionSizeInstruction,
+  getSetAndVerifyCollectionInstructionAsync,
+  getSetAndVerifySizedCollectionItemInstructionAsync,
+  getSetCollectionSizeInstructionAsync,
   getSetTokenStandardInstructionAsync,
   getSignMetadataInstruction,
   getThawDelegatedAccountInstruction,
   getTransferInstructionAsync,
   getTransferOutOfEscrowInstruction,
   getUnlockInstructionAsync,
-  getUnverifyCollectionInstruction,
+  getUnverifyCollectionInstructionAsync,
   getUnverifyInstruction,
-  getUnverifySizedCollectionItemInstruction,
+  getUnverifySizedCollectionItemInstructionAsync,
   getUpdateInstructionAsync,
   getUpdateMetadataAccountInstruction,
   getUpdateMetadataAccountV2Instruction,
   getUpdatePrimarySaleHappenedViaTokenInstruction,
   getUseInstructionAsync,
   getUtilizeInstructionAsync,
-  getVerifyCollectionInstruction,
+  getVerifyCollectionInstructionAsync,
   getVerifyInstruction,
-  getVerifySizedCollectionItemInstruction,
+  getVerifySizedCollectionItemInstructionAsync,
   parseApproveCollectionAuthorityInstruction,
   parseApproveUseAuthorityInstruction,
   parseBubblegumSetCollectionSizeInstruction,
@@ -194,7 +194,7 @@ import {
   parseVerifySizedCollectionItemInstruction,
   type ApproveCollectionAuthorityAsyncInput,
   type ApproveUseAuthorityAsyncInput,
-  type BubblegumSetCollectionSizeInput,
+  type BubblegumSetCollectionSizeAsyncInput,
   type BurnAsyncInput,
   type BurnEditionNftInput,
   type BurnNftAsyncInput,
@@ -287,27 +287,27 @@ import {
   type RevokeAsyncInput,
   type RevokeCollectionAuthorityAsyncInput,
   type RevokeUseAuthorityAsyncInput,
-  type SetAndVerifyCollectionInput,
-  type SetAndVerifySizedCollectionItemInput,
-  type SetCollectionSizeInput,
+  type SetAndVerifyCollectionAsyncInput,
+  type SetAndVerifySizedCollectionItemAsyncInput,
+  type SetCollectionSizeAsyncInput,
   type SetTokenStandardAsyncInput,
   type SignMetadataInput,
   type ThawDelegatedAccountInput,
   type TransferAsyncInput,
   type TransferOutOfEscrowInput,
   type UnlockAsyncInput,
-  type UnverifyCollectionInput,
+  type UnverifyCollectionAsyncInput,
   type UnverifyInput,
-  type UnverifySizedCollectionItemInput,
+  type UnverifySizedCollectionItemAsyncInput,
   type UpdateAsyncInput,
   type UpdateMetadataAccountInput,
   type UpdateMetadataAccountV2Input,
   type UpdatePrimarySaleHappenedViaTokenInput,
   type UseAsyncInput,
   type UtilizeAsyncInput,
-  type VerifyCollectionInput,
+  type VerifyCollectionAsyncInput,
   type VerifyInput,
-  type VerifySizedCollectionItemInput,
+  type VerifySizedCollectionItemAsyncInput,
 } from "../instructions/index.js";
 import {
   findMasterEditionPda,
@@ -1317,8 +1317,8 @@ export type TokenMetadataPluginInstructions = {
   ) => ReturnType<typeof getCreateMasterEditionV3InstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCollection: (
-    input: MakeOptional<VerifyCollectionInput, "payer">,
-  ) => ReturnType<typeof getVerifyCollectionInstruction> &
+    input: MakeOptional<VerifyCollectionAsyncInput, "payer">,
+  ) => ReturnType<typeof getVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   utilize: (
     input: UtilizeAsyncInput,
@@ -1332,8 +1332,8 @@ export type TokenMetadataPluginInstructions = {
   ) => ReturnType<typeof getRevokeUseAuthorityInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifyCollection: (
-    input: UnverifyCollectionInput,
-  ) => ReturnType<typeof getUnverifyCollectionInstruction> &
+    input: UnverifyCollectionAsyncInput,
+  ) => ReturnType<typeof getUnverifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   approveCollectionAuthority: (
     input: MakeOptional<ApproveCollectionAuthorityAsyncInput, "payer">,
@@ -1344,8 +1344,8 @@ export type TokenMetadataPluginInstructions = {
   ) => ReturnType<typeof getRevokeCollectionAuthorityInstructionAsync> &
     SelfPlanAndSendFunctions;
   setAndVerifyCollection: (
-    input: MakeOptional<SetAndVerifyCollectionInput, "payer">,
-  ) => ReturnType<typeof getSetAndVerifyCollectionInstruction> &
+    input: MakeOptional<SetAndVerifyCollectionAsyncInput, "payer">,
+  ) => ReturnType<typeof getSetAndVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   freezeDelegatedAccount: (
     input: FreezeDelegatedAccountInput,
@@ -1363,32 +1363,32 @@ export type TokenMetadataPluginInstructions = {
     input: BurnNftAsyncInput,
   ) => ReturnType<typeof getBurnNftInstructionAsync> & SelfPlanAndSendFunctions;
   verifySizedCollectionItem: (
-    input: MakeOptional<VerifySizedCollectionItemInput, "payer">,
-  ) => ReturnType<typeof getVerifySizedCollectionItemInstruction> &
+    input: MakeOptional<VerifySizedCollectionItemAsyncInput, "payer">,
+  ) => ReturnType<typeof getVerifySizedCollectionItemInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifySizedCollectionItem: (
-    input: MakeOptional<UnverifySizedCollectionItemInput, "payer">,
-  ) => ReturnType<typeof getUnverifySizedCollectionItemInstruction> &
+    input: MakeOptional<UnverifySizedCollectionItemAsyncInput, "payer">,
+  ) => ReturnType<typeof getUnverifySizedCollectionItemInstructionAsync> &
     SelfPlanAndSendFunctions;
   setAndVerifySizedCollectionItem: (
-    input: MakeOptional<SetAndVerifySizedCollectionItemInput, "payer">,
-  ) => ReturnType<typeof getSetAndVerifySizedCollectionItemInstruction> &
+    input: MakeOptional<SetAndVerifySizedCollectionItemAsyncInput, "payer">,
+  ) => ReturnType<typeof getSetAndVerifySizedCollectionItemInstructionAsync> &
     SelfPlanAndSendFunctions;
   createMetadataAccountV3: (
     input: MakeOptional<CreateMetadataAccountV3AsyncInput, "payer">,
   ) => ReturnType<typeof getCreateMetadataAccountV3InstructionAsync> &
     SelfPlanAndSendFunctions;
   setCollectionSize: (
-    input: SetCollectionSizeInput,
-  ) => ReturnType<typeof getSetCollectionSizeInstruction> &
+    input: SetCollectionSizeAsyncInput,
+  ) => ReturnType<typeof getSetCollectionSizeInstructionAsync> &
     SelfPlanAndSendFunctions;
   setTokenStandard: (
     input: SetTokenStandardAsyncInput,
   ) => ReturnType<typeof getSetTokenStandardInstructionAsync> &
     SelfPlanAndSendFunctions;
   bubblegumSetCollectionSize: (
-    input: BubblegumSetCollectionSizeInput,
-  ) => ReturnType<typeof getBubblegumSetCollectionSizeInstruction> &
+    input: BubblegumSetCollectionSizeAsyncInput,
+  ) => ReturnType<typeof getBubblegumSetCollectionSizeInstructionAsync> &
     SelfPlanAndSendFunctions;
   burnEditionNft: (
     input: BurnEditionNftInput,
@@ -1647,7 +1647,7 @@ export function tokenMetadataProgram() {
           verifyCollection: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getVerifyCollectionInstruction({
+              getVerifyCollectionInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1673,7 +1673,7 @@ export function tokenMetadataProgram() {
           unverifyCollection: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifyCollectionInstruction(input),
+              getUnverifyCollectionInstructionAsync(input),
             ),
           approveCollectionAuthority: (input) =>
             addSelfPlanAndSendFunctions(
@@ -1691,7 +1691,7 @@ export function tokenMetadataProgram() {
           setAndVerifyCollection: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetAndVerifyCollectionInstruction({
+              getSetAndVerifyCollectionInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1719,7 +1719,7 @@ export function tokenMetadataProgram() {
           verifySizedCollectionItem: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getVerifySizedCollectionItemInstruction({
+              getVerifySizedCollectionItemInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1727,7 +1727,7 @@ export function tokenMetadataProgram() {
           unverifySizedCollectionItem: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifySizedCollectionItemInstruction({
+              getUnverifySizedCollectionItemInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1735,7 +1735,7 @@ export function tokenMetadataProgram() {
           setAndVerifySizedCollectionItem: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetAndVerifySizedCollectionItemInstruction({
+              getSetAndVerifySizedCollectionItemInstructionAsync({
                 ...input,
                 payer: input.payer ?? client.payer,
               }),
@@ -1751,7 +1751,7 @@ export function tokenMetadataProgram() {
           setCollectionSize: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetCollectionSizeInstruction(input),
+              getSetCollectionSizeInstructionAsync(input),
             ),
           setTokenStandard: (input) =>
             addSelfPlanAndSendFunctions(
@@ -1761,7 +1761,7 @@ export function tokenMetadataProgram() {
           bubblegumSetCollectionSize: (input) =>
             addSelfPlanAndSendFunctions(
               client,
-              getBubblegumSetCollectionSizeInstruction(input),
+              getBubblegumSetCollectionSizeInstructionAsync(input),
             ),
           burnEditionNft: (input) =>
             addSelfPlanAndSendFunctions(
