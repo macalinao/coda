@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  WriteToBufferArgs,
-  WriteToBufferArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -36,16 +15,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findRuleSetBufferPda } from "../pdas/index.js";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getWriteToBufferArgsDecoder,
   getWriteToBufferArgsEncoder,
+  type WriteToBufferArgs,
+  type WriteToBufferArgsArgs,
 } from "../types/index.js";
 
 export const WRITE_TO_BUFFER_DISCRIMINATOR = 2;
@@ -79,14 +75,16 @@ export type WriteToBufferInstruction<
     ]
   >;
 
-export interface WriteToBufferInstructionData {
+export type WriteToBufferInstructionData = {
   discriminator: number;
+  /** The chunk of serialized RuleSet data to append. */
   writeToBufferArgs: WriteToBufferArgs;
-}
+};
 
-export interface WriteToBufferInstructionDataArgs {
+export type WriteToBufferInstructionDataArgs = {
+  /** The chunk of serialized RuleSet data to append. */
   writeToBufferArgs: WriteToBufferArgsArgs;
-}
+};
 
 export function getWriteToBufferInstructionDataEncoder(): Encoder<WriteToBufferInstructionDataArgs> {
   return transformEncoder(
@@ -115,11 +113,11 @@ export function getWriteToBufferInstructionDataCodec(): Codec<
   );
 }
 
-export interface WriteToBufferAsyncInput<
+export type WriteToBufferAsyncInput<
   TAccountPayer extends string = string,
   TAccountBufferPda extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** Payer and creator of the RuleSet */
   payer: TransactionSigner<TAccountPayer>;
   /** The PDA account where the RuleSet buffer is stored */
@@ -127,8 +125,15 @@ export interface WriteToBufferAsyncInput<
   /** System program */
   systemProgram?: Address<TAccountSystemProgram>;
   writeToBufferArgs: WriteToBufferInstructionDataArgs["writeToBufferArgs"];
-}
+};
 
+/**
+ * Appends serialized RuleSet bytes to a buffer PDA.
+ *
+ * RuleSets larger than a single transaction can hold are streamed in
+ * chunks to a buffer account, then applied in one `createOrUpdate`
+ * call that reads from the buffer.
+ */
 export async function getWriteToBufferInstructionAsync<
   TAccountPayer extends string,
   TAccountBufferPda extends string,
@@ -200,11 +205,11 @@ export async function getWriteToBufferInstructionAsync<
   >);
 }
 
-export interface WriteToBufferInput<
+export type WriteToBufferInput<
   TAccountPayer extends string = string,
   TAccountBufferPda extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** Payer and creator of the RuleSet */
   payer: TransactionSigner<TAccountPayer>;
   /** The PDA account where the RuleSet buffer is stored */
@@ -212,8 +217,15 @@ export interface WriteToBufferInput<
   /** System program */
   systemProgram?: Address<TAccountSystemProgram>;
   writeToBufferArgs: WriteToBufferInstructionDataArgs["writeToBufferArgs"];
-}
+};
 
+/**
+ * Appends serialized RuleSet bytes to a buffer PDA.
+ *
+ * RuleSets larger than a single transaction can hold are streamed in
+ * chunks to a buffer account, then applied in one `createOrUpdate`
+ * call that reads from the buffer.
+ */
 export function getWriteToBufferInstruction<
   TAccountPayer extends string,
   TAccountBufferPda extends string,
@@ -275,10 +287,10 @@ export function getWriteToBufferInstruction<
   >);
 }
 
-export interface ParsedWriteToBufferInstruction<
+export type ParsedWriteToBufferInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Payer and creator of the RuleSet */
@@ -289,7 +301,7 @@ export interface ParsedWriteToBufferInstruction<
     systemProgram: TAccountMetas[2];
   };
   data: WriteToBufferInstructionData;
-}
+};
 
 export function parseWriteToBufferInstruction<
   TProgram extends string,

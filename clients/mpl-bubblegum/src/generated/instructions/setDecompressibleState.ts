@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  DecompressibleState,
-  DecompressibleStateArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,12 +17,30 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getDecompressibleStateDecoder,
   getDecompressibleStateEncoder,
+  type DecompressibleState,
+  type DecompressibleStateArgs,
 } from "../types/index.js";
 
 export const SET_DECOMPRESSIBLE_STATE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -74,14 +72,22 @@ export type SetDecompressibleStateInstruction<
     ]
   >;
 
-export interface SetDecompressibleStateInstructionData {
+export type SetDecompressibleStateInstructionData = {
   discriminator: ReadonlyUint8Array;
+  /**
+   * The new decompressible state to set on the tree: `Enabled` allows
+   * `redeem`/`decompressV1`, `Disabled` blocks them.
+   */
   decompressableState: DecompressibleState;
-}
+};
 
-export interface SetDecompressibleStateInstructionDataArgs {
+export type SetDecompressibleStateInstructionDataArgs = {
+  /**
+   * The new decompressible state to set on the tree: `Enabled` allows
+   * `redeem`/`decompressV1`, `Disabled` blocks them.
+   */
   decompressableState: DecompressibleStateArgs;
-}
+};
 
 export function getSetDecompressibleStateInstructionDataEncoder(): FixedSizeEncoder<SetDecompressibleStateInstructionDataArgs> {
   return transformEncoder(
@@ -113,15 +119,30 @@ export function getSetDecompressibleStateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetDecompressibleStateInput<
+export type SetDecompressibleStateInput<
   TAccountTreeAuthority extends string = string,
   TAccountTreeCreator extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /**
+   * Creator of the tree, recorded in `TreeConfig` when the tree was
+   * created.
+   */
   treeCreator: TransactionSigner<TAccountTreeCreator>;
   decompressableState: SetDecompressibleStateInstructionDataArgs["decompressableState"];
-}
+};
 
+/**
+ * Sets the `decompressible_state` of a tree.
+ *
+ * Controls whether leaves in the tree may be `redeem`ed and
+ * `decompressV1`'d into regular NFTs. Only the tree creator may call
+ * this instruction.
+ */
 export function getSetDecompressibleStateInstruction<
   TAccountTreeAuthority extends string,
   TAccountTreeCreator extends string,
@@ -170,17 +191,25 @@ export function getSetDecompressibleStateInstruction<
   >);
 }
 
-export interface ParsedSetDecompressibleStateInstruction<
+export type ParsedSetDecompressibleStateInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /**
+     * Creator of the tree, recorded in `TreeConfig` when the tree was
+     * created.
+     */
     treeCreator: TAccountMetas[1];
   };
   data: SetDecompressibleStateInstructionData;
-}
+};
 
 export function parseSetDecompressibleStateInstruction<
   TProgram extends string,

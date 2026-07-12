@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type {
-  AgentIdentityInitInfo,
-  AgentIdentityInitInfoArgs,
-  AppDataInitInfo,
-  AppDataInitInfoArgs,
-  DataSectionInitInfo,
-  DataSectionInitInfoArgs,
-  LifecycleHookInitInfo,
-  LifecycleHookInitInfoArgs,
-  LinkedAppDataInitInfo,
-  LinkedAppDataInitInfoArgs,
-  LinkedLifecycleHookInitInfo,
-  LinkedLifecycleHookInitInfoArgs,
-  OracleInitInfo,
-  OracleInitInfoArgs,
-} from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -37,6 +14,11 @@ import {
   getStructEncoder,
   getTupleDecoder,
   getTupleEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 import {
   getAgentIdentityInitInfoDecoder,
@@ -53,8 +35,26 @@ import {
   getLinkedLifecycleHookInitInfoEncoder,
   getOracleInitInfoDecoder,
   getOracleInitInfoEncoder,
+  type AgentIdentityInitInfo,
+  type AgentIdentityInitInfoArgs,
+  type AppDataInitInfo,
+  type AppDataInitInfoArgs,
+  type DataSectionInitInfo,
+  type DataSectionInitInfoArgs,
+  type LifecycleHookInitInfo,
+  type LifecycleHookInitInfoArgs,
+  type LinkedAppDataInitInfo,
+  type LinkedAppDataInitInfoArgs,
+  type LinkedLifecycleHookInitInfo,
+  type LinkedLifecycleHookInitInfoArgs,
+  type OracleInitInfo,
+  type OracleInitInfoArgs,
 } from "./index.js";
 
+/**
+ * Initialization data for adding a new external plugin adapter,
+ * keyed by adapter type.
+ */
 export type ExternalPluginAdapterInitInfo =
   | { __kind: "LifecycleHook"; fields: readonly [LifecycleHookInitInfo] }
   | { __kind: "Oracle"; fields: readonly [OracleInitInfo] }

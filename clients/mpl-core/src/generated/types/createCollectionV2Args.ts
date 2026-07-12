@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  ExternalPluginAdapterInitInfo,
-  ExternalPluginAdapterInitInfoArgs,
-  PluginAuthorityPair,
-  PluginAuthorityPairArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -33,27 +20,47 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getExternalPluginAdapterInitInfoDecoder,
   getExternalPluginAdapterInitInfoEncoder,
   getPluginAuthorityPairDecoder,
   getPluginAuthorityPairEncoder,
+  type ExternalPluginAdapterInitInfo,
+  type ExternalPluginAdapterInitInfoArgs,
+  type PluginAuthorityPair,
+  type PluginAuthorityPairArgs,
 } from "./index.js";
 
-export interface CreateCollectionV2Args {
+/** Arguments for `createCollectionV2`. */
+export type CreateCollectionV2Args = {
+  /** The collection's display name. */
   name: string;
+  /** The URI pointing to the collection's off-chain JSON metadata. */
   uri: string;
-  plugins: Option<PluginAuthorityPair[]>;
-  externalPluginAdapters: Option<ExternalPluginAdapterInitInfo[]>;
-}
+  /** Plugins to attach at creation, each paired with an optional authority override. */
+  plugins: Option<Array<PluginAuthorityPair>>;
+  /** External plugin adapters to attach at creation. */
+  externalPluginAdapters: Option<Array<ExternalPluginAdapterInitInfo>>;
+};
 
-export interface CreateCollectionV2ArgsArgs {
+export type CreateCollectionV2ArgsArgs = {
+  /** The collection's display name. */
   name: string;
+  /** The URI pointing to the collection's off-chain JSON metadata. */
   uri: string;
-  plugins: OptionOrNullable<PluginAuthorityPairArgs[]>;
-  externalPluginAdapters: OptionOrNullable<ExternalPluginAdapterInitInfoArgs[]>;
-}
+  /** Plugins to attach at creation, each paired with an optional authority override. */
+  plugins: OptionOrNullable<Array<PluginAuthorityPairArgs>>;
+  /** External plugin adapters to attach at creation. */
+  externalPluginAdapters: OptionOrNullable<
+    Array<ExternalPluginAdapterInitInfoArgs>
+  >;
+};
 
 export function getCreateCollectionV2ArgsEncoder(): Encoder<CreateCollectionV2ArgsArgs> {
   return getStructEncoder([

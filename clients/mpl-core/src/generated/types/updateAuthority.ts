@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -26,8 +18,18 @@ import {
   getTupleEncoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 
+/**
+ * The update authority of an asset: unset (`None`), a specific
+ * `Address`, or inherited from a `Collection`.
+ */
 export type UpdateAuthority =
   | { __kind: "None" }
   | { __kind: "Address"; fields: readonly [Address] }

@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { VoucherSeeds } from "../pdas/index.js";
-import type { LeafSchema, LeafSchemaArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -39,9 +24,25 @@ import {
   getU32Decoder,
   getU32Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVoucherPda } from "../pdas/index.js";
-import { getLeafSchemaDecoder, getLeafSchemaEncoder } from "../types/index.js";
+import { findVoucherPda, type VoucherSeeds } from "../pdas/index.js";
+import {
+  getLeafSchemaDecoder,
+  getLeafSchemaEncoder,
+  type LeafSchema,
+  type LeafSchemaArgs,
+} from "../types/index.js";
 
 export const VOUCHER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   191, 204, 149, 234, 213, 165, 13, 65,
@@ -51,18 +52,24 @@ export function getVoucherDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(VOUCHER_DISCRIMINATOR);
 }
 
-export interface Voucher {
+export type Voucher = {
   discriminator: ReadonlyUint8Array;
+  /** Snapshot of the redeemed leaf's data, preserved until it is decompressed or the redeem is cancelled. */
   leafSchema: LeafSchema;
+  /** Position the leaf occupied in the Merkle tree before it was redeemed. */
   index: number;
+  /** Address of the tree the leaf was redeemed from. */
   merkleTree: Address;
-}
+};
 
-export interface VoucherArgs {
+export type VoucherArgs = {
+  /** Snapshot of the redeemed leaf's data, preserved until it is decompressed or the redeem is cancelled. */
   leafSchema: LeafSchemaArgs;
+  /** Position the leaf occupied in the Merkle tree before it was redeemed. */
   index: number;
+  /** Address of the tree the leaf was redeemed from. */
   merkleTree: Address;
-}
+};
 
 /** Gets the encoder for {@link VoucherArgs} account data. */
 export function getVoucherEncoder(): Encoder<VoucherArgs> {
@@ -128,7 +135,7 @@ export async function fetchMaybeVoucher<TAddress extends string = string>(
 
 export async function fetchAllVoucher(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Voucher>[]> {
   const maybeAccounts = await fetchAllMaybeVoucher(rpc, addresses, config);
@@ -138,7 +145,7 @@ export async function fetchAllVoucher(
 
 export async function fetchAllMaybeVoucher(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Voucher>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

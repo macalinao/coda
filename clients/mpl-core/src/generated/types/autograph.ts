@@ -6,27 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { AutographSignature, AutographSignatureArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getAutographSignatureDecoder,
   getAutographSignatureEncoder,
+  type AutographSignature,
+  type AutographSignatureArgs,
 } from "./index.js";
 
-export interface Autograph {
-  signatures: AutographSignature[];
-}
+/**
+ * Internal plugin that collects a guestbook of signatures left
+ * by arbitrary addresses.
+ */
+export type Autograph = {
+  /** The signatures collected on the asset. */
+  signatures: Array<AutographSignature>;
+};
 
-export interface AutographArgs {
-  signatures: AutographSignatureArgs[];
-}
+export type AutographArgs = {
+  /** The signatures collected on the asset. */
+  signatures: Array<AutographSignatureArgs>;
+};
 
 export function getAutographEncoder(): Encoder<AutographArgs> {
   return getStructEncoder([

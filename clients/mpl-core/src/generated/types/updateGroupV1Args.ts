@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -25,17 +18,27 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 
-export interface UpdateGroupV1Args {
+/** Arguments for `updateGroupV1`. */
+export type UpdateGroupV1Args = {
+  /** The group's new display name, if changing. */
   newName: Option<string>;
+  /** The group's new metadata URI, if changing. */
   newUri: Option<string>;
-}
+};
 
-export interface UpdateGroupV1ArgsArgs {
+export type UpdateGroupV1ArgsArgs = {
+  /** The group's new display name, if changing. */
   newName: OptionOrNullable<string>;
+  /** The group's new metadata URI, if changing. */
   newUri: OptionOrNullable<string>;
-}
+};
 
 export function getUpdateGroupV1ArgsEncoder(): Encoder<UpdateGroupV1ArgsArgs> {
   return getStructEncoder([

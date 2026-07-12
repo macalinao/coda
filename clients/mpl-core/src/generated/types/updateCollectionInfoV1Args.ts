@@ -6,30 +6,43 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { UpdateType, UpdateTypeArgs } from "./index.js";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { getUpdateTypeDecoder, getUpdateTypeEncoder } from "./index.js";
+import {
+  getUpdateTypeDecoder,
+  getUpdateTypeEncoder,
+  type UpdateType,
+  type UpdateTypeArgs,
+} from "./index.js";
 
-export interface UpdateCollectionInfoV1Args {
+/** Arguments for `updateCollectionInfoV1`. */
+export type UpdateCollectionInfoV1Args = {
+  /**
+   * Whether this call records a `Mint`, or an `Add`/`Remove` of
+   * collection size.
+   */
   updateType: UpdateType;
+  /** The amount by which to adjust the collection's counters. */
   amount: number;
-}
+};
 
-export interface UpdateCollectionInfoV1ArgsArgs {
+export type UpdateCollectionInfoV1ArgsArgs = {
+  /**
+   * Whether this call records a `Mint`, or an `Add`/`Remove` of
+   * collection size.
+   */
   updateType: UpdateTypeArgs;
+  /** The amount by which to adjust the collection's counters. */
   amount: number;
-}
+};
 
 export function getUpdateCollectionInfoV1ArgsEncoder(): FixedSizeEncoder<UpdateCollectionInfoV1ArgsArgs> {
   return getStructEncoder([

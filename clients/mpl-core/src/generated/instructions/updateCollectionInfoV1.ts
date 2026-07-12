@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  UpdateCollectionInfoV1Args,
-  UpdateCollectionInfoV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -35,12 +15,30 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getUpdateCollectionInfoV1ArgsDecoder,
   getUpdateCollectionInfoV1ArgsEncoder,
+  type UpdateCollectionInfoV1Args,
+  type UpdateCollectionInfoV1ArgsArgs,
 } from "../types/index.js";
 
 export const UPDATE_COLLECTION_INFO_V1_DISCRIMINATOR = 32;
@@ -69,14 +67,16 @@ export type UpdateCollectionInfoV1Instruction<
     ]
   >;
 
-export interface UpdateCollectionInfoV1InstructionData {
+export type UpdateCollectionInfoV1InstructionData = {
   discriminator: number;
+  /** Whether to record a mint or an add/remove, and by how much. */
   updateCollectionInfoV1Args: UpdateCollectionInfoV1Args;
-}
+};
 
-export interface UpdateCollectionInfoV1InstructionDataArgs {
+export type UpdateCollectionInfoV1InstructionDataArgs = {
+  /** Whether to record a mint or an add/remove, and by how much. */
   updateCollectionInfoV1Args: UpdateCollectionInfoV1ArgsArgs;
-}
+};
 
 export function getUpdateCollectionInfoV1InstructionDataEncoder(): FixedSizeEncoder<UpdateCollectionInfoV1InstructionDataArgs> {
   return transformEncoder(
@@ -108,17 +108,26 @@ export function getUpdateCollectionInfoV1InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UpdateCollectionInfoV1Input<
+export type UpdateCollectionInfoV1Input<
   TAccountCollection extends string = string,
   TAccountBubblegumSigner extends string = string,
-> {
+> = {
   /** The address of the asset */
   collection: Address<TAccountCollection>;
   /** Bubblegum PDA signer */
   bubblegumSigner: TransactionSigner<TAccountBubblegumSigner>;
   updateCollectionInfoV1Args: UpdateCollectionInfoV1InstructionDataArgs["updateCollectionInfoV1Args"];
-}
+};
 
+/**
+ * Updates a collection's `numMinted` and `currentSize` counters.
+ *
+ * Invoked via CPI (signed by the `bubblegumSigner` PDA) by the
+ * Bubblegum program when compressed NFTs are minted into, or
+ * removed from, a Core collection, so the collection's on-chain
+ * size stays accurate without every compressed asset living in a
+ * Core account.
+ */
 export function getUpdateCollectionInfoV1Instruction<
   TAccountCollection extends string,
   TAccountBubblegumSigner extends string,
@@ -171,10 +180,10 @@ export function getUpdateCollectionInfoV1Instruction<
   >);
 }
 
-export interface ParsedUpdateCollectionInfoV1Instruction<
+export type ParsedUpdateCollectionInfoV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -183,7 +192,7 @@ export interface ParsedUpdateCollectionInfoV1Instruction<
     bubblegumSigner: TAccountMetas[1];
   };
   data: UpdateCollectionInfoV1InstructionData;
-}
+};
 
 export function parseUpdateCollectionInfoV1Instruction<
   TProgram extends string,

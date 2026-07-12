@@ -6,21 +6,27 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * Account discriminator identifying which kind of MPL Core
+ * account a given account is.
+ */
 export enum Key {
-  Uninitialized = 0,
-  AssetV1 = 1,
-  HashedAssetV1 = 2,
-  PluginHeaderV1 = 3,
-  PluginRegistryV1 = 4,
-  CollectionV1 = 5,
-  GroupV1 = 6,
+  Uninitialized,
+  AssetV1,
+  HashedAssetV1,
+  PluginHeaderV1,
+  PluginRegistryV1,
+  CollectionV1,
+  GroupV1,
 }
 
 export type KeyArgs = Key;

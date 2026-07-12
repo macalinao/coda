@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  AddCollectionsToGroupV1Args,
-  AddCollectionsToGroupV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAddCollectionsToGroupV1ArgsDecoder,
   getAddCollectionsToGroupV1ArgsEncoder,
+  type AddCollectionsToGroupV1Args,
+  type AddCollectionsToGroupV1ArgsArgs,
 } from "../types/index.js";
 
 export const ADD_COLLECTIONS_TO_GROUP_V1_DISCRIMINATOR = 33;
@@ -81,14 +79,22 @@ export type AddCollectionsToGroupV1Instruction<
     ]
   >;
 
-export interface AddCollectionsToGroupV1InstructionData {
+export type AddCollectionsToGroupV1InstructionData = {
   discriminator: number;
+  /**
+   * Reserved; the collections to add are passed as remaining
+   * accounts.
+   */
   addCollectionsToGroupV1Args: AddCollectionsToGroupV1Args;
-}
+};
 
-export interface AddCollectionsToGroupV1InstructionDataArgs {
+export type AddCollectionsToGroupV1InstructionDataArgs = {
+  /**
+   * Reserved; the collections to add are passed as remaining
+   * accounts.
+   */
   addCollectionsToGroupV1Args: AddCollectionsToGroupV1ArgsArgs;
-}
+};
 
 export function getAddCollectionsToGroupV1InstructionDataEncoder(): FixedSizeEncoder<AddCollectionsToGroupV1InstructionDataArgs> {
   return transformEncoder(
@@ -120,12 +126,12 @@ export function getAddCollectionsToGroupV1InstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface AddCollectionsToGroupV1Input<
+export type AddCollectionsToGroupV1Input<
   TAccountGroup extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The address of the group to modify */
   group: Address<TAccountGroup>;
   /** The account paying for storage fees */
@@ -135,8 +141,13 @@ export interface AddCollectionsToGroupV1Input<
   /** The system program */
   systemProgram?: Address<TAccountSystemProgram>;
   addCollectionsToGroupV1Args: AddCollectionsToGroupV1InstructionDataArgs["addCollectionsToGroupV1Args"];
-}
+};
 
+/**
+ * Adds one or more collections to a group, recording the
+ * membership as a `ChildGroup` relationship. The collections to
+ * add are passed as remaining accounts.
+ */
 export function getAddCollectionsToGroupV1Instruction<
   TAccountGroup extends string,
   TAccountPayer extends string,
@@ -204,10 +215,10 @@ export function getAddCollectionsToGroupV1Instruction<
   >);
 }
 
-export interface ParsedAddCollectionsToGroupV1Instruction<
+export type ParsedAddCollectionsToGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the group to modify */
@@ -220,7 +231,7 @@ export interface ParsedAddCollectionsToGroupV1Instruction<
     systemProgram: TAccountMetas[3];
   };
   data: AddCollectionsToGroupV1InstructionData;
-}
+};
 
 export function parseAddCollectionsToGroupV1Instruction<
   TProgram extends string,

@@ -6,13 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 
+/**
+ * Internal plugin marking the asset as linked to / managed via
+ * the Bubblegum V2 compressed NFT program.
+ */
 export type BubblegumV2 = {};
 
 export type BubblegumV2Args = BubblegumV2;

@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Collection,
-  CollectionArgs,
-  Creator,
-  CreatorArgs,
-  TokenProgramVersion,
-  TokenProgramVersionArgs,
-  TokenStandard,
-  TokenStandardArgs,
-  Uses,
-  UsesArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -37,14 +18,19 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getCollectionDecoder,
@@ -57,9 +43,27 @@ import {
   getTokenStandardEncoder,
   getUsesDecoder,
   getUsesEncoder,
+  type Collection,
+  type CollectionArgs,
+  type Creator,
+  type CreatorArgs,
+  type TokenProgramVersion,
+  type TokenProgramVersionArgs,
+  type TokenStandard,
+  type TokenStandardArgs,
+  type Uses,
+  type UsesArgs,
 } from "./index.js";
 
-export interface MetadataArgs {
+/**
+ * Metadata for a V1 (`LeafSchema` V1) compressed NFT leaf.
+ *
+ * Mirrors the fields of a Token Metadata `Metadata` account closely
+ * enough that a leaf can be decompressed into one. Hashed (along with
+ * `creators`) to produce the `dataHash`/`creatorHash` used to verify
+ * the leaf on every mutating instruction.
+ */
+export type MetadataArgs = {
   /** The name of the asset */
   name: string;
   /** The symbol for the asset */
@@ -80,11 +84,13 @@ export interface MetadataArgs {
   collection: Option<Collection>;
   /** Uses */
   uses: Option<Uses>;
+  /** Which SPL token program a decompressed version of this leaf's mint should use. */
   tokenProgramVersion: TokenProgramVersion;
-  creators: Creator[];
-}
+  /** Creators of the asset and their royalty shares; hashed to produce `creatorHash`. */
+  creators: Array<Creator>;
+};
 
-export interface MetadataArgsArgs {
+export type MetadataArgsArgs = {
   /** The name of the asset */
   name: string;
   /** The symbol for the asset */
@@ -105,9 +111,11 @@ export interface MetadataArgsArgs {
   collection: OptionOrNullable<CollectionArgs>;
   /** Uses */
   uses: OptionOrNullable<UsesArgs>;
+  /** Which SPL token program a decompressed version of this leaf's mint should use. */
   tokenProgramVersion: TokenProgramVersionArgs;
-  creators: CreatorArgs[];
-}
+  /** Creators of the asset and their royalty shares; hashed to produce `creatorHash`. */
+  creators: Array<CreatorArgs>;
+};
 
 export function getMetadataArgsEncoder(): Encoder<MetadataArgsArgs> {
   return getStructEncoder([

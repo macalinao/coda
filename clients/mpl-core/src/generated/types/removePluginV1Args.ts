@@ -6,22 +6,31 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import type { PluginType, PluginTypeArgs } from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
-import { getPluginTypeDecoder, getPluginTypeEncoder } from "./index.js";
+import {
+  getPluginTypeDecoder,
+  getPluginTypeEncoder,
+  type PluginType,
+  type PluginTypeArgs,
+} from "./index.js";
 
-export interface RemovePluginV1Args {
+/** Arguments for `removePluginV1`. */
+export type RemovePluginV1Args = {
+  /** The type of plugin to remove. */
   pluginType: PluginType;
-}
+};
 
-export interface RemovePluginV1ArgsArgs {
+export type RemovePluginV1ArgsArgs = {
+  /** The type of plugin to remove. */
   pluginType: PluginTypeArgs;
-}
+};
 
 export function getRemovePluginV1ArgsEncoder(): FixedSizeEncoder<RemovePluginV1ArgsArgs> {
   return getStructEncoder([["pluginType", getPluginTypeEncoder()]]);

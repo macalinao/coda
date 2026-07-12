@@ -6,8 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
-import { getProgramDerivedAddress, getUtf8Encoder } from "@solana/kit";
+import {
+  getProgramDerivedAddress,
+  getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
+} from "@solana/kit";
 
 /** PDA used by Bubblegum to sign Token Metadata collection CPIs */
 export async function findBubblegumSignerPda(

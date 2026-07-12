@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { TreeConfigSeeds } from "../pdas/index.js";
-import type {
-  DecompressibleState,
-  DecompressibleStateArgs,
-  Version,
-  VersionArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -46,13 +26,28 @@ import {
   getU64Decoder,
   getU64Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTreeConfigPda } from "../pdas/index.js";
+import { findTreeConfigPda, type TreeConfigSeeds } from "../pdas/index.js";
 import {
   getDecompressibleStateDecoder,
   getDecompressibleStateEncoder,
   getVersionDecoder,
   getVersionEncoder,
+  type DecompressibleState,
+  type DecompressibleStateArgs,
+  type Version,
+  type VersionArgs,
 } from "../types/index.js";
 
 export const TREE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -63,26 +58,40 @@ export function getTreeConfigDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(TREE_CONFIG_DISCRIMINATOR);
 }
 
-export interface TreeConfig {
+export type TreeConfig = {
   discriminator: ReadonlyUint8Array;
+  /** Original creator of the tree. */
   treeCreator: Address;
+  /** Current delegate authority of the tree, authorized to mint and manage it on the creator's behalf. */
   treeDelegate: Address;
+  /** Maximum number of leaves the tree can ever hold, derived from its `maxDepth`. */
   totalMintCapacity: bigint;
+  /** Number of leaves minted into the tree so far; used as the `nonce` for the next minted leaf. */
   numMinted: bigint;
+  /** Whether any signer may mint into the tree, not just the tree delegate. */
   isPublic: boolean;
+  /** Whether leaves in the tree may currently be redeemed and decompressed. */
   isDecompressible: DecompressibleState;
+  /** Schema version (`V1` or `V2`) leaves minted into this tree use. */
   version: Version;
-}
+};
 
-export interface TreeConfigArgs {
+export type TreeConfigArgs = {
+  /** Original creator of the tree. */
   treeCreator: Address;
+  /** Current delegate authority of the tree, authorized to mint and manage it on the creator's behalf. */
   treeDelegate: Address;
+  /** Maximum number of leaves the tree can ever hold, derived from its `maxDepth`. */
   totalMintCapacity: number | bigint;
+  /** Number of leaves minted into the tree so far; used as the `nonce` for the next minted leaf. */
   numMinted: number | bigint;
+  /** Whether any signer may mint into the tree, not just the tree delegate. */
   isPublic: boolean;
+  /** Whether leaves in the tree may currently be redeemed and decompressed. */
   isDecompressible: DecompressibleStateArgs;
+  /** Schema version (`V1` or `V2`) leaves minted into this tree use. */
   version: VersionArgs;
-}
+};
 
 /** Gets the encoder for {@link TreeConfigArgs} account data. */
 export function getTreeConfigEncoder(): FixedSizeEncoder<TreeConfigArgs> {
@@ -159,7 +168,7 @@ export async function fetchMaybeTreeConfig<TAddress extends string = string>(
 
 export async function fetchAllTreeConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TreeConfig>[]> {
   const maybeAccounts = await fetchAllMaybeTreeConfig(rpc, addresses, config);
@@ -169,7 +178,7 @@ export async function fetchAllTreeConfig(
 
 export async function fetchAllMaybeTreeConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TreeConfig>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,15 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type { Authority, AuthorityArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -25,9 +16,24 @@ import {
   getStructEncoder,
   getTupleDecoder,
   getTupleEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
-import { getAuthorityDecoder, getAuthorityEncoder } from "./index.js";
+import {
+  getAuthorityDecoder,
+  getAuthorityEncoder,
+  type Authority,
+  type AuthorityArgs,
+} from "./index.js";
 
+/**
+ * Identifies which linked adapter (`LinkedLifecycleHook` or
+ * `LinkedAppData`) a `DataSection` belongs to.
+ */
 export type LinkedDataKey =
   | { __kind: "LinkedLifecycleHook"; fields: readonly [Address] }
   | { __kind: "LinkedAppData"; fields: readonly [Authority] };

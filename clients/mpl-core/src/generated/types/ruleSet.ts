@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -28,12 +20,23 @@ import {
   getTupleEncoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 
+/**
+ * Restricts which programs may transfer an asset with the
+ * `Royalties` plugin: `None`, a `ProgramAllowList`, or a
+ * `ProgramDenyList`.
+ */
 export type RuleSet =
   | { __kind: "None" }
-  | { __kind: "ProgramAllowList"; fields: readonly [Address[]] }
-  | { __kind: "ProgramDenyList"; fields: readonly [Address[]] };
+  | { __kind: "ProgramAllowList"; fields: readonly [Array<Address>] }
+  | { __kind: "ProgramDenyList"; fields: readonly [Array<Address>] };
 
 export type RuleSetArgs = RuleSet;
 

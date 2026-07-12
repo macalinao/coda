@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  DataState,
-  DataStateArgs,
-  ExternalPluginAdapterInitInfo,
-  ExternalPluginAdapterInitInfoArgs,
-  PluginAuthorityPair,
-  PluginAuthorityPairArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -35,6 +20,11 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getDataStateDecoder,
@@ -43,23 +33,48 @@ import {
   getExternalPluginAdapterInitInfoEncoder,
   getPluginAuthorityPairDecoder,
   getPluginAuthorityPairEncoder,
+  type DataState,
+  type DataStateArgs,
+  type ExternalPluginAdapterInitInfo,
+  type ExternalPluginAdapterInitInfoArgs,
+  type PluginAuthorityPair,
+  type PluginAuthorityPairArgs,
 } from "./index.js";
 
-export interface CreateV2Args {
+/** Arguments for `createV2`. */
+export type CreateV2Args = {
+  /**
+   * Whether the asset is created directly in `AccountState`
+   * (typical) or already-compressed `LedgerState`.
+   */
   dataState: DataState;
+  /** The asset's display name. */
   name: string;
+  /** The URI pointing to the asset's off-chain JSON metadata. */
   uri: string;
-  plugins: Option<PluginAuthorityPair[]>;
-  externalPluginAdapters: Option<ExternalPluginAdapterInitInfo[]>;
-}
+  /** Plugins to attach at creation, each paired with an optional authority override. */
+  plugins: Option<Array<PluginAuthorityPair>>;
+  /** External plugin adapters to attach at creation. */
+  externalPluginAdapters: Option<Array<ExternalPluginAdapterInitInfo>>;
+};
 
-export interface CreateV2ArgsArgs {
+export type CreateV2ArgsArgs = {
+  /**
+   * Whether the asset is created directly in `AccountState`
+   * (typical) or already-compressed `LedgerState`.
+   */
   dataState: DataStateArgs;
+  /** The asset's display name. */
   name: string;
+  /** The URI pointing to the asset's off-chain JSON metadata. */
   uri: string;
-  plugins: OptionOrNullable<PluginAuthorityPairArgs[]>;
-  externalPluginAdapters: OptionOrNullable<ExternalPluginAdapterInitInfoArgs[]>;
-}
+  /** Plugins to attach at creation, each paired with an optional authority override. */
+  plugins: OptionOrNullable<Array<PluginAuthorityPairArgs>>;
+  /** External plugin adapters to attach at creation. */
+  externalPluginAdapters: OptionOrNullable<
+    Array<ExternalPluginAdapterInitInfoArgs>
+  >;
+};
 
 export function getCreateV2ArgsEncoder(): Encoder<CreateV2ArgsArgs> {
   return getStructEncoder([

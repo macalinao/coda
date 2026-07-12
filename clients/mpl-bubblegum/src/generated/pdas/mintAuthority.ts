@@ -6,13 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
-import { getAddressEncoder, getProgramDerivedAddress } from "@solana/kit";
+import {
+  getAddressEncoder,
+  getProgramDerivedAddress,
+  type Address,
+  type ProgramDerivedAddress,
+} from "@solana/kit";
 
-export interface MintAuthoritySeeds {
+export type MintAuthoritySeeds = {
   /** The address of the decompressed mint account */
   mint: Address;
-}
+};
 
 /** Mint authority PDA for a decompressed NFT mint */
 export async function findMintAuthorityPda(

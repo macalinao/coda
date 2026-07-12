@@ -6,19 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface RuleSetSeeds {
+export type RuleSetSeeds = {
   /** The owner (creator) of the rule set */
   owner: Address;
   /** The name of the rule set */
   name: string;
-}
+};
 
 /** RuleSet PDA storing a named set of authorization rules */
 export async function findRuleSetPda(

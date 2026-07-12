@@ -6,17 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/** Discriminator identifying the type of an auth-rules account. */
 export enum Key {
-  Uninitialized = 0,
-  RuleSet = 1,
-  Frequency = 2,
+  Uninitialized,
+  RuleSet,
+  Frequency,
 }
 
 export type KeyArgs = Key;

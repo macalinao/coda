@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,12 +14,23 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Collection {
+/**
+ * A collection reference on a V1 leaf's metadata, with its own
+ * verified flag independent of the collection's on-chain verification
+ * state.
+ */
+export type Collection = {
+  /** Whether the collection has been verified via `verifyCollection` / `setAndVerifyCollection`. */
   verified: boolean;
+  /** Mint of the collection NFT. */
   key: Address;
-}
+};
 
 export type CollectionArgs = Collection;
 

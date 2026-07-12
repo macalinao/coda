@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemoveCollectionsFromGroupV1Args,
-  RemoveCollectionsFromGroupV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemoveCollectionsFromGroupV1ArgsDecoder,
   getRemoveCollectionsFromGroupV1ArgsEncoder,
+  type RemoveCollectionsFromGroupV1Args,
+  type RemoveCollectionsFromGroupV1ArgsArgs,
 } from "../types/index.js";
 
 export const REMOVE_COLLECTIONS_FROM_GROUP_V1_DISCRIMINATOR = 34;
@@ -81,14 +79,16 @@ export type RemoveCollectionsFromGroupV1Instruction<
     ]
   >;
 
-export interface RemoveCollectionsFromGroupV1InstructionData {
+export type RemoveCollectionsFromGroupV1InstructionData = {
   discriminator: number;
+  /** The addresses of the collections to remove from the group. */
   removeCollectionsFromGroupV1Args: RemoveCollectionsFromGroupV1Args;
-}
+};
 
-export interface RemoveCollectionsFromGroupV1InstructionDataArgs {
+export type RemoveCollectionsFromGroupV1InstructionDataArgs = {
+  /** The addresses of the collections to remove from the group. */
   removeCollectionsFromGroupV1Args: RemoveCollectionsFromGroupV1ArgsArgs;
-}
+};
 
 export function getRemoveCollectionsFromGroupV1InstructionDataEncoder(): Encoder<RemoveCollectionsFromGroupV1InstructionDataArgs> {
   return transformEncoder(
@@ -126,12 +126,12 @@ export function getRemoveCollectionsFromGroupV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface RemoveCollectionsFromGroupV1Input<
+export type RemoveCollectionsFromGroupV1Input<
   TAccountGroup extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The address of the group to modify */
   group: Address<TAccountGroup>;
   /** The account paying for storage fees */
@@ -141,8 +141,11 @@ export interface RemoveCollectionsFromGroupV1Input<
   /** The system program */
   systemProgram?: Address<TAccountSystemProgram>;
   removeCollectionsFromGroupV1Args: RemoveCollectionsFromGroupV1InstructionDataArgs["removeCollectionsFromGroupV1Args"];
-}
+};
 
+/**
+ * Removes one or more collections from a group.
+ */
 export function getRemoveCollectionsFromGroupV1Instruction<
   TAccountGroup extends string,
   TAccountPayer extends string,
@@ -210,10 +213,10 @@ export function getRemoveCollectionsFromGroupV1Instruction<
   >);
 }
 
-export interface ParsedRemoveCollectionsFromGroupV1Instruction<
+export type ParsedRemoveCollectionsFromGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the group to modify */
@@ -226,7 +229,7 @@ export interface ParsedRemoveCollectionsFromGroupV1Instruction<
     systemProgram: TAccountMetas[3];
   };
   data: RemoveCollectionsFromGroupV1InstructionData;
-}
+};
 
 export function parseRemoveCollectionsFromGroupV1Instruction<
   TProgram extends string,

@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { CreateV2Args, CreateV2ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCreateV2ArgsDecoder,
   getCreateV2ArgsEncoder,
+  type CreateV2Args,
+  type CreateV2ArgsArgs,
 } from "../types/index.js";
 
 export const CREATE_V2_DISCRIMINATOR = 20;
@@ -95,14 +96,22 @@ export type CreateV2Instruction<
     ]
   >;
 
-export interface CreateV2InstructionData {
+export type CreateV2InstructionData = {
   discriminator: number;
+  /**
+   * The asset's initial data state, name, URI, plugins and
+   * external plugin adapters.
+   */
   createV2Args: CreateV2Args;
-}
+};
 
-export interface CreateV2InstructionDataArgs {
+export type CreateV2InstructionDataArgs = {
+  /**
+   * The asset's initial data state, name, URI, plugins and
+   * external plugin adapters.
+   */
   createV2Args: CreateV2ArgsArgs;
-}
+};
 
 export function getCreateV2InstructionDataEncoder(): Encoder<CreateV2InstructionDataArgs> {
   return transformEncoder(
@@ -131,7 +140,7 @@ export function getCreateV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateV2Input<
+export type CreateV2Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountAuthority extends string = string,
@@ -140,7 +149,7 @@ export interface CreateV2Input<
   TAccountUpdateAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the new asset */
   asset: TransactionSigner<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -158,8 +167,13 @@ export interface CreateV2Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   createV2Args: CreateV2InstructionDataArgs["createV2Args"];
-}
+};
 
+/**
+ * Creates a new Core asset, like `CreateV1`, but also accepts
+ * external plugin adapters (Oracle, AppData, LifecycleHook, etc.)
+ * at creation time via `externalPluginAdapters`.
+ */
 export function getCreateV2Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -254,10 +268,10 @@ export function getCreateV2Instruction<
   >);
 }
 
-export interface ParsedCreateV2Instruction<
+export type ParsedCreateV2Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the new asset */
@@ -278,7 +292,7 @@ export interface ParsedCreateV2Instruction<
     logWrapper?: TAccountMetas[7] | undefined;
   };
   data: CreateV2InstructionData;
-}
+};
 
 export function parseCreateV2Instruction<
   TProgram extends string,

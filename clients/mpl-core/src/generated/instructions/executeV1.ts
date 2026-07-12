@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { ExecuteV1Args, ExecuteV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,16 +15,34 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findAssetSignerPda } from "../pdas/index.js";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getExecuteV1ArgsDecoder,
   getExecuteV1ArgsEncoder,
+  type ExecuteV1Args,
+  type ExecuteV1ArgsArgs,
 } from "../types/index.js";
 
 export const EXECUTE_V1_DISCRIMINATOR = 31;
@@ -94,14 +93,22 @@ export type ExecuteV1Instruction<
     ]
   >;
 
-export interface ExecuteV1InstructionData {
+export type ExecuteV1InstructionData = {
   discriminator: number;
+  /**
+   * The raw, serialized instruction data to invoke via the
+   * asset-signer PDA.
+   */
   executeV1Args: ExecuteV1Args;
-}
+};
 
-export interface ExecuteV1InstructionDataArgs {
+export type ExecuteV1InstructionDataArgs = {
+  /**
+   * The raw, serialized instruction data to invoke via the
+   * asset-signer PDA.
+   */
   executeV1Args: ExecuteV1ArgsArgs;
-}
+};
 
 export function getExecuteV1InstructionDataEncoder(): Encoder<ExecuteV1InstructionDataArgs> {
   return transformEncoder(
@@ -130,7 +137,7 @@ export function getExecuteV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface ExecuteV1AsyncInput<
+export type ExecuteV1AsyncInput<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountAssetSigner extends string = string,
@@ -138,7 +145,7 @@ export interface ExecuteV1AsyncInput<
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountProgramId extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -154,8 +161,18 @@ export interface ExecuteV1AsyncInput<
   /** The program id of the instruction */
   programId?: Address<TAccountProgramId>;
   executeV1Args: ExecuteV1InstructionDataArgs["executeV1Args"];
-}
+};
 
+/**
+ * Invokes an arbitrary instruction on another program via CPI,
+ * signed by the asset's own program-derived `assetSigner`
+ * address.
+ *
+ * This lets an asset act as its own transaction signer (e.g. to
+ * control a wallet or vault it owns). Requires the owner or an
+ * authorized delegate, and increments the asset's sequence
+ * number. Not available for compressed assets.
+ */
 export async function getExecuteV1InstructionAsync<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -259,7 +276,7 @@ export async function getExecuteV1InstructionAsync<
   >);
 }
 
-export interface ExecuteV1Input<
+export type ExecuteV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountAssetSigner extends string = string,
@@ -267,7 +284,7 @@ export interface ExecuteV1Input<
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountProgramId extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -283,8 +300,18 @@ export interface ExecuteV1Input<
   /** The program id of the instruction */
   programId?: Address<TAccountProgramId>;
   executeV1Args: ExecuteV1InstructionDataArgs["executeV1Args"];
-}
+};
 
+/**
+ * Invokes an arbitrary instruction on another program via CPI,
+ * signed by the asset's own program-derived `assetSigner`
+ * address.
+ *
+ * This lets an asset act as its own transaction signer (e.g. to
+ * control a wallet or vault it owns). Requires the owner or an
+ * authorized delegate, and increments the asset's sequence
+ * number. Not available for compressed assets.
+ */
 export function getExecuteV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -378,10 +405,10 @@ export function getExecuteV1Instruction<
   >);
 }
 
-export interface ParsedExecuteV1Instruction<
+export type ParsedExecuteV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -400,7 +427,7 @@ export interface ParsedExecuteV1Instruction<
     programId: TAccountMetas[6];
   };
   data: ExecuteV1InstructionData;
-}
+};
 
 export function parseExecuteV1Instruction<
   TProgram extends string,

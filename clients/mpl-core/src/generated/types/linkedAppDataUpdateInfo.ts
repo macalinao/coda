@@ -6,36 +6,35 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
 import {
   combineCodec,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getExternalPluginAdapterSchemaDecoder,
   getExternalPluginAdapterSchemaEncoder,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
 } from "./index.js";
 
-export interface LinkedAppDataUpdateInfo {
+/** Update data for the `LinkedAppData` external plugin adapter. */
+export type LinkedAppDataUpdateInfo = {
+  /** The new serialization format for this adapter's stored data, if changing. */
   schema: Option<ExternalPluginAdapterSchema>;
-}
+};
 
-export interface LinkedAppDataUpdateInfoArgs {
+export type LinkedAppDataUpdateInfoArgs = {
+  /** The new serialization format for this adapter's stored data, if changing. */
   schema: OptionOrNullable<ExternalPluginAdapterSchemaArgs>;
-}
+};
 
 export function getLinkedAppDataUpdateInfoEncoder(): Encoder<LinkedAppDataUpdateInfoArgs> {
   return getStructEncoder([

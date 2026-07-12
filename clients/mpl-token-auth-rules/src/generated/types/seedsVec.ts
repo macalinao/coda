@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder, ReadonlyUint8Array } from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -19,11 +18,17 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
-export interface SeedsVec {
-  seeds: ReadonlyUint8Array[];
-}
+/** A list of seeds used to derive and match a program address in a rule. */
+export type SeedsVec = {
+  /** The ordered seed byte-strings. */
+  seeds: Array<ReadonlyUint8Array>;
+};
 
 export type SeedsVecArgs = SeedsVec;
 

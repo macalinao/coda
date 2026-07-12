@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { PuffRuleSetArgs, PuffRuleSetArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -33,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getPuffRuleSetArgsDecoder,
   getPuffRuleSetArgsEncoder,
+  type PuffRuleSetArgs,
+  type PuffRuleSetArgsArgs,
 } from "../types/index.js";
 
 export const PUFF_RULE_SET_DISCRIMINATOR = 3;
@@ -72,14 +73,16 @@ export type PuffRuleSetInstruction<
     ]
   >;
 
-export interface PuffRuleSetInstructionData {
+export type PuffRuleSetInstructionData = {
   discriminator: number;
+  /** Identifies the RuleSet to grow by name. */
   puffRuleSetArgs: PuffRuleSetArgs;
-}
+};
 
-export interface PuffRuleSetInstructionDataArgs {
+export type PuffRuleSetInstructionDataArgs = {
+  /** Identifies the RuleSet to grow by name. */
   puffRuleSetArgs: PuffRuleSetArgsArgs;
-}
+};
 
 export function getPuffRuleSetInstructionDataEncoder(): Encoder<PuffRuleSetInstructionDataArgs> {
   return transformEncoder(
@@ -108,11 +111,11 @@ export function getPuffRuleSetInstructionDataCodec(): Codec<
   );
 }
 
-export interface PuffRuleSetInput<
+export type PuffRuleSetInput<
   TAccountPayer extends string = string,
   TAccountRuleSetPda extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** Payer and creator of the RuleSet */
   payer: TransactionSigner<TAccountPayer>;
   /** The PDA account where the RuleSet is stored */
@@ -120,8 +123,15 @@ export interface PuffRuleSetInput<
   /** System program */
   systemProgram?: Address<TAccountSystemProgram>;
   puffRuleSetArgs: PuffRuleSetInstructionDataArgs["puffRuleSetArgs"];
-}
+};
 
+/**
+ * Grows a RuleSet PDA by reallocating additional space.
+ *
+ * Used to pre-allocate ("puff up") the account to the size a large
+ * RuleSet will need before writing to it, since a single instruction
+ * can only grow an account by a limited amount.
+ */
 export function getPuffRuleSetInstruction<
   TAccountPayer extends string,
   TAccountRuleSetPda extends string,
@@ -183,10 +193,10 @@ export function getPuffRuleSetInstruction<
   >);
 }
 
-export interface ParsedPuffRuleSetInstruction<
+export type ParsedPuffRuleSetInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Payer and creator of the RuleSet */
@@ -197,7 +207,7 @@ export interface ParsedPuffRuleSetInstruction<
     systemProgram: TAccountMetas[2];
   };
   data: PuffRuleSetInstructionData;
-}
+};
 
 export function parsePuffRuleSetInstruction<
   TProgram extends string,

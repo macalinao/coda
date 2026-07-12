@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  HashablePluginSchema,
-  HashablePluginSchemaArgs,
-  UpdateAuthority,
-  UpdateAuthorityArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -29,31 +22,56 @@ import {
   getU64Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getHashablePluginSchemaDecoder,
   getHashablePluginSchemaEncoder,
   getUpdateAuthorityDecoder,
   getUpdateAuthorityEncoder,
+  type HashablePluginSchema,
+  type HashablePluginSchemaArgs,
+  type UpdateAuthority,
+  type UpdateAuthorityArgs,
 } from "./index.js";
 
-export interface CompressionProof {
+/**
+ * The asset's core data and plugins as they existed at the time
+ * it was compressed, used to verify and rebuild it on
+ * `decompressV1`.
+ */
+export type CompressionProof = {
+  /** The asset's owner at the time it was compressed. */
   owner: Address;
+  /** The asset's update authority at the time it was compressed. */
   updateAuthority: UpdateAuthority;
+  /** The asset's name at the time it was compressed. */
   name: string;
+  /** The asset's URI at the time it was compressed. */
   uri: string;
+  /** The asset's sequence number at the time it was compressed. */
   seq: bigint;
-  plugins: HashablePluginSchema[];
-}
+  /** The asset's plugins at the time it was compressed. */
+  plugins: Array<HashablePluginSchema>;
+};
 
-export interface CompressionProofArgs {
+export type CompressionProofArgs = {
+  /** The asset's owner at the time it was compressed. */
   owner: Address;
+  /** The asset's update authority at the time it was compressed. */
   updateAuthority: UpdateAuthorityArgs;
+  /** The asset's name at the time it was compressed. */
   name: string;
+  /** The asset's URI at the time it was compressed. */
   uri: string;
+  /** The asset's sequence number at the time it was compressed. */
   seq: number | bigint;
-  plugins: HashablePluginSchemaArgs[];
-}
+  /** The asset's plugins at the time it was compressed. */
+  plugins: Array<HashablePluginSchemaArgs>;
+};
 
 export function getCompressionProofEncoder(): Encoder<CompressionProofArgs> {
   return getStructEncoder([

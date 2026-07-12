@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -32,18 +19,48 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "../types/index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "../types/index.js";
 
-export interface HashedAssetV1 {
+/**
+ * The compressed (`LedgerState`) representation of an asset:
+ * just a discriminator and a hash committing to its full data,
+ * restorable via `decompressV1`.
+ */
+export type HashedAssetV1 = {
+  /** Account discriminator; always `Key.HashedAssetV1`. */
   key: Key;
-  hash: number[];
-}
+  /**
+   * The 32-byte hash committing to the asset's full data and
+   * plugin state while compressed.
+   */
+  hash: Array<number>;
+};
 
-export interface HashedAssetV1Args {
+export type HashedAssetV1Args = {
+  /** Account discriminator; always `Key.HashedAssetV1`. */
   key: KeyArgs;
-  hash: number[];
-}
+  /**
+   * The 32-byte hash committing to the asset's full data and
+   * plugin state while compressed.
+   */
+  hash: Array<number>;
+};
 
 /** Gets the encoder for {@link HashedAssetV1Args} account data. */
 export function getHashedAssetV1Encoder(): FixedSizeEncoder<HashedAssetV1Args> {
@@ -105,7 +122,7 @@ export async function fetchMaybeHashedAssetV1<TAddress extends string = string>(
 
 export async function fetchAllHashedAssetV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<HashedAssetV1>[]> {
   const maybeAccounts = await fetchAllMaybeHashedAssetV1(
@@ -119,7 +136,7 @@ export async function fetchAllHashedAssetV1(
 
 export async function fetchAllMaybeHashedAssetV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<HashedAssetV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -15,11 +14,17 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface AddGroupsToGroupV1Args {
-  groups: Address[];
-}
+/** Arguments for `addGroupsToGroupV1`. */
+export type AddGroupsToGroupV1Args = {
+  /** The addresses of the child groups to add to the parent. */
+  groups: Array<Address>;
+};
 
 export type AddGroupsToGroupV1ArgsArgs = AddGroupsToGroupV1Args;
 

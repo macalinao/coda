@@ -6,15 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -33,8 +24,19 @@ import {
   getU32Encoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
+/**
+ * A single seed component used to derive a `CustomPda` account
+ * for a `LifecycleHook`'s extra accounts.
+ */
 export type Seed =
   | { __kind: "Collection" }
   | { __kind: "Owner" }

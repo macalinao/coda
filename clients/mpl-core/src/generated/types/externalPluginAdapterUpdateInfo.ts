@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type {
-  AgentIdentityUpdateInfo,
-  AgentIdentityUpdateInfoArgs,
-  AppDataUpdateInfo,
-  AppDataUpdateInfoArgs,
-  LifecycleHookUpdateInfo,
-  LifecycleHookUpdateInfoArgs,
-  LinkedAppDataUpdateInfo,
-  LinkedAppDataUpdateInfoArgs,
-  LinkedLifecycleHookUpdateInfo,
-  LinkedLifecycleHookUpdateInfoArgs,
-  OracleUpdateInfo,
-  OracleUpdateInfoArgs,
-} from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -35,6 +14,11 @@ import {
   getStructEncoder,
   getTupleDecoder,
   getTupleEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 import {
   getAgentIdentityUpdateInfoDecoder,
@@ -49,8 +33,24 @@ import {
   getLinkedLifecycleHookUpdateInfoEncoder,
   getOracleUpdateInfoDecoder,
   getOracleUpdateInfoEncoder,
+  type AgentIdentityUpdateInfo,
+  type AgentIdentityUpdateInfoArgs,
+  type AppDataUpdateInfo,
+  type AppDataUpdateInfoArgs,
+  type LifecycleHookUpdateInfo,
+  type LifecycleHookUpdateInfoArgs,
+  type LinkedAppDataUpdateInfo,
+  type LinkedAppDataUpdateInfoArgs,
+  type LinkedLifecycleHookUpdateInfo,
+  type LinkedLifecycleHookUpdateInfoArgs,
+  type OracleUpdateInfo,
+  type OracleUpdateInfoArgs,
 } from "./index.js";
 
+/**
+ * Update data for an existing external plugin adapter, keyed by
+ * adapter type.
+ */
 export type ExternalPluginAdapterUpdateInfo =
   | { __kind: "LifecycleHook"; fields: readonly [LifecycleHookUpdateInfo] }
   | { __kind: "Oracle"; fields: readonly [OracleUpdateInfo] }

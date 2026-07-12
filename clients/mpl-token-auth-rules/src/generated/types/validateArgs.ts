@@ -6,16 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { Payload, PayloadArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -34,24 +24,45 @@ import {
   getU64Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getPayloadDecoder, getPayloadEncoder } from "./index.js";
+import {
+  getPayloadDecoder,
+  getPayloadEncoder,
+  type Payload,
+  type PayloadArgs,
+} from "./index.js";
 
-export interface ValidateArgs {
+/** Versioned arguments for the `validate` instruction. */
+export type ValidateArgs = {
   __kind: "V1";
+  /** The name of the operation being validated (e.g. `Transfer`). */
   operation: string;
+  /** The runtime values the operation's rules will evaluate. */
   payload: Payload;
+  /** Whether stateful rules (e.g. Frequency) should be advanced and persisted. */
   updateRuleState: boolean;
+  /** Optional revision to validate against; defaults to the latest. */
   ruleSetRevision: Option<bigint>;
-}
+};
 
-export interface ValidateArgsArgs {
+export type ValidateArgsArgs = {
   __kind: "V1";
+  /** The name of the operation being validated (e.g. `Transfer`). */
   operation: string;
+  /** The runtime values the operation's rules will evaluate. */
   payload: PayloadArgs;
+  /** Whether stateful rules (e.g. Frequency) should be advanced and persisted. */
   updateRuleState: boolean;
+  /** Optional revision to validate against; defaults to the latest. */
   ruleSetRevision: OptionOrNullable<number | bigint>;
-}
+};
 
 export function getValidateArgsEncoder(): Encoder<ValidateArgsArgs> {
   return getDiscriminatedUnionEncoder([

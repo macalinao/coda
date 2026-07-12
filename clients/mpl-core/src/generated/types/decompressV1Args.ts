@@ -6,21 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { CompressionProof, CompressionProofArgs } from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
 import {
   getCompressionProofDecoder,
   getCompressionProofEncoder,
+  type CompressionProof,
+  type CompressionProofArgs,
 } from "./index.js";
 
-export interface DecompressV1Args {
+/** Arguments for `decompressV1`. */
+export type DecompressV1Args = {
+  /**
+   * Proof of the asset's pre-compression state, used to rebuild
+   * the on-chain account.
+   */
   compressionProof: CompressionProof;
-}
+};
 
-export interface DecompressV1ArgsArgs {
+export type DecompressV1ArgsArgs = {
+  /**
+   * Proof of the asset's pre-compression state, used to rebuild
+   * the on-chain account.
+   */
   compressionProof: CompressionProofArgs;
-}
+};
 
 export function getDecompressV1ArgsEncoder(): Encoder<DecompressV1ArgsArgs> {
   return getStructEncoder([["compressionProof", getCompressionProofEncoder()]]);

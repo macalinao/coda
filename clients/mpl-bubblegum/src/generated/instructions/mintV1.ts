@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { MetadataArgs, MetadataArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,16 +17,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
+  type MetadataArgs,
+  type MetadataArgsArgs,
 } from "../types/index.js";
 
 export const MINT_V1_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -107,14 +106,16 @@ export type MintV1Instruction<
     ]
   >;
 
-export interface MintV1InstructionData {
+export type MintV1InstructionData = {
   discriminator: ReadonlyUint8Array;
+  /** Metadata for the newly minted compressed NFT. */
   message: MetadataArgs;
-}
+};
 
-export interface MintV1InstructionDataArgs {
+export type MintV1InstructionDataArgs = {
+  /** Metadata for the newly minted compressed NFT. */
   message: MetadataArgsArgs;
-}
+};
 
 export function getMintV1InstructionDataEncoder(): Encoder<MintV1InstructionDataArgs> {
   return transformEncoder(
@@ -143,7 +144,7 @@ export function getMintV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface MintV1AsyncInput<
+export type MintV1AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -153,19 +154,53 @@ export interface MintV1AsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * Delegate authority of the tree, authorized to mint into and manage
+   * the tree on the creator's behalf.
+   */
   treeDelegate: TransactionSigner<TAccountTreeDelegate>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   message: MintV1InstructionDataArgs["message"];
-}
+};
 
+/**
+ * Mints a new compressed NFT (V1) leaf and appends it to the tree.
+ *
+ * The tree delegate (or, for public trees, any signer) supplies the
+ * leaf's `MetadataArgs`; Bubblegum hashes it, builds the `LeafSchema`,
+ * and appends the resulting leaf to the Merkle tree.
+ */
 export async function getMintV1InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -283,7 +318,7 @@ export async function getMintV1InstructionAsync<
   >);
 }
 
-export interface MintV1Input<
+export type MintV1Input<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -293,19 +328,53 @@ export interface MintV1Input<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * Delegate authority of the tree, authorized to mint into and manage
+   * the tree on the creator's behalf.
+   */
   treeDelegate: TransactionSigner<TAccountTreeDelegate>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   message: MintV1InstructionDataArgs["message"];
-}
+};
 
+/**
+ * Mints a new compressed NFT (V1) leaf and appends it to the tree.
+ *
+ * The tree delegate (or, for public trees, any signer) supplies the
+ * leaf's `MetadataArgs`; Bubblegum hashes it, builds the `LeafSchema`,
+ * and appends the resulting leaf to the Merkle tree.
+ */
 export function getMintV1Instruction<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -413,24 +482,51 @@ export function getMintV1Instruction<
   >);
 }
 
-export interface ParsedMintV1Instruction<
+export type ParsedMintV1Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[2];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[3];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[4];
+    /**
+     * Delegate authority of the tree, authorized to mint into and manage
+     * the tree on the creator's behalf.
+     */
     treeDelegate: TAccountMetas[5];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[6];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[7];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[8];
   };
   data: MintV1InstructionData;
-}
+};
 
 export function parseMintV1Instruction<
   TProgram extends string,

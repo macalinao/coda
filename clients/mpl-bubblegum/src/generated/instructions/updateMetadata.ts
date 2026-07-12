@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  MetadataArgs,
-  MetadataArgsArgs,
-  UpdateArgs,
-  UpdateArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,19 +16,34 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -60,6 +52,10 @@ import {
   getMetadataArgsEncoder,
   getUpdateArgsDecoder,
   getUpdateArgsEncoder,
+  type MetadataArgs,
+  type MetadataArgsArgs,
+  type UpdateArgs,
+  type UpdateArgsArgs,
 } from "../types/index.js";
 
 export const UPDATE_METADATA_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -142,22 +138,64 @@ export type UpdateMetadataInstruction<
     ]
   >;
 
-export interface UpdateMetadataInstructionData {
+export type UpdateMetadataInstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current metadata args, verified against `dataHash` before
+   * `updateArgs` is applied.
+   */
   currentMetadata: MetadataArgs;
+  /**
+   * The metadata fields to change; fields left unset keep their current
+   * value on the leaf.
+   */
   updateArgs: UpdateArgs;
-}
+};
 
-export interface UpdateMetadataInstructionDataArgs {
-  root: number[];
+export type UpdateMetadataInstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current metadata args, verified against `dataHash` before
+   * `updateArgs` is applied.
+   */
   currentMetadata: MetadataArgsArgs;
+  /**
+   * The metadata fields to change; fields left unset keep their current
+   * value on the leaf.
+   */
   updateArgs: UpdateArgsArgs;
-}
+};
 
 export function getUpdateMetadataInstructionDataEncoder(): Encoder<UpdateMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -194,7 +232,7 @@ export function getUpdateMetadataInstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateMetadataAsyncInput<
+export type UpdateMetadataAsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountAuthority extends string = string,
   TAccountCollectionMint extends string = string,
@@ -208,33 +246,72 @@ export interface UpdateMetadataAsyncInput<
   TAccountCompressionProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
   /**
-   * Either collection authority or tree owner/delegate, depending
-   * on whether the item is in a verified collection
+   * Either the collection authority or the tree owner/delegate,
+   * depending on whether the asset is in a verified collection.
    */
   authority: TransactionSigner<TAccountAuthority>;
-  /** Used when item is in a verified collection */
+  /** Used when the asset is in a verified collection. */
   collectionMint?: Address<TAccountCollectionMint>;
-  /** Used when item is in a verified collection */
+  /** Used when the asset is in a verified collection. */
   collectionMetadata?: Address<TAccountCollectionMetadata>;
+  /**
+   * Delegated collection authority record PDA. Pass the Bubblegum
+   * program id if `collectionAuthority` is the collection's direct
+   * update authority rather than a delegate.
+   */
   collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: UpdateMetadataInstructionDataArgs["root"];
   nonce: UpdateMetadataInstructionDataArgs["nonce"];
   index: UpdateMetadataInstructionDataArgs["index"];
   currentMetadata: UpdateMetadataInstructionDataArgs["currentMetadata"];
   updateArgs: UpdateMetadataInstructionDataArgs["updateArgs"];
-}
+};
 
+/**
+ * Updates the on-chain metadata fields of a compressed NFT leaf.
+ *
+ * The caller supplies `currentMetadata` (verified against the leaf's
+ * stored `dataHash`) and `updateArgs` describing which fields to
+ * change; unset fields in `updateArgs` are left as-is.
+ */
 export async function getUpdateMetadataInstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountAuthority extends string,
@@ -392,7 +469,7 @@ export async function getUpdateMetadataInstructionAsync<
   >);
 }
 
-export interface UpdateMetadataInput<
+export type UpdateMetadataInput<
   TAccountTreeAuthority extends string = string,
   TAccountAuthority extends string = string,
   TAccountCollectionMint extends string = string,
@@ -406,33 +483,72 @@ export interface UpdateMetadataInput<
   TAccountCompressionProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
   /**
-   * Either collection authority or tree owner/delegate, depending
-   * on whether the item is in a verified collection
+   * Either the collection authority or the tree owner/delegate,
+   * depending on whether the asset is in a verified collection.
    */
   authority: TransactionSigner<TAccountAuthority>;
-  /** Used when item is in a verified collection */
+  /** Used when the asset is in a verified collection. */
   collectionMint?: Address<TAccountCollectionMint>;
-  /** Used when item is in a verified collection */
+  /** Used when the asset is in a verified collection. */
   collectionMetadata?: Address<TAccountCollectionMetadata>;
+  /**
+   * Delegated collection authority record PDA. Pass the Bubblegum
+   * program id if `collectionAuthority` is the collection's direct
+   * update authority rather than a delegate.
+   */
   collectionAuthorityRecordPda?: Address<TAccountCollectionAuthorityRecordPda>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: UpdateMetadataInstructionDataArgs["root"];
   nonce: UpdateMetadataInstructionDataArgs["nonce"];
   index: UpdateMetadataInstructionDataArgs["index"];
   currentMetadata: UpdateMetadataInstructionDataArgs["currentMetadata"];
   updateArgs: UpdateMetadataInstructionDataArgs["updateArgs"];
-}
+};
 
+/**
+ * Updates the on-chain metadata fields of a compressed NFT leaf.
+ *
+ * The caller supplies `currentMetadata` (verified against the leaf's
+ * stored `dataHash`) and `updateArgs` describing which fields to
+ * change; unset fields in `updateArgs` are left as-is.
+ */
 export function getUpdateMetadataInstruction<
   TAccountTreeAuthority extends string,
   TAccountAuthority extends string,
@@ -580,34 +696,66 @@ export function getUpdateMetadataInstruction<
   >);
 }
 
-export interface ParsedUpdateMetadataInstruction<
+export type ParsedUpdateMetadataInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
     /**
-     * Either collection authority or tree owner/delegate, depending
-     * on whether the item is in a verified collection
+     * Either the collection authority or the tree owner/delegate,
+     * depending on whether the asset is in a verified collection.
      */
     authority: TAccountMetas[1];
-    /** Used when item is in a verified collection */
+    /** Used when the asset is in a verified collection. */
     collectionMint?: TAccountMetas[2] | undefined;
-    /** Used when item is in a verified collection */
+    /** Used when the asset is in a verified collection. */
     collectionMetadata?: TAccountMetas[3] | undefined;
+    /**
+     * Delegated collection authority record PDA. Pass the Bubblegum
+     * program id if `collectionAuthority` is the collection's direct
+     * update authority rather than a delegate.
+     */
     collectionAuthorityRecordPda?: TAccountMetas[4] | undefined;
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[5];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[6];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[7];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[8];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[9];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[10];
+    /**
+     * The Token Metadata program, invoked to read or (un)verify the
+     * legacy collection accounts.
+     */
     tokenMetadataProgram: TAccountMetas[11];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[12];
   };
   data: UpdateMetadataInstructionData;
-}
+};
 
 export function parseUpdateMetadataInstruction<
   TProgram extends string,

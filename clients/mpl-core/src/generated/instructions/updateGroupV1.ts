@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  UpdateGroupV1Args,
-  UpdateGroupV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getUpdateGroupV1ArgsDecoder,
   getUpdateGroupV1ArgsEncoder,
+  type UpdateGroupV1Args,
+  type UpdateGroupV1ArgsArgs,
 } from "../types/index.js";
 
 export const UPDATE_GROUP_V1_DISCRIMINATOR = 41;
@@ -85,14 +83,16 @@ export type UpdateGroupV1Instruction<
     ]
   >;
 
-export interface UpdateGroupV1InstructionData {
+export type UpdateGroupV1InstructionData = {
   discriminator: number;
+  /** The fields to change; omitted fields are left untouched. */
   updateGroupV1Args: UpdateGroupV1Args;
-}
+};
 
-export interface UpdateGroupV1InstructionDataArgs {
+export type UpdateGroupV1InstructionDataArgs = {
+  /** The fields to change; omitted fields are left untouched. */
   updateGroupV1Args: UpdateGroupV1ArgsArgs;
-}
+};
 
 export function getUpdateGroupV1InstructionDataEncoder(): Encoder<UpdateGroupV1InstructionDataArgs> {
   return transformEncoder(
@@ -121,13 +121,13 @@ export function getUpdateGroupV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateGroupV1Input<
+export type UpdateGroupV1Input<
   TAccountGroup extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountNewUpdateAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The address of the group to update */
   group: Address<TAccountGroup>;
   /** The account paying for the storage fees */
@@ -139,8 +139,11 @@ export interface UpdateGroupV1Input<
   /** The system program */
   systemProgram?: Address<TAccountSystemProgram>;
   updateGroupV1Args: UpdateGroupV1InstructionDataArgs["updateGroupV1Args"];
-}
+};
 
+/**
+ * Updates a group's name, URI and/or update authority.
+ */
 export function getUpdateGroupV1Instruction<
   TAccountGroup extends string,
   TAccountPayer extends string,
@@ -217,10 +220,10 @@ export function getUpdateGroupV1Instruction<
   >);
 }
 
-export interface ParsedUpdateGroupV1Instruction<
+export type ParsedUpdateGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the group to update */
@@ -235,7 +238,7 @@ export interface ParsedUpdateGroupV1Instruction<
     systemProgram: TAccountMetas[4];
   };
   data: UpdateGroupV1InstructionData;
-}
+};
 
 export function parseUpdateGroupV1Instruction<
   TProgram extends string,

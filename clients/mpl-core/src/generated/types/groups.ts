@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -15,11 +14,17 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface Groups {
-  groups: Address[];
-}
+/** Internal plugin recording the groups an asset or collection belongs to. */
+export type Groups = {
+  /** The addresses of the groups this asset or collection belongs to. */
+  groups: Array<Address>;
+};
 
 export type GroupsArgs = Groups;
 

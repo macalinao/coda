@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  AddAssetsToGroupV1Args,
-  AddAssetsToGroupV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAddAssetsToGroupV1ArgsDecoder,
   getAddAssetsToGroupV1ArgsEncoder,
+  type AddAssetsToGroupV1Args,
+  type AddAssetsToGroupV1ArgsArgs,
 } from "../types/index.js";
 
 export const ADD_ASSETS_TO_GROUP_V1_DISCRIMINATOR = 35;
@@ -81,14 +79,16 @@ export type AddAssetsToGroupV1Instruction<
     ]
   >;
 
-export interface AddAssetsToGroupV1InstructionData {
+export type AddAssetsToGroupV1InstructionData = {
   discriminator: number;
+  /** Reserved; the assets to add are passed as remaining accounts. */
   addAssetsToGroupV1Args: AddAssetsToGroupV1Args;
-}
+};
 
-export interface AddAssetsToGroupV1InstructionDataArgs {
+export type AddAssetsToGroupV1InstructionDataArgs = {
+  /** Reserved; the assets to add are passed as remaining accounts. */
   addAssetsToGroupV1Args: AddAssetsToGroupV1ArgsArgs;
-}
+};
 
 export function getAddAssetsToGroupV1InstructionDataEncoder(): FixedSizeEncoder<AddAssetsToGroupV1InstructionDataArgs> {
   return transformEncoder(
@@ -120,12 +120,12 @@ export function getAddAssetsToGroupV1InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface AddAssetsToGroupV1Input<
+export type AddAssetsToGroupV1Input<
   TAccountGroup extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The address of the group to modify */
   group: Address<TAccountGroup>;
   /** The account paying for storage fees */
@@ -135,8 +135,13 @@ export interface AddAssetsToGroupV1Input<
   /** The system program */
   systemProgram?: Address<TAccountSystemProgram>;
   addAssetsToGroupV1Args: AddAssetsToGroupV1InstructionDataArgs["addAssetsToGroupV1Args"];
-}
+};
 
+/**
+ * Adds one or more assets to a group, recording the membership as
+ * an `Asset` relationship. The assets to add are passed as
+ * remaining accounts.
+ */
 export function getAddAssetsToGroupV1Instruction<
   TAccountGroup extends string,
   TAccountPayer extends string,
@@ -204,10 +209,10 @@ export function getAddAssetsToGroupV1Instruction<
   >);
 }
 
-export interface ParsedAddAssetsToGroupV1Instruction<
+export type ParsedAddAssetsToGroupV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the group to modify */
@@ -220,7 +225,7 @@ export interface ParsedAddAssetsToGroupV1Instruction<
     systemProgram: TAccountMetas[3];
   };
   data: AddAssetsToGroupV1InstructionData;
-}
+};
 
 export function parseAddAssetsToGroupV1Instruction<
   TProgram extends string,

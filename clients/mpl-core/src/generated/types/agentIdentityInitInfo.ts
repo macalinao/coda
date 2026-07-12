@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalCheckResult,
-  ExternalCheckResultArgs,
-  HookableLifecycleEvent,
-  HookableLifecycleEventArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -37,6 +22,11 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
@@ -45,23 +35,48 @@ import {
   getExternalCheckResultEncoder,
   getHookableLifecycleEventDecoder,
   getHookableLifecycleEventEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalCheckResult,
+  type ExternalCheckResultArgs,
+  type HookableLifecycleEvent,
+  type HookableLifecycleEventArgs,
 } from "./index.js";
 
-export interface AgentIdentityInitInfo {
+/** Initialization data for the `AgentIdentity` external plugin adapter. */
+export type AgentIdentityInitInfo = {
+  /** The URI pointing to the agent's off-chain identity metadata. */
   uri: string;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: Option<Authority>;
+  /**
+   * The lifecycle events this adapter should be consulted for,
+   * and how its result should be interpreted.
+   */
   lifecycleChecks: Array<
     readonly [HookableLifecycleEvent, ExternalCheckResult]
   >;
-}
+};
 
-export interface AgentIdentityInitInfoArgs {
+export type AgentIdentityInitInfoArgs = {
+  /** The URI pointing to the agent's off-chain identity metadata. */
   uri: string;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: OptionOrNullable<AuthorityArgs>;
+  /**
+   * The lifecycle events this adapter should be consulted for,
+   * and how its result should be interpreted.
+   */
   lifecycleChecks: Array<
     readonly [HookableLifecycleEventArgs, ExternalCheckResultArgs]
   >;
-}
+};
 
 export function getAgentIdentityInitInfoEncoder(): Encoder<AgentIdentityInitInfoArgs> {
   return getStructEncoder([

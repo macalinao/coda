@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  ExternalCheckResult,
-  ExternalCheckResultArgs,
-  HookableLifecycleEvent,
-  HookableLifecycleEventArgs,
-} from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -35,27 +22,41 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getExternalCheckResultDecoder,
   getExternalCheckResultEncoder,
   getHookableLifecycleEventDecoder,
   getHookableLifecycleEventEncoder,
+  type ExternalCheckResult,
+  type ExternalCheckResultArgs,
+  type HookableLifecycleEvent,
+  type HookableLifecycleEventArgs,
 } from "./index.js";
 
-export interface AgentIdentityUpdateInfo {
+/** Update data for the `AgentIdentity` external plugin adapter. */
+export type AgentIdentityUpdateInfo = {
+  /** The agent's new identity metadata URI, if changing. */
   uri: Option<string>;
+  /** The lifecycle events this adapter should be consulted for, if changing. */
   lifecycleChecks: Option<
     Array<readonly [HookableLifecycleEvent, ExternalCheckResult]>
   >;
-}
+};
 
-export interface AgentIdentityUpdateInfoArgs {
+export type AgentIdentityUpdateInfoArgs = {
+  /** The agent's new identity metadata URI, if changing. */
   uri: OptionOrNullable<string>;
+  /** The lifecycle events this adapter should be consulted for, if changing. */
   lifecycleChecks: OptionOrNullable<
     Array<readonly [HookableLifecycleEventArgs, ExternalCheckResultArgs]>
   >;
-}
+};
 
 export function getAgentIdentityUpdateInfoEncoder(): Encoder<AgentIdentityUpdateInfoArgs> {
   return getStructEncoder([

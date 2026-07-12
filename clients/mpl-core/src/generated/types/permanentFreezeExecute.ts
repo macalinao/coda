@@ -6,22 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getBooleanDecoder,
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface PermanentFreezeExecute {
+/**
+ * Internal plugin, addable only at creation, whose authority
+ * permanently retains the right to freeze the asset's
+ * `executeV1` capability.
+ */
+export type PermanentFreezeExecute = {
+  /** Whether the asset's `executeV1` capability is currently frozen. */
   frozen: boolean;
-}
+};
 
 export type PermanentFreezeExecuteArgs = PermanentFreezeExecute;
 

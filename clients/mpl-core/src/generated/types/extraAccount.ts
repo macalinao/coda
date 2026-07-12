@@ -6,17 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { Seed, SeedArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -31,9 +20,28 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getSeedDecoder, getSeedEncoder } from "./index.js";
+import {
+  getSeedDecoder,
+  getSeedEncoder,
+  type Seed,
+  type SeedArgs,
+} from "./index.js";
 
+/**
+ * An additional account to forward to a `LifecycleHook`'s
+ * hooked program: either a preconfigured well-known account
+ * (asset, collection, owner, recipient, program) or a custom
+ * PDA derived from `seeds`.
+ */
 export type ExtraAccount =
   | { __kind: "PreconfiguredProgram"; isSigner: boolean; isWritable: boolean }
   | {
@@ -46,7 +54,7 @@ export type ExtraAccount =
   | { __kind: "PreconfiguredAsset"; isSigner: boolean; isWritable: boolean }
   | {
       __kind: "CustomPda";
-      seeds: Seed[];
+      seeds: Array<Seed>;
       customProgramId: Option<Address>;
       isSigner: boolean;
       isWritable: boolean;
@@ -70,7 +78,7 @@ export type ExtraAccountArgs =
   | { __kind: "PreconfiguredAsset"; isSigner: boolean; isWritable: boolean }
   | {
       __kind: "CustomPda";
-      seeds: SeedArgs[];
+      seeds: Array<SeedArgs>;
       customProgramId: OptionOrNullable<Address>;
       isSigner: boolean;
       isWritable: boolean;

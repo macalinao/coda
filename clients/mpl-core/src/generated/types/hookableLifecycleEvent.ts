@@ -6,19 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * A lifecycle event that can trigger an external plugin
+ * adapter's check: `Create`, `Transfer`, `Burn`, `Update` or
+ * `Execute`.
+ */
 export enum HookableLifecycleEvent {
-  Create = 0,
-  Transfer = 1,
-  Burn = 2,
-  Update = 3,
-  Execute = 4,
+  Create,
+  Transfer,
+  Burn,
+  Update,
+  Execute,
 }
 
 export type HookableLifecycleEventArgs = HookableLifecycleEvent;

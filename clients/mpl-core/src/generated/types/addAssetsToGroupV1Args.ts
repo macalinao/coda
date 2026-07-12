@@ -6,13 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 
+/**
+ * Arguments for `addAssetsToGroupV1`; the assets to add are
+ * passed as remaining accounts.
+ */
 export type AddAssetsToGroupV1Args = {};
 
 export type AddAssetsToGroupV1ArgsArgs = AddAssetsToGroupV1Args;

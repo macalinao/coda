@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalCheckResult,
-  ExternalCheckResultArgs,
-  ExternalPluginAdapterType,
-  ExternalPluginAdapterTypeArgs,
-  HookableLifecycleEvent,
-  HookableLifecycleEventArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -35,6 +18,11 @@ import {
   getTupleEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
@@ -45,29 +33,77 @@ import {
   getExternalPluginAdapterTypeEncoder,
   getHookableLifecycleEventDecoder,
   getHookableLifecycleEventEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalCheckResult,
+  type ExternalCheckResultArgs,
+  type ExternalPluginAdapterType,
+  type ExternalPluginAdapterTypeArgs,
+  type HookableLifecycleEvent,
+  type HookableLifecycleEventArgs,
 } from "./index.js";
 
-export interface ExternalRegistryRecord {
+/**
+ * An entry in `PluginRegistryV1` describing one external plugin
+ * adapter and where its config/data live in the account.
+ */
+export type ExternalRegistryRecord = {
+  /** The type of the external plugin adapter this record describes. */
   pluginType: ExternalPluginAdapterType;
+  /** The authority currently allowed to manage the adapter. */
   authority: Authority;
+  /**
+   * The lifecycle events this adapter is consulted for, and how
+   * its result should be interpreted.
+   */
   lifecycleChecks: Option<
     Array<readonly [HookableLifecycleEvent, ExternalCheckResult]>
   >;
+  /**
+   * The byte offset, within the plugin registry, at which this
+   * adapter's config begins.
+   */
   offset: bigint;
+  /**
+   * The byte offset at which this adapter's separate data
+   * payload begins, if it stores one.
+   */
   dataOffset: Option<bigint>;
+  /**
+   * The length, in bytes, of this adapter's separate data
+   * payload, if it stores one.
+   */
   dataLen: Option<bigint>;
-}
+};
 
-export interface ExternalRegistryRecordArgs {
+export type ExternalRegistryRecordArgs = {
+  /** The type of the external plugin adapter this record describes. */
   pluginType: ExternalPluginAdapterTypeArgs;
+  /** The authority currently allowed to manage the adapter. */
   authority: AuthorityArgs;
+  /**
+   * The lifecycle events this adapter is consulted for, and how
+   * its result should be interpreted.
+   */
   lifecycleChecks: OptionOrNullable<
     Array<readonly [HookableLifecycleEventArgs, ExternalCheckResultArgs]>
   >;
+  /**
+   * The byte offset, within the plugin registry, at which this
+   * adapter's config begins.
+   */
   offset: number | bigint;
+  /**
+   * The byte offset at which this adapter's separate data
+   * payload begins, if it stores one.
+   */
   dataOffset: OptionOrNullable<number | bigint>;
+  /**
+   * The length, in bytes, of this adapter's separate data
+   * payload, if it stores one.
+   */
   dataLen: OptionOrNullable<number | bigint>;
-}
+};
 
 export function getExternalRegistryRecordEncoder(): Encoder<ExternalRegistryRecordArgs> {
   return getStructEncoder([

@@ -6,16 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * Schema version of a tree's leaves: `V1` (Token Metadata
+ * collections) or `V2` (MPL Core collections, freezing, and
+ * non-transferable assets).
+ */
 export enum Version {
-  V1 = 0,
-  V2 = 1,
+  V1,
+  V2,
 }
 
 export type VersionArgs = Version;

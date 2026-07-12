@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** InvalidSystemProgram: Invalid System Program */
@@ -191,112 +191,72 @@ export type MplCoreProgramError =
 let mplCoreProgramErrorMessages:
   | Record<MplCoreProgramError, string>
   | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   mplCoreProgramErrorMessages = {
-    [MPL_CORE_PROGRAM_ERROR__AGENT_IDENTITY_MUST_SIGN]:
-      "Agent Identity Program must sign",
-    [MPL_CORE_PROGRAM_ERROR__ALREADY_COMPRESSED]: "Already compressed account",
-    [MPL_CORE_PROGRAM_ERROR__ALREADY_DECOMPRESSED]:
-      "Already decompressed account",
-    [MPL_CORE_PROGRAM_ERROR__ASSET_IS_FROZEN]: "Cannot transfer a frozen asset",
-    [MPL_CORE_PROGRAM_ERROR__BLOCKED_BY_BUBBLEGUM_V2]:
-      "Bubblegum V2 Plugin limits other plugins",
-    [MPL_CORE_PROGRAM_ERROR__CANNOT_ADD_DATA_SECTION]:
-      "Cannot add a Data Section without a linked external plugin",
-    [MPL_CORE_PROGRAM_ERROR__CANNOT_BURN_COLLECTION]:
-      "Cannot burn a collection NFT",
-    [MPL_CORE_PROGRAM_ERROR__CANNOT_MIGRATE_MASTER_WITH_SUPPLY]:
-      "Cannot migrate a master edition used for prints",
-    [MPL_CORE_PROGRAM_ERROR__CANNOT_MIGRATE_PRINTS]:
-      "Cannot migrate a print edition",
-    [MPL_CORE_PROGRAM_ERROR__CANNOT_REDELEGATE]:
-      "Plugin Manager cannot redelegate a delegated plugin without revoking first",
-    [MPL_CORE_PROGRAM_ERROR__COLLECTION_MUST_BE_EMPTY]:
-      "Collection must be empty to be burned",
-    [MPL_CORE_PROGRAM_ERROR__CONFLICTING_AUTHORITY]:
-      "Cannot specify both an update authority and collection on an asset",
-    [MPL_CORE_PROGRAM_ERROR__DESERIALIZATION_ERROR]:
-      "Error deserializing account",
-    [MPL_CORE_PROGRAM_ERROR__DUPLICATE_ENTRY]:
-      "Duplicate entry provided when adding relationships to a group",
-    [MPL_CORE_PROGRAM_ERROR__DUPLICATE_LIFECYCLE_CHECKS]:
-      "Duplicate lifecycle checks were provided for external plugin adapter ",
-    [MPL_CORE_PROGRAM_ERROR__EXTERNAL_PLUGIN_ADAPTER_ALREADY_EXISTS]:
-      "External Plugin Adapter already exists",
-    [MPL_CORE_PROGRAM_ERROR__EXTERNAL_PLUGIN_ADAPTER_NOT_FOUND]:
-      "External Plugin Adapter not found",
-    [MPL_CORE_PROGRAM_ERROR__GROUP_MUST_BE_EMPTY]:
-      "Group must be empty to be closed",
-    [MPL_CORE_PROGRAM_ERROR__GROUP_NESTING_DEPTH_EXCEEDED]:
-      "Group nesting depth exceeded",
-    [MPL_CORE_PROGRAM_ERROR__GROUP_VECTOR_FULL]:
-      "Group vector is at maximum capacity",
-    [MPL_CORE_PROGRAM_ERROR__INCONSISTENT_GROUP_RELATIONSHIP]:
-      "Bidirectional group relationship is inconsistent",
-    [MPL_CORE_PROGRAM_ERROR__INCORRECT_ACCOUNT]: "Incorrect account",
-    [MPL_CORE_PROGRAM_ERROR__INCORRECT_ASSET_HASH]: "Incorrect asset hash",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_ASSET]: "Invalid Asset passed in",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_AUTHORITY]: "Invalid Authority",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_COLLECTION]:
-      "Invalid Collection passed in",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_EXECUTE_PDA]:
-      "Invalid Signing PDA for Asset or Collection Execute",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_LOG_WRAPPER_PROGRAM]:
-      "Invalid Log Wrapper Program",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_ORACLE_ACCOUNT_DATA]:
-      "Could not read from oracle account",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN]: "Invalid Plugin",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN_ADAPTER_TARGET]:
-      "This plugin adapter cannot be added to an Asset",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN_OPERATION]:
-      "Invalid plugin operation",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN_SETTING]:
-      "Invalid setting for plugin",
-    [MPL_CORE_PROGRAM_ERROR__INVALID_SYSTEM_PROGRAM]: "Invalid System Program",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_ASSET]:
-      "Missing asset needed for extra account PDA derivation",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_COLLECTION]: "Missing collection",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_COMPRESSION_PROOF]:
-      "Missing compression proof",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_EXTERNAL_PLUGIN_ADAPTER_ACCOUNT]:
-      "Missing account needed for external plugin adapter",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_NEW_OWNER]: "Missing new owner",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_SIGNER]:
-      "Missing required signer for operation",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_SYSTEM_PROGRAM]: "Missing system program",
-    [MPL_CORE_PROGRAM_ERROR__MISSING_UPDATE_AUTHORITY]:
-      "Missing update authority",
-    [MPL_CORE_PROGRAM_ERROR__NO_APPROVALS]:
-      "Neither the asset or any plugins have approved this operation",
-    [MPL_CORE_PROGRAM_ERROR__NO_DATA_SOURCES]:
-      "No data sources provided, one is required",
-    [MPL_CORE_PROGRAM_ERROR__NOT_AVAILABLE]: "Feature not available",
-    [MPL_CORE_PROGRAM_ERROR__NUMERICAL_OVERFLOW]: "Numerical Overflow",
-    [MPL_CORE_PROGRAM_ERROR__NUMERICAL_OVERFLOW_ERROR]: "Numerical overflow",
-    [MPL_CORE_PROGRAM_ERROR__ORACLE_CAN_REJECT_ONLY]:
-      "Oracle external plugin adapter can only be configured to reject",
-    [MPL_CORE_PROGRAM_ERROR__PERMANENT_DELEGATES_PREVENT_MOVE]:
-      "Cannot move asset to collection with permanent delegates",
-    [MPL_CORE_PROGRAM_ERROR__PLUGIN_ALREADY_EXISTS]: "Plugin already exists",
-    [MPL_CORE_PROGRAM_ERROR__PLUGIN_NOT_FOUND]: "Plugin not found",
-    [MPL_CORE_PROGRAM_ERROR__PLUGINS_NOT_INITIALIZED]:
-      "Plugins not initialized",
-    [MPL_CORE_PROGRAM_ERROR__REQUIRES_LIFECYCLE_CHECK]:
-      "External plugin adapter must have at least one lifecycle check",
-    [MPL_CORE_PROGRAM_ERROR__SERIALIZATION_ERROR]: "Error serializing account",
-    [MPL_CORE_PROGRAM_ERROR__TWO_DATA_SOURCES]:
-      "Two data sources provided, only one is allowed",
-    [MPL_CORE_PROGRAM_ERROR__UNINITIALIZED_ORACLE_ACCOUNT]:
-      "Oracle account is uninitialized",
-    [MPL_CORE_PROGRAM_ERROR__UNSUPPORTED_OPERATION]:
-      "External Plugin does not support this operation",
+    [MPL_CORE_PROGRAM_ERROR__AGENT_IDENTITY_MUST_SIGN]: `Agent Identity Program must sign`,
+    [MPL_CORE_PROGRAM_ERROR__ALREADY_COMPRESSED]: `Already compressed account`,
+    [MPL_CORE_PROGRAM_ERROR__ALREADY_DECOMPRESSED]: `Already decompressed account`,
+    [MPL_CORE_PROGRAM_ERROR__ASSET_IS_FROZEN]: `Cannot transfer a frozen asset`,
+    [MPL_CORE_PROGRAM_ERROR__BLOCKED_BY_BUBBLEGUM_V2]: `Bubblegum V2 Plugin limits other plugins`,
+    [MPL_CORE_PROGRAM_ERROR__CANNOT_ADD_DATA_SECTION]: `Cannot add a Data Section without a linked external plugin`,
+    [MPL_CORE_PROGRAM_ERROR__CANNOT_BURN_COLLECTION]: `Cannot burn a collection NFT`,
+    [MPL_CORE_PROGRAM_ERROR__CANNOT_MIGRATE_MASTER_WITH_SUPPLY]: `Cannot migrate a master edition used for prints`,
+    [MPL_CORE_PROGRAM_ERROR__CANNOT_MIGRATE_PRINTS]: `Cannot migrate a print edition`,
+    [MPL_CORE_PROGRAM_ERROR__CANNOT_REDELEGATE]: `Plugin Manager cannot redelegate a delegated plugin without revoking first`,
+    [MPL_CORE_PROGRAM_ERROR__COLLECTION_MUST_BE_EMPTY]: `Collection must be empty to be burned`,
+    [MPL_CORE_PROGRAM_ERROR__CONFLICTING_AUTHORITY]: `Cannot specify both an update authority and collection on an asset`,
+    [MPL_CORE_PROGRAM_ERROR__DESERIALIZATION_ERROR]: `Error deserializing account`,
+    [MPL_CORE_PROGRAM_ERROR__DUPLICATE_ENTRY]: `Duplicate entry provided when adding relationships to a group`,
+    [MPL_CORE_PROGRAM_ERROR__DUPLICATE_LIFECYCLE_CHECKS]: `Duplicate lifecycle checks were provided for external plugin adapter `,
+    [MPL_CORE_PROGRAM_ERROR__EXTERNAL_PLUGIN_ADAPTER_ALREADY_EXISTS]: `External Plugin Adapter already exists`,
+    [MPL_CORE_PROGRAM_ERROR__EXTERNAL_PLUGIN_ADAPTER_NOT_FOUND]: `External Plugin Adapter not found`,
+    [MPL_CORE_PROGRAM_ERROR__GROUP_MUST_BE_EMPTY]: `Group must be empty to be closed`,
+    [MPL_CORE_PROGRAM_ERROR__GROUP_NESTING_DEPTH_EXCEEDED]: `Group nesting depth exceeded`,
+    [MPL_CORE_PROGRAM_ERROR__GROUP_VECTOR_FULL]: `Group vector is at maximum capacity`,
+    [MPL_CORE_PROGRAM_ERROR__INCONSISTENT_GROUP_RELATIONSHIP]: `Bidirectional group relationship is inconsistent`,
+    [MPL_CORE_PROGRAM_ERROR__INCORRECT_ACCOUNT]: `Incorrect account`,
+    [MPL_CORE_PROGRAM_ERROR__INCORRECT_ASSET_HASH]: `Incorrect asset hash`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_ASSET]: `Invalid Asset passed in`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_AUTHORITY]: `Invalid Authority`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_COLLECTION]: `Invalid Collection passed in`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_EXECUTE_PDA]: `Invalid Signing PDA for Asset or Collection Execute`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_LOG_WRAPPER_PROGRAM]: `Invalid Log Wrapper Program`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_ORACLE_ACCOUNT_DATA]: `Could not read from oracle account`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN]: `Invalid Plugin`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN_ADAPTER_TARGET]: `This plugin adapter cannot be added to an Asset`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN_OPERATION]: `Invalid plugin operation`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_PLUGIN_SETTING]: `Invalid setting for plugin`,
+    [MPL_CORE_PROGRAM_ERROR__INVALID_SYSTEM_PROGRAM]: `Invalid System Program`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_ASSET]: `Missing asset needed for extra account PDA derivation`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_COLLECTION]: `Missing collection`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_COMPRESSION_PROOF]: `Missing compression proof`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_EXTERNAL_PLUGIN_ADAPTER_ACCOUNT]: `Missing account needed for external plugin adapter`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_NEW_OWNER]: `Missing new owner`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_SIGNER]: `Missing required signer for operation`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_SYSTEM_PROGRAM]: `Missing system program`,
+    [MPL_CORE_PROGRAM_ERROR__MISSING_UPDATE_AUTHORITY]: `Missing update authority`,
+    [MPL_CORE_PROGRAM_ERROR__NO_APPROVALS]: `Neither the asset or any plugins have approved this operation`,
+    [MPL_CORE_PROGRAM_ERROR__NO_DATA_SOURCES]: `No data sources provided, one is required`,
+    [MPL_CORE_PROGRAM_ERROR__NOT_AVAILABLE]: `Feature not available`,
+    [MPL_CORE_PROGRAM_ERROR__NUMERICAL_OVERFLOW]: `Numerical Overflow`,
+    [MPL_CORE_PROGRAM_ERROR__NUMERICAL_OVERFLOW_ERROR]: `Numerical overflow`,
+    [MPL_CORE_PROGRAM_ERROR__ORACLE_CAN_REJECT_ONLY]: `Oracle external plugin adapter can only be configured to reject`,
+    [MPL_CORE_PROGRAM_ERROR__PERMANENT_DELEGATES_PREVENT_MOVE]: `Cannot move asset to collection with permanent delegates`,
+    [MPL_CORE_PROGRAM_ERROR__PLUGIN_ALREADY_EXISTS]: `Plugin already exists`,
+    [MPL_CORE_PROGRAM_ERROR__PLUGIN_NOT_FOUND]: `Plugin not found`,
+    [MPL_CORE_PROGRAM_ERROR__PLUGINS_NOT_INITIALIZED]: `Plugins not initialized`,
+    [MPL_CORE_PROGRAM_ERROR__REQUIRES_LIFECYCLE_CHECK]: `External plugin adapter must have at least one lifecycle check`,
+    [MPL_CORE_PROGRAM_ERROR__SERIALIZATION_ERROR]: `Error serializing account`,
+    [MPL_CORE_PROGRAM_ERROR__TWO_DATA_SOURCES]: `Two data sources provided, only one is allowed`,
+    [MPL_CORE_PROGRAM_ERROR__UNINITIALIZED_ORACLE_ACCOUNT]: `Oracle account is uninitialized`,
+    [MPL_CORE_PROGRAM_ERROR__UNSUPPORTED_OPERATION]: `External Plugin does not support this operation`,
   };
 }
 
 export function getMplCoreProgramErrorMessage(
   code: MplCoreProgramError,
 ): string {
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env["NODE_ENV"] !== "production") {
     return (mplCoreProgramErrorMessages as Record<MplCoreProgramError, string>)[
       code
     ];

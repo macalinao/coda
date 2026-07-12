@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -43,10 +23,28 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -105,18 +103,42 @@ export type CreateTreeV2Instruction<
     ]
   >;
 
-export interface CreateTreeV2InstructionData {
+export type CreateTreeV2InstructionData = {
   discriminator: ReadonlyUint8Array;
+  /**
+   * Maximum depth of the Merkle tree, i.e. log2 of the maximum number of
+   * leaves it can hold. Fixed for the lifetime of the tree.
+   */
   maxDepth: number;
+  /**
+   * Maximum number of concurrent, unconflicting modifications the tree's
+   * changelog buffer can track. Fixed for the lifetime of the tree.
+   */
   maxBufferSize: number;
+  /**
+   * Optional flag; when `true`, any signer may mint into the tree, not
+   * just the tree delegate. Defaults to `false`.
+   */
   public: Option<boolean>;
-}
+};
 
-export interface CreateTreeV2InstructionDataArgs {
+export type CreateTreeV2InstructionDataArgs = {
+  /**
+   * Maximum depth of the Merkle tree, i.e. log2 of the maximum number of
+   * leaves it can hold. Fixed for the lifetime of the tree.
+   */
   maxDepth: number;
+  /**
+   * Maximum number of concurrent, unconflicting modifications the tree's
+   * changelog buffer can track. Fixed for the lifetime of the tree.
+   */
   maxBufferSize: number;
+  /**
+   * Optional flag; when `true`, any signer may mint into the tree, not
+   * just the tree delegate. Defaults to `false`.
+   */
   public: OptionOrNullable<boolean>;
-}
+};
 
 export function getCreateTreeV2InstructionDataEncoder(): Encoder<CreateTreeV2InstructionDataArgs> {
   return transformEncoder(
@@ -149,7 +171,7 @@ export function getCreateTreeV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateTreeV2AsyncInput<
+export type CreateTreeV2AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountMerkleTree extends string = string,
   TAccountPayer extends string = string,
@@ -157,20 +179,46 @@ export interface CreateTreeV2AsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
-  /** Optional tree creator, defaults to `payer` */
+  /** Optional tree creator, defaults to `payer`. */
   treeCreator?: TransactionSigner<TAccountTreeCreator>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   maxDepth: CreateTreeV2InstructionDataArgs["maxDepth"];
   maxBufferSize: CreateTreeV2InstructionDataArgs["maxBufferSize"];
   public: CreateTreeV2InstructionDataArgs["public"];
-}
+};
 
+/**
+ * Creates a new tree for use with `LeafSchema` V2 leaf nodes.
+ *
+ * Identical in shape to `createTree`, but the resulting tree's leaves
+ * support the V2 functionality (MPL Core collections, freezing,
+ * non-transferable assets, and permanent delegate plugins) enabled by
+ * `mintV2` and the other `*V2` instructions.
+ */
 export async function getCreateTreeV2InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountMerkleTree extends string,
@@ -276,7 +324,7 @@ export async function getCreateTreeV2InstructionAsync<
   >);
 }
 
-export interface CreateTreeV2Input<
+export type CreateTreeV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountMerkleTree extends string = string,
   TAccountPayer extends string = string,
@@ -284,20 +332,46 @@ export interface CreateTreeV2Input<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
-  /** Optional tree creator, defaults to `payer` */
+  /** Optional tree creator, defaults to `payer`. */
   treeCreator?: TransactionSigner<TAccountTreeCreator>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   maxDepth: CreateTreeV2InstructionDataArgs["maxDepth"];
   maxBufferSize: CreateTreeV2InstructionDataArgs["maxBufferSize"];
   public: CreateTreeV2InstructionDataArgs["public"];
-}
+};
 
+/**
+ * Creates a new tree for use with `LeafSchema` V2 leaf nodes.
+ *
+ * Identical in shape to `createTree`, but the resulting tree's leaves
+ * support the V2 functionality (MPL Core collections, freezing,
+ * non-transferable assets, and permanent delegate plugins) enabled by
+ * `mintV2` and the other `*V2` instructions.
+ */
 export function getCreateTreeV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountMerkleTree extends string,
@@ -393,23 +467,41 @@ export function getCreateTreeV2Instruction<
   >);
 }
 
-export interface ParsedCreateTreeV2Instruction<
+export type ParsedCreateTreeV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[1];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[2];
-    /** Optional tree creator, defaults to `payer` */
+    /** Optional tree creator, defaults to `payer`. */
     treeCreator?: TAccountMetas[3] | undefined;
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[4];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[5];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[6];
   };
   data: CreateTreeV2InstructionData;
-}
+};
 
 export function parseCreateTreeV2Instruction<
   TProgram extends string,

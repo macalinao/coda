@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalCheckResult,
-  ExternalCheckResultArgs,
-  ExtraAccount,
-  ExtraAccountArgs,
-  HookableLifecycleEvent,
-  HookableLifecycleEventArgs,
-  ValidationResultsOffset,
-  ValidationResultsOffsetArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -38,6 +18,12 @@ import {
   getStructEncoder,
   getTupleDecoder,
   getTupleEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
@@ -50,27 +36,66 @@ import {
   getHookableLifecycleEventEncoder,
   getValidationResultsOffsetDecoder,
   getValidationResultsOffsetEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalCheckResult,
+  type ExternalCheckResultArgs,
+  type ExtraAccount,
+  type ExtraAccountArgs,
+  type HookableLifecycleEvent,
+  type HookableLifecycleEventArgs,
+  type ValidationResultsOffset,
+  type ValidationResultsOffsetArgs,
 } from "./index.js";
 
-export interface OracleInitInfo {
+/** Initialization data for the `Oracle` external plugin adapter. */
+export type OracleInitInfo = {
+  /** The address of the oracle account, or the base address used to derive it. */
   baseAddress: Address;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: Option<Authority>;
+  /**
+   * The lifecycle events this adapter should be consulted for,
+   * and how its result should be interpreted.
+   */
   lifecycleChecks: Array<
     readonly [HookableLifecycleEvent, ExternalCheckResult]
   >;
+  /**
+   * How to derive the actual oracle account from `baseAddress`,
+   * if not `baseAddress` itself.
+   */
   baseAddressConfig: Option<ExtraAccount>;
+  /** Where within the oracle account to read the `OracleValidation` result. */
   resultsOffset: Option<ValidationResultsOffset>;
-}
+};
 
-export interface OracleInitInfoArgs {
+export type OracleInitInfoArgs = {
+  /** The address of the oracle account, or the base address used to derive it. */
   baseAddress: Address;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: OptionOrNullable<AuthorityArgs>;
+  /**
+   * The lifecycle events this adapter should be consulted for,
+   * and how its result should be interpreted.
+   */
   lifecycleChecks: Array<
     readonly [HookableLifecycleEventArgs, ExternalCheckResultArgs]
   >;
+  /**
+   * How to derive the actual oracle account from `baseAddress`,
+   * if not `baseAddress` itself.
+   */
   baseAddressConfig: OptionOrNullable<ExtraAccountArgs>;
+  /** Where within the oracle account to read the `OracleValidation` result. */
   resultsOffset: OptionOrNullable<ValidationResultsOffsetArgs>;
-}
+};
 
 export function getOracleInitInfoEncoder(): Encoder<OracleInitInfoArgs> {
   return getStructEncoder([

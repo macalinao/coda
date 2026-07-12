@@ -6,16 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * Whether an asset/collection's data lives fully on-chain
+ * (`AccountState`) or in the compressed, off-chain-hashed form
+ * (`LedgerState`).
+ */
 export enum DataState {
-  AccountState = 0,
-  LedgerState = 1,
+  AccountState,
+  LedgerState,
 }
 
 export type DataStateArgs = DataState;

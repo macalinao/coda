@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -17,12 +16,18 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface Attribute {
+/** A single key/value pair stored by the `Attributes` plugin. */
+export type Attribute = {
+  /** The attribute's name. */
   key: string;
+  /** The attribute's value. */
   value: string;
-}
+};
 
 export type AttributeArgs = Attribute;
 

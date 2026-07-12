@@ -6,17 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * Whether an `updateCollectionInfoV1` call records a `Mint`, or
+ * an `Add`/`Remove` adjustment to collection size.
+ */
 export enum UpdateType {
-  Mint = 0,
-  Add = 1,
-  Remove = 2,
+  Mint,
+  Add,
+  Remove,
 }
 
 export type UpdateTypeArgs = UpdateType;

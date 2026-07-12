@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  AddExternalPluginAdapterV1Args,
-  AddExternalPluginAdapterV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAddExternalPluginAdapterV1ArgsDecoder,
   getAddExternalPluginAdapterV1ArgsEncoder,
+  type AddExternalPluginAdapterV1Args,
+  type AddExternalPluginAdapterV1ArgsArgs,
 } from "../types/index.js";
 
 export const ADD_EXTERNAL_PLUGIN_ADAPTER_V1_DISCRIMINATOR = 22;
@@ -89,14 +87,16 @@ export type AddExternalPluginAdapterV1Instruction<
     ]
   >;
 
-export interface AddExternalPluginAdapterV1InstructionData {
+export type AddExternalPluginAdapterV1InstructionData = {
   discriminator: number;
+  /** The adapter variant to add and its initialization data. */
   addExternalPluginAdapterV1Args: AddExternalPluginAdapterV1Args;
-}
+};
 
-export interface AddExternalPluginAdapterV1InstructionDataArgs {
+export type AddExternalPluginAdapterV1InstructionDataArgs = {
+  /** The adapter variant to add and its initialization data. */
   addExternalPluginAdapterV1Args: AddExternalPluginAdapterV1ArgsArgs;
-}
+};
 
 export function getAddExternalPluginAdapterV1InstructionDataEncoder(): Encoder<AddExternalPluginAdapterV1InstructionDataArgs> {
   return transformEncoder(
@@ -134,14 +134,14 @@ export function getAddExternalPluginAdapterV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface AddExternalPluginAdapterV1Input<
+export type AddExternalPluginAdapterV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -155,8 +155,12 @@ export interface AddExternalPluginAdapterV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   addExternalPluginAdapterV1Args: AddExternalPluginAdapterV1InstructionDataArgs["addExternalPluginAdapterV1Args"];
-}
+};
 
+/**
+ * Adds a new external plugin adapter (Oracle, AppData,
+ * LifecycleHook, etc.) to an asset.
+ */
 export function getAddExternalPluginAdapterV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -236,10 +240,10 @@ export function getAddExternalPluginAdapterV1Instruction<
   >);
 }
 
-export interface ParsedAddExternalPluginAdapterV1Instruction<
+export type ParsedAddExternalPluginAdapterV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -256,7 +260,7 @@ export interface ParsedAddExternalPluginAdapterV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: AddExternalPluginAdapterV1InstructionData;
-}
+};
 
 export function parseAddExternalPluginAdapterV1Instruction<
   TProgram extends string,

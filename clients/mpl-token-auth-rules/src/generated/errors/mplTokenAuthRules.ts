@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** NumericalOverflow: Numerical Overflow */
@@ -143,87 +143,56 @@ export type MplTokenAuthRulesError =
 let mplTokenAuthRulesErrorMessages:
   | Record<MplTokenAuthRulesError, string>
   | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   mplTokenAuthRulesErrorMessages = {
-    [MPL_TOKEN_AUTH_RULES_ERROR__ADDITIONAL_SIGNER_CHECK_FAILED]:
-      "Additional Signer check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__ALIGNMENT_ERROR]:
-      "Could not determine alignemnt",
-    [MPL_TOKEN_AUTH_RULES_ERROR__AMOUNT_CHECK_FAILED]: "Amount checked failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__BORSH_DESERIALIZATION_ERROR]:
-      "Borsh deserialization error",
-    [MPL_TOKEN_AUTH_RULES_ERROR__BORSH_SERIALIZATION_ERROR]:
-      "Borsh serialization error",
-    [MPL_TOKEN_AUTH_RULES_ERROR__DATA_IS_EMPTY]: "Account data is empty",
-    [MPL_TOKEN_AUTH_RULES_ERROR__DATA_SLICE_UNEXPECTED_INDEX_ERROR]:
-      "Data slice unexpected index error",
-    [MPL_TOKEN_AUTH_RULES_ERROR__DATA_TYPE_MISMATCH]: "Data type mismatch",
-    [MPL_TOKEN_AUTH_RULES_ERROR__DERIVED_KEY_INVALID]: "Derived key invalid",
-    [MPL_TOKEN_AUTH_RULES_ERROR__DUPLICATED_OPERATION_NAME]:
-      "Duplicated operation name",
-    [MPL_TOKEN_AUTH_RULES_ERROR__FREQUENCY_CHECK_FAILED]:
-      "Frequency check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__INCORRECT_OWNER]: "Incorrect account owner",
-    [MPL_TOKEN_AUTH_RULES_ERROR__INVALID_COMPARE_OP]:
-      "Invalid compare operator",
-    [MPL_TOKEN_AUTH_RULES_ERROR__INVALID_CONSTRAINT_TYPE]:
-      "Invalid constraint type value",
-    [MPL_TOKEN_AUTH_RULES_ERROR__IS_WALLET_CHECK_FAILED]:
-      "IsWallet check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__MESSAGE_PACK_DESERIALIZATION_ERROR]:
-      "MessagePack deserialization error",
-    [MPL_TOKEN_AUTH_RULES_ERROR__MESSAGE_PACK_SERIALIZATION_ERROR]:
-      "MessagePack serialization error",
-    [MPL_TOKEN_AUTH_RULES_ERROR__MISSING_ACCOUNT]: "Missing account",
-    [MPL_TOKEN_AUTH_RULES_ERROR__MISSING_PAYLOAD_VALUE]:
-      "Missing Payload value",
-    [MPL_TOKEN_AUTH_RULES_ERROR__NAME_TOO_LONG]: "Name too long",
-    [MPL_TOKEN_AUTH_RULES_ERROR__NOT_IMPLEMENTED]: "Not implemented",
-    [MPL_TOKEN_AUTH_RULES_ERROR__NUMERICAL_OVERFLOW]: "Numerical Overflow",
-    [MPL_TOKEN_AUTH_RULES_ERROR__OPERATION_NOT_FOUND]:
-      "The operation retrieved is not in the selected RuleSet",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PAYER_IS_NOT_SIGNER]: "Payer is not a signer",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PAYLOAD_VEC_INDEX_ERROR]:
-      "Could not index into PayloadVec",
-    [MPL_TOKEN_AUTH_RULES_ERROR__P_D_A_MATCH_CHECK_FAILED]:
-      "PDA Match check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_CHECK_FAILED]:
-      "Program Owned check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_LIST_CHECK_FAILED]:
-      "Program Owned List check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_SET_CHECK_FAILED]:
-      "Program Owned Set check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_TREE_CHECK_FAILED]:
-      "Program Owned Tree check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PUBKEY_LIST_MATCH_CHECK_FAILED]:
-      "Pubkey List Match check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PUBKEY_MATCH_CHECK_FAILED]:
-      "Pubkey Match check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__PUBKEY_TREE_MATCH_CHECK_FAILED]:
-      "Pubkey Tree Match check failed",
-    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_AUTHORITY_IS_NOT_SIGNER]:
-      "Rule authority is not signer",
-    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_SET_OWNER_MISMATCH]:
-      "RuleSet owner must be payer",
-    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_SET_READ_FAILED]:
-      "Failed to read the rule set",
-    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_SET_REVISION_NOT_AVAILABLE]:
-      "RuleSet revision not available",
-    [MPL_TOKEN_AUTH_RULES_ERROR__UNEXPECTED_RULE_SET_FAILURE]:
-      "Unexpected RuleSet failure",
-    [MPL_TOKEN_AUTH_RULES_ERROR__UNSUPPORTED_RULE_SET_REV_MAP_VERSION]:
-      "Unsupported RuleSet revision map version",
-    [MPL_TOKEN_AUTH_RULES_ERROR__UNSUPPORTED_RULE_SET_VERSION]:
-      "Unsupported RuleSet version",
-    [MPL_TOKEN_AUTH_RULES_ERROR__VALUE_OCCUPIED]:
-      "Value in Payload or RuleSet is occupied",
+    [MPL_TOKEN_AUTH_RULES_ERROR__ADDITIONAL_SIGNER_CHECK_FAILED]: `Additional Signer check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__ALIGNMENT_ERROR]: `Could not determine alignemnt`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__AMOUNT_CHECK_FAILED]: `Amount checked failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__BORSH_DESERIALIZATION_ERROR]: `Borsh deserialization error`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__BORSH_SERIALIZATION_ERROR]: `Borsh serialization error`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__DATA_IS_EMPTY]: `Account data is empty`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__DATA_SLICE_UNEXPECTED_INDEX_ERROR]: `Data slice unexpected index error`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__DATA_TYPE_MISMATCH]: `Data type mismatch`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__DERIVED_KEY_INVALID]: `Derived key invalid`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__DUPLICATED_OPERATION_NAME]: `Duplicated operation name`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__FREQUENCY_CHECK_FAILED]: `Frequency check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__INCORRECT_OWNER]: `Incorrect account owner`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__INVALID_COMPARE_OP]: `Invalid compare operator`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__INVALID_CONSTRAINT_TYPE]: `Invalid constraint type value`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__IS_WALLET_CHECK_FAILED]: `IsWallet check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__MESSAGE_PACK_DESERIALIZATION_ERROR]: `MessagePack deserialization error`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__MESSAGE_PACK_SERIALIZATION_ERROR]: `MessagePack serialization error`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__MISSING_ACCOUNT]: `Missing account`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__MISSING_PAYLOAD_VALUE]: `Missing Payload value`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__NAME_TOO_LONG]: `Name too long`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__NOT_IMPLEMENTED]: `Not implemented`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__NUMERICAL_OVERFLOW]: `Numerical Overflow`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__OPERATION_NOT_FOUND]: `The operation retrieved is not in the selected RuleSet`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PAYER_IS_NOT_SIGNER]: `Payer is not a signer`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PAYLOAD_VEC_INDEX_ERROR]: `Could not index into PayloadVec`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__P_D_A_MATCH_CHECK_FAILED]: `PDA Match check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_CHECK_FAILED]: `Program Owned check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_LIST_CHECK_FAILED]: `Program Owned List check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_SET_CHECK_FAILED]: `Program Owned Set check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PROGRAM_OWNED_TREE_CHECK_FAILED]: `Program Owned Tree check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PUBKEY_LIST_MATCH_CHECK_FAILED]: `Pubkey List Match check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PUBKEY_MATCH_CHECK_FAILED]: `Pubkey Match check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__PUBKEY_TREE_MATCH_CHECK_FAILED]: `Pubkey Tree Match check failed`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_AUTHORITY_IS_NOT_SIGNER]: `Rule authority is not signer`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_SET_OWNER_MISMATCH]: `RuleSet owner must be payer`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_SET_READ_FAILED]: `Failed to read the rule set`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__RULE_SET_REVISION_NOT_AVAILABLE]: `RuleSet revision not available`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__UNEXPECTED_RULE_SET_FAILURE]: `Unexpected RuleSet failure`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__UNSUPPORTED_RULE_SET_REV_MAP_VERSION]: `Unsupported RuleSet revision map version`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__UNSUPPORTED_RULE_SET_VERSION]: `Unsupported RuleSet version`,
+    [MPL_TOKEN_AUTH_RULES_ERROR__VALUE_OCCUPIED]: `Value in Payload or RuleSet is occupied`,
   };
 }
 
 export function getMplTokenAuthRulesErrorMessage(
   code: MplTokenAuthRulesError,
 ): string {
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env["NODE_ENV"] !== "production") {
     return (
       mplTokenAuthRulesErrorMessages as Record<MplTokenAuthRulesError, string>
     )[code];

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { MetadataArgs, MetadataArgsArgs } from "../types/index.js";
 import {
   address,
   combineCodec,
@@ -38,10 +20,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findMasterEditionPda,
@@ -52,6 +49,8 @@ import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
+  type MetadataArgs,
+  type MetadataArgsArgs,
 } from "../types/index.js";
 
 export const DECOMPRESS_V1_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -134,14 +133,24 @@ export type DecompressV1Instruction<
     ]
   >;
 
-export interface DecompressV1InstructionData {
+export type DecompressV1InstructionData = {
   discriminator: ReadonlyUint8Array;
+  /**
+   * Metadata args of the leaf being decompressed; must match the leaf's
+   * stored `dataHash` and is used to populate the new Token Metadata
+   * account.
+   */
   metadata: MetadataArgs;
-}
+};
 
-export interface DecompressV1InstructionDataArgs {
+export type DecompressV1InstructionDataArgs = {
+  /**
+   * Metadata args of the leaf being decompressed; must match the leaf's
+   * stored `dataHash` and is used to populate the new Token Metadata
+   * account.
+   */
   metadata: MetadataArgsArgs;
-}
+};
 
 export function getDecompressV1InstructionDataEncoder(): Encoder<DecompressV1InstructionDataArgs> {
   return transformEncoder(
@@ -170,7 +179,7 @@ export function getDecompressV1InstructionDataCodec(): Codec<
   );
 }
 
-export interface DecompressV1AsyncInput<
+export type DecompressV1AsyncInput<
   TAccountVoucher extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountTokenAccount extends string = string,
@@ -184,23 +193,54 @@ export interface DecompressV1AsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
+  /**
+   * Voucher PDA created by `redeem`; closed by this instruction once its
+   * leaf data has been used to mint the decompressed NFT.
+   */
   voucher: Address<TAccountVoucher>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: TransactionSigner<TAccountLeafOwner>;
+  /** Token account that will hold the decompressed NFT for `leafOwner`. */
   tokenAccount?: Address<TAccountTokenAccount>;
+  /** Mint account of the decompressed NFT, created fresh during decompression. */
   mint: Address<TAccountMint>;
+  /** PDA mint authority for the decompressed NFT's mint. */
   mintAuthority?: Address<TAccountMintAuthority>;
+  /** Metadata account created for the decompressed NFT. */
   metadata?: Address<TAccountMetadata>;
+  /** Master edition account created for the decompressed NFT. */
   masterEdition?: Address<TAccountMasterEdition>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
+  /** The Rent sysvar. */
   sysvarRent?: Address<TAccountSysvarRent>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The SPL Token program. */
   tokenProgram?: Address<TAccountTokenProgram>;
+  /** The SPL Associated Token Account program. */
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
   metadataArg: DecompressV1InstructionDataArgs["metadata"];
-}
+};
 
+/**
+ * Decompresses a leaf node from the tree into a regular SPL/Token
+ * Metadata NFT.
+ *
+ * Consumes the `voucher` PDA created by `redeem`, then mints a new SPL
+ * token, and creates the associated Token Metadata metadata and master
+ * edition accounts so the asset can be held and traded like any other
+ * NFT.
+ */
 export async function getDecompressV1InstructionAsync<
   TAccountVoucher extends string,
   TAccountLeafOwner extends string,
@@ -395,7 +435,7 @@ export async function getDecompressV1InstructionAsync<
   >);
 }
 
-export interface DecompressV1Input<
+export type DecompressV1Input<
   TAccountVoucher extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountTokenAccount extends string = string,
@@ -409,23 +449,54 @@ export interface DecompressV1Input<
   TAccountTokenProgram extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
+  /**
+   * Voucher PDA created by `redeem`; closed by this instruction once its
+   * leaf data has been used to mint the decompressed NFT.
+   */
   voucher: Address<TAccountVoucher>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: TransactionSigner<TAccountLeafOwner>;
+  /** Token account that will hold the decompressed NFT for `leafOwner`. */
   tokenAccount: Address<TAccountTokenAccount>;
+  /** Mint account of the decompressed NFT, created fresh during decompression. */
   mint: Address<TAccountMint>;
+  /** PDA mint authority for the decompressed NFT's mint. */
   mintAuthority: Address<TAccountMintAuthority>;
+  /** Metadata account created for the decompressed NFT. */
   metadata: Address<TAccountMetadata>;
+  /** Master edition account created for the decompressed NFT. */
   masterEdition: Address<TAccountMasterEdition>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
+  /** The Rent sysvar. */
   sysvarRent?: Address<TAccountSysvarRent>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The SPL Token program. */
   tokenProgram?: Address<TAccountTokenProgram>;
+  /** The SPL Associated Token Account program. */
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
   metadataArg: DecompressV1InstructionDataArgs["metadata"];
-}
+};
 
+/**
+ * Decompresses a leaf node from the tree into a regular SPL/Token
+ * Metadata NFT.
+ *
+ * Consumes the `voucher` PDA created by `redeem`, then mints a new SPL
+ * token, and creates the associated Token Metadata metadata and master
+ * edition accounts so the asset can be held and traded like any other
+ * NFT.
+ */
 export function getDecompressV1Instruction<
   TAccountVoucher extends string,
   TAccountLeafOwner extends string,
@@ -572,28 +643,50 @@ export function getDecompressV1Instruction<
   >);
 }
 
-export interface ParsedDecompressV1Instruction<
+export type ParsedDecompressV1Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * Voucher PDA created by `redeem`; closed by this instruction once its
+     * leaf data has been used to mint the decompressed NFT.
+     */
     voucher: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /** Token account that will hold the decompressed NFT for `leafOwner`. */
     tokenAccount: TAccountMetas[2];
+    /** Mint account of the decompressed NFT, created fresh during decompression. */
     mint: TAccountMetas[3];
+    /** PDA mint authority for the decompressed NFT's mint. */
     mintAuthority: TAccountMetas[4];
+    /** Metadata account created for the decompressed NFT. */
     metadata: TAccountMetas[5];
+    /** Master edition account created for the decompressed NFT. */
     masterEdition: TAccountMetas[6];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[7];
+    /** The Rent sysvar. */
     sysvarRent: TAccountMetas[8];
+    /**
+     * The Token Metadata program, invoked to read or (un)verify the
+     * legacy collection accounts.
+     */
     tokenMetadataProgram: TAccountMetas[9];
+    /** The SPL Token program. */
     tokenProgram: TAccountMetas[10];
+    /** The SPL Associated Token Account program. */
     associatedTokenProgram: TAccountMetas[11];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[12];
   };
   data: DecompressV1InstructionData;
-}
+};
 
 export function parseDecompressV1Instruction<
   TProgram extends string,

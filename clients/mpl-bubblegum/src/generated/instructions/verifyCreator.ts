@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { MetadataArgs, MetadataArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,25 +16,42 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
+  type MetadataArgs,
+  type MetadataArgsArgs,
 } from "../types/index.js";
 
 export const VERIFY_CREATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -117,24 +116,74 @@ export type VerifyCreatorInstruction<
     ]
   >;
 
-export interface VerifyCreatorInstructionData {
+export type VerifyCreatorInstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current metadata args, verified against `dataHash` before
+   * `creator` is marked verified.
+   */
   message: MetadataArgs;
-}
+};
 
-export interface VerifyCreatorInstructionDataArgs {
-  root: number[];
-  dataHash: number[];
-  creatorHash: number[];
+export type VerifyCreatorInstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's metadata, used together with `root` to
+   * verify the leaf before it is modified.
+   */
+  dataHash: Array<number>;
+  /**
+   * Keccak256 hash of the leaf's creators array, used together with
+   * `root` to verify the leaf before it is modified.
+   */
+  creatorHash: Array<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current metadata args, verified against `dataHash` before
+   * `creator` is marked verified.
+   */
   message: MetadataArgsArgs;
-}
+};
 
 export function getVerifyCreatorInstructionDataEncoder(): Encoder<VerifyCreatorInstructionDataArgs> {
   return transformEncoder(
@@ -173,7 +222,7 @@ export function getVerifyCreatorInstructionDataCodec(): Codec<
   );
 }
 
-export interface VerifyCreatorAsyncInput<
+export type VerifyCreatorAsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -183,15 +232,42 @@ export interface VerifyCreatorAsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * One of the leaf's creators, whose verified flag is being changed by
+   * this instruction. Must sign to (un)verify itself.
+   */
   creator: TransactionSigner<TAccountCreator>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: VerifyCreatorInstructionDataArgs["root"];
   dataHash: VerifyCreatorInstructionDataArgs["dataHash"];
@@ -199,8 +275,14 @@ export interface VerifyCreatorAsyncInput<
   nonce: VerifyCreatorInstructionDataArgs["nonce"];
   index: VerifyCreatorInstructionDataArgs["index"];
   message: VerifyCreatorInstructionDataArgs["message"];
-}
+};
 
+/**
+ * Verifies a creator for a leaf node.
+ *
+ * The named `creator` must sign to mark their own entry in the leaf's
+ * creators array as verified.
+ */
 export async function getVerifyCreatorInstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -318,7 +400,7 @@ export async function getVerifyCreatorInstructionAsync<
   >);
 }
 
-export interface VerifyCreatorInput<
+export type VerifyCreatorInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -328,15 +410,42 @@ export interface VerifyCreatorInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * One of the leaf's creators, whose verified flag is being changed by
+   * this instruction. Must sign to (un)verify itself.
+   */
   creator: TransactionSigner<TAccountCreator>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: VerifyCreatorInstructionDataArgs["root"];
   dataHash: VerifyCreatorInstructionDataArgs["dataHash"];
@@ -344,8 +453,14 @@ export interface VerifyCreatorInput<
   nonce: VerifyCreatorInstructionDataArgs["nonce"];
   index: VerifyCreatorInstructionDataArgs["index"];
   message: VerifyCreatorInstructionDataArgs["message"];
-}
+};
 
+/**
+ * Verifies a creator for a leaf node.
+ *
+ * The named `creator` must sign to mark their own entry in the leaf's
+ * creators array as verified.
+ */
 export function getVerifyCreatorInstruction<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -453,24 +568,51 @@ export function getVerifyCreatorInstruction<
   >);
 }
 
-export interface ParsedVerifyCreatorInstruction<
+export type ParsedVerifyCreatorInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[2];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[3];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[4];
+    /**
+     * One of the leaf's creators, whose verified flag is being changed by
+     * this instruction. Must sign to (un)verify itself.
+     */
     creator: TAccountMetas[5];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[6];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[7];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[8];
   };
   data: VerifyCreatorInstructionData;
-}
+};
 
 export function parseVerifyCreatorInstruction<
   TProgram extends string,

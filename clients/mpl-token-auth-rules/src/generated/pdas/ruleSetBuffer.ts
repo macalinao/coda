@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface RuleSetBufferSeeds {
+export type RuleSetBufferSeeds = {
   /** The owner (creator) of the rule set */
   owner: Address;
-}
+};
 
 /** Buffer PDA used to assemble large rule sets before applying */
 export async function findRuleSetBufferPda(

@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder, ReadonlyUint8Array } from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -17,11 +16,17 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
-export interface ExecuteV1Args {
+/** Arguments for `executeV1`. */
+export type ExecuteV1Args = {
+  /** The serialized instruction to invoke via the asset-signer PDA. */
   instructionData: ReadonlyUint8Array;
-}
+};
 
 export type ExecuteV1ArgsArgs = ExecuteV1Args;
 

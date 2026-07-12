@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -24,55 +16,100 @@ import {
   getDiscriminatedUnionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 
+/**
+ * The canonical on-chain representation of a compressed NFT leaf,
+ * hashed to produce the value stored at a tree's leaf node.
+ *
+ * `V1` is produced by `mintV1`/`mintToCollectionV1` and the legacy
+ * instruction family; `V2` is produced by `mintV2` and adds
+ * `collectionHash`, `assetDataHash` and `flags` to support MPL Core
+ * collections and freezing/non-transferable assets.
+ */
 export type LeafSchema =
   | {
       __kind: "V1";
+      /** Asset id of the leaf, derived from the tree address and `nonce`. */
       id: Address;
+      /** Current owner of the leaf. */
       owner: Address;
+      /** Current delegate of the leaf (equal to `owner` when unset). */
       delegate: Address;
+      /** Tree-scoped nonce assigned to the leaf when it was minted; part of the asset id derivation. */
       nonce: bigint;
-      dataHash: number[];
-      creatorHash: number[];
+      /** Keccak256 hash of the leaf's metadata (`MetadataArgs`/`MetadataArgsV2`). */
+      dataHash: Array<number>;
+      /** Keccak256 hash of the leaf's creators array. */
+      creatorHash: Array<number>;
     }
   | {
       __kind: "V2";
+      /** Asset id of the leaf, derived from the tree address and `nonce`. */
       id: Address;
+      /** Current owner of the leaf. */
       owner: Address;
+      /** Current delegate of the leaf (equal to `owner` when unset). */
       delegate: Address;
+      /** Tree-scoped nonce assigned to the leaf when it was minted; part of the asset id derivation. */
       nonce: bigint;
-      dataHash: number[];
-      creatorHash: number[];
-      collectionHash: number[];
-      assetDataHash: number[];
+      /** Keccak256 hash of the leaf's metadata (`MetadataArgs`/`MetadataArgsV2`). */
+      dataHash: Array<number>;
+      /** Keccak256 hash of the leaf's creators array. */
+      creatorHash: Array<number>;
+      /** Hash of the leaf's MPL Core collection reference, if any (V2 only). */
+      collectionHash: Array<number>;
+      /** Hash of the leaf's optional off-chain asset data, if any (V2 only). */
+      assetDataHash: Array<number>;
+      /** Packed status bits for the leaf, e.g. frozen and non-transferable (V2 only). */
       flags: number;
     };
 
 export type LeafSchemaArgs =
   | {
       __kind: "V1";
+      /** Asset id of the leaf, derived from the tree address and `nonce`. */
       id: Address;
+      /** Current owner of the leaf. */
       owner: Address;
+      /** Current delegate of the leaf (equal to `owner` when unset). */
       delegate: Address;
+      /** Tree-scoped nonce assigned to the leaf when it was minted; part of the asset id derivation. */
       nonce: number | bigint;
-      dataHash: number[];
-      creatorHash: number[];
+      /** Keccak256 hash of the leaf's metadata (`MetadataArgs`/`MetadataArgsV2`). */
+      dataHash: Array<number>;
+      /** Keccak256 hash of the leaf's creators array. */
+      creatorHash: Array<number>;
     }
   | {
       __kind: "V2";
+      /** Asset id of the leaf, derived from the tree address and `nonce`. */
       id: Address;
+      /** Current owner of the leaf. */
       owner: Address;
+      /** Current delegate of the leaf (equal to `owner` when unset). */
       delegate: Address;
+      /** Tree-scoped nonce assigned to the leaf when it was minted; part of the asset id derivation. */
       nonce: number | bigint;
-      dataHash: number[];
-      creatorHash: number[];
-      collectionHash: number[];
-      assetDataHash: number[];
+      /** Keccak256 hash of the leaf's metadata (`MetadataArgs`/`MetadataArgsV2`). */
+      dataHash: Array<number>;
+      /** Keccak256 hash of the leaf's creators array. */
+      creatorHash: Array<number>;
+      /** Hash of the leaf's MPL Core collection reference, if any (V2 only). */
+      collectionHash: Array<number>;
+      /** Hash of the leaf's optional off-chain asset data, if any (V2 only). */
+      assetDataHash: Array<number>;
+      /** Packed status bits for the leaf, e.g. frozen and non-transferable (V2 only). */
       flags: number;
     };
 

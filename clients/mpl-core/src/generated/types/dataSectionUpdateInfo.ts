@@ -6,13 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
 
+/**
+ * Update data for the `DataSection` external plugin adapter;
+ * currently carries no data.
+ */
 export type DataSectionUpdateInfo = {};
 
 export type DataSectionUpdateInfoArgs = DataSectionUpdateInfo;

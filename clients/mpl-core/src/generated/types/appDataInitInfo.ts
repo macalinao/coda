@@ -6,44 +6,53 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  ExternalPluginAdapterSchema,
-  ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
 import {
   combineCodec,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getExternalPluginAdapterSchemaDecoder,
   getExternalPluginAdapterSchemaEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type ExternalPluginAdapterSchema,
+  type ExternalPluginAdapterSchemaArgs,
 } from "./index.js";
 
-export interface AppDataInitInfo {
+/** Initialization data for the `AppData` external plugin adapter. */
+export type AppDataInitInfo = {
+  /** The authority allowed to write this adapter's data. */
   dataAuthority: Authority;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: Option<Authority>;
+  /** The serialization format to use for this adapter's stored data. */
   schema: Option<ExternalPluginAdapterSchema>;
-}
+};
 
-export interface AppDataInitInfoArgs {
+export type AppDataInitInfoArgs = {
+  /** The authority allowed to write this adapter's data. */
   dataAuthority: AuthorityArgs;
+  /**
+   * The authority to manage this adapter; defaults to the
+   * adapter type's standard authority if omitted.
+   */
   initPluginAuthority: OptionOrNullable<AuthorityArgs>;
+  /** The serialization format to use for this adapter's stored data. */
   schema: OptionOrNullable<ExternalPluginAdapterSchemaArgs>;
-}
+};
 
 export function getAppDataInitInfoEncoder(): Encoder<AppDataInitInfoArgs> {
   return getStructEncoder([

@@ -6,30 +6,39 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  Authority,
-  AuthorityArgs,
-  PluginType,
-  PluginTypeArgs,
-} from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
 import {
   getAuthorityDecoder,
   getAuthorityEncoder,
   getPluginTypeDecoder,
   getPluginTypeEncoder,
+  type Authority,
+  type AuthorityArgs,
+  type PluginType,
+  type PluginTypeArgs,
 } from "./index.js";
 
-export interface ApproveCollectionPluginAuthorityV1Args {
+/** Arguments for `approveCollectionPluginAuthorityV1`. */
+export type ApproveCollectionPluginAuthorityV1Args = {
+  /** The type of plugin whose authority is being set. */
   pluginType: PluginType;
+  /** The authority to grant management of the plugin. */
   newAuthority: Authority;
-}
+};
 
-export interface ApproveCollectionPluginAuthorityV1ArgsArgs {
+export type ApproveCollectionPluginAuthorityV1ArgsArgs = {
+  /** The type of plugin whose authority is being set. */
   pluginType: PluginTypeArgs;
+  /** The authority to grant management of the plugin. */
   newAuthority: AuthorityArgs;
-}
+};
 
 export function getApproveCollectionPluginAuthorityV1ArgsEncoder(): Encoder<ApproveCollectionPluginAuthorityV1ArgsArgs> {
   return getStructEncoder([

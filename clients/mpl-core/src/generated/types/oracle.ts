@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  ExtraAccount,
-  ExtraAccountArgs,
-  ValidationResultsOffset,
-  ValidationResultsOffsetArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -28,25 +14,51 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getExtraAccountDecoder,
   getExtraAccountEncoder,
   getValidationResultsOffsetDecoder,
   getValidationResultsOffsetEncoder,
+  type ExtraAccount,
+  type ExtraAccountArgs,
+  type ValidationResultsOffset,
+  type ValidationResultsOffsetArgs,
 } from "./index.js";
 
-export interface Oracle {
+/**
+ * External plugin adapter that reads a `ValidationResult` from
+ * an external account to gate lifecycle events.
+ */
+export type Oracle = {
+  /** The address of the oracle account, or the base address used to derive it. */
   baseAddress: Address;
+  /**
+   * How to derive the actual oracle account from `baseAddress`
+   * (e.g. a PDA keyed by the asset), if not `baseAddress` itself.
+   */
   baseAddressConfig: Option<ExtraAccount>;
+  /** Where within the oracle account to read the `OracleValidation` result. */
   resultsOffset: ValidationResultsOffset;
-}
+};
 
-export interface OracleArgs {
+export type OracleArgs = {
+  /** The address of the oracle account, or the base address used to derive it. */
   baseAddress: Address;
+  /**
+   * How to derive the actual oracle account from `baseAddress`
+   * (e.g. a PDA keyed by the asset), if not `baseAddress` itself.
+   */
   baseAddressConfig: OptionOrNullable<ExtraAccountArgs>;
+  /** Where within the oracle account to read the `OracleValidation` result. */
   resultsOffset: ValidationResultsOffsetArgs;
-}
+};
 
 export function getOracleEncoder(): Encoder<OracleArgs> {
   return getStructEncoder([

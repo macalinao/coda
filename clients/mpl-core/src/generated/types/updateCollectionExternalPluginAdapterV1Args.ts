@@ -6,30 +6,39 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  ExternalPluginAdapterKey,
-  ExternalPluginAdapterKeyArgs,
-  ExternalPluginAdapterUpdateInfo,
-  ExternalPluginAdapterUpdateInfoArgs,
-} from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
 import {
   getExternalPluginAdapterKeyDecoder,
   getExternalPluginAdapterKeyEncoder,
   getExternalPluginAdapterUpdateInfoDecoder,
   getExternalPluginAdapterUpdateInfoEncoder,
+  type ExternalPluginAdapterKey,
+  type ExternalPluginAdapterKeyArgs,
+  type ExternalPluginAdapterUpdateInfo,
+  type ExternalPluginAdapterUpdateInfoArgs,
 } from "./index.js";
 
-export interface UpdateCollectionExternalPluginAdapterV1Args {
+/** Arguments for `updateCollectionExternalPluginAdapterV1`. */
+export type UpdateCollectionExternalPluginAdapterV1Args = {
+  /** Identifies which external plugin adapter to update. */
   key: ExternalPluginAdapterKey;
+  /** The fields to change on the adapter. */
   updateInfo: ExternalPluginAdapterUpdateInfo;
-}
+};
 
-export interface UpdateCollectionExternalPluginAdapterV1ArgsArgs {
+export type UpdateCollectionExternalPluginAdapterV1ArgsArgs = {
+  /** Identifies which external plugin adapter to update. */
   key: ExternalPluginAdapterKeyArgs;
+  /** The fields to change on the adapter. */
   updateInfo: ExternalPluginAdapterUpdateInfoArgs;
-}
+};
 
 export function getUpdateCollectionExternalPluginAdapterV1ArgsEncoder(): Encoder<UpdateCollectionExternalPluginAdapterV1ArgsArgs> {
   return getStructEncoder([

@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { CompressV1Args, CompressV1ArgsArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -34,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCompressV1ArgsDecoder,
   getCompressV1ArgsEncoder,
+  type CompressV1Args,
+  type CompressV1ArgsArgs,
 } from "../types/index.js";
 
 export const COMPRESS_V1_DISCRIMINATOR = 17;
@@ -86,14 +87,16 @@ export type CompressV1Instruction<
     ]
   >;
 
-export interface CompressV1InstructionData {
+export type CompressV1InstructionData = {
   discriminator: number;
+  /** Reserved for future use; currently carries no data. */
   compressV1Args: CompressV1Args;
-}
+};
 
-export interface CompressV1InstructionDataArgs {
+export type CompressV1InstructionDataArgs = {
+  /** Reserved for future use; currently carries no data. */
   compressV1Args: CompressV1ArgsArgs;
-}
+};
 
 export function getCompressV1InstructionDataEncoder(): FixedSizeEncoder<CompressV1InstructionDataArgs> {
   return transformEncoder(
@@ -122,14 +125,14 @@ export function getCompressV1InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CompressV1Input<
+export type CompressV1Input<
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   asset: Address<TAccountAsset>;
   /** The collection to which the asset belongs */
@@ -143,8 +146,16 @@ export interface CompressV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   compressV1Args: CompressV1InstructionDataArgs["compressV1Args"];
-}
+};
 
+/**
+ * Compresses an asset from on-chain `AccountState` into the
+ * hashed `LedgerState` representation (`HashedAssetV1`),
+ * reclaiming most of the account's rent.
+ *
+ * Compression is not currently enabled by the on-chain program;
+ * calling this instruction returns an error.
+ */
 export function getCompressV1Instruction<
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -224,10 +235,10 @@ export function getCompressV1Instruction<
   >);
 }
 
-export interface ParsedCompressV1Instruction<
+export type ParsedCompressV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -244,7 +255,7 @@ export interface ParsedCompressV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: CompressV1InstructionData;
-}
+};
 
 export function parseCompressV1Instruction<
   TProgram extends string,

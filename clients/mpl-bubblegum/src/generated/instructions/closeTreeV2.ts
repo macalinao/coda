@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -95,9 +93,7 @@ export type CloseTreeV2Instruction<
     ]
   >;
 
-export interface CloseTreeV2InstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type CloseTreeV2InstructionData = { discriminator: ReadonlyUint8Array };
 
 export type CloseTreeV2InstructionDataArgs = {};
 
@@ -124,7 +120,7 @@ export function getCloseTreeV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseTreeV2AsyncInput<
+export type CloseTreeV2AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountAuthority extends string = string,
   TAccountMerkleTree extends string = string,
@@ -132,21 +128,45 @@ export interface CloseTreeV2AsyncInput<
   TAccountCompressionProgram extends string = string,
   TAccountLogWrapper extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
   /** Tree creator or delegate. */
   authority: TransactionSigner<TAccountAuthority>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
   /**
-   * Recipient for reclaimed lamports (tree + config PDA). Must be the creator
-   * or the delegate.
+   * Recipient for the reclaimed lamports (tree + config PDA). Must be
+   * the tree creator or delegate.
    */
   recipient: Address<TAccountRecipient>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
+/**
+ * Closes an empty V2 tree and its `TreeConfig` PDA, reclaiming rent.
+ *
+ * Only the tree creator or delegate may close a tree, and it must be
+ * empty (no un-burned leaves) for the underlying compression program
+ * to allow the close.
+ */
 export async function getCloseTreeV2InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountAuthority extends string,
@@ -247,7 +267,7 @@ export async function getCloseTreeV2InstructionAsync<
   >);
 }
 
-export interface CloseTreeV2Input<
+export type CloseTreeV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountAuthority extends string = string,
   TAccountMerkleTree extends string = string,
@@ -255,21 +275,45 @@ export interface CloseTreeV2Input<
   TAccountCompressionProgram extends string = string,
   TAccountLogWrapper extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
   /** Tree creator or delegate. */
   authority: TransactionSigner<TAccountAuthority>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
   /**
-   * Recipient for reclaimed lamports (tree + config PDA). Must be the creator
-   * or the delegate.
+   * Recipient for the reclaimed lamports (tree + config PDA). Must be
+   * the tree creator or delegate.
    */
   recipient: Address<TAccountRecipient>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
+/**
+ * Closes an empty V2 tree and its `TreeConfig` PDA, reclaiming rent.
+ *
+ * Only the tree creator or delegate may close a tree, and it must be
+ * empty (no un-burned leaves) for the underlying compression program
+ * to allow the close.
+ */
 export function getCloseTreeV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountAuthority extends string,
@@ -360,27 +404,44 @@ export function getCloseTreeV2Instruction<
   >);
 }
 
-export interface ParsedCloseTreeV2Instruction<
+export type ParsedCloseTreeV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
     /** Tree creator or delegate. */
     authority: TAccountMetas[1];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[2];
     /**
-     * Recipient for reclaimed lamports (tree + config PDA). Must be the creator
-     * or the delegate.
+     * Recipient for the reclaimed lamports (tree + config PDA). Must be
+     * the tree creator or delegate.
      */
     recipient: TAccountMetas[3];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[4];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[5];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[6];
   };
   data: CloseTreeV2InstructionData;
-}
+};
 
 export function parseCloseTreeV2Instruction<
   TProgram extends string,

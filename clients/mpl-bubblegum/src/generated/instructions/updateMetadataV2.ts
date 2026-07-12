@@ -6,32 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  MetadataArgsV2,
-  MetadataArgsV2Args,
-  UpdateArgs,
-  UpdateArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -44,19 +18,37 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -65,6 +57,10 @@ import {
   getMetadataArgsV2Encoder,
   getUpdateArgsDecoder,
   getUpdateArgsEncoder,
+  type MetadataArgsV2,
+  type MetadataArgsV2Args,
+  type UpdateArgs,
+  type UpdateArgsArgs,
 } from "../types/index.js";
 
 export const UPDATE_METADATA_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -132,26 +128,84 @@ export type UpdateMetadataV2Instruction<
     ]
   >;
 
-export interface UpdateMetadataV2InstructionData {
+export type UpdateMetadataV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-  assetDataHash: Option<number[]>;
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: Option<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: Option<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current `MetadataArgsV2`, verified against `dataHash`
+   * before `updateArgs` is applied.
+   */
   currentMetadata: MetadataArgsV2;
+  /**
+   * The metadata fields to change; fields left unset keep their current
+   * value on the leaf.
+   */
   updateArgs: UpdateArgs;
-}
+};
 
-export interface UpdateMetadataV2InstructionDataArgs {
-  root: number[];
-  assetDataHash: OptionOrNullable<number[]>;
+export type UpdateMetadataV2InstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree, used together with the Merkle proof
+   * (passed as remaining accounts) to verify the leaf being operated on.
+   */
+  root: Array<number>;
+  /**
+   * Expected current `assetDataHash` of the `LeafSchema` V2 leaf, if any,
+   * carried through unchanged by this instruction.
+   */
+  assetDataHash: OptionOrNullable<Array<number>>;
+  /**
+   * Expected current status flags (e.g. frozen, non-transferable) of the
+   * `LeafSchema` V2 leaf, verified before this instruction updates them.
+   */
   flags: OptionOrNullable<number>;
+  /**
+   * Tree-scoped nonce identifying the leaf, equal to the tree's
+   * `numMinted` at the time the leaf was minted. Combined with the tree
+   * address to derive the leaf's asset id.
+   */
   nonce: number | bigint;
+  /**
+   * Position of the leaf within the Merkle tree, used with the Merkle
+   * proof to locate and verify the leaf.
+   */
   index: number;
+  /**
+   * The leaf's current `MetadataArgsV2`, verified against `dataHash`
+   * before `updateArgs` is applied.
+   */
   currentMetadata: MetadataArgsV2Args;
+  /**
+   * The metadata fields to change; fields left unset keep their current
+   * value on the leaf.
+   */
   updateArgs: UpdateArgsArgs;
-}
+};
 
 export function getUpdateMetadataV2InstructionDataEncoder(): Encoder<UpdateMetadataV2InstructionDataArgs> {
   return transformEncoder(
@@ -198,7 +252,7 @@ export function getUpdateMetadataV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateMetadataV2AsyncInput<
+export type UpdateMetadataV2AsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
@@ -209,21 +263,42 @@ export interface UpdateMetadataV2AsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * Either collection authority or tree owner/delegate, depending
-   * on whether the item is in a verified collection.  Defaults to `payer`
+   * Either the collection authority or the tree owner/delegate,
+   * depending on whether the asset is in a verified collection.
+   * Defaults to `payer`.
    */
   authority?: TransactionSigner<TAccountAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
-  /** Defaults to `leaf_owner` */
+  /** Defaults to `leafOwner`. */
   leafDelegate?: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: UpdateMetadataV2InstructionDataArgs["root"];
   assetDataHash: UpdateMetadataV2InstructionDataArgs["assetDataHash"];
@@ -232,8 +307,14 @@ export interface UpdateMetadataV2AsyncInput<
   index: UpdateMetadataV2InstructionDataArgs["index"];
   currentMetadata: UpdateMetadataV2InstructionDataArgs["currentMetadata"];
   updateArgs: UpdateMetadataV2InstructionDataArgs["updateArgs"];
-}
+};
 
+/**
+ * Updates the on-chain metadata fields of a `LeafSchema` V2 leaf node.
+ *
+ * Like `updateMetadata`, but for V2 leaves: `currentMetadata` is
+ * verified against the leaf before `updateArgs` is applied.
+ */
 export async function getUpdateMetadataV2InstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -357,7 +438,7 @@ export async function getUpdateMetadataV2InstructionAsync<
   >);
 }
 
-export interface UpdateMetadataV2Input<
+export type UpdateMetadataV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
@@ -368,21 +449,42 @@ export interface UpdateMetadataV2Input<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
   /**
-   * Either collection authority or tree owner/delegate, depending
-   * on whether the item is in a verified collection.  Defaults to `payer`
+   * Either the collection authority or the tree owner/delegate,
+   * depending on whether the asset is in a verified collection.
+   * Defaults to `payer`.
    */
   authority?: TransactionSigner<TAccountAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: Address<TAccountLeafOwner>;
-  /** Defaults to `leaf_owner` */
+  /** Defaults to `leafOwner`. */
   leafDelegate?: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** MPL Core collection account the asset belongs to (V2 collections). */
   coreCollection?: Address<TAccountCoreCollection>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: UpdateMetadataV2InstructionDataArgs["root"];
   assetDataHash: UpdateMetadataV2InstructionDataArgs["assetDataHash"];
@@ -391,8 +493,14 @@ export interface UpdateMetadataV2Input<
   index: UpdateMetadataV2InstructionDataArgs["index"];
   currentMetadata: UpdateMetadataV2InstructionDataArgs["currentMetadata"];
   updateArgs: UpdateMetadataV2InstructionDataArgs["updateArgs"];
-}
+};
 
+/**
+ * Updates the on-chain metadata fields of a `LeafSchema` V2 leaf node.
+ *
+ * Like `updateMetadata`, but for V2 leaves: `currentMetadata` is
+ * verified against the leaf before `updateArgs` is applied.
+ */
 export function getUpdateMetadataV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountPayer extends string,
@@ -506,30 +614,51 @@ export function getUpdateMetadataV2Instruction<
   >);
 }
 
-export interface ParsedUpdateMetadataV2Instruction<
+export type ParsedUpdateMetadataV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[1];
     /**
-     * Either collection authority or tree owner/delegate, depending
-     * on whether the item is in a verified collection.  Defaults to `payer`
+     * Either the collection authority or the tree owner/delegate,
+     * depending on whether the asset is in a verified collection.
+     * Defaults to `payer`.
      */
     authority?: TAccountMetas[2] | undefined;
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[3];
-    /** Defaults to `leaf_owner` */
+    /** Defaults to `leafOwner`. */
     leafDelegate?: TAccountMetas[4] | undefined;
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[5];
+    /** MPL Core collection account the asset belongs to (V2 collections). */
     coreCollection?: TAccountMetas[6] | undefined;
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[7];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[8];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[9];
   };
   data: UpdateMetadataV2InstructionData;
-}
+};
 
 export function parseUpdateMetadataV2Instruction<
   TProgram extends string,

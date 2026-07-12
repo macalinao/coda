@@ -6,18 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
+/**
+ * The outcome of a plugin's check for a lifecycle event:
+ * `Approved`, `Rejected`, `Pass` (abstain), or `ForceApproved`.
+ */
 export enum ValidationResult {
-  Approved = 0,
-  Rejected = 1,
-  Pass = 2,
-  ForceApproved = 3,
+  Approved,
+  Rejected,
+  Pass,
+  ForceApproved,
 }
 
 export type ValidationResultArgs = ValidationResult;

@@ -6,36 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  FrequencyAccount,
-  FrequencyAccountArgs,
-} from "../accounts/index.js";
-import type {
-  CreateOrUpdateAsyncInput,
-  ParsedCreateOrUpdateInstruction,
-  ParsedPuffRuleSetInstruction,
-  ParsedValidateInstruction,
-  ParsedWriteToBufferInstruction,
-  PuffRuleSetInput,
-  ValidateInput,
-  WriteToBufferAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -44,12 +14,28 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getFrequencyAccountCodec } from "../accounts/index.js";
+import {
+  getFrequencyAccountCodec,
+  type FrequencyAccount,
+  type FrequencyAccountArgs,
+} from "../accounts/index.js";
 import {
   getCreateOrUpdateInstructionAsync,
   getPuffRuleSetInstruction,
@@ -59,6 +45,14 @@ import {
   parsePuffRuleSetInstruction,
   parseValidateInstruction,
   parseWriteToBufferInstruction,
+  type CreateOrUpdateAsyncInput,
+  type ParsedCreateOrUpdateInstruction,
+  type ParsedPuffRuleSetInstruction,
+  type ParsedValidateInstruction,
+  type ParsedWriteToBufferInstruction,
+  type PuffRuleSetInput,
+  type ValidateInput,
+  type WriteToBufferAsyncInput,
 } from "../instructions/index.js";
 import { findRuleSetBufferPda, findRuleSetPda } from "../pdas/index.js";
 
@@ -66,14 +60,14 @@ export const MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS =
   "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg" as Address<"auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg">;
 
 export enum MplTokenAuthRulesAccount {
-  FrequencyAccount = 0,
+  FrequencyAccount,
 }
 
 export enum MplTokenAuthRulesInstruction {
-  CreateOrUpdate = 0,
-  Validate = 1,
-  WriteToBuffer = 2,
-  PuffRuleSet = 3,
+  CreateOrUpdate,
+  Validate,
+  WriteToBuffer,
+  PuffRuleSet,
 }
 
 export function identifyMplTokenAuthRulesInstruction(
@@ -158,18 +152,18 @@ export function parseMplTokenAuthRulesInstruction<TProgram extends string>(
   }
 }
 
-export interface MplTokenAuthRulesPlugin {
+export type MplTokenAuthRulesPlugin = {
   accounts: MplTokenAuthRulesPluginAccounts;
   instructions: MplTokenAuthRulesPluginInstructions;
   pdas: MplTokenAuthRulesPluginPdas;
-}
+};
 
-export interface MplTokenAuthRulesPluginAccounts {
+export type MplTokenAuthRulesPluginAccounts = {
   frequencyAccount: ReturnType<typeof getFrequencyAccountCodec> &
     SelfFetchFunctions<FrequencyAccountArgs, FrequencyAccount>;
-}
+};
 
-export interface MplTokenAuthRulesPluginInstructions {
+export type MplTokenAuthRulesPluginInstructions = {
   createOrUpdate: (
     input: MakeOptional<CreateOrUpdateAsyncInput, "payer">,
   ) => ReturnType<typeof getCreateOrUpdateInstructionAsync> &
@@ -184,12 +178,12 @@ export interface MplTokenAuthRulesPluginInstructions {
   puffRuleSet: (
     input: MakeOptional<PuffRuleSetInput, "payer">,
   ) => ReturnType<typeof getPuffRuleSetInstruction> & SelfPlanAndSendFunctions;
-}
+};
 
-export interface MplTokenAuthRulesPluginPdas {
+export type MplTokenAuthRulesPluginPdas = {
   ruleSet: typeof findRuleSetPda;
   ruleSetBuffer: typeof findRuleSetBufferPda;
-}
+};
 
 export type MplTokenAuthRulesPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi

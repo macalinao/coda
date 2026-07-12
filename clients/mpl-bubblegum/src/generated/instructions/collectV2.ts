@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -30,8 +17,21 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const COLLECT_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -61,9 +61,7 @@ export type CollectV2Instruction<
     ]
   >;
 
-export interface CollectV2InstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type CollectV2InstructionData = { discriminator: ReadonlyUint8Array };
 
 export type CollectV2InstructionDataArgs = {};
 
@@ -90,14 +88,22 @@ export function getCollectV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CollectV2Input<
+export type CollectV2Input<
   TAccountTreeAuthority extends string = string,
   TAccountDestination extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Account to receive the collected V2 tree fees. */
   destination: Address<TAccountDestination>;
-}
+};
 
+/**
+ * Collects accumulated protocol fees from a V2 tree's `TreeConfig` PDA.
+ */
 export function getCollectV2Instruction<
   TAccountTreeAuthority extends string,
   TAccountDestination extends string,
@@ -138,17 +144,22 @@ export function getCollectV2Instruction<
   >);
 }
 
-export interface ParsedCollectV2Instruction<
+export type ParsedCollectV2Instruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Account to receive the collected V2 tree fees. */
     destination: TAccountMetas[1];
   };
   data: CollectV2InstructionData;
-}
+};
 
 export function parseCollectV2Instruction<
   TProgram extends string,

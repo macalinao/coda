@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,12 +14,25 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Creator {
+/**
+ * A single creator entry used by the `Royalties` plugin, with
+ * their address and royalty share.
+ */
+export type Creator = {
+  /** The creator's address. */
   address: Address;
+  /**
+   * The creator's share of royalties, in whole percentage points
+   * (0-100).
+   */
   percentage: number;
-}
+};
 
 export type CreatorArgs = Creator;
 

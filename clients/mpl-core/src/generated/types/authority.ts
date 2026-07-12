@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -24,8 +16,19 @@ import {
   getStructEncoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 
+/**
+ * Identifies who manages a plugin or external plugin adapter:
+ * nobody (`None`), the asset/collection `Owner`, its
+ * `UpdateAuthority`, or a specific `Address`.
+ */
 export type Authority =
   | { __kind: "None" }
   | { __kind: "Owner" }

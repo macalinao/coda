@@ -6,24 +6,31 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  ExternalPluginAdapterKey,
-  ExternalPluginAdapterKeyArgs,
-} from "./index.js";
-import { combineCodec, getStructDecoder, getStructEncoder } from "@solana/kit";
+import {
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+} from "@solana/kit";
 import {
   getExternalPluginAdapterKeyDecoder,
   getExternalPluginAdapterKeyEncoder,
+  type ExternalPluginAdapterKey,
+  type ExternalPluginAdapterKeyArgs,
 } from "./index.js";
 
-export interface RemoveExternalPluginAdapterV1Args {
+/** Arguments for `removeExternalPluginAdapterV1`. */
+export type RemoveExternalPluginAdapterV1Args = {
+  /** Identifies which external plugin adapter to remove. */
   key: ExternalPluginAdapterKey;
-}
+};
 
-export interface RemoveExternalPluginAdapterV1ArgsArgs {
+export type RemoveExternalPluginAdapterV1ArgsArgs = {
+  /** Identifies which external plugin adapter to remove. */
   key: ExternalPluginAdapterKeyArgs;
-}
+};
 
 export function getRemoveExternalPluginAdapterV1ArgsEncoder(): Encoder<RemoveExternalPluginAdapterV1ArgsArgs> {
   return getStructEncoder([["key", getExternalPluginAdapterKeyEncoder()]]);

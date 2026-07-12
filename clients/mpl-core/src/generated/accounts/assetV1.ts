@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  Key,
-  KeyArgs,
-  UpdateAuthority,
-  UpdateAuthorityArgs,
-} from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -47,31 +27,72 @@ import {
   getU64Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getKeyDecoder,
   getKeyEncoder,
   getUpdateAuthorityDecoder,
   getUpdateAuthorityEncoder,
+  type Key,
+  type KeyArgs,
+  type UpdateAuthority,
+  type UpdateAuthorityArgs,
 } from "../types/index.js";
 
-export interface AssetV1 {
+/**
+ * An MPL Core asset: a single account holding an NFT's owner,
+ * update authority, name, URI and sequence number, with its
+ * plugins stored afterward in the same account.
+ */
+export type AssetV1 = {
+  /** Account discriminator; always `Key.AssetV1`. */
   key: Key;
+  /** The current owner of the asset. */
   owner: Address;
+  /** The authority allowed to update the asset's metadata and plugins. */
   updateAuthority: UpdateAuthority;
+  /** The asset's display name. */
   name: string;
+  /** The URI pointing to the asset's off-chain JSON metadata. */
   uri: string;
+  /**
+   * Sequence number incremented on certain mutations (e.g.
+   * `executeV1`); present once the asset has been touched by such
+   * an instruction, used to detect stale off-chain indexes.
+   */
   seq: Option<bigint>;
-}
+};
 
-export interface AssetV1Args {
+export type AssetV1Args = {
+  /** Account discriminator; always `Key.AssetV1`. */
   key: KeyArgs;
+  /** The current owner of the asset. */
   owner: Address;
+  /** The authority allowed to update the asset's metadata and plugins. */
   updateAuthority: UpdateAuthorityArgs;
+  /** The asset's display name. */
   name: string;
+  /** The URI pointing to the asset's off-chain JSON metadata. */
   uri: string;
+  /**
+   * Sequence number incremented on certain mutations (e.g.
+   * `executeV1`); present once the asset has been touched by such
+   * an instruction, used to detect stale off-chain indexes.
+   */
   seq: OptionOrNullable<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link AssetV1Args} account data. */
 export function getAssetV1Encoder(): Encoder<AssetV1Args> {
@@ -138,7 +159,7 @@ export async function fetchMaybeAssetV1<TAddress extends string = string>(
 
 export async function fetchAllAssetV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<AssetV1>[]> {
   const maybeAccounts = await fetchAllMaybeAssetV1(rpc, addresses, config);
@@ -148,7 +169,7 @@ export async function fetchAllAssetV1(
 
 export async function fetchAllMaybeAssetV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<AssetV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

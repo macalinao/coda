@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,10 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -99,14 +97,22 @@ export type CancelRedeemInstruction<
     ]
   >;
 
-export interface CancelRedeemInstructionData {
+export type CancelRedeemInstructionData = {
   discriminator: ReadonlyUint8Array;
-  root: number[];
-}
+  /**
+   * Current Merkle root of the tree; the leaf recorded in `voucher` is
+   * re-inserted at its original position and verified against this root.
+   */
+  root: Array<number>;
+};
 
-export interface CancelRedeemInstructionDataArgs {
-  root: number[];
-}
+export type CancelRedeemInstructionDataArgs = {
+  /**
+   * Current Merkle root of the tree; the leaf recorded in `voucher` is
+   * re-inserted at its original position and verified against this root.
+   */
+  root: Array<number>;
+};
 
 export function getCancelRedeemInstructionDataEncoder(): FixedSizeEncoder<CancelRedeemInstructionDataArgs> {
   return transformEncoder(
@@ -135,7 +141,7 @@ export function getCancelRedeemInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CancelRedeemAsyncInput<
+export type CancelRedeemAsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountMerkleTree extends string = string,
@@ -143,17 +149,45 @@ export interface CancelRedeemAsyncInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: TransactionSigner<TAccountLeafOwner>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * Voucher PDA created by `redeem`; closed by this instruction as the
+   * leaf is restored to the tree.
+   */
   voucher: Address<TAccountVoucher>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: CancelRedeemInstructionDataArgs["root"];
-}
+};
 
+/**
+ * Cancels a pending redemption, restoring the leaf to the tree.
+ *
+ * Closes the `voucher` PDA created by `redeem` and re-inserts the leaf
+ * at its original position, verified against the current Merkle `root`.
+ */
 export async function getCancelRedeemInstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -259,7 +293,7 @@ export async function getCancelRedeemInstructionAsync<
   >);
 }
 
-export interface CancelRedeemInput<
+export type CancelRedeemInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountMerkleTree extends string = string,
@@ -267,17 +301,45 @@ export interface CancelRedeemInput<
   TAccountLogWrapper extends string = string,
   TAccountCompressionProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: TransactionSigner<TAccountLeafOwner>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /**
+   * Voucher PDA created by `redeem`; closed by this instruction as the
+   * leaf is restored to the tree.
+   */
   voucher: Address<TAccountVoucher>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
   root: CancelRedeemInstructionDataArgs["root"];
-}
+};
 
+/**
+ * Cancels a pending redemption, restoring the leaf to the tree.
+ *
+ * Closes the `voucher` PDA created by `redeem` and re-inserts the leaf
+ * at its original position, verified against the current Merkle `root`.
+ */
 export function getCancelRedeemInstruction<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -373,22 +435,44 @@ export function getCancelRedeemInstruction<
   >);
 }
 
-export interface ParsedCancelRedeemInstruction<
+export type ParsedCancelRedeemInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[2];
+    /**
+     * Voucher PDA created by `redeem`; closed by this instruction as the
+     * leaf is restored to the tree.
+     */
     voucher: TAccountMetas[3];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[4];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[5];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[6];
   };
   data: CancelRedeemInstructionData;
-}
+};
 
 export function parseCancelRedeemInstruction<
   TProgram extends string,

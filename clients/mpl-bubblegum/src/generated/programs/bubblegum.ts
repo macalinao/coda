@@ -6,102 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  TreeConfig,
-  TreeConfigArgs,
-  Voucher,
-  VoucherArgs,
-} from "../accounts/index.js";
-import type {
-  BurnAsyncInput,
-  BurnV2AsyncInput,
-  CancelRedeemAsyncInput,
-  CloseTreeV2AsyncInput,
-  CollectV2Input,
-  CompressAsyncInput,
-  CreateTreeAsyncInput,
-  CreateTreeV2AsyncInput,
-  DecompressV1AsyncInput,
-  DelegateAndFreezeV2AsyncInput,
-  DelegateAsyncInput,
-  DelegateV2AsyncInput,
-  FreezeV2AsyncInput,
-  MintToCollectionV1AsyncInput,
-  MintV1AsyncInput,
-  MintV2AsyncInput,
-  ParsedBurnInstruction,
-  ParsedBurnV2Instruction,
-  ParsedCancelRedeemInstruction,
-  ParsedCloseTreeV2Instruction,
-  ParsedCollectV2Instruction,
-  ParsedCompressInstruction,
-  ParsedCreateTreeInstruction,
-  ParsedCreateTreeV2Instruction,
-  ParsedDecompressV1Instruction,
-  ParsedDelegateAndFreezeV2Instruction,
-  ParsedDelegateInstruction,
-  ParsedDelegateV2Instruction,
-  ParsedFreezeV2Instruction,
-  ParsedMintToCollectionV1Instruction,
-  ParsedMintV1Instruction,
-  ParsedMintV2Instruction,
-  ParsedRedeemInstruction,
-  ParsedSetAndVerifyCollectionInstruction,
-  ParsedSetCollectionV2Instruction,
-  ParsedSetDecompressableStateInstruction,
-  ParsedSetDecompressibleStateInstruction,
-  ParsedSetNonTransferableV2Instruction,
-  ParsedSetTreeDelegateInstruction,
-  ParsedThawAndRevokeV2Instruction,
-  ParsedThawV2Instruction,
-  ParsedTransferInstruction,
-  ParsedTransferV2Instruction,
-  ParsedUnverifyCollectionInstruction,
-  ParsedUnverifyCreatorInstruction,
-  ParsedUnverifyCreatorV2Instruction,
-  ParsedUpdateAssetDataV2Instruction,
-  ParsedUpdateMetadataInstruction,
-  ParsedUpdateMetadataV2Instruction,
-  ParsedVerifyCollectionInstruction,
-  ParsedVerifyCreatorInstruction,
-  ParsedVerifyCreatorV2Instruction,
-  RedeemAsyncInput,
-  SetAndVerifyCollectionAsyncInput,
-  SetCollectionV2AsyncInput,
-  SetDecompressableStateInput,
-  SetDecompressibleStateInput,
-  SetNonTransferableV2AsyncInput,
-  SetTreeDelegateAsyncInput,
-  ThawAndRevokeV2AsyncInput,
-  ThawV2AsyncInput,
-  TransferAsyncInput,
-  TransferV2AsyncInput,
-  UnverifyCollectionAsyncInput,
-  UnverifyCreatorAsyncInput,
-  UnverifyCreatorV2AsyncInput,
-  UpdateAssetDataV2AsyncInput,
-  UpdateMetadataAsyncInput,
-  UpdateMetadataV2AsyncInput,
-  VerifyCollectionAsyncInput,
-  VerifyCreatorAsyncInput,
-  VerifyCreatorV2AsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -112,12 +16,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getTreeConfigCodec, getVoucherCodec } from "../accounts/index.js";
+import {
+  getTreeConfigCodec,
+  getVoucherCodec,
+  type TreeConfig,
+  type TreeConfigArgs,
+  type Voucher,
+  type VoucherArgs,
+} from "../accounts/index.js";
 import {
   getBurnInstructionAsync,
   getBurnV2InstructionAsync,
@@ -191,6 +114,78 @@ import {
   parseVerifyCollectionInstruction,
   parseVerifyCreatorInstruction,
   parseVerifyCreatorV2Instruction,
+  type BurnAsyncInput,
+  type BurnV2AsyncInput,
+  type CancelRedeemAsyncInput,
+  type CloseTreeV2AsyncInput,
+  type CollectV2Input,
+  type CompressAsyncInput,
+  type CreateTreeAsyncInput,
+  type CreateTreeV2AsyncInput,
+  type DecompressV1AsyncInput,
+  type DelegateAndFreezeV2AsyncInput,
+  type DelegateAsyncInput,
+  type DelegateV2AsyncInput,
+  type FreezeV2AsyncInput,
+  type MintToCollectionV1AsyncInput,
+  type MintV1AsyncInput,
+  type MintV2AsyncInput,
+  type ParsedBurnInstruction,
+  type ParsedBurnV2Instruction,
+  type ParsedCancelRedeemInstruction,
+  type ParsedCloseTreeV2Instruction,
+  type ParsedCollectV2Instruction,
+  type ParsedCompressInstruction,
+  type ParsedCreateTreeInstruction,
+  type ParsedCreateTreeV2Instruction,
+  type ParsedDecompressV1Instruction,
+  type ParsedDelegateAndFreezeV2Instruction,
+  type ParsedDelegateInstruction,
+  type ParsedDelegateV2Instruction,
+  type ParsedFreezeV2Instruction,
+  type ParsedMintToCollectionV1Instruction,
+  type ParsedMintV1Instruction,
+  type ParsedMintV2Instruction,
+  type ParsedRedeemInstruction,
+  type ParsedSetAndVerifyCollectionInstruction,
+  type ParsedSetCollectionV2Instruction,
+  type ParsedSetDecompressableStateInstruction,
+  type ParsedSetDecompressibleStateInstruction,
+  type ParsedSetNonTransferableV2Instruction,
+  type ParsedSetTreeDelegateInstruction,
+  type ParsedThawAndRevokeV2Instruction,
+  type ParsedThawV2Instruction,
+  type ParsedTransferInstruction,
+  type ParsedTransferV2Instruction,
+  type ParsedUnverifyCollectionInstruction,
+  type ParsedUnverifyCreatorInstruction,
+  type ParsedUnverifyCreatorV2Instruction,
+  type ParsedUpdateAssetDataV2Instruction,
+  type ParsedUpdateMetadataInstruction,
+  type ParsedUpdateMetadataV2Instruction,
+  type ParsedVerifyCollectionInstruction,
+  type ParsedVerifyCreatorInstruction,
+  type ParsedVerifyCreatorV2Instruction,
+  type RedeemAsyncInput,
+  type SetAndVerifyCollectionAsyncInput,
+  type SetCollectionV2AsyncInput,
+  type SetDecompressableStateInput,
+  type SetDecompressibleStateInput,
+  type SetNonTransferableV2AsyncInput,
+  type SetTreeDelegateAsyncInput,
+  type ThawAndRevokeV2AsyncInput,
+  type ThawV2AsyncInput,
+  type TransferAsyncInput,
+  type TransferV2AsyncInput,
+  type UnverifyCollectionAsyncInput,
+  type UnverifyCreatorAsyncInput,
+  type UnverifyCreatorV2AsyncInput,
+  type UpdateAssetDataV2AsyncInput,
+  type UpdateMetadataAsyncInput,
+  type UpdateMetadataV2AsyncInput,
+  type VerifyCollectionAsyncInput,
+  type VerifyCreatorAsyncInput,
+  type VerifyCreatorV2AsyncInput,
 } from "../instructions/index.js";
 import {
   findAssetIdPda,
@@ -204,8 +199,8 @@ export const BUBBLEGUM_PROGRAM_ADDRESS =
   "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">;
 
 export enum BubblegumAccount {
-  TreeConfig = 0,
-  Voucher = 1,
+  TreeConfig,
+  Voucher,
 }
 
 export function identifyBubblegumAccount(
@@ -241,42 +236,42 @@ export function identifyBubblegumAccount(
 }
 
 export enum BubblegumInstruction {
-  Burn = 0,
-  BurnV2 = 1,
-  CancelRedeem = 2,
-  CloseTreeV2 = 3,
-  CollectV2 = 4,
-  Compress = 5,
-  CreateTree = 6,
-  CreateTreeV2 = 7,
-  DecompressV1 = 8,
-  Delegate = 9,
-  DelegateAndFreezeV2 = 10,
-  DelegateV2 = 11,
-  FreezeV2 = 12,
-  MintToCollectionV1 = 13,
-  MintV1 = 14,
-  MintV2 = 15,
-  Redeem = 16,
-  SetAndVerifyCollection = 17,
-  SetCollectionV2 = 18,
-  SetDecompressableState = 19,
-  SetDecompressibleState = 20,
-  SetNonTransferableV2 = 21,
-  SetTreeDelegate = 22,
-  ThawAndRevokeV2 = 23,
-  ThawV2 = 24,
-  Transfer = 25,
-  TransferV2 = 26,
-  UnverifyCollection = 27,
-  UnverifyCreator = 28,
-  UnverifyCreatorV2 = 29,
-  UpdateAssetDataV2 = 30,
-  UpdateMetadata = 31,
-  UpdateMetadataV2 = 32,
-  VerifyCollection = 33,
-  VerifyCreator = 34,
-  VerifyCreatorV2 = 35,
+  Burn,
+  BurnV2,
+  CancelRedeem,
+  CloseTreeV2,
+  CollectV2,
+  Compress,
+  CreateTree,
+  CreateTreeV2,
+  DecompressV1,
+  Delegate,
+  DelegateAndFreezeV2,
+  DelegateV2,
+  FreezeV2,
+  MintToCollectionV1,
+  MintV1,
+  MintV2,
+  Redeem,
+  SetAndVerifyCollection,
+  SetCollectionV2,
+  SetDecompressableState,
+  SetDecompressibleState,
+  SetNonTransferableV2,
+  SetTreeDelegate,
+  ThawAndRevokeV2,
+  ThawV2,
+  Transfer,
+  TransferV2,
+  UnverifyCollection,
+  UnverifyCreator,
+  UnverifyCreatorV2,
+  UpdateAssetDataV2,
+  UpdateMetadata,
+  UpdateMetadataV2,
+  VerifyCollection,
+  VerifyCreator,
+  VerifyCreatorV2,
 }
 
 export function identifyBubblegumInstruction(
@@ -1065,20 +1060,20 @@ export function parseBubblegumInstruction<TProgram extends string>(
   }
 }
 
-export interface BubblegumPlugin {
+export type BubblegumPlugin = {
   accounts: BubblegumPluginAccounts;
   instructions: BubblegumPluginInstructions;
   pdas: BubblegumPluginPdas;
-}
+};
 
-export interface BubblegumPluginAccounts {
+export type BubblegumPluginAccounts = {
   treeConfig: ReturnType<typeof getTreeConfigCodec> &
     SelfFetchFunctions<TreeConfigArgs, TreeConfig>;
   voucher: ReturnType<typeof getVoucherCodec> &
     SelfFetchFunctions<VoucherArgs, Voucher>;
-}
+};
 
-export interface BubblegumPluginInstructions {
+export type BubblegumPluginInstructions = {
   burn: (
     input: BurnAsyncInput,
   ) => ReturnType<typeof getBurnInstructionAsync> & SelfPlanAndSendFunctions;
@@ -1216,15 +1211,15 @@ export interface BubblegumPluginInstructions {
     input: MakeOptional<VerifyCreatorV2AsyncInput, "payer">,
   ) => ReturnType<typeof getVerifyCreatorV2InstructionAsync> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface BubblegumPluginPdas {
+export type BubblegumPluginPdas = {
   treeConfig: typeof findTreeConfigPda;
   voucher: typeof findVoucherPda;
   assetId: typeof findAssetIdPda;
   bubblegumSigner: typeof findBubblegumSignerPda;
   mintAuthority: typeof findMintAuthorityPda;
-}
+};
 
 export type BubblegumPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi

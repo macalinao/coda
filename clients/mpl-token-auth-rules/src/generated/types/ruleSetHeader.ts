@@ -6,30 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { Key, KeyArgs } from "./index.js";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { getKeyDecoder, getKeyEncoder } from "./index.js";
+import {
+  getKeyDecoder,
+  getKeyEncoder,
+  type Key,
+  type KeyArgs,
+} from "./index.js";
 
-export interface RuleSetHeader {
+/** On-chain header at the start of a RuleSet PDA, locating its revision map. */
+export type RuleSetHeader = {
+  /** Account discriminator (always `RuleSet`). */
   key: Key;
+  /** Byte offset of the revision map within the PDA. */
   revMapVersionLocation: bigint;
-}
+};
 
-export interface RuleSetHeaderArgs {
+export type RuleSetHeaderArgs = {
+  /** Account discriminator (always `RuleSet`). */
   key: KeyArgs;
+  /** Byte offset of the revision map within the PDA. */
   revMapVersionLocation: number | bigint;
-}
+};
 
 export function getRuleSetHeaderEncoder(): FixedSizeEncoder<RuleSetHeaderArgs> {
   return getStructEncoder([

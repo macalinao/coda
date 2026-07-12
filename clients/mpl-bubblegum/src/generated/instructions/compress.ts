@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +17,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.js";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -125,9 +123,7 @@ export type CompressInstruction<
     ]
   >;
 
-export interface CompressInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type CompressInstructionData = { discriminator: ReadonlyUint8Array };
 
 export type CompressInstructionDataArgs = {};
 
@@ -154,7 +150,7 @@ export function getCompressInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CompressAsyncInput<
+export type CompressAsyncInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -169,23 +165,62 @@ export interface CompressAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority?: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: TransactionSigner<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Token account that will hold the decompressed NFT for `leafOwner`. */
   tokenAccount: Address<TAccountTokenAccount>;
+  /** Mint account of the decompressed NFT, created fresh during decompression. */
   mint: Address<TAccountMint>;
+  /** Metadata account created for the decompressed NFT. */
   metadata: Address<TAccountMetadata>;
+  /** Master edition account created for the decompressed NFT. */
   masterEdition: Address<TAccountMasterEdition>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The SPL Token program. */
   tokenProgram?: Address<TAccountTokenProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
+/**
+ * Compresses an existing decompressed (SPL/Token Metadata) NFT into a
+ * new leaf of a compressed Merkle tree.
+ *
+ * Reads the mint, token account, metadata and master edition of the
+ * decompressed NFT to build the leaf, then appends it to the tree.
+ */
 export async function getCompressInstructionAsync<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -339,7 +374,7 @@ export async function getCompressInstructionAsync<
   >);
 }
 
-export interface CompressInput<
+export type CompressInput<
   TAccountTreeAuthority extends string = string,
   TAccountLeafOwner extends string = string,
   TAccountLeafDelegate extends string = string,
@@ -354,23 +389,62 @@ export interface CompressInput<
   TAccountTokenProgram extends string = string,
   TAccountTokenMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
+  /**
+   * The tree's `TreeConfig` PDA, which stores its configuration and acts
+   * as the tree's authority for CPIs into the compression program.
+   */
   treeAuthority: Address<TAccountTreeAuthority>;
+  /** Owner of the compressed NFT leaf being operated on. */
   leafOwner: TransactionSigner<TAccountLeafOwner>;
+  /**
+   * Delegate authority for the leaf; defaults to the leaf owner when no
+   * delegate is set.
+   */
   leafDelegate: Address<TAccountLeafDelegate>;
+  /**
+   * The concurrent Merkle tree account storing the compressed leaves,
+   * owned by the account compression program.
+   */
   merkleTree: Address<TAccountMerkleTree>;
+  /** Token account that will hold the decompressed NFT for `leafOwner`. */
   tokenAccount: Address<TAccountTokenAccount>;
+  /** Mint account of the decompressed NFT, created fresh during decompression. */
   mint: Address<TAccountMint>;
+  /** Metadata account created for the decompressed NFT. */
   metadata: Address<TAccountMetadata>;
+  /** Master edition account created for the decompressed NFT. */
   masterEdition: Address<TAccountMasterEdition>;
+  /** Account that pays for the transaction and any account rent. */
   payer: TransactionSigner<TAccountPayer>;
+  /**
+   * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+   * can reconstruct the tree.
+   */
   logWrapper?: Address<TAccountLogWrapper>;
+  /**
+   * The SPL/MPL Account Compression program that owns and manages the
+   * Merkle tree.
+   */
   compressionProgram?: Address<TAccountCompressionProgram>;
+  /** The SPL Token program. */
   tokenProgram?: Address<TAccountTokenProgram>;
+  /**
+   * The Token Metadata program, invoked to read or (un)verify the
+   * legacy collection accounts.
+   */
   tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  /** The Solana System program. */
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
+/**
+ * Compresses an existing decompressed (SPL/Token Metadata) NFT into a
+ * new leaf of a compressed Merkle tree.
+ *
+ * Reads the mint, token account, metadata and master edition of the
+ * decompressed NFT to build the leaf, then appends it to the tree.
+ */
 export function getCompressInstruction<
   TAccountTreeAuthority extends string,
   TAccountLeafOwner extends string,
@@ -514,29 +588,61 @@ export function getCompressInstruction<
   >);
 }
 
-export interface ParsedCompressInstruction<
+export type ParsedCompressInstruction<
   TProgram extends string = typeof BUBBLEGUM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
+    /**
+     * The tree's `TreeConfig` PDA, which stores its configuration and acts
+     * as the tree's authority for CPIs into the compression program.
+     */
     treeAuthority: TAccountMetas[0];
+    /** Owner of the compressed NFT leaf being operated on. */
     leafOwner: TAccountMetas[1];
+    /**
+     * Delegate authority for the leaf; defaults to the leaf owner when no
+     * delegate is set.
+     */
     leafDelegate: TAccountMetas[2];
+    /**
+     * The concurrent Merkle tree account storing the compressed leaves,
+     * owned by the account compression program.
+     */
     merkleTree: TAccountMetas[3];
+    /** Token account that will hold the decompressed NFT for `leafOwner`. */
     tokenAccount: TAccountMetas[4];
+    /** Mint account of the decompressed NFT, created fresh during decompression. */
     mint: TAccountMetas[5];
+    /** Metadata account created for the decompressed NFT. */
     metadata: TAccountMetas[6];
+    /** Master edition account created for the decompressed NFT. */
     masterEdition: TAccountMetas[7];
+    /** Account that pays for the transaction and any account rent. */
     payer: TAccountMetas[8];
+    /**
+     * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
+     * can reconstruct the tree.
+     */
     logWrapper: TAccountMetas[9];
+    /**
+     * The SPL/MPL Account Compression program that owns and manages the
+     * Merkle tree.
+     */
     compressionProgram: TAccountMetas[10];
+    /** The SPL Token program. */
     tokenProgram: TAccountMetas[11];
+    /**
+     * The Token Metadata program, invoked to read or (un)verify the
+     * legacy collection accounts.
+     */
     tokenMetadataProgram: TAccountMetas[12];
+    /** The Solana System program. */
     systemProgram: TAccountMetas[13];
   };
   data: CompressInstructionData;
-}
+};
 
 export function parseCompressInstruction<
   TProgram extends string,

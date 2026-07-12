@@ -6,13 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
-import { getAddressEncoder, getProgramDerivedAddress } from "@solana/kit";
+import {
+  getAddressEncoder,
+  getProgramDerivedAddress,
+  type Address,
+  type ProgramDerivedAddress,
+} from "@solana/kit";
 
-export interface TreeConfigSeeds {
+export type TreeConfigSeeds = {
   /** The address of the merkle tree account */
   merkleTree: Address;
-}
+};
 
 /** Tree authority / config PDA that manages a concurrent merkle tree */
 export async function findTreeConfigPda(

@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  CreateOrUpdateArgs,
-  CreateOrUpdateArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -36,16 +15,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findRuleSetBufferPda } from "../pdas/index.js";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getCreateOrUpdateArgsDecoder,
   getCreateOrUpdateArgsEncoder,
+  type CreateOrUpdateArgs,
+  type CreateOrUpdateArgsArgs,
 } from "../types/index.js";
 
 export const CREATE_OR_UPDATE_DISCRIMINATOR = 0;
@@ -83,14 +79,16 @@ export type CreateOrUpdateInstruction<
     ]
   >;
 
-export interface CreateOrUpdateInstructionData {
+export type CreateOrUpdateInstructionData = {
   discriminator: number;
+  /** The (versioned) CBOR-serialized RuleSet to store. */
   createOrUpdateArgs: CreateOrUpdateArgs;
-}
+};
 
-export interface CreateOrUpdateInstructionDataArgs {
+export type CreateOrUpdateInstructionDataArgs = {
+  /** The (versioned) CBOR-serialized RuleSet to store. */
   createOrUpdateArgs: CreateOrUpdateArgsArgs;
-}
+};
 
 export function getCreateOrUpdateInstructionDataEncoder(): Encoder<CreateOrUpdateInstructionDataArgs> {
   return transformEncoder(
@@ -119,12 +117,12 @@ export function getCreateOrUpdateInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateOrUpdateAsyncInput<
+export type CreateOrUpdateAsyncInput<
   TAccountPayer extends string = string,
   TAccountRuleSetPda extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountBufferPda extends string = string,
-> {
+> = {
   /** Payer and creator of the RuleSet */
   payer: TransactionSigner<TAccountPayer>;
   /** The PDA account where the RuleSet is stored */
@@ -134,8 +132,17 @@ export interface CreateOrUpdateAsyncInput<
   /** The buffer to copy a complete ruleset from */
   bufferPda?: Address<TAccountBufferPda>;
   createOrUpdateArgs: CreateOrUpdateInstructionDataArgs["createOrUpdateArgs"];
-}
+};
 
+/**
+ * Creates or updates a RuleSet stored in a program-derived account.
+ *
+ * A RuleSet is a named, versioned collection of authorization rules
+ * owned by its creator. Each call appends a new revision to the PDA;
+ * existing revisions are preserved so previously-signed operations
+ * remain reproducible. Pass a serialized RuleSet built with the
+ * auth-rules Rust/JS SDK.
+ */
 export async function getCreateOrUpdateInstructionAsync<
   TAccountPayer extends string,
   TAccountRuleSetPda extends string,
@@ -213,12 +220,12 @@ export async function getCreateOrUpdateInstructionAsync<
   >);
 }
 
-export interface CreateOrUpdateInput<
+export type CreateOrUpdateInput<
   TAccountPayer extends string = string,
   TAccountRuleSetPda extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountBufferPda extends string = string,
-> {
+> = {
   /** Payer and creator of the RuleSet */
   payer: TransactionSigner<TAccountPayer>;
   /** The PDA account where the RuleSet is stored */
@@ -228,8 +235,17 @@ export interface CreateOrUpdateInput<
   /** The buffer to copy a complete ruleset from */
   bufferPda?: Address<TAccountBufferPda>;
   createOrUpdateArgs: CreateOrUpdateInstructionDataArgs["createOrUpdateArgs"];
-}
+};
 
+/**
+ * Creates or updates a RuleSet stored in a program-derived account.
+ *
+ * A RuleSet is a named, versioned collection of authorization rules
+ * owned by its creator. Each call appends a new revision to the PDA;
+ * existing revisions are preserved so previously-signed operations
+ * remain reproducible. Pass a serialized RuleSet built with the
+ * auth-rules Rust/JS SDK.
+ */
 export function getCreateOrUpdateInstruction<
   TAccountPayer extends string,
   TAccountRuleSetPda extends string,
@@ -297,10 +313,10 @@ export function getCreateOrUpdateInstruction<
   >);
 }
 
-export interface ParsedCreateOrUpdateInstruction<
+export type ParsedCreateOrUpdateInstruction<
   TProgram extends string = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Payer and creator of the RuleSet */
@@ -313,7 +329,7 @@ export interface ParsedCreateOrUpdateInstruction<
     bufferPda?: TAccountMetas[3] | undefined;
   };
   data: CreateOrUpdateInstructionData;
-}
+};
 
 export function parseCreateOrUpdateInstruction<
   TProgram extends string,

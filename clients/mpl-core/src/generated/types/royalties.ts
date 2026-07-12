@@ -6,8 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { Creator, CreatorArgs, RuleSet, RuleSetArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -16,25 +14,45 @@ import {
   getStructEncoder,
   getU16Decoder,
   getU16Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getCreatorDecoder,
   getCreatorEncoder,
   getRuleSetDecoder,
   getRuleSetEncoder,
+  type Creator,
+  type CreatorArgs,
+  type RuleSet,
+  type RuleSetArgs,
 } from "./index.js";
 
-export interface Royalties {
+/** Internal plugin enforcing creator royalty payments on secondary sales. */
+export type Royalties = {
+  /** The royalty rate, in basis points (1/100th of a percent). */
   basisPoints: number;
-  creators: Creator[];
+  /**
+   * The creators who split the royalty payment, with their
+   * address and percentage share.
+   */
+  creators: Array<Creator>;
+  /** Restricts which programs may transfer the asset, to enforce royalty payment. */
   ruleSet: RuleSet;
-}
+};
 
-export interface RoyaltiesArgs {
+export type RoyaltiesArgs = {
+  /** The royalty rate, in basis points (1/100th of a percent). */
   basisPoints: number;
-  creators: CreatorArgs[];
+  /**
+   * The creators who split the royalty payment, with their
+   * address and percentage share.
+   */
+  creators: Array<CreatorArgs>;
+  /** Restricts which programs may transfer the asset, to enforce royalty payment. */
   ruleSet: RuleSetArgs;
-}
+};
 
 export function getRoyaltiesEncoder(): Encoder<RoyaltiesArgs> {
   return getStructEncoder([

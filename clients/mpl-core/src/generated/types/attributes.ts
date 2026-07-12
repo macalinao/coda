@@ -6,24 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { Attribute, AttributeArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
-import { getAttributeDecoder, getAttributeEncoder } from "./index.js";
+import {
+  getAttributeDecoder,
+  getAttributeEncoder,
+  type Attribute,
+  type AttributeArgs,
+} from "./index.js";
 
-export interface Attributes {
-  attributeList: Attribute[];
-}
+/**
+ * Internal plugin that stores an arbitrary list of on-chain
+ * key/value attributes.
+ */
+export type Attributes = {
+  /** The list of key/value attributes stored on the asset. */
+  attributeList: Array<Attribute>;
+};
 
-export interface AttributesArgs {
-  attributeList: AttributeArgs[];
-}
+export type AttributesArgs = {
+  /** The list of key/value attributes stored on the asset. */
+  attributeList: Array<AttributeArgs>;
+};
 
 export function getAttributesEncoder(): Encoder<AttributesArgs> {
   return getStructEncoder([

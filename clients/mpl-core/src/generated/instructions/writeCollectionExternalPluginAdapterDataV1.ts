@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  WriteCollectionExternalPluginAdapterDataV1Args,
-  WriteCollectionExternalPluginAdapterDataV1ArgsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -37,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getWriteCollectionExternalPluginAdapterDataV1ArgsDecoder,
   getWriteCollectionExternalPluginAdapterDataV1ArgsEncoder,
+  type WriteCollectionExternalPluginAdapterDataV1Args,
+  type WriteCollectionExternalPluginAdapterDataV1ArgsArgs,
 } from "../types/index.js";
 
 export const WRITE_COLLECTION_EXTERNAL_PLUGIN_ADAPTER_DATA_V1_DISCRIMINATOR = 29;
@@ -91,14 +89,16 @@ export type WriteCollectionExternalPluginAdapterDataV1Instruction<
     ]
   >;
 
-export interface WriteCollectionExternalPluginAdapterDataV1InstructionData {
+export type WriteCollectionExternalPluginAdapterDataV1InstructionData = {
   discriminator: number;
+  /** The target adapter and the bytes to write, or `None` to clear it. */
   writeCollectionExternalPluginAdapterDataV1Args: WriteCollectionExternalPluginAdapterDataV1Args;
-}
+};
 
-export interface WriteCollectionExternalPluginAdapterDataV1InstructionDataArgs {
+export type WriteCollectionExternalPluginAdapterDataV1InstructionDataArgs = {
+  /** The target adapter and the bytes to write, or `None` to clear it. */
   writeCollectionExternalPluginAdapterDataV1Args: WriteCollectionExternalPluginAdapterDataV1ArgsArgs;
-}
+};
 
 export function getWriteCollectionExternalPluginAdapterDataV1InstructionDataEncoder(): Encoder<WriteCollectionExternalPluginAdapterDataV1InstructionDataArgs> {
   return transformEncoder(
@@ -137,14 +137,14 @@ export function getWriteCollectionExternalPluginAdapterDataV1InstructionDataCode
   );
 }
 
-export interface WriteCollectionExternalPluginAdapterDataV1Input<
+export type WriteCollectionExternalPluginAdapterDataV1Input<
   TAccountCollection extends string = string,
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountBuffer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountLogWrapper extends string = string,
-> {
+> = {
   /** The address of the asset */
   collection: Address<TAccountCollection>;
   /** The account paying for the storage fees */
@@ -158,8 +158,13 @@ export interface WriteCollectionExternalPluginAdapterDataV1Input<
   /** The SPL Noop Program */
   logWrapper?: Address<TAccountLogWrapper>;
   writeCollectionExternalPluginAdapterDataV1Args: WriteCollectionExternalPluginAdapterDataV1InstructionDataArgs["writeCollectionExternalPluginAdapterDataV1Args"];
-}
+};
 
+/**
+ * Writes (or clears) the raw bytes backing an `AppData`,
+ * `LinkedAppData` or `DataSection` external plugin adapter on a
+ * collection.
+ */
 export function getWriteCollectionExternalPluginAdapterDataV1Instruction<
   TAccountCollection extends string,
   TAccountPayer extends string,
@@ -239,10 +244,10 @@ export function getWriteCollectionExternalPluginAdapterDataV1Instruction<
   >);
 }
 
-export interface ParsedWriteCollectionExternalPluginAdapterDataV1Instruction<
+export type ParsedWriteCollectionExternalPluginAdapterDataV1Instruction<
   TProgram extends string = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The address of the asset */
@@ -259,7 +264,7 @@ export interface ParsedWriteCollectionExternalPluginAdapterDataV1Instruction<
     logWrapper?: TAccountMetas[5] | undefined;
   };
   data: WriteCollectionExternalPluginAdapterDataV1InstructionData;
-}
+};
 
 export function parseWriteCollectionExternalPluginAdapterDataV1Instruction<
   TProgram extends string,
