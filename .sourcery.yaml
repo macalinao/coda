@@ -13,7 +13,11 @@ github:
   request_review: author
   sourcery_branch: sourcery/{base_branch}
 
+# Sourcery does not support recursive `**` globs; use directory paths and
+# single-level wildcards, and enumerate nested dist dirs explicitly.
 ignore:
-  - clients/*/src/generated/**
-  - vendor/**
-  - "**/dist/**"
+  - clients/*/src/generated/
+  - vendor/
+  - packages/*/dist/
+  - clients/*/dist/
+  - apps/*/dist/
