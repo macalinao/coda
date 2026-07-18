@@ -18,7 +18,7 @@ The monorepo contains:
 - **Build System**: Turbo for monorepo orchestration
 - **Language**: TypeScript with ES modules
 - **Code Generation**: Codama for AST transformations
-- **Code Quality**: oxlint for linting (type-aware + type-checking via oxlint-tsgolint), oxfmt for formatting, Prettier for Markdown/JSON
+- **Code Quality**: oxlint for linting (type-aware + type-checking via oxlint-tsgolint), oxfmt for formatting
 - **Testing**: Bun test runner
 
 ## Essential Commands
@@ -38,7 +38,7 @@ coda init                  # Initialize coda.config.ts
 # Code Quality
 bun run lint                 # Run oxlint (lint + type-check) and check formatting
 bun run lint:fix            # Apply oxlint autofixes and format with oxfmt
-bun run format              # Format with oxfmt (code) + prettier (md/mdx)
+bun run format              # Format with oxfmt
 
 # Testing
 bun run test                # Run all tests
@@ -225,8 +225,8 @@ code (`clients/*/src/generated/**`), CLI console output, and tests.
 - Type-only imports must use `import type` (separated)
 - No `console` outside the CLI packages and build scripts
 
-Formatting is handled by oxfmt (code) and Prettier (Markdown/JSON);
-oxfmt is scoped to code via `.oxfmtrc.json` ignorePatterns.
+Formatting is handled by oxfmt; it is scoped to code via
+`.oxfmtrc.json` ignorePatterns.
 
 ## Turborepo Configuration
 
