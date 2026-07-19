@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,15 +14,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const WITHDRAW_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -52,16 +52,16 @@ export function getWithdrawDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TAccountVault extends string | AccountMeta = string,
-  TAccountDestination extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TAccountVault extends string | AccountMeta<string> = string,
+  TAccountDestination extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,16 +95,16 @@ export type WithdrawInstruction<
     ]
   >;
 
-export interface WithdrawInstructionData {
+export type WithdrawInstructionData = {
   discriminator: ReadonlyUint8Array;
   depositEntryIndex: number;
   amount: bigint;
-}
+};
 
-export interface WithdrawInstructionDataArgs {
+export type WithdrawInstructionDataArgs = {
   depositEntryIndex: number;
   amount: number | bigint;
-}
+};
 
 export function getWithdrawInstructionDataEncoder(): FixedSizeEncoder<WithdrawInstructionDataArgs> {
   return transformEncoder(
@@ -135,7 +135,7 @@ export function getWithdrawInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawInput<
+export type WithdrawInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
@@ -144,7 +144,7 @@ export interface WithdrawInput<
   TAccountVault extends string = string,
   TAccountDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   voterAuthority: TransactionSigner<TAccountVoterAuthority>;
@@ -155,7 +155,7 @@ export interface WithdrawInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   depositEntryIndex: WithdrawInstructionDataArgs["depositEntryIndex"];
   amount: WithdrawInstructionDataArgs["amount"];
-}
+};
 
 export function getWithdrawInstruction<
   TAccountRegistrar extends string,
@@ -254,10 +254,10 @@ export function getWithdrawInstruction<
   >);
 }
 
-export interface ParsedWithdrawInstruction<
+export type ParsedWithdrawInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -270,7 +270,7 @@ export interface ParsedWithdrawInstruction<
     tokenProgram: TAccountMetas[7];
   };
   data: WithdrawInstructionData;
-}
+};
 
 export function parseWithdrawInstruction<
   TProgram extends string,

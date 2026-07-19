@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const MARK_OBLIGATION_FOR_DELEVERAGING_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,10 +51,10 @@ export function getMarkObligationForDeleveragingDiscriminatorBytes(): ReadonlyUi
 
 export type MarkObligationForDeleveragingInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountRiskCouncil extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRiskCouncil extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -73,14 +73,14 @@ export type MarkObligationForDeleveragingInstruction<
     ]
   >;
 
-export interface MarkObligationForDeleveragingInstructionData {
+export type MarkObligationForDeleveragingInstructionData = {
   discriminator: ReadonlyUint8Array;
   autodeleverageTargetLtvPct: number;
-}
+};
 
-export interface MarkObligationForDeleveragingInstructionDataArgs {
+export type MarkObligationForDeleveragingInstructionDataArgs = {
   autodeleverageTargetLtvPct: number;
-}
+};
 
 export function getMarkObligationForDeleveragingInstructionDataEncoder(): FixedSizeEncoder<MarkObligationForDeleveragingInstructionDataArgs> {
   return transformEncoder(
@@ -112,16 +112,16 @@ export function getMarkObligationForDeleveragingInstructionDataCodec(): FixedSiz
   );
 }
 
-export interface MarkObligationForDeleveragingInput<
+export type MarkObligationForDeleveragingInput<
   TAccountRiskCouncil extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
-> {
+> = {
   riskCouncil: TransactionSigner<TAccountRiskCouncil>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
   autodeleverageTargetLtvPct: MarkObligationForDeleveragingInstructionDataArgs["autodeleverageTargetLtvPct"];
-}
+};
 
 export function getMarkObligationForDeleveragingInstruction<
   TAccountRiskCouncil extends string,
@@ -178,10 +178,10 @@ export function getMarkObligationForDeleveragingInstruction<
   >);
 }
 
-export interface ParsedMarkObligationForDeleveragingInstruction<
+export type ParsedMarkObligationForDeleveragingInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     riskCouncil: TAccountMetas[0];
@@ -189,7 +189,7 @@ export interface ParsedMarkObligationForDeleveragingInstruction<
     lendingMarket: TAccountMetas[2];
   };
   data: MarkObligationForDeleveragingInstructionData;
-}
+};
 
 export function parseMarkObligationForDeleveragingInstruction<
   TProgram extends string,

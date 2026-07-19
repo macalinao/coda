@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { RequiredSignatorySeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -34,12 +20,26 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRequiredSignatoryPda } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
+  findRequiredSignatoryPda,
+  type RequiredSignatorySeeds,
+} from "../pdas/index.js";
+import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
+  GovernanceAccountType,
 } from "../types/index.js";
 
 export const REQUIRED_SIGNATORY_ACCOUNT_TYPE: GovernanceAccountType =
@@ -51,18 +51,18 @@ export function getRequiredSignatoryAccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface RequiredSignatory {
+export type RequiredSignatory = {
   accountType: GovernanceAccountType;
   accountVersion: number;
   governance: Address;
   signatory: Address;
-}
+};
 
-export interface RequiredSignatoryArgs {
+export type RequiredSignatoryArgs = {
   accountVersion: number;
   governance: Address;
   signatory: Address;
-}
+};
 
 /** Gets the encoder for {@link RequiredSignatoryArgs} account data. */
 export function getRequiredSignatoryEncoder(): FixedSizeEncoder<RequiredSignatoryArgs> {
@@ -138,7 +138,7 @@ export async function fetchMaybeRequiredSignatory<
 
 export async function fetchAllRequiredSignatory(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<RequiredSignatory>[]> {
   const maybeAccounts = await fetchAllMaybeRequiredSignatory(
@@ -152,7 +152,7 @@ export async function fetchAllRequiredSignatory(
 
 export async function fetchAllMaybeRequiredSignatory(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<RequiredSignatory>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

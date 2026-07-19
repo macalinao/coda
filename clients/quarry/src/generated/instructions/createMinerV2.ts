@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +17,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMinerPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -104,9 +102,9 @@ export type CreateMinerV2Instruction<
     ]
   >;
 
-export interface CreateMinerV2InstructionData {
+export type CreateMinerV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type CreateMinerV2InstructionDataArgs = {};
 
@@ -133,7 +131,7 @@ export function getCreateMinerV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateMinerV2AsyncInput<
+export type CreateMinerV2AsyncInput<
   TAccountAuthority extends string = string,
   TAccountMiner extends string = string,
   TAccountQuarry extends string = string,
@@ -143,7 +141,7 @@ export interface CreateMinerV2AsyncInput<
   TAccountTokenMint extends string = string,
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   miner?: Address<TAccountMiner>;
   quarry: Address<TAccountQuarry>;
@@ -153,7 +151,7 @@ export interface CreateMinerV2AsyncInput<
   tokenMint: Address<TAccountTokenMint>;
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export async function getCreateMinerV2InstructionAsync<
   TAccountAuthority extends string,
@@ -264,7 +262,7 @@ export async function getCreateMinerV2InstructionAsync<
   >);
 }
 
-export interface CreateMinerV2Input<
+export type CreateMinerV2Input<
   TAccountAuthority extends string = string,
   TAccountMiner extends string = string,
   TAccountQuarry extends string = string,
@@ -274,7 +272,7 @@ export interface CreateMinerV2Input<
   TAccountTokenMint extends string = string,
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   miner: Address<TAccountMiner>;
   quarry: Address<TAccountQuarry>;
@@ -284,7 +282,7 @@ export interface CreateMinerV2Input<
   tokenMint: Address<TAccountTokenMint>;
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getCreateMinerV2Instruction<
   TAccountAuthority extends string,
@@ -381,10 +379,10 @@ export function getCreateMinerV2Instruction<
   >);
 }
 
-export interface ParsedCreateMinerV2Instruction<
+export type ParsedCreateMinerV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     authority: TAccountMetas[0];
@@ -398,7 +396,7 @@ export interface ParsedCreateMinerV2Instruction<
     tokenProgram: TAccountMetas[8];
   };
   data: CreateMinerV2InstructionData;
-}
+};
 
 export function parseCreateMinerV2Instruction<
   TProgram extends string,

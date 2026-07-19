@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  OpenPositionWithMetadataBumps,
-  OpenPositionWithMetadataBumpsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -40,12 +19,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getOpenPositionWithMetadataBumpsDecoder,
   getOpenPositionWithMetadataBumpsEncoder,
+  type OpenPositionWithMetadataBumps,
+  type OpenPositionWithMetadataBumpsArgs,
 } from "../types/index.js";
 
 export const OPEN_POSITION_WITH_METADATA_DISCRIMINATOR: ReadonlyUint8Array =
@@ -59,25 +57,25 @@ export function getOpenPositionWithMetadataDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type OpenPositionWithMetadataInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPositionMint extends string | AccountMeta = string,
-  TAccountPositionMetadataAccount extends string | AccountMeta = string,
-  TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPositionMint extends string | AccountMeta<string> = string,
+  TAccountPositionMetadataAccount extends string | AccountMeta<string> = string,
+  TAccountPositionTokenAccount extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends string | AccountMeta =
+  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountMetadataProgram extends string | AccountMeta =
+  TAccountMetadataProgram extends string | AccountMeta<string> =
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TAccountMetadataUpdateAuth extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountMetadataUpdateAuth extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -127,18 +125,18 @@ export type OpenPositionWithMetadataInstruction<
     ]
   >;
 
-export interface OpenPositionWithMetadataInstructionData {
+export type OpenPositionWithMetadataInstructionData = {
   discriminator: ReadonlyUint8Array;
   bumps: OpenPositionWithMetadataBumps;
   tickLowerIndex: number;
   tickUpperIndex: number;
-}
+};
 
-export interface OpenPositionWithMetadataInstructionDataArgs {
+export type OpenPositionWithMetadataInstructionDataArgs = {
   bumps: OpenPositionWithMetadataBumpsArgs;
   tickLowerIndex: number;
   tickUpperIndex: number;
-}
+};
 
 export function getOpenPositionWithMetadataInstructionDataEncoder(): FixedSizeEncoder<OpenPositionWithMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -174,7 +172,7 @@ export function getOpenPositionWithMetadataInstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface OpenPositionWithMetadataInput<
+export type OpenPositionWithMetadataInput<
   TAccountFunder extends string = string,
   TAccountOwner extends string = string,
   TAccountPosition extends string = string,
@@ -188,7 +186,7 @@ export interface OpenPositionWithMetadataInput<
   TAccountAssociatedTokenProgram extends string = string,
   TAccountMetadataProgram extends string = string,
   TAccountMetadataUpdateAuth extends string = string,
-> {
+> = {
   funder: TransactionSigner<TAccountFunder>;
   owner: Address<TAccountOwner>;
   position: Address<TAccountPosition>;
@@ -205,7 +203,7 @@ export interface OpenPositionWithMetadataInput<
   bumps: OpenPositionWithMetadataInstructionDataArgs["bumps"];
   tickLowerIndex: OpenPositionWithMetadataInstructionDataArgs["tickLowerIndex"];
   tickUpperIndex: OpenPositionWithMetadataInstructionDataArgs["tickUpperIndex"];
-}
+};
 
 export function getOpenPositionWithMetadataInstruction<
   TAccountFunder extends string,
@@ -361,10 +359,10 @@ export function getOpenPositionWithMetadataInstruction<
   >);
 }
 
-export interface ParsedOpenPositionWithMetadataInstruction<
+export type ParsedOpenPositionWithMetadataInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     funder: TAccountMetas[0];
@@ -382,7 +380,7 @@ export interface ParsedOpenPositionWithMetadataInstruction<
     metadataUpdateAuth: TAccountMetas[12];
   };
   data: OpenPositionWithMetadataInstructionData;
-}
+};
 
 export function parseOpenPositionWithMetadataInstruction<
   TProgram extends string,

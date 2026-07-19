@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  OpenPositionBumps,
-  OpenPositionBumpsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -40,12 +19,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getOpenPositionBumpsDecoder,
   getOpenPositionBumpsEncoder,
+  type OpenPositionBumps,
+  type OpenPositionBumpsArgs,
 } from "../types/index.js";
 
 export const OPEN_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -60,21 +58,21 @@ export function getOpenPositionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type OpenPositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPositionMint extends string | AccountMeta = string,
-  TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPositionMint extends string | AccountMeta<string> = string,
+  TAccountPositionTokenAccount extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends string | AccountMeta =
+  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -115,18 +113,18 @@ export type OpenPositionInstruction<
     ]
   >;
 
-export interface OpenPositionInstructionData {
+export type OpenPositionInstructionData = {
   discriminator: ReadonlyUint8Array;
   bumps: OpenPositionBumps;
   tickLowerIndex: number;
   tickUpperIndex: number;
-}
+};
 
-export interface OpenPositionInstructionDataArgs {
+export type OpenPositionInstructionDataArgs = {
   bumps: OpenPositionBumpsArgs;
   tickLowerIndex: number;
   tickUpperIndex: number;
-}
+};
 
 export function getOpenPositionInstructionDataEncoder(): FixedSizeEncoder<OpenPositionInstructionDataArgs> {
   return transformEncoder(
@@ -159,7 +157,7 @@ export function getOpenPositionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface OpenPositionInput<
+export type OpenPositionInput<
   TAccountFunder extends string = string,
   TAccountOwner extends string = string,
   TAccountPosition extends string = string,
@@ -170,7 +168,7 @@ export interface OpenPositionInput<
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
-> {
+> = {
   funder: TransactionSigner<TAccountFunder>;
   owner: Address<TAccountOwner>;
   position: Address<TAccountPosition>;
@@ -184,7 +182,7 @@ export interface OpenPositionInput<
   bumps: OpenPositionInstructionDataArgs["bumps"];
   tickLowerIndex: OpenPositionInstructionDataArgs["tickLowerIndex"];
   tickUpperIndex: OpenPositionInstructionDataArgs["tickUpperIndex"];
-}
+};
 
 export function getOpenPositionInstruction<
   TAccountFunder extends string,
@@ -306,10 +304,10 @@ export function getOpenPositionInstruction<
   >);
 }
 
-export interface ParsedOpenPositionInstruction<
+export type ParsedOpenPositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     funder: TAccountMetas[0];
@@ -324,7 +322,7 @@ export interface ParsedOpenPositionInstruction<
     associatedTokenProgram: TAccountMetas[9];
   };
   data: OpenPositionInstructionData;
-}
+};
 
 export function parseOpenPositionInstruction<
   TProgram extends string,

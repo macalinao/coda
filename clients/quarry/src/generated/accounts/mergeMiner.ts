@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { MergeMinerSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,13 +21,24 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMergeMinerPda } from "../pdas/index.js";
+import { findMergeMinerPda, type MergeMinerSeeds } from "../pdas/index.js";
 
 export const MERGE_MINER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 97, 253, 80, 19, 210, 148, 120,
@@ -51,7 +48,7 @@ export function getMergeMinerDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(MERGE_MINER_DISCRIMINATOR);
 }
 
-export interface MergeMiner {
+export type MergeMiner = {
   discriminator: ReadonlyUint8Array;
   pool: Address;
   owner: Address;
@@ -59,16 +56,16 @@ export interface MergeMiner {
   index: bigint;
   primaryBalance: bigint;
   replicaBalance: bigint;
-}
+};
 
-export interface MergeMinerArgs {
+export type MergeMinerArgs = {
   pool: Address;
   owner: Address;
   bump: number;
   index: number | bigint;
   primaryBalance: number | bigint;
   replicaBalance: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link MergeMinerArgs} account data. */
 export function getMergeMinerEncoder(): FixedSizeEncoder<MergeMinerArgs> {
@@ -143,7 +140,7 @@ export async function fetchMaybeMergeMiner<TAddress extends string = string>(
 
 export async function fetchAllMergeMiner(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MergeMiner>[]> {
   const maybeAccounts = await fetchAllMaybeMergeMiner(rpc, addresses, config);
@@ -153,7 +150,7 @@ export async function fetchAllMergeMiner(
 
 export async function fetchAllMaybeMergeMiner(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MergeMiner>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

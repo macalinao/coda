@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { TokenOwnerRecordSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,17 +21,33 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
+  findTokenOwnerRecordPda,
+  type TokenOwnerRecordSeeds,
+} from "../pdas/index.js";
+import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
+  GovernanceAccountType,
 } from "../types/index.js";
 
 export const TOKEN_OWNER_RECORD_V1_ACCOUNT_TYPE: GovernanceAccountType =
@@ -59,7 +59,7 @@ export function getTokenOwnerRecordV1AccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface TokenOwnerRecordV1 {
+export type TokenOwnerRecordV1 = {
   accountType: GovernanceAccountType;
   realm: Address;
   governingTokenMint: Address;
@@ -68,11 +68,11 @@ export interface TokenOwnerRecordV1 {
   unrelinquishedVotesCount: bigint;
   outstandingProposalCount: number;
   version: number;
-  reserved: number[];
+  reserved: Array<number>;
   governanceDelegate: Option<Address>;
-}
+};
 
-export interface TokenOwnerRecordV1Args {
+export type TokenOwnerRecordV1Args = {
   realm: Address;
   governingTokenMint: Address;
   governingTokenOwner: Address;
@@ -80,9 +80,9 @@ export interface TokenOwnerRecordV1Args {
   unrelinquishedVotesCount: number | bigint;
   outstandingProposalCount: number;
   version: number;
-  reserved: number[];
+  reserved: Array<number>;
   governanceDelegate: OptionOrNullable<Address>;
-}
+};
 
 /** Gets the encoder for {@link TokenOwnerRecordV1Args} account data. */
 export function getTokenOwnerRecordV1Encoder(): Encoder<TokenOwnerRecordV1Args> {
@@ -170,7 +170,7 @@ export async function fetchMaybeTokenOwnerRecordV1<
 
 export async function fetchAllTokenOwnerRecordV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TokenOwnerRecordV1>[]> {
   const maybeAccounts = await fetchAllMaybeTokenOwnerRecordV1(
@@ -184,7 +184,7 @@ export async function fetchAllTokenOwnerRecordV1(
 
 export async function fetchAllMaybeTokenOwnerRecordV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TokenOwnerRecordV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

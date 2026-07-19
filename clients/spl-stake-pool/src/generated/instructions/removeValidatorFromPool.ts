@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,10 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -48,17 +46,17 @@ export function getRemoveValidatorFromPoolDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type RemoveValidatorFromPoolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountStaker extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountValidatorStakeList extends string | AccountMeta = string,
-  TAccountStakeAccount extends string | AccountMeta = string,
-  TAccountTransientStakeAccount extends string | AccountMeta = string,
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountStaker extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountValidatorStakeList extends string | AccountMeta<string> = string,
+  TAccountStakeAccount extends string | AccountMeta<string> = string,
+  TAccountTransientStakeAccount extends string | AccountMeta<string> = string,
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -92,9 +90,7 @@ export type RemoveValidatorFromPoolInstruction<
     ]
   >;
 
-export interface RemoveValidatorFromPoolInstructionData {
-  discriminator: number;
-}
+export type RemoveValidatorFromPoolInstructionData = { discriminator: number };
 
 export type RemoveValidatorFromPoolInstructionDataArgs = {};
 
@@ -122,7 +118,7 @@ export function getRemoveValidatorFromPoolInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface RemoveValidatorFromPoolAsyncInput<
+export type RemoveValidatorFromPoolAsyncInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -131,7 +127,7 @@ export interface RemoveValidatorFromPoolAsyncInput<
   TAccountTransientStakeAccount extends string = string,
   TAccountClockSysvar extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Staker */
@@ -148,8 +144,23 @@ export interface RemoveValidatorFromPoolAsyncInput<
   clockSysvar?: Address<TAccountClockSysvar>;
   /** Stake program id */
   stakeProgram?: Address<TAccountStakeProgram>;
-}
+};
 
+/**
+ * (Staker only) Removes validator from the pool, deactivating its stake
+ * Only succeeds if the validator stake account has the minimum of
+ * `max(crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation())`.   plus the
+ * rent-exempt amount.
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Staker
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator stake list storage account
+ * 4. `[w]` Stake account to remove from the pool
+ * 5. `[w]` Transient stake account, to deactivate if necessary
+ * 6. `[]` Sysvar clock
+ * 7. `[]` Stake program id,
+ */
 export async function getRemoveValidatorFromPoolInstructionAsync<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -259,7 +270,7 @@ export async function getRemoveValidatorFromPoolInstructionAsync<
   >);
 }
 
-export interface RemoveValidatorFromPoolInput<
+export type RemoveValidatorFromPoolInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -268,7 +279,7 @@ export interface RemoveValidatorFromPoolInput<
   TAccountTransientStakeAccount extends string = string,
   TAccountClockSysvar extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Staker */
@@ -285,8 +296,23 @@ export interface RemoveValidatorFromPoolInput<
   clockSysvar?: Address<TAccountClockSysvar>;
   /** Stake program id */
   stakeProgram?: Address<TAccountStakeProgram>;
-}
+};
 
+/**
+ * (Staker only) Removes validator from the pool, deactivating its stake
+ * Only succeeds if the validator stake account has the minimum of
+ * `max(crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation())`.   plus the
+ * rent-exempt amount.
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Staker
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator stake list storage account
+ * 4. `[w]` Stake account to remove from the pool
+ * 5. `[w]` Transient stake account, to deactivate if necessary
+ * 6. `[]` Sysvar clock
+ * 7. `[]` Stake program id,
+ */
 export function getRemoveValidatorFromPoolInstruction<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -386,10 +412,10 @@ export function getRemoveValidatorFromPoolInstruction<
   >);
 }
 
-export interface ParsedRemoveValidatorFromPoolInstruction<
+export type ParsedRemoveValidatorFromPoolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -410,7 +436,7 @@ export interface ParsedRemoveValidatorFromPoolInstruction<
     stakeProgram: TAccountMetas[7];
   };
   data: RemoveValidatorFromPoolInstructionData;
-}
+};
 
 export function parseRemoveValidatorFromPoolInstruction<
   TProgram extends string,

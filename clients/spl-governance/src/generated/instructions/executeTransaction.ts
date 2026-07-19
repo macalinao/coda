@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -29,8 +15,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const EXECUTE_TRANSACTION_DISCRIMINATOR = 16;
@@ -41,10 +41,11 @@ export function getExecuteTransactionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ExecuteTransactionInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountProposalTransactionAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountProposalTransactionAccount extends string | AccountMeta<string> =
+    string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -62,9 +63,7 @@ export type ExecuteTransactionInstruction<
     ]
   >;
 
-export interface ExecuteTransactionInstructionData {
-  discriminator: number;
-}
+export type ExecuteTransactionInstructionData = { discriminator: number };
 
 export type ExecuteTransactionInstructionDataArgs = {};
 
@@ -89,15 +88,15 @@ export function getExecuteTransactionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ExecuteTransactionInput<
+export type ExecuteTransactionInput<
   TAccountGovernanceAccount extends string = string,
   TAccountProposalAccount extends string = string,
   TAccountProposalTransactionAccount extends string = string,
-> {
+> = {
   governanceAccount: Address<TAccountGovernanceAccount>;
   proposalAccount: Address<TAccountProposalAccount>;
   proposalTransactionAccount: Address<TAccountProposalTransactionAccount>;
-}
+};
 
 export function getExecuteTransactionInstruction<
   TAccountGovernanceAccount extends string,
@@ -158,10 +157,10 @@ export function getExecuteTransactionInstruction<
   >);
 }
 
-export interface ParsedExecuteTransactionInstruction<
+export type ParsedExecuteTransactionInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governanceAccount: TAccountMetas[0];
@@ -169,7 +168,7 @@ export interface ParsedExecuteTransactionInstruction<
     proposalTransactionAccount: TAccountMetas[2];
   };
   data: ExecuteTransactionInstructionData;
-}
+};
 
 export function parseExecuteTransactionInstruction<
   TProgram extends string,

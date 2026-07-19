@@ -6,66 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  Registrar,
-  RegistrarArgs,
-  Voter,
-  VoterArgs,
-  VoterWeightRecord,
-  VoterWeightRecordArgs,
-} from "../accounts/index.js";
-import type {
-  ClawbackInput,
-  CloseDepositEntryInput,
-  CloseVoterInput,
-  ConfigureVotingMintInput,
-  CreateDepositEntryInput,
-  CreateRegistrarInput,
-  CreateVoterAsyncInput,
-  DepositInput,
-  GrantInput,
-  InternalTransferLockedInput,
-  InternalTransferUnlockedInput,
-  LogVoterInfoInput,
-  ParsedClawbackInstruction,
-  ParsedCloseDepositEntryInstruction,
-  ParsedCloseVoterInstruction,
-  ParsedConfigureVotingMintInstruction,
-  ParsedCreateDepositEntryInstruction,
-  ParsedCreateRegistrarInstruction,
-  ParsedCreateVoterInstruction,
-  ParsedDepositInstruction,
-  ParsedGrantInstruction,
-  ParsedInternalTransferLockedInstruction,
-  ParsedInternalTransferUnlockedInstruction,
-  ParsedLogVoterInfoInstruction,
-  ParsedResetLockupInstruction,
-  ParsedSetTimeOffsetInstruction,
-  ParsedUpdateMaxVoteWeightInstruction,
-  ParsedUpdateVoterWeightRecordInstruction,
-  ParsedWithdrawInstruction,
-  ResetLockupInput,
-  SetTimeOffsetInput,
-  UpdateMaxVoteWeightInput,
-  UpdateVoterWeightRecordInput,
-  WithdrawInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -76,15 +16,34 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
   getRegistrarCodec,
   getVoterCodec,
   getVoterWeightRecordCodec,
+  type Registrar,
+  type RegistrarArgs,
+  type Voter,
+  type VoterArgs,
+  type VoterWeightRecord,
+  type VoterWeightRecordArgs,
 } from "../accounts/index.js";
 import {
   getClawbackInstruction,
@@ -121,6 +80,40 @@ import {
   parseUpdateMaxVoteWeightInstruction,
   parseUpdateVoterWeightRecordInstruction,
   parseWithdrawInstruction,
+  type ClawbackInput,
+  type CloseDepositEntryInput,
+  type CloseVoterInput,
+  type ConfigureVotingMintInput,
+  type CreateDepositEntryInput,
+  type CreateRegistrarInput,
+  type CreateVoterAsyncInput,
+  type DepositInput,
+  type GrantInput,
+  type InternalTransferLockedInput,
+  type InternalTransferUnlockedInput,
+  type LogVoterInfoInput,
+  type ParsedClawbackInstruction,
+  type ParsedCloseDepositEntryInstruction,
+  type ParsedCloseVoterInstruction,
+  type ParsedConfigureVotingMintInstruction,
+  type ParsedCreateDepositEntryInstruction,
+  type ParsedCreateRegistrarInstruction,
+  type ParsedCreateVoterInstruction,
+  type ParsedDepositInstruction,
+  type ParsedGrantInstruction,
+  type ParsedInternalTransferLockedInstruction,
+  type ParsedInternalTransferUnlockedInstruction,
+  type ParsedLogVoterInfoInstruction,
+  type ParsedResetLockupInstruction,
+  type ParsedSetTimeOffsetInstruction,
+  type ParsedUpdateMaxVoteWeightInstruction,
+  type ParsedUpdateVoterWeightRecordInstruction,
+  type ParsedWithdrawInstruction,
+  type ResetLockupInput,
+  type SetTimeOffsetInput,
+  type UpdateMaxVoteWeightInput,
+  type UpdateVoterWeightRecordInput,
+  type WithdrawInput,
 } from "../instructions/index.js";
 import {
   findRegistrarPda,
@@ -132,9 +125,9 @@ export const VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS =
   "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ" as Address<"vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ">;
 
 export enum VoterStakeRegistryAccount {
-  Registrar = 0,
-  Voter = 1,
-  VoterWeightRecord = 2,
+  Registrar,
+  Voter,
+  VoterWeightRecord,
 }
 
 export function identifyVoterStakeRegistryAccount(
@@ -181,23 +174,23 @@ export function identifyVoterStakeRegistryAccount(
 }
 
 export enum VoterStakeRegistryInstruction {
-  CreateRegistrar = 0,
-  ConfigureVotingMint = 1,
-  CreateVoter = 2,
-  CreateDepositEntry = 3,
-  Deposit = 4,
-  Withdraw = 5,
-  Grant = 6,
-  Clawback = 7,
-  CloseDepositEntry = 8,
-  ResetLockup = 9,
-  InternalTransferLocked = 10,
-  InternalTransferUnlocked = 11,
-  UpdateVoterWeightRecord = 12,
-  UpdateMaxVoteWeight = 13,
-  CloseVoter = 14,
-  LogVoterInfo = 15,
-  SetTimeOffset = 16,
+  CreateRegistrar,
+  ConfigureVotingMint,
+  CreateVoter,
+  CreateDepositEntry,
+  Deposit,
+  Withdraw,
+  Grant,
+  Clawback,
+  CloseDepositEntry,
+  ResetLockup,
+  InternalTransferLocked,
+  InternalTransferUnlocked,
+  UpdateVoterWeightRecord,
+  UpdateMaxVoteWeight,
+  CloseVoter,
+  LogVoterInfo,
+  SetTimeOffset,
 }
 
 export function identifyVoterStakeRegistryInstruction(
@@ -587,22 +580,25 @@ export function parseVoterStakeRegistryInstruction<TProgram extends string>(
   }
 }
 
-export interface VoterStakeRegistryPlugin {
+export type VoterStakeRegistryPlugin = {
   accounts: VoterStakeRegistryPluginAccounts;
   instructions: VoterStakeRegistryPluginInstructions;
   pdas: VoterStakeRegistryPluginPdas;
-}
+  identifyAccount: typeof identifyVoterStakeRegistryAccount;
+  identifyInstruction: typeof identifyVoterStakeRegistryInstruction;
+  parseInstruction: typeof parseVoterStakeRegistryInstruction;
+};
 
-export interface VoterStakeRegistryPluginAccounts {
+export type VoterStakeRegistryPluginAccounts = {
   registrar: ReturnType<typeof getRegistrarCodec> &
     SelfFetchFunctions<RegistrarArgs, Registrar>;
   voter: ReturnType<typeof getVoterCodec> &
     SelfFetchFunctions<VoterArgs, Voter>;
   voterWeightRecord: ReturnType<typeof getVoterWeightRecordCodec> &
     SelfFetchFunctions<VoterWeightRecordArgs, VoterWeightRecord>;
-}
+};
 
-export interface VoterStakeRegistryPluginInstructions {
+export type VoterStakeRegistryPluginInstructions = {
   createRegistrar: (
     input: MakeOptional<CreateRegistrarInput, "payer">,
   ) => ReturnType<typeof getCreateRegistrarInstruction> &
@@ -664,13 +660,13 @@ export interface VoterStakeRegistryPluginInstructions {
     input: SetTimeOffsetInput,
   ) => ReturnType<typeof getSetTimeOffsetInstruction> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface VoterStakeRegistryPluginPdas {
+export type VoterStakeRegistryPluginPdas = {
   registrar: typeof findRegistrarPda;
   voter: typeof findVoterPda;
   voterWeightRecord: typeof findVoterWeightRecordPda;
-}
+};
 
 export type VoterStakeRegistryPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -682,9 +678,7 @@ export type VoterStakeRegistryPluginRequirements = ClientWithRpc<
 export function voterStakeRegistryProgram() {
   return <T extends VoterStakeRegistryPluginRequirements>(
     client: T,
-  ): Omit<T, "voterStakeRegistry"> & {
-    voterStakeRegistry: VoterStakeRegistryPlugin;
-  } => {
+  ): ExtendedClient<T, { voterStakeRegistry: VoterStakeRegistryPlugin }> => {
     return extendClient(client, {
       voterStakeRegistry: <VoterStakeRegistryPlugin>{
         accounts: {
@@ -790,6 +784,9 @@ export function voterStakeRegistryProgram() {
           voter: findVoterPda,
           voterWeightRecord: findVoterWeightRecordPda,
         },
+        identifyAccount: identifyVoterStakeRegistryAccount,
+        identifyInstruction: identifyVoterStakeRegistryInstruction,
+        parseInstruction: parseVoterStakeRegistryInstruction,
       },
     });
   };

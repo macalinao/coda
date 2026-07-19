@@ -6,30 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ProposalTransactionSeeds } from "../pdas/index.js";
-import type {
-  InstructionData,
-  InstructionDataArgs,
-  TransactionExecutionStatus,
-  TransactionExecutionStatusArgs,
-  UnixTimestamp,
-  UnixTimestampArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -45,17 +21,32 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalTransactionPda } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
+  findProposalTransactionPda,
+  type ProposalTransactionSeeds,
+} from "../pdas/index.js";
+import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getInstructionDataDecoder,
@@ -64,6 +55,13 @@ import {
   getTransactionExecutionStatusEncoder,
   getUnixTimestampDecoder,
   getUnixTimestampEncoder,
+  GovernanceAccountType,
+  type InstructionData,
+  type InstructionDataArgs,
+  type TransactionExecutionStatus,
+  type TransactionExecutionStatusArgs,
+  type UnixTimestamp,
+  type UnixTimestampArgs,
 } from "../types/index.js";
 
 export const PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE: GovernanceAccountType =
@@ -75,28 +73,28 @@ export function getProposalTransactionV2AccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ProposalTransactionV2 {
+export type ProposalTransactionV2 = {
   accountType: GovernanceAccountType;
   proposal: Address;
   optionIndex: number;
   transactionIndex: number;
   holdUpTime: number;
-  instructions: InstructionData[];
+  instructions: Array<InstructionData>;
   executedAt: Option<UnixTimestamp>;
   executionStatus: TransactionExecutionStatus;
-  reservedV2: number[];
-}
+  reservedV2: Array<number>;
+};
 
-export interface ProposalTransactionV2Args {
+export type ProposalTransactionV2Args = {
   proposal: Address;
   optionIndex: number;
   transactionIndex: number;
   holdUpTime: number;
-  instructions: InstructionDataArgs[];
+  instructions: Array<InstructionDataArgs>;
   executedAt: OptionOrNullable<UnixTimestampArgs>;
   executionStatus: TransactionExecutionStatusArgs;
-  reservedV2: number[];
-}
+  reservedV2: Array<number>;
+};
 
 /** Gets the encoder for {@link ProposalTransactionV2Args} account data. */
 export function getProposalTransactionV2Encoder(): Encoder<ProposalTransactionV2Args> {
@@ -191,7 +189,7 @@ export async function fetchMaybeProposalTransactionV2<
 
 export async function fetchAllProposalTransactionV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProposalTransactionV2>[]> {
   const maybeAccounts = await fetchAllMaybeProposalTransactionV2(
@@ -205,7 +203,7 @@ export async function fetchAllProposalTransactionV2(
 
 export async function fetchAllMaybeProposalTransactionV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProposalTransactionV2>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

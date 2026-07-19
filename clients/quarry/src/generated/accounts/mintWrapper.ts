@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { MintWrapperSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,13 +21,24 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMintWrapperPda } from "../pdas/index.js";
+import { findMintWrapperPda, type MintWrapperSeeds } from "../pdas/index.js";
 
 export const MINT_WRAPPER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   154, 166, 64, 239, 170, 99, 74, 158,
@@ -53,7 +50,7 @@ export function getMintWrapperDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface MintWrapper {
+export type MintWrapper = {
   discriminator: ReadonlyUint8Array;
   base: Address;
   bump: number;
@@ -64,9 +61,9 @@ export interface MintWrapper {
   numMinters: bigint;
   totalAllowance: bigint;
   totalMinted: bigint;
-}
+};
 
-export interface MintWrapperArgs {
+export type MintWrapperArgs = {
   base: Address;
   bump: number;
   hardCap: number | bigint;
@@ -76,7 +73,7 @@ export interface MintWrapperArgs {
   numMinters: number | bigint;
   totalAllowance: number | bigint;
   totalMinted: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link MintWrapperArgs} account data. */
 export function getMintWrapperEncoder(): FixedSizeEncoder<MintWrapperArgs> {
@@ -157,7 +154,7 @@ export async function fetchMaybeMintWrapper<TAddress extends string = string>(
 
 export async function fetchAllMintWrapper(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MintWrapper>[]> {
   const maybeAccounts = await fetchAllMaybeMintWrapper(rpc, addresses, config);
@@ -167,7 +164,7 @@ export async function fetchAllMintWrapper(
 
 export async function fetchAllMaybeMintWrapper(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MintWrapper>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

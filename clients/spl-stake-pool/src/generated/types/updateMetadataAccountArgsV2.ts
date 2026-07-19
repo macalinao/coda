@@ -6,15 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { DataV2, DataV2Args } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -25,22 +16,33 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getDataV2Decoder, getDataV2Encoder } from "./index.js";
+import {
+  getDataV2Decoder,
+  getDataV2Encoder,
+  type DataV2,
+  type DataV2Args,
+} from "./index.js";
 
-export interface UpdateMetadataAccountArgsV2 {
+export type UpdateMetadataAccountArgsV2 = {
   data: Option<DataV2>;
   updateAuthority: Option<Address>;
   primarySaleHappened: Option<boolean>;
   isMutable: Option<boolean>;
-}
+};
 
-export interface UpdateMetadataAccountArgsV2Args {
+export type UpdateMetadataAccountArgsV2Args = {
   data: OptionOrNullable<DataV2Args>;
   updateAuthority: OptionOrNullable<Address>;
   primarySaleHappened: OptionOrNullable<boolean>;
   isMutable: OptionOrNullable<boolean>;
-}
+};
 
 export function getUpdateMetadataAccountArgsV2Encoder(): Encoder<UpdateMetadataAccountArgsV2Args> {
   return getStructEncoder([

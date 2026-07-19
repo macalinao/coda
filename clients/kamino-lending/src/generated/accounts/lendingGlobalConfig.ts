@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -39,6 +26,17 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import { findLendingGlobalConfigStatePda } from "../pdas/index.js";
 
@@ -51,7 +49,7 @@ export function getLendingGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface LendingGlobalConfig {
+export type LendingGlobalConfig = {
   discriminator: ReadonlyUint8Array;
   /** Global admin of the program */
   globalAdmin: Address;
@@ -60,10 +58,10 @@ export interface LendingGlobalConfig {
   /** Fee collector is the only allowed owner of token accounts receiving protocol fees */
   feeCollector: Address;
   /** Padding to make the struct size 1024 bytes */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
-export interface LendingGlobalConfigArgs {
+export type LendingGlobalConfigArgs = {
   /** Global admin of the program */
   globalAdmin: Address;
   /** Pending admin must sign a specific transaction to become the global admin */
@@ -71,8 +69,8 @@ export interface LendingGlobalConfigArgs {
   /** Fee collector is the only allowed owner of token accounts receiving protocol fees */
   feeCollector: Address;
   /** Padding to make the struct size 1024 bytes */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
 /** Gets the encoder for {@link LendingGlobalConfigArgs} account data. */
 export function getLendingGlobalConfigEncoder(): FixedSizeEncoder<LendingGlobalConfigArgs> {
@@ -159,7 +157,7 @@ export async function fetchMaybeLendingGlobalConfig<
 
 export async function fetchAllLendingGlobalConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LendingGlobalConfig>[]> {
   const maybeAccounts = await fetchAllMaybeLendingGlobalConfig(
@@ -173,7 +171,7 @@ export async function fetchAllLendingGlobalConfig(
 
 export async function fetchAllMaybeLendingGlobalConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LendingGlobalConfig>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

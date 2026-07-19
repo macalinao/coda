@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,8 +17,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UPDATE_FARM_ADMIN_DISCRIMINATOR: ReadonlyUint8Array =
@@ -48,9 +48,9 @@ export function getUpdateFarmAdminDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateFarmAdminInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountPendingFarmAdmin extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountPendingFarmAdmin extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -66,9 +66,9 @@ export type UpdateFarmAdminInstruction<
     ]
   >;
 
-export interface UpdateFarmAdminInstructionData {
+export type UpdateFarmAdminInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type UpdateFarmAdminInstructionDataArgs = {};
 
@@ -95,13 +95,13 @@ export function getUpdateFarmAdminInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UpdateFarmAdminInput<
+export type UpdateFarmAdminInput<
   TAccountPendingFarmAdmin extends string = string,
   TAccountFarmState extends string = string,
-> {
+> = {
   pendingFarmAdmin: TransactionSigner<TAccountPendingFarmAdmin>;
   farmState: Address<TAccountFarmState>;
-}
+};
 
 export function getUpdateFarmAdminInstruction<
   TAccountPendingFarmAdmin extends string,
@@ -146,17 +146,17 @@ export function getUpdateFarmAdminInstruction<
   >);
 }
 
-export interface ParsedUpdateFarmAdminInstruction<
+export type ParsedUpdateFarmAdminInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pendingFarmAdmin: TAccountMetas[0];
     farmState: TAccountMetas[1];
   };
   data: UpdateFarmAdminInstructionData;
-}
+};
 
 export function parseUpdateFarmAdminInstruction<
   TProgram extends string,

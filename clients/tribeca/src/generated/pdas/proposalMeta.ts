@@ -6,16 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface ProposalMetaSeeds {
+export type ProposalMetaSeeds = {
   proposal: Address;
-}
+};
 
 /** Proposal metadata account with additional information */
 export async function findProposalMetaPda(

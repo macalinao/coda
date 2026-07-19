@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findLendingGlobalConfigStatePda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -50,14 +50,14 @@ export function getInitGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitGlobalConfigInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TAccountProgramData extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountProgramData extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -82,9 +82,9 @@ export type InitGlobalConfigInstruction<
     ]
   >;
 
-export interface InitGlobalConfigInstructionData {
+export type InitGlobalConfigInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type InitGlobalConfigInstructionDataArgs = {};
 
@@ -111,19 +111,19 @@ export function getInitGlobalConfigInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitGlobalConfigAsyncInput<
+export type InitGlobalConfigAsyncInput<
   TAccountPayer extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountProgramData extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   payer: TransactionSigner<TAccountPayer>;
   globalConfig?: Address<TAccountGlobalConfig>;
   programData: Address<TAccountProgramData>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getInitGlobalConfigInstructionAsync<
   TAccountPayer extends string,
@@ -202,19 +202,19 @@ export async function getInitGlobalConfigInstructionAsync<
   >);
 }
 
-export interface InitGlobalConfigInput<
+export type InitGlobalConfigInput<
   TAccountPayer extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountProgramData extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   payer: TransactionSigner<TAccountPayer>;
   globalConfig: Address<TAccountGlobalConfig>;
   programData: Address<TAccountProgramData>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getInitGlobalConfigInstruction<
   TAccountPayer extends string,
@@ -288,10 +288,10 @@ export function getInitGlobalConfigInstruction<
   >);
 }
 
-export interface ParsedInitGlobalConfigInstruction<
+export type ParsedInitGlobalConfigInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     payer: TAccountMetas[0];
@@ -301,7 +301,7 @@ export interface ParsedInitGlobalConfigInstruction<
     rent: TAccountMetas[4];
   };
   data: InitGlobalConfigInstructionData;
-}
+};
 
 export function parseInitGlobalConfigInstruction<
   TProgram extends string,

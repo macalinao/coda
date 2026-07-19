@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { AccountMetaData, AccountMetaDataArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -28,23 +20,30 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getAccountMetaDataDecoder,
   getAccountMetaDataEncoder,
+  type AccountMetaData,
+  type AccountMetaDataArgs,
 } from "./index.js";
 
-export interface InstructionData {
+export type InstructionData = {
   programId: Address;
-  accounts: AccountMetaData[];
+  accounts: Array<AccountMetaData>;
   data: ReadonlyUint8Array;
-}
+};
 
-export interface InstructionDataArgs {
+export type InstructionDataArgs = {
   programId: Address;
-  accounts: AccountMetaDataArgs[];
+  accounts: Array<AccountMetaDataArgs>;
   data: ReadonlyUint8Array;
-}
+};
 
 export function getInstructionDataEncoder(): Encoder<InstructionDataArgs> {
   return getStructEncoder([

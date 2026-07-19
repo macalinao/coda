@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DEPOSIT_TO_FARM_VAULT_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,13 +51,13 @@ export function getDepositToFarmVaultDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DepositToFarmVaultInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountDepositor extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountFarmVault extends string | AccountMeta = string,
-  TAccountDepositorAta extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountDepositor extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountFarmVault extends string | AccountMeta<string> = string,
+  TAccountDepositorAta extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -82,14 +82,12 @@ export type DepositToFarmVaultInstruction<
     ]
   >;
 
-export interface DepositToFarmVaultInstructionData {
+export type DepositToFarmVaultInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-}
+};
 
-export interface DepositToFarmVaultInstructionDataArgs {
-  amount: number | bigint;
-}
+export type DepositToFarmVaultInstructionDataArgs = { amount: number | bigint };
 
 export function getDepositToFarmVaultInstructionDataEncoder(): FixedSizeEncoder<DepositToFarmVaultInstructionDataArgs> {
   return transformEncoder(
@@ -121,20 +119,20 @@ export function getDepositToFarmVaultInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface DepositToFarmVaultInput<
+export type DepositToFarmVaultInput<
   TAccountDepositor extends string = string,
   TAccountFarmState extends string = string,
   TAccountFarmVault extends string = string,
   TAccountDepositorAta extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   depositor: TransactionSigner<TAccountDepositor>;
   farmState: Address<TAccountFarmState>;
   farmVault: Address<TAccountFarmVault>;
   depositorAta: Address<TAccountDepositorAta>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: DepositToFarmVaultInstructionDataArgs["amount"];
-}
+};
 
 export function getDepositToFarmVaultInstruction<
   TAccountDepositor extends string,
@@ -208,10 +206,10 @@ export function getDepositToFarmVaultInstruction<
   >);
 }
 
-export interface ParsedDepositToFarmVaultInstruction<
+export type ParsedDepositToFarmVaultInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     depositor: TAccountMetas[0];
@@ -221,7 +219,7 @@ export interface ParsedDepositToFarmVaultInstruction<
     tokenProgram: TAccountMetas[4];
   };
   data: DepositToFarmVaultInstructionData;
-}
+};
 
 export function parseDepositToFarmVaultInstruction<
   TProgram extends string,

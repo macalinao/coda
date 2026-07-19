@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -82,9 +82,7 @@ export type CloseConfigInstruction<
     ]
   >;
 
-export interface CloseConfigInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type CloseConfigInstructionData = { discriminator: ReadonlyUint8Array };
 
 export type CloseConfigInstructionDataArgs = {};
 
@@ -111,19 +109,19 @@ export function getCloseConfigInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseConfigAsyncInput<
+export type CloseConfigAsyncInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountRentReceiver extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   config: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
   rentReceiver: Address<TAccountRentReceiver>;
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export async function getCloseConfigInstructionAsync<
   TAccountConfig extends string,
@@ -197,19 +195,19 @@ export async function getCloseConfigInstructionAsync<
   >);
 }
 
-export interface CloseConfigInput<
+export type CloseConfigInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountRentReceiver extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   config: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
   rentReceiver: Address<TAccountRentReceiver>;
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export function getCloseConfigInstruction<
   TAccountConfig extends string,
@@ -278,10 +276,10 @@ export function getCloseConfigInstruction<
   >);
 }
 
-export interface ParsedCloseConfigInstruction<
+export type ParsedCloseConfigInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     config: TAccountMetas[0];
@@ -291,7 +289,7 @@ export interface ParsedCloseConfigInstruction<
     program: TAccountMetas[4];
   };
   data: CloseConfigInstructionData;
-}
+};
 
 export function parseCloseConfigInstruction<
   TProgram extends string,

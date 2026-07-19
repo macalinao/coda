@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface GovernanceSeeds {
+export type GovernanceSeeds = {
   realm: Address;
   seed: Address;
-}
+};
 
 /** Governance account within a realm */
 export async function findGovernancePda(

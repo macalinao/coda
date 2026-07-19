@@ -6,46 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  Minter,
-  MinterArgs,
-  MintWrapper,
-  MintWrapperArgs,
-} from "../accounts/index.js";
-import type {
-  AcceptAdminInput,
-  MinterUpdateInput,
-  NewMinterAsyncInput,
-  NewMinterV2AsyncInput,
-  NewWrapperAsyncInput,
-  NewWrapperV2AsyncInput,
-  ParsedAcceptAdminInstruction,
-  ParsedMinterUpdateInstruction,
-  ParsedNewMinterInstruction,
-  ParsedNewMinterV2Instruction,
-  ParsedNewWrapperInstruction,
-  ParsedNewWrapperV2Instruction,
-  ParsedPerformMintInstruction,
-  ParsedTransferAdminInstruction,
-  PerformMintInput,
-  TransferAdminInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -56,12 +16,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getMinterCodec, getMintWrapperCodec } from "../accounts/index.js";
+import {
+  getMinterCodec,
+  getMintWrapperCodec,
+  type Minter,
+  type MinterArgs,
+  type MintWrapper,
+  type MintWrapperArgs,
+} from "../accounts/index.js";
 import {
   getAcceptAdminInstruction,
   getMinterUpdateInstruction,
@@ -79,6 +59,22 @@ import {
   parseNewWrapperV2Instruction,
   parsePerformMintInstruction,
   parseTransferAdminInstruction,
+  type AcceptAdminInput,
+  type MinterUpdateInput,
+  type NewMinterAsyncInput,
+  type NewMinterV2AsyncInput,
+  type NewWrapperAsyncInput,
+  type NewWrapperV2AsyncInput,
+  type ParsedAcceptAdminInstruction,
+  type ParsedMinterUpdateInstruction,
+  type ParsedNewMinterInstruction,
+  type ParsedNewMinterV2Instruction,
+  type ParsedNewWrapperInstruction,
+  type ParsedNewWrapperV2Instruction,
+  type ParsedPerformMintInstruction,
+  type ParsedTransferAdminInstruction,
+  type PerformMintInput,
+  type TransferAdminInput,
 } from "../instructions/index.js";
 import { findMinterPda, findMintWrapperPda } from "../pdas/index.js";
 
@@ -86,8 +82,8 @@ export const QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS =
   "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV" as Address<"QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV">;
 
 export enum QuarryMintWrapperAccount {
-  MintWrapper = 0,
-  Minter = 1,
+  MintWrapper,
+  Minter,
 }
 
 export function identifyQuarryMintWrapperAccount(
@@ -123,14 +119,14 @@ export function identifyQuarryMintWrapperAccount(
 }
 
 export enum QuarryMintWrapperInstruction {
-  NewWrapper = 0,
-  NewWrapperV2 = 1,
-  TransferAdmin = 2,
-  AcceptAdmin = 3,
-  NewMinter = 4,
-  NewMinterV2 = 5,
-  MinterUpdate = 6,
-  PerformMint = 7,
+  NewWrapper,
+  NewWrapperV2,
+  TransferAdmin,
+  AcceptAdmin,
+  NewMinter,
+  NewMinterV2,
+  MinterUpdate,
+  PerformMint,
 }
 
 export function identifyQuarryMintWrapperInstruction(
@@ -331,20 +327,23 @@ export function parseQuarryMintWrapperInstruction<TProgram extends string>(
   }
 }
 
-export interface QuarryMintWrapperPlugin {
+export type QuarryMintWrapperPlugin = {
   accounts: QuarryMintWrapperPluginAccounts;
   instructions: QuarryMintWrapperPluginInstructions;
   pdas: QuarryMintWrapperPluginPdas;
-}
+  identifyAccount: typeof identifyQuarryMintWrapperAccount;
+  identifyInstruction: typeof identifyQuarryMintWrapperInstruction;
+  parseInstruction: typeof parseQuarryMintWrapperInstruction;
+};
 
-export interface QuarryMintWrapperPluginAccounts {
+export type QuarryMintWrapperPluginAccounts = {
   mintWrapper: ReturnType<typeof getMintWrapperCodec> &
     SelfFetchFunctions<MintWrapperArgs, MintWrapper>;
   minter: ReturnType<typeof getMinterCodec> &
     SelfFetchFunctions<MinterArgs, Minter>;
-}
+};
 
-export interface QuarryMintWrapperPluginInstructions {
+export type QuarryMintWrapperPluginInstructions = {
   newWrapper: (
     input: MakeOptional<NewWrapperAsyncInput, "payer">,
   ) => ReturnType<typeof getNewWrapperInstructionAsync> &
@@ -374,12 +373,12 @@ export interface QuarryMintWrapperPluginInstructions {
   performMint: (
     input: PerformMintInput,
   ) => ReturnType<typeof getPerformMintInstruction> & SelfPlanAndSendFunctions;
-}
+};
 
-export interface QuarryMintWrapperPluginPdas {
+export type QuarryMintWrapperPluginPdas = {
   mintWrapper: typeof findMintWrapperPda;
   minter: typeof findMinterPda;
-}
+};
 
 export type QuarryMintWrapperPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -391,9 +390,7 @@ export type QuarryMintWrapperPluginRequirements = ClientWithRpc<
 export function quarryMintWrapperProgram() {
   return <T extends QuarryMintWrapperPluginRequirements>(
     client: T,
-  ): Omit<T, "quarryMintWrapper"> & {
-    quarryMintWrapper: QuarryMintWrapperPlugin;
-  } => {
+  ): ExtendedClient<T, { quarryMintWrapper: QuarryMintWrapperPlugin }> => {
     return extendClient(client, {
       quarryMintWrapper: <QuarryMintWrapperPlugin>{
         accounts: {
@@ -455,6 +452,9 @@ export function quarryMintWrapperProgram() {
             ),
         },
         pdas: { mintWrapper: findMintWrapperPda, minter: findMinterPda },
+        identifyAccount: identifyQuarryMintWrapperAccount,
+        identifyInstruction: identifyQuarryMintWrapperInstruction,
+        parseInstruction: parseQuarryMintWrapperInstruction,
       },
     });
   };

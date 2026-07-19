@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REPAY_OBLIGATION_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,18 +51,19 @@ export function getRepayObligationLiquidityDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type RepayObligationLiquidityInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountRepayReserve extends string | AccountMeta = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveDestinationLiquidity extends string | AccountMeta = string,
-  TAccountUserSourceLiquidity extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountRepayReserve extends string | AccountMeta<string> = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
+  TAccountReserveDestinationLiquidity extends string | AccountMeta<string> =
+    string,
+  TAccountUserSourceLiquidity extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends string | AccountMeta =
+  TAccountInstructionSysvarAccount extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -99,14 +100,14 @@ export type RepayObligationLiquidityInstruction<
     ]
   >;
 
-export interface RepayObligationLiquidityInstructionData {
+export type RepayObligationLiquidityInstructionData = {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
-}
+};
 
-export interface RepayObligationLiquidityInstructionDataArgs {
+export type RepayObligationLiquidityInstructionDataArgs = {
   liquidityAmount: number | bigint;
-}
+};
 
 export function getRepayObligationLiquidityInstructionDataEncoder(): FixedSizeEncoder<RepayObligationLiquidityInstructionDataArgs> {
   return transformEncoder(
@@ -138,7 +139,7 @@ export function getRepayObligationLiquidityInstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface RepayObligationLiquidityInput<
+export type RepayObligationLiquidityInput<
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
@@ -148,7 +149,7 @@ export interface RepayObligationLiquidityInput<
   TAccountUserSourceLiquidity extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountInstructionSysvarAccount extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -159,7 +160,7 @@ export interface RepayObligationLiquidityInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   liquidityAmount: RepayObligationLiquidityInstructionDataArgs["liquidityAmount"];
-}
+};
 
 export function getRepayObligationLiquidityInstruction<
   TAccountOwner extends string,
@@ -280,10 +281,10 @@ export function getRepayObligationLiquidityInstruction<
   >);
 }
 
-export interface ParsedRepayObligationLiquidityInstruction<
+export type ParsedRepayObligationLiquidityInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -297,7 +298,7 @@ export interface ParsedRepayObligationLiquidityInstruction<
     instructionSysvarAccount: TAccountMetas[8];
   };
   data: RepayObligationLiquidityInstructionData;
-}
+};
 
 export function parseRepayObligationLiquidityInstruction<
   TProgram extends string,

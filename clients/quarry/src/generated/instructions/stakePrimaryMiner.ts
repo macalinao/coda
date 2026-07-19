@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMergeMinerPda, findMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -103,9 +101,9 @@ export type StakePrimaryMinerInstruction<
     ]
   >;
 
-export interface StakePrimaryMinerInstructionData {
+export type StakePrimaryMinerInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type StakePrimaryMinerInstructionDataArgs = {};
 
@@ -132,7 +130,7 @@ export function getStakePrimaryMinerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface StakePrimaryMinerAsyncInput<
+export type StakePrimaryMinerAsyncInput<
   TAccountMmOwner extends string = string,
   TAccountMmPrimaryTokenAccount extends string = string,
   TAccountPool extends string = string,
@@ -143,7 +141,7 @@ export interface StakePrimaryMinerAsyncInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mmOwner: TransactionSigner<TAccountMmOwner>;
   mmPrimaryTokenAccount: Address<TAccountMmPrimaryTokenAccount>;
   pool: Address<TAccountPool>;
@@ -154,7 +152,7 @@ export interface StakePrimaryMinerAsyncInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export async function getStakePrimaryMinerInstructionAsync<
   TAccountMmOwner extends string,
@@ -287,7 +285,7 @@ export async function getStakePrimaryMinerInstructionAsync<
   >);
 }
 
-export interface StakePrimaryMinerInput<
+export type StakePrimaryMinerInput<
   TAccountMmOwner extends string = string,
   TAccountMmPrimaryTokenAccount extends string = string,
   TAccountPool extends string = string,
@@ -298,7 +296,7 @@ export interface StakePrimaryMinerInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mmOwner: TransactionSigner<TAccountMmOwner>;
   mmPrimaryTokenAccount: Address<TAccountMmPrimaryTokenAccount>;
   pool: Address<TAccountPool>;
@@ -309,7 +307,7 @@ export interface StakePrimaryMinerInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export function getStakePrimaryMinerInstruction<
   TAccountMmOwner extends string,
@@ -416,10 +414,10 @@ export function getStakePrimaryMinerInstruction<
   >);
 }
 
-export interface ParsedStakePrimaryMinerInstruction<
+export type ParsedStakePrimaryMinerInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mmOwner: TAccountMetas[0];
@@ -434,7 +432,7 @@ export interface ParsedStakePrimaryMinerInstruction<
     mineProgram: TAccountMetas[9];
   };
   data: StakePrimaryMinerInstructionData;
-}
+};
 
 export function parseStakePrimaryMinerInstruction<
   TProgram extends string,

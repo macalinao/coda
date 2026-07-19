@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const TRANSFER_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -68,14 +68,12 @@ export type TransferAuthorityInstruction<
     ]
   >;
 
-export interface TransferAuthorityInstructionData {
+export type TransferAuthorityInstructionData = {
   discriminator: ReadonlyUint8Array;
   newAuthority: Address;
-}
+};
 
-export interface TransferAuthorityInstructionDataArgs {
-  newAuthority: Address;
-}
+export type TransferAuthorityInstructionDataArgs = { newAuthority: Address };
 
 export function getTransferAuthorityInstructionDataEncoder(): FixedSizeEncoder<TransferAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -104,14 +102,14 @@ export function getTransferAuthorityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface TransferAuthorityInput<
+export type TransferAuthorityInput<
   TAccountAuthority extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   rewarder: Address<TAccountRewarder>;
   newAuthority: TransferAuthorityInstructionDataArgs["newAuthority"];
-}
+};
 
 export function getTransferAuthorityInstruction<
   TAccountAuthority extends string,
@@ -158,17 +156,17 @@ export function getTransferAuthorityInstruction<
   >);
 }
 
-export interface ParsedTransferAuthorityInstruction<
+export type ParsedTransferAuthorityInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     authority: TAccountMetas[0];
     rewarder: TAccountMetas[1];
   };
   data: TransferAuthorityInstructionData;
-}
+};
 
 export function parseTransferAuthorityInstruction<
   TProgram extends string,

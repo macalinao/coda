@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ProposalDepositSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,12 +22,26 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalDepositPda } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
+  findProposalDepositPda,
+  type ProposalDepositSeeds,
+} from "../pdas/index.js";
+import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
+  GovernanceAccountType,
 } from "../types/index.js";
 
 export const PROPOSAL_DEPOSIT_ACCOUNT_TYPE: GovernanceAccountType =
@@ -53,18 +53,18 @@ export function getProposalDepositAccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ProposalDeposit {
+export type ProposalDeposit = {
   accountType: GovernanceAccountType;
   proposal: Address;
   depositPayer: Address;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
-export interface ProposalDepositArgs {
+export type ProposalDepositArgs = {
   proposal: Address;
   depositPayer: Address;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
 /** Gets the encoder for {@link ProposalDepositArgs} account data. */
 export function getProposalDepositEncoder(): FixedSizeEncoder<ProposalDepositArgs> {
@@ -137,7 +137,7 @@ export async function fetchMaybeProposalDeposit<
 
 export async function fetchAllProposalDeposit(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProposalDeposit>[]> {
   const maybeAccounts = await fetchAllMaybeProposalDeposit(
@@ -151,7 +151,7 @@ export async function fetchAllProposalDeposit(
 
 export async function fetchAllMaybeProposalDeposit(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProposalDeposit>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

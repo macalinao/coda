@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type { Fee, FeeArgs } from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -24,8 +16,18 @@ import {
   getTupleEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
-import { getFeeDecoder, getFeeEncoder } from "./index.js";
+import {
+  getFeeDecoder,
+  getFeeEncoder,
+  type Fee,
+  type FeeArgs,
+} from "./index.js";
 
 /** The type of fees that can be set on the stake pool */
 export type FeeType =

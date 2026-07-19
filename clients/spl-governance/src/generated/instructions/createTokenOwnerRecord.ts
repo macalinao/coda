@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,10 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -48,14 +46,15 @@ export function getCreateTokenOwnerRecordDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type CreateTokenOwnerRecordInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountGoverningTokenOwnerAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGoverningTokenMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenOwnerAccount extends string | AccountMeta<string> =
+    string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,9 +82,7 @@ export type CreateTokenOwnerRecordInstruction<
     ]
   >;
 
-export interface CreateTokenOwnerRecordInstructionData {
-  discriminator: number;
-}
+export type CreateTokenOwnerRecordInstructionData = { discriminator: number };
 
 export type CreateTokenOwnerRecordInstructionDataArgs = {};
 
@@ -113,14 +110,14 @@ export function getCreateTokenOwnerRecordInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateTokenOwnerRecordAsyncInput<
+export type CreateTokenOwnerRecordAsyncInput<
   TAccountRealmAccount extends string = string,
   TAccountGoverningTokenOwnerAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
   TAccountGoverningTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   governingTokenOwnerAccount: Address<TAccountGoverningTokenOwnerAccount>;
   /** seeds=['governance', realm, governing_token_mint, governing_token_owner] */
@@ -128,7 +125,7 @@ export interface CreateTokenOwnerRecordAsyncInput<
   governingTokenMint: Address<TAccountGoverningTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export async function getCreateTokenOwnerRecordInstructionAsync<
   TAccountRealmAccount extends string,
@@ -234,14 +231,14 @@ export async function getCreateTokenOwnerRecordInstructionAsync<
   >);
 }
 
-export interface CreateTokenOwnerRecordInput<
+export type CreateTokenOwnerRecordInput<
   TAccountRealmAccount extends string = string,
   TAccountGoverningTokenOwnerAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
   TAccountGoverningTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   governingTokenOwnerAccount: Address<TAccountGoverningTokenOwnerAccount>;
   /** seeds=['governance', realm, governing_token_mint, governing_token_owner] */
@@ -249,7 +246,7 @@ export interface CreateTokenOwnerRecordInput<
   governingTokenMint: Address<TAccountGoverningTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getCreateTokenOwnerRecordInstruction<
   TAccountRealmAccount extends string,
@@ -337,10 +334,10 @@ export function getCreateTokenOwnerRecordInstruction<
   >);
 }
 
-export interface ParsedCreateTokenOwnerRecordInstruction<
+export type ParsedCreateTokenOwnerRecordInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -352,7 +349,7 @@ export interface ParsedCreateTokenOwnerRecordInstruction<
     systemProgram: TAccountMetas[5];
   };
   data: CreateTokenOwnerRecordInstructionData;
-}
+};
 
 export function parseCreateTokenOwnerRecordInstruction<
   TProgram extends string,

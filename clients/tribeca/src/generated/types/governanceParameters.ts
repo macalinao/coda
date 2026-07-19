@@ -6,11 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getI64Decoder,
@@ -19,21 +14,24 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface GovernanceParameters {
+export type GovernanceParameters = {
   votingDelay: bigint;
   votingPeriod: bigint;
   quorumVotes: bigint;
   timelockDelaySeconds: bigint;
-}
+};
 
-export interface GovernanceParametersArgs {
+export type GovernanceParametersArgs = {
   votingDelay: number | bigint;
   votingPeriod: number | bigint;
   quorumVotes: number | bigint;
   timelockDelaySeconds: number | bigint;
-}
+};
 
 export function getGovernanceParametersEncoder(): FixedSizeEncoder<GovernanceParametersArgs> {
   return getStructEncoder([

@@ -6,15 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  MintMaxVoterWeightSource,
-  MintMaxVoterWeightSourceArgs,
-} from "./index.js";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -23,23 +14,28 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getMintMaxVoterWeightSourceDecoder,
   getMintMaxVoterWeightSourceEncoder,
+  type MintMaxVoterWeightSource,
+  type MintMaxVoterWeightSourceArgs,
 } from "./index.js";
 
-export interface RealmConfigParamsV1 {
+export type RealmConfigParamsV1 = {
   useCouncilMint: boolean;
   minCommunityWeightToCreateGovernance: bigint;
   communityMintMaxVoterWeightSource: MintMaxVoterWeightSource;
-}
+};
 
-export interface RealmConfigParamsV1Args {
+export type RealmConfigParamsV1Args = {
   useCouncilMint: boolean;
   minCommunityWeightToCreateGovernance: number | bigint;
   communityMintMaxVoterWeightSource: MintMaxVoterWeightSourceArgs;
-}
+};
 
 export function getRealmConfigParamsV1Encoder(): FixedSizeEncoder<RealmConfigParamsV1Args> {
   return getStructEncoder([

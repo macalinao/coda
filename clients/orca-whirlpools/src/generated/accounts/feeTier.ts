@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,6 +24,17 @@ import {
   getU16Decoder,
   getU16Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const FEE_TIER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -47,18 +45,18 @@ export function getFeeTierDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(FEE_TIER_DISCRIMINATOR);
 }
 
-export interface FeeTier {
+export type FeeTier = {
   discriminator: ReadonlyUint8Array;
   whirlpoolsConfig: Address;
   tickSpacing: number;
   defaultFeeRate: number;
-}
+};
 
-export interface FeeTierArgs {
+export type FeeTierArgs = {
   whirlpoolsConfig: Address;
   tickSpacing: number;
   defaultFeeRate: number;
-}
+};
 
 /** Gets the encoder for {@link FeeTierArgs} account data. */
 export function getFeeTierEncoder(): FixedSizeEncoder<FeeTierArgs> {
@@ -124,7 +122,7 @@ export async function fetchMaybeFeeTier<TAddress extends string = string>(
 
 export async function fetchAllFeeTier(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FeeTier>[]> {
   const maybeAccounts = await fetchAllMaybeFeeTier(rpc, addresses, config);
@@ -134,7 +132,7 @@ export async function fetchAllFeeTier(
 
 export async function fetchAllMaybeFeeTier(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FeeTier>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

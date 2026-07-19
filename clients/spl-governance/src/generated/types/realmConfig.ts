@@ -6,18 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  MintMaxVoterWeightSource,
-  MintMaxVoterWeightSourceArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -28,33 +16,41 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getMintMaxVoterWeightSourceDecoder,
   getMintMaxVoterWeightSourceEncoder,
+  type MintMaxVoterWeightSource,
+  type MintMaxVoterWeightSourceArgs,
 } from "./index.js";
 
-export interface RealmConfig {
+export type RealmConfig = {
   legacy1: number;
   legacy2: number;
-  reserved: number[];
+  reserved: Array<number>;
   minCommunityWeightToCreateGovernance: bigint;
   communityMintMaxVoterWeightSource: MintMaxVoterWeightSource;
   councilMint: Option<Address>;
-}
+};
 
-export interface RealmConfigArgs {
+export type RealmConfigArgs = {
   legacy1: number;
   legacy2: number;
-  reserved: number[];
+  reserved: Array<number>;
   minCommunityWeightToCreateGovernance: number | bigint;
   communityMintMaxVoterWeightSource: MintMaxVoterWeightSourceArgs;
   councilMint: OptionOrNullable<Address>;
-}
+};
 
 export function getRealmConfigEncoder(): Encoder<RealmConfigArgs> {
   return getStructEncoder([

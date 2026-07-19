@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_TIME_OFFSET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -51,9 +51,9 @@ export function getSetTimeOffsetDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetTimeOffsetInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountRealmAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountRealmAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -69,14 +69,12 @@ export type SetTimeOffsetInstruction<
     ]
   >;
 
-export interface SetTimeOffsetInstructionData {
+export type SetTimeOffsetInstructionData = {
   discriminator: ReadonlyUint8Array;
   timeOffset: bigint;
-}
+};
 
-export interface SetTimeOffsetInstructionDataArgs {
-  timeOffset: number | bigint;
-}
+export type SetTimeOffsetInstructionDataArgs = { timeOffset: number | bigint };
 
 export function getSetTimeOffsetInstructionDataEncoder(): FixedSizeEncoder<SetTimeOffsetInstructionDataArgs> {
   return transformEncoder(
@@ -105,14 +103,14 @@ export function getSetTimeOffsetInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetTimeOffsetInput<
+export type SetTimeOffsetInput<
   TAccountRegistrar extends string = string,
   TAccountRealmAuthority extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
   timeOffset: SetTimeOffsetInstructionDataArgs["timeOffset"];
-}
+};
 
 export function getSetTimeOffsetInstruction<
   TAccountRegistrar extends string,
@@ -160,17 +158,17 @@ export function getSetTimeOffsetInstruction<
   >);
 }
 
-export interface ParsedSetTimeOffsetInstruction<
+export type ParsedSetTimeOffsetInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
     realmAuthority: TAccountMetas[1];
   };
   data: SetTimeOffsetInstructionData;
-}
+};
 
 export function parseSetTimeOffsetInstruction<
   TProgram extends string,

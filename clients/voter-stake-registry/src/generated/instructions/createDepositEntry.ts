@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { LockupKind, LockupKindArgs } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,19 +18,44 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getLockupKindDecoder, getLockupKindEncoder } from "../types/index.js";
+import {
+  getLockupKindDecoder,
+  getLockupKindEncoder,
+  type LockupKind,
+  type LockupKindArgs,
+} from "../types/index.js";
 
 export const CREATE_DEPOSIT_ENTRY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([185, 131, 167, 186, 159, 125, 19, 67]);
@@ -64,21 +68,21 @@ export function getCreateDepositEntryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateDepositEntryInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVault extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountDepositMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVault extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountDepositMint extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends string | AccountMeta =
+  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -119,22 +123,22 @@ export type CreateDepositEntryInstruction<
     ]
   >;
 
-export interface CreateDepositEntryInstructionData {
+export type CreateDepositEntryInstructionData = {
   discriminator: ReadonlyUint8Array;
   depositEntryIndex: number;
   kind: LockupKind;
   startTs: Option<bigint>;
   periods: number;
   allowClawback: boolean;
-}
+};
 
-export interface CreateDepositEntryInstructionDataArgs {
+export type CreateDepositEntryInstructionDataArgs = {
   depositEntryIndex: number;
   kind: LockupKindArgs;
   startTs: OptionOrNullable<number | bigint>;
   periods: number;
   allowClawback: boolean;
-}
+};
 
 export function getCreateDepositEntryInstructionDataEncoder(): Encoder<CreateDepositEntryInstructionDataArgs> {
   return transformEncoder(
@@ -174,7 +178,7 @@ export function getCreateDepositEntryInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateDepositEntryInput<
+export type CreateDepositEntryInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVault extends string = string,
@@ -185,7 +189,7 @@ export interface CreateDepositEntryInput<
   TAccountTokenProgram extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   vault: Address<TAccountVault>;
@@ -201,7 +205,7 @@ export interface CreateDepositEntryInput<
   startTs: CreateDepositEntryInstructionDataArgs["startTs"];
   periods: CreateDepositEntryInstructionDataArgs["periods"];
   allowClawback: CreateDepositEntryInstructionDataArgs["allowClawback"];
-}
+};
 
 export function getCreateDepositEntryInstruction<
   TAccountRegistrar extends string,
@@ -321,10 +325,10 @@ export function getCreateDepositEntryInstruction<
   >);
 }
 
-export interface ParsedCreateDepositEntryInstruction<
+export type ParsedCreateDepositEntryInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -339,7 +343,7 @@ export interface ParsedCreateDepositEntryInstruction<
     rent: TAccountMetas[9];
   };
   data: CreateDepositEntryInstructionData;
-}
+};
 
 export function parseCreateDepositEntryInstruction<
   TProgram extends string,

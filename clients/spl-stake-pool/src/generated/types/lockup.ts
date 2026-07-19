@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,9 +16,13 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Lockup {
+export type Lockup = {
   /**
    * UnixTimestamp at which this stake will allow withdrawal, unless the
    * transaction is signed by the custodian
@@ -40,9 +38,9 @@ export interface Lockup {
    * lockup constraints
    */
   custodian: Address;
-}
+};
 
-export interface LockupArgs {
+export type LockupArgs = {
   /**
    * UnixTimestamp at which this stake will allow withdrawal, unless the
    * transaction is signed by the custodian
@@ -58,7 +56,7 @@ export interface LockupArgs {
    * lockup constraints
    */
   custodian: Address;
-}
+};
 
 export function getLockupEncoder(): FixedSizeEncoder<LockupArgs> {
   return getStructEncoder([

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_FEE_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,10 +49,10 @@ export function getSetFeeAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetFeeAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountFeeAuthority extends string | AccountMeta = string,
-  TAccountNewFeeAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountFeeAuthority extends string | AccountMeta<string> = string,
+  TAccountNewFeeAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -71,9 +71,9 @@ export type SetFeeAuthorityInstruction<
     ]
   >;
 
-export interface SetFeeAuthorityInstructionData {
+export type SetFeeAuthorityInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type SetFeeAuthorityInstructionDataArgs = {};
 
@@ -100,15 +100,15 @@ export function getSetFeeAuthorityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetFeeAuthorityInput<
+export type SetFeeAuthorityInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountFeeAuthority extends string = string,
   TAccountNewFeeAuthority extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   feeAuthority: TransactionSigner<TAccountFeeAuthority>;
   newFeeAuthority: Address<TAccountNewFeeAuthority>;
-}
+};
 
 export function getSetFeeAuthorityInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -165,10 +165,10 @@ export function getSetFeeAuthorityInstruction<
   >);
 }
 
-export interface ParsedSetFeeAuthorityInstruction<
+export type ParsedSetFeeAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -176,7 +176,7 @@ export interface ParsedSetFeeAuthorityInstruction<
     newFeeAuthority: TAccountMetas[2];
   };
   data: SetFeeAuthorityInstructionData;
-}
+};
 
 export function parseSetFeeAuthorityInstruction<
   TProgram extends string,

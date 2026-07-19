@@ -6,56 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  MergeMiner,
-  MergeMinerArgs,
-  MergePool,
-  MergePoolArgs,
-} from "../accounts/index.js";
-import type {
-  ClaimRewardsMMAsyncInput,
-  InitMergeMinerAsyncInput,
-  InitMergeMinerV2AsyncInput,
-  InitMinerMMInput,
-  InitMinerMMV2Input,
-  NewPoolAsyncInput,
-  NewPoolV2AsyncInput,
-  ParsedClaimRewardsMMInstruction,
-  ParsedInitMergeMinerInstruction,
-  ParsedInitMergeMinerV2Instruction,
-  ParsedInitMinerMMInstruction,
-  ParsedInitMinerMMV2Instruction,
-  ParsedNewPoolInstruction,
-  ParsedNewPoolV2Instruction,
-  ParsedRescueTokensMMInstruction,
-  ParsedStakePrimaryMinerInstruction,
-  ParsedStakeReplicaMinerInstruction,
-  ParsedUnstakeAllReplicaMinerInstruction,
-  ParsedUnstakePrimaryMinerInstruction,
-  ParsedWithdrawTokensMMInstruction,
-  RescueTokensMMInput,
-  StakePrimaryMinerAsyncInput,
-  StakeReplicaMinerAsyncInput,
-  UnstakeAllReplicaMinerAsyncInput,
-  UnstakePrimaryMinerAsyncInput,
-  WithdrawTokensMMAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -66,12 +16,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getMergeMinerCodec, getMergePoolCodec } from "../accounts/index.js";
+import {
+  getMergeMinerCodec,
+  getMergePoolCodec,
+  type MergeMiner,
+  type MergeMinerArgs,
+  type MergePool,
+  type MergePoolArgs,
+} from "../accounts/index.js";
 import {
   getClaimRewardsMMInstructionAsync,
   getInitMergeMinerInstructionAsync,
@@ -99,6 +69,32 @@ import {
   parseUnstakeAllReplicaMinerInstruction,
   parseUnstakePrimaryMinerInstruction,
   parseWithdrawTokensMMInstruction,
+  type ClaimRewardsMMAsyncInput,
+  type InitMergeMinerAsyncInput,
+  type InitMergeMinerV2AsyncInput,
+  type InitMinerMMInput,
+  type InitMinerMMV2Input,
+  type NewPoolAsyncInput,
+  type NewPoolV2AsyncInput,
+  type ParsedClaimRewardsMMInstruction,
+  type ParsedInitMergeMinerInstruction,
+  type ParsedInitMergeMinerV2Instruction,
+  type ParsedInitMinerMMInstruction,
+  type ParsedInitMinerMMV2Instruction,
+  type ParsedNewPoolInstruction,
+  type ParsedNewPoolV2Instruction,
+  type ParsedRescueTokensMMInstruction,
+  type ParsedStakePrimaryMinerInstruction,
+  type ParsedStakeReplicaMinerInstruction,
+  type ParsedUnstakeAllReplicaMinerInstruction,
+  type ParsedUnstakePrimaryMinerInstruction,
+  type ParsedWithdrawTokensMMInstruction,
+  type RescueTokensMMInput,
+  type StakePrimaryMinerAsyncInput,
+  type StakeReplicaMinerAsyncInput,
+  type UnstakeAllReplicaMinerAsyncInput,
+  type UnstakePrimaryMinerAsyncInput,
+  type WithdrawTokensMMAsyncInput,
 } from "../instructions/index.js";
 import {
   findMergeMinerPda,
@@ -110,8 +106,8 @@ export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;
 
 export enum QuarryMergeMineAccount {
-  MergePool = 0,
-  MergeMiner = 1,
+  MergePool,
+  MergeMiner,
 }
 
 export function identifyQuarryMergeMineAccount(
@@ -147,19 +143,19 @@ export function identifyQuarryMergeMineAccount(
 }
 
 export enum QuarryMergeMineInstruction {
-  NewPool = 0,
-  NewPoolV2 = 1,
-  InitMergeMiner = 2,
-  InitMergeMinerV2 = 3,
-  InitMinerMM = 4,
-  InitMinerMMV2 = 5,
-  StakePrimaryMiner = 6,
-  StakeReplicaMiner = 7,
-  UnstakePrimaryMiner = 8,
-  UnstakeAllReplicaMiner = 9,
-  WithdrawTokensMM = 10,
-  RescueTokensMM = 11,
-  ClaimRewardsMM = 12,
+  NewPool,
+  NewPoolV2,
+  InitMergeMiner,
+  InitMergeMinerV2,
+  InitMinerMM,
+  InitMinerMMV2,
+  StakePrimaryMiner,
+  StakeReplicaMiner,
+  UnstakePrimaryMiner,
+  UnstakeAllReplicaMiner,
+  WithdrawTokensMM,
+  RescueTokensMM,
+  ClaimRewardsMM,
 }
 
 export function identifyQuarryMergeMineInstruction(
@@ -465,20 +461,23 @@ export function parseQuarryMergeMineInstruction<TProgram extends string>(
   }
 }
 
-export interface QuarryMergeMinePlugin {
+export type QuarryMergeMinePlugin = {
   accounts: QuarryMergeMinePluginAccounts;
   instructions: QuarryMergeMinePluginInstructions;
   pdas: QuarryMergeMinePluginPdas;
-}
+  identifyAccount: typeof identifyQuarryMergeMineAccount;
+  identifyInstruction: typeof identifyQuarryMergeMineInstruction;
+  parseInstruction: typeof parseQuarryMergeMineInstruction;
+};
 
-export interface QuarryMergeMinePluginAccounts {
+export type QuarryMergeMinePluginAccounts = {
   mergePool: ReturnType<typeof getMergePoolCodec> &
     SelfFetchFunctions<MergePoolArgs, MergePool>;
   mergeMiner: ReturnType<typeof getMergeMinerCodec> &
     SelfFetchFunctions<MergeMinerArgs, MergeMiner>;
-}
+};
 
-export interface QuarryMergeMinePluginInstructions {
+export type QuarryMergeMinePluginInstructions = {
   newPool: (
     input: MakeOptional<NewPoolAsyncInput, "payer">,
   ) => ReturnType<typeof getNewPoolInstructionAsync> & SelfPlanAndSendFunctions;
@@ -529,13 +528,13 @@ export interface QuarryMergeMinePluginInstructions {
     input: ClaimRewardsMMAsyncInput,
   ) => ReturnType<typeof getClaimRewardsMMInstructionAsync> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface QuarryMergeMinePluginPdas {
+export type QuarryMergeMinePluginPdas = {
   mergePool: typeof findMergePoolPda;
   replicaMint: typeof findReplicaMintPda;
   mergeMiner: typeof findMergeMinerPda;
-}
+};
 
 export type QuarryMergeMinePluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -547,9 +546,7 @@ export type QuarryMergeMinePluginRequirements = ClientWithRpc<
 export function quarryMergeMineProgram() {
   return <T extends QuarryMergeMinePluginRequirements>(
     client: T,
-  ): Omit<T, "quarryMergeMine"> & {
-    quarryMergeMine: QuarryMergeMinePlugin;
-  } => {
+  ): ExtendedClient<T, { quarryMergeMine: QuarryMergeMinePlugin }> => {
     return extendClient(client, {
       quarryMergeMine: <QuarryMergeMinePlugin>{
         accounts: {
@@ -646,6 +643,9 @@ export function quarryMergeMineProgram() {
           replicaMint: findReplicaMintPda,
           mergeMiner: findMergeMinerPda,
         },
+        identifyAccount: identifyQuarryMergeMineAccount,
+        identifyInstruction: identifyQuarryMergeMineInstruction,
+        parseInstruction: parseQuarryMergeMineInstruction,
       },
     });
   };

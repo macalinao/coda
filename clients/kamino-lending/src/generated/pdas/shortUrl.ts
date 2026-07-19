@@ -6,12 +6,16 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
-import { getProgramDerivedAddress, getUtf8Encoder } from "@solana/kit";
+import {
+  getProgramDerivedAddress,
+  getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
+} from "@solana/kit";
 
-export interface ShortUrlSeeds {
+export type ShortUrlSeeds = {
   shortUrl: string;
-}
+};
 
 export async function findShortUrlPda(
   seeds: ShortUrlSeeds,

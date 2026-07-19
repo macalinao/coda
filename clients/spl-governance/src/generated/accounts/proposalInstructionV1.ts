@@ -6,30 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ProposalTransactionSeeds } from "../pdas/index.js";
-import type {
-  InstructionData,
-  InstructionDataArgs,
-  TransactionExecutionStatus,
-  TransactionExecutionStatusArgs,
-  UnixTimestamp,
-  UnixTimestampArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -48,10 +24,25 @@ import {
   getU32Decoder,
   getU32Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalTransactionPda } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
+  findProposalTransactionPda,
+  type ProposalTransactionSeeds,
+} from "../pdas/index.js";
+import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getInstructionDataDecoder,
@@ -60,6 +51,13 @@ import {
   getTransactionExecutionStatusEncoder,
   getUnixTimestampDecoder,
   getUnixTimestampEncoder,
+  GovernanceAccountType,
+  type InstructionData,
+  type InstructionDataArgs,
+  type TransactionExecutionStatus,
+  type TransactionExecutionStatusArgs,
+  type UnixTimestamp,
+  type UnixTimestampArgs,
 } from "../types/index.js";
 
 export const PROPOSAL_INSTRUCTION_V1_ACCOUNT_TYPE: GovernanceAccountType =
@@ -71,7 +69,7 @@ export function getProposalInstructionV1AccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ProposalInstructionV1 {
+export type ProposalInstructionV1 = {
   accountType: GovernanceAccountType;
   proposal: Address;
   instructionIndex: number;
@@ -79,16 +77,16 @@ export interface ProposalInstructionV1 {
   instruction: InstructionData;
   executedAt: Option<UnixTimestamp>;
   executionStatus: TransactionExecutionStatus;
-}
+};
 
-export interface ProposalInstructionV1Args {
+export type ProposalInstructionV1Args = {
   proposal: Address;
   instructionIndex: number;
   holdUpTime: number;
   instruction: InstructionDataArgs;
   executedAt: OptionOrNullable<UnixTimestampArgs>;
   executionStatus: TransactionExecutionStatusArgs;
-}
+};
 
 /** Gets the encoder for {@link ProposalInstructionV1Args} account data. */
 export function getProposalInstructionV1Encoder(): Encoder<ProposalInstructionV1Args> {
@@ -179,7 +177,7 @@ export async function fetchMaybeProposalInstructionV1<
 
 export async function fetchAllProposalInstructionV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProposalInstructionV1>[]> {
   const maybeAccounts = await fetchAllMaybeProposalInstructionV1(
@@ -193,7 +191,7 @@ export async function fetchAllProposalInstructionV1(
 
 export async function fetchAllMaybeProposalInstructionV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProposalInstructionV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

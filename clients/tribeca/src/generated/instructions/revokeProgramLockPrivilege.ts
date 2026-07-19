@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +17,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REVOKE_PROGRAM_LOCK_PRIVILEGE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -50,12 +50,12 @@ export function getRevokeProgramLockPrivilegeDiscriminatorBytes(): ReadonlyUint8
 
 export type RevokeProgramLockPrivilegeInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
-  TAccountLocker extends string | AccountMeta = string,
-  TAccountWhitelistEntry extends string | AccountMeta = string,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountSmartWallet extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountLocker extends string | AccountMeta<string> = string,
+  TAccountWhitelistEntry extends string | AccountMeta<string> = string,
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountSmartWallet extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -81,9 +81,9 @@ export type RevokeProgramLockPrivilegeInstruction<
     ]
   >;
 
-export interface RevokeProgramLockPrivilegeInstructionData {
+export type RevokeProgramLockPrivilegeInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type RevokeProgramLockPrivilegeInstructionDataArgs = {};
 
@@ -113,19 +113,19 @@ export function getRevokeProgramLockPrivilegeInstructionDataCodec(): FixedSizeCo
   );
 }
 
-export interface RevokeProgramLockPrivilegeInput<
+export type RevokeProgramLockPrivilegeInput<
   TAccountLocker extends string = string,
   TAccountWhitelistEntry extends string = string,
   TAccountGovernor extends string = string,
   TAccountSmartWallet extends string = string,
   TAccountPayer extends string = string,
-> {
+> = {
   locker: Address<TAccountLocker>;
   whitelistEntry: Address<TAccountWhitelistEntry>;
   governor: Address<TAccountGovernor>;
   smartWallet: TransactionSigner<TAccountSmartWallet>;
   payer: TransactionSigner<TAccountPayer>;
-}
+};
 
 export function getRevokeProgramLockPrivilegeInstruction<
   TAccountLocker extends string,
@@ -188,10 +188,10 @@ export function getRevokeProgramLockPrivilegeInstruction<
   >);
 }
 
-export interface ParsedRevokeProgramLockPrivilegeInstruction<
+export type ParsedRevokeProgramLockPrivilegeInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     locker: TAccountMetas[0];
@@ -201,7 +201,7 @@ export interface ParsedRevokeProgramLockPrivilegeInstruction<
     payer: TAccountMetas[4];
   };
   data: RevokeProgramLockPrivilegeInstructionData;
-}
+};
 
 export function parseRevokeProgramLockPrivilegeInstruction<
   TProgram extends string,

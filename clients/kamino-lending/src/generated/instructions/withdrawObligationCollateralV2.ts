@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
@@ -58,22 +56,23 @@ export function getWithdrawObligationCollateralV2DiscriminatorBytes(): ReadonlyU
 
 export type WithdrawObligationCollateralV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountWithdrawReserve extends string | AccountMeta = string,
-  TAccountReserveSourceCollateral extends string | AccountMeta = string,
-  TAccountUserDestinationCollateral extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountWithdrawReserve extends string | AccountMeta<string> = string,
+  TAccountReserveSourceCollateral extends string | AccountMeta<string> = string,
+  TAccountUserDestinationCollateral extends string | AccountMeta<string> =
+    string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends string | AccountMeta =
+  TAccountInstructionSysvarAccount extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountObligationFarmUserState extends string | AccountMeta = string,
-  TAccountReserveFarmState extends string | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta =
+  TAccountObligationFarmUserState extends string | AccountMeta<string> = string,
+  TAccountReserveFarmState extends string | AccountMeta<string> = string,
+  TAccountFarmsProgram extends string | AccountMeta<string> =
     "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -119,14 +118,14 @@ export type WithdrawObligationCollateralV2Instruction<
     ]
   >;
 
-export interface WithdrawObligationCollateralV2InstructionData {
+export type WithdrawObligationCollateralV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   collateralAmount: bigint;
-}
+};
 
-export interface WithdrawObligationCollateralV2InstructionDataArgs {
+export type WithdrawObligationCollateralV2InstructionDataArgs = {
   collateralAmount: number | bigint;
-}
+};
 
 export function getWithdrawObligationCollateralV2InstructionDataEncoder(): FixedSizeEncoder<WithdrawObligationCollateralV2InstructionDataArgs> {
   return transformEncoder(
@@ -158,7 +157,7 @@ export function getWithdrawObligationCollateralV2InstructionDataCodec(): FixedSi
   );
 }
 
-export interface WithdrawObligationCollateralV2AsyncInput<
+export type WithdrawObligationCollateralV2AsyncInput<
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
@@ -171,7 +170,7 @@ export interface WithdrawObligationCollateralV2AsyncInput<
   TAccountObligationFarmUserState extends string = string,
   TAccountReserveFarmState extends string = string,
   TAccountFarmsProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -185,7 +184,7 @@ export interface WithdrawObligationCollateralV2AsyncInput<
   reserveFarmState?: Address<TAccountReserveFarmState>;
   farmsProgram?: Address<TAccountFarmsProgram>;
   collateralAmount: WithdrawObligationCollateralV2InstructionDataArgs["collateralAmount"];
-}
+};
 
 export async function getWithdrawObligationCollateralV2InstructionAsync<
   TAccountOwner extends string,
@@ -350,7 +349,7 @@ export async function getWithdrawObligationCollateralV2InstructionAsync<
   >);
 }
 
-export interface WithdrawObligationCollateralV2Input<
+export type WithdrawObligationCollateralV2Input<
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
@@ -363,7 +362,7 @@ export interface WithdrawObligationCollateralV2Input<
   TAccountObligationFarmUserState extends string = string,
   TAccountReserveFarmState extends string = string,
   TAccountFarmsProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -377,7 +376,7 @@ export interface WithdrawObligationCollateralV2Input<
   reserveFarmState?: Address<TAccountReserveFarmState>;
   farmsProgram?: Address<TAccountFarmsProgram>;
   collateralAmount: WithdrawObligationCollateralV2InstructionDataArgs["collateralAmount"];
-}
+};
 
 export function getWithdrawObligationCollateralV2Instruction<
   TAccountOwner extends string,
@@ -532,10 +531,10 @@ export function getWithdrawObligationCollateralV2Instruction<
   >);
 }
 
-export interface ParsedWithdrawObligationCollateralV2Instruction<
+export type ParsedWithdrawObligationCollateralV2Instruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -552,7 +551,7 @@ export interface ParsedWithdrawObligationCollateralV2Instruction<
     farmsProgram: TAccountMetas[11];
   };
   data: WithdrawObligationCollateralV2InstructionData;
-}
+};
 
 export function parseWithdrawObligationCollateralV2Instruction<
   TProgram extends string,

@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,17 +14,18 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface QuarryCreateEvent {
-  tokenMint: Address;
-  timestamp: bigint;
-}
+export type QuarryCreateEvent = { tokenMint: Address; timestamp: bigint };
 
-export interface QuarryCreateEventArgs {
+export type QuarryCreateEventArgs = {
   tokenMint: Address;
   timestamp: number | bigint;
-}
+};
 
 export function getQuarryCreateEventEncoder(): FixedSizeEncoder<QuarryCreateEventArgs> {
   return getStructEncoder([

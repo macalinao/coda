@@ -6,16 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  RemoveLiquidityParameters,
-  RemoveLiquidityParametersArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -24,29 +14,35 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getRemoveLiquidityParametersDecoder,
   getRemoveLiquidityParametersEncoder,
+  type RemoveLiquidityParameters,
+  type RemoveLiquidityParametersArgs,
 } from "./index.js";
 
-export interface EvtRemoveLiquidity {
+export type EvtRemoveLiquidity = {
   pool: Address;
   position: Address;
   owner: Address;
   params: RemoveLiquidityParameters;
   tokenAAmount: bigint;
   tokenBAmount: bigint;
-}
+};
 
-export interface EvtRemoveLiquidityArgs {
+export type EvtRemoveLiquidityArgs = {
   pool: Address;
   position: Address;
   owner: Address;
   params: RemoveLiquidityParametersArgs;
   tokenAAmount: number | bigint;
   tokenBAmount: number | bigint;
-}
+};
 
 export function getEvtRemoveLiquidityEncoder(): FixedSizeEncoder<EvtRemoveLiquidityArgs> {
   return getStructEncoder([

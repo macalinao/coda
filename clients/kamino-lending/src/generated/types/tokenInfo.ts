@@ -6,31 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  PriceHeuristic,
-  PriceHeuristicArgs,
-  PythConfiguration,
-  PythConfigurationArgs,
-  ScopeConfiguration,
-  ScopeConfigurationArgs,
-  SwitchboardConfiguration,
-  SwitchboardConfigurationArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getPriceHeuristicDecoder,
@@ -41,11 +29,19 @@ import {
   getScopeConfigurationEncoder,
   getSwitchboardConfigurationDecoder,
   getSwitchboardConfigurationEncoder,
+  type PriceHeuristic,
+  type PriceHeuristicArgs,
+  type PythConfiguration,
+  type PythConfigurationArgs,
+  type ScopeConfiguration,
+  type ScopeConfigurationArgs,
+  type SwitchboardConfiguration,
+  type SwitchboardConfigurationArgs,
 } from "./index.js";
 
-export interface TokenInfo {
+export type TokenInfo = {
   /** UTF-8 encoded name of the token (null-terminated) */
-  name: number[];
+  name: Array<number>;
   /** Heuristics limits of acceptable price */
   heuristic: PriceHeuristic;
   /** Max divergence between twap and price in bps */
@@ -59,13 +55,13 @@ export interface TokenInfo {
   /** Pyth configuration */
   pythConfiguration: PythConfiguration;
   blockPriceUsage: number;
-  reserved: number[];
-  padding: bigint[];
-}
+  reserved: Array<number>;
+  padding: Array<bigint>;
+};
 
-export interface TokenInfoArgs {
+export type TokenInfoArgs = {
   /** UTF-8 encoded name of the token (null-terminated) */
-  name: number[];
+  name: Array<number>;
   /** Heuristics limits of acceptable price */
   heuristic: PriceHeuristicArgs;
   /** Max divergence between twap and price in bps */
@@ -79,9 +75,9 @@ export interface TokenInfoArgs {
   /** Pyth configuration */
   pythConfiguration: PythConfigurationArgs;
   blockPriceUsage: number;
-  reserved: number[];
+  reserved: Array<number>;
   padding: Array<number | bigint>;
-}
+};
 
 export function getTokenInfoEncoder(): FixedSizeEncoder<TokenInfoArgs> {
   return getStructEncoder([

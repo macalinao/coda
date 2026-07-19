@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  AddLiquidityParameters,
-  AddLiquidityParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,16 +17,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda, findTokenVaultPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAddLiquidityParametersDecoder,
   getAddLiquidityParametersEncoder,
+  type AddLiquidityParameters,
+  type AddLiquidityParametersArgs,
 } from "../types/index.js";
 
 export const ADD_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -131,14 +127,14 @@ export type AddLiquidityInstruction<
     ]
   >;
 
-export interface AddLiquidityInstructionData {
+export type AddLiquidityInstructionData = {
   discriminator: ReadonlyUint8Array;
   params: AddLiquidityParameters;
-}
+};
 
-export interface AddLiquidityInstructionDataArgs {
+export type AddLiquidityInstructionDataArgs = {
   params: AddLiquidityParametersArgs;
-}
+};
 
 export function getAddLiquidityInstructionDataEncoder(): FixedSizeEncoder<AddLiquidityInstructionDataArgs> {
   return transformEncoder(
@@ -167,7 +163,7 @@ export function getAddLiquidityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface AddLiquidityAsyncInput<
+export type AddLiquidityAsyncInput<
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
   TAccountTokenAAccount extends string = string,
@@ -182,7 +178,7 @@ export interface AddLiquidityAsyncInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   /** The user token a account */
@@ -208,7 +204,7 @@ export interface AddLiquidityAsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: AddLiquidityInstructionDataArgs["params"];
-}
+};
 
 export async function getAddLiquidityInstructionAsync<
   TAccountPool extends string,
@@ -376,7 +372,7 @@ export async function getAddLiquidityInstructionAsync<
   >);
 }
 
-export interface AddLiquidityInput<
+export type AddLiquidityInput<
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
   TAccountTokenAAccount extends string = string,
@@ -391,7 +387,7 @@ export interface AddLiquidityInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   /** The user token a account */
@@ -417,7 +413,7 @@ export interface AddLiquidityInput<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: AddLiquidityInstructionDataArgs["params"];
-}
+};
 
 export function getAddLiquidityInstruction<
   TAccountPool extends string,
@@ -556,10 +552,10 @@ export function getAddLiquidityInstruction<
   >);
 }
 
-export interface ParsedAddLiquidityInstruction<
+export type ParsedAddLiquidityInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -588,7 +584,7 @@ export interface ParsedAddLiquidityInstruction<
     program: TAccountMetas[13];
   };
   data: AddLiquidityInstructionData;
-}
+};
 
 export function parseAddLiquidityInstruction<
   TProgram extends string,

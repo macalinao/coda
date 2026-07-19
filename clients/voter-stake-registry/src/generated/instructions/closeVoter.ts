@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CLOSE_VOTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -48,13 +48,13 @@ export function getCloseVoterDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CloseVoterInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TAccountSolDestination extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TAccountSolDestination extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -79,9 +79,7 @@ export type CloseVoterInstruction<
     ]
   >;
 
-export interface CloseVoterInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type CloseVoterInstructionData = { discriminator: ReadonlyUint8Array };
 
 export type CloseVoterInstructionDataArgs = {};
 
@@ -108,19 +106,19 @@ export function getCloseVoterInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseVoterInput<
+export type CloseVoterInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
   TAccountSolDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   voterAuthority: TransactionSigner<TAccountVoterAuthority>;
   solDestination: Address<TAccountSolDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getCloseVoterInstruction<
   TAccountRegistrar extends string,
@@ -190,10 +188,10 @@ export function getCloseVoterInstruction<
   >);
 }
 
-export interface ParsedCloseVoterInstruction<
+export type ParsedCloseVoterInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -203,7 +201,7 @@ export interface ParsedCloseVoterInstruction<
     tokenProgram: TAccountMetas[4];
   };
   data: CloseVoterInstructionData;
-}
+};
 
 export function parseCloseVoterInstruction<
   TProgram extends string,

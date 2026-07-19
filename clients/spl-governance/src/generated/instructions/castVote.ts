@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { Vote, VoteArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -33,10 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getVoteDecoder, getVoteEncoder } from "../types/index.js";
+import {
+  getVoteDecoder,
+  getVoteEncoder,
+  type Vote,
+  type VoteArgs,
+} from "../types/index.js";
 
 export const CAST_VOTE_DISCRIMINATOR = 13;
 
@@ -46,21 +50,22 @@ export function getCastVoteDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CastVoteInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountProposalTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountVoterTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountProposalVoteRecord extends string | AccountMeta = string,
-  TAccountGoverningTokenMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountProposalTokenOwnerRecord extends string | AccountMeta<string> =
+    string,
+  TAccountVoterTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountProposalVoteRecord extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRealmConfigAccount extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TAccountMaxVoterWeightRecord extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmConfigAccount extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TAccountMaxVoterWeightRecord extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -110,14 +115,9 @@ export type CastVoteInstruction<
     ]
   >;
 
-export interface CastVoteInstructionData {
-  discriminator: number;
-  vote: Vote;
-}
+export type CastVoteInstructionData = { discriminator: number; vote: Vote };
 
-export interface CastVoteInstructionDataArgs {
-  vote: VoteArgs;
-}
+export type CastVoteInstructionDataArgs = { vote: VoteArgs };
 
 export function getCastVoteInstructionDataEncoder(): Encoder<CastVoteInstructionDataArgs> {
   return transformEncoder(
@@ -146,7 +146,7 @@ export function getCastVoteInstructionDataCodec(): Codec<
   );
 }
 
-export interface CastVoteInput<
+export type CastVoteInput<
   TAccountRealmAccount extends string = string,
   TAccountGovernanceAccount extends string = string,
   TAccountProposalAccount extends string = string,
@@ -160,7 +160,7 @@ export interface CastVoteInput<
   TAccountRealmConfigAccount extends string = string,
   TAccountVoterWeightRecord extends string = string,
   TAccountMaxVoterWeightRecord extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   governanceAccount: Address<TAccountGovernanceAccount>;
   proposalAccount: Address<TAccountProposalAccount>;
@@ -189,7 +189,7 @@ export interface CastVoteInput<
   /** Optional Max Voter Weight Record */
   maxVoterWeightRecord?: Address<TAccountMaxVoterWeightRecord>;
   vote: CastVoteInstructionDataArgs["vote"];
-}
+};
 
 export function getCastVoteInstruction<
   TAccountRealmAccount extends string,
@@ -342,10 +342,10 @@ export function getCastVoteInstruction<
   >);
 }
 
-export interface ParsedCastVoteInstruction<
+export type ParsedCastVoteInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -377,7 +377,7 @@ export interface ParsedCastVoteInstruction<
     maxVoterWeightRecord?: TAccountMetas[12] | undefined;
   };
   data: CastVoteInstructionData;
-}
+};
 
 export function parseCastVoteInstruction<
   TProgram extends string,

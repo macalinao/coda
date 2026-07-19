@@ -6,8 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type { OptionVoteResult, OptionVoteResultArgs } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -22,29 +20,34 @@ import {
   getU64Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getOptionVoteResultDecoder,
   getOptionVoteResultEncoder,
+  type OptionVoteResult,
+  type OptionVoteResultArgs,
 } from "./index.js";
 
-export interface ProposalOption {
+export type ProposalOption = {
   label: string;
   voteWeight: bigint;
   voteResult: OptionVoteResult;
   transactionsExecutedCount: number;
   transactionsCount: number;
   transactionsNextIndex: number;
-}
+};
 
-export interface ProposalOptionArgs {
+export type ProposalOptionArgs = {
   label: string;
   voteWeight: number | bigint;
   voteResult: OptionVoteResultArgs;
   transactionsExecutedCount: number;
   transactionsCount: number;
   transactionsNextIndex: number;
-}
+};
 
 export function getProposalOptionEncoder(): Encoder<ProposalOptionArgs> {
   return getStructEncoder([

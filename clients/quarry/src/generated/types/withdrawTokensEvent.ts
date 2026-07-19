@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,23 +14,27 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface WithdrawTokensEvent {
+export type WithdrawTokensEvent = {
   pool: Address;
   mm: Address;
   owner: Address;
   mint: Address;
   amount: bigint;
-}
+};
 
-export interface WithdrawTokensEventArgs {
+export type WithdrawTokensEventArgs = {
   pool: Address;
   mm: Address;
   owner: Address;
   mint: Address;
   amount: number | bigint;
-}
+};
 
 export function getWithdrawTokensEventEncoder(): FixedSizeEncoder<WithdrawTokensEventArgs> {
   return getStructEncoder([

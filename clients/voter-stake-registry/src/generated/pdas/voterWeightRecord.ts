@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface VoterWeightRecordSeeds {
+export type VoterWeightRecordSeeds = {
   registrar: Address;
   voterAuthority: Address;
-}
+};
 
 /**
  * The voter weight record is the account that will be shown to spl-governance

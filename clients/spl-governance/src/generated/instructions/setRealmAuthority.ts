@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  SetRealmAuthorityAction,
-  SetRealmAuthorityActionArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -36,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getSetRealmAuthorityActionDecoder,
   getSetRealmAuthorityActionEncoder,
+  type SetRealmAuthorityAction,
+  type SetRealmAuthorityActionArgs,
 } from "../types/index.js";
 
 export const SET_REALM_AUTHORITY_DISCRIMINATOR = 21;
@@ -52,10 +50,10 @@ export function getSetRealmAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetRealmAuthorityInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountRealmAuthority extends string | AccountMeta = string,
-  TAccountNewRealmAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountRealmAuthority extends string | AccountMeta<string> = string,
+  TAccountNewRealmAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -74,14 +72,14 @@ export type SetRealmAuthorityInstruction<
     ]
   >;
 
-export interface SetRealmAuthorityInstructionData {
+export type SetRealmAuthorityInstructionData = {
   discriminator: number;
   action: SetRealmAuthorityAction;
-}
+};
 
-export interface SetRealmAuthorityInstructionDataArgs {
+export type SetRealmAuthorityInstructionDataArgs = {
   action: SetRealmAuthorityActionArgs;
-}
+};
 
 export function getSetRealmAuthorityInstructionDataEncoder(): FixedSizeEncoder<SetRealmAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -110,17 +108,17 @@ export function getSetRealmAuthorityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetRealmAuthorityInput<
+export type SetRealmAuthorityInput<
   TAccountRealmAccount extends string = string,
   TAccountRealmAuthority extends string = string,
   TAccountNewRealmAuthority extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
   /** Must be one of the realm governances when set */
   newRealmAuthority?: Address<TAccountNewRealmAuthority>;
   action: SetRealmAuthorityInstructionDataArgs["action"];
-}
+};
 
 export function getSetRealmAuthorityInstruction<
   TAccountRealmAccount extends string,
@@ -180,10 +178,10 @@ export function getSetRealmAuthorityInstruction<
   >);
 }
 
-export interface ParsedSetRealmAuthorityInstruction<
+export type ParsedSetRealmAuthorityInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -192,7 +190,7 @@ export interface ParsedSetRealmAuthorityInstruction<
     newRealmAuthority?: TAccountMetas[2] | undefined;
   };
   data: SetRealmAuthorityInstructionData;
-}
+};
 
 export function parseSetRealmAuthorityInstruction<
   TProgram extends string,

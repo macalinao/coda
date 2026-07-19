@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { FeeType, FeeTypeArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,10 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getFeeTypeDecoder, getFeeTypeEncoder } from "../types/index.js";
+import {
+  getFeeTypeDecoder,
+  getFeeTypeEncoder,
+  type FeeType,
+  type FeeTypeArgs,
+} from "../types/index.js";
 
 export const SET_FEE_DISCRIMINATOR = 12;
 
@@ -45,9 +49,9 @@ export function getSetFeeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetFeeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountManager extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountManager extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -63,14 +67,9 @@ export type SetFeeInstruction<
     ]
   >;
 
-export interface SetFeeInstructionData {
-  discriminator: number;
-  fee: FeeType;
-}
+export type SetFeeInstructionData = { discriminator: number; fee: FeeType };
 
-export interface SetFeeInstructionDataArgs {
-  fee: FeeTypeArgs;
-}
+export type SetFeeInstructionDataArgs = { fee: FeeTypeArgs };
 
 export function getSetFeeInstructionDataEncoder(): Encoder<SetFeeInstructionDataArgs> {
   return transformEncoder(
@@ -99,17 +98,22 @@ export function getSetFeeInstructionDataCodec(): Codec<
   );
 }
 
-export interface SetFeeInput<
+export type SetFeeInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Manager */
   manager: TransactionSigner<TAccountManager>;
   fee: SetFeeInstructionDataArgs["fee"];
-}
+};
 
+/**
+ * (Manager only) Update fee
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Manager
+ */
 export function getSetFeeInstruction<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -148,10 +152,10 @@ export function getSetFeeInstruction<
   } as SetFeeInstruction<TProgramAddress, TAccountStakePool, TAccountManager>);
 }
 
-export interface ParsedSetFeeInstruction<
+export type ParsedSetFeeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -160,7 +164,7 @@ export interface ParsedSetFeeInstruction<
     manager: TAccountMetas[1];
   };
   data: SetFeeInstructionData;
-}
+};
 
 export function parseSetFeeInstruction<
   TProgram extends string,

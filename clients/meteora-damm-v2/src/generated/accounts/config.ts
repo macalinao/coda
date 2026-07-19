@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { PoolFeesConfig, PoolFeesConfigArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,17 +23,30 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getPoolFeesConfigDecoder,
   getPoolFeesConfigEncoder,
+  type PoolFeesConfig,
+  type PoolFeesConfigArgs,
 } from "../types/index.js";
 
 export const CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -58,7 +57,7 @@ export function getConfigDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(CONFIG_DISCRIMINATOR);
 }
 
-export interface Config {
+export type Config = {
   discriminator: ReadonlyUint8Array;
   /** Vault config key */
   vaultConfigKey: Address;
@@ -73,7 +72,7 @@ export interface Config {
   /** Config type mode, 0 for static, 1 for dynamic */
   configType: number;
   /** padding 0 */
-  padding0: number[];
+  padding0: Array<number>;
   /** config index */
   index: bigint;
   /** sqrt min price */
@@ -84,10 +83,10 @@ export interface Config {
    * Fee curve point
    * Padding for further use
    */
-  padding1: bigint[];
-}
+  padding1: Array<bigint>;
+};
 
-export interface ConfigArgs {
+export type ConfigArgs = {
   /** Vault config key */
   vaultConfigKey: Address;
   /** Only pool_creator_authority can use the current config to initialize new pool. When it's Pubkey::default, it's a public config. */
@@ -101,7 +100,7 @@ export interface ConfigArgs {
   /** Config type mode, 0 for static, 1 for dynamic */
   configType: number;
   /** padding 0 */
-  padding0: number[];
+  padding0: Array<number>;
   /** config index */
   index: number | bigint;
   /** sqrt min price */
@@ -113,7 +112,7 @@ export interface ConfigArgs {
    * Padding for further use
    */
   padding1: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link ConfigArgs} account data. */
 export function getConfigEncoder(): FixedSizeEncoder<ConfigArgs> {
@@ -195,7 +194,7 @@ export async function fetchMaybeConfig<TAddress extends string = string>(
 
 export async function fetchAllConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Config>[]> {
   const maybeAccounts = await fetchAllMaybeConfig(rpc, addresses, config);
@@ -205,7 +204,7 @@ export async function fetchAllConfig(
 
 export async function fetchAllMaybeConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Config>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

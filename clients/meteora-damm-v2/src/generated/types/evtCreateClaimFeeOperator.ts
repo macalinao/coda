@@ -6,23 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface EvtCreateClaimFeeOperator {
-  operator: Address;
-}
+export type EvtCreateClaimFeeOperator = { operator: Address };
 
 export type EvtCreateClaimFeeOperatorArgs = EvtCreateClaimFeeOperator;
 

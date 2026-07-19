@@ -6,28 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface VestingInfo {
-  rate: bigint;
-  nextTimestamp: bigint;
-}
+export type VestingInfo = { rate: bigint; nextTimestamp: bigint };
 
-export interface VestingInfoArgs {
+export type VestingInfoArgs = {
   rate: number | bigint;
   nextTimestamp: number | bigint;
-}
+};
 
 export function getVestingInfoEncoder(): FixedSizeEncoder<VestingInfoArgs> {
   return getStructEncoder([

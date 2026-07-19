@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UPDATE_PROGRAM_METADATA_DISCRIMINATOR = 24;
@@ -44,11 +44,11 @@ export function getUpdateProgramMetadataDiscriminatorBytes(): ReadonlyUint8Array
 
 export type UpdateProgramMetadataInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountProgramMetadataAccount extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountProgramMetadataAccount extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -67,9 +67,7 @@ export type UpdateProgramMetadataInstruction<
     ]
   >;
 
-export interface UpdateProgramMetadataInstructionData {
-  discriminator: number;
-}
+export type UpdateProgramMetadataInstructionData = { discriminator: number };
 
 export type UpdateProgramMetadataInstructionDataArgs = {};
 
@@ -97,16 +95,16 @@ export function getUpdateProgramMetadataInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UpdateProgramMetadataInput<
+export type UpdateProgramMetadataInput<
   TAccountProgramMetadataAccount extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** seeds=['metadata'] */
   programMetadataAccount: Address<TAccountProgramMetadataAccount>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getUpdateProgramMetadataInstruction<
   TAccountProgramMetadataAccount extends string,
@@ -167,10 +165,10 @@ export function getUpdateProgramMetadataInstruction<
   >);
 }
 
-export interface ParsedUpdateProgramMetadataInstruction<
+export type ParsedUpdateProgramMetadataInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** seeds=['metadata'] */
@@ -179,7 +177,7 @@ export interface ParsedUpdateProgramMetadataInstruction<
     systemProgram: TAccountMetas[2];
   };
   data: UpdateProgramMetadataInstructionData;
-}
+};
 
 export function parseUpdateProgramMetadataInstruction<
   TProgram extends string,

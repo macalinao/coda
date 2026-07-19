@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,17 +16,32 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -86,16 +84,16 @@ export type NewRegistryInstruction<
     ]
   >;
 
-export interface NewRegistryInstructionData {
+export type NewRegistryInstructionData = {
   discriminator: ReadonlyUint8Array;
   maxQuarries: number;
   bump: number;
-}
+};
 
-export interface NewRegistryInstructionDataArgs {
+export type NewRegistryInstructionDataArgs = {
   maxQuarries: number;
   bump: number;
-}
+};
 
 export function getNewRegistryInstructionDataEncoder(): FixedSizeEncoder<NewRegistryInstructionDataArgs> {
   return transformEncoder(
@@ -126,19 +124,19 @@ export function getNewRegistryInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewRegistryAsyncInput<
+export type NewRegistryAsyncInput<
   TAccountRewarder extends string = string,
   TAccountRegistry extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   rewarder: Address<TAccountRewarder>;
   registry?: Address<TAccountRegistry>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   maxQuarries: NewRegistryInstructionDataArgs["maxQuarries"];
   bump: NewRegistryInstructionDataArgs["bump"];
-}
+};
 
 export async function getNewRegistryInstructionAsync<
   TAccountRewarder extends string,
@@ -228,19 +226,19 @@ export async function getNewRegistryInstructionAsync<
   >);
 }
 
-export interface NewRegistryInput<
+export type NewRegistryInput<
   TAccountRewarder extends string = string,
   TAccountRegistry extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   rewarder: Address<TAccountRewarder>;
   registry: Address<TAccountRegistry>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   maxQuarries: NewRegistryInstructionDataArgs["maxQuarries"];
   bump: NewRegistryInstructionDataArgs["bump"];
-}
+};
 
 export function getNewRegistryInstruction<
   TAccountRewarder extends string,
@@ -309,10 +307,10 @@ export function getNewRegistryInstruction<
   >);
 }
 
-export interface ParsedNewRegistryInstruction<
+export type ParsedNewRegistryInstruction<
   TProgram extends string = typeof QUARRY_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     rewarder: TAccountMetas[0];
@@ -321,7 +319,7 @@ export interface ParsedNewRegistryInstruction<
     systemProgram: TAccountMetas[3];
   };
   data: NewRegistryInstructionData;
-}
+};
 
 export function parseNewRegistryInstruction<
   TProgram extends string,

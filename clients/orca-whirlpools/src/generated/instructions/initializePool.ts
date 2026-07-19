@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { WhirlpoolBumps, WhirlpoolBumpsArgs } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,19 +14,38 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU16Decoder,
-  getU16Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU16Decoder,
+  getU16Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getWhirlpoolBumpsDecoder,
   getWhirlpoolBumpsEncoder,
+  type WhirlpoolBumps,
+  type WhirlpoolBumpsArgs,
 } from "../types/index.js";
 
 export const INITIALIZE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -59,21 +60,21 @@ export function getInitializePoolDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializePoolInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountTokenMintA extends string | AccountMeta = string,
-  TAccountTokenMintB extends string | AccountMeta = string,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenVaultA extends string | AccountMeta = string,
-  TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountFeeTier extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountTokenMintA extends string | AccountMeta<string> = string,
+  TAccountTokenMintB extends string | AccountMeta<string> = string,
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountTokenVaultA extends string | AccountMeta<string> = string,
+  TAccountTokenVaultB extends string | AccountMeta<string> = string,
+  TAccountFeeTier extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -118,18 +119,18 @@ export type InitializePoolInstruction<
     ]
   >;
 
-export interface InitializePoolInstructionData {
+export type InitializePoolInstructionData = {
   discriminator: ReadonlyUint8Array;
   bumps: WhirlpoolBumps;
   tickSpacing: number;
   initialSqrtPrice: bigint;
-}
+};
 
-export interface InitializePoolInstructionDataArgs {
+export type InitializePoolInstructionDataArgs = {
   bumps: WhirlpoolBumpsArgs;
   tickSpacing: number;
   initialSqrtPrice: number | bigint;
-}
+};
 
 export function getInitializePoolInstructionDataEncoder(): FixedSizeEncoder<InitializePoolInstructionDataArgs> {
   return transformEncoder(
@@ -162,7 +163,7 @@ export function getInitializePoolInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializePoolInput<
+export type InitializePoolInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountTokenMintA extends string = string,
   TAccountTokenMintB extends string = string,
@@ -174,7 +175,7 @@ export interface InitializePoolInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   tokenMintA: Address<TAccountTokenMintA>;
   tokenMintB: Address<TAccountTokenMintB>;
@@ -189,7 +190,7 @@ export interface InitializePoolInput<
   bumps: InitializePoolInstructionDataArgs["bumps"];
   tickSpacing: InitializePoolInstructionDataArgs["tickSpacing"];
   initialSqrtPrice: InitializePoolInstructionDataArgs["initialSqrtPrice"];
-}
+};
 
 export function getInitializePoolInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -310,10 +311,10 @@ export function getInitializePoolInstruction<
   >);
 }
 
-export interface ParsedInitializePoolInstruction<
+export type ParsedInitializePoolInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -329,7 +330,7 @@ export interface ParsedInitializePoolInstruction<
     rent: TAccountMetas[10];
   };
   data: InitializePoolInstructionData;
-}
+};
 
 export function parseInitializePoolInstruction<
   TProgram extends string,

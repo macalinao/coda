@@ -6,39 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -51,20 +49,20 @@ export function getDepositSolDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DepositSolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountUserPoolTokenAccount extends string | AccountMeta = string,
-  TAccountManagerFeeAccount extends string | AccountMeta = string,
-  TAccountReferralPoolAccount extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountUserPoolTokenAccount extends string | AccountMeta<string> = string,
+  TAccountManagerFeeAccount extends string | AccountMeta<string> = string,
+  TAccountReferralPoolAccount extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountDepositAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountDepositAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -108,14 +106,9 @@ export type DepositSolInstruction<
     ]
   >;
 
-export interface DepositSolInstructionData {
-  discriminator: number;
-  args: bigint;
-}
+export type DepositSolInstructionData = { discriminator: number; args: bigint };
 
-export interface DepositSolInstructionDataArgs {
-  args: number | bigint;
-}
+export type DepositSolInstructionDataArgs = { args: number | bigint };
 
 export function getDepositSolInstructionDataEncoder(): FixedSizeEncoder<DepositSolInstructionDataArgs> {
   return transformEncoder(
@@ -144,7 +137,7 @@ export function getDepositSolInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface DepositSolAsyncInput<
+export type DepositSolAsyncInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountReserveStake extends string = string,
@@ -156,7 +149,7 @@ export interface DepositSolAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountDepositAuthority extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Stake pool withdraw authority */
@@ -180,8 +173,24 @@ export interface DepositSolAsyncInput<
   /** (Optional) Stake pool sol deposit authority. */
   depositAuthority?: TransactionSigner<TAccountDepositAuthority>;
   args: DepositSolInstructionDataArgs["args"];
-}
+};
 
+/**
+ * Deposit SOL directly into the pool's reserve account. The output is a
+ * "pool" token representing ownership into the pool. Inputs are
+ * converted to the current ratio.
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Reserve stake account, to deposit SOL
+ * 3. `[s]` Account providing the lamports to be deposited into the pool
+ * 4. `[w]` User account to receive pool tokens
+ * 5. `[w]` Account to receive fee tokens
+ * 6. `[w]` Account to receive a portion of fee as referral fees
+ * 7. `[w]` Pool token mint account
+ * 8. `[]` System program account
+ * 9. `[]` Token program id
+ * 10. `[s]` (Optional) Stake pool sol deposit authority.
+ */
 export async function getDepositSolInstructionAsync<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -320,7 +329,7 @@ export async function getDepositSolInstructionAsync<
   >);
 }
 
-export interface DepositSolInput<
+export type DepositSolInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountReserveStake extends string = string,
@@ -332,7 +341,7 @@ export interface DepositSolInput<
   TAccountSystemProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountDepositAuthority extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Stake pool withdraw authority */
@@ -356,8 +365,24 @@ export interface DepositSolInput<
   /** (Optional) Stake pool sol deposit authority. */
   depositAuthority?: TransactionSigner<TAccountDepositAuthority>;
   args: DepositSolInstructionDataArgs["args"];
-}
+};
 
+/**
+ * Deposit SOL directly into the pool's reserve account. The output is a
+ * "pool" token representing ownership into the pool. Inputs are
+ * converted to the current ratio.
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Reserve stake account, to deposit SOL
+ * 3. `[s]` Account providing the lamports to be deposited into the pool
+ * 4. `[w]` User account to receive pool tokens
+ * 5. `[w]` Account to receive fee tokens
+ * 6. `[w]` Account to receive a portion of fee as referral fees
+ * 7. `[w]` Pool token mint account
+ * 8. `[]` System program account
+ * 9. `[]` Token program id
+ * 10. `[s]` (Optional) Stake pool sol deposit authority.
+ */
 export function getDepositSolInstruction<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -486,10 +511,10 @@ export function getDepositSolInstruction<
   >);
 }
 
-export interface ParsedDepositSolInstruction<
+export type ParsedDepositSolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -516,7 +541,7 @@ export interface ParsedDepositSolInstruction<
     depositAuthority?: TAccountMetas[10] | undefined;
   };
   data: DepositSolInstructionData;
-}
+};
 
 export function parseDepositSolInstruction<
   TProgram extends string,

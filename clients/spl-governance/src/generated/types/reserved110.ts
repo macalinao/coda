@@ -6,11 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -19,13 +14,16 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Reserved110 {
-  reserved64: number[];
-  reserved32: number[];
-  reserved14: number[];
-}
+export type Reserved110 = {
+  reserved64: Array<number>;
+  reserved32: Array<number>;
+  reserved14: Array<number>;
+};
 
 export type Reserved110Args = Reserved110;
 

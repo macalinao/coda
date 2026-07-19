@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,21 +16,25 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface QuarryRewardsUpdateEvent {
+export type QuarryRewardsUpdateEvent = {
   tokenMint: Address;
   annualRewardsRate: bigint;
   rewardsShare: bigint;
   timestamp: bigint;
-}
+};
 
-export interface QuarryRewardsUpdateEventArgs {
+export type QuarryRewardsUpdateEventArgs = {
   tokenMint: Address;
   annualRewardsRate: number | bigint;
   rewardsShare: number | bigint;
   timestamp: number | bigint;
-}
+};
 
 export function getQuarryRewardsUpdateEventEncoder(): FixedSizeEncoder<QuarryRewardsUpdateEventArgs> {
   return getStructEncoder([

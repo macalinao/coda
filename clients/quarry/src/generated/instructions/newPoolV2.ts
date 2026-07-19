@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findReplicaMintPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -95,9 +93,7 @@ export type NewPoolV2Instruction<
     ]
   >;
 
-export interface NewPoolV2InstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type NewPoolV2InstructionData = { discriminator: ReadonlyUint8Array };
 
 export type NewPoolV2InstructionDataArgs = {};
 
@@ -124,7 +120,7 @@ export function getNewPoolV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewPoolV2AsyncInput<
+export type NewPoolV2AsyncInput<
   TAccountPool extends string = string,
   TAccountPrimaryMint extends string = string,
   TAccountReplicaMint extends string = string,
@@ -132,7 +128,7 @@ export interface NewPoolV2AsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   pool?: Address<TAccountPool>;
   primaryMint: Address<TAccountPrimaryMint>;
   replicaMint?: Address<TAccountReplicaMint>;
@@ -140,7 +136,7 @@ export interface NewPoolV2AsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getNewPoolV2InstructionAsync<
   TAccountPool extends string,
@@ -256,7 +252,7 @@ export async function getNewPoolV2InstructionAsync<
   >);
 }
 
-export interface NewPoolV2Input<
+export type NewPoolV2Input<
   TAccountPool extends string = string,
   TAccountPrimaryMint extends string = string,
   TAccountReplicaMint extends string = string,
@@ -264,7 +260,7 @@ export interface NewPoolV2Input<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   primaryMint: Address<TAccountPrimaryMint>;
   replicaMint: Address<TAccountReplicaMint>;
@@ -272,7 +268,7 @@ export interface NewPoolV2Input<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getNewPoolV2Instruction<
   TAccountPool extends string,
@@ -362,10 +358,10 @@ export function getNewPoolV2Instruction<
   >);
 }
 
-export interface ParsedNewPoolV2Instruction<
+export type ParsedNewPoolV2Instruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -377,7 +373,7 @@ export interface ParsedNewPoolV2Instruction<
     rent: TAccountMetas[6];
   };
   data: NewPoolV2InstructionData;
-}
+};
 
 export function parseNewPoolV2Instruction<
   TProgram extends string,

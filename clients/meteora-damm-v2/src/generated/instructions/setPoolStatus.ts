@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -80,14 +80,12 @@ export type SetPoolStatusInstruction<
     ]
   >;
 
-export interface SetPoolStatusInstructionData {
+export type SetPoolStatusInstructionData = {
   discriminator: ReadonlyUint8Array;
   status: number;
-}
+};
 
-export interface SetPoolStatusInstructionDataArgs {
-  status: number;
-}
+export type SetPoolStatusInstructionDataArgs = { status: number };
 
 export function getSetPoolStatusInstructionDataEncoder(): FixedSizeEncoder<SetPoolStatusInstructionDataArgs> {
   return transformEncoder(
@@ -116,18 +114,18 @@ export function getSetPoolStatusInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetPoolStatusAsyncInput<
+export type SetPoolStatusAsyncInput<
   TAccountPool extends string = string,
   TAccountAdmin extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   admin: TransactionSigner<TAccountAdmin>;
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   status: SetPoolStatusInstructionDataArgs["status"];
-}
+};
 
 export async function getSetPoolStatusInstructionAsync<
   TAccountPool extends string,
@@ -200,18 +198,18 @@ export async function getSetPoolStatusInstructionAsync<
   >);
 }
 
-export interface SetPoolStatusInput<
+export type SetPoolStatusInput<
   TAccountPool extends string = string,
   TAccountAdmin extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   admin: TransactionSigner<TAccountAdmin>;
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   status: SetPoolStatusInstructionDataArgs["status"];
-}
+};
 
 export function getSetPoolStatusInstruction<
   TAccountPool extends string,
@@ -279,10 +277,10 @@ export function getSetPoolStatusInstruction<
   >);
 }
 
-export interface ParsedSetPoolStatusInstruction<
+export type ParsedSetPoolStatusInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -291,7 +289,7 @@ export interface ParsedSetPoolStatusInstruction<
     program: TAccountMetas[3];
   };
   data: SetPoolStatusInstructionData;
-}
+};
 
 export function parseSetPoolStatusInstruction<
   TProgram extends string,

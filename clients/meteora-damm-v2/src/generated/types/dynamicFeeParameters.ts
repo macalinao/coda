@@ -6,24 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface DynamicFeeParameters {
+export type DynamicFeeParameters = {
   binStep: number;
   binStepU128: bigint;
   filterPeriod: number;
@@ -31,9 +29,9 @@ export interface DynamicFeeParameters {
   reductionFactor: number;
   maxVolatilityAccumulator: number;
   variableFeeControl: number;
-}
+};
 
-export interface DynamicFeeParametersArgs {
+export type DynamicFeeParametersArgs = {
   binStep: number;
   binStepU128: number | bigint;
   filterPeriod: number;
@@ -41,7 +39,7 @@ export interface DynamicFeeParametersArgs {
   reductionFactor: number;
   maxVolatilityAccumulator: number;
   variableFeeControl: number;
-}
+};
 
 export function getDynamicFeeParametersEncoder(): FixedSizeEncoder<DynamicFeeParametersArgs> {
   return getStructEncoder([

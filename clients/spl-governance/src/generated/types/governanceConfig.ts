@@ -6,32 +6,32 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  VoteThreshold,
-  VoteThresholdArgs,
-  VoteTipping,
-  VoteTippingArgs,
-} from "./index.js";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getVoteThresholdDecoder,
   getVoteThresholdEncoder,
   getVoteTippingDecoder,
   getVoteTippingEncoder,
+  type VoteThreshold,
+  type VoteThresholdArgs,
+  type VoteTipping,
+  type VoteTippingArgs,
 } from "./index.js";
 
-export interface GovernanceConfig {
+export type GovernanceConfig = {
   communityVoteThreshold: VoteThreshold;
   minCommunityWeightToCreateProposal: bigint;
   minTransactionHoldUpTime: number;
@@ -44,9 +44,9 @@ export interface GovernanceConfig {
   communityVetoVoteThreshold: VoteThreshold;
   votingCoolOffTime: number;
   depositExemptProposalCount: number;
-}
+};
 
-export interface GovernanceConfigArgs {
+export type GovernanceConfigArgs = {
   communityVoteThreshold: VoteThresholdArgs;
   minCommunityWeightToCreateProposal: number | bigint;
   minTransactionHoldUpTime: number;
@@ -59,7 +59,7 @@ export interface GovernanceConfigArgs {
   communityVetoVoteThreshold: VoteThresholdArgs;
   votingCoolOffTime: number;
   depositExemptProposalCount: number;
-}
+};
 
 export function getGovernanceConfigEncoder(): Encoder<GovernanceConfigArgs> {
   return getStructEncoder([

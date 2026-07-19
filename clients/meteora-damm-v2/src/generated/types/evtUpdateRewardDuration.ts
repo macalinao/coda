@@ -6,37 +6,35 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface EvtUpdateRewardDuration {
+export type EvtUpdateRewardDuration = {
   pool: Address;
   rewardIndex: number;
   oldRewardDuration: bigint;
   newRewardDuration: bigint;
-}
+};
 
-export interface EvtUpdateRewardDurationArgs {
+export type EvtUpdateRewardDurationArgs = {
   pool: Address;
   rewardIndex: number;
   oldRewardDuration: number | bigint;
   newRewardDuration: number | bigint;
-}
+};
 
 export function getEvtUpdateRewardDurationEncoder(): FixedSizeEncoder<EvtUpdateRewardDurationArgs> {
   return getStructEncoder([

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -33,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
+  type GovernanceConfig,
+  type GovernanceConfigArgs,
 } from "../types/index.js";
 
 export const CREATE_GOVERNANCE_DISCRIMINATOR = 4;
@@ -49,17 +50,18 @@ export function getCreateGovernanceDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateGovernanceInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountGovernedAccount extends string | AccountMeta = string,
-  TAccountGoverningTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountGovernedAccount extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenOwnerRecord extends string | AccountMeta<string> =
+    string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountRealmConfigAccount extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountRealmConfigAccount extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -97,14 +99,14 @@ export type CreateGovernanceInstruction<
     ]
   >;
 
-export interface CreateGovernanceInstructionData {
+export type CreateGovernanceInstructionData = {
   discriminator: number;
   config: GovernanceConfig;
-}
+};
 
-export interface CreateGovernanceInstructionDataArgs {
+export type CreateGovernanceInstructionDataArgs = {
   config: GovernanceConfigArgs;
-}
+};
 
 export function getCreateGovernanceInstructionDataEncoder(): Encoder<CreateGovernanceInstructionDataArgs> {
   return transformEncoder(
@@ -133,7 +135,7 @@ export function getCreateGovernanceInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateGovernanceInput<
+export type CreateGovernanceInput<
   TAccountRealmAccount extends string = string,
   TAccountGovernanceAccount extends string = string,
   TAccountGovernedAccount extends string = string,
@@ -143,7 +145,7 @@ export interface CreateGovernanceInput<
   TAccountGovernanceAuthority extends string = string,
   TAccountRealmConfigAccount extends string = string,
   TAccountVoterWeightRecord extends string = string,
-> {
+> = {
   /** Realm account the created governance belongs to */
   realmAccount: Address<TAccountRealmAccount>;
   /** seeds=['account-governance', realm, governed_account] */
@@ -163,7 +165,7 @@ export interface CreateGovernanceInput<
   /** Optional Voter Weight Record */
   voterWeightRecord?: Address<TAccountVoterWeightRecord>;
   config: CreateGovernanceInstructionDataArgs["config"];
-}
+};
 
 export function getCreateGovernanceInstruction<
   TAccountRealmAccount extends string,
@@ -283,10 +285,10 @@ export function getCreateGovernanceInstruction<
   >);
 }
 
-export interface ParsedCreateGovernanceInstruction<
+export type ParsedCreateGovernanceInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Realm account the created governance belongs to */
@@ -309,7 +311,7 @@ export interface ParsedCreateGovernanceInstruction<
     voterWeightRecord?: TAccountMetas[8] | undefined;
   };
   data: CreateGovernanceInstructionData;
-}
+};
 
 export function parseCreateGovernanceInstruction<
   TProgram extends string,

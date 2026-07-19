@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  InitializeCustomizablePoolParameters,
-  InitializeCustomizablePoolParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -40,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findCustomizablePoolPda,
@@ -56,6 +50,8 @@ import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getInitializeCustomizablePoolParametersDecoder,
   getInitializeCustomizablePoolParametersEncoder,
+  type InitializeCustomizablePoolParameters,
+  type InitializeCustomizablePoolParametersArgs,
 } from "../types/index.js";
 
 export const INITIALIZE_CUSTOMIZABLE_POOL_DISCRIMINATOR: ReadonlyUint8Array =
@@ -161,14 +157,14 @@ export type InitializeCustomizablePoolInstruction<
     ]
   >;
 
-export interface InitializeCustomizablePoolInstructionData {
+export type InitializeCustomizablePoolInstructionData = {
   discriminator: ReadonlyUint8Array;
   params: InitializeCustomizablePoolParameters;
-}
+};
 
-export interface InitializeCustomizablePoolInstructionDataArgs {
+export type InitializeCustomizablePoolInstructionDataArgs = {
   params: InitializeCustomizablePoolParametersArgs;
-}
+};
 
 export function getInitializeCustomizablePoolInstructionDataEncoder(): Encoder<InitializeCustomizablePoolInstructionDataArgs> {
   return transformEncoder(
@@ -200,7 +196,7 @@ export function getInitializeCustomizablePoolInstructionDataCodec(): Codec<
   );
 }
 
-export interface InitializeCustomizablePoolAsyncInput<
+export type InitializeCustomizablePoolAsyncInput<
   TAccountCreator extends string = string,
   TAccountPositionNftMint extends string = string,
   TAccountPositionNftAccount extends string = string,
@@ -220,7 +216,7 @@ export interface InitializeCustomizablePoolAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   creator: Address<TAccountCreator>;
   /** position_nft_mint */
   positionNftMint: TransactionSigner<TAccountPositionNftMint>;
@@ -254,7 +250,7 @@ export interface InitializeCustomizablePoolAsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: InitializeCustomizablePoolInstructionDataArgs["params"];
-}
+};
 
 export async function getInitializeCustomizablePoolInstructionAsync<
   TAccountCreator extends string,
@@ -502,7 +498,7 @@ export async function getInitializeCustomizablePoolInstructionAsync<
   >);
 }
 
-export interface InitializeCustomizablePoolInput<
+export type InitializeCustomizablePoolInput<
   TAccountCreator extends string = string,
   TAccountPositionNftMint extends string = string,
   TAccountPositionNftAccount extends string = string,
@@ -522,7 +518,7 @@ export interface InitializeCustomizablePoolInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   creator: Address<TAccountCreator>;
   /** position_nft_mint */
   positionNftMint: TransactionSigner<TAccountPositionNftMint>;
@@ -556,7 +552,7 @@ export interface InitializeCustomizablePoolInput<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: InitializeCustomizablePoolInstructionDataArgs["params"];
-}
+};
 
 export function getInitializeCustomizablePoolInstruction<
   TAccountCreator extends string,
@@ -736,10 +732,10 @@ export function getInitializeCustomizablePoolInstruction<
   >);
 }
 
-export interface ParsedInitializeCustomizablePoolInstruction<
+export type ParsedInitializeCustomizablePoolInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     creator: TAccountMetas[0];
@@ -776,7 +772,7 @@ export interface ParsedInitializeCustomizablePoolInstruction<
     program: TAccountMetas[18];
   };
   data: InitializeCustomizablePoolInstructionData;
-}
+};
 
 export function parseInitializeCustomizablePoolInstruction<
   TProgram extends string,

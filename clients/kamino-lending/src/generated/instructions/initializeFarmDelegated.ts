@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +17,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -54,16 +52,16 @@ export function getInitializeFarmDelegatedDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type InitializeFarmDelegatedInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountFarmAdmin extends string | AccountMeta = string,
-  TAccountFarmDelegate extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TAccountFarmVaultsAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountFarmAdmin extends string | AccountMeta<string> = string,
+  TAccountFarmDelegate extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountFarmVaultsAuthority extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,9 +93,9 @@ export type InitializeFarmDelegatedInstruction<
     ]
   >;
 
-export interface InitializeFarmDelegatedInstructionData {
+export type InitializeFarmDelegatedInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type InitializeFarmDelegatedInstructionDataArgs = {};
 
@@ -127,7 +125,7 @@ export function getInitializeFarmDelegatedInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface InitializeFarmDelegatedAsyncInput<
+export type InitializeFarmDelegatedAsyncInput<
   TAccountFarmAdmin extends string = string,
   TAccountFarmDelegate extends string = string,
   TAccountFarmState extends string = string,
@@ -135,7 +133,7 @@ export interface InitializeFarmDelegatedAsyncInput<
   TAccountFarmVaultsAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   farmAdmin: TransactionSigner<TAccountFarmAdmin>;
   farmDelegate: TransactionSigner<TAccountFarmDelegate>;
   farmState: Address<TAccountFarmState>;
@@ -143,7 +141,7 @@ export interface InitializeFarmDelegatedAsyncInput<
   farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getInitializeFarmDelegatedInstructionAsync<
   TAccountFarmAdmin extends string,
@@ -241,7 +239,7 @@ export async function getInitializeFarmDelegatedInstructionAsync<
   >);
 }
 
-export interface InitializeFarmDelegatedInput<
+export type InitializeFarmDelegatedInput<
   TAccountFarmAdmin extends string = string,
   TAccountFarmDelegate extends string = string,
   TAccountFarmState extends string = string,
@@ -249,7 +247,7 @@ export interface InitializeFarmDelegatedInput<
   TAccountFarmVaultsAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   farmAdmin: TransactionSigner<TAccountFarmAdmin>;
   farmDelegate: TransactionSigner<TAccountFarmDelegate>;
   farmState: Address<TAccountFarmState>;
@@ -257,7 +255,7 @@ export interface InitializeFarmDelegatedInput<
   farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getInitializeFarmDelegatedInstruction<
   TAccountFarmAdmin extends string,
@@ -345,10 +343,10 @@ export function getInitializeFarmDelegatedInstruction<
   >);
 }
 
-export interface ParsedInitializeFarmDelegatedInstruction<
+export type ParsedInitializeFarmDelegatedInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     farmAdmin: TAccountMetas[0];
@@ -360,7 +358,7 @@ export interface ParsedInitializeFarmDelegatedInstruction<
     rent: TAccountMetas[6];
   };
   data: InitializeFarmDelegatedInstructionData;
-}
+};
 
 export function parseInitializeFarmDelegatedInstruction<
   TProgram extends string,

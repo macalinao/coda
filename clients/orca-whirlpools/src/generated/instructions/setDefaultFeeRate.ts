@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_DEFAULT_FEE_RATE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,10 +51,10 @@ export function getSetDefaultFeeRateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetDefaultFeeRateInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountFeeTier extends string | AccountMeta = string,
-  TAccountFeeAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountFeeTier extends string | AccountMeta<string> = string,
+  TAccountFeeAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -73,14 +73,12 @@ export type SetDefaultFeeRateInstruction<
     ]
   >;
 
-export interface SetDefaultFeeRateInstructionData {
+export type SetDefaultFeeRateInstructionData = {
   discriminator: ReadonlyUint8Array;
   defaultFeeRate: number;
-}
+};
 
-export interface SetDefaultFeeRateInstructionDataArgs {
-  defaultFeeRate: number;
-}
+export type SetDefaultFeeRateInstructionDataArgs = { defaultFeeRate: number };
 
 export function getSetDefaultFeeRateInstructionDataEncoder(): FixedSizeEncoder<SetDefaultFeeRateInstructionDataArgs> {
   return transformEncoder(
@@ -112,16 +110,16 @@ export function getSetDefaultFeeRateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetDefaultFeeRateInput<
+export type SetDefaultFeeRateInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountFeeTier extends string = string,
   TAccountFeeAuthority extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   feeTier: Address<TAccountFeeTier>;
   feeAuthority: TransactionSigner<TAccountFeeAuthority>;
   defaultFeeRate: SetDefaultFeeRateInstructionDataArgs["defaultFeeRate"];
-}
+};
 
 export function getSetDefaultFeeRateInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -180,10 +178,10 @@ export function getSetDefaultFeeRateInstruction<
   >);
 }
 
-export interface ParsedSetDefaultFeeRateInstruction<
+export type ParsedSetDefaultFeeRateInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -191,7 +189,7 @@ export interface ParsedSetDefaultFeeRateInstruction<
     feeAuthority: TAccountMetas[2];
   };
   data: SetDefaultFeeRateInstructionData;
-}
+};
 
 export function parseSetDefaultFeeRateInstruction<
   TProgram extends string,

@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RealmConfigParams,
-  RealmConfigParamsArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -36,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRealmConfigParamsDecoder,
   getRealmConfigParamsEncoder,
+  type RealmConfigParams,
+  type RealmConfigParamsArgs,
 } from "../types/index.js";
 
 export const SET_REALM_CONFIG_DISCRIMINATOR = 22;
@@ -52,23 +50,28 @@ export function getSetRealmConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetRealmConfigInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountRealmAuthority extends string | AccountMeta = string,
-  TAccountCouncilTokenMint extends string | AccountMeta = string,
-  TAccountCouncilTokenHoldingAccount extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountRealmAuthority extends string | AccountMeta<string> = string,
+  TAccountCouncilTokenMint extends string | AccountMeta<string> = string,
+  TAccountCouncilTokenHoldingAccount extends string | AccountMeta<string> =
+    string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRealmConfig extends string | AccountMeta = string,
-  TAccountCommunityVoterWeightAddinProgramId extends string | AccountMeta =
-    string,
-  TAccountMaxCommunityVoterWeightAddinProgramId extends string | AccountMeta =
-    string,
-  TAccountCouncilVoterWeightAddinProgramId extends string | AccountMeta =
-    string,
-  TAccountMaxCouncilVoterWeightAddinProgramId extends string | AccountMeta =
-    string,
-  TAccountPayer extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmConfig extends string | AccountMeta<string> = string,
+  TAccountCommunityVoterWeightAddinProgramId extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountMaxCommunityVoterWeightAddinProgramId extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountCouncilVoterWeightAddinProgramId extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountMaxCouncilVoterWeightAddinProgramId extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -112,14 +115,14 @@ export type SetRealmConfigInstruction<
     ]
   >;
 
-export interface SetRealmConfigInstructionData {
+export type SetRealmConfigInstructionData = {
   discriminator: number;
   configArgs: RealmConfigParams;
-}
+};
 
-export interface SetRealmConfigInstructionDataArgs {
+export type SetRealmConfigInstructionDataArgs = {
   configArgs: RealmConfigParamsArgs;
-}
+};
 
 export function getSetRealmConfigInstructionDataEncoder(): FixedSizeEncoder<SetRealmConfigInstructionDataArgs> {
   return transformEncoder(
@@ -148,7 +151,7 @@ export function getSetRealmConfigInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetRealmConfigInput<
+export type SetRealmConfigInput<
   TAccountRealmAccount extends string = string,
   TAccountRealmAuthority extends string = string,
   TAccountCouncilTokenMint extends string = string,
@@ -160,7 +163,7 @@ export interface SetRealmConfigInput<
   TAccountCouncilVoterWeightAddinProgramId extends string = string,
   TAccountMaxCouncilVoterWeightAddinProgramId extends string = string,
   TAccountPayer extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
   /**
@@ -186,7 +189,7 @@ export interface SetRealmConfigInput<
   /** Optional Payer. Required if RealmConfig doesn't exist and needs to be created */
   payer?: TransactionSigner<TAccountPayer>;
   configArgs: SetRealmConfigInstructionDataArgs["configArgs"];
-}
+};
 
 export function getSetRealmConfigInstruction<
   TAccountRealmAccount extends string,
@@ -330,10 +333,10 @@ export function getSetRealmConfigInstruction<
   >);
 }
 
-export interface ParsedSetRealmConfigInstruction<
+export type ParsedSetRealmConfigInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -362,7 +365,7 @@ export interface ParsedSetRealmConfigInstruction<
     payer?: TAccountMetas[10] | undefined;
   };
   data: SetRealmConfigInstructionData;
-}
+};
 
 export function parseSetRealmConfigInstruction<
   TProgram extends string,

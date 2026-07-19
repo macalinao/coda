@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  SplitPositionParameters,
-  SplitPositionParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,13 +17,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getSplitPositionParametersDecoder,
   getSplitPositionParametersEncoder,
+  type SplitPositionParameters,
+  type SplitPositionParametersArgs,
 } from "../types/index.js";
 
 export const SPLIT_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -108,14 +106,14 @@ export type SplitPositionInstruction<
     ]
   >;
 
-export interface SplitPositionInstructionData {
+export type SplitPositionInstructionData = {
   discriminator: ReadonlyUint8Array;
   params: SplitPositionParameters;
-}
+};
 
-export interface SplitPositionInstructionDataArgs {
+export type SplitPositionInstructionDataArgs = {
   params: SplitPositionParametersArgs;
-}
+};
 
 export function getSplitPositionInstructionDataEncoder(): FixedSizeEncoder<SplitPositionInstructionDataArgs> {
   return transformEncoder(
@@ -144,7 +142,7 @@ export function getSplitPositionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SplitPositionAsyncInput<
+export type SplitPositionAsyncInput<
   TAccountPool extends string = string,
   TAccountFirstPosition extends string = string,
   TAccountFirstPositionNftAccount extends string = string,
@@ -154,7 +152,7 @@ export interface SplitPositionAsyncInput<
   TAccountSecondOwner extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   /** The first position */
   firstPosition: Address<TAccountFirstPosition>;
@@ -171,7 +169,7 @@ export interface SplitPositionAsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: SplitPositionInstructionDataArgs["params"];
-}
+};
 
 export async function getSplitPositionInstructionAsync<
   TAccountPool extends string,
@@ -286,7 +284,7 @@ export async function getSplitPositionInstructionAsync<
   >);
 }
 
-export interface SplitPositionInput<
+export type SplitPositionInput<
   TAccountPool extends string = string,
   TAccountFirstPosition extends string = string,
   TAccountFirstPositionNftAccount extends string = string,
@@ -296,7 +294,7 @@ export interface SplitPositionInput<
   TAccountSecondOwner extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   /** The first position */
   firstPosition: Address<TAccountFirstPosition>;
@@ -313,7 +311,7 @@ export interface SplitPositionInput<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: SplitPositionInstructionDataArgs["params"];
-}
+};
 
 export function getSplitPositionInstruction<
   TAccountPool extends string,
@@ -423,10 +421,10 @@ export function getSplitPositionInstruction<
   >);
 }
 
-export interface ParsedSplitPositionInstruction<
+export type ParsedSplitPositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -446,7 +444,7 @@ export interface ParsedSplitPositionInstruction<
     program: TAccountMetas[8];
   };
   data: SplitPositionInstructionData;
-}
+};
 
 export function parseSplitPositionInstruction<
   TProgram extends string,

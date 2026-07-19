@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { RegistrySeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,8 +26,19 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRegistryPda } from "../pdas/index.js";
+import { findRegistryPda, type RegistrySeeds } from "../pdas/index.js";
 
 export const REGISTRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   47, 174, 110, 246, 184, 182, 252, 218,
@@ -51,18 +48,18 @@ export function getRegistryDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(REGISTRY_DISCRIMINATOR);
 }
 
-export interface Registry {
+export type Registry = {
   discriminator: ReadonlyUint8Array;
   bump: number;
   rewarder: Address;
-  tokens: Address[];
-}
+  tokens: Array<Address>;
+};
 
-export interface RegistryArgs {
+export type RegistryArgs = {
   bump: number;
   rewarder: Address;
-  tokens: Address[];
-}
+  tokens: Array<Address>;
+};
 
 /** Gets the encoder for {@link RegistryArgs} account data. */
 export function getRegistryEncoder(): Encoder<RegistryArgs> {
@@ -128,7 +125,7 @@ export async function fetchMaybeRegistry<TAddress extends string = string>(
 
 export async function fetchAllRegistry(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Registry>[]> {
   const maybeAccounts = await fetchAllMaybeRegistry(rpc, addresses, config);
@@ -138,7 +135,7 @@ export async function fetchAllRegistry(
 
 export async function fetchAllMaybeRegistry(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Registry>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

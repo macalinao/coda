@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type { MultiChoiceType, MultiChoiceTypeArgs } from "./index.js";
 import {
   combineCodec,
   getDiscriminatedUnionDecoder,
@@ -24,10 +16,17 @@ import {
   getU8Encoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 import {
   getMultiChoiceTypeDecoder,
   getMultiChoiceTypeEncoder,
+  type MultiChoiceType,
+  type MultiChoiceTypeArgs,
 } from "./index.js";
 
 export type VoteType =

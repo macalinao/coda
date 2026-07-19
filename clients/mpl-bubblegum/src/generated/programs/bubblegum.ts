@@ -21,6 +21,7 @@ import {
   type ClientWithRpc,
   type ClientWithTransactionPlanning,
   type ClientWithTransactionSending,
+  type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
   type Instruction,
@@ -1064,6 +1065,9 @@ export type BubblegumPlugin = {
   accounts: BubblegumPluginAccounts;
   instructions: BubblegumPluginInstructions;
   pdas: BubblegumPluginPdas;
+  identifyAccount: typeof identifyBubblegumAccount;
+  identifyInstruction: typeof identifyBubblegumInstruction;
+  parseInstruction: typeof parseBubblegumInstruction;
 };
 
 export type BubblegumPluginAccounts = {
@@ -1231,7 +1235,7 @@ export type BubblegumPluginRequirements = ClientWithRpc<
 export function bubblegumProgram() {
   return <T extends BubblegumPluginRequirements>(
     client: T,
-  ): Omit<T, "bubblegum"> & { bubblegum: BubblegumPlugin } => {
+  ): ExtendedClient<T, { bubblegum: BubblegumPlugin }> => {
     return extendClient(client, {
       bubblegum: <BubblegumPlugin>{
         accounts: {
@@ -1496,6 +1500,9 @@ export function bubblegumProgram() {
           bubblegumSigner: findBubblegumSignerPda,
           mintAuthority: findMintAuthorityPda,
         },
+        identifyAccount: identifyBubblegumAccount,
+        identifyInstruction: identifyBubblegumInstruction,
+        parseInstruction: parseBubblegumInstruction,
       },
     });
   };

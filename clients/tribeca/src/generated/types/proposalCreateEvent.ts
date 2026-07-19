@@ -6,8 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
-import type { ProposalInstruction, ProposalInstructionArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -18,25 +16,31 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getProposalInstructionDecoder,
   getProposalInstructionEncoder,
+  type ProposalInstruction,
+  type ProposalInstructionArgs,
 } from "./index.js";
 
-export interface ProposalCreateEvent {
+export type ProposalCreateEvent = {
   governor: Address;
   proposal: Address;
   index: bigint;
-  instructions: ProposalInstruction[];
-}
+  instructions: Array<ProposalInstruction>;
+};
 
-export interface ProposalCreateEventArgs {
+export type ProposalCreateEventArgs = {
   governor: Address;
   proposal: Address;
   index: number | bigint;
-  instructions: ProposalInstructionArgs[];
-}
+  instructions: Array<ProposalInstructionArgs>;
+};
 
 export function getProposalCreateEventEncoder(): Encoder<ProposalCreateEventArgs> {
   return getStructEncoder([

@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,8 +21,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INITIALIZE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
@@ -52,11 +52,11 @@ export function getInitializeConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeConfigInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountConfig extends string | AccountMeta = string,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountConfig extends string | AccountMeta<string> = string,
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -76,20 +76,20 @@ export type InitializeConfigInstruction<
     ]
   >;
 
-export interface InitializeConfigInstructionData {
+export type InitializeConfigInstructionData = {
   discriminator: ReadonlyUint8Array;
   feeAuthority: Address;
   collectProtocolFeesAuthority: Address;
   rewardEmissionsSuperAuthority: Address;
   defaultProtocolFeeRate: number;
-}
+};
 
-export interface InitializeConfigInstructionDataArgs {
+export type InitializeConfigInstructionDataArgs = {
   feeAuthority: Address;
   collectProtocolFeesAuthority: Address;
   rewardEmissionsSuperAuthority: Address;
   defaultProtocolFeeRate: number;
-}
+};
 
 export function getInitializeConfigInstructionDataEncoder(): FixedSizeEncoder<InitializeConfigInstructionDataArgs> {
   return transformEncoder(
@@ -124,11 +124,11 @@ export function getInitializeConfigInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializeConfigInput<
+export type InitializeConfigInput<
   TAccountConfig extends string = string,
   TAccountFunder extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   config: TransactionSigner<TAccountConfig>;
   funder: TransactionSigner<TAccountFunder>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -136,7 +136,7 @@ export interface InitializeConfigInput<
   collectProtocolFeesAuthority: InitializeConfigInstructionDataArgs["collectProtocolFeesAuthority"];
   rewardEmissionsSuperAuthority: InitializeConfigInstructionDataArgs["rewardEmissionsSuperAuthority"];
   defaultProtocolFeeRate: InitializeConfigInstructionDataArgs["defaultProtocolFeeRate"];
-}
+};
 
 export function getInitializeConfigInstruction<
   TAccountConfig extends string,
@@ -198,10 +198,10 @@ export function getInitializeConfigInstruction<
   >);
 }
 
-export interface ParsedInitializeConfigInstruction<
+export type ParsedInitializeConfigInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     config: TAccountMetas[0];
@@ -209,7 +209,7 @@ export interface ParsedInitializeConfigInstruction<
     systemProgram: TAccountMetas[2];
   };
   data: InitializeConfigInstructionData;
-}
+};
 
 export function parseInitializeConfigInstruction<
   TProgram extends string,

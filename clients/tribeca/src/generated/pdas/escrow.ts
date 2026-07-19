@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface EscrowSeeds {
+export type EscrowSeeds = {
   locker: Address;
   authority: Address;
-}
+};
 
 /** Escrow account that holds locked tokens for a user */
 export async function findEscrowPda(

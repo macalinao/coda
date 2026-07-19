@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ProposalSeeds } from "../pdas/index.js";
-import type {
-  ProposalInstruction,
-  ProposalInstructionArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -43,16 +25,29 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalPda } from "../pdas/index.js";
+import { findProposalPda, type ProposalSeeds } from "../pdas/index.js";
 import {
   getProposalInstructionDecoder,
   getProposalInstructionEncoder,
+  type ProposalInstruction,
+  type ProposalInstructionArgs,
 } from "../types/index.js";
 
 export const PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -63,7 +58,7 @@ export function getProposalDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(PROPOSAL_DISCRIMINATOR);
 }
 
-export interface Proposal {
+export type Proposal = {
   discriminator: ReadonlyUint8Array;
   governor: Address;
   index: bigint;
@@ -79,10 +74,10 @@ export interface Proposal {
   votingEndsAt: bigint;
   queuedAt: bigint;
   queuedTransaction: Address;
-  instructions: ProposalInstruction[];
-}
+  instructions: Array<ProposalInstruction>;
+};
 
-export interface ProposalArgs {
+export type ProposalArgs = {
   governor: Address;
   index: number | bigint;
   bump: number;
@@ -97,8 +92,8 @@ export interface ProposalArgs {
   votingEndsAt: number | bigint;
   queuedAt: number | bigint;
   queuedTransaction: Address;
-  instructions: ProposalInstructionArgs[];
-}
+  instructions: Array<ProposalInstructionArgs>;
+};
 
 /** Gets the encoder for {@link ProposalArgs} account data. */
 export function getProposalEncoder(): Encoder<ProposalArgs> {
@@ -188,7 +183,7 @@ export async function fetchMaybeProposal<TAddress extends string = string>(
 
 export async function fetchAllProposal(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Proposal>[]> {
   const maybeAccounts = await fetchAllMaybeProposal(rpc, addresses, config);
@@ -198,7 +193,7 @@ export async function fetchAllProposal(
 
 export async function fetchAllMaybeProposal(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Proposal>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { OperatorSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,13 +23,24 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findOperatorPda } from "../pdas/index.js";
+import { findOperatorPda, type OperatorSeeds } from "../pdas/index.js";
 
 export const OPERATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   219, 31, 188, 145, 69, 139, 204, 117,
@@ -53,7 +50,7 @@ export function getOperatorDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(OPERATOR_DISCRIMINATOR);
 }
 
-export interface Operator {
+export type Operator = {
   discriminator: ReadonlyUint8Array;
   base: Address;
   bump: number;
@@ -64,9 +61,9 @@ export interface Operator {
   shareAllocator: Address;
   lastModifiedTs: bigint;
   generation: bigint;
-}
+};
 
-export interface OperatorArgs {
+export type OperatorArgs = {
   base: Address;
   bump: number;
   rewarder: Address;
@@ -76,7 +73,7 @@ export interface OperatorArgs {
   shareAllocator: Address;
   lastModifiedTs: number | bigint;
   generation: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link OperatorArgs} account data. */
 export function getOperatorEncoder(): FixedSizeEncoder<OperatorArgs> {
@@ -154,7 +151,7 @@ export async function fetchMaybeOperator<TAddress extends string = string>(
 
 export async function fetchAllOperator(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Operator>[]> {
   const maybeAccounts = await fetchAllMaybeOperator(rpc, addresses, config);
@@ -164,7 +161,7 @@ export async function fetchAllOperator(
 
 export async function fetchAllMaybeOperator(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Operator>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,44 +6,46 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { LockingInfo, LockingInfoArgs } from "./index.js";
 import {
   combineCodec,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getLockingInfoDecoder, getLockingInfoEncoder } from "./index.js";
+import {
+  getLockingInfoDecoder,
+  getLockingInfoEncoder,
+  type LockingInfo,
+  type LockingInfoArgs,
+} from "./index.js";
 
-export interface DepositEntryInfo {
+export type DepositEntryInfo = {
   depositEntryIndex: number;
   votingMintConfigIndex: number;
   unlocked: bigint;
   votingPower: bigint;
   votingPowerBaseline: bigint;
   locking: Option<LockingInfo>;
-}
+};
 
-export interface DepositEntryInfoArgs {
+export type DepositEntryInfoArgs = {
   depositEntryIndex: number;
   votingMintConfigIndex: number;
   unlocked: number | bigint;
   votingPower: number | bigint;
   votingPowerBaseline: number | bigint;
   locking: OptionOrNullable<LockingInfoArgs>;
-}
+};
 
 export function getDepositEntryInfoEncoder(): Encoder<DepositEntryInfoArgs> {
   return getStructEncoder([

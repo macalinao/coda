@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { LockupKind, LockupKindArgs } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,19 +18,44 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getLockupKindDecoder, getLockupKindEncoder } from "../types/index.js";
+import {
+  getLockupKindDecoder,
+  getLockupKindEncoder,
+  type LockupKind,
+  type LockupKindArgs,
+} from "../types/index.js";
 
 export const GRANT_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   145, 189, 68, 153, 161, 231, 76, 107,
@@ -63,25 +67,25 @@ export function getGrantDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type GrantInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TAccountVault extends string | AccountMeta = string,
-  TAccountDepositToken extends string | AccountMeta = string,
-  TAccountTokenAuthority extends string | AccountMeta = string,
-  TAccountGrantAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountDepositMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TAccountVault extends string | AccountMeta<string> = string,
+  TAccountDepositToken extends string | AccountMeta<string> = string,
+  TAccountTokenAuthority extends string | AccountMeta<string> = string,
+  TAccountGrantAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountDepositMint extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends string | AccountMeta =
+  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -135,7 +139,7 @@ export type GrantInstruction<
     ]
   >;
 
-export interface GrantInstructionData {
+export type GrantInstructionData = {
   discriminator: ReadonlyUint8Array;
   voterBump: number;
   voterWeightRecordBump: number;
@@ -144,9 +148,9 @@ export interface GrantInstructionData {
   periods: number;
   allowClawback: boolean;
   amount: bigint;
-}
+};
 
-export interface GrantInstructionDataArgs {
+export type GrantInstructionDataArgs = {
   voterBump: number;
   voterWeightRecordBump: number;
   kind: LockupKindArgs;
@@ -154,7 +158,7 @@ export interface GrantInstructionDataArgs {
   periods: number;
   allowClawback: boolean;
   amount: number | bigint;
-}
+};
 
 export function getGrantInstructionDataEncoder(): Encoder<GrantInstructionDataArgs> {
   return transformEncoder(
@@ -195,7 +199,7 @@ export function getGrantInstructionDataCodec(): Codec<
   );
 }
 
-export interface GrantInput<
+export type GrantInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
@@ -210,7 +214,7 @@ export interface GrantInput<
   TAccountTokenProgram extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   voterAuthority: Address<TAccountVoterAuthority>;
@@ -232,7 +236,7 @@ export interface GrantInput<
   periods: GrantInstructionDataArgs["periods"];
   allowClawback: GrantInstructionDataArgs["allowClawback"];
   amount: GrantInstructionDataArgs["amount"];
-}
+};
 
 export function getGrantInstruction<
   TAccountRegistrar extends string,
@@ -379,10 +383,10 @@ export function getGrantInstruction<
   >);
 }
 
-export interface ParsedGrantInstruction<
+export type ParsedGrantInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -401,7 +405,7 @@ export interface ParsedGrantInstruction<
     rent: TAccountMetas[13];
   };
   data: GrantInstructionData;
-}
+};
 
 export function parseGrantInstruction<
   TProgram extends string,

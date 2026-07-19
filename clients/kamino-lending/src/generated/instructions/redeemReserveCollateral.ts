@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findLendingMarketAuthPda,
@@ -59,22 +57,23 @@ export function getRedeemReserveCollateralDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type RedeemReserveCollateralInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveCollateralMint extends string | AccountMeta = string,
-  TAccountReserveLiquiditySupply extends string | AccountMeta = string,
-  TAccountUserSourceCollateral extends string | AccountMeta = string,
-  TAccountUserDestinationLiquidity extends string | AccountMeta = string,
-  TAccountCollateralTokenProgram extends string | AccountMeta =
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
+  TAccountReserveCollateralMint extends string | AccountMeta<string> = string,
+  TAccountReserveLiquiditySupply extends string | AccountMeta<string> = string,
+  TAccountUserSourceCollateral extends string | AccountMeta<string> = string,
+  TAccountUserDestinationLiquidity extends string | AccountMeta<string> =
+    string,
+  TAccountCollateralTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountLiquidityTokenProgram extends string | AccountMeta =
+  TAccountLiquidityTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends string | AccountMeta =
+  TAccountInstructionSysvarAccount extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -120,14 +119,14 @@ export type RedeemReserveCollateralInstruction<
     ]
   >;
 
-export interface RedeemReserveCollateralInstructionData {
+export type RedeemReserveCollateralInstructionData = {
   discriminator: ReadonlyUint8Array;
   collateralAmount: bigint;
-}
+};
 
-export interface RedeemReserveCollateralInstructionDataArgs {
+export type RedeemReserveCollateralInstructionDataArgs = {
   collateralAmount: number | bigint;
-}
+};
 
 export function getRedeemReserveCollateralInstructionDataEncoder(): FixedSizeEncoder<RedeemReserveCollateralInstructionDataArgs> {
   return transformEncoder(
@@ -159,7 +158,7 @@ export function getRedeemReserveCollateralInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface RedeemReserveCollateralAsyncInput<
+export type RedeemReserveCollateralAsyncInput<
   TAccountOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
@@ -172,7 +171,7 @@ export interface RedeemReserveCollateralAsyncInput<
   TAccountCollateralTokenProgram extends string = string,
   TAccountLiquidityTokenProgram extends string = string,
   TAccountInstructionSysvarAccount extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
@@ -186,7 +185,7 @@ export interface RedeemReserveCollateralAsyncInput<
   liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   collateralAmount: RedeemReserveCollateralInstructionDataArgs["collateralAmount"];
-}
+};
 
 export async function getRedeemReserveCollateralInstructionAsync<
   TAccountOwner extends string,
@@ -380,7 +379,7 @@ export async function getRedeemReserveCollateralInstructionAsync<
   >);
 }
 
-export interface RedeemReserveCollateralInput<
+export type RedeemReserveCollateralInput<
   TAccountOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
@@ -393,7 +392,7 @@ export interface RedeemReserveCollateralInput<
   TAccountCollateralTokenProgram extends string = string,
   TAccountLiquidityTokenProgram extends string = string,
   TAccountInstructionSysvarAccount extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
@@ -407,7 +406,7 @@ export interface RedeemReserveCollateralInput<
   liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   collateralAmount: RedeemReserveCollateralInstructionDataArgs["collateralAmount"];
-}
+};
 
 export function getRedeemReserveCollateralInstruction<
   TAccountOwner extends string,
@@ -565,10 +564,10 @@ export function getRedeemReserveCollateralInstruction<
   >);
 }
 
-export interface ParsedRedeemReserveCollateralInstruction<
+export type ParsedRedeemReserveCollateralInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -585,7 +584,7 @@ export interface ParsedRedeemReserveCollateralInstruction<
     instructionSysvarAccount: TAccountMetas[11];
   };
   data: RedeemReserveCollateralInstructionData;
-}
+};
 
 export function parseRedeemReserveCollateralInstruction<
   TProgram extends string,

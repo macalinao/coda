@@ -6,43 +6,41 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /** Last update state */
-export interface LastUpdate {
+export type LastUpdate = {
   /** Last slot when updated */
   slot: bigint;
   /** True when marked stale, false when slot updated */
   stale: number;
   /** Status of the prices used to calculate the last update */
   priceStatus: number;
-  placeholder: number[];
-}
+  placeholder: Array<number>;
+};
 
-export interface LastUpdateArgs {
+export type LastUpdateArgs = {
   /** Last slot when updated */
   slot: number | bigint;
   /** True when marked stale, false when slot updated */
   stale: number;
   /** Status of the prices used to calculate the last update */
   priceStatus: number;
-  placeholder: number[];
-}
+  placeholder: Array<number>;
+};
 
 export function getLastUpdateEncoder(): FixedSizeEncoder<LastUpdateArgs> {
   return getStructEncoder([

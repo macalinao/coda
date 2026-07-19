@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  PositionRewardInfo,
-  PositionRewardInfoArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,15 +25,28 @@ import {
   getI32Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getPositionRewardInfoDecoder,
   getPositionRewardInfoEncoder,
+  type PositionRewardInfo,
+  type PositionRewardInfoArgs,
 } from "../types/index.js";
 
 export const POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -61,7 +57,7 @@ export function getPositionDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(POSITION_DISCRIMINATOR);
 }
 
-export interface Position {
+export type Position = {
   discriminator: ReadonlyUint8Array;
   whirlpool: Address;
   positionMint: Address;
@@ -72,10 +68,10 @@ export interface Position {
   feeOwedA: bigint;
   feeGrowthCheckpointB: bigint;
   feeOwedB: bigint;
-  rewardInfos: PositionRewardInfo[];
-}
+  rewardInfos: Array<PositionRewardInfo>;
+};
 
-export interface PositionArgs {
+export type PositionArgs = {
   whirlpool: Address;
   positionMint: Address;
   liquidity: number | bigint;
@@ -85,8 +81,8 @@ export interface PositionArgs {
   feeOwedA: number | bigint;
   feeGrowthCheckpointB: number | bigint;
   feeOwedB: number | bigint;
-  rewardInfos: PositionRewardInfoArgs[];
-}
+  rewardInfos: Array<PositionRewardInfoArgs>;
+};
 
 /** Gets the encoder for {@link PositionArgs} account data. */
 export function getPositionEncoder(): FixedSizeEncoder<PositionArgs> {
@@ -172,7 +168,7 @@ export async function fetchMaybePosition<TAddress extends string = string>(
 
 export async function fetchAllPosition(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Position>[]> {
   const maybeAccounts = await fetchAllMaybePosition(rpc, addresses, config);
@@ -182,7 +178,7 @@ export async function fetchAllPosition(
 
 export async function fetchAllMaybePosition(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Position>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

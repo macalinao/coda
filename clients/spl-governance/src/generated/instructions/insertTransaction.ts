@@ -6,45 +6,46 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { InstructionData, InstructionDataArgs } from "../types/index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getInstructionDataDecoder,
   getInstructionDataEncoder,
+  type InstructionData,
+  type InstructionDataArgs,
 } from "../types/index.js";
 
 export const INSERT_TRANSACTION_DISCRIMINATOR = 9;
@@ -55,17 +56,18 @@ export function getInsertTransactionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InsertTransactionInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountProposalTransactionAccount extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountProposalTransactionAccount extends string | AccountMeta<string> =
+    string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -100,20 +102,20 @@ export type InsertTransactionInstruction<
     ]
   >;
 
-export interface InsertTransactionInstructionData {
+export type InsertTransactionInstructionData = {
   discriminator: number;
   optionIndex: number;
   index: number;
   holdUpTime: number;
-  instructions: InstructionData[];
-}
+  instructions: Array<InstructionData>;
+};
 
-export interface InsertTransactionInstructionDataArgs {
+export type InsertTransactionInstructionDataArgs = {
   optionIndex: number;
   index: number;
   holdUpTime: number;
-  instructions: InstructionDataArgs[];
-}
+  instructions: Array<InstructionDataArgs>;
+};
 
 export function getInsertTransactionInstructionDataEncoder(): Encoder<InsertTransactionInstructionDataArgs> {
   return transformEncoder(
@@ -148,7 +150,7 @@ export function getInsertTransactionInstructionDataCodec(): Codec<
   );
 }
 
-export interface InsertTransactionInput<
+export type InsertTransactionInput<
   TAccountGovernanceAccount extends string = string,
   TAccountProposalAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
@@ -157,7 +159,7 @@ export interface InsertTransactionInput<
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   governanceAccount: Address<TAccountGovernanceAccount>;
   proposalAccount: Address<TAccountProposalAccount>;
   /** TokenOwnerRecord account of the Proposal owner */
@@ -173,7 +175,7 @@ export interface InsertTransactionInput<
   index: InsertTransactionInstructionDataArgs["index"];
   holdUpTime: InsertTransactionInstructionDataArgs["holdUpTime"];
   instructions: InsertTransactionInstructionDataArgs["instructions"];
-}
+};
 
 export function getInsertTransactionInstruction<
   TAccountGovernanceAccount extends string,
@@ -285,10 +287,10 @@ export function getInsertTransactionInstruction<
   >);
 }
 
-export interface ParsedInsertTransactionInstruction<
+export type ParsedInsertTransactionInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governanceAccount: TAccountMetas[0];
@@ -304,7 +306,7 @@ export interface ParsedInsertTransactionInstruction<
     rent: TAccountMetas[7];
   };
   data: InsertTransactionInstructionData;
-}
+};
 
 export function parseInsertTransactionInstruction<
   TProgram extends string,

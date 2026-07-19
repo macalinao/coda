@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { PodStakeStatus, PodStakeStatusArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -23,8 +16,17 @@ import {
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { getPodStakeStatusDecoder, getPodStakeStatusEncoder } from "./index.js";
+import {
+  getPodStakeStatusDecoder,
+  getPodStakeStatusEncoder,
+  type PodStakeStatus,
+  type PodStakeStatusArgs,
+} from "./index.js";
 
 /**
  * Information about a validator in the pool
@@ -34,7 +36,7 @@ import { getPodStakeStatusDecoder, getPodStakeStatusEncoder } from "./index.js";
  * `bytemuck` transmute, which means that this structure cannot have any
  * undeclared alignment-padding in its representation.
  */
-export interface ValidatorStakeInfo {
+export type ValidatorStakeInfo = {
   /**
    * Amount of lamports on the validator stake account, including rent
    * Note that if `last_update_epoch` does not match the current epoch then
@@ -62,9 +64,9 @@ export interface ValidatorStakeInfo {
   status: PodStakeStatus;
   /** Validator vote account address */
   voteAccountAddress: Address;
-}
+};
 
-export interface ValidatorStakeInfoArgs {
+export type ValidatorStakeInfoArgs = {
   /**
    * Amount of lamports on the validator stake account, including rent
    * Note that if `last_update_epoch` does not match the current epoch then
@@ -92,7 +94,7 @@ export interface ValidatorStakeInfoArgs {
   status: PodStakeStatusArgs;
   /** Validator vote account address */
   voteAccountAddress: Address;
-}
+};
 
 export function getValidatorStakeInfoEncoder(): FixedSizeEncoder<ValidatorStakeInfoArgs> {
   return getStructEncoder([

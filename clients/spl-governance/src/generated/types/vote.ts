@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type { VoteChoice, VoteChoiceArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -26,17 +18,27 @@ import {
   getTupleEncoder,
   getUnitDecoder,
   getUnitEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
-import { getVoteChoiceDecoder, getVoteChoiceEncoder } from "./index.js";
+import {
+  getVoteChoiceDecoder,
+  getVoteChoiceEncoder,
+  type VoteChoice,
+  type VoteChoiceArgs,
+} from "./index.js";
 
 export type Vote =
-  | { __kind: "Approve"; fields: readonly [VoteChoice[]] }
+  | { __kind: "Approve"; fields: readonly [Array<VoteChoice>] }
   | { __kind: "Deny" }
   | { __kind: "Abstain" }
   | { __kind: "Veto" };
 
 export type VoteArgs =
-  | { __kind: "Approve"; fields: readonly [VoteChoiceArgs[]] }
+  | { __kind: "Approve"; fields: readonly [Array<VoteChoiceArgs>] }
   | { __kind: "Deny" }
   | { __kind: "Abstain" }
   | { __kind: "Veto" };

@@ -6,25 +6,29 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
-import type { PoolFeeParameters, PoolFeeParametersArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getPoolFeeParametersDecoder,
   getPoolFeeParametersEncoder,
+  type PoolFeeParameters,
+  type PoolFeeParametersArgs,
 } from "./index.js";
 
-export interface StaticConfigParameters {
+export type StaticConfigParameters = {
   poolFees: PoolFeeParameters;
   sqrtMinPrice: bigint;
   sqrtMaxPrice: bigint;
@@ -32,9 +36,9 @@ export interface StaticConfigParameters {
   poolCreatorAuthority: Address;
   activationType: number;
   collectFeeMode: number;
-}
+};
 
-export interface StaticConfigParametersArgs {
+export type StaticConfigParametersArgs = {
   poolFees: PoolFeeParametersArgs;
   sqrtMinPrice: number | bigint;
   sqrtMaxPrice: number | bigint;
@@ -42,7 +46,7 @@ export interface StaticConfigParametersArgs {
   poolCreatorAuthority: Address;
   activationType: number;
   collectFeeMode: number;
-}
+};
 
 export function getStaticConfigParametersEncoder(): Encoder<StaticConfigParametersArgs> {
   return getStructEncoder([

@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ReferrerTokenStateSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,13 +23,27 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findReferrerTokenStatePda } from "../pdas/index.js";
+import {
+  findReferrerTokenStatePda,
+  type ReferrerTokenStateSeeds,
+} from "../pdas/index.js";
 
 export const REFERRER_TOKEN_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([39, 15, 208, 77, 32, 195, 105, 56]);
@@ -54,7 +54,7 @@ export function getReferrerTokenStateDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ReferrerTokenState {
+export type ReferrerTokenState = {
   discriminator: ReadonlyUint8Array;
   /** Pubkey of the referrer/owner */
   referrer: Address;
@@ -66,10 +66,10 @@ export interface ReferrerTokenState {
   amountCumulativeSf: bigint;
   /** Referrer token state bump, used for address validation */
   bump: bigint;
-  padding: bigint[];
-}
+  padding: Array<bigint>;
+};
 
-export interface ReferrerTokenStateArgs {
+export type ReferrerTokenStateArgs = {
   /** Pubkey of the referrer/owner */
   referrer: Address;
   /** Token mint for the account */
@@ -81,7 +81,7 @@ export interface ReferrerTokenStateArgs {
   /** Referrer token state bump, used for address validation */
   bump: number | bigint;
   padding: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link ReferrerTokenStateArgs} account data. */
 export function getReferrerTokenStateEncoder(): FixedSizeEncoder<ReferrerTokenStateArgs> {
@@ -166,7 +166,7 @@ export async function fetchMaybeReferrerTokenState<
 
 export async function fetchAllReferrerTokenState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ReferrerTokenState>[]> {
   const maybeAccounts = await fetchAllMaybeReferrerTokenState(
@@ -180,7 +180,7 @@ export async function fetchAllReferrerTokenState(
 
 export async function fetchAllMaybeReferrerTokenState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ReferrerTokenState>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

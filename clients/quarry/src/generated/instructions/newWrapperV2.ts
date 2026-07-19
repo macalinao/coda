@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,11 +19,27 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getResolvedInstructionAccountAsTransactionSigner,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMintWrapperPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -98,14 +96,12 @@ export type NewWrapperV2Instruction<
     ]
   >;
 
-export interface NewWrapperV2InstructionData {
+export type NewWrapperV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   hardCap: bigint;
-}
+};
 
-export interface NewWrapperV2InstructionDataArgs {
-  hardCap: number | bigint;
-}
+export type NewWrapperV2InstructionDataArgs = { hardCap: number | bigint };
 
 export function getNewWrapperV2InstructionDataEncoder(): FixedSizeEncoder<NewWrapperV2InstructionDataArgs> {
   return transformEncoder(
@@ -134,7 +130,7 @@ export function getNewWrapperV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewWrapperV2AsyncInput<
+export type NewWrapperV2AsyncInput<
   TAccountBase extends string = string,
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
@@ -142,7 +138,7 @@ export interface NewWrapperV2AsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   mintWrapper?: Address<TAccountMintWrapper>;
   admin?: Address<TAccountAdmin>;
@@ -151,7 +147,7 @@ export interface NewWrapperV2AsyncInput<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   hardCap: NewWrapperV2InstructionDataArgs["hardCap"];
-}
+};
 
 export async function getNewWrapperV2InstructionAsync<
   TAccountBase extends string,
@@ -258,7 +254,7 @@ export async function getNewWrapperV2InstructionAsync<
   >);
 }
 
-export interface NewWrapperV2Input<
+export type NewWrapperV2Input<
   TAccountBase extends string = string,
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
@@ -266,7 +262,7 @@ export interface NewWrapperV2Input<
   TAccountTokenProgram extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   mintWrapper: Address<TAccountMintWrapper>;
   admin?: Address<TAccountAdmin>;
@@ -275,7 +271,7 @@ export interface NewWrapperV2Input<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   hardCap: NewWrapperV2InstructionDataArgs["hardCap"];
-}
+};
 
 export function getNewWrapperV2Instruction<
   TAccountBase extends string,
@@ -372,10 +368,10 @@ export function getNewWrapperV2Instruction<
   >);
 }
 
-export interface ParsedNewWrapperV2Instruction<
+export type ParsedNewWrapperV2Instruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     base: TAccountMetas[0];
@@ -387,7 +383,7 @@ export interface ParsedNewWrapperV2Instruction<
     systemProgram: TAccountMetas[6];
   };
   data: NewWrapperV2InstructionData;
-}
+};
 
 export function parseNewWrapperV2Instruction<
   TProgram extends string,

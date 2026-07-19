@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  SplitAmountInfo,
-  SplitAmountInfoArgs,
-  SplitPositionInfo,
-  SplitPositionInfoArgs,
-  SplitPositionParameters2,
-  SplitPositionParameters2Args,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -28,6 +14,10 @@ import {
   getStructEncoder,
   getU128Decoder,
   getU128Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getSplitAmountInfoDecoder,
@@ -36,9 +26,15 @@ import {
   getSplitPositionInfoEncoder,
   getSplitPositionParameters2Decoder,
   getSplitPositionParameters2Encoder,
+  type SplitAmountInfo,
+  type SplitAmountInfoArgs,
+  type SplitPositionInfo,
+  type SplitPositionInfoArgs,
+  type SplitPositionParameters2,
+  type SplitPositionParameters2Args,
 } from "./index.js";
 
-export interface EvtSplitPosition2 {
+export type EvtSplitPosition2 = {
   pool: Address;
   firstOwner: Address;
   secondOwner: Address;
@@ -49,9 +45,9 @@ export interface EvtSplitPosition2 {
   firstPositionInfo: SplitPositionInfo;
   secondPositionInfo: SplitPositionInfo;
   splitPositionParameters: SplitPositionParameters2;
-}
+};
 
-export interface EvtSplitPosition2Args {
+export type EvtSplitPosition2Args = {
   pool: Address;
   firstOwner: Address;
   secondOwner: Address;
@@ -62,7 +58,7 @@ export interface EvtSplitPosition2Args {
   firstPositionInfo: SplitPositionInfoArgs;
   secondPositionInfo: SplitPositionInfoArgs;
   splitPositionParameters: SplitPositionParameters2Args;
-}
+};
 
 export function getEvtSplitPosition2Encoder(): FixedSizeEncoder<EvtSplitPosition2Args> {
   return getStructEncoder([

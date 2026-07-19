@@ -6,30 +6,28 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU16Decoder,
-  getU16Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU16Decoder,
+  getU16Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /**
  * A single obligation order.
  * See [Obligation::orders].
  */
-export interface ObligationOrderInput {
+export type ObligationOrderInput = {
   /**
    * A threshold value used by the condition (scaled [Fraction]).
    * The exact meaning depends on the specific [Self::condition_type].
@@ -106,15 +104,15 @@ export interface ObligationOrderInput {
    * The fields above take up 2+2+1+1 bytes = 48 bits, which means we need 80 bits = 10 bytes to
    * align with `u128`s.
    */
-  padding1: number[];
+  padding1: Array<number>;
   /**
    * End padding.
    * The total size of a single instance is 8*u128 = 128 bytes.
    */
-  padding2: bigint[];
-}
+  padding2: Array<bigint>;
+};
 
-export interface ObligationOrderInputArgs {
+export type ObligationOrderInputArgs = {
   /**
    * A threshold value used by the condition (scaled [Fraction]).
    * The exact meaning depends on the specific [Self::condition_type].
@@ -191,13 +189,13 @@ export interface ObligationOrderInputArgs {
    * The fields above take up 2+2+1+1 bytes = 48 bits, which means we need 80 bits = 10 bytes to
    * align with `u128`s.
    */
-  padding1: number[];
+  padding1: Array<number>;
   /**
    * End padding.
    * The total size of a single instance is 8*u128 = 128 bytes.
    */
   padding2: Array<number | bigint>;
-}
+};
 
 export function getObligationOrderInputEncoder(): FixedSizeEncoder<ObligationOrderInputArgs> {
   return getStructEncoder([

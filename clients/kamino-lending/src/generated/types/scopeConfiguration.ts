@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,16 +16,20 @@ import {
   getStructEncoder,
   getU16Decoder,
   getU16Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface ScopeConfiguration {
+export type ScopeConfiguration = {
   /** Pubkey of the scope price feed (disabled if `null` or `default`) */
   priceFeed: Address;
   /** This is the scope_id price chain that results in a price for the token */
-  priceChain: number[];
+  priceChain: Array<number>;
   /** This is the scope_id price chain for the twap */
-  twapChain: number[];
-}
+  twapChain: Array<number>;
+};
 
 export type ScopeConfigurationArgs = ScopeConfiguration;
 

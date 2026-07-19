@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface RemoveLiquidityParameters {
+export type RemoveLiquidityParameters = {
   /** delta liquidity */
   liquidityDelta: bigint;
   /** minimum token a amount */
   tokenAAmountThreshold: bigint;
   /** minimum token b amount */
   tokenBAmountThreshold: bigint;
-}
+};
 
-export interface RemoveLiquidityParametersArgs {
+export type RemoveLiquidityParametersArgs = {
   /** delta liquidity */
   liquidityDelta: number | bigint;
   /** minimum token a amount */
   tokenAAmountThreshold: number | bigint;
   /** minimum token b amount */
   tokenBAmountThreshold: number | bigint;
-}
+};
 
 export function getRemoveLiquidityParametersEncoder(): FixedSizeEncoder<RemoveLiquidityParametersArgs> {
   return getStructEncoder([

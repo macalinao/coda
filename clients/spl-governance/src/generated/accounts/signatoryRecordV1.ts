@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { SignatoryRecordSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -34,12 +20,26 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findSignatoryRecordPda } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
+  findSignatoryRecordPda,
+  type SignatoryRecordSeeds,
+} from "../pdas/index.js";
+import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
+  GovernanceAccountType,
 } from "../types/index.js";
 
 export const SIGNATORY_RECORD_V1_ACCOUNT_TYPE: GovernanceAccountType =
@@ -51,18 +51,18 @@ export function getSignatoryRecordV1AccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface SignatoryRecordV1 {
+export type SignatoryRecordV1 = {
   accountType: GovernanceAccountType;
   proposal: Address;
   signatory: Address;
   signedOff: boolean;
-}
+};
 
-export interface SignatoryRecordV1Args {
+export type SignatoryRecordV1Args = {
   proposal: Address;
   signatory: Address;
   signedOff: boolean;
-}
+};
 
 /** Gets the encoder for {@link SignatoryRecordV1Args} account data. */
 export function getSignatoryRecordV1Encoder(): FixedSizeEncoder<SignatoryRecordV1Args> {
@@ -138,7 +138,7 @@ export async function fetchMaybeSignatoryRecordV1<
 
 export async function fetchAllSignatoryRecordV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<SignatoryRecordV1>[]> {
   const maybeAccounts = await fetchAllMaybeSignatoryRecordV1(
@@ -152,7 +152,7 @@ export async function fetchAllSignatoryRecordV1(
 
 export async function fetchAllMaybeSignatoryRecordV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<SignatoryRecordV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

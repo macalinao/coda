@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_PROTOCOL_FEE_RATE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,10 +51,10 @@ export function getSetProtocolFeeRateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetProtocolFeeRateInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountFeeAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountFeeAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -73,14 +73,12 @@ export type SetProtocolFeeRateInstruction<
     ]
   >;
 
-export interface SetProtocolFeeRateInstructionData {
+export type SetProtocolFeeRateInstructionData = {
   discriminator: ReadonlyUint8Array;
   protocolFeeRate: number;
-}
+};
 
-export interface SetProtocolFeeRateInstructionDataArgs {
-  protocolFeeRate: number;
-}
+export type SetProtocolFeeRateInstructionDataArgs = { protocolFeeRate: number };
 
 export function getSetProtocolFeeRateInstructionDataEncoder(): FixedSizeEncoder<SetProtocolFeeRateInstructionDataArgs> {
   return transformEncoder(
@@ -112,16 +110,16 @@ export function getSetProtocolFeeRateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetProtocolFeeRateInput<
+export type SetProtocolFeeRateInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountWhirlpool extends string = string,
   TAccountFeeAuthority extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   whirlpool: Address<TAccountWhirlpool>;
   feeAuthority: TransactionSigner<TAccountFeeAuthority>;
   protocolFeeRate: SetProtocolFeeRateInstructionDataArgs["protocolFeeRate"];
-}
+};
 
 export function getSetProtocolFeeRateInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -180,10 +178,10 @@ export function getSetProtocolFeeRateInstruction<
   >);
 }
 
-export interface ParsedSetProtocolFeeRateInstruction<
+export type ParsedSetProtocolFeeRateInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -191,7 +189,7 @@ export interface ParsedSetProtocolFeeRateInstruction<
     feeAuthority: TAccountMetas[2];
   };
   data: SetProtocolFeeRateInstructionData;
-}
+};
 
 export function parseSetProtocolFeeRateInstruction<
   TProgram extends string,

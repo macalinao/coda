@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,8 +15,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CANCEL_PROPOSAL_DISCRIMINATOR = 11;
@@ -43,12 +43,12 @@ export function getCancelProposalDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CancelProposalInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -73,9 +73,7 @@ export type CancelProposalInstruction<
     ]
   >;
 
-export interface CancelProposalInstructionData {
-  discriminator: number;
-}
+export type CancelProposalInstructionData = { discriminator: number };
 
 export type CancelProposalInstructionDataArgs = {};
 
@@ -100,13 +98,13 @@ export function getCancelProposalInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CancelProposalInput<
+export type CancelProposalInput<
   TAccountRealmAccount extends string = string,
   TAccountGovernanceAccount extends string = string,
   TAccountProposalAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
   TAccountGovernanceAuthority extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   governanceAccount: Address<TAccountGovernanceAccount>;
   proposalAccount: Address<TAccountProposalAccount>;
@@ -114,7 +112,7 @@ export interface CancelProposalInput<
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
   /** Governance authority (Token Owner or Governance Delegate) */
   governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
-}
+};
 
 export function getCancelProposalInstruction<
   TAccountRealmAccount extends string,
@@ -187,10 +185,10 @@ export function getCancelProposalInstruction<
   >);
 }
 
-export interface ParsedCancelProposalInstruction<
+export type ParsedCancelProposalInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -202,7 +200,7 @@ export interface ParsedCancelProposalInstruction<
     governanceAuthority: TAccountMetas[4];
   };
   data: CancelProposalInstructionData;
-}
+};
 
 export function parseCancelProposalInstruction<
   TProgram extends string,

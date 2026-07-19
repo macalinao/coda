@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { EscrowSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,13 +23,24 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findEscrowPda } from "../pdas/index.js";
+import { type EscrowSeeds, findEscrowPda } from "../pdas/index.js";
 
 export const ESCROW_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   31, 213, 123, 187, 186, 22, 218, 155,
@@ -53,7 +50,7 @@ export function getEscrowDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(ESCROW_DISCRIMINATOR);
 }
 
-export interface Escrow {
+export type Escrow = {
   discriminator: ReadonlyUint8Array;
   locker: Address;
   owner: Address;
@@ -63,9 +60,9 @@ export interface Escrow {
   escrowStartedAt: bigint;
   escrowEndsAt: bigint;
   voteDelegate: Address;
-}
+};
 
-export interface EscrowArgs {
+export type EscrowArgs = {
   locker: Address;
   owner: Address;
   bump: number;
@@ -74,7 +71,7 @@ export interface EscrowArgs {
   escrowStartedAt: number | bigint;
   escrowEndsAt: number | bigint;
   voteDelegate: Address;
-}
+};
 
 /** Gets the encoder for {@link EscrowArgs} account data. */
 export function getEscrowEncoder(): FixedSizeEncoder<EscrowArgs> {
@@ -150,7 +147,7 @@ export async function fetchMaybeEscrow<TAddress extends string = string>(
 
 export async function fetchAllEscrow(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Escrow>[]> {
   const maybeAccounts = await fetchAllMaybeEscrow(rpc, addresses, config);
@@ -160,7 +157,7 @@ export async function fetchAllEscrow(
 
 export async function fetchAllMaybeEscrow(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Escrow>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

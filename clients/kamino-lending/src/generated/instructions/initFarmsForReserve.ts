@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
@@ -58,20 +56,20 @@ export function getInitFarmsForReserveDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitFarmsForReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta =
+  TAccountLendingMarketOwner extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountFarmsProgram extends string | AccountMeta<string> =
     "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
-  TAccountFarmsGlobalConfig extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountFarmsVaultAuthority extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta =
+  TAccountFarmsGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountFarmsVaultAuthority extends string | AccountMeta<string> = string,
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -111,14 +109,12 @@ export type InitFarmsForReserveInstruction<
     ]
   >;
 
-export interface InitFarmsForReserveInstructionData {
+export type InitFarmsForReserveInstructionData = {
   discriminator: ReadonlyUint8Array;
   mode: number;
-}
+};
 
-export interface InitFarmsForReserveInstructionDataArgs {
-  mode: number;
-}
+export type InitFarmsForReserveInstructionDataArgs = { mode: number };
 
 export function getInitFarmsForReserveInstructionDataEncoder(): FixedSizeEncoder<InitFarmsForReserveInstructionDataArgs> {
   return transformEncoder(
@@ -150,7 +146,7 @@ export function getInitFarmsForReserveInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitFarmsForReserveAsyncInput<
+export type InitFarmsForReserveAsyncInput<
   TAccountLendingMarketOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
@@ -161,7 +157,7 @@ export interface InitFarmsForReserveAsyncInput<
   TAccountFarmsVaultAuthority extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
@@ -173,7 +169,7 @@ export interface InitFarmsForReserveAsyncInput<
   rent?: Address<TAccountRent>;
   systemProgram?: Address<TAccountSystemProgram>;
   mode: InitFarmsForReserveInstructionDataArgs["mode"];
-}
+};
 
 export async function getInitFarmsForReserveInstructionAsync<
   TAccountLendingMarketOwner extends string,
@@ -308,7 +304,7 @@ export async function getInitFarmsForReserveInstructionAsync<
   >);
 }
 
-export interface InitFarmsForReserveInput<
+export type InitFarmsForReserveInput<
   TAccountLendingMarketOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
@@ -319,7 +315,7 @@ export interface InitFarmsForReserveInput<
   TAccountFarmsVaultAuthority extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
@@ -331,7 +327,7 @@ export interface InitFarmsForReserveInput<
   rent?: Address<TAccountRent>;
   systemProgram?: Address<TAccountSystemProgram>;
   mode: InitFarmsForReserveInstructionDataArgs["mode"];
-}
+};
 
 export function getInitFarmsForReserveInstruction<
   TAccountLendingMarketOwner extends string,
@@ -456,10 +452,10 @@ export function getInitFarmsForReserveInstruction<
   >);
 }
 
-export interface ParsedInitFarmsForReserveInstruction<
+export type ParsedInitFarmsForReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarketOwner: TAccountMetas[0];
@@ -474,7 +470,7 @@ export interface ParsedInitFarmsForReserveInstruction<
     systemProgram: TAccountMetas[9];
   };
   data: InitFarmsForReserveInstructionData;
-}
+};
 
 export function parseInitFarmsForReserveInstruction<
   TProgram extends string,

@@ -19,6 +19,7 @@ import {
   type ClientWithRpc,
   type ClientWithTransactionPlanning,
   type ClientWithTransactionSending,
+  type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
   type Instruction,
@@ -156,6 +157,8 @@ export type MplTokenAuthRulesPlugin = {
   accounts: MplTokenAuthRulesPluginAccounts;
   instructions: MplTokenAuthRulesPluginInstructions;
   pdas: MplTokenAuthRulesPluginPdas;
+  identifyInstruction: typeof identifyMplTokenAuthRulesInstruction;
+  parseInstruction: typeof parseMplTokenAuthRulesInstruction;
 };
 
 export type MplTokenAuthRulesPluginAccounts = {
@@ -195,9 +198,7 @@ export type MplTokenAuthRulesPluginRequirements = ClientWithRpc<
 export function mplTokenAuthRulesProgram() {
   return <T extends MplTokenAuthRulesPluginRequirements>(
     client: T,
-  ): Omit<T, "mplTokenAuthRules"> & {
-    mplTokenAuthRules: MplTokenAuthRulesPlugin;
-  } => {
+  ): ExtendedClient<T, { mplTokenAuthRules: MplTokenAuthRulesPlugin }> => {
     return extendClient(client, {
       mplTokenAuthRules: <MplTokenAuthRulesPlugin>{
         accounts: {
@@ -235,6 +236,8 @@ export function mplTokenAuthRulesProgram() {
             ),
         },
         pdas: { ruleSet: findRuleSetPda, ruleSetBuffer: findRuleSetBufferPda },
+        identifyInstruction: identifyMplTokenAuthRulesInstruction,
+        parseInstruction: parseMplTokenAuthRulesInstruction,
       },
     });
   };

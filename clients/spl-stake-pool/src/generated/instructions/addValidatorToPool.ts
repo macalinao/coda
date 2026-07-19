@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,26 +48,26 @@ export function getAddValidatorToPoolDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type AddValidatorToPoolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountStaker extends string | AccountMeta = string,
-  TAccountReserveStakeAccount extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountValidatorStakeList extends string | AccountMeta = string,
-  TAccountNewStakeAccount extends string | AccountMeta = string,
-  TAccountValidatorVoteAccount extends string | AccountMeta = string,
-  TAccountRentSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountStaker extends string | AccountMeta<string> = string,
+  TAccountReserveStakeAccount extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountValidatorStakeList extends string | AccountMeta<string> = string,
+  TAccountNewStakeAccount extends string | AccountMeta<string> = string,
+  TAccountValidatorVoteAccount extends string | AccountMeta<string> = string,
+  TAccountRentSysvar extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends string | AccountMeta =
+  TAccountStakeHistorySysvar extends string | AccountMeta<string> =
     "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeConfigSysvar extends string | AccountMeta =
+  TAccountStakeConfigSysvar extends string | AccountMeta<string> =
     "StakeConfig11111111111111111111111111111111",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -118,14 +116,12 @@ export type AddValidatorToPoolInstruction<
     ]
   >;
 
-export interface AddValidatorToPoolInstructionData {
+export type AddValidatorToPoolInstructionData = {
   discriminator: number;
   args: number;
-}
+};
 
-export interface AddValidatorToPoolInstructionDataArgs {
-  args: number;
-}
+export type AddValidatorToPoolInstructionDataArgs = { args: number };
 
 export function getAddValidatorToPoolInstructionDataEncoder(): FixedSizeEncoder<AddValidatorToPoolInstructionDataArgs> {
   return transformEncoder(
@@ -157,7 +153,7 @@ export function getAddValidatorToPoolInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface AddValidatorToPoolAsyncInput<
+export type AddValidatorToPoolAsyncInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountReserveStakeAccount extends string = string,
@@ -171,7 +167,7 @@ export interface AddValidatorToPoolAsyncInput<
   TAccountStakeConfigSysvar extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Staker */
@@ -199,8 +195,33 @@ export interface AddValidatorToPoolAsyncInput<
   /** Stake program */
   stakeProgram?: Address<TAccountStakeProgram>;
   args: AddValidatorToPoolInstructionDataArgs["args"];
-}
+};
 
+/**
+ * (Staker only) Adds stake account delegated to validator to the pool's
+ * list of managed validators.
+ * The stake account will have the rent-exempt amount plus
+ * `max(
+ * crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation()
+ * )`.
+ * It is funded from the stake pool reserve.
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Staker
+ * 2. `[w]` Reserve stake account
+ * 3. `[]` Stake pool withdraw authority
+ * 4. `[w]` Validator stake list storage account
+ * 5. `[w]` Stake account to add to the pool
+ * 6. `[]` Validator this stake account will be delegated to
+ * 7. `[]` Rent sysvar
+ * 8. `[]` Clock sysvar
+ * 9. '[]' Stake history sysvar
+ * 10. '[]' Stake config sysvar
+ * 11. `[]` System program
+ * 12. `[]` Stake program
+ * User data: optional non-zero `u32` seed used for generating the
+ * validator stake address
+ */
 export async function getAddValidatorToPoolInstructionAsync<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -370,7 +391,7 @@ export async function getAddValidatorToPoolInstructionAsync<
   >);
 }
 
-export interface AddValidatorToPoolInput<
+export type AddValidatorToPoolInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountReserveStakeAccount extends string = string,
@@ -384,7 +405,7 @@ export interface AddValidatorToPoolInput<
   TAccountStakeConfigSysvar extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Staker */
@@ -412,8 +433,33 @@ export interface AddValidatorToPoolInput<
   /** Stake program */
   stakeProgram?: Address<TAccountStakeProgram>;
   args: AddValidatorToPoolInstructionDataArgs["args"];
-}
+};
 
+/**
+ * (Staker only) Adds stake account delegated to validator to the pool's
+ * list of managed validators.
+ * The stake account will have the rent-exempt amount plus
+ * `max(
+ * crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation()
+ * )`.
+ * It is funded from the stake pool reserve.
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Staker
+ * 2. `[w]` Reserve stake account
+ * 3. `[]` Stake pool withdraw authority
+ * 4. `[w]` Validator stake list storage account
+ * 5. `[w]` Stake account to add to the pool
+ * 6. `[]` Validator this stake account will be delegated to
+ * 7. `[]` Rent sysvar
+ * 8. `[]` Clock sysvar
+ * 9. '[]' Stake history sysvar
+ * 10. '[]' Stake config sysvar
+ * 11. `[]` System program
+ * 12. `[]` Stake program
+ * User data: optional non-zero `u32` seed used for generating the
+ * validator stake address
+ */
 export function getAddValidatorToPoolInstruction<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -573,10 +619,10 @@ export function getAddValidatorToPoolInstruction<
   >);
 }
 
-export interface ParsedAddValidatorToPoolInstruction<
+export type ParsedAddValidatorToPoolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -607,7 +653,7 @@ export interface ParsedAddValidatorToPoolInstruction<
     stakeProgram: TAccountMetas[12];
   };
   data: AddValidatorToPoolInstructionData;
-}
+};
 
 export function parseAddValidatorToPoolInstruction<
   TProgram extends string,

@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,23 +14,27 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface EvtClaimPositionFee {
+export type EvtClaimPositionFee = {
   pool: Address;
   position: Address;
   owner: Address;
   feeAClaimed: bigint;
   feeBClaimed: bigint;
-}
+};
 
-export interface EvtClaimPositionFeeArgs {
+export type EvtClaimPositionFeeArgs = {
   pool: Address;
   position: Address;
   owner: Address;
   feeAClaimed: number | bigint;
   feeBClaimed: number | bigint;
-}
+};
 
 export function getEvtClaimPositionFeeEncoder(): FixedSizeEncoder<EvtClaimPositionFeeArgs> {
   return getStructEncoder([

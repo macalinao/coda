@@ -6,17 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum GoverningTokenType {
-  Liquid = 0,
-  Membership = 1,
-  Dormant = 2,
+  Liquid,
+  Membership,
+  Dormant,
 }
 
 export type GoverningTokenTypeArgs = GoverningTokenType;

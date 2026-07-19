@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,15 +14,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_REWARD_EMISSIONS_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -53,10 +53,10 @@ export function getSetRewardEmissionsV2DiscriminatorBytes(): ReadonlyUint8Array 
 
 export type SetRewardEmissionsV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountRewardAuthority extends string | AccountMeta = string,
-  TAccountRewardVault extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountRewardAuthority extends string | AccountMeta<string> = string,
+  TAccountRewardVault extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -75,16 +75,16 @@ export type SetRewardEmissionsV2Instruction<
     ]
   >;
 
-export interface SetRewardEmissionsV2InstructionData {
+export type SetRewardEmissionsV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
   emissionsPerSecondX64: bigint;
-}
+};
 
-export interface SetRewardEmissionsV2InstructionDataArgs {
+export type SetRewardEmissionsV2InstructionDataArgs = {
   rewardIndex: number;
   emissionsPerSecondX64: number | bigint;
-}
+};
 
 export function getSetRewardEmissionsV2InstructionDataEncoder(): FixedSizeEncoder<SetRewardEmissionsV2InstructionDataArgs> {
   return transformEncoder(
@@ -118,17 +118,17 @@ export function getSetRewardEmissionsV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetRewardEmissionsV2Input<
+export type SetRewardEmissionsV2Input<
   TAccountWhirlpool extends string = string,
   TAccountRewardAuthority extends string = string,
   TAccountRewardVault extends string = string,
-> {
+> = {
   whirlpool: Address<TAccountWhirlpool>;
   rewardAuthority: TransactionSigner<TAccountRewardAuthority>;
   rewardVault: Address<TAccountRewardVault>;
   rewardIndex: SetRewardEmissionsV2InstructionDataArgs["rewardIndex"];
   emissionsPerSecondX64: SetRewardEmissionsV2InstructionDataArgs["emissionsPerSecondX64"];
-}
+};
 
 export function getSetRewardEmissionsV2Instruction<
   TAccountWhirlpool extends string,
@@ -187,10 +187,10 @@ export function getSetRewardEmissionsV2Instruction<
   >);
 }
 
-export interface ParsedSetRewardEmissionsV2Instruction<
+export type ParsedSetRewardEmissionsV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpool: TAccountMetas[0];
@@ -198,7 +198,7 @@ export interface ParsedSetRewardEmissionsV2Instruction<
     rewardVault: TAccountMetas[2];
   };
   data: SetRewardEmissionsV2InstructionData;
-}
+};
 
 export function parseSetRewardEmissionsV2Instruction<
   TProgram extends string,

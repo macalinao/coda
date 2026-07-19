@@ -6,40 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface UserRewardInfo {
+export type UserRewardInfo = {
   /** The latest update reward checkpoint */
-  rewardPerTokenCheckpoint: number[];
+  rewardPerTokenCheckpoint: Array<number>;
   /** Current pending rewards */
   rewardPendings: bigint;
   /** Total claimed rewards */
   totalClaimedRewards: bigint;
-}
+};
 
-export interface UserRewardInfoArgs {
+export type UserRewardInfoArgs = {
   /** The latest update reward checkpoint */
-  rewardPerTokenCheckpoint: number[];
+  rewardPerTokenCheckpoint: Array<number>;
   /** Current pending rewards */
   rewardPendings: number | bigint;
   /** Total claimed rewards */
   totalClaimedRewards: number | bigint;
-}
+};
 
 export function getUserRewardInfoEncoder(): FixedSizeEncoder<UserRewardInfoArgs> {
   return getStructEncoder([

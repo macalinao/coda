@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const QUEUE_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -52,15 +52,15 @@ export function getQueueProposalDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type QueueProposalInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountProposal extends string | AccountMeta = string,
-  TAccountTransaction extends string | AccountMeta = string,
-  TAccountSmartWallet extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSmartWalletProgram extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountProposal extends string | AccountMeta<string> = string,
+  TAccountTransaction extends string | AccountMeta<string> = string,
+  TAccountSmartWallet extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSmartWalletProgram extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -91,14 +91,12 @@ export type QueueProposalInstruction<
     ]
   >;
 
-export interface QueueProposalInstructionData {
+export type QueueProposalInstructionData = {
   discriminator: ReadonlyUint8Array;
   txBump: number;
-}
+};
 
-export interface QueueProposalInstructionDataArgs {
-  txBump: number;
-}
+export type QueueProposalInstructionDataArgs = { txBump: number };
 
 export function getQueueProposalInstructionDataEncoder(): FixedSizeEncoder<QueueProposalInstructionDataArgs> {
   return transformEncoder(
@@ -127,7 +125,7 @@ export function getQueueProposalInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface QueueProposalInput<
+export type QueueProposalInput<
   TAccountGovernor extends string = string,
   TAccountProposal extends string = string,
   TAccountTransaction extends string = string,
@@ -135,7 +133,7 @@ export interface QueueProposalInput<
   TAccountPayer extends string = string,
   TAccountSmartWalletProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   governor: Address<TAccountGovernor>;
   proposal: Address<TAccountProposal>;
   transaction: Address<TAccountTransaction>;
@@ -144,7 +142,7 @@ export interface QueueProposalInput<
   smartWalletProgram: Address<TAccountSmartWalletProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   txBump: QueueProposalInstructionDataArgs["txBump"];
-}
+};
 
 export function getQueueProposalInstruction<
   TAccountGovernor extends string,
@@ -233,10 +231,10 @@ export function getQueueProposalInstruction<
   >);
 }
 
-export interface ParsedQueueProposalInstruction<
+export type ParsedQueueProposalInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governor: TAccountMetas[0];
@@ -248,7 +246,7 @@ export interface ParsedQueueProposalInstruction<
     systemProgram: TAccountMetas[6];
   };
   data: QueueProposalInstructionData;
-}
+};
 
 export function parseQueueProposalInstruction<
   TProgram extends string,

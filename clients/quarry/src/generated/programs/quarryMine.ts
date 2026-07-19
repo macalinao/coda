@@ -6,74 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  Miner,
-  MinerArgs,
-  Quarry,
-  QuarryArgs,
-  Rewarder,
-  RewarderArgs,
-} from "../accounts/index.js";
-import type {
-  AcceptAuthorityInput,
-  ClaimRewardsAsyncInput,
-  ClaimRewardsV2AsyncInput,
-  CreateMinerAsyncInput,
-  CreateMinerV2AsyncInput,
-  CreateQuarryAsyncInput,
-  CreateQuarryV2AsyncInput,
-  ExtractFeesInput,
-  NewRewarderAsyncInput,
-  NewRewarderV2AsyncInput,
-  ParsedAcceptAuthorityInstruction,
-  ParsedClaimRewardsInstruction,
-  ParsedClaimRewardsV2Instruction,
-  ParsedCreateMinerInstruction,
-  ParsedCreateMinerV2Instruction,
-  ParsedCreateQuarryInstruction,
-  ParsedCreateQuarryV2Instruction,
-  ParsedExtractFeesInstruction,
-  ParsedNewRewarderInstruction,
-  ParsedNewRewarderV2Instruction,
-  ParsedPauseInstruction,
-  ParsedRescueTokensInstruction,
-  ParsedSetAnnualRewardsInstruction,
-  ParsedSetFamineInstruction,
-  ParsedSetPauseAuthorityInstruction,
-  ParsedSetRewardsShareInstruction,
-  ParsedStakeTokensInstruction,
-  ParsedTransferAuthorityInstruction,
-  ParsedUnpauseInstruction,
-  ParsedUpdateQuarryRewardsInstruction,
-  ParsedWithdrawTokensInstruction,
-  PauseInput,
-  RescueTokensInput,
-  SetAnnualRewardsInput,
-  SetFamineInput,
-  SetPauseAuthorityInput,
-  SetRewardsShareInput,
-  StakeTokensAsyncInput,
-  TransferAuthorityInput,
-  UnpauseInput,
-  UpdateQuarryRewardsInput,
-  WithdrawTokensAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -84,15 +16,34 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
   getMinerCodec,
   getQuarryCodec,
   getRewarderCodec,
+  type Miner,
+  type MinerArgs,
+  type Quarry,
+  type QuarryArgs,
+  type Rewarder,
+  type RewarderArgs,
 } from "../accounts/index.js";
 import {
   getAcceptAuthorityInstruction,
@@ -137,6 +88,48 @@ import {
   parseUnpauseInstruction,
   parseUpdateQuarryRewardsInstruction,
   parseWithdrawTokensInstruction,
+  type AcceptAuthorityInput,
+  type ClaimRewardsAsyncInput,
+  type ClaimRewardsV2AsyncInput,
+  type CreateMinerAsyncInput,
+  type CreateMinerV2AsyncInput,
+  type CreateQuarryAsyncInput,
+  type CreateQuarryV2AsyncInput,
+  type ExtractFeesInput,
+  type NewRewarderAsyncInput,
+  type NewRewarderV2AsyncInput,
+  type ParsedAcceptAuthorityInstruction,
+  type ParsedClaimRewardsInstruction,
+  type ParsedClaimRewardsV2Instruction,
+  type ParsedCreateMinerInstruction,
+  type ParsedCreateMinerV2Instruction,
+  type ParsedCreateQuarryInstruction,
+  type ParsedCreateQuarryV2Instruction,
+  type ParsedExtractFeesInstruction,
+  type ParsedNewRewarderInstruction,
+  type ParsedNewRewarderV2Instruction,
+  type ParsedPauseInstruction,
+  type ParsedRescueTokensInstruction,
+  type ParsedSetAnnualRewardsInstruction,
+  type ParsedSetFamineInstruction,
+  type ParsedSetPauseAuthorityInstruction,
+  type ParsedSetRewardsShareInstruction,
+  type ParsedStakeTokensInstruction,
+  type ParsedTransferAuthorityInstruction,
+  type ParsedUnpauseInstruction,
+  type ParsedUpdateQuarryRewardsInstruction,
+  type ParsedWithdrawTokensInstruction,
+  type PauseInput,
+  type RescueTokensInput,
+  type SetAnnualRewardsInput,
+  type SetFamineInput,
+  type SetPauseAuthorityInput,
+  type SetRewardsShareInput,
+  type StakeTokensAsyncInput,
+  type TransferAuthorityInput,
+  type UnpauseInput,
+  type UpdateQuarryRewardsInput,
+  type WithdrawTokensAsyncInput,
 } from "../instructions/index.js";
 import { findMinerPda, findQuarryPda, findRewarderPda } from "../pdas/index.js";
 
@@ -144,9 +137,9 @@ export const QUARRY_MINE_PROGRAM_ADDRESS =
   "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
 
 export enum QuarryMineAccount {
-  Rewarder = 0,
-  Quarry = 1,
-  Miner = 2,
+  Rewarder,
+  Quarry,
+  Miner,
 }
 
 export function identifyQuarryMineAccount(
@@ -193,27 +186,27 @@ export function identifyQuarryMineAccount(
 }
 
 export enum QuarryMineInstruction {
-  NewRewarder = 0,
-  NewRewarderV2 = 1,
-  SetPauseAuthority = 2,
-  Pause = 3,
-  Unpause = 4,
-  TransferAuthority = 5,
-  AcceptAuthority = 6,
-  SetAnnualRewards = 7,
-  CreateQuarry = 8,
-  CreateQuarryV2 = 9,
-  SetRewardsShare = 10,
-  SetFamine = 11,
-  UpdateQuarryRewards = 12,
-  CreateMiner = 13,
-  CreateMinerV2 = 14,
-  ClaimRewards = 15,
-  ClaimRewardsV2 = 16,
-  StakeTokens = 17,
-  WithdrawTokens = 18,
-  RescueTokens = 19,
-  ExtractFees = 20,
+  NewRewarder,
+  NewRewarderV2,
+  SetPauseAuthority,
+  Pause,
+  Unpause,
+  TransferAuthority,
+  AcceptAuthority,
+  SetAnnualRewards,
+  CreateQuarry,
+  CreateQuarryV2,
+  SetRewardsShare,
+  SetFamine,
+  UpdateQuarryRewards,
+  CreateMiner,
+  CreateMinerV2,
+  ClaimRewards,
+  ClaimRewardsV2,
+  StakeTokens,
+  WithdrawTokens,
+  RescueTokens,
+  ExtractFees,
 }
 
 export function identifyQuarryMineInstruction(
@@ -687,22 +680,25 @@ export function parseQuarryMineInstruction<TProgram extends string>(
   }
 }
 
-export interface QuarryMinePlugin {
+export type QuarryMinePlugin = {
   accounts: QuarryMinePluginAccounts;
   instructions: QuarryMinePluginInstructions;
   pdas: QuarryMinePluginPdas;
-}
+  identifyAccount: typeof identifyQuarryMineAccount;
+  identifyInstruction: typeof identifyQuarryMineInstruction;
+  parseInstruction: typeof parseQuarryMineInstruction;
+};
 
-export interface QuarryMinePluginAccounts {
+export type QuarryMinePluginAccounts = {
   rewarder: ReturnType<typeof getRewarderCodec> &
     SelfFetchFunctions<RewarderArgs, Rewarder>;
   quarry: ReturnType<typeof getQuarryCodec> &
     SelfFetchFunctions<QuarryArgs, Quarry>;
   miner: ReturnType<typeof getMinerCodec> &
     SelfFetchFunctions<MinerArgs, Miner>;
-}
+};
 
-export interface QuarryMinePluginInstructions {
+export type QuarryMinePluginInstructions = {
   newRewarder: (
     input: MakeOptional<NewRewarderAsyncInput, "payer">,
   ) => ReturnType<typeof getNewRewarderInstructionAsync> &
@@ -782,13 +778,13 @@ export interface QuarryMinePluginInstructions {
   extractFees: (
     input: ExtractFeesInput,
   ) => ReturnType<typeof getExtractFeesInstruction> & SelfPlanAndSendFunctions;
-}
+};
 
-export interface QuarryMinePluginPdas {
+export type QuarryMinePluginPdas = {
   rewarder: typeof findRewarderPda;
   quarry: typeof findQuarryPda;
   miner: typeof findMinerPda;
-}
+};
 
 export type QuarryMinePluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -800,7 +796,7 @@ export type QuarryMinePluginRequirements = ClientWithRpc<
 export function quarryMineProgram() {
   return <T extends QuarryMinePluginRequirements>(
     client: T,
-  ): Omit<T, "quarryMine"> & { quarryMine: QuarryMinePlugin } => {
+  ): ExtendedClient<T, { quarryMine: QuarryMinePlugin }> => {
     return extendClient(client, {
       quarryMine: <QuarryMinePlugin>{
         accounts: {
@@ -929,6 +925,9 @@ export function quarryMineProgram() {
           quarry: findQuarryPda,
           miner: findMinerPda,
         },
+        identifyAccount: identifyQuarryMineAccount,
+        identifyInstruction: identifyQuarryMineInstruction,
+        parseInstruction: parseQuarryMineInstruction,
       },
     });
   };

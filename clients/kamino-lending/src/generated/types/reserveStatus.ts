@@ -6,17 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum ReserveStatus {
-  Active = 0,
-  Obsolete = 1,
-  Hidden = 2,
+  Active,
+  Obsolete,
+  Hidden,
 }
 
 export type ReserveStatusArgs = ReserveStatus;

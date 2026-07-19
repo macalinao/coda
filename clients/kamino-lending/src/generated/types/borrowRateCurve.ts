@@ -6,28 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { CurvePoint, CurvePointArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { getCurvePointDecoder, getCurvePointEncoder } from "./index.js";
+import {
+  getCurvePointDecoder,
+  getCurvePointEncoder,
+  type CurvePoint,
+  type CurvePointArgs,
+} from "./index.js";
 
-export interface BorrowRateCurve {
-  points: CurvePoint[];
-}
+export type BorrowRateCurve = { points: Array<CurvePoint> };
 
-export interface BorrowRateCurveArgs {
-  points: CurvePointArgs[];
-}
+export type BorrowRateCurveArgs = { points: Array<CurvePointArgs> };
 
 export function getBorrowRateCurveEncoder(): FixedSizeEncoder<BorrowRateCurveArgs> {
   return getStructEncoder([

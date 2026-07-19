@@ -11,18 +11,18 @@
       "clients/*"
     ],
     "catalog": {
-      "typescript": "^6.0.3",
+      "typescript": "^7.0.2",
       "@macalinao/tsconfig": "^3.2.5",
-      "@solana/kit": "^6.9.0",
-      "@solana/program-client-core": "^6.9.0",
+      "@solana/kit": "^7.0.0",
+      "@solana/program-client-core": "^7.0.0",
       "@types/bun": "^1.3.14",
-      "codama": "^1.7.0",
-      "@codama/nodes": "^1.7.0",
-      "@codama/nodes-from-anchor": "^1.5.0",
-      "@codama/renderers-core": "^1.3.8",
-      "@codama/visitors-core": "^1.7.0",
+      "codama": "^1.9.0",
+      "@codama/nodes": "^1.9.0",
+      "@codama/nodes-from-anchor": "^1.5.2",
+      "@codama/renderers-core": "^1.3.10",
+      "@codama/visitors-core": "^1.9.0",
       "ws": "^8.21.0",
-      "tsdown": "^0.22.2"
+      "tsdown": "^0.22.5"
     }
   },
   "scripts": {
@@ -52,14 +52,14 @@
     "@changesets/cli": "^2.31.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
-    "oxfmt": "0.55.0",
-    "oxlint": "1.69.0",
-    "oxlint-tsgolint": "0.23.0",
-    "tsdown": "^0.22.3",
-    "turbo": "^2.10.3",
-    "typedoc": "^0.28.19",
-    "typescript": "^6.0.3",
-    "wrangler": "^4.107.0"
+    "oxfmt": "0.58.0",
+    "oxlint": "1.73.0",
+    "oxlint-tsgolint": "0.24.0",
+    "tsdown": "^0.22.5",
+    "turbo": "^2.10.4",
+    "typedoc": "^0.28.20",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.110.0"
   },
   "packageManager": "bun@1.3.13",
   "lint-staged": {
@@ -67,6 +67,10 @@
   },
   "overrides": {
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "@codama/errors": "^1.9.0",
+    "@codama/nodes": "^1.9.0",
+    "@codama/renderers-core": "^1.3.10",
+    "@codama/visitors-core": "^1.9.0"
   }
 }

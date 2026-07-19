@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,13 +14,17 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface ProposalAccountMeta {
+export type ProposalAccountMeta = {
   pubkey: Address;
   isSigner: boolean;
   isWritable: boolean;
-}
+};
 
 export type ProposalAccountMetaArgs = ProposalAccountMeta;
 

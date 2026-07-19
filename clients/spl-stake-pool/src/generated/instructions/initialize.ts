@@ -6,43 +6,45 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { Fee, FeeArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getFeeDecoder, getFeeEncoder } from "../types/index.js";
+import {
+  getFeeDecoder,
+  getFeeEncoder,
+  type Fee,
+  type FeeArgs,
+} from "../types/index.js";
 
 export const INITIALIZE_DISCRIMINATOR = 0;
 
@@ -52,18 +54,18 @@ export function getInitializeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountManager extends string | AccountMeta = string,
-  TAccountStaker extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountFeeAccount extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountManager extends string | AccountMeta<string> = string,
+  TAccountStaker extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountFeeAccount extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountDepositAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountDepositAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -103,22 +105,22 @@ export type InitializeInstruction<
     ]
   >;
 
-export interface InitializeInstructionData {
+export type InitializeInstructionData = {
   discriminator: number;
   fee: Fee;
   withdrawalFee: Fee;
   depositFee: Fee;
   referralFee: number;
   maxValidators: number;
-}
+};
 
-export interface InitializeInstructionDataArgs {
+export type InitializeInstructionDataArgs = {
   fee: FeeArgs;
   withdrawalFee: FeeArgs;
   depositFee: FeeArgs;
   referralFee: number;
   maxValidators: number;
-}
+};
 
 export function getInitializeInstructionDataEncoder(): FixedSizeEncoder<InitializeInstructionDataArgs> {
   return transformEncoder(
@@ -155,7 +157,7 @@ export function getInitializeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializeAsyncInput<
+export type InitializeAsyncInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountStaker extends string = string,
@@ -166,7 +168,7 @@ export interface InitializeAsyncInput<
   TAccountFeeAccount extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountDepositAuthority extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   manager: TransactionSigner<TAccountManager>;
   staker: Address<TAccountStaker>;
@@ -184,8 +186,26 @@ export interface InitializeAsyncInput<
   depositFee: InitializeInstructionDataArgs["depositFee"];
   referralFee: InitializeInstructionDataArgs["referralFee"];
   maxValidators: InitializeInstructionDataArgs["maxValidators"];
-}
+};
 
+/**
+ * Initializes a new `StakePool`.
+ * 0. `[w]` New `StakePool` to create.
+ * 1. `[s]` Manager
+ * 2. `[]` Staker
+ * 3. `[]` Stake pool withdraw authority
+ * 4. `[w]` Uninitialized validator stake list storage account
+ * 5. `[]` Reserve stake account must be initialized, have zero balance,
+ * and staker / withdrawer authority set to pool withdraw authority.
+ * 6. `[]` Pool token mint. Must have zero supply, owned by withdraw
+ * authority.
+ * 7. `[]` Pool account to deposit the generated fee for manager.
+ * 8. `[]` Token program id
+ * 9. `[]` (Optional) Deposit authority that must sign all deposits.
+ * Defaults to the program address generated using
+ * `find_deposit_authority_program_address`, making deposits
+ * permissionless.
+ */
 export async function getInitializeInstructionAsync<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -311,7 +331,7 @@ export async function getInitializeInstructionAsync<
   >);
 }
 
-export interface InitializeInput<
+export type InitializeInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountStaker extends string = string,
@@ -322,7 +342,7 @@ export interface InitializeInput<
   TAccountFeeAccount extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountDepositAuthority extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   manager: TransactionSigner<TAccountManager>;
   staker: Address<TAccountStaker>;
@@ -340,8 +360,26 @@ export interface InitializeInput<
   depositFee: InitializeInstructionDataArgs["depositFee"];
   referralFee: InitializeInstructionDataArgs["referralFee"];
   maxValidators: InitializeInstructionDataArgs["maxValidators"];
-}
+};
 
+/**
+ * Initializes a new `StakePool`.
+ * 0. `[w]` New `StakePool` to create.
+ * 1. `[s]` Manager
+ * 2. `[]` Staker
+ * 3. `[]` Stake pool withdraw authority
+ * 4. `[w]` Uninitialized validator stake list storage account
+ * 5. `[]` Reserve stake account must be initialized, have zero balance,
+ * and staker / withdrawer authority set to pool withdraw authority.
+ * 6. `[]` Pool token mint. Must have zero supply, owned by withdraw
+ * authority.
+ * 7. `[]` Pool account to deposit the generated fee for manager.
+ * 8. `[]` Token program id
+ * 9. `[]` (Optional) Deposit authority that must sign all deposits.
+ * Defaults to the program address generated using
+ * `find_deposit_authority_program_address`, making deposits
+ * permissionless.
+ */
 export function getInitializeInstruction<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -457,10 +495,10 @@ export function getInitializeInstruction<
   >);
 }
 
-export interface ParsedInitializeInstruction<
+export type ParsedInitializeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -475,7 +513,7 @@ export interface ParsedInitializeInstruction<
     depositAuthority: TAccountMetas[9];
   };
   data: InitializeInstructionData;
-}
+};
 
 export function parseInitializeInstruction<
   TProgram extends string,

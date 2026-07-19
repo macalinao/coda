@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { RewarderSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,15 +23,26 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRewarderPda } from "../pdas/index.js";
+import { findRewarderPda, type RewarderSeeds } from "../pdas/index.js";
 
 export const REWARDER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   83, 3, 203, 174, 244, 30, 172, 198,
@@ -55,7 +52,7 @@ export function getRewarderDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(REWARDER_DISCRIMINATOR);
 }
 
-export interface Rewarder {
+export type Rewarder = {
   discriminator: ReadonlyUint8Array;
   base: Address;
   bump: number;
@@ -70,9 +67,9 @@ export interface Rewarder {
   maxClaimFeeMillibps: bigint;
   pauseAuthority: Address;
   isPaused: boolean;
-}
+};
 
-export interface RewarderArgs {
+export type RewarderArgs = {
   base: Address;
   bump: number;
   authority: Address;
@@ -86,7 +83,7 @@ export interface RewarderArgs {
   maxClaimFeeMillibps: number | bigint;
   pauseAuthority: Address;
   isPaused: boolean;
-}
+};
 
 /** Gets the encoder for {@link RewarderArgs} account data. */
 export function getRewarderEncoder(): FixedSizeEncoder<RewarderArgs> {
@@ -172,7 +169,7 @@ export async function fetchMaybeRewarder<TAddress extends string = string>(
 
 export async function fetchAllRewarder(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Rewarder>[]> {
   const maybeAccounts = await fetchAllMaybeRewarder(rpc, addresses, config);
@@ -182,7 +179,7 @@ export async function fetchAllRewarder(
 
 export async function fetchAllMaybeRewarder(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Rewarder>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

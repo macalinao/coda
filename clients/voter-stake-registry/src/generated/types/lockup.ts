@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { LockupKind, LockupKindArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -22,22 +16,30 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { getLockupKindDecoder, getLockupKindEncoder } from "./index.js";
+import {
+  getLockupKindDecoder,
+  getLockupKindEncoder,
+  type LockupKind,
+  type LockupKindArgs,
+} from "./index.js";
 
-export interface Lockup {
+export type Lockup = {
   startTs: bigint;
   endTs: bigint;
   kind: LockupKind;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
-export interface LockupArgs {
+export type LockupArgs = {
   startTs: number | bigint;
   endTs: number | bigint;
   kind: LockupKindArgs;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
 export function getLockupEncoder(): FixedSizeEncoder<LockupArgs> {
   return getStructEncoder([

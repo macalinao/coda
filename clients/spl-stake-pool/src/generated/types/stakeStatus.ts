@@ -6,20 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 /** Status of the stake account in the validator list, for accounting */
 export enum StakeStatus {
-  Active = 0,
-  DeactivatingTransient = 1,
-  ReadyForRemoval = 2,
-  DeactivatingValidator = 3,
-  DeactivatingAll = 4,
+  Active,
+  DeactivatingTransient,
+  ReadyForRemoval,
+  DeactivatingValidator,
+  DeactivatingAll,
 }
 
 export type StakeStatusArgs = StakeStatus;

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REMOVE_TRANSACTION_DISCRIMINATOR = 10;
@@ -44,12 +44,13 @@ export function getRemoveTransactionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RemoveTransactionInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountProposalTransactionAccount extends string | AccountMeta = string,
-  TAccountBeneficiaryAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountProposalTransactionAccount extends string | AccountMeta<string> =
+    string,
+  TAccountBeneficiaryAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -74,9 +75,7 @@ export type RemoveTransactionInstruction<
     ]
   >;
 
-export interface RemoveTransactionInstructionData {
-  discriminator: number;
-}
+export type RemoveTransactionInstructionData = { discriminator: number };
 
 export type RemoveTransactionInstructionDataArgs = {};
 
@@ -101,13 +100,13 @@ export function getRemoveTransactionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RemoveTransactionInput<
+export type RemoveTransactionInput<
   TAccountProposalAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
   TAccountGovernanceAuthority extends string = string,
   TAccountProposalTransactionAccount extends string = string,
   TAccountBeneficiaryAccount extends string = string,
-> {
+> = {
   proposalAccount: Address<TAccountProposalAccount>;
   /** TokenOwnerRecord account of the Proposal owner */
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
@@ -116,7 +115,7 @@ export interface RemoveTransactionInput<
   proposalTransactionAccount: Address<TAccountProposalTransactionAccount>;
   /** Beneficiary Account which would receive lamports from the disposed ProposalTransaction account */
   beneficiaryAccount: Address<TAccountBeneficiaryAccount>;
-}
+};
 
 export function getRemoveTransactionInstruction<
   TAccountProposalAccount extends string,
@@ -195,10 +194,10 @@ export function getRemoveTransactionInstruction<
   >);
 }
 
-export interface ParsedRemoveTransactionInstruction<
+export type ParsedRemoveTransactionInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     proposalAccount: TAccountMetas[0];
@@ -211,7 +210,7 @@ export interface ParsedRemoveTransactionInstruction<
     beneficiaryAccount: TAccountMetas[4];
   };
   data: RemoveTransactionInstructionData;
-}
+};
 
 export function parseRemoveTransactionInstruction<
   TProgram extends string,

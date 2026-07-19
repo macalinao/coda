@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CAST_VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -50,14 +50,14 @@ export function getCastVoteDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CastVoteInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
-  TAccountLocker extends string | AccountMeta = string,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountVoteDelegate extends string | AccountMeta = string,
-  TAccountProposal extends string | AccountMeta = string,
-  TAccountVote extends string | AccountMeta = string,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountGovernProgram extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountLocker extends string | AccountMeta<string> = string,
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountVoteDelegate extends string | AccountMeta<string> = string,
+  TAccountProposal extends string | AccountMeta<string> = string,
+  TAccountVote extends string | AccountMeta<string> = string,
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountGovernProgram extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -88,14 +88,12 @@ export type CastVoteInstruction<
     ]
   >;
 
-export interface CastVoteInstructionData {
+export type CastVoteInstructionData = {
   discriminator: ReadonlyUint8Array;
   side: number;
-}
+};
 
-export interface CastVoteInstructionDataArgs {
-  side: number;
-}
+export type CastVoteInstructionDataArgs = { side: number };
 
 export function getCastVoteInstructionDataEncoder(): FixedSizeEncoder<CastVoteInstructionDataArgs> {
   return transformEncoder(
@@ -124,7 +122,7 @@ export function getCastVoteInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CastVoteInput<
+export type CastVoteInput<
   TAccountLocker extends string = string,
   TAccountEscrow extends string = string,
   TAccountVoteDelegate extends string = string,
@@ -132,7 +130,7 @@ export interface CastVoteInput<
   TAccountVote extends string = string,
   TAccountGovernor extends string = string,
   TAccountGovernProgram extends string = string,
-> {
+> = {
   locker: Address<TAccountLocker>;
   escrow: Address<TAccountEscrow>;
   voteDelegate: TransactionSigner<TAccountVoteDelegate>;
@@ -141,7 +139,7 @@ export interface CastVoteInput<
   governor: Address<TAccountGovernor>;
   governProgram: Address<TAccountGovernProgram>;
   side: CastVoteInstructionDataArgs["side"];
-}
+};
 
 export function getCastVoteInstruction<
   TAccountLocker extends string,
@@ -221,10 +219,10 @@ export function getCastVoteInstruction<
   >);
 }
 
-export interface ParsedCastVoteInstruction<
+export type ParsedCastVoteInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     locker: TAccountMetas[0];
@@ -236,7 +234,7 @@ export interface ParsedCastVoteInstruction<
     governProgram: TAccountMetas[6];
   };
   data: CastVoteInstructionData;
-}
+};
 
 export function parseCastVoteInstruction<
   TProgram extends string,

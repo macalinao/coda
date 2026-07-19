@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const ACTIVATE_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,13 +49,13 @@ export function getActivateProposalDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ActivateProposalInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
-  TAccountLocker extends string | AccountMeta = string,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountProposal extends string | AccountMeta = string,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountEscrowOwner extends string | AccountMeta = string,
-  TAccountGovernProgram extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountLocker extends string | AccountMeta<string> = string,
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountProposal extends string | AccountMeta<string> = string,
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountEscrowOwner extends string | AccountMeta<string> = string,
+  TAccountGovernProgram extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,9 +83,9 @@ export type ActivateProposalInstruction<
     ]
   >;
 
-export interface ActivateProposalInstructionData {
+export type ActivateProposalInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type ActivateProposalInstructionDataArgs = {};
 
@@ -112,21 +112,21 @@ export function getActivateProposalInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ActivateProposalInput<
+export type ActivateProposalInput<
   TAccountLocker extends string = string,
   TAccountGovernor extends string = string,
   TAccountProposal extends string = string,
   TAccountEscrow extends string = string,
   TAccountEscrowOwner extends string = string,
   TAccountGovernProgram extends string = string,
-> {
+> = {
   locker: Address<TAccountLocker>;
   governor: Address<TAccountGovernor>;
   proposal: Address<TAccountProposal>;
   escrow: Address<TAccountEscrow>;
   escrowOwner: TransactionSigner<TAccountEscrowOwner>;
   governProgram: Address<TAccountGovernProgram>;
-}
+};
 
 export function getActivateProposalInstruction<
   TAccountLocker extends string,
@@ -195,10 +195,10 @@ export function getActivateProposalInstruction<
   >);
 }
 
-export interface ParsedActivateProposalInstruction<
+export type ParsedActivateProposalInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     locker: TAccountMetas[0];
@@ -209,7 +209,7 @@ export interface ParsedActivateProposalInstruction<
     governProgram: TAccountMetas[5];
   };
   data: ActivateProposalInstructionData;
-}
+};
 
 export function parseActivateProposalInstruction<
   TProgram extends string,

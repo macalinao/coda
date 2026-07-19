@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -37,10 +20,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMinerPda, findMinterPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -112,9 +110,9 @@ export type ClaimRewardsV2Instruction<
     ]
   >;
 
-export interface ClaimRewardsV2InstructionData {
+export type ClaimRewardsV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type ClaimRewardsV2InstructionDataArgs = {};
 
@@ -141,7 +139,7 @@ export function getClaimRewardsV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClaimRewardsV2AsyncInput<
+export type ClaimRewardsV2AsyncInput<
   TAccountMintWrapper extends string = string,
   TAccountMintWrapperProgram extends string = string,
   TAccountMinter extends string = string,
@@ -153,7 +151,7 @@ export interface ClaimRewardsV2AsyncInput<
   TAccountQuarry extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   mintWrapperProgram?: Address<TAccountMintWrapperProgram>;
   minter?: Address<TAccountMinter>;
@@ -165,7 +163,7 @@ export interface ClaimRewardsV2AsyncInput<
   quarry: Address<TAccountQuarry>;
   tokenProgram?: Address<TAccountTokenProgram>;
   rewarder: Address<TAccountRewarder>;
-}
+};
 
 export async function getClaimRewardsV2InstructionAsync<
   TAccountMintWrapper extends string,
@@ -335,7 +333,7 @@ export async function getClaimRewardsV2InstructionAsync<
   >);
 }
 
-export interface ClaimRewardsV2Input<
+export type ClaimRewardsV2Input<
   TAccountMintWrapper extends string = string,
   TAccountMintWrapperProgram extends string = string,
   TAccountMinter extends string = string,
@@ -347,7 +345,7 @@ export interface ClaimRewardsV2Input<
   TAccountQuarry extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   mintWrapperProgram?: Address<TAccountMintWrapperProgram>;
   minter: Address<TAccountMinter>;
@@ -359,7 +357,7 @@ export interface ClaimRewardsV2Input<
   quarry: Address<TAccountQuarry>;
   tokenProgram?: Address<TAccountTokenProgram>;
   rewarder: Address<TAccountRewarder>;
-}
+};
 
 export function getClaimRewardsV2Instruction<
   TAccountMintWrapper extends string,
@@ -480,10 +478,10 @@ export function getClaimRewardsV2Instruction<
   >);
 }
 
-export interface ParsedClaimRewardsV2Instruction<
+export type ParsedClaimRewardsV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mintWrapper: TAccountMetas[0];
@@ -499,7 +497,7 @@ export interface ParsedClaimRewardsV2Instruction<
     rewarder: TAccountMetas[10];
   };
   data: ClaimRewardsV2InstructionData;
-}
+};
 
 export function parseClaimRewardsV2Instruction<
   TProgram extends string,

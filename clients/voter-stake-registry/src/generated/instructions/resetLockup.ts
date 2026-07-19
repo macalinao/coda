@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { LockupKind, LockupKindArgs } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,17 +14,39 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getLockupKindDecoder, getLockupKindEncoder } from "../types/index.js";
+import {
+  getLockupKindDecoder,
+  getLockupKindEncoder,
+  type LockupKind,
+  type LockupKindArgs,
+} from "../types/index.js";
 
 export const RESET_LOCKUP_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 20, 24, 247, 238, 148, 94, 62,
@@ -56,10 +60,10 @@ export function getResetLockupDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ResetLockupInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -78,18 +82,18 @@ export type ResetLockupInstruction<
     ]
   >;
 
-export interface ResetLockupInstructionData {
+export type ResetLockupInstructionData = {
   discriminator: ReadonlyUint8Array;
   depositEntryIndex: number;
   kind: LockupKind;
   periods: number;
-}
+};
 
-export interface ResetLockupInstructionDataArgs {
+export type ResetLockupInstructionDataArgs = {
   depositEntryIndex: number;
   kind: LockupKindArgs;
   periods: number;
-}
+};
 
 export function getResetLockupInstructionDataEncoder(): FixedSizeEncoder<ResetLockupInstructionDataArgs> {
   return transformEncoder(
@@ -122,18 +126,18 @@ export function getResetLockupInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ResetLockupInput<
+export type ResetLockupInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   voterAuthority: TransactionSigner<TAccountVoterAuthority>;
   depositEntryIndex: ResetLockupInstructionDataArgs["depositEntryIndex"];
   kind: ResetLockupInstructionDataArgs["kind"];
   periods: ResetLockupInstructionDataArgs["periods"];
-}
+};
 
 export function getResetLockupInstruction<
   TAccountRegistrar extends string,
@@ -190,10 +194,10 @@ export function getResetLockupInstruction<
   >);
 }
 
-export interface ParsedResetLockupInstruction<
+export type ParsedResetLockupInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -201,7 +205,7 @@ export interface ParsedResetLockupInstruction<
     voterAuthority: TAccountMetas[2];
   };
   data: ResetLockupInstructionData;
-}
+};
 
 export function parseResetLockupInstruction<
   TProgram extends string,

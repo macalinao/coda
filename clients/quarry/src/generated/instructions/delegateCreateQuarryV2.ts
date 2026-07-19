@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +17,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findQuarryPda } from "../pdas/index.js";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -99,9 +97,9 @@ export type DelegateCreateQuarryV2Instruction<
     ]
   >;
 
-export interface DelegateCreateQuarryV2InstructionData {
+export type DelegateCreateQuarryV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type DelegateCreateQuarryV2InstructionDataArgs = {};
 
@@ -131,7 +129,7 @@ export function getDelegateCreateQuarryV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface DelegateCreateQuarryV2AsyncInput<
+export type DelegateCreateQuarryV2AsyncInput<
   TAccountOperator extends string = string,
   TAccountDelegate extends string = string,
   TAccountRewarder extends string = string,
@@ -140,7 +138,7 @@ export interface DelegateCreateQuarryV2AsyncInput<
   TAccountTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   operator: Address<TAccountOperator>;
   delegate: TransactionSigner<TAccountDelegate>;
   rewarder: Address<TAccountRewarder>;
@@ -149,7 +147,7 @@ export interface DelegateCreateQuarryV2AsyncInput<
   tokenMint: Address<TAccountTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export async function getDelegateCreateQuarryV2InstructionAsync<
   TAccountOperator extends string,
@@ -258,7 +256,7 @@ export async function getDelegateCreateQuarryV2InstructionAsync<
   >);
 }
 
-export interface DelegateCreateQuarryV2Input<
+export type DelegateCreateQuarryV2Input<
   TAccountOperator extends string = string,
   TAccountDelegate extends string = string,
   TAccountRewarder extends string = string,
@@ -267,7 +265,7 @@ export interface DelegateCreateQuarryV2Input<
   TAccountTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   operator: Address<TAccountOperator>;
   delegate: TransactionSigner<TAccountDelegate>;
   rewarder: Address<TAccountRewarder>;
@@ -276,7 +274,7 @@ export interface DelegateCreateQuarryV2Input<
   tokenMint: Address<TAccountTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getDelegateCreateQuarryV2Instruction<
   TAccountOperator extends string,
@@ -371,10 +369,10 @@ export function getDelegateCreateQuarryV2Instruction<
   >);
 }
 
-export interface ParsedDelegateCreateQuarryV2Instruction<
+export type ParsedDelegateCreateQuarryV2Instruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     operator: TAccountMetas[0];
@@ -387,7 +385,7 @@ export interface ParsedDelegateCreateQuarryV2Instruction<
     systemProgram: TAccountMetas[7];
   };
   data: DelegateCreateQuarryV2InstructionData;
-}
+};
 
 export function parseDelegateCreateQuarryV2Instruction<
   TProgram extends string,

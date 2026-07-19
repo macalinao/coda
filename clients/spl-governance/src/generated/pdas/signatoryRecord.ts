@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface SignatoryRecordSeeds {
+export type SignatoryRecordSeeds = {
   proposal: Address;
   signatory: Address;
-}
+};
 
 /** Signatory's record on a proposal */
 export async function findSignatoryRecordPda(

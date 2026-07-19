@@ -6,19 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getU64Encoder,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface TransientStakeSeeds {
+export type TransientStakeSeeds = {
   voteAccountAddress: Address;
   stakePoolAddress: Address;
   seed: number | bigint;
-}
+};
 
 export async function findTransientStakePda(
   seeds: TransientStakeSeeds,

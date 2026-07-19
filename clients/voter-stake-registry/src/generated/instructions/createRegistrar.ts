@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,8 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CREATE_REGISTRAR_DISCRIMINATOR: ReadonlyUint8Array =
@@ -52,18 +52,18 @@ export function getCreateRegistrarDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateRegistrarInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountRealm extends string | AccountMeta = string,
-  TAccountGovernanceProgramId extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountRealm extends string | AccountMeta<string> = string,
+  TAccountGovernanceProgramId extends string | AccountMeta<string> =
     "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-  TAccountRealmGoverningTokenMint extends string | AccountMeta = string,
-  TAccountRealmAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRealmGoverningTokenMint extends string | AccountMeta<string> = string,
+  TAccountRealmAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -98,14 +98,12 @@ export type CreateRegistrarInstruction<
     ]
   >;
 
-export interface CreateRegistrarInstructionData {
+export type CreateRegistrarInstructionData = {
   discriminator: ReadonlyUint8Array;
   registrarBump: number;
-}
+};
 
-export interface CreateRegistrarInstructionDataArgs {
-  registrarBump: number;
-}
+export type CreateRegistrarInstructionDataArgs = { registrarBump: number };
 
 export function getCreateRegistrarInstructionDataEncoder(): FixedSizeEncoder<CreateRegistrarInstructionDataArgs> {
   return transformEncoder(
@@ -134,7 +132,7 @@ export function getCreateRegistrarInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateRegistrarInput<
+export type CreateRegistrarInput<
   TAccountRegistrar extends string = string,
   TAccountRealm extends string = string,
   TAccountGovernanceProgramId extends string = string,
@@ -143,7 +141,7 @@ export interface CreateRegistrarInput<
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   realm: Address<TAccountRealm>;
   governanceProgramId?: Address<TAccountGovernanceProgramId>;
@@ -153,7 +151,7 @@ export interface CreateRegistrarInput<
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
   registrarBump: CreateRegistrarInstructionDataArgs["registrarBump"];
-}
+};
 
 export function getCreateRegistrarInstruction<
   TAccountRegistrar extends string,
@@ -263,10 +261,10 @@ export function getCreateRegistrarInstruction<
   >);
 }
 
-export interface ParsedCreateRegistrarInstruction<
+export type ParsedCreateRegistrarInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -279,7 +277,7 @@ export interface ParsedCreateRegistrarInstruction<
     rent: TAccountMetas[7];
   };
   data: CreateRegistrarInstructionData;
-}
+};
 
 export function parseCreateRegistrarInstruction<
   TProgram extends string,

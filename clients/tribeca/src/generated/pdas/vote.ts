@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface VoteSeeds {
+export type VoteSeeds = {
   proposal: Address;
   voter: Address;
-}
+};
 
 /** Vote account representing a voter's decision on a proposal */
 export async function findVotePda(

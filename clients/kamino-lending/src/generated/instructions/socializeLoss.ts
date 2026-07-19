@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SOCIALIZE_LOSS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -52,13 +52,13 @@ export function getSocializeLossDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SocializeLossInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountRiskCouncil extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountInstructionSysvarAccount extends string | AccountMeta =
+  TAccountRiskCouncil extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountInstructionSysvarAccount extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,14 +83,14 @@ export type SocializeLossInstruction<
     ]
   >;
 
-export interface SocializeLossInstructionData {
+export type SocializeLossInstructionData = {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
-}
+};
 
-export interface SocializeLossInstructionDataArgs {
+export type SocializeLossInstructionDataArgs = {
   liquidityAmount: number | bigint;
-}
+};
 
 export function getSocializeLossInstructionDataEncoder(): FixedSizeEncoder<SocializeLossInstructionDataArgs> {
   return transformEncoder(
@@ -119,20 +119,20 @@ export function getSocializeLossInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SocializeLossInput<
+export type SocializeLossInput<
   TAccountRiskCouncil extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
   TAccountInstructionSysvarAccount extends string = string,
-> {
+> = {
   riskCouncil: TransactionSigner<TAccountRiskCouncil>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
   reserve: Address<TAccountReserve>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   liquidityAmount: SocializeLossInstructionDataArgs["liquidityAmount"];
-}
+};
 
 export function getSocializeLossInstruction<
   TAccountRiskCouncil extends string,
@@ -213,10 +213,10 @@ export function getSocializeLossInstruction<
   >);
 }
 
-export interface ParsedSocializeLossInstruction<
+export type ParsedSocializeLossInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     riskCouncil: TAccountMetas[0];
@@ -226,7 +226,7 @@ export interface ParsedSocializeLossInstruction<
     instructionSysvarAccount: TAccountMetas[4];
   };
   data: SocializeLossInstructionData;
-}
+};
 
 export function parseSocializeLossInstruction<
   TProgram extends string,

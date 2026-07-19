@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getProgramDerivedAddress,
   getU64Encoder,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface ConfigSeeds {
+export type ConfigSeeds = {
   /** The config index */
   index: number | bigint;
-}
+};
 
 /**
  * Configuration account that stores global protocol settings.

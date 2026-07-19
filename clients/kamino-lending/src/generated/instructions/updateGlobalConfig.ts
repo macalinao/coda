@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  UpdateGlobalConfigMode,
-  UpdateGlobalConfigModeArgs,
-} from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -41,12 +21,30 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getUpdateGlobalConfigModeDecoder,
   getUpdateGlobalConfigModeEncoder,
+  type UpdateGlobalConfigMode,
+  type UpdateGlobalConfigModeArgs,
 } from "../types/index.js";
 
 export const UPDATE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
@@ -60,9 +58,9 @@ export function getUpdateGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateGlobalConfigInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountGlobalAdmin extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGlobalAdmin extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -78,16 +76,16 @@ export type UpdateGlobalConfigInstruction<
     ]
   >;
 
-export interface UpdateGlobalConfigInstructionData {
+export type UpdateGlobalConfigInstructionData = {
   discriminator: ReadonlyUint8Array;
   mode: UpdateGlobalConfigMode;
   value: ReadonlyUint8Array;
-}
+};
 
-export interface UpdateGlobalConfigInstructionDataArgs {
+export type UpdateGlobalConfigInstructionDataArgs = {
   mode: UpdateGlobalConfigModeArgs;
   value: ReadonlyUint8Array;
-}
+};
 
 export function getUpdateGlobalConfigInstructionDataEncoder(): Encoder<UpdateGlobalConfigInstructionDataArgs> {
   return transformEncoder(
@@ -121,15 +119,15 @@ export function getUpdateGlobalConfigInstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateGlobalConfigInput<
+export type UpdateGlobalConfigInput<
   TAccountGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
-> {
+> = {
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
   mode: UpdateGlobalConfigInstructionDataArgs["mode"];
   value: UpdateGlobalConfigInstructionDataArgs["value"];
-}
+};
 
 export function getUpdateGlobalConfigInstruction<
   TAccountGlobalAdmin extends string,
@@ -177,17 +175,17 @@ export function getUpdateGlobalConfigInstruction<
   >);
 }
 
-export interface ParsedUpdateGlobalConfigInstruction<
+export type ParsedUpdateGlobalConfigInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     globalAdmin: TAccountMetas[0];
     globalConfig: TAccountMetas[1];
   };
   data: UpdateGlobalConfigInstructionData;
-}
+};
 
 export function parseUpdateGlobalConfigInstruction<
   TProgram extends string,

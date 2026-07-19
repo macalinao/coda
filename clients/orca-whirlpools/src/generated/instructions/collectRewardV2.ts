@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemainingAccountsInfo,
-  RemainingAccountsInfoArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -44,12 +21,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
+  type RemainingAccountsInfo,
+  type RemainingAccountsInfoArgs,
 } from "../types/index.js";
 
 export const COLLECT_REWARD_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -63,18 +61,18 @@ export function getCollectRewardV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CollectRewardV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountPositionAuthority extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountRewardOwnerAccount extends string | AccountMeta = string,
-  TAccountRewardMint extends string | AccountMeta = string,
-  TAccountRewardVault extends string | AccountMeta = string,
-  TAccountRewardTokenProgram extends string | AccountMeta =
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountPositionAuthority extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPositionTokenAccount extends string | AccountMeta<string> = string,
+  TAccountRewardOwnerAccount extends string | AccountMeta<string> = string,
+  TAccountRewardMint extends string | AccountMeta<string> = string,
+  TAccountRewardVault extends string | AccountMeta<string> = string,
+  TAccountRewardTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountMemoProgram extends string | AccountMeta =
+  TAccountMemoProgram extends string | AccountMeta<string> =
     "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -111,16 +109,16 @@ export type CollectRewardV2Instruction<
     ]
   >;
 
-export interface CollectRewardV2InstructionData {
+export type CollectRewardV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
   remainingAccountsInfo: Option<RemainingAccountsInfo>;
-}
+};
 
-export interface CollectRewardV2InstructionDataArgs {
+export type CollectRewardV2InstructionDataArgs = {
   rewardIndex: number;
   remainingAccountsInfo: OptionOrNullable<RemainingAccountsInfoArgs>;
-}
+};
 
 export function getCollectRewardV2InstructionDataEncoder(): Encoder<CollectRewardV2InstructionDataArgs> {
   return transformEncoder(
@@ -157,7 +155,7 @@ export function getCollectRewardV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface CollectRewardV2Input<
+export type CollectRewardV2Input<
   TAccountWhirlpool extends string = string,
   TAccountPositionAuthority extends string = string,
   TAccountPosition extends string = string,
@@ -167,7 +165,7 @@ export interface CollectRewardV2Input<
   TAccountRewardVault extends string = string,
   TAccountRewardTokenProgram extends string = string,
   TAccountMemoProgram extends string = string,
-> {
+> = {
   whirlpool: Address<TAccountWhirlpool>;
   positionAuthority: TransactionSigner<TAccountPositionAuthority>;
   position: Address<TAccountPosition>;
@@ -179,7 +177,7 @@ export interface CollectRewardV2Input<
   memoProgram?: Address<TAccountMemoProgram>;
   rewardIndex: CollectRewardV2InstructionDataArgs["rewardIndex"];
   remainingAccountsInfo: CollectRewardV2InstructionDataArgs["remainingAccountsInfo"];
-}
+};
 
 export function getCollectRewardV2Instruction<
   TAccountWhirlpool extends string,
@@ -293,10 +291,10 @@ export function getCollectRewardV2Instruction<
   >);
 }
 
-export interface ParsedCollectRewardV2Instruction<
+export type ParsedCollectRewardV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpool: TAccountMetas[0];
@@ -310,7 +308,7 @@ export interface ParsedCollectRewardV2Instruction<
     memoProgram: TAccountMetas[8];
   };
   data: CollectRewardV2InstructionData;
-}
+};
 
 export function parseCollectRewardV2Instruction<
   TProgram extends string,

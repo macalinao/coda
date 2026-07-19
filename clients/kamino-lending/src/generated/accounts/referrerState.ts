@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ReferrerStateSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,8 +22,22 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findReferrerStatePda } from "../pdas/index.js";
+import {
+  findReferrerStatePda,
+  type ReferrerStateSeeds,
+} from "../pdas/index.js";
 
 export const REFERRER_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   194, 81, 217, 103, 12, 19, 12, 66,
@@ -49,16 +49,13 @@ export function getReferrerStateDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ReferrerState {
+export type ReferrerState = {
   discriminator: ReadonlyUint8Array;
   shortUrl: Address;
   owner: Address;
-}
+};
 
-export interface ReferrerStateArgs {
-  shortUrl: Address;
-  owner: Address;
-}
+export type ReferrerStateArgs = { shortUrl: Address; owner: Address };
 
 /** Gets the encoder for {@link ReferrerStateArgs} account data. */
 export function getReferrerStateEncoder(): FixedSizeEncoder<ReferrerStateArgs> {
@@ -125,7 +122,7 @@ export async function fetchMaybeReferrerState<TAddress extends string = string>(
 
 export async function fetchAllReferrerState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ReferrerState>[]> {
   const maybeAccounts = await fetchAllMaybeReferrerState(
@@ -139,7 +136,7 @@ export async function fetchAllReferrerState(
 
 export async function fetchAllMaybeReferrerState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ReferrerState>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

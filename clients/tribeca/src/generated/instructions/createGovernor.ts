@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  GovernanceParameters,
-  GovernanceParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -43,12 +21,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getGovernanceParametersDecoder,
   getGovernanceParametersEncoder,
+  type GovernanceParameters,
+  type GovernanceParametersArgs,
 } from "../types/index.js";
 
 export const CREATE_GOVERNOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -63,13 +61,13 @@ export function getCreateGovernorDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateGovernorInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountBase extends string | AccountMeta = string,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountSmartWallet extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountBase extends string | AccountMeta<string> = string,
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountSmartWallet extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -94,18 +92,18 @@ export type CreateGovernorInstruction<
     ]
   >;
 
-export interface CreateGovernorInstructionData {
+export type CreateGovernorInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
   electorate: Address;
   params: GovernanceParameters;
-}
+};
 
-export interface CreateGovernorInstructionDataArgs {
+export type CreateGovernorInstructionDataArgs = {
   bump: number;
   electorate: Address;
   params: GovernanceParametersArgs;
-}
+};
 
 export function getCreateGovernorInstructionDataEncoder(): FixedSizeEncoder<CreateGovernorInstructionDataArgs> {
   return transformEncoder(
@@ -138,13 +136,13 @@ export function getCreateGovernorInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateGovernorInput<
+export type CreateGovernorInput<
   TAccountBase extends string = string,
   TAccountGovernor extends string = string,
   TAccountSmartWallet extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   governor: Address<TAccountGovernor>;
   smartWallet: Address<TAccountSmartWallet>;
@@ -153,7 +151,7 @@ export interface CreateGovernorInput<
   bump: CreateGovernorInstructionDataArgs["bump"];
   electorate: CreateGovernorInstructionDataArgs["electorate"];
   params: CreateGovernorInstructionDataArgs["params"];
-}
+};
 
 export function getCreateGovernorInstruction<
   TAccountBase extends string,
@@ -227,10 +225,10 @@ export function getCreateGovernorInstruction<
   >);
 }
 
-export interface ParsedCreateGovernorInstruction<
+export type ParsedCreateGovernorInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     base: TAccountMetas[0];
@@ -240,7 +238,7 @@ export interface ParsedCreateGovernorInstruction<
     systemProgram: TAccountMetas[4];
   };
   data: CreateGovernorInstructionData;
-}
+};
 
 export function parseCreateGovernorInstruction<
   TProgram extends string,

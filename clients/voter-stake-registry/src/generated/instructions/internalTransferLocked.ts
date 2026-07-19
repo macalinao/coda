@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,15 +14,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INTERNAL_TRANSFER_LOCKED_DISCRIMINATOR: ReadonlyUint8Array =
@@ -53,10 +53,10 @@ export function getInternalTransferLockedDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type InternalTransferLockedInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -75,18 +75,18 @@ export type InternalTransferLockedInstruction<
     ]
   >;
 
-export interface InternalTransferLockedInstructionData {
+export type InternalTransferLockedInstructionData = {
   discriminator: ReadonlyUint8Array;
   sourceDepositEntryIndex: number;
   targetDepositEntryIndex: number;
   amount: bigint;
-}
+};
 
-export interface InternalTransferLockedInstructionDataArgs {
+export type InternalTransferLockedInstructionDataArgs = {
   sourceDepositEntryIndex: number;
   targetDepositEntryIndex: number;
   amount: number | bigint;
-}
+};
 
 export function getInternalTransferLockedInstructionDataEncoder(): FixedSizeEncoder<InternalTransferLockedInstructionDataArgs> {
   return transformEncoder(
@@ -122,18 +122,18 @@ export function getInternalTransferLockedInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InternalTransferLockedInput<
+export type InternalTransferLockedInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   voterAuthority: TransactionSigner<TAccountVoterAuthority>;
   sourceDepositEntryIndex: InternalTransferLockedInstructionDataArgs["sourceDepositEntryIndex"];
   targetDepositEntryIndex: InternalTransferLockedInstructionDataArgs["targetDepositEntryIndex"];
   amount: InternalTransferLockedInstructionDataArgs["amount"];
-}
+};
 
 export function getInternalTransferLockedInstruction<
   TAccountRegistrar extends string,
@@ -190,10 +190,10 @@ export function getInternalTransferLockedInstruction<
   >);
 }
 
-export interface ParsedInternalTransferLockedInstruction<
+export type ParsedInternalTransferLockedInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -201,7 +201,7 @@ export interface ParsedInternalTransferLockedInstruction<
     voterAuthority: TAccountMetas[2];
   };
   data: InternalTransferLockedInstructionData;
-}
+};
 
 export function parseInternalTransferLockedInstruction<
   TProgram extends string,

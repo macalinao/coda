@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { MinterSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,13 +21,24 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMinterPda } from "../pdas/index.js";
+import { findMinterPda, type MinterSeeds } from "../pdas/index.js";
 
 export const MINTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   28, 69, 107, 166, 41, 139, 205, 247,
@@ -51,7 +48,7 @@ export function getMinterDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(MINTER_DISCRIMINATOR);
 }
 
-export interface Minter {
+export type Minter = {
   discriminator: ReadonlyUint8Array;
   mintWrapper: Address;
   minterAuthority: Address;
@@ -59,16 +56,16 @@ export interface Minter {
   index: bigint;
   allowance: bigint;
   totalMinted: bigint;
-}
+};
 
-export interface MinterArgs {
+export type MinterArgs = {
   mintWrapper: Address;
   minterAuthority: Address;
   bump: number;
   index: number | bigint;
   allowance: number | bigint;
   totalMinted: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link MinterArgs} account data. */
 export function getMinterEncoder(): FixedSizeEncoder<MinterArgs> {
@@ -140,7 +137,7 @@ export async function fetchMaybeMinter<TAddress extends string = string>(
 
 export async function fetchAllMinter(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Minter>[]> {
   const maybeAccounts = await fetchAllMaybeMinter(rpc, addresses, config);
@@ -150,7 +147,7 @@ export async function fetchAllMinter(
 
 export async function fetchAllMaybeMinter(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Minter>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

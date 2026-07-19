@@ -6,30 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ObligationSeeds } from "../pdas/index.js";
-import type {
-  LastUpdate,
-  LastUpdateArgs,
-  ObligationCollateral,
-  ObligationCollateralArgs,
-  ObligationLiquidity,
-  ObligationLiquidityArgs,
-  ObligationOrder,
-  ObligationOrderArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -47,15 +23,26 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findObligationPda } from "../pdas/index.js";
+import { findObligationPda, type ObligationSeeds } from "../pdas/index.js";
 import {
   getLastUpdateDecoder,
   getLastUpdateEncoder,
@@ -65,6 +52,14 @@ import {
   getObligationLiquidityEncoder,
   getObligationOrderDecoder,
   getObligationOrderEncoder,
+  type LastUpdate,
+  type LastUpdateArgs,
+  type ObligationCollateral,
+  type ObligationCollateralArgs,
+  type ObligationLiquidity,
+  type ObligationLiquidityArgs,
+  type ObligationOrder,
+  type ObligationOrderArgs,
 } from "../types/index.js";
 
 export const OBLIGATION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -75,7 +70,7 @@ export function getObligationDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(OBLIGATION_DISCRIMINATOR);
 }
 
-export interface Obligation {
+export type Obligation = {
   discriminator: ReadonlyUint8Array;
   /** Version of the struct */
   tag: bigint;
@@ -86,13 +81,13 @@ export interface Obligation {
   /** Owner authority which can borrow liquidity */
   owner: Address;
   /** Deposited collateral for the obligation, unique by deposit reserve address */
-  deposits: ObligationCollateral[];
+  deposits: Array<ObligationCollateral>;
   /** Worst LTV for the collaterals backing the loan, represented as a percentage */
   lowestReserveDepositLiquidationLtv: bigint;
   /** Market value of deposits (scaled fraction) */
   depositedValueSf: bigint;
   /** Borrowed liquidity for the obligation, unique by borrow reserve address */
-  borrows: ObligationLiquidity[];
+  borrows: Array<ObligationLiquidity>;
   /** Risk adjusted market value of borrows/debt (sum of price * borrowed_amount * borrow_factor) (scaled fraction) */
   borrowFactorAdjustedDebtValueSf: bigint;
   /** Market value of borrows - used for max_liquidatable_borrowed_amount (scaled fraction) */
@@ -102,9 +97,9 @@ export interface Obligation {
   /** The dangerous borrow value at the weighted average liquidation threshold (scaled fraction) */
   unhealthyBorrowValueSf: bigint;
   /** The asset tier of the deposits */
-  depositsAssetTiers: number[];
+  depositsAssetTiers: Array<number>;
   /** The asset tier of the borrows */
-  borrowsAssetTiers: number[];
+  borrowsAssetTiers: Array<number>;
   /** The elevation group id the obligation opted into. */
   elevationGroup: number;
   /** The number of obsolete reserves the obligation has a deposit in */
@@ -124,7 +119,7 @@ export interface Obligation {
   lowestReserveDepositMaxLtvPct: number;
   /** The number of obsolete reserves the obligation has a borrow in */
   numOfObsoleteBorrowReserves: number;
-  reserved: number[];
+  reserved: Array<number>;
   highestBorrowFactorPct: bigint;
   /**
    * A timestamp at which the risk council most-recently marked this obligation for deleveraging.
@@ -135,11 +130,11 @@ export interface Obligation {
    * Owner-defined, liquidator-executed orders applicable to this obligation.
    * Typical use-cases would be a stop-loss and a take-profit (possibly co-existing).
    */
-  orders: ObligationOrder[];
-  padding3: bigint[];
-}
+  orders: Array<ObligationOrder>;
+  padding3: Array<bigint>;
+};
 
-export interface ObligationArgs {
+export type ObligationArgs = {
   /** Version of the struct */
   tag: number | bigint;
   /** Last update to collateral, liquidity, or their market values */
@@ -149,13 +144,13 @@ export interface ObligationArgs {
   /** Owner authority which can borrow liquidity */
   owner: Address;
   /** Deposited collateral for the obligation, unique by deposit reserve address */
-  deposits: ObligationCollateralArgs[];
+  deposits: Array<ObligationCollateralArgs>;
   /** Worst LTV for the collaterals backing the loan, represented as a percentage */
   lowestReserveDepositLiquidationLtv: number | bigint;
   /** Market value of deposits (scaled fraction) */
   depositedValueSf: number | bigint;
   /** Borrowed liquidity for the obligation, unique by borrow reserve address */
-  borrows: ObligationLiquidityArgs[];
+  borrows: Array<ObligationLiquidityArgs>;
   /** Risk adjusted market value of borrows/debt (sum of price * borrowed_amount * borrow_factor) (scaled fraction) */
   borrowFactorAdjustedDebtValueSf: number | bigint;
   /** Market value of borrows - used for max_liquidatable_borrowed_amount (scaled fraction) */
@@ -165,9 +160,9 @@ export interface ObligationArgs {
   /** The dangerous borrow value at the weighted average liquidation threshold (scaled fraction) */
   unhealthyBorrowValueSf: number | bigint;
   /** The asset tier of the deposits */
-  depositsAssetTiers: number[];
+  depositsAssetTiers: Array<number>;
   /** The asset tier of the borrows */
-  borrowsAssetTiers: number[];
+  borrowsAssetTiers: Array<number>;
   /** The elevation group id the obligation opted into. */
   elevationGroup: number;
   /** The number of obsolete reserves the obligation has a deposit in */
@@ -187,7 +182,7 @@ export interface ObligationArgs {
   lowestReserveDepositMaxLtvPct: number;
   /** The number of obsolete reserves the obligation has a borrow in */
   numOfObsoleteBorrowReserves: number;
-  reserved: number[];
+  reserved: Array<number>;
   highestBorrowFactorPct: number | bigint;
   /**
    * A timestamp at which the risk council most-recently marked this obligation for deleveraging.
@@ -198,9 +193,9 @@ export interface ObligationArgs {
    * Owner-defined, liquidator-executed orders applicable to this obligation.
    * Typical use-cases would be a stop-loss and a take-profit (possibly co-existing).
    */
-  orders: ObligationOrderArgs[];
+  orders: Array<ObligationOrderArgs>;
   padding3: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link ObligationArgs} account data. */
 export function getObligationEncoder(): FixedSizeEncoder<ObligationArgs> {
@@ -326,7 +321,7 @@ export async function fetchMaybeObligation<TAddress extends string = string>(
 
 export async function fetchAllObligation(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Obligation>[]> {
   const maybeAccounts = await fetchAllMaybeObligation(rpc, addresses, config);
@@ -336,7 +331,7 @@ export async function fetchAllObligation(
 
 export async function fetchAllMaybeObligation(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Obligation>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

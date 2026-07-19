@@ -6,140 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  LendingGlobalConfig,
-  LendingGlobalConfigArgs,
-  LendingMarket,
-  LendingMarketArgs,
-  Obligation,
-  ObligationArgs,
-  ReferrerState,
-  ReferrerStateArgs,
-  ReferrerTokenState,
-  ReferrerTokenStateArgs,
-  Reserve,
-  ReserveArgs,
-  ShortUrl,
-  ShortUrlArgs,
-  UserMetadata,
-  UserMetadataArgs,
-  UserState,
-  UserStateArgs,
-} from "../accounts/index.js";
-import type {
-  BorrowObligationLiquidityAsyncInput,
-  BorrowObligationLiquidityV2AsyncInput,
-  DeleteReferrerStateAndShortUrlInput,
-  DepositAndWithdrawInput,
-  DepositObligationCollateralInput,
-  DepositObligationCollateralV2AsyncInput,
-  DepositReserveLiquidityAndObligationCollateralAsyncInput,
-  DepositReserveLiquidityAndObligationCollateralV2AsyncInput,
-  DepositReserveLiquidityAsyncInput,
-  FlashBorrowReserveLiquidityAsyncInput,
-  FlashRepayReserveLiquidityAsyncInput,
-  IdlMissingTypesInput,
-  InitFarmsForReserveAsyncInput,
-  InitGlobalConfigAsyncInput,
-  InitLendingMarketAsyncInput,
-  InitObligationFarmsForReserveAsyncInput,
-  InitObligationInput,
-  InitReferrerStateAndShortUrlInput,
-  InitReferrerTokenStateInput,
-  InitReserveAsyncInput,
-  InitUserMetadataInput,
-  LiquidateObligationAndRedeemReserveCollateralAsyncInput,
-  LiquidateObligationAndRedeemReserveCollateralV2Input,
-  MarkObligationForDeleveragingInput,
-  ParsedBorrowObligationLiquidityInstruction,
-  ParsedBorrowObligationLiquidityV2Instruction,
-  ParsedDeleteReferrerStateAndShortUrlInstruction,
-  ParsedDepositAndWithdrawInstruction,
-  ParsedDepositObligationCollateralInstruction,
-  ParsedDepositObligationCollateralV2Instruction,
-  ParsedDepositReserveLiquidityAndObligationCollateralInstruction,
-  ParsedDepositReserveLiquidityAndObligationCollateralV2Instruction,
-  ParsedDepositReserveLiquidityInstruction,
-  ParsedFlashBorrowReserveLiquidityInstruction,
-  ParsedFlashRepayReserveLiquidityInstruction,
-  ParsedIdlMissingTypesInstruction,
-  ParsedInitFarmsForReserveInstruction,
-  ParsedInitGlobalConfigInstruction,
-  ParsedInitLendingMarketInstruction,
-  ParsedInitObligationFarmsForReserveInstruction,
-  ParsedInitObligationInstruction,
-  ParsedInitReferrerStateAndShortUrlInstruction,
-  ParsedInitReferrerTokenStateInstruction,
-  ParsedInitReserveInstruction,
-  ParsedInitUserMetadataInstruction,
-  ParsedLiquidateObligationAndRedeemReserveCollateralInstruction,
-  ParsedLiquidateObligationAndRedeemReserveCollateralV2Instruction,
-  ParsedMarkObligationForDeleveragingInstruction,
-  ParsedRedeemFeesInstruction,
-  ParsedRedeemReserveCollateralInstruction,
-  ParsedRefreshObligationFarmsForReserveInstruction,
-  ParsedRefreshObligationInstruction,
-  ParsedRefreshReserveInstruction,
-  ParsedRefreshReservesBatchInstruction,
-  ParsedRepayAndWithdrawAndRedeemInstruction,
-  ParsedRepayObligationLiquidityInstruction,
-  ParsedRepayObligationLiquidityV2Instruction,
-  ParsedRequestElevationGroupInstruction,
-  ParsedSetObligationOrderInstruction,
-  ParsedSocializeLossInstruction,
-  ParsedSocializeLossV2Instruction,
-  ParsedUpdateGlobalConfigAdminInstruction,
-  ParsedUpdateGlobalConfigInstruction,
-  ParsedUpdateLendingMarketInstruction,
-  ParsedUpdateLendingMarketOwnerInstruction,
-  ParsedUpdateReserveConfigInstruction,
-  ParsedWithdrawObligationCollateralAndRedeemReserveCollateralInstruction,
-  ParsedWithdrawObligationCollateralAndRedeemReserveCollateralV2Instruction,
-  ParsedWithdrawObligationCollateralInstruction,
-  ParsedWithdrawObligationCollateralV2Instruction,
-  ParsedWithdrawProtocolFeeInstruction,
-  ParsedWithdrawReferrerFeesInstruction,
-  RedeemFeesAsyncInput,
-  RedeemReserveCollateralAsyncInput,
-  RefreshObligationFarmsForReserveAsyncInput,
-  RefreshObligationInput,
-  RefreshReserveInput,
-  RefreshReservesBatchInput,
-  RepayAndWithdrawAndRedeemInput,
-  RepayObligationLiquidityInput,
-  RepayObligationLiquidityV2AsyncInput,
-  RequestElevationGroupInput,
-  SetObligationOrderInput,
-  SocializeLossInput,
-  SocializeLossV2AsyncInput,
-  UpdateGlobalConfigAdminInput,
-  UpdateGlobalConfigInput,
-  UpdateLendingMarketInput,
-  UpdateLendingMarketOwnerInput,
-  UpdateReserveConfigInput,
-  WithdrawObligationCollateralAndRedeemReserveCollateralAsyncInput,
-  WithdrawObligationCollateralAndRedeemReserveCollateralV2AsyncInput,
-  WithdrawObligationCollateralAsyncInput,
-  WithdrawObligationCollateralV2AsyncInput,
-  WithdrawProtocolFeeAsyncInput,
-  WithdrawReferrerFeesAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -150,10 +16,23 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
   getLendingGlobalConfigCodec,
@@ -165,6 +44,24 @@ import {
   getShortUrlCodec,
   getUserMetadataCodec,
   getUserStateCodec,
+  type LendingGlobalConfig,
+  type LendingGlobalConfigArgs,
+  type LendingMarket,
+  type LendingMarketArgs,
+  type Obligation,
+  type ObligationArgs,
+  type ReferrerState,
+  type ReferrerStateArgs,
+  type ReferrerTokenState,
+  type ReferrerTokenStateArgs,
+  type Reserve,
+  type ReserveArgs,
+  type ShortUrl,
+  type ShortUrlArgs,
+  type UserMetadata,
+  type UserMetadataArgs,
+  type UserState,
+  type UserStateArgs,
 } from "../accounts/index.js";
 import {
   getBorrowObligationLiquidityInstructionAsync,
@@ -263,6 +160,102 @@ import {
   parseWithdrawObligationCollateralV2Instruction,
   parseWithdrawProtocolFeeInstruction,
   parseWithdrawReferrerFeesInstruction,
+  type BorrowObligationLiquidityAsyncInput,
+  type BorrowObligationLiquidityV2AsyncInput,
+  type DeleteReferrerStateAndShortUrlInput,
+  type DepositAndWithdrawInput,
+  type DepositObligationCollateralInput,
+  type DepositObligationCollateralV2AsyncInput,
+  type DepositReserveLiquidityAndObligationCollateralAsyncInput,
+  type DepositReserveLiquidityAndObligationCollateralV2AsyncInput,
+  type DepositReserveLiquidityAsyncInput,
+  type FlashBorrowReserveLiquidityAsyncInput,
+  type FlashRepayReserveLiquidityAsyncInput,
+  type IdlMissingTypesInput,
+  type InitFarmsForReserveAsyncInput,
+  type InitGlobalConfigAsyncInput,
+  type InitLendingMarketAsyncInput,
+  type InitObligationFarmsForReserveAsyncInput,
+  type InitObligationInput,
+  type InitReferrerStateAndShortUrlInput,
+  type InitReferrerTokenStateInput,
+  type InitReserveAsyncInput,
+  type InitUserMetadataInput,
+  type LiquidateObligationAndRedeemReserveCollateralAsyncInput,
+  type LiquidateObligationAndRedeemReserveCollateralV2Input,
+  type MarkObligationForDeleveragingInput,
+  type ParsedBorrowObligationLiquidityInstruction,
+  type ParsedBorrowObligationLiquidityV2Instruction,
+  type ParsedDeleteReferrerStateAndShortUrlInstruction,
+  type ParsedDepositAndWithdrawInstruction,
+  type ParsedDepositObligationCollateralInstruction,
+  type ParsedDepositObligationCollateralV2Instruction,
+  type ParsedDepositReserveLiquidityAndObligationCollateralInstruction,
+  type ParsedDepositReserveLiquidityAndObligationCollateralV2Instruction,
+  type ParsedDepositReserveLiquidityInstruction,
+  type ParsedFlashBorrowReserveLiquidityInstruction,
+  type ParsedFlashRepayReserveLiquidityInstruction,
+  type ParsedIdlMissingTypesInstruction,
+  type ParsedInitFarmsForReserveInstruction,
+  type ParsedInitGlobalConfigInstruction,
+  type ParsedInitLendingMarketInstruction,
+  type ParsedInitObligationFarmsForReserveInstruction,
+  type ParsedInitObligationInstruction,
+  type ParsedInitReferrerStateAndShortUrlInstruction,
+  type ParsedInitReferrerTokenStateInstruction,
+  type ParsedInitReserveInstruction,
+  type ParsedInitUserMetadataInstruction,
+  type ParsedLiquidateObligationAndRedeemReserveCollateralInstruction,
+  type ParsedLiquidateObligationAndRedeemReserveCollateralV2Instruction,
+  type ParsedMarkObligationForDeleveragingInstruction,
+  type ParsedRedeemFeesInstruction,
+  type ParsedRedeemReserveCollateralInstruction,
+  type ParsedRefreshObligationFarmsForReserveInstruction,
+  type ParsedRefreshObligationInstruction,
+  type ParsedRefreshReserveInstruction,
+  type ParsedRefreshReservesBatchInstruction,
+  type ParsedRepayAndWithdrawAndRedeemInstruction,
+  type ParsedRepayObligationLiquidityInstruction,
+  type ParsedRepayObligationLiquidityV2Instruction,
+  type ParsedRequestElevationGroupInstruction,
+  type ParsedSetObligationOrderInstruction,
+  type ParsedSocializeLossInstruction,
+  type ParsedSocializeLossV2Instruction,
+  type ParsedUpdateGlobalConfigAdminInstruction,
+  type ParsedUpdateGlobalConfigInstruction,
+  type ParsedUpdateLendingMarketInstruction,
+  type ParsedUpdateLendingMarketOwnerInstruction,
+  type ParsedUpdateReserveConfigInstruction,
+  type ParsedWithdrawObligationCollateralAndRedeemReserveCollateralInstruction,
+  type ParsedWithdrawObligationCollateralAndRedeemReserveCollateralV2Instruction,
+  type ParsedWithdrawObligationCollateralInstruction,
+  type ParsedWithdrawObligationCollateralV2Instruction,
+  type ParsedWithdrawProtocolFeeInstruction,
+  type ParsedWithdrawReferrerFeesInstruction,
+  type RedeemFeesAsyncInput,
+  type RedeemReserveCollateralAsyncInput,
+  type RefreshObligationFarmsForReserveAsyncInput,
+  type RefreshObligationInput,
+  type RefreshReserveInput,
+  type RefreshReservesBatchInput,
+  type RepayAndWithdrawAndRedeemInput,
+  type RepayObligationLiquidityInput,
+  type RepayObligationLiquidityV2AsyncInput,
+  type RequestElevationGroupInput,
+  type SetObligationOrderInput,
+  type SocializeLossInput,
+  type SocializeLossV2AsyncInput,
+  type UpdateGlobalConfigAdminInput,
+  type UpdateGlobalConfigInput,
+  type UpdateLendingMarketInput,
+  type UpdateLendingMarketOwnerInput,
+  type UpdateReserveConfigInput,
+  type WithdrawObligationCollateralAndRedeemReserveCollateralAsyncInput,
+  type WithdrawObligationCollateralAndRedeemReserveCollateralV2AsyncInput,
+  type WithdrawObligationCollateralAsyncInput,
+  type WithdrawObligationCollateralV2AsyncInput,
+  type WithdrawProtocolFeeAsyncInput,
+  type WithdrawReferrerFeesAsyncInput,
 } from "../instructions/index.js";
 import {
   findLendingGlobalConfigStatePda,
@@ -282,15 +275,15 @@ export const KAMINO_LENDING_PROGRAM_ADDRESS =
   "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD" as Address<"KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD">;
 
 export enum KaminoLendingAccount {
-  UserState = 0,
-  LendingGlobalConfig = 1,
-  LendingMarket = 2,
-  Obligation = 3,
-  ReferrerState = 4,
-  ReferrerTokenState = 5,
-  ShortUrl = 6,
-  UserMetadata = 7,
-  Reserve = 8,
+  UserState,
+  LendingGlobalConfig,
+  LendingMarket,
+  Obligation,
+  ReferrerState,
+  ReferrerTokenState,
+  ShortUrl,
+  UserMetadata,
+  Reserve,
 }
 
 export function identifyKaminoLendingAccount(
@@ -403,54 +396,54 @@ export function identifyKaminoLendingAccount(
 }
 
 export enum KaminoLendingInstruction {
-  InitLendingMarket = 0,
-  UpdateLendingMarket = 1,
-  UpdateLendingMarketOwner = 2,
-  InitReserve = 3,
-  InitFarmsForReserve = 4,
-  UpdateReserveConfig = 5,
-  RedeemFees = 6,
-  WithdrawProtocolFee = 7,
-  SocializeLoss = 8,
-  SocializeLossV2 = 9,
-  MarkObligationForDeleveraging = 10,
-  RefreshReserve = 11,
-  RefreshReservesBatch = 12,
-  DepositReserveLiquidity = 13,
-  RedeemReserveCollateral = 14,
-  InitObligation = 15,
-  InitObligationFarmsForReserve = 16,
-  RefreshObligationFarmsForReserve = 17,
-  RefreshObligation = 18,
-  DepositObligationCollateral = 19,
-  DepositObligationCollateralV2 = 20,
-  WithdrawObligationCollateral = 21,
-  WithdrawObligationCollateralV2 = 22,
-  BorrowObligationLiquidity = 23,
-  BorrowObligationLiquidityV2 = 24,
-  RepayObligationLiquidity = 25,
-  RepayObligationLiquidityV2 = 26,
-  RepayAndWithdrawAndRedeem = 27,
-  DepositAndWithdraw = 28,
-  DepositReserveLiquidityAndObligationCollateral = 29,
-  DepositReserveLiquidityAndObligationCollateralV2 = 30,
-  WithdrawObligationCollateralAndRedeemReserveCollateral = 31,
-  WithdrawObligationCollateralAndRedeemReserveCollateralV2 = 32,
-  LiquidateObligationAndRedeemReserveCollateral = 33,
-  LiquidateObligationAndRedeemReserveCollateralV2 = 34,
-  FlashRepayReserveLiquidity = 35,
-  FlashBorrowReserveLiquidity = 36,
-  RequestElevationGroup = 37,
-  InitReferrerTokenState = 38,
-  InitUserMetadata = 39,
-  WithdrawReferrerFees = 40,
-  InitReferrerStateAndShortUrl = 41,
-  DeleteReferrerStateAndShortUrl = 42,
-  SetObligationOrder = 43,
-  InitGlobalConfig = 44,
-  UpdateGlobalConfig = 45,
-  UpdateGlobalConfigAdmin = 46,
-  IdlMissingTypes = 47,
+  InitLendingMarket,
+  UpdateLendingMarket,
+  UpdateLendingMarketOwner,
+  InitReserve,
+  InitFarmsForReserve,
+  UpdateReserveConfig,
+  RedeemFees,
+  WithdrawProtocolFee,
+  SocializeLoss,
+  SocializeLossV2,
+  MarkObligationForDeleveraging,
+  RefreshReserve,
+  RefreshReservesBatch,
+  DepositReserveLiquidity,
+  RedeemReserveCollateral,
+  InitObligation,
+  InitObligationFarmsForReserve,
+  RefreshObligationFarmsForReserve,
+  RefreshObligation,
+  DepositObligationCollateral,
+  DepositObligationCollateralV2,
+  WithdrawObligationCollateral,
+  WithdrawObligationCollateralV2,
+  BorrowObligationLiquidity,
+  BorrowObligationLiquidityV2,
+  RepayObligationLiquidity,
+  RepayObligationLiquidityV2,
+  RepayAndWithdrawAndRedeem,
+  DepositAndWithdraw,
+  DepositReserveLiquidityAndObligationCollateral,
+  DepositReserveLiquidityAndObligationCollateralV2,
+  WithdrawObligationCollateralAndRedeemReserveCollateral,
+  WithdrawObligationCollateralAndRedeemReserveCollateralV2,
+  LiquidateObligationAndRedeemReserveCollateral,
+  LiquidateObligationAndRedeemReserveCollateralV2,
+  FlashRepayReserveLiquidity,
+  FlashBorrowReserveLiquidity,
+  RequestElevationGroup,
+  InitReferrerTokenState,
+  InitUserMetadata,
+  WithdrawReferrerFees,
+  InitReferrerStateAndShortUrl,
+  DeleteReferrerStateAndShortUrl,
+  SetObligationOrder,
+  InitGlobalConfig,
+  UpdateGlobalConfig,
+  UpdateGlobalConfigAdmin,
+  IdlMissingTypes,
 }
 
 export function identifyKaminoLendingInstruction(
@@ -1511,13 +1504,16 @@ export function parseKaminoLendingInstruction<TProgram extends string>(
   }
 }
 
-export interface KaminoLendingPlugin {
+export type KaminoLendingPlugin = {
   accounts: KaminoLendingPluginAccounts;
   instructions: KaminoLendingPluginInstructions;
   pdas: KaminoLendingPluginPdas;
-}
+  identifyAccount: typeof identifyKaminoLendingAccount;
+  identifyInstruction: typeof identifyKaminoLendingInstruction;
+  parseInstruction: typeof parseKaminoLendingInstruction;
+};
 
-export interface KaminoLendingPluginAccounts {
+export type KaminoLendingPluginAccounts = {
   userState: ReturnType<typeof getUserStateCodec> &
     SelfFetchFunctions<UserStateArgs, UserState>;
   lendingGlobalConfig: ReturnType<typeof getLendingGlobalConfigCodec> &
@@ -1536,9 +1532,9 @@ export interface KaminoLendingPluginAccounts {
     SelfFetchFunctions<UserMetadataArgs, UserMetadata>;
   reserve: ReturnType<typeof getReserveCodec> &
     SelfFetchFunctions<ReserveArgs, Reserve>;
-}
+};
 
-export interface KaminoLendingPluginInstructions {
+export type KaminoLendingPluginInstructions = {
   initLendingMarket: (
     input: InitLendingMarketAsyncInput,
   ) => ReturnType<typeof getInitLendingMarketInstructionAsync> &
@@ -1743,9 +1739,9 @@ export interface KaminoLendingPluginInstructions {
     input: IdlMissingTypesInput,
   ) => ReturnType<typeof getIdlMissingTypesInstruction> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface KaminoLendingPluginPdas {
+export type KaminoLendingPluginPdas = {
   lendingGlobalConfigState: typeof findLendingGlobalConfigStatePda;
   obligation: typeof findObligationPda;
   lendingMarketAuth: typeof findLendingMarketAuthPda;
@@ -1757,7 +1753,7 @@ export interface KaminoLendingPluginPdas {
   referrerTokenState: typeof findReferrerTokenStatePda;
   referrerState: typeof findReferrerStatePda;
   shortUrl: typeof findShortUrlPda;
-}
+};
 
 export type KaminoLendingPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -1769,7 +1765,7 @@ export type KaminoLendingPluginRequirements = ClientWithRpc<
 export function kaminoLendingProgram() {
   return <T extends KaminoLendingPluginRequirements>(
     client: T,
-  ): Omit<T, "kaminoLending"> & { kaminoLending: KaminoLendingPlugin } => {
+  ): ExtendedClient<T, { kaminoLending: KaminoLendingPlugin }> => {
     return extendClient(client, {
       kaminoLending: <KaminoLendingPlugin>{
         accounts: {
@@ -2071,6 +2067,9 @@ export function kaminoLendingProgram() {
           referrerState: findReferrerStatePda,
           shortUrl: findShortUrlPda,
         },
+        identifyAccount: identifyKaminoLendingAccount,
+        identifyInstruction: identifyKaminoLendingInstruction,
+        parseInstruction: parseKaminoLendingInstruction,
       },
     });
   };

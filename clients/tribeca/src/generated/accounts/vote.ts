@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { VoteSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,13 +21,24 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVotePda } from "../pdas/index.js";
+import { findVotePda, type VoteSeeds } from "../pdas/index.js";
 
 export const VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   96, 91, 104, 57, 145, 35, 172, 155,
@@ -51,22 +48,22 @@ export function getVoteDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(VOTE_DISCRIMINATOR);
 }
 
-export interface Vote {
+export type Vote = {
   discriminator: ReadonlyUint8Array;
   proposal: Address;
   voter: Address;
   bump: number;
   side: number;
   weight: bigint;
-}
+};
 
-export interface VoteArgs {
+export type VoteArgs = {
   proposal: Address;
   voter: Address;
   bump: number;
   side: number;
   weight: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link VoteArgs} account data. */
 export function getVoteEncoder(): FixedSizeEncoder<VoteArgs> {
@@ -136,7 +133,7 @@ export async function fetchMaybeVote<TAddress extends string = string>(
 
 export async function fetchAllVote(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Vote>[]> {
   const maybeAccounts = await fetchAllMaybeVote(rpc, addresses, config);
@@ -146,7 +143,7 @@ export async function fetchAllVote(
 
 export async function fetchAllMaybeVote(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Vote>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

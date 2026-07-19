@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { GovernanceSeeds } from "../pdas/index.js";
-import type {
-  GovernanceConfig,
-  GovernanceConfigArgs,
-  Reserved119,
-  Reserved119Args,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,23 +17,38 @@ import {
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findGovernancePda } from "../pdas/index.js";
+import { findGovernancePda, type GovernanceSeeds } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
   getReserved119Decoder,
   getReserved119Encoder,
+  GovernanceAccountType,
+  type GovernanceConfig,
+  type GovernanceConfigArgs,
+  type Reserved119,
+  type Reserved119Args,
 } from "../types/index.js";
 
 export const GOVERNANCE_V2_ACCOUNT_TYPE: GovernanceAccountType =
@@ -63,7 +58,7 @@ export function getGovernanceV2AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(GOVERNANCE_V2_ACCOUNT_TYPE);
 }
 
-export interface GovernanceV2 {
+export type GovernanceV2 = {
   accountType: GovernanceAccountType;
   realm: Address;
   governedAccount: Address;
@@ -72,9 +67,9 @@ export interface GovernanceV2 {
   reservedV2: Reserved119;
   requiredSignatoriesCount: number;
   activeProposalCount: bigint;
-}
+};
 
-export interface GovernanceV2Args {
+export type GovernanceV2Args = {
   realm: Address;
   governedAccount: Address;
   reserved1: number;
@@ -82,7 +77,7 @@ export interface GovernanceV2Args {
   reservedV2: Reserved119Args;
   requiredSignatoriesCount: number;
   activeProposalCount: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link GovernanceV2Args} account data. */
 export function getGovernanceV2Encoder(): Encoder<GovernanceV2Args> {
@@ -156,7 +151,7 @@ export async function fetchMaybeGovernanceV2<TAddress extends string = string>(
 
 export async function fetchAllGovernanceV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<GovernanceV2>[]> {
   const maybeAccounts = await fetchAllMaybeGovernanceV2(rpc, addresses, config);
@@ -166,7 +161,7 @@ export async function fetchAllGovernanceV2(
 
 export async function fetchAllMaybeGovernanceV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<GovernanceV2>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CREATE_NATIVE_TREASURY_DISCRIMINATOR = 25;
@@ -44,12 +44,12 @@ export function getCreateNativeTreasuryDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type CreateNativeTreasuryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountNativeTreasuryAccount extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountNativeTreasuryAccount extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -71,9 +71,7 @@ export type CreateNativeTreasuryInstruction<
     ]
   >;
 
-export interface CreateNativeTreasuryInstructionData {
-  discriminator: number;
-}
+export type CreateNativeTreasuryInstructionData = { discriminator: number };
 
 export type CreateNativeTreasuryInstructionDataArgs = {};
 
@@ -101,19 +99,19 @@ export function getCreateNativeTreasuryInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateNativeTreasuryInput<
+export type CreateNativeTreasuryInput<
   TAccountGovernanceAccount extends string = string,
   TAccountNativeTreasuryAccount extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** Governance account the treasury account is for */
   governanceAccount: Address<TAccountGovernanceAccount>;
   /** seeds=['native-treasury', governance] */
   nativeTreasuryAccount: Address<TAccountNativeTreasuryAccount>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getCreateNativeTreasuryInstruction<
   TAccountGovernanceAccount extends string,
@@ -183,10 +181,10 @@ export function getCreateNativeTreasuryInstruction<
   >);
 }
 
-export interface ParsedCreateNativeTreasuryInstruction<
+export type ParsedCreateNativeTreasuryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Governance account the treasury account is for */
@@ -197,7 +195,7 @@ export interface ParsedCreateNativeTreasuryInstruction<
     systemProgram: TAccountMetas[3];
   };
   data: CreateNativeTreasuryInstructionData;
-}
+};
 
 export function parseCreateNativeTreasuryInstruction<
   TProgram extends string,

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DELETE_TOKEN_BADGE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,13 +49,14 @@ export function getDeleteTokenBadgeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DeleteTokenBadgeInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpoolsConfigExtension extends string | AccountMeta = string,
-  TAccountTokenBadgeAuthority extends string | AccountMeta = string,
-  TAccountTokenMint extends string | AccountMeta = string,
-  TAccountTokenBadge extends string | AccountMeta = string,
-  TAccountReceiver extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountWhirlpoolsConfigExtension extends string | AccountMeta<string> =
+    string,
+  TAccountTokenBadgeAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenMint extends string | AccountMeta<string> = string,
+  TAccountTokenBadge extends string | AccountMeta<string> = string,
+  TAccountReceiver extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,9 +84,9 @@ export type DeleteTokenBadgeInstruction<
     ]
   >;
 
-export interface DeleteTokenBadgeInstructionData {
+export type DeleteTokenBadgeInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type DeleteTokenBadgeInstructionDataArgs = {};
 
@@ -112,21 +113,21 @@ export function getDeleteTokenBadgeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface DeleteTokenBadgeInput<
+export type DeleteTokenBadgeInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountWhirlpoolsConfigExtension extends string = string,
   TAccountTokenBadgeAuthority extends string = string,
   TAccountTokenMint extends string = string,
   TAccountTokenBadge extends string = string,
   TAccountReceiver extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   whirlpoolsConfigExtension: Address<TAccountWhirlpoolsConfigExtension>;
   tokenBadgeAuthority: TransactionSigner<TAccountTokenBadgeAuthority>;
   tokenMint: Address<TAccountTokenMint>;
   tokenBadge: Address<TAccountTokenBadge>;
   receiver: Address<TAccountReceiver>;
-}
+};
 
 export function getDeleteTokenBadgeInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -207,10 +208,10 @@ export function getDeleteTokenBadgeInstruction<
   >);
 }
 
-export interface ParsedDeleteTokenBadgeInstruction<
+export type ParsedDeleteTokenBadgeInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -221,7 +222,7 @@ export interface ParsedDeleteTokenBadgeInstruction<
     receiver: TAccountMetas[5];
   };
   data: DeleteTokenBadgeInstructionData;
-}
+};
 
 export function parseDeleteTokenBadgeInstruction<
   TProgram extends string,

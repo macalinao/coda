@@ -6,17 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  GoverningTokenConfigParams,
-  GoverningTokenConfigParamsArgs,
-  MintMaxVoterWeightSource,
-  MintMaxVoterWeightSourceArgs,
-} from "./index.js";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -25,29 +14,36 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getGoverningTokenConfigParamsDecoder,
   getGoverningTokenConfigParamsEncoder,
   getMintMaxVoterWeightSourceDecoder,
   getMintMaxVoterWeightSourceEncoder,
+  type GoverningTokenConfigParams,
+  type GoverningTokenConfigParamsArgs,
+  type MintMaxVoterWeightSource,
+  type MintMaxVoterWeightSourceArgs,
 } from "./index.js";
 
-export interface RealmConfigParams {
+export type RealmConfigParams = {
   useCouncilMint: boolean;
   minCommunityWeightToCreateGovernance: bigint;
   communityMintMaxVoterWeightSource: MintMaxVoterWeightSource;
   communityTokenConfigArgs: GoverningTokenConfigParams;
   councilTokenConfigArgs: GoverningTokenConfigParams;
-}
+};
 
-export interface RealmConfigParamsArgs {
+export type RealmConfigParamsArgs = {
   useCouncilMint: boolean;
   minCommunityWeightToCreateGovernance: number | bigint;
   communityMintMaxVoterWeightSource: MintMaxVoterWeightSourceArgs;
   communityTokenConfigArgs: GoverningTokenConfigParamsArgs;
   councilTokenConfigArgs: GoverningTokenConfigParamsArgs;
-}
+};
 
 export function getRealmConfigParamsEncoder(): FixedSizeEncoder<RealmConfigParamsArgs> {
   return getStructEncoder([

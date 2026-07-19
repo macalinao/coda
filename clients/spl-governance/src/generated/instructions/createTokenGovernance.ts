@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -35,12 +17,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
+  type GovernanceConfig,
+  type GovernanceConfigArgs,
 } from "../types/index.js";
 
 export const CREATE_TOKEN_GOVERNANCE_DISCRIMINATOR = 18;
@@ -51,20 +52,21 @@ export function getCreateTokenGovernanceDiscriminatorBytes(): ReadonlyUint8Array
 
 export type CreateTokenGovernanceInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountTokenGovernanceAccount extends string | AccountMeta = string,
-  TAccountTokenAccount extends string | AccountMeta = string,
-  TAccountTokenAccountAuthority extends string | AccountMeta = string,
-  TAccountGoverningTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountTokenGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountTokenAccount extends string | AccountMeta<string> = string,
+  TAccountTokenAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenOwnerRecord extends string | AccountMeta<string> =
+    string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountRealmConfig extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountRealmConfig extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -109,16 +111,16 @@ export type CreateTokenGovernanceInstruction<
     ]
   >;
 
-export interface CreateTokenGovernanceInstructionData {
+export type CreateTokenGovernanceInstructionData = {
   discriminator: number;
   config: GovernanceConfig;
   transferAccountAuthorities: boolean;
-}
+};
 
-export interface CreateTokenGovernanceInstructionDataArgs {
+export type CreateTokenGovernanceInstructionDataArgs = {
   config: GovernanceConfigArgs;
   transferAccountAuthorities: boolean;
-}
+};
 
 export function getCreateTokenGovernanceInstructionDataEncoder(): Encoder<CreateTokenGovernanceInstructionDataArgs> {
   return transformEncoder(
@@ -152,7 +154,7 @@ export function getCreateTokenGovernanceInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateTokenGovernanceInput<
+export type CreateTokenGovernanceInput<
   TAccountRealmAccount extends string = string,
   TAccountTokenGovernanceAccount extends string = string,
   TAccountTokenAccount extends string = string,
@@ -164,7 +166,7 @@ export interface CreateTokenGovernanceInput<
   TAccountGovernanceAuthority extends string = string,
   TAccountRealmConfig extends string = string,
   TAccountVoterWeightRecord extends string = string,
-> {
+> = {
   /** Realm account the created Governance belongs to */
   realmAccount: Address<TAccountRealmAccount>;
   /** Token Governance account. seeds=['token-governance', realm, governed_token] */
@@ -185,7 +187,7 @@ export interface CreateTokenGovernanceInput<
   voterWeightRecord?: Address<TAccountVoterWeightRecord>;
   config: CreateTokenGovernanceInstructionDataArgs["config"];
   transferAccountAuthorities: CreateTokenGovernanceInstructionDataArgs["transferAccountAuthorities"];
-}
+};
 
 export function getCreateTokenGovernanceInstruction<
   TAccountRealmAccount extends string,
@@ -318,10 +320,10 @@ export function getCreateTokenGovernanceInstruction<
   >);
 }
 
-export interface ParsedCreateTokenGovernanceInstruction<
+export type ParsedCreateTokenGovernanceInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Realm account the created Governance belongs to */
@@ -344,7 +346,7 @@ export interface ParsedCreateTokenGovernanceInstruction<
     voterWeightRecord?: TAccountMetas[10] | undefined;
   };
   data: CreateTokenGovernanceInstructionData;
-}
+};
 
 export function parseCreateTokenGovernanceInstruction<
   TProgram extends string,

@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  Fee,
-  FeeArgs,
-  FutureEpoch,
-  FutureEpochArgs,
-  Lockup,
-  LockupArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,11 +19,24 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   AccountType,
@@ -58,6 +48,12 @@ import {
   getFutureEpochEncoder,
   getLockupDecoder,
   getLockupEncoder,
+  type Fee,
+  type FeeArgs,
+  type FutureEpoch,
+  type FutureEpochArgs,
+  type Lockup,
+  type LockupArgs,
 } from "../types/index.js";
 
 export const STAKE_POOL_ACCOUNT_TYPE: AccountType = AccountType.StakePool;
@@ -67,7 +63,7 @@ export function getStakePoolAccountTypeBytes(): ReadonlyUint8Array {
 }
 
 /** Initialized program details. */
-export interface StakePool {
+export type StakePool = {
   /** Account type, must be `StakePool` currently */
   accountType: AccountType;
   /**
@@ -171,9 +167,9 @@ export interface StakePool {
   lastEpochPoolTokenSupply: bigint;
   /** Last epoch's total lamports, used only for APR estimation */
   lastEpochTotalLamports: bigint;
-}
+};
 
-export interface StakePoolArgs {
+export type StakePoolArgs = {
   /**
    * Manager authority, allows for updating the staker, manager, and fee
    * account
@@ -275,7 +271,7 @@ export interface StakePoolArgs {
   lastEpochPoolTokenSupply: number | bigint;
   /** Last epoch's total lamports, used only for APR estimation */
   lastEpochTotalLamports: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link StakePoolArgs} account data. */
 export function getStakePoolEncoder(): Encoder<StakePoolArgs> {
@@ -405,7 +401,7 @@ export async function fetchMaybeStakePool<TAddress extends string = string>(
 
 export async function fetchAllStakePool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<StakePool>[]> {
   const maybeAccounts = await fetchAllMaybeStakePool(rpc, addresses, config);
@@ -415,7 +411,7 @@ export async function fetchAllStakePool(
 
 export async function fetchAllMaybeStakePool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<StakePool>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

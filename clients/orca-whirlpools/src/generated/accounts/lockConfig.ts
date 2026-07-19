@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { LockTypeLabel, LockTypeLabelArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,10 +24,23 @@ import {
   getU64Decoder,
   getU64Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getLockTypeLabelDecoder,
   getLockTypeLabelEncoder,
+  type LockTypeLabel,
+  type LockTypeLabelArgs,
 } from "../types/index.js";
 
 export const LOCK_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -52,22 +51,22 @@ export function getLockConfigDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(LOCK_CONFIG_DISCRIMINATOR);
 }
 
-export interface LockConfig {
+export type LockConfig = {
   discriminator: ReadonlyUint8Array;
   position: Address;
   positionOwner: Address;
   whirlpool: Address;
   lockedTimestamp: bigint;
   lockType: LockTypeLabel;
-}
+};
 
-export interface LockConfigArgs {
+export type LockConfigArgs = {
   position: Address;
   positionOwner: Address;
   whirlpool: Address;
   lockedTimestamp: number | bigint;
   lockType: LockTypeLabelArgs;
-}
+};
 
 /** Gets the encoder for {@link LockConfigArgs} account data. */
 export function getLockConfigEncoder(): FixedSizeEncoder<LockConfigArgs> {
@@ -140,7 +139,7 @@ export async function fetchMaybeLockConfig<TAddress extends string = string>(
 
 export async function fetchAllLockConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LockConfig>[]> {
   const maybeAccounts = await fetchAllMaybeLockConfig(rpc, addresses, config);
@@ -150,7 +149,7 @@ export async function fetchAllLockConfig(
 
 export async function fetchAllMaybeLockConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LockConfig>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { SwapParameters2, SwapParameters2Args } from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -49,6 +46,8 @@ import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getSwapParameters2Decoder,
   getSwapParameters2Encoder,
+  type SwapParameters2,
+  type SwapParameters2Args,
 } from "../types/index.js";
 
 export const SWAP2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -130,14 +129,12 @@ export type Swap2Instruction<
     ]
   >;
 
-export interface Swap2InstructionData {
+export type Swap2InstructionData = {
   discriminator: ReadonlyUint8Array;
   params: SwapParameters2;
-}
+};
 
-export interface Swap2InstructionDataArgs {
-  params: SwapParameters2Args;
-}
+export type Swap2InstructionDataArgs = { params: SwapParameters2Args };
 
 export function getSwap2InstructionDataEncoder(): FixedSizeEncoder<Swap2InstructionDataArgs> {
   return transformEncoder(
@@ -166,7 +163,7 @@ export function getSwap2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface Swap2AsyncInput<
+export type Swap2AsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountInputTokenAccount extends string = string,
@@ -181,7 +178,7 @@ export interface Swap2AsyncInput<
   TAccountReferralTokenAccount extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   /** Pool account */
   pool: Address<TAccountPool>;
@@ -208,7 +205,7 @@ export interface Swap2AsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: Swap2InstructionDataArgs["params"];
-}
+};
 
 export async function getSwap2InstructionAsync<
   TAccountPoolAuthority extends string,
@@ -385,7 +382,7 @@ export async function getSwap2InstructionAsync<
   >);
 }
 
-export interface Swap2Input<
+export type Swap2Input<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountInputTokenAccount extends string = string,
@@ -400,7 +397,7 @@ export interface Swap2Input<
   TAccountReferralTokenAccount extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   /** Pool account */
   pool: Address<TAccountPool>;
@@ -427,7 +424,7 @@ export interface Swap2Input<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: Swap2InstructionDataArgs["params"];
-}
+};
 
 export function getSwap2Instruction<
   TAccountPoolAuthority extends string,
@@ -572,10 +569,10 @@ export function getSwap2Instruction<
   >);
 }
 
-export interface ParsedSwap2Instruction<
+export type ParsedSwap2Instruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -605,7 +602,7 @@ export interface ParsedSwap2Instruction<
     program: TAccountMetas[13];
   };
   data: Swap2InstructionData;
-}
+};
 
 export function parseSwap2Instruction<
   TProgram extends string,

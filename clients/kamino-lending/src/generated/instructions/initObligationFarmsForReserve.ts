@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import {
@@ -58,21 +56,21 @@ export function getInitObligationFarmsForReserveDiscriminatorBytes(): ReadonlyUi
 
 export type InitObligationFarmsForReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountReserveFarmState extends string | AccountMeta = string,
-  TAccountObligationFarm extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountFarmsProgram extends string | AccountMeta =
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountReserveFarmState extends string | AccountMeta<string> = string,
+  TAccountObligationFarm extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountFarmsProgram extends string | AccountMeta<string> =
     "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -115,14 +113,12 @@ export type InitObligationFarmsForReserveInstruction<
     ]
   >;
 
-export interface InitObligationFarmsForReserveInstructionData {
+export type InitObligationFarmsForReserveInstructionData = {
   discriminator: ReadonlyUint8Array;
   mode: number;
-}
+};
 
-export interface InitObligationFarmsForReserveInstructionDataArgs {
-  mode: number;
-}
+export type InitObligationFarmsForReserveInstructionDataArgs = { mode: number };
 
 export function getInitObligationFarmsForReserveInstructionDataEncoder(): FixedSizeEncoder<InitObligationFarmsForReserveInstructionDataArgs> {
   return transformEncoder(
@@ -154,7 +150,7 @@ export function getInitObligationFarmsForReserveInstructionDataCodec(): FixedSiz
   );
 }
 
-export interface InitObligationFarmsForReserveAsyncInput<
+export type InitObligationFarmsForReserveAsyncInput<
   TAccountPayer extends string = string,
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
@@ -166,7 +162,7 @@ export interface InitObligationFarmsForReserveAsyncInput<
   TAccountFarmsProgram extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   payer: TransactionSigner<TAccountPayer>;
   owner: Address<TAccountOwner>;
   obligation: Address<TAccountObligation>;
@@ -179,7 +175,7 @@ export interface InitObligationFarmsForReserveAsyncInput<
   rent?: Address<TAccountRent>;
   systemProgram?: Address<TAccountSystemProgram>;
   mode: InitObligationFarmsForReserveInstructionDataArgs["mode"];
-}
+};
 
 export async function getInitObligationFarmsForReserveInstructionAsync<
   TAccountPayer extends string,
@@ -314,7 +310,7 @@ export async function getInitObligationFarmsForReserveInstructionAsync<
   >);
 }
 
-export interface InitObligationFarmsForReserveInput<
+export type InitObligationFarmsForReserveInput<
   TAccountPayer extends string = string,
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
@@ -326,7 +322,7 @@ export interface InitObligationFarmsForReserveInput<
   TAccountFarmsProgram extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   payer: TransactionSigner<TAccountPayer>;
   owner: Address<TAccountOwner>;
   obligation: Address<TAccountObligation>;
@@ -339,7 +335,7 @@ export interface InitObligationFarmsForReserveInput<
   rent?: Address<TAccountRent>;
   systemProgram?: Address<TAccountSystemProgram>;
   mode: InitObligationFarmsForReserveInstructionDataArgs["mode"];
-}
+};
 
 export function getInitObligationFarmsForReserveInstruction<
   TAccountPayer extends string,
@@ -464,10 +460,10 @@ export function getInitObligationFarmsForReserveInstruction<
   >);
 }
 
-export interface ParsedInitObligationFarmsForReserveInstruction<
+export type ParsedInitObligationFarmsForReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     payer: TAccountMetas[0];
@@ -483,7 +479,7 @@ export interface ParsedInitObligationFarmsForReserveInstruction<
     systemProgram: TAccountMetas[10];
   };
   data: InitObligationFarmsForReserveInstructionData;
-}
+};
 
 export function parseInitObligationFarmsForReserveInstruction<
   TProgram extends string,

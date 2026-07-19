@@ -6,36 +6,34 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface SplitPositionInfo {
+export type SplitPositionInfo = {
   liquidity: bigint;
   feeA: bigint;
   feeB: bigint;
   reward0: bigint;
   reward1: bigint;
-}
+};
 
-export interface SplitPositionInfoArgs {
+export type SplitPositionInfoArgs = {
   liquidity: number | bigint;
   feeA: number | bigint;
   feeB: number | bigint;
   reward0: number | bigint;
   reward1: number | bigint;
-}
+};
 
 export function getSplitPositionInfoEncoder(): FixedSizeEncoder<SplitPositionInfoArgs> {
   return getStructEncoder([

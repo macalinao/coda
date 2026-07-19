@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { VestingInfo, VestingInfoArgs } from "./index.js";
 import {
   combineCodec,
   getOptionDecoder,
@@ -22,20 +14,30 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getVestingInfoDecoder, getVestingInfoEncoder } from "./index.js";
+import {
+  getVestingInfoDecoder,
+  getVestingInfoEncoder,
+  type VestingInfo,
+  type VestingInfoArgs,
+} from "./index.js";
 
-export interface LockingInfo {
+export type LockingInfo = {
   amount: bigint;
   endTimestamp: Option<bigint>;
   vesting: Option<VestingInfo>;
-}
+};
 
-export interface LockingInfoArgs {
+export type LockingInfoArgs = {
   amount: number | bigint;
   endTimestamp: OptionOrNullable<number | bigint>;
   vesting: OptionOrNullable<VestingInfoArgs>;
-}
+};
 
 export function getLockingInfoEncoder(): Encoder<LockingInfoArgs> {
   return getStructEncoder([

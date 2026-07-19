@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -118,9 +116,9 @@ export type CreatePositionInstruction<
     ]
   >;
 
-export interface CreatePositionInstructionData {
+export type CreatePositionInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type CreatePositionInstructionDataArgs = {};
 
@@ -147,7 +145,7 @@ export function getCreatePositionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreatePositionAsyncInput<
+export type CreatePositionAsyncInput<
   TAccountOwner extends string = string,
   TAccountPositionNftMint extends string = string,
   TAccountPositionNftAccount extends string = string,
@@ -159,7 +157,7 @@ export interface CreatePositionAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   owner: Address<TAccountOwner>;
   /** position_nft_mint */
   positionNftMint: TransactionSigner<TAccountPositionNftMint>;
@@ -175,7 +173,7 @@ export interface CreatePositionAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export async function getCreatePositionInstructionAsync<
   TAccountOwner extends string,
@@ -323,7 +321,7 @@ export async function getCreatePositionInstructionAsync<
   >);
 }
 
-export interface CreatePositionInput<
+export type CreatePositionInput<
   TAccountOwner extends string = string,
   TAccountPositionNftMint extends string = string,
   TAccountPositionNftAccount extends string = string,
@@ -335,7 +333,7 @@ export interface CreatePositionInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   owner: Address<TAccountOwner>;
   /** position_nft_mint */
   positionNftMint: TransactionSigner<TAccountPositionNftMint>;
@@ -351,7 +349,7 @@ export interface CreatePositionInput<
   systemProgram?: Address<TAccountSystemProgram>;
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export function getCreatePositionInstruction<
   TAccountOwner extends string,
@@ -467,10 +465,10 @@ export function getCreatePositionInstruction<
   >);
 }
 
-export interface ParsedCreatePositionInstruction<
+export type ParsedCreatePositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -490,7 +488,7 @@ export interface ParsedCreatePositionInstruction<
     program: TAccountMetas[10];
   };
   data: CreatePositionInstructionData;
-}
+};
 
 export function parseCreatePositionInstruction<
   TProgram extends string,

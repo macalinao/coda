@@ -6,21 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 /**
  * Defines which authority to update in the `SetFundingAuthority`
  * instruction
  */
 export enum FundingType {
-  StakeDeposit = 0,
-  SolDeposit = 1,
-  SolWithdraw = 2,
+  StakeDeposit,
+  SolDeposit,
+  SolWithdraw,
 }
 
 export type FundingTypeArgs = FundingType;

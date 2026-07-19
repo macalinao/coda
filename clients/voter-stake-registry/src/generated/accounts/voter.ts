@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { VoterSeeds } from "../pdas/index.js";
-import type { DepositEntry, DepositEntryArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -41,11 +26,24 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVoterPda } from "../pdas/index.js";
+import { findVoterPda, type VoterSeeds } from "../pdas/index.js";
 import {
   getDepositEntryDecoder,
   getDepositEntryEncoder,
+  type DepositEntry,
+  type DepositEntryArgs,
 } from "../types/index.js";
 
 export const VOTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -56,24 +54,24 @@ export function getVoterDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(VOTER_DISCRIMINATOR);
 }
 
-export interface Voter {
+export type Voter = {
   discriminator: ReadonlyUint8Array;
   voterAuthority: Address;
   registrar: Address;
-  deposits: DepositEntry[];
+  deposits: Array<DepositEntry>;
   voterBump: number;
   voterWeightRecordBump: number;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
-export interface VoterArgs {
+export type VoterArgs = {
   voterAuthority: Address;
   registrar: Address;
-  deposits: DepositEntryArgs[];
+  deposits: Array<DepositEntryArgs>;
   voterBump: number;
   voterWeightRecordBump: number;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
 /** Gets the encoder for {@link VoterArgs} account data. */
 export function getVoterEncoder(): FixedSizeEncoder<VoterArgs> {
@@ -145,7 +143,7 @@ export async function fetchMaybeVoter<TAddress extends string = string>(
 
 export async function fetchAllVoter(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Voter>[]> {
   const maybeAccounts = await fetchAllMaybeVoter(rpc, addresses, config);
@@ -155,7 +153,7 @@ export async function fetchAllVoter(
 
 export async function fetchAllMaybeVoter(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Voter>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

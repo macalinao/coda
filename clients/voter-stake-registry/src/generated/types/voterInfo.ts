@@ -6,28 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface VoterInfo {
-  votingPower: bigint;
-  votingPowerBaseline: bigint;
-}
+export type VoterInfo = { votingPower: bigint; votingPowerBaseline: bigint };
 
-export interface VoterInfoArgs {
+export type VoterInfoArgs = {
   votingPower: number | bigint;
   votingPowerBaseline: number | bigint;
-}
+};
 
 export function getVoterInfoEncoder(): FixedSizeEncoder<VoterInfoArgs> {
   return getStructEncoder([

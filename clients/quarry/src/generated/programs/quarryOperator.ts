@@ -6,47 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type { Operator, OperatorArgs } from "../accounts/index.js";
-import type {
-  CreateOperatorAsyncInput,
-  CreateOperatorV2AsyncInput,
-  DelegateCreateQuarryAsyncInput,
-  DelegateCreateQuarryV2AsyncInput,
-  DelegateSetAnnualRewardsInput,
-  DelegateSetFamineInput,
-  DelegateSetRewardsShareInput,
-  ParsedCreateOperatorInstruction,
-  ParsedCreateOperatorV2Instruction,
-  ParsedDelegateCreateQuarryInstruction,
-  ParsedDelegateCreateQuarryV2Instruction,
-  ParsedDelegateSetAnnualRewardsInstruction,
-  ParsedDelegateSetFamineInstruction,
-  ParsedDelegateSetRewardsShareInstruction,
-  ParsedSetAdminInstruction,
-  ParsedSetQuarryCreatorInstruction,
-  ParsedSetRateSetterInstruction,
-  ParsedSetShareAllocatorInstruction,
-  SetAdminInput,
-  SetQuarryCreatorInput,
-  SetRateSetterInput,
-  SetShareAllocatorInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -57,12 +16,29 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getOperatorCodec } from "../accounts/index.js";
+import {
+  getOperatorCodec,
+  type Operator,
+  type OperatorArgs,
+} from "../accounts/index.js";
 import {
   getCreateOperatorInstructionAsync,
   getCreateOperatorV2InstructionAsync,
@@ -86,6 +62,28 @@ import {
   parseSetQuarryCreatorInstruction,
   parseSetRateSetterInstruction,
   parseSetShareAllocatorInstruction,
+  type CreateOperatorAsyncInput,
+  type CreateOperatorV2AsyncInput,
+  type DelegateCreateQuarryAsyncInput,
+  type DelegateCreateQuarryV2AsyncInput,
+  type DelegateSetAnnualRewardsInput,
+  type DelegateSetFamineInput,
+  type DelegateSetRewardsShareInput,
+  type ParsedCreateOperatorInstruction,
+  type ParsedCreateOperatorV2Instruction,
+  type ParsedDelegateCreateQuarryInstruction,
+  type ParsedDelegateCreateQuarryV2Instruction,
+  type ParsedDelegateSetAnnualRewardsInstruction,
+  type ParsedDelegateSetFamineInstruction,
+  type ParsedDelegateSetRewardsShareInstruction,
+  type ParsedSetAdminInstruction,
+  type ParsedSetQuarryCreatorInstruction,
+  type ParsedSetRateSetterInstruction,
+  type ParsedSetShareAllocatorInstruction,
+  type SetAdminInput,
+  type SetQuarryCreatorInput,
+  type SetRateSetterInput,
+  type SetShareAllocatorInput,
 } from "../instructions/index.js";
 import { findOperatorPda } from "../pdas/index.js";
 
@@ -93,7 +91,7 @@ export const QUARRY_OPERATOR_PROGRAM_ADDRESS =
   "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz" as Address<"QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz">;
 
 export enum QuarryOperatorAccount {
-  Operator = 0,
+  Operator,
 }
 
 export function identifyQuarryOperatorAccount(
@@ -118,17 +116,17 @@ export function identifyQuarryOperatorAccount(
 }
 
 export enum QuarryOperatorInstruction {
-  CreateOperator = 0,
-  CreateOperatorV2 = 1,
-  SetAdmin = 2,
-  SetRateSetter = 3,
-  SetQuarryCreator = 4,
-  SetShareAllocator = 5,
-  DelegateSetAnnualRewards = 6,
-  DelegateCreateQuarry = 7,
-  DelegateCreateQuarryV2 = 8,
-  DelegateSetRewardsShare = 9,
-  DelegateSetFamine = 10,
+  CreateOperator,
+  CreateOperatorV2,
+  SetAdmin,
+  SetRateSetter,
+  SetQuarryCreator,
+  SetShareAllocator,
+  DelegateSetAnnualRewards,
+  DelegateCreateQuarry,
+  DelegateCreateQuarryV2,
+  DelegateSetRewardsShare,
+  DelegateSetFamine,
 }
 
 export function identifyQuarryOperatorInstruction(
@@ -392,18 +390,21 @@ export function parseQuarryOperatorInstruction<TProgram extends string>(
   }
 }
 
-export interface QuarryOperatorPlugin {
+export type QuarryOperatorPlugin = {
   accounts: QuarryOperatorPluginAccounts;
   instructions: QuarryOperatorPluginInstructions;
   pdas: QuarryOperatorPluginPdas;
-}
+  identifyAccount: typeof identifyQuarryOperatorAccount;
+  identifyInstruction: typeof identifyQuarryOperatorInstruction;
+  parseInstruction: typeof parseQuarryOperatorInstruction;
+};
 
-export interface QuarryOperatorPluginAccounts {
+export type QuarryOperatorPluginAccounts = {
   operator: ReturnType<typeof getOperatorCodec> &
     SelfFetchFunctions<OperatorArgs, Operator>;
-}
+};
 
-export interface QuarryOperatorPluginInstructions {
+export type QuarryOperatorPluginInstructions = {
   createOperator: (
     input: MakeOptional<CreateOperatorAsyncInput, "payer">,
   ) => ReturnType<typeof getCreateOperatorInstructionAsync> &
@@ -447,11 +448,9 @@ export interface QuarryOperatorPluginInstructions {
     input: DelegateSetFamineInput,
   ) => ReturnType<typeof getDelegateSetFamineInstruction> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface QuarryOperatorPluginPdas {
-  operator: typeof findOperatorPda;
-}
+export type QuarryOperatorPluginPdas = { operator: typeof findOperatorPda };
 
 export type QuarryOperatorPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -463,7 +462,7 @@ export type QuarryOperatorPluginRequirements = ClientWithRpc<
 export function quarryOperatorProgram() {
   return <T extends QuarryOperatorPluginRequirements>(
     client: T,
-  ): Omit<T, "quarryOperator"> & { quarryOperator: QuarryOperatorPlugin } => {
+  ): ExtendedClient<T, { quarryOperator: QuarryOperatorPlugin }> => {
     return extendClient(client, {
       quarryOperator: <QuarryOperatorPlugin>{
         accounts: {
@@ -536,6 +535,9 @@ export function quarryOperatorProgram() {
             ),
         },
         pdas: { operator: findOperatorPda },
+        identifyAccount: identifyQuarryOperatorAccount,
+        identifyInstruction: identifyQuarryOperatorInstruction,
+        parseInstruction: parseQuarryOperatorInstruction,
       },
     });
   };

@@ -6,7 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -19,14 +18,18 @@ import {
   getU32Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 
-export interface ProposalMetaCreateEvent {
+export type ProposalMetaCreateEvent = {
   governor: Address;
   proposal: Address;
   title: string;
   descriptionLink: string;
-}
+};
 
 export type ProposalMetaCreateEventArgs = ProposalMetaCreateEvent;
 

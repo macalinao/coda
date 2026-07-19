@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const NEW_ESCROW_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -50,13 +50,13 @@ export function getNewEscrowDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewEscrowInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
-  TAccountLocker extends string | AccountMeta = string,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountEscrowOwner extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountLocker extends string | AccountMeta<string> = string,
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountEscrowOwner extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -81,14 +81,12 @@ export type NewEscrowInstruction<
     ]
   >;
 
-export interface NewEscrowInstructionData {
+export type NewEscrowInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface NewEscrowInstructionDataArgs {
-  bump: number;
-}
+export type NewEscrowInstructionDataArgs = { bump: number };
 
 export function getNewEscrowInstructionDataEncoder(): FixedSizeEncoder<NewEscrowInstructionDataArgs> {
   return transformEncoder(
@@ -117,20 +115,20 @@ export function getNewEscrowInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewEscrowInput<
+export type NewEscrowInput<
   TAccountLocker extends string = string,
   TAccountEscrow extends string = string,
   TAccountEscrowOwner extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   locker: Address<TAccountLocker>;
   escrow: Address<TAccountEscrow>;
   escrowOwner: Address<TAccountEscrowOwner>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: NewEscrowInstructionDataArgs["bump"];
-}
+};
 
 export function getNewEscrowInstruction<
   TAccountLocker extends string,
@@ -204,10 +202,10 @@ export function getNewEscrowInstruction<
   >);
 }
 
-export interface ParsedNewEscrowInstruction<
+export type ParsedNewEscrowInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     locker: TAccountMetas[0];
@@ -217,7 +215,7 @@ export interface ParsedNewEscrowInstruction<
     systemProgram: TAccountMetas[4];
   };
   data: NewEscrowInstructionData;
-}
+};
 
 export function parseNewEscrowInstruction<
   TProgram extends string,

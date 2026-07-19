@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { UpdateConfigMode, UpdateConfigModeArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -41,12 +23,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getUpdateConfigModeDecoder,
   getUpdateConfigModeEncoder,
+  type UpdateConfigMode,
+  type UpdateConfigModeArgs,
 } from "../types/index.js";
 
 export const UPDATE_RESERVE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
@@ -60,11 +61,11 @@ export function getUpdateReserveConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateReserveConfigInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountSigner extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSigner extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -86,18 +87,18 @@ export type UpdateReserveConfigInstruction<
     ]
   >;
 
-export interface UpdateReserveConfigInstructionData {
+export type UpdateReserveConfigInstructionData = {
   discriminator: ReadonlyUint8Array;
   mode: UpdateConfigMode;
   value: ReadonlyUint8Array;
   skipConfigIntegrityValidation: boolean;
-}
+};
 
-export interface UpdateReserveConfigInstructionDataArgs {
+export type UpdateReserveConfigInstructionDataArgs = {
   mode: UpdateConfigModeArgs;
   value: ReadonlyUint8Array;
   skipConfigIntegrityValidation: boolean;
-}
+};
 
 export function getUpdateReserveConfigInstructionDataEncoder(): Encoder<UpdateReserveConfigInstructionDataArgs> {
   return transformEncoder(
@@ -133,12 +134,12 @@ export function getUpdateReserveConfigInstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateReserveConfigInput<
+export type UpdateReserveConfigInput<
   TAccountSigner extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
-> {
+> = {
   signer: TransactionSigner<TAccountSigner>;
   globalConfig: Address<TAccountGlobalConfig>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -146,7 +147,7 @@ export interface UpdateReserveConfigInput<
   mode: UpdateReserveConfigInstructionDataArgs["mode"];
   value: UpdateReserveConfigInstructionDataArgs["value"];
   skipConfigIntegrityValidation: UpdateReserveConfigInstructionDataArgs["skipConfigIntegrityValidation"];
-}
+};
 
 export function getUpdateReserveConfigInstruction<
   TAccountSigner extends string,
@@ -209,10 +210,10 @@ export function getUpdateReserveConfigInstruction<
   >);
 }
 
-export interface ParsedUpdateReserveConfigInstruction<
+export type ParsedUpdateReserveConfigInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     signer: TAccountMetas[0];
@@ -221,7 +222,7 @@ export interface ParsedUpdateReserveConfigInstruction<
     reserve: TAccountMetas[3];
   };
   data: UpdateReserveConfigInstructionData;
-}
+};
 
 export function parseUpdateReserveConfigInstruction<
   TProgram extends string,

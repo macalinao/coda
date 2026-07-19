@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -32,18 +14,34 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getResolvedInstructionAccountAsTransactionSigner,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMintWrapperPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -98,16 +96,16 @@ export type NewWrapperInstruction<
     ]
   >;
 
-export interface NewWrapperInstructionData {
+export type NewWrapperInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
   hardCap: bigint;
-}
+};
 
-export interface NewWrapperInstructionDataArgs {
+export type NewWrapperInstructionDataArgs = {
   bump: number;
   hardCap: number | bigint;
-}
+};
 
 export function getNewWrapperInstructionDataEncoder(): FixedSizeEncoder<NewWrapperInstructionDataArgs> {
   return transformEncoder(
@@ -138,7 +136,7 @@ export function getNewWrapperInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewWrapperAsyncInput<
+export type NewWrapperAsyncInput<
   TAccountBase extends string = string,
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
@@ -146,7 +144,7 @@ export interface NewWrapperAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   mintWrapper?: Address<TAccountMintWrapper>;
   admin?: Address<TAccountAdmin>;
@@ -156,7 +154,7 @@ export interface NewWrapperAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   bump: NewWrapperInstructionDataArgs["bump"];
   hardCap: NewWrapperInstructionDataArgs["hardCap"];
-}
+};
 
 export async function getNewWrapperInstructionAsync<
   TAccountBase extends string,
@@ -263,7 +261,7 @@ export async function getNewWrapperInstructionAsync<
   >);
 }
 
-export interface NewWrapperInput<
+export type NewWrapperInput<
   TAccountBase extends string = string,
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
@@ -271,7 +269,7 @@ export interface NewWrapperInput<
   TAccountTokenProgram extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   mintWrapper: Address<TAccountMintWrapper>;
   admin?: Address<TAccountAdmin>;
@@ -281,7 +279,7 @@ export interface NewWrapperInput<
   systemProgram?: Address<TAccountSystemProgram>;
   bump: NewWrapperInstructionDataArgs["bump"];
   hardCap: NewWrapperInstructionDataArgs["hardCap"];
-}
+};
 
 export function getNewWrapperInstruction<
   TAccountBase extends string,
@@ -378,10 +376,10 @@ export function getNewWrapperInstruction<
   >);
 }
 
-export interface ParsedNewWrapperInstruction<
+export type ParsedNewWrapperInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     base: TAccountMetas[0];
@@ -393,7 +391,7 @@ export interface ParsedNewWrapperInstruction<
     systemProgram: TAccountMetas[6];
   };
   data: NewWrapperInstructionData;
-}
+};
 
 export function parseNewWrapperInstruction<
   TProgram extends string,

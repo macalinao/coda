@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,10 +17,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findLendingMarketAuthPda,
@@ -52,15 +50,16 @@ export function getRedeemFeesDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RedeemFeesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveLiquidityFeeReceiver extends string | AccountMeta = string,
-  TAccountReserveSupplyLiquidity extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
+  TAccountReserveLiquidityFeeReceiver extends string | AccountMeta<string> =
+    string,
+  TAccountReserveSupplyLiquidity extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -90,9 +89,7 @@ export type RedeemFeesInstruction<
     ]
   >;
 
-export interface RedeemFeesInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type RedeemFeesInstructionData = { discriminator: ReadonlyUint8Array };
 
 export type RedeemFeesInstructionDataArgs = {};
 
@@ -119,7 +116,7 @@ export function getRedeemFeesInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RedeemFeesAsyncInput<
+export type RedeemFeesAsyncInput<
   TAccountReserve extends string = string,
   TAccountReserveLiquidityMint extends string = string,
   TAccountReserveLiquidityFeeReceiver extends string = string,
@@ -127,7 +124,7 @@ export interface RedeemFeesAsyncInput<
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   reserve: Address<TAccountReserve>;
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
   reserveLiquidityFeeReceiver?: Address<TAccountReserveLiquidityFeeReceiver>;
@@ -135,7 +132,7 @@ export interface RedeemFeesAsyncInput<
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export async function getRedeemFeesInstructionAsync<
   TAccountReserve extends string,
@@ -254,7 +251,7 @@ export async function getRedeemFeesInstructionAsync<
   >);
 }
 
-export interface RedeemFeesInput<
+export type RedeemFeesInput<
   TAccountReserve extends string = string,
   TAccountReserveLiquidityMint extends string = string,
   TAccountReserveLiquidityFeeReceiver extends string = string,
@@ -262,7 +259,7 @@ export interface RedeemFeesInput<
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   reserve: Address<TAccountReserve>;
   reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
   reserveLiquidityFeeReceiver: Address<TAccountReserveLiquidityFeeReceiver>;
@@ -270,7 +267,7 @@ export interface RedeemFeesInput<
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getRedeemFeesInstruction<
   TAccountReserve extends string,
@@ -367,10 +364,10 @@ export function getRedeemFeesInstruction<
   >);
 }
 
-export interface ParsedRedeemFeesInstruction<
+export type ParsedRedeemFeesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     reserve: TAccountMetas[0];
@@ -382,7 +379,7 @@ export interface ParsedRedeemFeesInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: RedeemFeesInstructionData;
-}
+};
 
 export function parseRedeemFeesInstruction<
   TProgram extends string,

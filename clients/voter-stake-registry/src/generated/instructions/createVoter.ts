@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,10 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findVoterPda, findVoterWeightRecordPda } from "../pdas/index.js";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -57,17 +55,17 @@ export function getCreateVoterDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateVoterInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountInstructions extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountInstructions extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -102,16 +100,16 @@ export type CreateVoterInstruction<
     ]
   >;
 
-export interface CreateVoterInstructionData {
+export type CreateVoterInstructionData = {
   discriminator: ReadonlyUint8Array;
   voterBump: number;
   voterWeightRecordBump: number;
-}
+};
 
-export interface CreateVoterInstructionDataArgs {
+export type CreateVoterInstructionDataArgs = {
   voterBump: number;
   voterWeightRecordBump: number;
-}
+};
 
 export function getCreateVoterInstructionDataEncoder(): FixedSizeEncoder<CreateVoterInstructionDataArgs> {
   return transformEncoder(
@@ -142,7 +140,7 @@ export function getCreateVoterInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateVoterAsyncInput<
+export type CreateVoterAsyncInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
@@ -151,7 +149,7 @@ export interface CreateVoterAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
   TAccountInstructions extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter?: Address<TAccountVoter>;
   voterAuthority: TransactionSigner<TAccountVoterAuthority>;
@@ -162,7 +160,7 @@ export interface CreateVoterAsyncInput<
   instructions: Address<TAccountInstructions>;
   voterBump: CreateVoterInstructionDataArgs["voterBump"];
   voterWeightRecordBump: CreateVoterInstructionDataArgs["voterWeightRecordBump"];
-}
+};
 
 export async function getCreateVoterInstructionAsync<
   TAccountRegistrar extends string,
@@ -288,7 +286,7 @@ export async function getCreateVoterInstructionAsync<
   >);
 }
 
-export interface CreateVoterInput<
+export type CreateVoterInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
@@ -297,7 +295,7 @@ export interface CreateVoterInput<
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
   TAccountInstructions extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   voterAuthority: TransactionSigner<TAccountVoterAuthority>;
@@ -308,7 +306,7 @@ export interface CreateVoterInput<
   instructions: Address<TAccountInstructions>;
   voterBump: CreateVoterInstructionDataArgs["voterBump"];
   voterWeightRecordBump: CreateVoterInstructionDataArgs["voterWeightRecordBump"];
-}
+};
 
 export function getCreateVoterInstruction<
   TAccountRegistrar extends string,
@@ -408,10 +406,10 @@ export function getCreateVoterInstruction<
   >);
 }
 
-export interface ParsedCreateVoterInstruction<
+export type ParsedCreateVoterInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -424,7 +422,7 @@ export interface ParsedCreateVoterInstruction<
     instructions: TAccountMetas[7];
   };
   data: CreateVoterInstructionData;
-}
+};
 
 export function parseCreateVoterInstruction<
   TProgram extends string,

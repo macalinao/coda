@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,15 +14,19 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface ElevationGroupPod {
+export type ElevationGroupPod = {
   maxLiquidationBonusBps: number;
   id: number;
   ltvPct: number;
@@ -38,10 +36,10 @@ export interface ElevationGroupPod {
   padding0: number;
   /** Mandatory debt reserve for this elevation group */
   debtReserve: Address;
-  padding1: bigint[];
-}
+  padding1: Array<bigint>;
+};
 
-export interface ElevationGroupPodArgs {
+export type ElevationGroupPodArgs = {
   maxLiquidationBonusBps: number;
   id: number;
   ltvPct: number;
@@ -52,7 +50,7 @@ export interface ElevationGroupPodArgs {
   /** Mandatory debt reserve for this elevation group */
   debtReserve: Address;
   padding1: Array<number | bigint>;
-}
+};
 
 export function getElevationGroupPodEncoder(): FixedSizeEncoder<ElevationGroupPodArgs> {
   return getStructEncoder([

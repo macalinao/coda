@@ -6,35 +6,34 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { GoverningTokenType, GoverningTokenTypeArgs } from "./index.js";
 import {
   combineCodec,
   getBooleanDecoder,
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getGoverningTokenTypeDecoder,
   getGoverningTokenTypeEncoder,
+  type GoverningTokenType,
+  type GoverningTokenTypeArgs,
 } from "./index.js";
 
-export interface GoverningTokenConfigParams {
+export type GoverningTokenConfigParams = {
   useVoterWeightAddin: boolean;
   useMaxVoterWeightAddin: boolean;
   tokenType: GoverningTokenType;
-}
+};
 
-export interface GoverningTokenConfigParamsArgs {
+export type GoverningTokenConfigParamsArgs = {
   useVoterWeightAddin: boolean;
   useMaxVoterWeightAddin: boolean;
   tokenType: GoverningTokenTypeArgs;
-}
+};
 
 export function getGoverningTokenConfigParamsEncoder(): FixedSizeEncoder<GoverningTokenConfigParamsArgs> {
   return getStructEncoder([

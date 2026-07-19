@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -37,10 +20,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findMergeMinerPda,
@@ -115,9 +113,9 @@ export type StakeReplicaMinerInstruction<
     ]
   >;
 
-export interface StakeReplicaMinerInstructionData {
+export type StakeReplicaMinerInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type StakeReplicaMinerInstructionDataArgs = {};
 
@@ -144,7 +142,7 @@ export function getStakeReplicaMinerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface StakeReplicaMinerAsyncInput<
+export type StakeReplicaMinerAsyncInput<
   TAccountMmOwner extends string = string,
   TAccountReplicaMint extends string = string,
   TAccountReplicaMintTokenAccount extends string = string,
@@ -156,7 +154,7 @@ export interface StakeReplicaMinerAsyncInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mmOwner: TransactionSigner<TAccountMmOwner>;
   replicaMint?: Address<TAccountReplicaMint>;
   replicaMintTokenAccount?: Address<TAccountReplicaMintTokenAccount>;
@@ -168,7 +166,7 @@ export interface StakeReplicaMinerAsyncInput<
   minerVault?: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export async function getStakeReplicaMinerInstructionAsync<
   TAccountMmOwner extends string,
@@ -373,7 +371,7 @@ export async function getStakeReplicaMinerInstructionAsync<
   >);
 }
 
-export interface StakeReplicaMinerInput<
+export type StakeReplicaMinerInput<
   TAccountMmOwner extends string = string,
   TAccountReplicaMint extends string = string,
   TAccountReplicaMintTokenAccount extends string = string,
@@ -385,7 +383,7 @@ export interface StakeReplicaMinerInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mmOwner: TransactionSigner<TAccountMmOwner>;
   replicaMint: Address<TAccountReplicaMint>;
   replicaMintTokenAccount: Address<TAccountReplicaMintTokenAccount>;
@@ -397,7 +395,7 @@ export interface StakeReplicaMinerInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export function getStakeReplicaMinerInstruction<
   TAccountMmOwner extends string,
@@ -513,10 +511,10 @@ export function getStakeReplicaMinerInstruction<
   >);
 }
 
-export interface ParsedStakeReplicaMinerInstruction<
+export type ParsedStakeReplicaMinerInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mmOwner: TAccountMetas[0];
@@ -532,7 +530,7 @@ export interface ParsedStakeReplicaMinerInstruction<
     mineProgram: TAccountMetas[10];
   };
   data: StakeReplicaMinerInstructionData;
-}
+};
 
 export function parseStakeReplicaMinerInstruction<
   TProgram extends string,

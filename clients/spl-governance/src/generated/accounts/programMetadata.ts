@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { Slot, SlotArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -33,20 +19,33 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getSlotDecoder,
   getSlotEncoder,
+  GovernanceAccountType,
+  type Slot,
+  type SlotArgs,
 } from "../types/index.js";
 
 export const PROGRAM_METADATA_ACCOUNT_TYPE: GovernanceAccountType =
@@ -58,18 +57,18 @@ export function getProgramMetadataAccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ProgramMetadata {
+export type ProgramMetadata = {
   accountType: GovernanceAccountType;
   updatedAt: Slot;
   version: string;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
-export interface ProgramMetadataArgs {
+export type ProgramMetadataArgs = {
   updatedAt: SlotArgs;
   version: string;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
 /** Gets the encoder for {@link ProgramMetadataArgs} account data. */
 export function getProgramMetadataEncoder(): Encoder<ProgramMetadataArgs> {
@@ -142,7 +141,7 @@ export async function fetchMaybeProgramMetadata<
 
 export async function fetchAllProgramMetadata(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProgramMetadata>[]> {
   const maybeAccounts = await fetchAllMaybeProgramMetadata(
@@ -156,7 +155,7 @@ export async function fetchAllProgramMetadata(
 
 export async function fetchAllMaybeProgramMetadata(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProgramMetadata>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

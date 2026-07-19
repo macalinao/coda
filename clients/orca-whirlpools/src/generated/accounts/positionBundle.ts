@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -39,6 +26,17 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const POSITION_BUNDLE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -51,16 +49,16 @@ export function getPositionBundleDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface PositionBundle {
+export type PositionBundle = {
   discriminator: ReadonlyUint8Array;
   positionBundleMint: Address;
-  positionBitmap: number[];
-}
+  positionBitmap: Array<number>;
+};
 
-export interface PositionBundleArgs {
+export type PositionBundleArgs = {
   positionBundleMint: Address;
-  positionBitmap: number[];
-}
+  positionBitmap: Array<number>;
+};
 
 /** Gets the encoder for {@link PositionBundleArgs} account data. */
 export function getPositionBundleEncoder(): FixedSizeEncoder<PositionBundleArgs> {
@@ -129,7 +127,7 @@ export async function fetchMaybePositionBundle<
 
 export async function fetchAllPositionBundle(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<PositionBundle>[]> {
   const maybeAccounts = await fetchAllMaybePositionBundle(
@@ -143,7 +141,7 @@ export async function fetchAllPositionBundle(
 
 export async function fetchAllMaybePositionBundle(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<PositionBundle>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

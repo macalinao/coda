@@ -6,24 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum ProposalState {
-  Draft = 0,
-  SigningOff = 1,
-  Voting = 2,
-  Succeeded = 3,
-  Executing = 4,
-  Completed = 5,
-  Cancelled = 6,
-  Defeated = 7,
-  ExecutingWithErrors = 8,
-  Vetoed = 9,
+  Draft,
+  SigningOff,
+  Voting,
+  Succeeded,
+  Executing,
+  Completed,
+  Cancelled,
+  Defeated,
+  ExecutingWithErrors,
+  Vetoed,
 }
 
 export type ProposalStateArgs = ProposalState;

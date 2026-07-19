@@ -6,22 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface PoolMetrics {
+export type PoolMetrics = {
   totalLpAFee: bigint;
   totalLpBFee: bigint;
   totalProtocolAFee: bigint;
@@ -30,9 +28,9 @@ export interface PoolMetrics {
   totalPartnerBFee: bigint;
   totalPosition: bigint;
   padding: bigint;
-}
+};
 
-export interface PoolMetricsArgs {
+export type PoolMetricsArgs = {
   totalLpAFee: number | bigint;
   totalLpBFee: number | bigint;
   totalProtocolAFee: number | bigint;
@@ -41,7 +39,7 @@ export interface PoolMetricsArgs {
   totalPartnerBFee: number | bigint;
   totalPosition: number | bigint;
   padding: number | bigint;
-}
+};
 
 export function getPoolMetricsEncoder(): FixedSizeEncoder<PoolMetricsArgs> {
   return getStructEncoder([

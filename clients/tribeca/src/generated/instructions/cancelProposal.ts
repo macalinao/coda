@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CANCEL_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -50,10 +50,10 @@ export function getCancelProposalDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CancelProposalInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountProposal extends string | AccountMeta = string,
-  TAccountProposer extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountProposal extends string | AccountMeta<string> = string,
+  TAccountProposer extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -72,9 +72,9 @@ export type CancelProposalInstruction<
     ]
   >;
 
-export interface CancelProposalInstructionData {
+export type CancelProposalInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type CancelProposalInstructionDataArgs = {};
 
@@ -101,15 +101,15 @@ export function getCancelProposalInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CancelProposalInput<
+export type CancelProposalInput<
   TAccountGovernor extends string = string,
   TAccountProposal extends string = string,
   TAccountProposer extends string = string,
-> {
+> = {
   governor: Address<TAccountGovernor>;
   proposal: Address<TAccountProposal>;
   proposer: TransactionSigner<TAccountProposer>;
-}
+};
 
 export function getCancelProposalInstruction<
   TAccountGovernor extends string,
@@ -160,10 +160,10 @@ export function getCancelProposalInstruction<
   >);
 }
 
-export interface ParsedCancelProposalInstruction<
+export type ParsedCancelProposalInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governor: TAccountMetas[0];
@@ -171,7 +171,7 @@ export interface ParsedCancelProposalInstruction<
     proposer: TAccountMetas[2];
   };
   data: CancelProposalInstructionData;
-}
+};
 
 export function parseCancelProposalInstruction<
   TProgram extends string,

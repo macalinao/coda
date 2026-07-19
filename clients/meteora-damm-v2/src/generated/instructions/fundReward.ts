@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,18 +16,33 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getNonNullResolvedInstructionInput,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda, findRewardVaultPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -103,18 +101,18 @@ export type FundRewardInstruction<
     ]
   >;
 
-export interface FundRewardInstructionData {
+export type FundRewardInstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
   amount: bigint;
   carryForward: boolean;
-}
+};
 
-export interface FundRewardInstructionDataArgs {
+export type FundRewardInstructionDataArgs = {
   rewardIndex: number;
   amount: number | bigint;
   carryForward: boolean;
-}
+};
 
 export function getFundRewardInstructionDataEncoder(): FixedSizeEncoder<FundRewardInstructionDataArgs> {
   return transformEncoder(
@@ -147,7 +145,7 @@ export function getFundRewardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface FundRewardAsyncInput<
+export type FundRewardAsyncInput<
   TAccountPool extends string = string,
   TAccountRewardVault extends string = string,
   TAccountRewardMint extends string = string,
@@ -156,7 +154,7 @@ export interface FundRewardAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   rewardVault?: Address<TAccountRewardVault>;
   rewardMint: Address<TAccountRewardMint>;
@@ -168,7 +166,7 @@ export interface FundRewardAsyncInput<
   rewardIndex: FundRewardInstructionDataArgs["rewardIndex"];
   amount: FundRewardInstructionDataArgs["amount"];
   carryForward: FundRewardInstructionDataArgs["carryForward"];
-}
+};
 
 export async function getFundRewardInstructionAsync<
   TAccountPool extends string,
@@ -284,7 +282,7 @@ export async function getFundRewardInstructionAsync<
   >);
 }
 
-export interface FundRewardInput<
+export type FundRewardInput<
   TAccountPool extends string = string,
   TAccountRewardVault extends string = string,
   TAccountRewardMint extends string = string,
@@ -293,7 +291,7 @@ export interface FundRewardInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   rewardVault: Address<TAccountRewardVault>;
   rewardMint: Address<TAccountRewardMint>;
@@ -305,7 +303,7 @@ export interface FundRewardInput<
   rewardIndex: FundRewardInstructionDataArgs["rewardIndex"];
   amount: FundRewardInstructionDataArgs["amount"];
   carryForward: FundRewardInstructionDataArgs["carryForward"];
-}
+};
 
 export function getFundRewardInstruction<
   TAccountPool extends string,
@@ -404,10 +402,10 @@ export function getFundRewardInstruction<
   >);
 }
 
-export interface ParsedFundRewardInstruction<
+export type ParsedFundRewardInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -420,7 +418,7 @@ export interface ParsedFundRewardInstruction<
     program: TAccountMetas[7];
   };
   data: FundRewardInstructionData;
-}
+};
 
 export function parseFundRewardInstruction<
   TProgram extends string,

@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,8 +17,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UPDATE_QUARRY_REWARDS_DISCRIMINATOR: ReadonlyUint8Array =
@@ -63,9 +63,9 @@ export type UpdateQuarryRewardsInstruction<
     ]
   >;
 
-export interface UpdateQuarryRewardsInstructionData {
+export type UpdateQuarryRewardsInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type UpdateQuarryRewardsInstructionDataArgs = {};
 
@@ -95,13 +95,13 @@ export function getUpdateQuarryRewardsInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UpdateQuarryRewardsInput<
+export type UpdateQuarryRewardsInput<
   TAccountQuarry extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   quarry: Address<TAccountQuarry>;
   rewarder: Address<TAccountRewarder>;
-}
+};
 
 export function getUpdateQuarryRewardsInstruction<
   TAccountQuarry extends string,
@@ -143,17 +143,17 @@ export function getUpdateQuarryRewardsInstruction<
   >);
 }
 
-export interface ParsedUpdateQuarryRewardsInstruction<
+export type ParsedUpdateQuarryRewardsInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     quarry: TAccountMetas[0];
     rewarder: TAccountMetas[1];
   };
   data: UpdateQuarryRewardsInstructionData;
-}
+};
 
 export function parseUpdateQuarryRewardsInstruction<
   TProgram extends string,

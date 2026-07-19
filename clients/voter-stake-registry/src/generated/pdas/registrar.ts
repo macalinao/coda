@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface RegistrarSeeds {
+export type RegistrarSeeds = {
   realm: Address;
   realmGoverningTokenMint: Address;
-}
+};
 
 /**
  * The voting registrar. There can only be a single registrar

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -40,8 +23,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INIT_REFERRER_STATE_AND_SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array =
@@ -55,15 +55,15 @@ export function getInitReferrerStateAndShortUrlDiscriminatorBytes(): ReadonlyUin
 
 export type InitReferrerStateAndShortUrlInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountReferrer extends string | AccountMeta = string,
-  TAccountReferrerState extends string | AccountMeta = string,
-  TAccountReferrerShortUrl extends string | AccountMeta = string,
-  TAccountReferrerUserMetadata extends string | AccountMeta = string,
-  TAccountRent extends string | AccountMeta =
+  TAccountReferrer extends string | AccountMeta<string> = string,
+  TAccountReferrerState extends string | AccountMeta<string> = string,
+  TAccountReferrerShortUrl extends string | AccountMeta<string> = string,
+  TAccountReferrerUserMetadata extends string | AccountMeta<string> = string,
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -91,14 +91,14 @@ export type InitReferrerStateAndShortUrlInstruction<
     ]
   >;
 
-export interface InitReferrerStateAndShortUrlInstructionData {
+export type InitReferrerStateAndShortUrlInstructionData = {
   discriminator: ReadonlyUint8Array;
   shortUrl: string;
-}
+};
 
-export interface InitReferrerStateAndShortUrlInstructionDataArgs {
+export type InitReferrerStateAndShortUrlInstructionDataArgs = {
   shortUrl: string;
-}
+};
 
 export function getInitReferrerStateAndShortUrlInstructionDataEncoder(): Encoder<InitReferrerStateAndShortUrlInstructionDataArgs> {
   return transformEncoder(
@@ -130,14 +130,14 @@ export function getInitReferrerStateAndShortUrlInstructionDataCodec(): Codec<
   );
 }
 
-export interface InitReferrerStateAndShortUrlInput<
+export type InitReferrerStateAndShortUrlInput<
   TAccountReferrer extends string = string,
   TAccountReferrerState extends string = string,
   TAccountReferrerShortUrl extends string = string,
   TAccountReferrerUserMetadata extends string = string,
   TAccountRent extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   referrer: TransactionSigner<TAccountReferrer>;
   referrerState: Address<TAccountReferrerState>;
   referrerShortUrl: Address<TAccountReferrerShortUrl>;
@@ -145,7 +145,7 @@ export interface InitReferrerStateAndShortUrlInput<
   rent?: Address<TAccountRent>;
   systemProgram?: Address<TAccountSystemProgram>;
   shortUrl: InitReferrerStateAndShortUrlInstructionDataArgs["shortUrl"];
-}
+};
 
 export function getInitReferrerStateAndShortUrlInstruction<
   TAccountReferrer extends string,
@@ -236,10 +236,10 @@ export function getInitReferrerStateAndShortUrlInstruction<
   >);
 }
 
-export interface ParsedInitReferrerStateAndShortUrlInstruction<
+export type ParsedInitReferrerStateAndShortUrlInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     referrer: TAccountMetas[0];
@@ -250,7 +250,7 @@ export interface ParsedInitReferrerStateAndShortUrlInstruction<
     systemProgram: TAccountMetas[5];
   };
   data: InitReferrerStateAndShortUrlInstructionData;
-}
+};
 
 export function parseInitReferrerStateAndShortUrlInstruction<
   TProgram extends string,

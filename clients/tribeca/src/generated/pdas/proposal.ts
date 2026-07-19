@@ -6,18 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getU64Encoder,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface ProposalSeeds {
+export type ProposalSeeds = {
   governor: Address;
   index: number | bigint;
-}
+};
 
 /** Proposal account for governance actions */
 export async function findProposalPda(

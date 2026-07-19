@@ -6,34 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  FarmConfigOption,
-  FarmConfigOptionArgs,
-  GlobalConfigOption,
-  GlobalConfigOptionArgs,
-  LockingMode,
-  LockingModeArgs,
-  RewardType,
-  RewardTypeArgs,
-  TimeUnit,
-  TimeUnitArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -45,8 +17,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getFarmConfigOptionDecoder,
@@ -59,6 +47,16 @@ import {
   getRewardTypeEncoder,
   getTimeUnitDecoder,
   getTimeUnitEncoder,
+  type FarmConfigOption,
+  type FarmConfigOptionArgs,
+  type GlobalConfigOption,
+  type GlobalConfigOptionArgs,
+  type LockingMode,
+  type LockingModeArgs,
+  type RewardType,
+  type RewardTypeArgs,
+  type TimeUnit,
+  type TimeUnitArgs,
 } from "../types/index.js";
 
 export const FARMS_IDL_MISSING_TYPES_DISCRIMINATOR: ReadonlyUint8Array =
@@ -72,9 +70,9 @@ export function getFarmsIdlMissingTypesDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type FarmsIdlMissingTypesInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountGlobalAdmin extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGlobalAdmin extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -90,22 +88,22 @@ export type FarmsIdlMissingTypesInstruction<
     ]
   >;
 
-export interface FarmsIdlMissingTypesInstructionData {
+export type FarmsIdlMissingTypesInstructionData = {
   discriminator: ReadonlyUint8Array;
   globalConfigOptionKind: GlobalConfigOption;
   farmConfigOptionKind: FarmConfigOption;
   timeUnit: TimeUnit;
   lockingMode: LockingMode;
   rewardType: RewardType;
-}
+};
 
-export interface FarmsIdlMissingTypesInstructionDataArgs {
+export type FarmsIdlMissingTypesInstructionDataArgs = {
   globalConfigOptionKind: GlobalConfigOptionArgs;
   farmConfigOptionKind: FarmConfigOptionArgs;
   timeUnit: TimeUnitArgs;
   lockingMode: LockingModeArgs;
   rewardType: RewardTypeArgs;
-}
+};
 
 export function getFarmsIdlMissingTypesInstructionDataEncoder(): FixedSizeEncoder<FarmsIdlMissingTypesInstructionDataArgs> {
   return transformEncoder(
@@ -145,10 +143,10 @@ export function getFarmsIdlMissingTypesInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface FarmsIdlMissingTypesInput<
+export type FarmsIdlMissingTypesInput<
   TAccountGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
-> {
+> = {
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
   globalConfigOptionKind: FarmsIdlMissingTypesInstructionDataArgs["globalConfigOptionKind"];
@@ -156,7 +154,7 @@ export interface FarmsIdlMissingTypesInput<
   timeUnit: FarmsIdlMissingTypesInstructionDataArgs["timeUnit"];
   lockingMode: FarmsIdlMissingTypesInstructionDataArgs["lockingMode"];
   rewardType: FarmsIdlMissingTypesInstructionDataArgs["rewardType"];
-}
+};
 
 export function getFarmsIdlMissingTypesInstruction<
   TAccountGlobalAdmin extends string,
@@ -203,17 +201,17 @@ export function getFarmsIdlMissingTypesInstruction<
   >);
 }
 
-export interface ParsedFarmsIdlMissingTypesInstruction<
+export type ParsedFarmsIdlMissingTypesInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     globalAdmin: TAccountMetas[0];
     globalConfig: TAccountMetas[1];
   };
   data: FarmsIdlMissingTypesInstructionData;
-}
+};
 
 export function parseFarmsIdlMissingTypesInstruction<
   TProgram extends string,

@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -39,6 +26,17 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const TOKEN_BADGE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -49,20 +47,20 @@ export function getTokenBadgeDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(TOKEN_BADGE_DISCRIMINATOR);
 }
 
-export interface TokenBadge {
+export type TokenBadge = {
   discriminator: ReadonlyUint8Array;
   /** token mint */
   tokenMint: Address;
   /** Reserve */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
-export interface TokenBadgeArgs {
+export type TokenBadgeArgs = {
   /** token mint */
   tokenMint: Address;
   /** Reserve */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
 /** Gets the encoder for {@link TokenBadgeArgs} account data. */
 export function getTokenBadgeEncoder(): FixedSizeEncoder<TokenBadgeArgs> {
@@ -129,7 +127,7 @@ export async function fetchMaybeTokenBadge<TAddress extends string = string>(
 
 export async function fetchAllTokenBadge(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TokenBadge>[]> {
   const maybeAccounts = await fetchAllMaybeTokenBadge(rpc, addresses, config);
@@ -139,7 +137,7 @@ export async function fetchAllTokenBadge(
 
 export async function fetchAllMaybeTokenBadge(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TokenBadge>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

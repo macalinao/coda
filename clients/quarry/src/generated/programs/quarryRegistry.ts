@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type { Registry, RegistryArgs } from "../accounts/index.js";
-import type {
-  NewRegistryAsyncInput,
-  ParsedNewRegistryInstruction,
-  ParsedSyncQuarryInstruction,
-  SyncQuarryInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -39,17 +16,38 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getRegistryCodec } from "../accounts/index.js";
+import {
+  getRegistryCodec,
+  type Registry,
+  type RegistryArgs,
+} from "../accounts/index.js";
 import {
   getNewRegistryInstructionAsync,
   getSyncQuarryInstruction,
   parseNewRegistryInstruction,
   parseSyncQuarryInstruction,
+  type NewRegistryAsyncInput,
+  type ParsedNewRegistryInstruction,
+  type ParsedSyncQuarryInstruction,
+  type SyncQuarryInput,
 } from "../instructions/index.js";
 import { findRegistryPda } from "../pdas/index.js";
 
@@ -57,7 +55,7 @@ export const QUARRY_REGISTRY_PROGRAM_ADDRESS =
   "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc" as Address<"QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc">;
 
 export enum QuarryRegistryAccount {
-  Registry = 0,
+  Registry,
 }
 
 export function identifyQuarryRegistryAccount(
@@ -82,8 +80,8 @@ export function identifyQuarryRegistryAccount(
 }
 
 export enum QuarryRegistryInstruction {
-  NewRegistry = 0,
-  SyncQuarry = 1,
+  NewRegistry,
+  SyncQuarry,
 }
 
 export function identifyQuarryRegistryInstruction(
@@ -158,18 +156,21 @@ export function parseQuarryRegistryInstruction<TProgram extends string>(
   }
 }
 
-export interface QuarryRegistryPlugin {
+export type QuarryRegistryPlugin = {
   accounts: QuarryRegistryPluginAccounts;
   instructions: QuarryRegistryPluginInstructions;
   pdas: QuarryRegistryPluginPdas;
-}
+  identifyAccount: typeof identifyQuarryRegistryAccount;
+  identifyInstruction: typeof identifyQuarryRegistryInstruction;
+  parseInstruction: typeof parseQuarryRegistryInstruction;
+};
 
-export interface QuarryRegistryPluginAccounts {
+export type QuarryRegistryPluginAccounts = {
   registry: ReturnType<typeof getRegistryCodec> &
     SelfFetchFunctions<RegistryArgs, Registry>;
-}
+};
 
-export interface QuarryRegistryPluginInstructions {
+export type QuarryRegistryPluginInstructions = {
   newRegistry: (
     input: MakeOptional<NewRegistryAsyncInput, "payer">,
   ) => ReturnType<typeof getNewRegistryInstructionAsync> &
@@ -177,11 +178,9 @@ export interface QuarryRegistryPluginInstructions {
   syncQuarry: (
     input: SyncQuarryInput,
   ) => ReturnType<typeof getSyncQuarryInstruction> & SelfPlanAndSendFunctions;
-}
+};
 
-export interface QuarryRegistryPluginPdas {
-  registry: typeof findRegistryPda;
-}
+export type QuarryRegistryPluginPdas = { registry: typeof findRegistryPda };
 
 export type QuarryRegistryPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -193,7 +192,7 @@ export type QuarryRegistryPluginRequirements = ClientWithRpc<
 export function quarryRegistryProgram() {
   return <T extends QuarryRegistryPluginRequirements>(
     client: T,
-  ): Omit<T, "quarryRegistry"> & { quarryRegistry: QuarryRegistryPlugin } => {
+  ): ExtendedClient<T, { quarryRegistry: QuarryRegistryPlugin }> => {
     return extendClient(client, {
       quarryRegistry: <QuarryRegistryPlugin>{
         accounts: {
@@ -215,6 +214,9 @@ export function quarryRegistryProgram() {
             ),
         },
         pdas: { registry: findRegistryPda },
+        identifyAccount: identifyQuarryRegistryAccount,
+        identifyInstruction: identifyQuarryRegistryInstruction,
+        parseInstruction: parseQuarryRegistryInstruction,
       },
     });
   };

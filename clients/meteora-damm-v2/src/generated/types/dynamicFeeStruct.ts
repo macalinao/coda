@@ -6,32 +6,30 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface DynamicFeeStruct {
+export type DynamicFeeStruct = {
   initialized: number;
-  padding: number[];
+  padding: Array<number>;
   maxVolatilityAccumulator: number;
   variableFeeControl: number;
   binStep: number;
@@ -43,11 +41,11 @@ export interface DynamicFeeStruct {
   sqrtPriceReference: bigint;
   volatilityAccumulator: bigint;
   volatilityReference: bigint;
-}
+};
 
-export interface DynamicFeeStructArgs {
+export type DynamicFeeStructArgs = {
   initialized: number;
-  padding: number[];
+  padding: Array<number>;
   maxVolatilityAccumulator: number;
   variableFeeControl: number;
   binStep: number;
@@ -59,7 +57,7 @@ export interface DynamicFeeStructArgs {
   sqrtPriceReference: number | bigint;
   volatilityAccumulator: number | bigint;
   volatilityReference: number | bigint;
-}
+};
 
 export function getDynamicFeeStructEncoder(): FixedSizeEncoder<DynamicFeeStructArgs> {
   return getStructEncoder([

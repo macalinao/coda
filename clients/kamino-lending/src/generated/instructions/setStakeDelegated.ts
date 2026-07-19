@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_STAKE_DELEGATED_DISCRIMINATOR: ReadonlyUint8Array =
@@ -50,10 +50,10 @@ export function getSetStakeDelegatedDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetStakeDelegatedInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountDelegateAuthority extends string | AccountMeta = string,
-  TAccountUserState extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountDelegateAuthority extends string | AccountMeta<string> = string,
+  TAccountUserState extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -72,14 +72,14 @@ export type SetStakeDelegatedInstruction<
     ]
   >;
 
-export interface SetStakeDelegatedInstructionData {
+export type SetStakeDelegatedInstructionData = {
   discriminator: ReadonlyUint8Array;
   newAmount: bigint;
-}
+};
 
-export interface SetStakeDelegatedInstructionDataArgs {
+export type SetStakeDelegatedInstructionDataArgs = {
   newAmount: number | bigint;
-}
+};
 
 export function getSetStakeDelegatedInstructionDataEncoder(): FixedSizeEncoder<SetStakeDelegatedInstructionDataArgs> {
   return transformEncoder(
@@ -108,16 +108,16 @@ export function getSetStakeDelegatedInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetStakeDelegatedInput<
+export type SetStakeDelegatedInput<
   TAccountDelegateAuthority extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
-> {
+> = {
   delegateAuthority: TransactionSigner<TAccountDelegateAuthority>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
   newAmount: SetStakeDelegatedInstructionDataArgs["newAmount"];
-}
+};
 
 export function getSetStakeDelegatedInstruction<
   TAccountDelegateAuthority extends string,
@@ -176,10 +176,10 @@ export function getSetStakeDelegatedInstruction<
   >);
 }
 
-export interface ParsedSetStakeDelegatedInstruction<
+export type ParsedSetStakeDelegatedInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     delegateAuthority: TAccountMetas[0];
@@ -187,7 +187,7 @@ export interface ParsedSetStakeDelegatedInstruction<
     farmState: TAccountMetas[2];
   };
   data: SetStakeDelegatedInstructionData;
-}
+};
 
 export function parseSetStakeDelegatedInstruction<
   TProgram extends string,

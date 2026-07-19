@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { GovernorSeeds } from "../pdas/index.js";
-import type {
-  GovernanceParameters,
-  GovernanceParametersArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -39,16 +21,29 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findGovernorPda } from "../pdas/index.js";
+import { findGovernorPda, type GovernorSeeds } from "../pdas/index.js";
 import {
   getGovernanceParametersDecoder,
   getGovernanceParametersEncoder,
+  type GovernanceParameters,
+  type GovernanceParametersArgs,
 } from "../types/index.js";
 
 export const GOVERNOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -59,7 +54,7 @@ export function getGovernorDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(GOVERNOR_DISCRIMINATOR);
 }
 
-export interface Governor {
+export type Governor = {
   discriminator: ReadonlyUint8Array;
   base: Address;
   bump: number;
@@ -67,16 +62,16 @@ export interface Governor {
   electorate: Address;
   smartWallet: Address;
   params: GovernanceParameters;
-}
+};
 
-export interface GovernorArgs {
+export type GovernorArgs = {
   base: Address;
   bump: number;
   proposalCount: number | bigint;
   electorate: Address;
   smartWallet: Address;
   params: GovernanceParametersArgs;
-}
+};
 
 /** Gets the encoder for {@link GovernorArgs} account data. */
 export function getGovernorEncoder(): FixedSizeEncoder<GovernorArgs> {
@@ -148,7 +143,7 @@ export async function fetchMaybeGovernor<TAddress extends string = string>(
 
 export async function fetchAllGovernor(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Governor>[]> {
   const maybeAccounts = await fetchAllMaybeGovernor(rpc, addresses, config);
@@ -158,7 +153,7 @@ export async function fetchAllGovernor(
 
 export async function fetchAllMaybeGovernor(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Governor>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,20 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: You are not authorized to perform this action. */
-export const QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED = 0x17_70; // 6000
+export const QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED = 0x1770; // 6000
 /** HardcapExceeded: Cannot mint over hard cap. */
-export const QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED = 0x17_71; // 6001
+export const QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED = 0x1771; // 6001
 /** MinterAllowanceExceeded: Minter allowance exceeded. */
-export const QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED = 0x17_72; // 6002
+export const QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED = 0x1772; // 6002
 
 export type QuarryMintWrapperError =
   | typeof QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED
@@ -29,20 +29,18 @@ export type QuarryMintWrapperError =
 let quarryMintWrapperErrorMessages:
   | Record<QuarryMintWrapperError, string>
   | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   quarryMintWrapperErrorMessages = {
-    [QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED]: "Cannot mint over hard cap.",
-    [QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED]:
-      "Minter allowance exceeded.",
-    [QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED]:
-      "You are not authorized to perform this action.",
+    [QUARRY_MINT_WRAPPER_ERROR__HARDCAP_EXCEEDED]: `Cannot mint over hard cap.`,
+    [QUARRY_MINT_WRAPPER_ERROR__MINTER_ALLOWANCE_EXCEEDED]: `Minter allowance exceeded.`,
+    [QUARRY_MINT_WRAPPER_ERROR__UNAUTHORIZED]: `You are not authorized to perform this action.`,
   };
 }
 
 export function getQuarryMintWrapperErrorMessage(
   code: QuarryMintWrapperError,
 ): string {
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env["NODE_ENV"] !== "production") {
     return (
       quarryMintWrapperErrorMessages as Record<QuarryMintWrapperError, string>
     )[code];

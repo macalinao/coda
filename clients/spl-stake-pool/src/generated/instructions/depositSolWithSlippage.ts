@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,20 +48,20 @@ export function getDepositSolWithSlippageDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type DepositSolWithSlippageInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountUserPoolTokenAccount extends string | AccountMeta = string,
-  TAccountFeeAccount extends string | AccountMeta = string,
-  TAccountReferralFeeAccount extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountUserPoolTokenAccount extends string | AccountMeta<string> = string,
+  TAccountFeeAccount extends string | AccountMeta<string> = string,
+  TAccountReferralFeeAccount extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSolDepositAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSolDepositAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -106,16 +104,16 @@ export type DepositSolWithSlippageInstruction<
     ]
   >;
 
-export interface DepositSolWithSlippageInstructionData {
+export type DepositSolWithSlippageInstructionData = {
   discriminator: number;
   lamportsIn: bigint;
   minimumPoolTokensOut: bigint;
-}
+};
 
-export interface DepositSolWithSlippageInstructionDataArgs {
+export type DepositSolWithSlippageInstructionDataArgs = {
   lamportsIn: number | bigint;
   minimumPoolTokensOut: number | bigint;
-}
+};
 
 export function getDepositSolWithSlippageInstructionDataEncoder(): FixedSizeEncoder<DepositSolWithSlippageInstructionDataArgs> {
   return transformEncoder(
@@ -149,7 +147,7 @@ export function getDepositSolWithSlippageInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface DepositSolWithSlippageAsyncInput<
+export type DepositSolWithSlippageAsyncInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountReserveStake extends string = string,
@@ -161,7 +159,7 @@ export interface DepositSolWithSlippageAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSolDepositAuthority extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Stake pool withdraw authority */
@@ -188,8 +186,25 @@ export interface DepositSolWithSlippageAsyncInput<
     | TransactionSigner<TAccountSolDepositAuthority>;
   lamportsIn: DepositSolWithSlippageInstructionDataArgs["lamportsIn"];
   minimumPoolTokensOut: DepositSolWithSlippageInstructionDataArgs["minimumPoolTokensOut"];
-}
+};
 
+/**
+ * Deposit SOL directly into the pool's reserve account, with a
+ * specified slippage constraint. The output is a "pool" token
+ * representing ownership into the pool. Inputs are converted at the
+ * current ratio.
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Reserve stake account, to deposit SOL
+ * 3. `[s]` Account providing the lamports to be deposited into the pool
+ * 4. `[w]` User account to receive pool tokens
+ * 5. `[w]` Account to receive fee tokens
+ * 6. `[w]` Account to receive a portion of fee as referral fees
+ * 7. `[w]` Pool token mint account
+ * 8. `[]` System program account
+ * 9. `[]` Token program id
+ * 10. `[s]` (Optional) Stake pool sol deposit authority.
+ */
 export async function getDepositSolWithSlippageInstructionAsync<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -331,7 +346,7 @@ export async function getDepositSolWithSlippageInstructionAsync<
   >);
 }
 
-export interface DepositSolWithSlippageInput<
+export type DepositSolWithSlippageInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountReserveStake extends string = string,
@@ -343,7 +358,7 @@ export interface DepositSolWithSlippageInput<
   TAccountSystemProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSolDepositAuthority extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Stake pool withdraw authority */
@@ -370,8 +385,25 @@ export interface DepositSolWithSlippageInput<
     | TransactionSigner<TAccountSolDepositAuthority>;
   lamportsIn: DepositSolWithSlippageInstructionDataArgs["lamportsIn"];
   minimumPoolTokensOut: DepositSolWithSlippageInstructionDataArgs["minimumPoolTokensOut"];
-}
+};
 
+/**
+ * Deposit SOL directly into the pool's reserve account, with a
+ * specified slippage constraint. The output is a "pool" token
+ * representing ownership into the pool. Inputs are converted at the
+ * current ratio.
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Reserve stake account, to deposit SOL
+ * 3. `[s]` Account providing the lamports to be deposited into the pool
+ * 4. `[w]` User account to receive pool tokens
+ * 5. `[w]` Account to receive fee tokens
+ * 6. `[w]` Account to receive a portion of fee as referral fees
+ * 7. `[w]` Pool token mint account
+ * 8. `[]` System program account
+ * 9. `[]` Token program id
+ * 10. `[s]` (Optional) Stake pool sol deposit authority.
+ */
 export function getDepositSolWithSlippageInstruction<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -503,10 +535,10 @@ export function getDepositSolWithSlippageInstruction<
   >);
 }
 
-export interface ParsedDepositSolWithSlippageInstruction<
+export type ParsedDepositSolWithSlippageInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -533,7 +565,7 @@ export interface ParsedDepositSolWithSlippageInstruction<
     solDepositAuthority: TAccountMetas[10];
   };
   data: DepositSolWithSlippageInstructionData;
-}
+};
 
 export function parseDepositSolWithSlippageInstruction<
   TProgram extends string,

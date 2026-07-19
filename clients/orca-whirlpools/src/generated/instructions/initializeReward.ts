@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,8 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INITIALIZE_REWARD_DISCRIMINATOR: ReadonlyUint8Array =
@@ -52,18 +52,18 @@ export function getInitializeRewardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeRewardInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountRewardAuthority extends string | AccountMeta = string,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountRewardMint extends string | AccountMeta = string,
-  TAccountRewardVault extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountRewardAuthority extends string | AccountMeta<string> = string,
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountRewardMint extends string | AccountMeta<string> = string,
+  TAccountRewardVault extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -99,14 +99,12 @@ export type InitializeRewardInstruction<
     ]
   >;
 
-export interface InitializeRewardInstructionData {
+export type InitializeRewardInstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
-}
+};
 
-export interface InitializeRewardInstructionDataArgs {
-  rewardIndex: number;
-}
+export type InitializeRewardInstructionDataArgs = { rewardIndex: number };
 
 export function getInitializeRewardInstructionDataEncoder(): FixedSizeEncoder<InitializeRewardInstructionDataArgs> {
   return transformEncoder(
@@ -135,7 +133,7 @@ export function getInitializeRewardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializeRewardInput<
+export type InitializeRewardInput<
   TAccountRewardAuthority extends string = string,
   TAccountFunder extends string = string,
   TAccountWhirlpool extends string = string,
@@ -144,7 +142,7 @@ export interface InitializeRewardInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   rewardAuthority: TransactionSigner<TAccountRewardAuthority>;
   funder: TransactionSigner<TAccountFunder>;
   whirlpool: Address<TAccountWhirlpool>;
@@ -154,7 +152,7 @@ export interface InitializeRewardInput<
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
   rewardIndex: InitializeRewardInstructionDataArgs["rewardIndex"];
-}
+};
 
 export function getInitializeRewardInstruction<
   TAccountRewardAuthority extends string,
@@ -257,10 +255,10 @@ export function getInitializeRewardInstruction<
   >);
 }
 
-export interface ParsedInitializeRewardInstruction<
+export type ParsedInitializeRewardInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     rewardAuthority: TAccountMetas[0];
@@ -273,7 +271,7 @@ export interface ParsedInitializeRewardInstruction<
     rent: TAccountMetas[7];
   };
   data: InitializeRewardInstructionData;
-}
+};
 
 export function parseInitializeRewardInstruction<
   TProgram extends string,

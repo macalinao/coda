@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,17 +14,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findLendingMarketAuthPda,
@@ -60,21 +58,23 @@ export function getFlashRepayReserveLiquidityDiscriminatorBytes(): ReadonlyUint8
 
 export type FlashRepayReserveLiquidityInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountUserTransferAuthority extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveDestinationLiquidity extends string | AccountMeta = string,
-  TAccountUserSourceLiquidity extends string | AccountMeta = string,
-  TAccountReserveLiquidityFeeReceiver extends string | AccountMeta = string,
-  TAccountReferrerTokenState extends string | AccountMeta = string,
-  TAccountReferrerAccount extends string | AccountMeta = string,
-  TAccountSysvarInfo extends string | AccountMeta =
+  TAccountUserTransferAuthority extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
+  TAccountReserveDestinationLiquidity extends string | AccountMeta<string> =
+    string,
+  TAccountUserSourceLiquidity extends string | AccountMeta<string> = string,
+  TAccountReserveLiquidityFeeReceiver extends string | AccountMeta<string> =
+    string,
+  TAccountReferrerTokenState extends string | AccountMeta<string> = string,
+  TAccountReferrerAccount extends string | AccountMeta<string> = string,
+  TAccountSysvarInfo extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -120,16 +120,16 @@ export type FlashRepayReserveLiquidityInstruction<
     ]
   >;
 
-export interface FlashRepayReserveLiquidityInstructionData {
+export type FlashRepayReserveLiquidityInstructionData = {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
   borrowInstructionIndex: number;
-}
+};
 
-export interface FlashRepayReserveLiquidityInstructionDataArgs {
+export type FlashRepayReserveLiquidityInstructionDataArgs = {
   liquidityAmount: number | bigint;
   borrowInstructionIndex: number;
-}
+};
 
 export function getFlashRepayReserveLiquidityInstructionDataEncoder(): FixedSizeEncoder<FlashRepayReserveLiquidityInstructionDataArgs> {
   return transformEncoder(
@@ -163,7 +163,7 @@ export function getFlashRepayReserveLiquidityInstructionDataCodec(): FixedSizeCo
   );
 }
 
-export interface FlashRepayReserveLiquidityAsyncInput<
+export type FlashRepayReserveLiquidityAsyncInput<
   TAccountUserTransferAuthority extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountLendingMarket extends string = string,
@@ -176,7 +176,7 @@ export interface FlashRepayReserveLiquidityAsyncInput<
   TAccountReferrerAccount extends string = string,
   TAccountSysvarInfo extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   userTransferAuthority: TransactionSigner<TAccountUserTransferAuthority>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -191,7 +191,7 @@ export interface FlashRepayReserveLiquidityAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   liquidityAmount: FlashRepayReserveLiquidityInstructionDataArgs["liquidityAmount"];
   borrowInstructionIndex: FlashRepayReserveLiquidityInstructionDataArgs["borrowInstructionIndex"];
-}
+};
 
 export async function getFlashRepayReserveLiquidityInstructionAsync<
   TAccountUserTransferAuthority extends string,
@@ -361,7 +361,7 @@ export async function getFlashRepayReserveLiquidityInstructionAsync<
   >);
 }
 
-export interface FlashRepayReserveLiquidityInput<
+export type FlashRepayReserveLiquidityInput<
   TAccountUserTransferAuthority extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountLendingMarket extends string = string,
@@ -374,7 +374,7 @@ export interface FlashRepayReserveLiquidityInput<
   TAccountReferrerAccount extends string = string,
   TAccountSysvarInfo extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   userTransferAuthority: TransactionSigner<TAccountUserTransferAuthority>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -389,7 +389,7 @@ export interface FlashRepayReserveLiquidityInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   liquidityAmount: FlashRepayReserveLiquidityInstructionDataArgs["liquidityAmount"];
   borrowInstructionIndex: FlashRepayReserveLiquidityInstructionDataArgs["borrowInstructionIndex"];
-}
+};
 
 export function getFlashRepayReserveLiquidityInstruction<
   TAccountUserTransferAuthority extends string,
@@ -537,10 +537,10 @@ export function getFlashRepayReserveLiquidityInstruction<
   >);
 }
 
-export interface ParsedFlashRepayReserveLiquidityInstruction<
+export type ParsedFlashRepayReserveLiquidityInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     userTransferAuthority: TAccountMetas[0];
@@ -557,7 +557,7 @@ export interface ParsedFlashRepayReserveLiquidityInstruction<
     tokenProgram: TAccountMetas[11];
   };
   data: FlashRepayReserveLiquidityInstructionData;
-}
+};
 
 export function parseFlashRepayReserveLiquidityInstruction<
   TProgram extends string,

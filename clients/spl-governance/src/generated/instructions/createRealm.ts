@@ -6,48 +6,46 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RealmConfigParams,
-  RealmConfigParamsArgs,
-} from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRealmConfigParamsDecoder,
   getRealmConfigParamsEncoder,
+  type RealmConfigParams,
+  type RealmConfigParamsArgs,
 } from "../types/index.js";
 
 export const CREATE_REALM_DISCRIMINATOR = 0;
@@ -58,25 +56,30 @@ export function getCreateRealmDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateRealmInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountRealmAuthority extends string | AccountMeta = string,
-  TAccountCommunityTokenMint extends string | AccountMeta = string,
-  TAccountCommunityTokenHoldingAccount extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountRealmAuthority extends string | AccountMeta<string> = string,
+  TAccountCommunityTokenMint extends string | AccountMeta<string> = string,
+  TAccountCommunityTokenHoldingAccount extends string | AccountMeta<string> =
+    string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountCouncilTokenMint extends string | AccountMeta = string,
-  TAccountCouncilTokenHoldingAccount extends string | AccountMeta = string,
-  TAccountRealmConfig extends string | AccountMeta = string,
-  TAccountCommunityVoterWeightAddin extends string | AccountMeta = string,
-  TAccountMaxCommunityVoterWeightAddin extends string | AccountMeta = string,
-  TAccountCouncilVoterWeightAddin extends string | AccountMeta = string,
-  TAccountMaxCouncilVoterWeightAddin extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountCouncilTokenMint extends string | AccountMeta<string> = string,
+  TAccountCouncilTokenHoldingAccount extends string | AccountMeta<string> =
+    string,
+  TAccountRealmConfig extends string | AccountMeta<string> = string,
+  TAccountCommunityVoterWeightAddin extends string | AccountMeta<string> =
+    string,
+  TAccountMaxCommunityVoterWeightAddin extends string | AccountMeta<string> =
+    string,
+  TAccountCouncilVoterWeightAddin extends string | AccountMeta<string> = string,
+  TAccountMaxCouncilVoterWeightAddin extends string | AccountMeta<string> =
+    string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -131,16 +134,16 @@ export type CreateRealmInstruction<
     ]
   >;
 
-export interface CreateRealmInstructionData {
+export type CreateRealmInstructionData = {
   discriminator: number;
   name: string;
   configArgs: RealmConfigParams;
-}
+};
 
-export interface CreateRealmInstructionDataArgs {
+export type CreateRealmInstructionDataArgs = {
   name: string;
   configArgs: RealmConfigParamsArgs;
-}
+};
 
 export function getCreateRealmInstructionDataEncoder(): Encoder<CreateRealmInstructionDataArgs> {
   return transformEncoder(
@@ -171,7 +174,7 @@ export function getCreateRealmInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateRealmInput<
+export type CreateRealmInput<
   TAccountRealmAccount extends string = string,
   TAccountRealmAuthority extends string = string,
   TAccountCommunityTokenMint extends string = string,
@@ -187,7 +190,7 @@ export interface CreateRealmInput<
   TAccountMaxCommunityVoterWeightAddin extends string = string,
   TAccountCouncilVoterWeightAddin extends string = string,
   TAccountMaxCouncilVoterWeightAddin extends string = string,
-> {
+> = {
   /** Governance Realm account */
   realmAccount: Address<TAccountRealmAccount>;
   /** The authority of the Realm */
@@ -227,7 +230,7 @@ export interface CreateRealmInput<
   maxCouncilVoterWeightAddin?: Address<TAccountMaxCouncilVoterWeightAddin>;
   name: CreateRealmInstructionDataArgs["name"];
   configArgs: CreateRealmInstructionDataArgs["configArgs"];
-}
+};
 
 export function getCreateRealmInstruction<
   TAccountRealmAccount extends string,
@@ -412,10 +415,10 @@ export function getCreateRealmInstruction<
   >);
 }
 
-export interface ParsedCreateRealmInstruction<
+export type ParsedCreateRealmInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Governance Realm account */
@@ -457,7 +460,7 @@ export interface ParsedCreateRealmInstruction<
     maxCouncilVoterWeightAddin?: TAccountMetas[14] | undefined;
   };
   data: CreateRealmInstructionData;
-}
+};
 
 export function parseCreateRealmInstruction<
   TProgram extends string,

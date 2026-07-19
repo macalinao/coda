@@ -6,17 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum InstructionExecutionFlags {
-  None = 0,
-  Ordered = 1,
-  UseTransaction = 2,
+  None,
+  Ordered,
+  UseTransaction,
 }
 
 export type InstructionExecutionFlagsArgs = InstructionExecutionFlags;

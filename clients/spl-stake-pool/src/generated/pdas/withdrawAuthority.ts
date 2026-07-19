@@ -6,16 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface WithdrawAuthoritySeeds {
+export type WithdrawAuthoritySeeds = {
   stakePoolAddress: Address;
-}
+};
 
 export async function findWithdrawAuthorityPda(
   seeds: WithdrawAuthoritySeeds,

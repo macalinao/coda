@@ -6,18 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface TokenOwnerRecordSeeds {
+export type TokenOwnerRecordSeeds = {
   realm: Address;
   governingTokenMint: Address;
   governingTokenOwner: Address;
-}
+};
 
 /** Token owner's record within a realm */
 export async function findTokenOwnerRecordPda(

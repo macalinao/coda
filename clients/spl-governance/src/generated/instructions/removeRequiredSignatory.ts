@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,8 +15,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REMOVE_REQUIRED_SIGNATORY_DISCRIMINATOR = 30;
@@ -43,10 +43,11 @@ export function getRemoveRequiredSignatoryDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type RemoveRequiredSignatoryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountRequiredSignatoryAccount extends string | AccountMeta = string,
-  TAccountBeneficiaryAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountRequiredSignatoryAccount extends string | AccountMeta<string> =
+    string,
+  TAccountBeneficiaryAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -65,9 +66,7 @@ export type RemoveRequiredSignatoryInstruction<
     ]
   >;
 
-export interface RemoveRequiredSignatoryInstructionData {
-  discriminator: number;
-}
+export type RemoveRequiredSignatoryInstructionData = { discriminator: number };
 
 export type RemoveRequiredSignatoryInstructionDataArgs = {};
 
@@ -95,16 +94,16 @@ export function getRemoveRequiredSignatoryInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface RemoveRequiredSignatoryInput<
+export type RemoveRequiredSignatoryInput<
   TAccountGovernanceAccount extends string = string,
   TAccountRequiredSignatoryAccount extends string = string,
   TAccountBeneficiaryAccount extends string = string,
-> {
+> = {
   governanceAccount: TransactionSigner<TAccountGovernanceAccount>;
   requiredSignatoryAccount: Address<TAccountRequiredSignatoryAccount>;
   /** Beneficiary Account which would receive lamports from the disposed RequiredSignatory Account */
   beneficiaryAccount: Address<TAccountBeneficiaryAccount>;
-}
+};
 
 export function getRemoveRequiredSignatoryInstruction<
   TAccountGovernanceAccount extends string,
@@ -168,10 +167,10 @@ export function getRemoveRequiredSignatoryInstruction<
   >);
 }
 
-export interface ParsedRemoveRequiredSignatoryInstruction<
+export type ParsedRemoveRequiredSignatoryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governanceAccount: TAccountMetas[0];
@@ -180,7 +179,7 @@ export interface ParsedRemoveRequiredSignatoryInstruction<
     beneficiaryAccount: TAccountMetas[2];
   };
   data: RemoveRequiredSignatoryInstructionData;
-}
+};
 
 export function parseRemoveRequiredSignatoryInstruction<
   TProgram extends string,

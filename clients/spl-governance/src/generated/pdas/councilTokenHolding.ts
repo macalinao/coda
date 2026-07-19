@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface CouncilTokenHoldingSeeds {
+export type CouncilTokenHoldingSeeds = {
   realm: Address;
   councilMint: Address;
-}
+};
 
 /** Council token holding account of a realm */
 export async function findCouncilTokenHoldingPda(

@@ -6,12 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getI64Decoder,
+  getI64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getI64Decoder, getI64Encoder } from "@solana/kit";
 
 export type UnixTimestamp = bigint;
 

@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_ANNUAL_REWARDS_DISCRIMINATOR: ReadonlyUint8Array =
@@ -68,14 +68,12 @@ export type SetAnnualRewardsInstruction<
     ]
   >;
 
-export interface SetAnnualRewardsInstructionData {
+export type SetAnnualRewardsInstructionData = {
   discriminator: ReadonlyUint8Array;
   newRate: bigint;
-}
+};
 
-export interface SetAnnualRewardsInstructionDataArgs {
-  newRate: number | bigint;
-}
+export type SetAnnualRewardsInstructionDataArgs = { newRate: number | bigint };
 
 export function getSetAnnualRewardsInstructionDataEncoder(): FixedSizeEncoder<SetAnnualRewardsInstructionDataArgs> {
   return transformEncoder(
@@ -104,14 +102,14 @@ export function getSetAnnualRewardsInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetAnnualRewardsInput<
+export type SetAnnualRewardsInput<
   TAccountAuthority extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   rewarder: Address<TAccountRewarder>;
   newRate: SetAnnualRewardsInstructionDataArgs["newRate"];
-}
+};
 
 export function getSetAnnualRewardsInstruction<
   TAccountAuthority extends string,
@@ -158,17 +156,17 @@ export function getSetAnnualRewardsInstruction<
   >);
 }
 
-export interface ParsedSetAnnualRewardsInstruction<
+export type ParsedSetAnnualRewardsInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     authority: TAccountMetas[0];
     rewarder: TAccountMetas[1];
   };
   data: SetAnnualRewardsInstructionData;
-}
+};
 
 export function parseSetAnnualRewardsInstruction<
   TProgram extends string,

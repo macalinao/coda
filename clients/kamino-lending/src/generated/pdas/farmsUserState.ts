@@ -6,18 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface FarmsUserStateSeeds {
+export type FarmsUserStateSeeds = {
   farmState: Address;
   /** The user who is farming. This is sometimes the obligation in the case of delegated farms. */
   owner: Address;
-}
+};
 
 export async function findFarmsUserStatePda(
   seeds: FarmsUserStateSeeds,

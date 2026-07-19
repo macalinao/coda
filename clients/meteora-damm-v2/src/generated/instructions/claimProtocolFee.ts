@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,10 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findClaimFeeOperatorPda,
@@ -131,16 +129,16 @@ export type ClaimProtocolFeeInstruction<
     ]
   >;
 
-export interface ClaimProtocolFeeInstructionData {
+export type ClaimProtocolFeeInstructionData = {
   discriminator: ReadonlyUint8Array;
   maxAmountA: bigint;
   maxAmountB: bigint;
-}
+};
 
-export interface ClaimProtocolFeeInstructionDataArgs {
+export type ClaimProtocolFeeInstructionDataArgs = {
   maxAmountA: number | bigint;
   maxAmountB: number | bigint;
-}
+};
 
 export function getClaimProtocolFeeInstructionDataEncoder(): FixedSizeEncoder<ClaimProtocolFeeInstructionDataArgs> {
   return transformEncoder(
@@ -171,7 +169,7 @@ export function getClaimProtocolFeeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClaimProtocolFeeAsyncInput<
+export type ClaimProtocolFeeAsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountTokenAVault extends string = string,
@@ -186,7 +184,7 @@ export interface ClaimProtocolFeeAsyncInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   /** The vault token account for input token */
@@ -213,7 +211,7 @@ export interface ClaimProtocolFeeAsyncInput<
   program?: Address<TAccountProgram>;
   maxAmountA: ClaimProtocolFeeInstructionDataArgs["maxAmountA"];
   maxAmountB: ClaimProtocolFeeInstructionDataArgs["maxAmountB"];
-}
+};
 
 export async function getClaimProtocolFeeInstructionAsync<
   TAccountPoolAuthority extends string,
@@ -446,7 +444,7 @@ export async function getClaimProtocolFeeInstructionAsync<
   >);
 }
 
-export interface ClaimProtocolFeeInput<
+export type ClaimProtocolFeeInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountTokenAVault extends string = string,
@@ -461,7 +459,7 @@ export interface ClaimProtocolFeeInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   /** The vault token account for input token */
@@ -488,7 +486,7 @@ export interface ClaimProtocolFeeInput<
   program?: Address<TAccountProgram>;
   maxAmountA: ClaimProtocolFeeInstructionDataArgs["maxAmountA"];
   maxAmountB: ClaimProtocolFeeInstructionDataArgs["maxAmountB"];
-}
+};
 
 export function getClaimProtocolFeeInstruction<
   TAccountPoolAuthority extends string,
@@ -627,10 +625,10 @@ export function getClaimProtocolFeeInstruction<
   >);
 }
 
-export interface ParsedClaimProtocolFeeInstruction<
+export type ParsedClaimProtocolFeeInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -659,7 +657,7 @@ export interface ParsedClaimProtocolFeeInstruction<
     program: TAccountMetas[13];
   };
   data: ClaimProtocolFeeInstructionData;
-}
+};
 
 export function parseClaimProtocolFeeInstruction<
   TProgram extends string,

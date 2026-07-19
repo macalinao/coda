@@ -6,19 +6,21 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum LockupKind {
-  None = 0,
-  Daily = 1,
-  Monthly = 2,
-  Cliff = 3,
-  Constant = 4,
+  None,
+  Daily,
+  Monthly,
+  Cliff,
+  Constant,
 }
 
 export type LockupKindArgs = LockupKind;

@@ -6,35 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum FarmConfigOption {
-  UpdateRewardRps = 0,
-  UpdateRewardMinClaimDuration = 1,
-  WithdrawAuthority = 2,
-  DepositWarmupPeriod = 3,
-  WithdrawCooldownPeriod = 4,
-  RewardType = 5,
-  RpsDecimals = 6,
-  LockingMode = 7,
-  LockingStartTimestamp = 8,
-  LockingDuration = 9,
-  LockingEarlyWithdrawalPenaltyBps = 10,
-  DepositCapAmount = 11,
-  SlashedAmountSpillAddress = 12,
-  ScopePricesAccount = 13,
-  ScopeOraclePriceId = 14,
-  ScopeOracleMaxAge = 15,
-  UpdateRewardScheduleCurvePoints = 16,
-  UpdatePendingFarmAdmin = 17,
-  UpdateStrategyId = 18,
-  UpdateDelegatedRpsAdmin = 19,
-  UpdateVaultId = 20,
+  UpdateRewardRps,
+  UpdateRewardMinClaimDuration,
+  WithdrawAuthority,
+  DepositWarmupPeriod,
+  WithdrawCooldownPeriod,
+  RewardType,
+  RpsDecimals,
+  LockingMode,
+  LockingStartTimestamp,
+  LockingDuration,
+  LockingEarlyWithdrawalPenaltyBps,
+  DepositCapAmount,
+  SlashedAmountSpillAddress,
+  ScopePricesAccount,
+  ScopeOraclePriceId,
+  ScopeOracleMaxAge,
+  UpdateRewardScheduleCurvePoints,
+  UpdatePendingFarmAdmin,
+  UpdateStrategyId,
+  UpdateDelegatedRpsAdmin,
+  UpdateVaultId,
 }
 
 export type FarmConfigOptionArgs = FarmConfigOption;

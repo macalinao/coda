@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -46,8 +27,27 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CONFIGURE_VOTING_MINT_DISCRIMINATOR: ReadonlyUint8Array =
@@ -61,10 +61,10 @@ export function getConfigureVotingMintDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ConfigureVotingMintInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountRealmAuthority extends string | AccountMeta = string,
-  TAccountMint extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountRealmAuthority extends string | AccountMeta<string> = string,
+  TAccountMint extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,7 +83,7 @@ export type ConfigureVotingMintInstruction<
     ]
   >;
 
-export interface ConfigureVotingMintInstructionData {
+export type ConfigureVotingMintInstructionData = {
   discriminator: ReadonlyUint8Array;
   idx: number;
   digitShift: number;
@@ -91,16 +91,16 @@ export interface ConfigureVotingMintInstructionData {
   maxExtraLockupVoteWeightScaledFactor: bigint;
   lockupSaturationSecs: bigint;
   grantAuthority: Option<Address>;
-}
+};
 
-export interface ConfigureVotingMintInstructionDataArgs {
+export type ConfigureVotingMintInstructionDataArgs = {
   idx: number;
   digitShift: number;
   baselineVoteWeightScaledFactor: number | bigint;
   maxExtraLockupVoteWeightScaledFactor: number | bigint;
   lockupSaturationSecs: number | bigint;
   grantAuthority: OptionOrNullable<Address>;
-}
+};
 
 export function getConfigureVotingMintInstructionDataEncoder(): Encoder<ConfigureVotingMintInstructionDataArgs> {
   return transformEncoder(
@@ -142,11 +142,11 @@ export function getConfigureVotingMintInstructionDataCodec(): Codec<
   );
 }
 
-export interface ConfigureVotingMintInput<
+export type ConfigureVotingMintInput<
   TAccountRegistrar extends string = string,
   TAccountRealmAuthority extends string = string,
   TAccountMint extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
   mint: Address<TAccountMint>;
@@ -156,7 +156,7 @@ export interface ConfigureVotingMintInput<
   maxExtraLockupVoteWeightScaledFactor: ConfigureVotingMintInstructionDataArgs["maxExtraLockupVoteWeightScaledFactor"];
   lockupSaturationSecs: ConfigureVotingMintInstructionDataArgs["lockupSaturationSecs"];
   grantAuthority: ConfigureVotingMintInstructionDataArgs["grantAuthority"];
-}
+};
 
 export function getConfigureVotingMintInstruction<
   TAccountRegistrar extends string,
@@ -213,10 +213,10 @@ export function getConfigureVotingMintInstruction<
   >);
 }
 
-export interface ParsedConfigureVotingMintInstruction<
+export type ParsedConfigureVotingMintInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -224,7 +224,7 @@ export interface ParsedConfigureVotingMintInstruction<
     mint: TAccountMetas[2];
   };
   data: ConfigureVotingMintInstructionData;
-}
+};
 
 export function parseConfigureVotingMintInstruction<
   TProgram extends string,

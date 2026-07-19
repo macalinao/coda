@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -29,8 +15,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CLEANUP_REMOVED_VALIDATOR_ENTRIES_DISCRIMINATOR = 8;
@@ -41,9 +41,9 @@ export function getCleanupRemovedValidatorEntriesDiscriminatorBytes(): ReadonlyU
 
 export type CleanupRemovedValidatorEntriesInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -58,9 +58,9 @@ export type CleanupRemovedValidatorEntriesInstruction<
     ]
   >;
 
-export interface CleanupRemovedValidatorEntriesInstructionData {
+export type CleanupRemovedValidatorEntriesInstructionData = {
   discriminator: number;
-}
+};
 
 export type CleanupRemovedValidatorEntriesInstructionDataArgs = {};
 
@@ -88,14 +88,19 @@ export function getCleanupRemovedValidatorEntriesInstructionDataCodec(): FixedSi
   );
 }
 
-export interface CleanupRemovedValidatorEntriesInput<
+export type CleanupRemovedValidatorEntriesInput<
   TAccountStakePool extends string = string,
   TAccountValidatorList extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   validatorList: Address<TAccountValidatorList>;
-}
+};
 
+/**
+ * Cleans up validator stake account entries marked as `ReadyForRemoval`
+ * 0. `[]` Stake pool
+ * 1. `[w]` Validator stake list storage account
+ */
 export function getCleanupRemovedValidatorEntriesInstruction<
   TAccountStakePool extends string,
   TAccountValidatorList extends string,
@@ -140,17 +145,17 @@ export function getCleanupRemovedValidatorEntriesInstruction<
   >);
 }
 
-export interface ParsedCleanupRemovedValidatorEntriesInstruction<
+export type ParsedCleanupRemovedValidatorEntriesInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
     validatorList: TAccountMetas[1];
   };
   data: CleanupRemovedValidatorEntriesInstructionData;
-}
+};
 
 export function parseCleanupRemovedValidatorEntriesInstruction<
   TProgram extends string,

@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,21 +16,25 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface FarmsTokenInfo {
+export type FarmsTokenInfo = {
   mint: Address;
   decimals: bigint;
   tokenProgram: Address;
-  padding: bigint[];
-}
+  padding: Array<bigint>;
+};
 
-export interface FarmsTokenInfoArgs {
+export type FarmsTokenInfoArgs = {
   mint: Address;
   decimals: number | bigint;
   tokenProgram: Address;
   padding: Array<number | bigint>;
-}
+};
 
 export function getFarmsTokenInfoEncoder(): FixedSizeEncoder<FarmsTokenInfoArgs> {
   return getStructEncoder([

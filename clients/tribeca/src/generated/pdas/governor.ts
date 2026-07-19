@@ -6,16 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface GovernorSeeds {
+export type GovernorSeeds = {
   base: Address;
-}
+};
 
 /** Governor account that manages proposals and voting */
 export async function findGovernorPda(

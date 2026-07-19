@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,23 +48,23 @@ export function getWithdrawStakeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawStakeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountSourceStakeAccount extends string | AccountMeta = string,
-  TAccountDestinationStakeAccount extends string | AccountMeta = string,
-  TAccountNewWithdrawAuthority extends string | AccountMeta = string,
-  TAccountUserTransferAuthority extends string | AccountMeta = string,
-  TAccountUserPoolTokenAccount extends string | AccountMeta = string,
-  TAccountFeeAccount extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountSourceStakeAccount extends string | AccountMeta<string> = string,
+  TAccountDestinationStakeAccount extends string | AccountMeta<string> = string,
+  TAccountNewWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountUserTransferAuthority extends string | AccountMeta<string> = string,
+  TAccountUserPoolTokenAccount extends string | AccountMeta<string> = string,
+  TAccountFeeAccount extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -115,14 +113,12 @@ export type WithdrawStakeInstruction<
     ]
   >;
 
-export interface WithdrawStakeInstructionData {
+export type WithdrawStakeInstructionData = {
   discriminator: number;
   args: bigint;
-}
+};
 
-export interface WithdrawStakeInstructionDataArgs {
-  args: number | bigint;
-}
+export type WithdrawStakeInstructionDataArgs = { args: number | bigint };
 
 export function getWithdrawStakeInstructionDataEncoder(): FixedSizeEncoder<WithdrawStakeInstructionDataArgs> {
   return transformEncoder(
@@ -151,7 +147,7 @@ export function getWithdrawStakeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawStakeAsyncInput<
+export type WithdrawStakeAsyncInput<
   TAccountStakePool extends string = string,
   TAccountValidatorList extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -165,7 +161,7 @@ export interface WithdrawStakeAsyncInput<
   TAccountClockSysvar extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Validator list */
@@ -193,8 +189,40 @@ export interface WithdrawStakeAsyncInput<
   /** Stake program */
   stakeProgram?: Address<TAccountStakeProgram>;
   args: WithdrawStakeInstructionDataArgs["args"];
-}
+};
 
+/**
+ * Withdraw the token from the pool at the current ratio.
+ * Succeeds if the stake account has enough SOL to cover the desired
+ * amount of pool tokens, and if the withdrawal keeps the total
+ * staked amount above the minimum of rent-exempt amount plus `max(
+ * crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation()
+ * )`.
+ * When allowing withdrawals, the order of priority goes:
+ * * preferred withdraw validator stake account (if set)
+ * * validator stake accounts
+ * * transient stake accounts
+ * * reserve stake account OR totally remove validator stake accounts
+ * A user can freely withdraw from a validator stake account, and if they
+ * are all at the minimum, then they can withdraw from transient stake
+ * accounts, and if they are all at minimum, then they can withdraw from
+ * the reserve or remove any validator from the pool.
+ * 0. `[w]` Stake pool
+ * 1. `[w]` Validator stake list storage account
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator or reserve stake account to split
+ * 4. `[w]` Uninitialized stake account to receive withdrawal
+ * 5. `[]` User account to set as a new withdraw authority
+ * 6. `[s]` User transfer authority, for pool token account
+ * 7. `[w]` User account with pool tokens to burn from
+ * 8. `[w]` Account to receive pool fee tokens
+ * 9. `[w]` Pool token mint account
+ * 10. `[]` Sysvar clock account (required)
+ * 11. `[]` Pool token program id
+ * 12. `[]` Stake program id,
+ * User data: amount of pool tokens to withdraw
+ */
 export async function getWithdrawStakeInstructionAsync<
   TAccountStakePool extends string,
   TAccountValidatorList extends string,
@@ -355,7 +383,7 @@ export async function getWithdrawStakeInstructionAsync<
   >);
 }
 
-export interface WithdrawStakeInput<
+export type WithdrawStakeInput<
   TAccountStakePool extends string = string,
   TAccountValidatorList extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -369,7 +397,7 @@ export interface WithdrawStakeInput<
   TAccountClockSysvar extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Validator list */
@@ -397,8 +425,40 @@ export interface WithdrawStakeInput<
   /** Stake program */
   stakeProgram?: Address<TAccountStakeProgram>;
   args: WithdrawStakeInstructionDataArgs["args"];
-}
+};
 
+/**
+ * Withdraw the token from the pool at the current ratio.
+ * Succeeds if the stake account has enough SOL to cover the desired
+ * amount of pool tokens, and if the withdrawal keeps the total
+ * staked amount above the minimum of rent-exempt amount plus `max(
+ * crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation()
+ * )`.
+ * When allowing withdrawals, the order of priority goes:
+ * * preferred withdraw validator stake account (if set)
+ * * validator stake accounts
+ * * transient stake accounts
+ * * reserve stake account OR totally remove validator stake accounts
+ * A user can freely withdraw from a validator stake account, and if they
+ * are all at the minimum, then they can withdraw from transient stake
+ * accounts, and if they are all at minimum, then they can withdraw from
+ * the reserve or remove any validator from the pool.
+ * 0. `[w]` Stake pool
+ * 1. `[w]` Validator stake list storage account
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator or reserve stake account to split
+ * 4. `[w]` Uninitialized stake account to receive withdrawal
+ * 5. `[]` User account to set as a new withdraw authority
+ * 6. `[s]` User transfer authority, for pool token account
+ * 7. `[w]` User account with pool tokens to burn from
+ * 8. `[w]` Account to receive pool fee tokens
+ * 9. `[w]` Pool token mint account
+ * 10. `[]` Sysvar clock account (required)
+ * 11. `[]` Pool token program id
+ * 12. `[]` Stake program id,
+ * User data: amount of pool tokens to withdraw
+ */
 export function getWithdrawStakeInstruction<
   TAccountStakePool extends string,
   TAccountValidatorList extends string,
@@ -549,10 +609,10 @@ export function getWithdrawStakeInstruction<
   >);
 }
 
-export interface ParsedWithdrawStakeInstruction<
+export type ParsedWithdrawStakeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -583,7 +643,7 @@ export interface ParsedWithdrawStakeInstruction<
     stakeProgram: TAccountMetas[12];
   };
   data: WithdrawStakeInstructionData;
-}
+};
 
 export function parseWithdrawStakeInstruction<
   TProgram extends string,

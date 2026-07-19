@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -37,10 +20,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMergeMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -93,9 +91,9 @@ export type WithdrawTokensMMInstruction<
     ]
   >;
 
-export interface WithdrawTokensMMInstructionData {
+export type WithdrawTokensMMInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type WithdrawTokensMMInstructionDataArgs = {};
 
@@ -122,7 +120,7 @@ export function getWithdrawTokensMMInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawTokensMMAsyncInput<
+export type WithdrawTokensMMAsyncInput<
   TAccountOwner extends string = string,
   TAccountPool extends string = string,
   TAccountMm extends string = string,
@@ -130,7 +128,7 @@ export interface WithdrawTokensMMAsyncInput<
   TAccountMmTokenAccount extends string = string,
   TAccountTokenDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   pool: Address<TAccountPool>;
   mm?: Address<TAccountMm>;
@@ -138,7 +136,7 @@ export interface WithdrawTokensMMAsyncInput<
   mmTokenAccount?: Address<TAccountMmTokenAccount>;
   tokenDestination: Address<TAccountTokenDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export async function getWithdrawTokensMMInstructionAsync<
   TAccountOwner extends string,
@@ -257,7 +255,7 @@ export async function getWithdrawTokensMMInstructionAsync<
   >);
 }
 
-export interface WithdrawTokensMMInput<
+export type WithdrawTokensMMInput<
   TAccountOwner extends string = string,
   TAccountPool extends string = string,
   TAccountMm extends string = string,
@@ -265,7 +263,7 @@ export interface WithdrawTokensMMInput<
   TAccountMmTokenAccount extends string = string,
   TAccountTokenDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   pool: Address<TAccountPool>;
   mm: Address<TAccountMm>;
@@ -273,7 +271,7 @@ export interface WithdrawTokensMMInput<
   mmTokenAccount: Address<TAccountMmTokenAccount>;
   tokenDestination: Address<TAccountTokenDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getWithdrawTokensMMInstruction<
   TAccountOwner extends string,
@@ -358,10 +356,10 @@ export function getWithdrawTokensMMInstruction<
   >);
 }
 
-export interface ParsedWithdrawTokensMMInstruction<
+export type ParsedWithdrawTokensMMInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -373,7 +371,7 @@ export interface ParsedWithdrawTokensMMInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: WithdrawTokensMMInstructionData;
-}
+};
 
 export function parseWithdrawTokensMMInstruction<
   TProgram extends string,

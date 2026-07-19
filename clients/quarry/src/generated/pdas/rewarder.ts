@@ -6,16 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface RewarderSeeds {
+export type RewarderSeeds = {
   base: Address;
-}
+};
 
 /** Rewarder account that manages reward distribution for quarries */
 export async function findRewarderPda(

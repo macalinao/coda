@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const COLLECT_PROTOCOL_FEES_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,16 +49,17 @@ export function getCollectProtocolFeesDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CollectProtocolFeesInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountCollectProtocolFeesAuthority extends string | AccountMeta = string,
-  TAccountTokenVaultA extends string | AccountMeta = string,
-  TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTokenDestinationA extends string | AccountMeta = string,
-  TAccountTokenDestinationB extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountCollectProtocolFeesAuthority extends string | AccountMeta<string> =
+    string,
+  TAccountTokenVaultA extends string | AccountMeta<string> = string,
+  TAccountTokenVaultB extends string | AccountMeta<string> = string,
+  TAccountTokenDestinationA extends string | AccountMeta<string> = string,
+  TAccountTokenDestinationB extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -92,9 +93,9 @@ export type CollectProtocolFeesInstruction<
     ]
   >;
 
-export interface CollectProtocolFeesInstructionData {
+export type CollectProtocolFeesInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type CollectProtocolFeesInstructionDataArgs = {};
 
@@ -124,7 +125,7 @@ export function getCollectProtocolFeesInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CollectProtocolFeesInput<
+export type CollectProtocolFeesInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountWhirlpool extends string = string,
   TAccountCollectProtocolFeesAuthority extends string = string,
@@ -133,7 +134,7 @@ export interface CollectProtocolFeesInput<
   TAccountTokenDestinationA extends string = string,
   TAccountTokenDestinationB extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   whirlpool: Address<TAccountWhirlpool>;
   collectProtocolFeesAuthority: TransactionSigner<TAccountCollectProtocolFeesAuthority>;
@@ -142,7 +143,7 @@ export interface CollectProtocolFeesInput<
   tokenDestinationA: Address<TAccountTokenDestinationA>;
   tokenDestinationB: Address<TAccountTokenDestinationB>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getCollectProtocolFeesInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -244,10 +245,10 @@ export function getCollectProtocolFeesInstruction<
   >);
 }
 
-export interface ParsedCollectProtocolFeesInstruction<
+export type ParsedCollectProtocolFeesInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -260,7 +261,7 @@ export interface ParsedCollectProtocolFeesInstruction<
     tokenProgram: TAccountMetas[7];
   };
   data: CollectProtocolFeesInstructionData;
-}
+};
 
 export function parseCollectProtocolFeesInstruction<
   TProgram extends string,

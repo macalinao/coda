@@ -6,21 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /**
@@ -30,7 +28,7 @@ import {
  * and referral fee. The fees are paid out as a percentage of liquidity token amounts during
  * repayments and liquidations.
  */
-export interface ReserveFees {
+export type ReserveFees = {
   /**
    * Fee assessed on `BorrowObligationLiquidity`, as scaled fraction (60 bits fractional part)
    * Must be between `0` and `2^60`, such that `2^60 = 1`.  A few examples for
@@ -46,10 +44,10 @@ export interface ReserveFees {
    */
   flashLoanFeeSf: bigint;
   /** Used for allignment */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
-export interface ReserveFeesArgs {
+export type ReserveFeesArgs = {
   /**
    * Fee assessed on `BorrowObligationLiquidity`, as scaled fraction (60 bits fractional part)
    * Must be between `0` and `2^60`, such that `2^60 = 1`.  A few examples for
@@ -65,8 +63,8 @@ export interface ReserveFeesArgs {
    */
   flashLoanFeeSf: number | bigint;
   /** Used for allignment */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
 export function getReserveFeesEncoder(): FixedSizeEncoder<ReserveFeesArgs> {
   return getStructEncoder([

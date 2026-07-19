@@ -6,37 +6,35 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getBooleanDecoder,
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -49,17 +47,17 @@ export function getUpdateValidatorListBalanceDiscriminatorBytes(): ReadonlyUint8
 
 export type UpdateValidatorListBalanceInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends string | AccountMeta =
+  TAccountStakeHistorySysvar extends string | AccountMeta<string> =
     "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -89,16 +87,16 @@ export type UpdateValidatorListBalanceInstruction<
     ]
   >;
 
-export interface UpdateValidatorListBalanceInstructionData {
+export type UpdateValidatorListBalanceInstructionData = {
   discriminator: number;
   startIndex: number;
   noMerge: boolean;
-}
+};
 
-export interface UpdateValidatorListBalanceInstructionDataArgs {
+export type UpdateValidatorListBalanceInstructionDataArgs = {
   startIndex: number;
   noMerge: boolean;
-}
+};
 
 export function getUpdateValidatorListBalanceInstructionDataEncoder(): FixedSizeEncoder<UpdateValidatorListBalanceInstructionDataArgs> {
   return transformEncoder(
@@ -132,7 +130,7 @@ export function getUpdateValidatorListBalanceInstructionDataCodec(): FixedSizeCo
   );
 }
 
-export interface UpdateValidatorListBalanceAsyncInput<
+export type UpdateValidatorListBalanceAsyncInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountValidatorList extends string = string,
@@ -140,7 +138,7 @@ export interface UpdateValidatorListBalanceAsyncInput<
   TAccountClockSysvar extends string = string,
   TAccountStakeHistorySysvar extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
   validatorList: Address<TAccountValidatorList>;
@@ -150,8 +148,25 @@ export interface UpdateValidatorListBalanceAsyncInput<
   stakeProgram?: Address<TAccountStakeProgram>;
   startIndex: UpdateValidatorListBalanceInstructionDataArgs["startIndex"];
   noMerge: UpdateValidatorListBalanceInstructionDataArgs["noMerge"];
-}
+};
 
+/**
+ * Updates balances of validator and transient stake accounts in the pool
+ * While going through the pairs of validator and transient stake
+ * accounts, if the transient stake is inactive, it is merged into the
+ * reserve stake account. If the transient stake is active and has
+ * matching credits observed, it is merged into the canonical
+ * validator stake account. In all other states, nothing is done, and
+ * the balance is simply added to the canonical stake account balance.
+ * 0. `[]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Validator stake list storage account
+ * 3. `[w]` Reserve stake account
+ * 4. `[]` Sysvar clock
+ * 5. `[]` Sysvar stake history
+ * 6. `[]` Stake program
+ * 7. `..7+2N` [] N pairs of validator and transient stake accounts
+ */
 export async function getUpdateValidatorListBalanceInstructionAsync<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -261,7 +276,7 @@ export async function getUpdateValidatorListBalanceInstructionAsync<
   >);
 }
 
-export interface UpdateValidatorListBalanceInput<
+export type UpdateValidatorListBalanceInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountValidatorList extends string = string,
@@ -269,7 +284,7 @@ export interface UpdateValidatorListBalanceInput<
   TAccountClockSysvar extends string = string,
   TAccountStakeHistorySysvar extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   withdrawAuthority: Address<TAccountWithdrawAuthority>;
   validatorList: Address<TAccountValidatorList>;
@@ -279,8 +294,25 @@ export interface UpdateValidatorListBalanceInput<
   stakeProgram?: Address<TAccountStakeProgram>;
   startIndex: UpdateValidatorListBalanceInstructionDataArgs["startIndex"];
   noMerge: UpdateValidatorListBalanceInstructionDataArgs["noMerge"];
-}
+};
 
+/**
+ * Updates balances of validator and transient stake accounts in the pool
+ * While going through the pairs of validator and transient stake
+ * accounts, if the transient stake is inactive, it is merged into the
+ * reserve stake account. If the transient stake is active and has
+ * matching credits observed, it is merged into the canonical
+ * validator stake account. In all other states, nothing is done, and
+ * the balance is simply added to the canonical stake account balance.
+ * 0. `[]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Validator stake list storage account
+ * 3. `[w]` Reserve stake account
+ * 4. `[]` Sysvar clock
+ * 5. `[]` Sysvar stake history
+ * 6. `[]` Stake program
+ * 7. `..7+2N` [] N pairs of validator and transient stake accounts
+ */
 export function getUpdateValidatorListBalanceInstruction<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -380,10 +412,10 @@ export function getUpdateValidatorListBalanceInstruction<
   >);
 }
 
-export interface ParsedUpdateValidatorListBalanceInstruction<
+export type ParsedUpdateValidatorListBalanceInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -395,7 +427,7 @@ export interface ParsedUpdateValidatorListBalanceInstruction<
     stakeProgram: TAccountMetas[6];
   };
   data: UpdateValidatorListBalanceInstructionData;
-}
+};
 
 export function parseUpdateValidatorListBalanceInstruction<
   TProgram extends string,

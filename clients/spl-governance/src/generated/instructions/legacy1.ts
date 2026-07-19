@@ -6,17 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
@@ -24,6 +13,15 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -35,14 +33,12 @@ export function getLegacy1DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type Legacy1Instruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<TRemainingAccounts>;
 
-export interface Legacy1InstructionData {
-  discriminator: number;
-}
+export type Legacy1InstructionData = { discriminator: number };
 
 export type Legacy1InstructionDataArgs = {};
 
@@ -84,12 +80,9 @@ export function getLegacy1Instruction<
   } as Legacy1Instruction<TProgramAddress>);
 }
 
-export interface ParsedLegacy1Instruction<
+export type ParsedLegacy1Instruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-> {
-  programAddress: Address<TProgram>;
-  data: Legacy1InstructionData;
-}
+> = { programAddress: Address<TProgram>; data: Legacy1InstructionData };
 
 export function parseLegacy1Instruction<TProgram extends string>(
   instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,

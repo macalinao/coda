@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,28 +48,29 @@ export function getRedelegateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RedelegateInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountStaker extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountSourceCanonicalStake extends string | AccountMeta = string,
-  TAccountSourceTransientStake extends string | AccountMeta = string,
-  TAccountEphemeralStake extends string | AccountMeta = string,
-  TAccountDestinationTransientStake extends string | AccountMeta = string,
-  TAccountDestinationStake extends string | AccountMeta = string,
-  TAccountDestinationVote extends string | AccountMeta = string,
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountStaker extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountSourceCanonicalStake extends string | AccountMeta<string> = string,
+  TAccountSourceTransientStake extends string | AccountMeta<string> = string,
+  TAccountEphemeralStake extends string | AccountMeta<string> = string,
+  TAccountDestinationTransientStake extends string | AccountMeta<string> =
+    string,
+  TAccountDestinationStake extends string | AccountMeta<string> = string,
+  TAccountDestinationVote extends string | AccountMeta<string> = string,
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends string | AccountMeta =
+  TAccountStakeHistorySysvar extends string | AccountMeta<string> =
     "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeConfigSysvar extends string | AccountMeta =
+  TAccountStakeConfigSysvar extends string | AccountMeta<string> =
     "StakeConfig11111111111111111111111111111111",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -129,20 +128,20 @@ export type RedelegateInstruction<
     ]
   >;
 
-export interface RedelegateInstructionData {
+export type RedelegateInstructionData = {
   discriminator: number;
   lamports: bigint;
   sourceTransientStakeSeed: bigint;
   ephemeralStakeSeed: bigint;
   destinationTransientStakeSeed: bigint;
-}
+};
 
-export interface RedelegateInstructionDataArgs {
+export type RedelegateInstructionDataArgs = {
   lamports: number | bigint;
   sourceTransientStakeSeed: number | bigint;
   ephemeralStakeSeed: number | bigint;
   destinationTransientStakeSeed: number | bigint;
-}
+};
 
 export function getRedelegateInstructionDataEncoder(): FixedSizeEncoder<RedelegateInstructionDataArgs> {
   return transformEncoder(
@@ -177,7 +176,7 @@ export function getRedelegateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RedelegateAsyncInput<
+export type RedelegateAsyncInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -194,7 +193,7 @@ export interface RedelegateAsyncInput<
   TAccountStakeConfigSysvar extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   staker: TransactionSigner<TAccountStaker>;
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
@@ -215,8 +214,53 @@ export interface RedelegateAsyncInput<
   sourceTransientStakeSeed: RedelegateInstructionDataArgs["sourceTransientStakeSeed"];
   ephemeralStakeSeed: RedelegateInstructionDataArgs["ephemeralStakeSeed"];
   destinationTransientStakeSeed: RedelegateInstructionDataArgs["destinationTransientStakeSeed"];
-}
+};
 
+/**
+ * (Staker only) Redelegate active stake on a validator, eventually moving
+ * it to another
+ * Internally, this instruction splits a validator stake account into its
+ * corresponding transient stake account, redelegates it to an ephemeral
+ * stake account, then merges that stake into the destination transient
+ * stake account.
+ * In order to rebalance the pool without taking custody, the staker needs
+ * a way of reducing the stake on a stake account. This instruction splits
+ * some amount of stake, up to the total activated stake, from the
+ * canonical validator stake account, into its "transient" stake
+ * account.
+ * The instruction only succeeds if the source transient stake account and
+ * ephemeral stake account do not exist.
+ * The amount of lamports to move must be at least rent-exemption plus the
+ * minimum delegation amount. Rent-exemption plus minimum delegation
+ * is required for the destination ephemeral stake account.
+ * The rent-exemption for the source transient account comes from the stake
+ * pool reserve, if needed.
+ * The amount that arrives at the destination validator in the end is
+ * `redelegate_lamports - rent_exemption` if the destination transient
+ * account does *not* exist, and `redelegate_lamports` if the destination
+ * transient account already exists. The `rent_exemption` is not activated
+ * when creating the destination transient stake account, but if it already
+ * exists, then the full amount is delegated.
+ * 0. `[]` Stake pool
+ * 1. `[s]` Stake pool staker
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator list
+ * 4. `[w]` Reserve stake account, to withdraw rent exempt reserve
+ * 5. `[w]` Source canonical stake account to split from
+ * 6. `[w]` Source transient stake account to receive split and be
+ * redelegated
+ * 7. `[w]` Uninitialized ephemeral stake account to receive redelegation
+ * 8. `[w]` Destination transient stake account to receive ephemeral stake
+ * by merge
+ * 9. `[]` Destination stake account to receive transient stake after
+ * activation
+ * 10. `[]` Destination validator vote account
+ * 11. `[]` Clock sysvar
+ * 12. `[]` Stake History sysvar
+ * 13. `[]` Stake Config sysvar
+ * 14. `[]` System program
+ * 15. `[]` Stake program
+ */
 export async function getRedelegateInstructionAsync<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -409,7 +453,7 @@ export async function getRedelegateInstructionAsync<
   >);
 }
 
-export interface RedelegateInput<
+export type RedelegateInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -426,7 +470,7 @@ export interface RedelegateInput<
   TAccountStakeConfigSysvar extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   staker: TransactionSigner<TAccountStaker>;
   withdrawAuthority: Address<TAccountWithdrawAuthority>;
@@ -447,8 +491,53 @@ export interface RedelegateInput<
   sourceTransientStakeSeed: RedelegateInstructionDataArgs["sourceTransientStakeSeed"];
   ephemeralStakeSeed: RedelegateInstructionDataArgs["ephemeralStakeSeed"];
   destinationTransientStakeSeed: RedelegateInstructionDataArgs["destinationTransientStakeSeed"];
-}
+};
 
+/**
+ * (Staker only) Redelegate active stake on a validator, eventually moving
+ * it to another
+ * Internally, this instruction splits a validator stake account into its
+ * corresponding transient stake account, redelegates it to an ephemeral
+ * stake account, then merges that stake into the destination transient
+ * stake account.
+ * In order to rebalance the pool without taking custody, the staker needs
+ * a way of reducing the stake on a stake account. This instruction splits
+ * some amount of stake, up to the total activated stake, from the
+ * canonical validator stake account, into its "transient" stake
+ * account.
+ * The instruction only succeeds if the source transient stake account and
+ * ephemeral stake account do not exist.
+ * The amount of lamports to move must be at least rent-exemption plus the
+ * minimum delegation amount. Rent-exemption plus minimum delegation
+ * is required for the destination ephemeral stake account.
+ * The rent-exemption for the source transient account comes from the stake
+ * pool reserve, if needed.
+ * The amount that arrives at the destination validator in the end is
+ * `redelegate_lamports - rent_exemption` if the destination transient
+ * account does *not* exist, and `redelegate_lamports` if the destination
+ * transient account already exists. The `rent_exemption` is not activated
+ * when creating the destination transient stake account, but if it already
+ * exists, then the full amount is delegated.
+ * 0. `[]` Stake pool
+ * 1. `[s]` Stake pool staker
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator list
+ * 4. `[w]` Reserve stake account, to withdraw rent exempt reserve
+ * 5. `[w]` Source canonical stake account to split from
+ * 6. `[w]` Source transient stake account to receive split and be
+ * redelegated
+ * 7. `[w]` Uninitialized ephemeral stake account to receive redelegation
+ * 8. `[w]` Destination transient stake account to receive ephemeral stake
+ * by merge
+ * 9. `[]` Destination stake account to receive transient stake after
+ * activation
+ * 10. `[]` Destination validator vote account
+ * 11. `[]` Clock sysvar
+ * 12. `[]` Stake History sysvar
+ * 13. `[]` Stake Config sysvar
+ * 14. `[]` System program
+ * 15. `[]` Stake program
+ */
 export function getRedelegateInstruction<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -631,10 +720,10 @@ export function getRedelegateInstruction<
   >);
 }
 
-export interface ParsedRedelegateInstruction<
+export type ParsedRedelegateInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -655,7 +744,7 @@ export interface ParsedRedelegateInstruction<
     stakeProgram: TAccountMetas[15];
   };
   data: RedelegateInstructionData;
-}
+};
 
 export function parseRedelegateInstruction<
   TProgram extends string,

@@ -6,35 +6,37 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { LockerParams, LockerParamsArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { getLockerParamsDecoder, getLockerParamsEncoder } from "./index.js";
+import {
+  getLockerParamsDecoder,
+  getLockerParamsEncoder,
+  type LockerParams,
+  type LockerParamsArgs,
+} from "./index.js";
 
-export interface NewLockerEvent {
+export type NewLockerEvent = {
   governor: Address;
   locker: Address;
   tokenMint: Address;
   params: LockerParams;
-}
+};
 
-export interface NewLockerEventArgs {
+export type NewLockerEventArgs = {
   governor: Address;
   locker: Address;
   tokenMint: Address;
   params: LockerParamsArgs;
-}
+};
 
 export function getNewLockerEventEncoder(): FixedSizeEncoder<NewLockerEventArgs> {
   return getStructEncoder([
