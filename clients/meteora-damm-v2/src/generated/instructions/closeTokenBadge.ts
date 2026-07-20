@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -81,9 +81,9 @@ export type CloseTokenBadgeInstruction<
     ]
   >;
 
-export interface CloseTokenBadgeInstructionData {
+export type CloseTokenBadgeInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type CloseTokenBadgeInstructionDataArgs = {};
 
@@ -110,19 +110,19 @@ export function getCloseTokenBadgeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseTokenBadgeAsyncInput<
+export type CloseTokenBadgeAsyncInput<
   TAccountTokenBadge extends string = string,
   TAccountAdmin extends string = string,
   TAccountRentReceiver extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   tokenBadge: Address<TAccountTokenBadge>;
   admin: TransactionSigner<TAccountAdmin>;
   rentReceiver: Address<TAccountRentReceiver>;
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export async function getCloseTokenBadgeInstructionAsync<
   TAccountTokenBadge extends string,
@@ -196,19 +196,19 @@ export async function getCloseTokenBadgeInstructionAsync<
   >);
 }
 
-export interface CloseTokenBadgeInput<
+export type CloseTokenBadgeInput<
   TAccountTokenBadge extends string = string,
   TAccountAdmin extends string = string,
   TAccountRentReceiver extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   tokenBadge: Address<TAccountTokenBadge>;
   admin: TransactionSigner<TAccountAdmin>;
   rentReceiver: Address<TAccountRentReceiver>;
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export function getCloseTokenBadgeInstruction<
   TAccountTokenBadge extends string,
@@ -277,10 +277,10 @@ export function getCloseTokenBadgeInstruction<
   >);
 }
 
-export interface ParsedCloseTokenBadgeInstruction<
+export type ParsedCloseTokenBadgeInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     tokenBadge: TAccountMetas[0];
@@ -290,7 +290,7 @@ export interface ParsedCloseTokenBadgeInstruction<
     program: TAccountMetas[4];
   };
   data: CloseTokenBadgeInstructionData;
-}
+};
 
 export function parseCloseTokenBadgeInstruction<
   TProgram extends string,

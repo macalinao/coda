@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getBooleanDecoder,
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface LockerParams {
+export type LockerParams = {
   whitelistEnabled: boolean;
   maxStakeVoteMultiplier: number;
   minStakeDuration: bigint;
   maxStakeDuration: bigint;
   proposalActivationMinVotes: bigint;
-}
+};
 
-export interface LockerParamsArgs {
+export type LockerParamsArgs = {
   whitelistEnabled: boolean;
   maxStakeVoteMultiplier: number;
   minStakeDuration: number | bigint;
   maxStakeDuration: number | bigint;
   proposalActivationMinVotes: number | bigint;
-}
+};
 
 export function getLockerParamsEncoder(): FixedSizeEncoder<LockerParamsArgs> {
   return getStructEncoder([

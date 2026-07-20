@@ -6,30 +6,28 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Codec, Decoder, Encoder } from "@solana/kit";
-import type {
-  RemainingAccountsSlice,
-  RemainingAccountsSliceArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getRemainingAccountsSliceDecoder,
   getRemainingAccountsSliceEncoder,
+  type RemainingAccountsSlice,
+  type RemainingAccountsSliceArgs,
 } from "./index.js";
 
-export interface RemainingAccountsInfo {
-  slices: RemainingAccountsSlice[];
-}
+export type RemainingAccountsInfo = { slices: Array<RemainingAccountsSlice> };
 
-export interface RemainingAccountsInfoArgs {
-  slices: RemainingAccountsSliceArgs[];
-}
+export type RemainingAccountsInfoArgs = {
+  slices: Array<RemainingAccountsSliceArgs>;
+};
 
 export function getRemainingAccountsInfoEncoder(): Encoder<RemainingAccountsInfoArgs> {
   return getStructEncoder([

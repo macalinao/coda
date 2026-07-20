@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { LockerSeeds } from "../pdas/index.js";
-import type { LockerParams, LockerParamsArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,16 +21,29 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findLockerPda } from "../pdas/index.js";
+import { findLockerPda, type LockerSeeds } from "../pdas/index.js";
 import {
   getLockerParamsDecoder,
   getLockerParamsEncoder,
+  type LockerParams,
+  type LockerParamsArgs,
 } from "../types/index.js";
 
 export const LOCKER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -56,7 +54,7 @@ export function getLockerDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(LOCKER_DISCRIMINATOR);
 }
 
-export interface Locker {
+export type Locker = {
   discriminator: ReadonlyUint8Array;
   base: Address;
   bump: number;
@@ -64,16 +62,16 @@ export interface Locker {
   lockedSupply: bigint;
   governor: Address;
   params: LockerParams;
-}
+};
 
-export interface LockerArgs {
+export type LockerArgs = {
   base: Address;
   bump: number;
   tokenMint: Address;
   lockedSupply: number | bigint;
   governor: Address;
   params: LockerParamsArgs;
-}
+};
 
 /** Gets the encoder for {@link LockerArgs} account data. */
 export function getLockerEncoder(): FixedSizeEncoder<LockerArgs> {
@@ -145,7 +143,7 @@ export async function fetchMaybeLocker<TAddress extends string = string>(
 
 export async function fetchAllLocker(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Locker>[]> {
   const maybeAccounts = await fetchAllMaybeLocker(rpc, addresses, config);
@@ -155,7 +153,7 @@ export async function fetchAllLocker(
 
 export async function fetchAllMaybeLocker(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Locker>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemainingAccountsInfo,
-  RemainingAccountsInfoArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -41,19 +18,40 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
+  type RemainingAccountsInfo,
+  type RemainingAccountsInfoArgs,
 } from "../types/index.js";
 
 export const SWAP_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -66,23 +64,23 @@ export function getSwapV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SwapV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountTokenProgramA extends string | AccountMeta = string,
-  TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta =
+  TAccountTokenProgramA extends string | AccountMeta<string> = string,
+  TAccountTokenProgramB extends string | AccountMeta<string> = string,
+  TAccountMemoProgram extends string | AccountMeta<string> =
     "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
-  TAccountTokenAuthority extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenMintA extends string | AccountMeta = string,
-  TAccountTokenMintB extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountA extends string | AccountMeta = string,
-  TAccountTokenVaultA extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountB extends string | AccountMeta = string,
-  TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTickArray0 extends string | AccountMeta = string,
-  TAccountTickArray1 extends string | AccountMeta = string,
-  TAccountTickArray2 extends string | AccountMeta = string,
-  TAccountOracle extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountTokenAuthority extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountTokenMintA extends string | AccountMeta<string> = string,
+  TAccountTokenMintB extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountA extends string | AccountMeta<string> = string,
+  TAccountTokenVaultA extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountB extends string | AccountMeta<string> = string,
+  TAccountTokenVaultB extends string | AccountMeta<string> = string,
+  TAccountTickArray0 extends string | AccountMeta<string> = string,
+  TAccountTickArray1 extends string | AccountMeta<string> = string,
+  TAccountTickArray2 extends string | AccountMeta<string> = string,
+  TAccountOracle extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -137,7 +135,7 @@ export type SwapV2Instruction<
     ]
   >;
 
-export interface SwapV2InstructionData {
+export type SwapV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
   otherAmountThreshold: bigint;
@@ -145,16 +143,16 @@ export interface SwapV2InstructionData {
   amountSpecifiedIsInput: boolean;
   aToB: boolean;
   remainingAccountsInfo: Option<RemainingAccountsInfo>;
-}
+};
 
-export interface SwapV2InstructionDataArgs {
+export type SwapV2InstructionDataArgs = {
   amount: number | bigint;
   otherAmountThreshold: number | bigint;
   sqrtPriceLimit: number | bigint;
   amountSpecifiedIsInput: boolean;
   aToB: boolean;
   remainingAccountsInfo: OptionOrNullable<RemainingAccountsInfoArgs>;
-}
+};
 
 export function getSwapV2InstructionDataEncoder(): Encoder<SwapV2InstructionDataArgs> {
   return transformEncoder(
@@ -199,7 +197,7 @@ export function getSwapV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface SwapV2Input<
+export type SwapV2Input<
   TAccountTokenProgramA extends string = string,
   TAccountTokenProgramB extends string = string,
   TAccountMemoProgram extends string = string,
@@ -215,7 +213,7 @@ export interface SwapV2Input<
   TAccountTickArray1 extends string = string,
   TAccountTickArray2 extends string = string,
   TAccountOracle extends string = string,
-> {
+> = {
   tokenProgramA: Address<TAccountTokenProgramA>;
   tokenProgramB: Address<TAccountTokenProgramB>;
   memoProgram?: Address<TAccountMemoProgram>;
@@ -237,7 +235,7 @@ export interface SwapV2Input<
   amountSpecifiedIsInput: SwapV2InstructionDataArgs["amountSpecifiedIsInput"];
   aToB: SwapV2InstructionDataArgs["aToB"];
   remainingAccountsInfo: SwapV2InstructionDataArgs["remainingAccountsInfo"];
-}
+};
 
 export function getSwapV2Instruction<
   TAccountTokenProgramA extends string,
@@ -377,10 +375,10 @@ export function getSwapV2Instruction<
   >);
 }
 
-export interface ParsedSwapV2Instruction<
+export type ParsedSwapV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     tokenProgramA: TAccountMetas[0];
@@ -400,7 +398,7 @@ export interface ParsedSwapV2Instruction<
     oracle: TAccountMetas[14];
   };
   data: SwapV2InstructionData;
-}
+};
 
 export function parseSwapV2Instruction<
   TProgram extends string,

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  ElevationGroupPod,
-  ElevationGroupPodArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,19 +23,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getElevationGroupPodDecoder,
   getElevationGroupPodEncoder,
+  type ElevationGroupPod,
+  type ElevationGroupPodArgs,
 } from "../types/index.js";
 
 export const LENDING_MARKET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -65,7 +61,7 @@ export function getLendingMarketDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface LendingMarket {
+export type LendingMarket = {
   discriminator: ReadonlyUint8Array;
   /** Version of lending market */
   version: bigint;
@@ -79,7 +75,7 @@ export interface LendingMarket {
    * Currency market prices are quoted in
    * e.g. "USD" null padded (`*b"USD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"`) or a SPL token mint pubkey
    */
-  quoteCurrency: number[];
+  quoteCurrency: Array<number>;
   /** Referral fee for the lending market, as bps out of the total protocol fee */
   referralFeeBps: number;
   emergencyMode: number;
@@ -106,22 +102,22 @@ export interface LendingMarket {
   /** Max allowed liquidation value in one ix call */
   maxLiquidatableDebtMarketValueAtOnce: bigint;
   /** [DEPRECATED] Global maximum unhealthy borrow value allowed for any obligation */
-  reserved0: number[];
+  reserved0: Array<number>;
   /** Global maximum allowed borrow value allowed for any obligation */
   globalAllowedBorrowValue: bigint;
   /** The address of the risk council, in charge of making parameter and risk decisions on behalf of the protocol */
   riskCouncil: Address;
   /** [DEPRECATED] Reward points multiplier per obligation type */
-  reserved1: number[];
+  reserved1: Array<number>;
   /** Elevation groups are used to group together reserves that have the same risk parameters and can bump the ltv and liquidation threshold */
-  elevationGroups: ElevationGroupPod[];
-  elevationGroupPadding: bigint[];
+  elevationGroups: Array<ElevationGroupPod>;
+  elevationGroupPadding: Array<bigint>;
   /** Min net value accepted to be found in a position after any lending action in an obligation (scaled by quote currency decimals) */
   minNetValueInObligationSf: bigint;
   /** Minimum value to enforce smallest ltv priority checks on the collateral reserves on liquidation */
   minValueSkipLiquidationLtvChecks: bigint;
   /** Market name, zero-padded. */
-  name: number[];
+  name: Array<number>;
   /** Minimum value to enforce highest borrow factor priority checks on the debt reserves on liquidation */
   minValueSkipLiquidationBfChecks: bigint;
   /**
@@ -143,11 +139,11 @@ export interface LendingMarket {
    * Note: updating or cancelling existing orders is *not* affected by this flag.
    */
   obligationOrderCreationEnabled: number;
-  padding2: number[];
-  padding1: bigint[];
-}
+  padding2: Array<number>;
+  padding1: Array<bigint>;
+};
 
-export interface LendingMarketArgs {
+export type LendingMarketArgs = {
   /** Version of lending market */
   version: number | bigint;
   /** Bump seed for derived authority address */
@@ -160,7 +156,7 @@ export interface LendingMarketArgs {
    * Currency market prices are quoted in
    * e.g. "USD" null padded (`*b"USD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"`) or a SPL token mint pubkey
    */
-  quoteCurrency: number[];
+  quoteCurrency: Array<number>;
   /** Referral fee for the lending market, as bps out of the total protocol fee */
   referralFeeBps: number;
   emergencyMode: number;
@@ -187,22 +183,22 @@ export interface LendingMarketArgs {
   /** Max allowed liquidation value in one ix call */
   maxLiquidatableDebtMarketValueAtOnce: number | bigint;
   /** [DEPRECATED] Global maximum unhealthy borrow value allowed for any obligation */
-  reserved0: number[];
+  reserved0: Array<number>;
   /** Global maximum allowed borrow value allowed for any obligation */
   globalAllowedBorrowValue: number | bigint;
   /** The address of the risk council, in charge of making parameter and risk decisions on behalf of the protocol */
   riskCouncil: Address;
   /** [DEPRECATED] Reward points multiplier per obligation type */
-  reserved1: number[];
+  reserved1: Array<number>;
   /** Elevation groups are used to group together reserves that have the same risk parameters and can bump the ltv and liquidation threshold */
-  elevationGroups: ElevationGroupPodArgs[];
+  elevationGroups: Array<ElevationGroupPodArgs>;
   elevationGroupPadding: Array<number | bigint>;
   /** Min net value accepted to be found in a position after any lending action in an obligation (scaled by quote currency decimals) */
   minNetValueInObligationSf: number | bigint;
   /** Minimum value to enforce smallest ltv priority checks on the collateral reserves on liquidation */
   minValueSkipLiquidationLtvChecks: number | bigint;
   /** Market name, zero-padded. */
-  name: number[];
+  name: Array<number>;
   /** Minimum value to enforce highest borrow factor priority checks on the debt reserves on liquidation */
   minValueSkipLiquidationBfChecks: number | bigint;
   /**
@@ -224,9 +220,9 @@ export interface LendingMarketArgs {
    * Note: updating or cancelling existing orders is *not* affected by this flag.
    */
   obligationOrderCreationEnabled: number;
-  padding2: number[];
+  padding2: Array<number>;
   padding1: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link LendingMarketArgs} account data. */
 export function getLendingMarketEncoder(): FixedSizeEncoder<LendingMarketArgs> {
@@ -357,7 +353,7 @@ export async function fetchMaybeLendingMarket<TAddress extends string = string>(
 
 export async function fetchAllLendingMarket(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LendingMarket>[]> {
   const maybeAccounts = await fetchAllMaybeLendingMarket(
@@ -371,7 +367,7 @@ export async function fetchAllLendingMarket(
 
 export async function fetchAllMaybeLendingMarket(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LendingMarket>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

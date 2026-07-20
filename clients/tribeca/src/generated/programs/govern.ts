@@ -6,54 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  Governor,
-  GovernorArgs,
-  Proposal,
-  ProposalArgs,
-  ProposalMeta,
-  ProposalMetaArgs,
-  Vote,
-  VoteArgs,
-} from "../accounts/index.js";
-import type {
-  ActivateProposalInput,
-  CancelProposalInput,
-  CreateGovernorInput,
-  CreateProposalInput,
-  CreateProposalMetaInput,
-  NewVoteInput,
-  ParsedActivateProposalInstruction,
-  ParsedCancelProposalInstruction,
-  ParsedCreateGovernorInstruction,
-  ParsedCreateProposalInstruction,
-  ParsedCreateProposalMetaInstruction,
-  ParsedNewVoteInstruction,
-  ParsedQueueProposalInstruction,
-  ParsedSetElectorateInstruction,
-  ParsedSetGovernanceParamsInstruction,
-  ParsedSetVoteInstruction,
-  QueueProposalInput,
-  SetElectorateInput,
-  SetGovernanceParamsInput,
-  SetVoteInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -64,16 +16,37 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
   getGovernorCodec,
   getProposalCodec,
   getProposalMetaCodec,
   getVoteCodec,
+  type Governor,
+  type GovernorArgs,
+  type Proposal,
+  type ProposalArgs,
+  type ProposalMeta,
+  type ProposalMetaArgs,
+  type Vote,
+  type VoteArgs,
 } from "../accounts/index.js";
 import {
   getActivateProposalInstruction,
@@ -96,6 +69,26 @@ import {
   parseSetElectorateInstruction,
   parseSetGovernanceParamsInstruction,
   parseSetVoteInstruction,
+  type ActivateProposalInput,
+  type CancelProposalInput,
+  type CreateGovernorInput,
+  type CreateProposalInput,
+  type CreateProposalMetaInput,
+  type NewVoteInput,
+  type ParsedActivateProposalInstruction,
+  type ParsedCancelProposalInstruction,
+  type ParsedCreateGovernorInstruction,
+  type ParsedCreateProposalInstruction,
+  type ParsedCreateProposalMetaInstruction,
+  type ParsedNewVoteInstruction,
+  type ParsedQueueProposalInstruction,
+  type ParsedSetElectorateInstruction,
+  type ParsedSetGovernanceParamsInstruction,
+  type ParsedSetVoteInstruction,
+  type QueueProposalInput,
+  type SetElectorateInput,
+  type SetGovernanceParamsInput,
+  type SetVoteInput,
 } from "../instructions/index.js";
 import {
   findGovernorPda,
@@ -108,10 +101,10 @@ export const GOVERN_PROGRAM_ADDRESS =
   "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw" as Address<"Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw">;
 
 export enum GovernAccount {
-  Governor = 0,
-  Proposal = 1,
-  ProposalMeta = 2,
-  Vote = 3,
+  Governor,
+  Proposal,
+  ProposalMeta,
+  Vote,
 }
 
 export function identifyGovernAccount(
@@ -169,16 +162,16 @@ export function identifyGovernAccount(
 }
 
 export enum GovernInstruction {
-  CreateGovernor = 0,
-  CreateProposal = 1,
-  ActivateProposal = 2,
-  CancelProposal = 3,
-  QueueProposal = 4,
-  NewVote = 5,
-  SetVote = 6,
-  SetGovernanceParams = 7,
-  SetElectorate = 8,
-  CreateProposalMeta = 9,
+  CreateGovernor,
+  CreateProposal,
+  ActivateProposal,
+  CancelProposal,
+  QueueProposal,
+  NewVote,
+  SetVote,
+  SetGovernanceParams,
+  SetElectorate,
+  CreateProposalMeta,
 }
 
 export function identifyGovernInstruction(
@@ -418,13 +411,16 @@ export function parseGovernInstruction<TProgram extends string>(
   }
 }
 
-export interface GovernPlugin {
+export type GovernPlugin = {
   accounts: GovernPluginAccounts;
   instructions: GovernPluginInstructions;
   pdas: GovernPluginPdas;
-}
+  identifyAccount: typeof identifyGovernAccount;
+  identifyInstruction: typeof identifyGovernInstruction;
+  parseInstruction: typeof parseGovernInstruction;
+};
 
-export interface GovernPluginAccounts {
+export type GovernPluginAccounts = {
   governor: ReturnType<typeof getGovernorCodec> &
     SelfFetchFunctions<GovernorArgs, Governor>;
   proposal: ReturnType<typeof getProposalCodec> &
@@ -432,9 +428,9 @@ export interface GovernPluginAccounts {
   proposalMeta: ReturnType<typeof getProposalMetaCodec> &
     SelfFetchFunctions<ProposalMetaArgs, ProposalMeta>;
   vote: ReturnType<typeof getVoteCodec> & SelfFetchFunctions<VoteArgs, Vote>;
-}
+};
 
-export interface GovernPluginInstructions {
+export type GovernPluginInstructions = {
   createGovernor: (
     input: MakeOptional<CreateGovernorInput, "payer">,
   ) => ReturnType<typeof getCreateGovernorInstruction> &
@@ -473,14 +469,14 @@ export interface GovernPluginInstructions {
     input: MakeOptional<CreateProposalMetaInput, "payer">,
   ) => ReturnType<typeof getCreateProposalMetaInstruction> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface GovernPluginPdas {
+export type GovernPluginPdas = {
   governor: typeof findGovernorPda;
   proposal: typeof findProposalPda;
   vote: typeof findVotePda;
   proposalMeta: typeof findProposalMetaPda;
-}
+};
 
 export type GovernPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -492,7 +488,7 @@ export type GovernPluginRequirements = ClientWithRpc<
 export function governProgram() {
   return <T extends GovernPluginRequirements>(
     client: T,
-  ): Omit<T, "govern"> & { govern: GovernPlugin } => {
+  ): ExtendedClient<T, { govern: GovernPlugin }> => {
     return extendClient(client, {
       govern: <GovernPlugin>{
         accounts: {
@@ -571,6 +567,9 @@ export function governProgram() {
           vote: findVotePda,
           proposalMeta: findProposalMetaPda,
         },
+        identifyAccount: identifyGovernAccount,
+        identifyInstruction: identifyGovernInstruction,
+        parseInstruction: parseGovernInstruction,
       },
     });
   };

@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { RealmConfigSeeds } from "../pdas/index.js";
-import type {
-  GoverningTokenConfig,
-  GoverningTokenConfigArgs,
-  Reserved110,
-  Reserved110Args,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,16 +18,31 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRealmConfigPda } from "../pdas/index.js";
+import { findRealmConfigPda, type RealmConfigSeeds } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getGoverningTokenConfigDecoder,
   getGoverningTokenConfigEncoder,
   getReserved110Decoder,
   getReserved110Encoder,
+  GovernanceAccountType,
+  type GoverningTokenConfig,
+  type GoverningTokenConfigArgs,
+  type Reserved110,
+  type Reserved110Args,
 } from "../types/index.js";
 
 export const REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE: GovernanceAccountType =
@@ -59,20 +54,20 @@ export function getRealmConfigAccountAccountTypeBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface RealmConfigAccount {
+export type RealmConfigAccount = {
   accountType: GovernanceAccountType;
   realm: Address;
   communityTokenConfig: GoverningTokenConfig;
   councilTokenConfig: GoverningTokenConfig;
   reserved: Reserved110;
-}
+};
 
-export interface RealmConfigAccountArgs {
+export type RealmConfigAccountArgs = {
   realm: Address;
   communityTokenConfig: GoverningTokenConfigArgs;
   councilTokenConfig: GoverningTokenConfigArgs;
   reserved: Reserved110Args;
-}
+};
 
 /** Gets the encoder for {@link RealmConfigAccountArgs} account data. */
 export function getRealmConfigAccountEncoder(): Encoder<RealmConfigAccountArgs> {
@@ -150,7 +145,7 @@ export async function fetchMaybeRealmConfigAccount<
 
 export async function fetchAllRealmConfigAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<RealmConfigAccount>[]> {
   const maybeAccounts = await fetchAllMaybeRealmConfigAccount(
@@ -164,7 +159,7 @@ export async function fetchAllRealmConfigAccount(
 
 export async function fetchAllMaybeRealmConfigAccount(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<RealmConfigAccount>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  FarmsTokenInfo,
-  FarmsTokenInfoArgs,
-  RewardInfo,
-  RewardInfoArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,21 +23,36 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU128Decoder,
+  getU128Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getFarmsTokenInfoDecoder,
   getFarmsTokenInfoEncoder,
   getRewardInfoDecoder,
   getRewardInfoEncoder,
+  type FarmsTokenInfo,
+  type FarmsTokenInfoArgs,
+  type RewardInfo,
+  type RewardInfoArgs,
 } from "../types/index.js";
 
 export const FARM_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -67,12 +63,12 @@ export function getFarmStateDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(FARM_STATE_DISCRIMINATOR);
 }
 
-export interface FarmState {
+export type FarmState = {
   discriminator: ReadonlyUint8Array;
   farmAdmin: Address;
   globalConfig: Address;
   token: FarmsTokenInfo;
-  rewardInfos: RewardInfo[];
+  rewardInfos: Array<RewardInfo>;
   numRewardTokens: bigint;
   /** Data used to calculate the rewards of the user */
   numUsers: bigint;
@@ -104,7 +100,7 @@ export interface FarmState {
    * If true, the farm is a delegate farm and the `delegate_authority` is set*
    */
   isFarmDelegated: number;
-  padding0: number[];
+  padding0: Array<number>;
   /**
    * Withdraw authority for the farm, allowed to lock deposited funds and withdraw them
    * Set to `default()` if unused (only the depositors can withdraw their funds)
@@ -143,14 +139,14 @@ export interface FarmState {
   strategyId: Address;
   delegatedRpsAdmin: Address;
   vaultId: Address;
-  padding: bigint[];
-}
+  padding: Array<bigint>;
+};
 
-export interface FarmStateArgs {
+export type FarmStateArgs = {
   farmAdmin: Address;
   globalConfig: Address;
   token: FarmsTokenInfoArgs;
-  rewardInfos: RewardInfoArgs[];
+  rewardInfos: Array<RewardInfoArgs>;
   numRewardTokens: number | bigint;
   /** Data used to calculate the rewards of the user */
   numUsers: number | bigint;
@@ -182,7 +178,7 @@ export interface FarmStateArgs {
    * If true, the farm is a delegate farm and the `delegate_authority` is set*
    */
   isFarmDelegated: number;
-  padding0: number[];
+  padding0: Array<number>;
   /**
    * Withdraw authority for the farm, allowed to lock deposited funds and withdraw them
    * Set to `default()` if unused (only the depositors can withdraw their funds)
@@ -222,7 +218,7 @@ export interface FarmStateArgs {
   delegatedRpsAdmin: Address;
   vaultId: Address;
   padding: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link FarmStateArgs} account data. */
 export function getFarmStateEncoder(): FixedSizeEncoder<FarmStateArgs> {
@@ -356,7 +352,7 @@ export async function fetchMaybeFarmState<TAddress extends string = string>(
 
 export async function fetchAllFarmState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FarmState>[]> {
   const maybeAccounts = await fetchAllMaybeFarmState(rpc, addresses, config);
@@ -366,7 +362,7 @@ export async function fetchAllFarmState(
 
 export async function fetchAllMaybeFarmState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FarmState>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

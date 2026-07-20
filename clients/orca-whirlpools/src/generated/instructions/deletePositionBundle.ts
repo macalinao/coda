@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DELETE_POSITION_BUNDLE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,14 +49,15 @@ export function getDeletePositionBundleDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type DeletePositionBundleInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountPositionBundle extends string | AccountMeta = string,
-  TAccountPositionBundleMint extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
-  TAccountPositionBundleOwner extends string | AccountMeta = string,
-  TAccountReceiver extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountPositionBundle extends string | AccountMeta<string> = string,
+  TAccountPositionBundleMint extends string | AccountMeta<string> = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta<string> =
+    string,
+  TAccountPositionBundleOwner extends string | AccountMeta<string> = string,
+  TAccountReceiver extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -84,9 +85,9 @@ export type DeletePositionBundleInstruction<
     ]
   >;
 
-export interface DeletePositionBundleInstructionData {
+export type DeletePositionBundleInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type DeletePositionBundleInstructionDataArgs = {};
 
@@ -116,21 +117,21 @@ export function getDeletePositionBundleInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface DeletePositionBundleInput<
+export type DeletePositionBundleInput<
   TAccountPositionBundle extends string = string,
   TAccountPositionBundleMint extends string = string,
   TAccountPositionBundleTokenAccount extends string = string,
   TAccountPositionBundleOwner extends string = string,
   TAccountReceiver extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   positionBundle: Address<TAccountPositionBundle>;
   positionBundleMint: Address<TAccountPositionBundleMint>;
   positionBundleTokenAccount: Address<TAccountPositionBundleTokenAccount>;
   positionBundleOwner: TransactionSigner<TAccountPositionBundleOwner>;
   receiver: Address<TAccountReceiver>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getDeletePositionBundleInstruction<
   TAccountPositionBundle extends string,
@@ -217,10 +218,10 @@ export function getDeletePositionBundleInstruction<
   >);
 }
 
-export interface ParsedDeletePositionBundleInstruction<
+export type ParsedDeletePositionBundleInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     positionBundle: TAccountMetas[0];
@@ -231,7 +232,7 @@ export interface ParsedDeletePositionBundleInstruction<
     tokenProgram: TAccountMetas[5];
   };
   data: DeletePositionBundleInstructionData;
-}
+};
 
 export function parseDeletePositionBundleInstruction<
   TProgram extends string,

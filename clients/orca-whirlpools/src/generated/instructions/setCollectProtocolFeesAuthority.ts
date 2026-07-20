@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_COLLECT_PROTOCOL_FEES_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,10 +49,12 @@ export function getSetCollectProtocolFeesAuthorityDiscriminatorBytes(): Readonly
 
 export type SetCollectProtocolFeesAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountCollectProtocolFeesAuthority extends string | AccountMeta = string,
-  TAccountNewCollectProtocolFeesAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountCollectProtocolFeesAuthority extends string | AccountMeta<string> =
+    string,
+  TAccountNewCollectProtocolFeesAuthority extends string | AccountMeta<string> =
+    string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -71,9 +73,9 @@ export type SetCollectProtocolFeesAuthorityInstruction<
     ]
   >;
 
-export interface SetCollectProtocolFeesAuthorityInstructionData {
+export type SetCollectProtocolFeesAuthorityInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type SetCollectProtocolFeesAuthorityInstructionDataArgs = {};
 
@@ -103,15 +105,15 @@ export function getSetCollectProtocolFeesAuthorityInstructionDataCodec(): FixedS
   );
 }
 
-export interface SetCollectProtocolFeesAuthorityInput<
+export type SetCollectProtocolFeesAuthorityInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountCollectProtocolFeesAuthority extends string = string,
   TAccountNewCollectProtocolFeesAuthority extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   collectProtocolFeesAuthority: TransactionSigner<TAccountCollectProtocolFeesAuthority>;
   newCollectProtocolFeesAuthority: Address<TAccountNewCollectProtocolFeesAuthority>;
-}
+};
 
 export function getSetCollectProtocolFeesAuthorityInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -177,10 +179,10 @@ export function getSetCollectProtocolFeesAuthorityInstruction<
   >);
 }
 
-export interface ParsedSetCollectProtocolFeesAuthorityInstruction<
+export type ParsedSetCollectProtocolFeesAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -188,7 +190,7 @@ export interface ParsedSetCollectProtocolFeesAuthorityInstruction<
     newCollectProtocolFeesAuthority: TAccountMetas[2];
   };
   data: SetCollectProtocolFeesAuthorityInstructionData;
-}
+};
 
 export function parseSetCollectProtocolFeesAuthorityInstruction<
   TProgram extends string,

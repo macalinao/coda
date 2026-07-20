@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CLOSE_DEPOSIT_ENTRY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -50,9 +50,9 @@ export function getCloseDepositEntryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CloseDepositEntryInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -68,14 +68,14 @@ export type CloseDepositEntryInstruction<
     ]
   >;
 
-export interface CloseDepositEntryInstructionData {
+export type CloseDepositEntryInstructionData = {
   discriminator: ReadonlyUint8Array;
   depositEntryIndex: number;
-}
+};
 
-export interface CloseDepositEntryInstructionDataArgs {
+export type CloseDepositEntryInstructionDataArgs = {
   depositEntryIndex: number;
-}
+};
 
 export function getCloseDepositEntryInstructionDataEncoder(): FixedSizeEncoder<CloseDepositEntryInstructionDataArgs> {
   return transformEncoder(
@@ -104,14 +104,14 @@ export function getCloseDepositEntryInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseDepositEntryInput<
+export type CloseDepositEntryInput<
   TAccountVoter extends string = string,
   TAccountVoterAuthority extends string = string,
-> {
+> = {
   voter: Address<TAccountVoter>;
   voterAuthority: TransactionSigner<TAccountVoterAuthority>;
   depositEntryIndex: CloseDepositEntryInstructionDataArgs["depositEntryIndex"];
-}
+};
 
 export function getCloseDepositEntryInstruction<
   TAccountVoter extends string,
@@ -159,17 +159,17 @@ export function getCloseDepositEntryInstruction<
   >);
 }
 
-export interface ParsedCloseDepositEntryInstruction<
+export type ParsedCloseDepositEntryInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     voter: TAccountMetas[0];
     voterAuthority: TAccountMetas[1];
   };
   data: CloseDepositEntryInstructionData;
-}
+};
 
 export function parseCloseDepositEntryInstruction<
   TProgram extends string,

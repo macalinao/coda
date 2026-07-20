@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,19 +14,23 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface EvtWithdrawIneligibleReward {
+export type EvtWithdrawIneligibleReward = {
   pool: Address;
   rewardMint: Address;
   amount: bigint;
-}
+};
 
-export interface EvtWithdrawIneligibleRewardArgs {
+export type EvtWithdrawIneligibleRewardArgs = {
   pool: Address;
   rewardMint: Address;
   amount: number | bigint;
-}
+};
 
 export function getEvtWithdrawIneligibleRewardEncoder(): FixedSizeEncoder<EvtWithdrawIneligibleRewardArgs> {
   return getStructEncoder([

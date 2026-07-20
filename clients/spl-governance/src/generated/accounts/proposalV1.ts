@@ -6,34 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ProposalSeeds } from "../pdas/index.js";
-import type {
-  InstructionExecutionFlags,
-  InstructionExecutionFlagsArgs,
-  ProposalState,
-  ProposalStateArgs,
-  Slot,
-  SlotArgs,
-  UnixTimestamp,
-  UnixTimestampArgs,
-  VoteThreshold,
-  VoteThresholdArgs,
-} from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -49,21 +21,33 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalPda } from "../pdas/index.js";
+import { findProposalPda, type ProposalSeeds } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getInstructionExecutionFlagsDecoder,
@@ -76,6 +60,17 @@ import {
   getUnixTimestampEncoder,
   getVoteThresholdDecoder,
   getVoteThresholdEncoder,
+  GovernanceAccountType,
+  type InstructionExecutionFlags,
+  type InstructionExecutionFlagsArgs,
+  type ProposalState,
+  type ProposalStateArgs,
+  type Slot,
+  type SlotArgs,
+  type UnixTimestamp,
+  type UnixTimestampArgs,
+  type VoteThreshold,
+  type VoteThresholdArgs,
 } from "../types/index.js";
 
 export const PROPOSAL_V1_ACCOUNT_TYPE: GovernanceAccountType =
@@ -85,7 +80,7 @@ export function getProposalV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(PROPOSAL_V1_ACCOUNT_TYPE);
 }
 
-export interface ProposalV1 {
+export type ProposalV1 = {
   accountType: GovernanceAccountType;
   governance: Address;
   governingTokenMint: Address;
@@ -110,9 +105,9 @@ export interface ProposalV1 {
   voteThreshold: Option<VoteThreshold>;
   name: string;
   descriptionLink: string;
-}
+};
 
-export interface ProposalV1Args {
+export type ProposalV1Args = {
   governance: Address;
   governingTokenMint: Address;
   state: ProposalStateArgs;
@@ -136,7 +131,7 @@ export interface ProposalV1Args {
   voteThreshold: OptionOrNullable<VoteThresholdArgs>;
   name: string;
   descriptionLink: string;
-}
+};
 
 /** Gets the encoder for {@link ProposalV1Args} account data. */
 export function getProposalV1Encoder(): Encoder<ProposalV1Args> {
@@ -248,7 +243,7 @@ export async function fetchMaybeProposalV1<TAddress extends string = string>(
 
 export async function fetchAllProposalV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProposalV1>[]> {
   const maybeAccounts = await fetchAllMaybeProposalV1(rpc, addresses, config);
@@ -258,7 +253,7 @@ export async function fetchAllProposalV1(
 
 export async function fetchAllMaybeProposalV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProposalV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

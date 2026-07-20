@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,8 +17,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const PAUSE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -65,9 +65,7 @@ export type PauseInstruction<
     ]
   >;
 
-export interface PauseInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type PauseInstructionData = { discriminator: ReadonlyUint8Array };
 
 export type PauseInstructionDataArgs = {};
 
@@ -94,13 +92,13 @@ export function getPauseInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface PauseInput<
+export type PauseInput<
   TAccountPauseAuthority extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   pauseAuthority: TransactionSigner<TAccountPauseAuthority>;
   rewarder: Address<TAccountRewarder>;
-}
+};
 
 export function getPauseInstruction<
   TAccountPauseAuthority extends string,
@@ -138,17 +136,17 @@ export function getPauseInstruction<
   >);
 }
 
-export interface ParsedPauseInstruction<
+export type ParsedPauseInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pauseAuthority: TAccountMetas[0];
     rewarder: TAccountMetas[1];
   };
   data: PauseInstructionData;
-}
+};
 
 export function parsePauseInstruction<
   TProgram extends string,

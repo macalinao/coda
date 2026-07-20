@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,33 +16,37 @@ import {
   getI8Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface VotingMintConfig {
+export type VotingMintConfig = {
   mint: Address;
   grantAuthority: Address;
   baselineVoteWeightScaledFactor: bigint;
   maxExtraLockupVoteWeightScaledFactor: bigint;
   lockupSaturationSecs: bigint;
   digitShift: number;
-  reserved1: number[];
-  reserved2: bigint[];
-}
+  reserved1: Array<number>;
+  reserved2: Array<bigint>;
+};
 
-export interface VotingMintConfigArgs {
+export type VotingMintConfigArgs = {
   mint: Address;
   grantAuthority: Address;
   baselineVoteWeightScaledFactor: number | bigint;
   maxExtraLockupVoteWeightScaledFactor: number | bigint;
   lockupSaturationSecs: number | bigint;
   digitShift: number;
-  reserved1: number[];
+  reserved1: Array<number>;
   reserved2: Array<number | bigint>;
-}
+};
 
 export function getVotingMintConfigEncoder(): FixedSizeEncoder<VotingMintConfigArgs> {
   return getStructEncoder([

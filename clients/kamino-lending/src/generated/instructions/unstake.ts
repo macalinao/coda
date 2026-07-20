@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findFarmsUserStatePda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -54,11 +52,11 @@ export function getUnstakeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UnstakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountUserState extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountScopePrices extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountUserState extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountScopePrices extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -80,14 +78,12 @@ export type UnstakeInstruction<
     ]
   >;
 
-export interface UnstakeInstructionData {
+export type UnstakeInstructionData = {
   discriminator: ReadonlyUint8Array;
   stakeSharesScaled: bigint;
-}
+};
 
-export interface UnstakeInstructionDataArgs {
-  stakeSharesScaled: number | bigint;
-}
+export type UnstakeInstructionDataArgs = { stakeSharesScaled: number | bigint };
 
 export function getUnstakeInstructionDataEncoder(): FixedSizeEncoder<UnstakeInstructionDataArgs> {
   return transformEncoder(
@@ -116,18 +112,18 @@ export function getUnstakeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UnstakeAsyncInput<
+export type UnstakeAsyncInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
   TAccountScopePrices extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState?: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
   scopePrices?: Address<TAccountScopePrices>;
   stakeSharesScaled: UnstakeInstructionDataArgs["stakeSharesScaled"];
-}
+};
 
 export async function getUnstakeInstructionAsync<
   TAccountOwner extends string,
@@ -205,18 +201,18 @@ export async function getUnstakeInstructionAsync<
   >);
 }
 
-export interface UnstakeInput<
+export type UnstakeInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
   TAccountScopePrices extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
   scopePrices?: Address<TAccountScopePrices>;
   stakeSharesScaled: UnstakeInstructionDataArgs["stakeSharesScaled"];
-}
+};
 
 export function getUnstakeInstruction<
   TAccountOwner extends string,
@@ -278,10 +274,10 @@ export function getUnstakeInstruction<
   >);
 }
 
-export interface ParsedUnstakeInstruction<
+export type ParsedUnstakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -290,7 +286,7 @@ export interface ParsedUnstakeInstruction<
     scopePrices?: TAccountMetas[3] | undefined;
   };
   data: UnstakeInstructionData;
-}
+};
 
 export function parseUnstakeInstruction<
   TProgram extends string,

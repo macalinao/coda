@@ -6,33 +6,29 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  BaseFeeStruct,
-  BaseFeeStructArgs,
-  DynamicFeeStruct,
-  DynamicFeeStructArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getBaseFeeStructDecoder,
   getBaseFeeStructEncoder,
   getDynamicFeeStructDecoder,
   getDynamicFeeStructEncoder,
+  type BaseFeeStruct,
+  type BaseFeeStructArgs,
+  type DynamicFeeStruct,
+  type DynamicFeeStructArgs,
 } from "./index.js";
 
 /**
@@ -42,7 +38,7 @@ import {
  * referral_fee = protocol_fee * referral_percentage / 100
  * partner_fee = (protocol_fee - referral_fee) * partner_fee_percentage / denominator
  */
-export interface PoolFeesStruct {
+export type PoolFeesStruct = {
   /**
    * Trade fees are extra token amounts that are held inside the token
    * accounts during a trade, making the value of liquidity tokens rise.
@@ -61,14 +57,14 @@ export interface PoolFeesStruct {
   /** referral fee */
   referralFeePercent: number;
   /** padding */
-  padding0: number[];
+  padding0: Array<number>;
   /** dynamic fee */
   dynamicFee: DynamicFeeStruct;
   /** padding */
-  padding1: bigint[];
-}
+  padding1: Array<bigint>;
+};
 
-export interface PoolFeesStructArgs {
+export type PoolFeesStructArgs = {
   /**
    * Trade fees are extra token amounts that are held inside the token
    * accounts during a trade, making the value of liquidity tokens rise.
@@ -87,12 +83,12 @@ export interface PoolFeesStructArgs {
   /** referral fee */
   referralFeePercent: number;
   /** padding */
-  padding0: number[];
+  padding0: Array<number>;
   /** dynamic fee */
   dynamicFee: DynamicFeeStructArgs;
   /** padding */
   padding1: Array<number | bigint>;
-}
+};
 
 export function getPoolFeesStructEncoder(): FixedSizeEncoder<PoolFeesStructArgs> {
   return getStructEncoder([

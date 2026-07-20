@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { TokenOwnerRecordSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,19 +21,35 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTokenOwnerRecordPda } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
+  findTokenOwnerRecordPda,
+  type TokenOwnerRecordSeeds,
+} from "../pdas/index.js";
+import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
+  GovernanceAccountType,
 } from "../types/index.js";
 
 export const LEGACY_TOKEN_OWNER_RECORD_ACCOUNT_TYPE: GovernanceAccountType =
@@ -61,7 +61,7 @@ export function getLegacyTokenOwnerRecordAccountTypeBytes(): ReadonlyUint8Array 
   );
 }
 
-export interface LegacyTokenOwnerRecord {
+export type LegacyTokenOwnerRecord = {
   accountType: GovernanceAccountType;
   realm: Address;
   governingTokenMint: Address;
@@ -70,12 +70,12 @@ export interface LegacyTokenOwnerRecord {
   unrelinquishedVotesCount: number;
   totalVotesCount: number;
   outstandingProposalCount: number;
-  reserved: number[];
+  reserved: Array<number>;
   governanceDelegate: Option<Address>;
-  reservedV2: number[];
-}
+  reservedV2: Array<number>;
+};
 
-export interface LegacyTokenOwnerRecordArgs {
+export type LegacyTokenOwnerRecordArgs = {
   realm: Address;
   governingTokenMint: Address;
   governingTokenOwner: Address;
@@ -83,10 +83,10 @@ export interface LegacyTokenOwnerRecordArgs {
   unrelinquishedVotesCount: number;
   totalVotesCount: number;
   outstandingProposalCount: number;
-  reserved: number[];
+  reserved: Array<number>;
   governanceDelegate: OptionOrNullable<Address>;
-  reservedV2: number[];
-}
+  reservedV2: Array<number>;
+};
 
 /** Gets the encoder for {@link LegacyTokenOwnerRecordArgs} account data. */
 export function getLegacyTokenOwnerRecordEncoder(): Encoder<LegacyTokenOwnerRecordArgs> {
@@ -185,7 +185,7 @@ export async function fetchMaybeLegacyTokenOwnerRecord<
 
 export async function fetchAllLegacyTokenOwnerRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LegacyTokenOwnerRecord>[]> {
   const maybeAccounts = await fetchAllMaybeLegacyTokenOwnerRecord(
@@ -199,7 +199,7 @@ export async function fetchAllLegacyTokenOwnerRecord(
 
 export async function fetchAllMaybeLegacyTokenOwnerRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LegacyTokenOwnerRecord>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -19,6 +19,7 @@ import {
   type ClientWithRpc,
   type ClientWithTransactionPlanning,
   type ClientWithTransactionSending,
+  type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
   type Instruction,
@@ -871,6 +872,8 @@ export type MplCoreProgramPlugin = {
   accounts: MplCoreProgramPluginAccounts;
   instructions: MplCoreProgramPluginInstructions;
   pdas: MplCoreProgramPluginPdas;
+  identifyInstruction: typeof identifyMplCoreProgramInstruction;
+  parseInstruction: typeof parseMplCoreProgramInstruction;
 };
 
 export type MplCoreProgramPluginAccounts = {
@@ -1071,7 +1074,7 @@ export type MplCoreProgramPluginRequirements = ClientWithRpc<
 export function mplCoreProgramProgram() {
   return <T extends MplCoreProgramPluginRequirements>(
     client: T,
-  ): Omit<T, "mplCoreProgram"> & { mplCoreProgram: MplCoreProgramPlugin } => {
+  ): ExtendedClient<T, { mplCoreProgram: MplCoreProgramPlugin }> => {
     return extendClient(client, {
       mplCoreProgram: <MplCoreProgramPlugin>{
         accounts: {
@@ -1418,6 +1421,8 @@ export function mplCoreProgramProgram() {
             ),
         },
         pdas: { assetSigner: findAssetSignerPda },
+        identifyInstruction: identifyMplCoreProgramInstruction,
+        parseInstruction: parseMplCoreProgramInstruction,
       },
     });
   };

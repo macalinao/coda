@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { DatedPrice, DatedPriceArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,8 +24,24 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { getDatedPriceDecoder, getDatedPriceEncoder } from "../types/index.js";
+import {
+  getDatedPriceDecoder,
+  getDatedPriceEncoder,
+  type DatedPrice,
+  type DatedPriceArgs,
+} from "../types/index.js";
 
 export const ORACLE_PRICES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   89, 128, 118, 221, 6, 72, 180, 146,
@@ -51,16 +53,16 @@ export function getOraclePricesDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface OraclePrices {
+export type OraclePrices = {
   discriminator: ReadonlyUint8Array;
   oracleMappings: Address;
-  prices: DatedPrice[];
-}
+  prices: Array<DatedPrice>;
+};
 
-export interface OraclePricesArgs {
+export type OraclePricesArgs = {
   oracleMappings: Address;
-  prices: DatedPriceArgs[];
-}
+  prices: Array<DatedPriceArgs>;
+};
 
 /** Gets the encoder for {@link OraclePricesArgs} account data. */
 export function getOraclePricesEncoder(): FixedSizeEncoder<OraclePricesArgs> {
@@ -127,7 +129,7 @@ export async function fetchMaybeOraclePrices<TAddress extends string = string>(
 
 export async function fetchAllOraclePrices(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<OraclePrices>[]> {
   const maybeAccounts = await fetchAllMaybeOraclePrices(rpc, addresses, config);
@@ -137,7 +139,7 @@ export async function fetchAllOraclePrices(
 
 export async function fetchAllMaybeOraclePrices(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<OraclePrices>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const RELINQUISH_VOTE_DISCRIMINATOR = 15;
@@ -44,15 +44,15 @@ export function getRelinquishVoteDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RelinquishVoteInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountProposalVoteRecord extends string | AccountMeta = string,
-  TAccountGoverningTokenMint extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountBeneficiaryAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountProposalVoteRecord extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenMint extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountBeneficiaryAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -86,9 +86,7 @@ export type RelinquishVoteInstruction<
     ]
   >;
 
-export interface RelinquishVoteInstructionData {
-  discriminator: number;
-}
+export type RelinquishVoteInstructionData = { discriminator: number };
 
 export type RelinquishVoteInstructionDataArgs = {};
 
@@ -113,7 +111,7 @@ export function getRelinquishVoteInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RelinquishVoteInput<
+export type RelinquishVoteInput<
   TAccountRealmAccount extends string = string,
   TAccountGovernanceAccount extends string = string,
   TAccountProposalAccount extends string = string,
@@ -122,7 +120,7 @@ export interface RelinquishVoteInput<
   TAccountGoverningTokenMint extends string = string,
   TAccountGovernanceAuthority extends string = string,
   TAccountBeneficiaryAccount extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   governanceAccount: Address<TAccountGovernanceAccount>;
   proposalAccount: Address<TAccountProposalAccount>;
@@ -138,7 +136,7 @@ export interface RelinquishVoteInput<
    *     It's required only when Proposal is still being voted on
    */
   beneficiaryAccount?: Address<TAccountBeneficiaryAccount>;
-}
+};
 
 export function getRelinquishVoteInstruction<
   TAccountRealmAccount extends string,
@@ -238,10 +236,10 @@ export function getRelinquishVoteInstruction<
   >);
 }
 
-export interface ParsedRelinquishVoteInstruction<
+export type ParsedRelinquishVoteInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -261,7 +259,7 @@ export interface ParsedRelinquishVoteInstruction<
     beneficiaryAccount?: TAccountMetas[7] | undefined;
   };
   data: RelinquishVoteInstructionData;
-}
+};
 
 export function parseRelinquishVoteInstruction<
   TProgram extends string,

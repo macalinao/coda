@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  ValidatorStakeInfo,
-  ValidatorStakeInfoArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,6 +20,17 @@ import {
   getU32Decoder,
   getU32Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   AccountType,
@@ -44,6 +38,8 @@ import {
   getAccountTypeEncoder,
   getValidatorStakeInfoDecoder,
   getValidatorStakeInfoEncoder,
+  type ValidatorStakeInfo,
+  type ValidatorStakeInfoArgs,
 } from "../types/index.js";
 
 export const VALIDATOR_LIST_ACCOUNT_TYPE: AccountType =
@@ -54,21 +50,21 @@ export function getValidatorListAccountTypeBytes(): ReadonlyUint8Array {
 }
 
 /** Storage list for all validator stake accounts in the pool. */
-export interface ValidatorList {
+export type ValidatorList = {
   /** Account type, must be `ValidatorList` currently */
   accountType: AccountType;
   /** Maximum allowable number of validators */
   maxValidators: number;
   /** List of stake info for each validator in the pool */
-  validators: ValidatorStakeInfo[];
-}
+  validators: Array<ValidatorStakeInfo>;
+};
 
-export interface ValidatorListArgs {
+export type ValidatorListArgs = {
   /** Maximum allowable number of validators */
   maxValidators: number;
   /** List of stake info for each validator in the pool */
-  validators: ValidatorStakeInfoArgs[];
-}
+  validators: Array<ValidatorStakeInfoArgs>;
+};
 
 /** Gets the encoder for {@link ValidatorListArgs} account data. */
 export function getValidatorListEncoder(): Encoder<ValidatorListArgs> {
@@ -135,7 +131,7 @@ export async function fetchMaybeValidatorList<TAddress extends string = string>(
 
 export async function fetchAllValidatorList(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ValidatorList>[]> {
   const maybeAccounts = await fetchAllMaybeValidatorList(
@@ -149,7 +145,7 @@ export async function fetchAllValidatorList(
 
 export async function fetchAllMaybeValidatorList(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ValidatorList>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

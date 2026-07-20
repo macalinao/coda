@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,11 +19,27 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getResolvedInstructionAccountAsTransactionSigner,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMinterPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -92,14 +90,12 @@ export type NewMinterInstruction<
     ]
   >;
 
-export interface NewMinterInstructionData {
+export type NewMinterInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface NewMinterInstructionDataArgs {
-  bump: number;
-}
+export type NewMinterInstructionDataArgs = { bump: number };
 
 export function getNewMinterInstructionDataEncoder(): FixedSizeEncoder<NewMinterInstructionDataArgs> {
   return transformEncoder(
@@ -128,14 +124,14 @@ export function getNewMinterInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewMinterAsyncInput<
+export type NewMinterAsyncInput<
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
   TAccountNewMinterAuthority extends string = string,
   TAccountMinter extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   admin: TransactionSigner<TAccountAdmin>;
   newMinterAuthority?: Address<TAccountNewMinterAuthority>;
@@ -143,7 +139,7 @@ export interface NewMinterAsyncInput<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: NewMinterInstructionDataArgs["bump"];
-}
+};
 
 export async function getNewMinterInstructionAsync<
   TAccountMintWrapper extends string,
@@ -248,14 +244,14 @@ export async function getNewMinterInstructionAsync<
   >);
 }
 
-export interface NewMinterInput<
+export type NewMinterInput<
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
   TAccountNewMinterAuthority extends string = string,
   TAccountMinter extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   admin: TransactionSigner<TAccountAdmin>;
   newMinterAuthority?: Address<TAccountNewMinterAuthority>;
@@ -263,7 +259,7 @@ export interface NewMinterInput<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: NewMinterInstructionDataArgs["bump"];
-}
+};
 
 export function getNewMinterInstruction<
   TAccountMintWrapper extends string,
@@ -354,10 +350,10 @@ export function getNewMinterInstruction<
   >);
 }
 
-export interface ParsedNewMinterInstruction<
+export type ParsedNewMinterInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mintWrapper: TAccountMetas[0];
@@ -368,7 +364,7 @@ export interface ParsedNewMinterInstruction<
     systemProgram: TAccountMetas[5];
   };
   data: NewMinterInstructionData;
-}
+};
 
 export function parseNewMinterInstruction<
   TProgram extends string,

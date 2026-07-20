@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,8 +17,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const EXTRACT_FEES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -73,9 +73,7 @@ export type ExtractFeesInstruction<
     ]
   >;
 
-export interface ExtractFeesInstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type ExtractFeesInstructionData = { discriminator: ReadonlyUint8Array };
 
 export type ExtractFeesInstructionDataArgs = {};
 
@@ -102,17 +100,17 @@ export function getExtractFeesInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ExtractFeesInput<
+export type ExtractFeesInput<
   TAccountRewarder extends string = string,
   TAccountClaimFeeTokenAccount extends string = string,
   TAccountFeeToTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   rewarder: Address<TAccountRewarder>;
   claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
   feeToTokenAccount: Address<TAccountFeeToTokenAccount>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getExtractFeesInstruction<
   TAccountRewarder extends string,
@@ -181,10 +179,10 @@ export function getExtractFeesInstruction<
   >);
 }
 
-export interface ParsedExtractFeesInstruction<
+export type ParsedExtractFeesInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     rewarder: TAccountMetas[0];
@@ -193,7 +191,7 @@ export interface ParsedExtractFeesInstruction<
     tokenProgram: TAccountMetas[3];
   };
   data: ExtractFeesInstructionData;
-}
+};
 
 export function parseExtractFeesInstruction<
   TProgram extends string,

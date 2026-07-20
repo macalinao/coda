@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_STAKER_DISCRIMINATOR = 13;
@@ -44,10 +44,10 @@ export function getSetStakerDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetStakerInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountAuthority extends string | AccountMeta = string,
-  TAccountNewStakerPubkey extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountNewStakerPubkey extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -66,9 +66,7 @@ export type SetStakerInstruction<
     ]
   >;
 
-export interface SetStakerInstructionData {
-  discriminator: number;
-}
+export type SetStakerInstructionData = { discriminator: number };
 
 export type SetStakerInstructionDataArgs = {};
 
@@ -93,19 +91,25 @@ export function getSetStakerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetStakerInput<
+export type SetStakerInput<
   TAccountStakePool extends string = string,
   TAccountAuthority extends string = string,
   TAccountNewStakerPubkey extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Manager or current staker */
   authority: TransactionSigner<TAccountAuthority>;
   /** New staker pubkey */
   newStakerPubkey: Address<TAccountNewStakerPubkey>;
-}
+};
 
+/**
+ * (Manager or staker only) Update staker
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Manager or current staker
+ * 2. '[]` New staker pubkey
+ */
 export function getSetStakerInstruction<
   TAccountStakePool extends string,
   TAccountAuthority extends string,
@@ -159,10 +163,10 @@ export function getSetStakerInstruction<
   >);
 }
 
-export interface ParsedSetStakerInstruction<
+export type ParsedSetStakerInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -173,7 +177,7 @@ export interface ParsedSetStakerInstruction<
     newStakerPubkey: TAccountMetas[2];
   };
   data: SetStakerInstructionData;
-}
+};
 
 export function parseSetStakerInstruction<
   TProgram extends string,

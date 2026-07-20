@@ -6,84 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  FarmState,
-  FarmStateArgs,
-  FarmsGlobalConfig,
-  FarmsGlobalConfigArgs,
-  FarmsUserState,
-  FarmsUserStateArgs,
-  OraclePrices,
-  OraclePricesArgs,
-} from "../accounts/index.js";
-import type {
-  AddRewardsAsyncInput,
-  DepositToFarmVaultInput,
-  FarmsIdlMissingTypesInput,
-  HarvestRewardAsyncInput,
-  InitializeFarmAsyncInput,
-  InitializeFarmDelegatedAsyncInput,
-  InitializeGlobalConfigAsyncInput,
-  InitializeRewardAsyncInput,
-  InitializeUserAsyncInput,
-  ParsedAddRewardsInstruction,
-  ParsedDepositToFarmVaultInstruction,
-  ParsedFarmsIdlMissingTypesInstruction,
-  ParsedHarvestRewardInstruction,
-  ParsedInitializeFarmDelegatedInstruction,
-  ParsedInitializeFarmInstruction,
-  ParsedInitializeGlobalConfigInstruction,
-  ParsedInitializeRewardInstruction,
-  ParsedInitializeUserInstruction,
-  ParsedRefreshFarmInstruction,
-  ParsedRefreshUserStateInstruction,
-  ParsedRewardUserOnceInstruction,
-  ParsedSetStakeDelegatedInstruction,
-  ParsedStakeInstruction,
-  ParsedTransferOwnershipInstruction,
-  ParsedUnstakeInstruction,
-  ParsedUpdateFarmAdminInstruction,
-  ParsedUpdateFarmConfigInstruction,
-  ParsedUpdateGlobalConfigAdminInstruction,
-  ParsedUpdateGlobalConfigInstruction,
-  ParsedWithdrawFromFarmVaultInstruction,
-  ParsedWithdrawRewardInstruction,
-  ParsedWithdrawSlashedAmountInstruction,
-  ParsedWithdrawTreasuryInstruction,
-  ParsedWithdrawUnstakedDepositsInstruction,
-  RefreshFarmInput,
-  RefreshUserStateInput,
-  RewardUserOnceInput,
-  SetStakeDelegatedInput,
-  StakeAsyncInput,
-  TransferOwnershipInput,
-  UnstakeAsyncInput,
-  UpdateFarmAdminInput,
-  UpdateFarmConfigInput,
-  UpdateGlobalConfigAdminInput,
-  UpdateGlobalConfigInput,
-  WithdrawFromFarmVaultAsyncInput,
-  WithdrawRewardAsyncInput,
-  WithdrawSlashedAmountAsyncInput,
-  WithdrawTreasuryAsyncInput,
-  WithdrawUnstakedDepositsAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -94,16 +16,37 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
-  getFarmStateCodec,
   getFarmsGlobalConfigCodec,
+  getFarmStateCodec,
   getFarmsUserStateCodec,
   getOraclePricesCodec,
+  type FarmsGlobalConfig,
+  type FarmsGlobalConfigArgs,
+  type FarmState,
+  type FarmStateArgs,
+  type FarmsUserState,
+  type FarmsUserStateArgs,
+  type OraclePrices,
+  type OraclePricesArgs,
 } from "../accounts/index.js";
 import {
   getAddRewardsInstructionAsync,
@@ -156,6 +99,56 @@ import {
   parseWithdrawSlashedAmountInstruction,
   parseWithdrawTreasuryInstruction,
   parseWithdrawUnstakedDepositsInstruction,
+  type AddRewardsAsyncInput,
+  type DepositToFarmVaultInput,
+  type FarmsIdlMissingTypesInput,
+  type HarvestRewardAsyncInput,
+  type InitializeFarmAsyncInput,
+  type InitializeFarmDelegatedAsyncInput,
+  type InitializeGlobalConfigAsyncInput,
+  type InitializeRewardAsyncInput,
+  type InitializeUserAsyncInput,
+  type ParsedAddRewardsInstruction,
+  type ParsedDepositToFarmVaultInstruction,
+  type ParsedFarmsIdlMissingTypesInstruction,
+  type ParsedHarvestRewardInstruction,
+  type ParsedInitializeFarmDelegatedInstruction,
+  type ParsedInitializeFarmInstruction,
+  type ParsedInitializeGlobalConfigInstruction,
+  type ParsedInitializeRewardInstruction,
+  type ParsedInitializeUserInstruction,
+  type ParsedRefreshFarmInstruction,
+  type ParsedRefreshUserStateInstruction,
+  type ParsedRewardUserOnceInstruction,
+  type ParsedSetStakeDelegatedInstruction,
+  type ParsedStakeInstruction,
+  type ParsedTransferOwnershipInstruction,
+  type ParsedUnstakeInstruction,
+  type ParsedUpdateFarmAdminInstruction,
+  type ParsedUpdateFarmConfigInstruction,
+  type ParsedUpdateGlobalConfigAdminInstruction,
+  type ParsedUpdateGlobalConfigInstruction,
+  type ParsedWithdrawFromFarmVaultInstruction,
+  type ParsedWithdrawRewardInstruction,
+  type ParsedWithdrawSlashedAmountInstruction,
+  type ParsedWithdrawTreasuryInstruction,
+  type ParsedWithdrawUnstakedDepositsInstruction,
+  type RefreshFarmInput,
+  type RefreshUserStateInput,
+  type RewardUserOnceInput,
+  type SetStakeDelegatedInput,
+  type StakeAsyncInput,
+  type TransferOwnershipInput,
+  type UnstakeAsyncInput,
+  type UpdateFarmAdminInput,
+  type UpdateFarmConfigInput,
+  type UpdateGlobalConfigAdminInput,
+  type UpdateGlobalConfigInput,
+  type WithdrawFromFarmVaultAsyncInput,
+  type WithdrawRewardAsyncInput,
+  type WithdrawSlashedAmountAsyncInput,
+  type WithdrawTreasuryAsyncInput,
+  type WithdrawUnstakedDepositsAsyncInput,
 } from "../instructions/index.js";
 import {
   findFarmsUserStatePda,
@@ -170,10 +163,10 @@ export const FARMS_PROGRAM_ADDRESS =
   "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr" as Address<"FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr">;
 
 export enum FarmsAccount {
-  FarmState = 0,
-  FarmsGlobalConfig = 1,
-  FarmsUserState = 2,
-  OraclePrices = 3,
+  FarmState,
+  FarmsGlobalConfig,
+  FarmsUserState,
+  OraclePrices,
 }
 
 export function identifyFarmsAccount(
@@ -231,31 +224,31 @@ export function identifyFarmsAccount(
 }
 
 export enum FarmsInstruction {
-  InitializeGlobalConfig = 0,
-  UpdateGlobalConfig = 1,
-  InitializeFarm = 2,
-  InitializeFarmDelegated = 3,
-  InitializeReward = 4,
-  AddRewards = 5,
-  UpdateFarmConfig = 6,
-  InitializeUser = 7,
-  TransferOwnership = 8,
-  RewardUserOnce = 9,
-  RefreshFarm = 10,
-  Stake = 11,
-  SetStakeDelegated = 12,
-  HarvestReward = 13,
-  Unstake = 14,
-  RefreshUserState = 15,
-  WithdrawUnstakedDeposits = 16,
-  WithdrawTreasury = 17,
-  DepositToFarmVault = 18,
-  WithdrawFromFarmVault = 19,
-  WithdrawSlashedAmount = 20,
-  UpdateFarmAdmin = 21,
-  UpdateGlobalConfigAdmin = 22,
-  WithdrawReward = 23,
-  FarmsIdlMissingTypes = 24,
+  InitializeGlobalConfig,
+  UpdateGlobalConfig,
+  InitializeFarm,
+  InitializeFarmDelegated,
+  InitializeReward,
+  AddRewards,
+  UpdateFarmConfig,
+  InitializeUser,
+  TransferOwnership,
+  RewardUserOnce,
+  RefreshFarm,
+  Stake,
+  SetStakeDelegated,
+  HarvestReward,
+  Unstake,
+  RefreshUserState,
+  WithdrawUnstakedDeposits,
+  WithdrawTreasury,
+  DepositToFarmVault,
+  WithdrawFromFarmVault,
+  WithdrawSlashedAmount,
+  UpdateFarmAdmin,
+  UpdateGlobalConfigAdmin,
+  WithdrawReward,
+  FarmsIdlMissingTypes,
 }
 
 export function identifyFarmsInstruction(
@@ -810,13 +803,16 @@ export function parseFarmsInstruction<TProgram extends string>(
   }
 }
 
-export interface FarmsPlugin {
+export type FarmsPlugin = {
   accounts: FarmsPluginAccounts;
   instructions: FarmsPluginInstructions;
   pdas: FarmsPluginPdas;
-}
+  identifyAccount: typeof identifyFarmsAccount;
+  identifyInstruction: typeof identifyFarmsInstruction;
+  parseInstruction: typeof parseFarmsInstruction;
+};
 
-export interface FarmsPluginAccounts {
+export type FarmsPluginAccounts = {
   farmState: ReturnType<typeof getFarmStateCodec> &
     SelfFetchFunctions<FarmStateArgs, FarmState>;
   farmsGlobalConfig: ReturnType<typeof getFarmsGlobalConfigCodec> &
@@ -825,9 +821,9 @@ export interface FarmsPluginAccounts {
     SelfFetchFunctions<FarmsUserStateArgs, FarmsUserState>;
   oraclePrices: ReturnType<typeof getOraclePricesCodec> &
     SelfFetchFunctions<OraclePricesArgs, OraclePrices>;
-}
+};
 
-export interface FarmsPluginInstructions {
+export type FarmsPluginInstructions = {
   initializeGlobalConfig: (
     input: InitializeGlobalConfigAsyncInput,
   ) => ReturnType<typeof getInitializeGlobalConfigInstructionAsync> &
@@ -925,16 +921,16 @@ export interface FarmsPluginInstructions {
     input: FarmsIdlMissingTypesInput,
   ) => ReturnType<typeof getFarmsIdlMissingTypesInstruction> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface FarmsPluginPdas {
+export type FarmsPluginPdas = {
   rewardTreasuryVault: typeof findRewardTreasuryVaultPda;
   treasuryVaultsAuthority: typeof findTreasuryVaultsAuthorityPda;
   farmVaultsAuthority: typeof findFarmVaultsAuthorityPda;
   farmVault: typeof findFarmVaultPda;
   rewardVault: typeof findRewardVaultPda;
   farmsUserState: typeof findFarmsUserStatePda;
-}
+};
 
 export type FarmsPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -946,7 +942,7 @@ export type FarmsPluginRequirements = ClientWithRpc<
 export function farmsProgram() {
   return <T extends FarmsPluginRequirements>(
     client: T,
-  ): Omit<T, "farms"> & { farms: FarmsPlugin } => {
+  ): ExtendedClient<T, { farms: FarmsPlugin }> => {
     return extendClient(client, {
       farms: <FarmsPlugin>{
         accounts: {
@@ -1102,6 +1098,9 @@ export function farmsProgram() {
           rewardVault: findRewardVaultPda,
           farmsUserState: findFarmsUserStatePda,
         },
+        identifyAccount: identifyFarmsAccount,
+        identifyInstruction: identifyFarmsInstruction,
+        parseInstruction: parseFarmsInstruction,
       },
     });
   };

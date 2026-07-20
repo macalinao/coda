@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface SwapParameters2 {
+export type SwapParameters2 = {
   /** When it's exact in, partial fill, this will be amount_in. When it's exact out, this will be amount_out */
   amount0: bigint;
   /** When it's exact in, partial fill, this will be minimum_amount_out. When it's exact out, this will be maximum_amount_in */
   amount1: bigint;
   /** Swap mode, refer [SwapMode] */
   swapMode: number;
-}
+};
 
-export interface SwapParameters2Args {
+export type SwapParameters2Args = {
   /** When it's exact in, partial fill, this will be amount_in. When it's exact out, this will be amount_out */
   amount0: number | bigint;
   /** When it's exact in, partial fill, this will be minimum_amount_out. When it's exact out, this will be maximum_amount_in */
   amount1: number | bigint;
   /** Swap mode, refer [SwapMode] */
   swapMode: number;
-}
+};
 
 export function getSwapParameters2Encoder(): FixedSizeEncoder<SwapParameters2Args> {
   return getStructEncoder([

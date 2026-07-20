@@ -6,17 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum VoteTipping {
-  Strict = 0,
-  Early = 1,
-  Disabled = 2,
+  Strict,
+  Early,
+  Disabled,
 }
 
 export type VoteTippingArgs = VoteTipping;

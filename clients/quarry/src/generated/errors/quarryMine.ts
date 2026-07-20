@@ -6,38 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: You are not authorized to perform this action. */
-export const QUARRY_MINE_ERROR__UNAUTHORIZED = 0x17_70; // 6000
+export const QUARRY_MINE_ERROR__UNAUTHORIZED = 0x1770; // 6000
 /** InsufficientBalance: Insufficient staked balance for withdraw request. */
-export const QUARRY_MINE_ERROR__INSUFFICIENT_BALANCE = 0x17_71; // 6001
+export const QUARRY_MINE_ERROR__INSUFFICIENT_BALANCE = 0x1771; // 6001
 /** PendingAuthorityNotSet: Pending authority not set */
-export const QUARRY_MINE_ERROR__PENDING_AUTHORITY_NOT_SET = 0x17_72; // 6002
+export const QUARRY_MINE_ERROR__PENDING_AUTHORITY_NOT_SET = 0x1772; // 6002
 /** InvalidRewardsShare: Invalid quarry rewards share */
-export const QUARRY_MINE_ERROR__INVALID_REWARDS_SHARE = 0x17_73; // 6003
+export const QUARRY_MINE_ERROR__INVALID_REWARDS_SHARE = 0x1773; // 6003
 /** InsufficientAllowance: Insufficient allowance. */
-export const QUARRY_MINE_ERROR__INSUFFICIENT_ALLOWANCE = 0x17_74; // 6004
+export const QUARRY_MINE_ERROR__INSUFFICIENT_ALLOWANCE = 0x1774; // 6004
 /** NewVaultNotEmpty: New vault not empty. */
-export const QUARRY_MINE_ERROR__NEW_VAULT_NOT_EMPTY = 0x17_75; // 6005
+export const QUARRY_MINE_ERROR__NEW_VAULT_NOT_EMPTY = 0x1775; // 6005
 /** NotEnoughTokens: Not enough tokens. */
-export const QUARRY_MINE_ERROR__NOT_ENOUGH_TOKENS = 0x17_76; // 6006
+export const QUARRY_MINE_ERROR__NOT_ENOUGH_TOKENS = 0x1776; // 6006
 /** InvalidTimestamp: Invalid timestamp. */
-export const QUARRY_MINE_ERROR__INVALID_TIMESTAMP = 0x17_77; // 6007
+export const QUARRY_MINE_ERROR__INVALID_TIMESTAMP = 0x1777; // 6007
 /** InvalidMaxClaimFee: Invalid max claim fee. */
-export const QUARRY_MINE_ERROR__INVALID_MAX_CLAIM_FEE = 0x17_78; // 6008
+export const QUARRY_MINE_ERROR__INVALID_MAX_CLAIM_FEE = 0x1778; // 6008
 /** MaxAnnualRewardsRateExceeded: Max annual rewards rate exceeded. */
-export const QUARRY_MINE_ERROR__MAX_ANNUAL_REWARDS_RATE_EXCEEDED = 0x17_79; // 6009
+export const QUARRY_MINE_ERROR__MAX_ANNUAL_REWARDS_RATE_EXCEEDED = 0x1779; // 6009
 /** Paused: Rewarder is paused. */
-export const QUARRY_MINE_ERROR__PAUSED = 0x17_7a; // 6010
+export const QUARRY_MINE_ERROR__PAUSED = 0x177a; // 6010
 /** UpperboundExceeded: Rewards earned exceeded quarry's upper bound. */
-export const QUARRY_MINE_ERROR__UPPERBOUND_EXCEEDED = 0x17_7b; // 6011
+export const QUARRY_MINE_ERROR__UPPERBOUND_EXCEEDED = 0x177b; // 6011
 
 export type QuarryMineError =
   | typeof QUARRY_MINE_ERROR__INSUFFICIENT_ALLOWANCE
@@ -54,28 +54,25 @@ export type QuarryMineError =
   | typeof QUARRY_MINE_ERROR__UPPERBOUND_EXCEEDED;
 
 let quarryMineErrorMessages: Record<QuarryMineError, string> | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   quarryMineErrorMessages = {
-    [QUARRY_MINE_ERROR__INSUFFICIENT_ALLOWANCE]: "Insufficient allowance.",
-    [QUARRY_MINE_ERROR__INSUFFICIENT_BALANCE]:
-      "Insufficient staked balance for withdraw request.",
-    [QUARRY_MINE_ERROR__INVALID_MAX_CLAIM_FEE]: "Invalid max claim fee.",
-    [QUARRY_MINE_ERROR__INVALID_REWARDS_SHARE]: "Invalid quarry rewards share",
-    [QUARRY_MINE_ERROR__INVALID_TIMESTAMP]: "Invalid timestamp.",
-    [QUARRY_MINE_ERROR__MAX_ANNUAL_REWARDS_RATE_EXCEEDED]:
-      "Max annual rewards rate exceeded.",
-    [QUARRY_MINE_ERROR__NEW_VAULT_NOT_EMPTY]: "New vault not empty.",
-    [QUARRY_MINE_ERROR__NOT_ENOUGH_TOKENS]: "Not enough tokens.",
-    [QUARRY_MINE_ERROR__PAUSED]: "Rewarder is paused.",
-    [QUARRY_MINE_ERROR__PENDING_AUTHORITY_NOT_SET]: "Pending authority not set",
-    [QUARRY_MINE_ERROR__UNAUTHORIZED]:
-      "You are not authorized to perform this action.",
+    [QUARRY_MINE_ERROR__INSUFFICIENT_ALLOWANCE]: `Insufficient allowance.`,
+    [QUARRY_MINE_ERROR__INSUFFICIENT_BALANCE]: `Insufficient staked balance for withdraw request.`,
+    [QUARRY_MINE_ERROR__INVALID_MAX_CLAIM_FEE]: `Invalid max claim fee.`,
+    [QUARRY_MINE_ERROR__INVALID_REWARDS_SHARE]: `Invalid quarry rewards share`,
+    [QUARRY_MINE_ERROR__INVALID_TIMESTAMP]: `Invalid timestamp.`,
+    [QUARRY_MINE_ERROR__MAX_ANNUAL_REWARDS_RATE_EXCEEDED]: `Max annual rewards rate exceeded.`,
+    [QUARRY_MINE_ERROR__NEW_VAULT_NOT_EMPTY]: `New vault not empty.`,
+    [QUARRY_MINE_ERROR__NOT_ENOUGH_TOKENS]: `Not enough tokens.`,
+    [QUARRY_MINE_ERROR__PAUSED]: `Rewarder is paused.`,
+    [QUARRY_MINE_ERROR__PENDING_AUTHORITY_NOT_SET]: `Pending authority not set`,
+    [QUARRY_MINE_ERROR__UNAUTHORIZED]: `You are not authorized to perform this action.`,
     [QUARRY_MINE_ERROR__UPPERBOUND_EXCEEDED]: `Rewards earned exceeded quarry's upper bound.`,
   };
 }
 
 export function getQuarryMineErrorMessage(code: QuarryMineError): string {
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env["NODE_ENV"] !== "production") {
     return (quarryMineErrorMessages as Record<QuarryMineError, string>)[code];
   }
 

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_MANAGER_DISCRIMINATOR = 11;
@@ -44,11 +44,11 @@ export function getSetManagerDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetManagerInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountManager extends string | AccountMeta = string,
-  TAccountNewManager extends string | AccountMeta = string,
-  TAccountNewManagerFeeAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountManager extends string | AccountMeta<string> = string,
+  TAccountNewManager extends string | AccountMeta<string> = string,
+  TAccountNewManagerFeeAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -71,9 +71,7 @@ export type SetManagerInstruction<
     ]
   >;
 
-export interface SetManagerInstructionData {
-  discriminator: number;
-}
+export type SetManagerInstructionData = { discriminator: number };
 
 export type SetManagerInstructionDataArgs = {};
 
@@ -98,12 +96,12 @@ export function getSetManagerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetManagerInput<
+export type SetManagerInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountNewManager extends string = string,
   TAccountNewManagerFeeAccount extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Manager */
@@ -112,8 +110,15 @@ export interface SetManagerInput<
   newManager: TransactionSigner<TAccountNewManager>;
   /** New manager fee account */
   newManagerFeeAccount: Address<TAccountNewManagerFeeAccount>;
-}
+};
 
+/**
+ * (Manager only) Update manager
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Manager
+ * 2. `[s]` New manager
+ * 3. `[]` New manager fee account
+ */
 export function getSetManagerInstruction<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -173,10 +178,10 @@ export function getSetManagerInstruction<
   >);
 }
 
-export interface ParsedSetManagerInstruction<
+export type ParsedSetManagerInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -189,7 +194,7 @@ export interface ParsedSetManagerInstruction<
     newManagerFeeAccount: TAccountMetas[3];
   };
   data: SetManagerInstructionData;
-}
+};
 
 export function parseSetManagerInstruction<
   TProgram extends string,

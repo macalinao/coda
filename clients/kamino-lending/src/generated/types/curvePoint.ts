@@ -6,23 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface CurvePoint {
-  utilizationRateBps: number;
-  borrowRateBps: number;
-}
+export type CurvePoint = { utilizationRateBps: number; borrowRateBps: number };
 
 export type CurvePointArgs = CurvePoint;
 

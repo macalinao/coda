@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,8 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const LOCK_PERMISSIONLESS_DISCRIMINATOR: ReadonlyUint8Array =
@@ -53,14 +53,14 @@ export function getLockPermissionlessDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type LockPermissionlessInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
-  TAccountLocker extends string | AccountMeta = string,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountEscrowTokens extends string | AccountMeta = string,
-  TAccountEscrowOwner extends string | AccountMeta = string,
-  TAccountSourceTokens extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountLocker extends string | AccountMeta<string> = string,
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountEscrowTokens extends string | AccountMeta<string> = string,
+  TAccountEscrowOwner extends string | AccountMeta<string> = string,
+  TAccountSourceTokens extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -88,16 +88,16 @@ export type LockPermissionlessInstruction<
     ]
   >;
 
-export interface LockPermissionlessInstructionData {
+export type LockPermissionlessInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
   duration: bigint;
-}
+};
 
-export interface LockPermissionlessInstructionDataArgs {
+export type LockPermissionlessInstructionDataArgs = {
   amount: number | bigint;
   duration: number | bigint;
-}
+};
 
 export function getLockPermissionlessInstructionDataEncoder(): FixedSizeEncoder<LockPermissionlessInstructionDataArgs> {
   return transformEncoder(
@@ -128,14 +128,14 @@ export function getLockPermissionlessInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface LockPermissionlessInput<
+export type LockPermissionlessInput<
   TAccountLocker extends string = string,
   TAccountEscrow extends string = string,
   TAccountEscrowTokens extends string = string,
   TAccountEscrowOwner extends string = string,
   TAccountSourceTokens extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   locker: Address<TAccountLocker>;
   escrow: Address<TAccountEscrow>;
   escrowTokens: Address<TAccountEscrowTokens>;
@@ -144,7 +144,7 @@ export interface LockPermissionlessInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: LockPermissionlessInstructionDataArgs["amount"];
   duration: LockPermissionlessInstructionDataArgs["duration"];
-}
+};
 
 export function getLockPermissionlessInstruction<
   TAccountLocker extends string,
@@ -224,10 +224,10 @@ export function getLockPermissionlessInstruction<
   >);
 }
 
-export interface ParsedLockPermissionlessInstruction<
+export type ParsedLockPermissionlessInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     locker: TAccountMetas[0];
@@ -238,7 +238,7 @@ export interface ParsedLockPermissionlessInstruction<
     tokenProgram: TAccountMetas[5];
   };
   data: LockPermissionlessInstructionData;
-}
+};
 
 export function parseLockPermissionlessInstruction<
   TProgram extends string,

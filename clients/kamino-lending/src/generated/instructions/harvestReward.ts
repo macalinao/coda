@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,10 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findFarmsUserStatePda,
@@ -63,19 +61,19 @@ export function getHarvestRewardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type HarvestRewardInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountUserState extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TAccountRewardMint extends string | AccountMeta = string,
-  TAccountUserRewardAta extends string | AccountMeta = string,
-  TAccountRewardsVault extends string | AccountMeta = string,
-  TAccountRewardsTreasuryVault extends string | AccountMeta = string,
-  TAccountFarmVaultsAuthority extends string | AccountMeta = string,
-  TAccountScopePrices extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountUserState extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountRewardMint extends string | AccountMeta<string> = string,
+  TAccountUserRewardAta extends string | AccountMeta<string> = string,
+  TAccountRewardsVault extends string | AccountMeta<string> = string,
+  TAccountRewardsTreasuryVault extends string | AccountMeta<string> = string,
+  TAccountFarmVaultsAuthority extends string | AccountMeta<string> = string,
+  TAccountScopePrices extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -118,14 +116,12 @@ export type HarvestRewardInstruction<
     ]
   >;
 
-export interface HarvestRewardInstructionData {
+export type HarvestRewardInstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: bigint;
-}
+};
 
-export interface HarvestRewardInstructionDataArgs {
-  rewardIndex: number | bigint;
-}
+export type HarvestRewardInstructionDataArgs = { rewardIndex: number | bigint };
 
 export function getHarvestRewardInstructionDataEncoder(): FixedSizeEncoder<HarvestRewardInstructionDataArgs> {
   return transformEncoder(
@@ -154,7 +150,7 @@ export function getHarvestRewardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface HarvestRewardAsyncInput<
+export type HarvestRewardAsyncInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -166,7 +162,7 @@ export interface HarvestRewardAsyncInput<
   TAccountFarmVaultsAuthority extends string = string,
   TAccountScopePrices extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState?: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -179,7 +175,7 @@ export interface HarvestRewardAsyncInput<
   scopePrices?: Address<TAccountScopePrices>;
   tokenProgram?: Address<TAccountTokenProgram>;
   rewardIndex: HarvestRewardInstructionDataArgs["rewardIndex"];
-}
+};
 
 export async function getHarvestRewardInstructionAsync<
   TAccountOwner extends string,
@@ -367,7 +363,7 @@ export async function getHarvestRewardInstructionAsync<
   >);
 }
 
-export interface HarvestRewardInput<
+export type HarvestRewardInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -379,7 +375,7 @@ export interface HarvestRewardInput<
   TAccountFarmVaultsAuthority extends string = string,
   TAccountScopePrices extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -392,7 +388,7 @@ export interface HarvestRewardInput<
   scopePrices?: Address<TAccountScopePrices>;
   tokenProgram?: Address<TAccountTokenProgram>;
   rewardIndex: HarvestRewardInstructionDataArgs["rewardIndex"];
-}
+};
 
 export function getHarvestRewardInstruction<
   TAccountOwner extends string,
@@ -508,10 +504,10 @@ export function getHarvestRewardInstruction<
   >);
 }
 
-export interface ParsedHarvestRewardInstruction<
+export type ParsedHarvestRewardInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -527,7 +523,7 @@ export interface ParsedHarvestRewardInstruction<
     tokenProgram: TAccountMetas[10];
   };
   data: HarvestRewardInstructionData;
-}
+};
 
 export function parseHarvestRewardInstruction<
   TProgram extends string,

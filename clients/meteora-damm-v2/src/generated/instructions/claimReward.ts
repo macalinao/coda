@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,11 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getNonNullResolvedInstructionInput,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -117,16 +115,16 @@ export type ClaimRewardInstruction<
     ]
   >;
 
-export interface ClaimRewardInstructionData {
+export type ClaimRewardInstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
   skipReward: number;
-}
+};
 
-export interface ClaimRewardInstructionDataArgs {
+export type ClaimRewardInstructionDataArgs = {
   rewardIndex: number;
   skipReward: number;
-}
+};
 
 export function getClaimRewardInstructionDataEncoder(): FixedSizeEncoder<ClaimRewardInstructionDataArgs> {
   return transformEncoder(
@@ -157,7 +155,7 @@ export function getClaimRewardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClaimRewardAsyncInput<
+export type ClaimRewardAsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -169,7 +167,7 @@ export interface ClaimRewardAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -186,7 +184,7 @@ export interface ClaimRewardAsyncInput<
   program?: Address<TAccountProgram>;
   rewardIndex: ClaimRewardInstructionDataArgs["rewardIndex"];
   skipReward: ClaimRewardInstructionDataArgs["skipReward"];
-}
+};
 
 export async function getClaimRewardInstructionAsync<
   TAccountPoolAuthority extends string,
@@ -326,7 +324,7 @@ export async function getClaimRewardInstructionAsync<
   >);
 }
 
-export interface ClaimRewardInput<
+export type ClaimRewardInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -338,7 +336,7 @@ export interface ClaimRewardInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -355,7 +353,7 @@ export interface ClaimRewardInput<
   program?: Address<TAccountProgram>;
   rewardIndex: ClaimRewardInstructionDataArgs["rewardIndex"];
   skipReward: ClaimRewardInstructionDataArgs["skipReward"];
-}
+};
 
 export function getClaimRewardInstruction<
   TAccountPoolAuthority extends string,
@@ -475,10 +473,10 @@ export function getClaimRewardInstruction<
   >);
 }
 
-export interface ParsedClaimRewardInstruction<
+export type ParsedClaimRewardInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -497,7 +495,7 @@ export interface ParsedClaimRewardInstruction<
     program: TAccountMetas[10];
   };
   data: ClaimRewardInstructionData;
-}
+};
 
 export function parseClaimRewardInstruction<
   TProgram extends string,

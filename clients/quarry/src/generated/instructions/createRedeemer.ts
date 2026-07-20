@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,10 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -88,14 +86,12 @@ export type CreateRedeemerInstruction<
     ]
   >;
 
-export interface CreateRedeemerInstructionData {
+export type CreateRedeemerInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface CreateRedeemerInstructionDataArgs {
-  bump: number;
-}
+export type CreateRedeemerInstructionDataArgs = { bump: number };
 
 export function getCreateRedeemerInstructionDataEncoder(): FixedSizeEncoder<CreateRedeemerInstructionDataArgs> {
   return transformEncoder(
@@ -124,20 +120,20 @@ export function getCreateRedeemerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateRedeemerAsyncInput<
+export type CreateRedeemerAsyncInput<
   TAccountRedeemer extends string = string,
   TAccountIouMint extends string = string,
   TAccountRedemptionMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   redeemer?: Address<TAccountRedeemer>;
   iouMint: Address<TAccountIouMint>;
   redemptionMint: Address<TAccountRedemptionMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: CreateRedeemerInstructionDataArgs["bump"];
-}
+};
 
 export async function getCreateRedeemerInstructionAsync<
   TAccountRedeemer extends string,
@@ -236,20 +232,20 @@ export async function getCreateRedeemerInstructionAsync<
   >);
 }
 
-export interface CreateRedeemerInput<
+export type CreateRedeemerInput<
   TAccountRedeemer extends string = string,
   TAccountIouMint extends string = string,
   TAccountRedemptionMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   redeemer: Address<TAccountRedeemer>;
   iouMint: Address<TAccountIouMint>;
   redemptionMint: Address<TAccountRedemptionMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: CreateRedeemerInstructionDataArgs["bump"];
-}
+};
 
 export function getCreateRedeemerInstruction<
   TAccountRedeemer extends string,
@@ -324,10 +320,10 @@ export function getCreateRedeemerInstruction<
   >);
 }
 
-export interface ParsedCreateRedeemerInstruction<
+export type ParsedCreateRedeemerInstruction<
   TProgram extends string = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     redeemer: TAccountMetas[0];
@@ -337,7 +333,7 @@ export interface ParsedCreateRedeemerInstruction<
     systemProgram: TAccountMetas[4];
   };
   data: CreateRedeemerInstructionData;
-}
+};
 
 export function parseCreateRedeemerInstruction<
   TProgram extends string,

@@ -6,28 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface RewardPerTimeUnitPoint {
+export type RewardPerTimeUnitPoint = {
   tsStart: bigint;
   rewardPerTimeUnit: bigint;
-}
+};
 
-export interface RewardPerTimeUnitPointArgs {
+export type RewardPerTimeUnitPointArgs = {
   tsStart: number | bigint;
   rewardPerTimeUnit: number | bigint;
-}
+};
 
 export function getRewardPerTimeUnitPointEncoder(): FixedSizeEncoder<RewardPerTimeUnitPointArgs> {
   return getStructEncoder([

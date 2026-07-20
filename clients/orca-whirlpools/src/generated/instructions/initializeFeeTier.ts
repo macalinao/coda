@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,8 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INITIALIZE_FEE_TIER_DISCRIMINATOR: ReadonlyUint8Array =
@@ -52,13 +52,13 @@ export function getInitializeFeeTierDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeFeeTierInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountConfig extends string | AccountMeta = string,
-  TAccountFeeTier extends string | AccountMeta = string,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountFeeAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountConfig extends string | AccountMeta<string> = string,
+  TAccountFeeTier extends string | AccountMeta<string> = string,
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountFeeAuthority extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -84,16 +84,16 @@ export type InitializeFeeTierInstruction<
     ]
   >;
 
-export interface InitializeFeeTierInstructionData {
+export type InitializeFeeTierInstructionData = {
   discriminator: ReadonlyUint8Array;
   tickSpacing: number;
   defaultFeeRate: number;
-}
+};
 
-export interface InitializeFeeTierInstructionDataArgs {
+export type InitializeFeeTierInstructionDataArgs = {
   tickSpacing: number;
   defaultFeeRate: number;
-}
+};
 
 export function getInitializeFeeTierInstructionDataEncoder(): FixedSizeEncoder<InitializeFeeTierInstructionDataArgs> {
   return transformEncoder(
@@ -124,13 +124,13 @@ export function getInitializeFeeTierInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializeFeeTierInput<
+export type InitializeFeeTierInput<
   TAccountConfig extends string = string,
   TAccountFeeTier extends string = string,
   TAccountFunder extends string = string,
   TAccountFeeAuthority extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   config: Address<TAccountConfig>;
   feeTier: Address<TAccountFeeTier>;
   funder: TransactionSigner<TAccountFunder>;
@@ -138,7 +138,7 @@ export interface InitializeFeeTierInput<
   systemProgram?: Address<TAccountSystemProgram>;
   tickSpacing: InitializeFeeTierInstructionDataArgs["tickSpacing"];
   defaultFeeRate: InitializeFeeTierInstructionDataArgs["defaultFeeRate"];
-}
+};
 
 export function getInitializeFeeTierInstruction<
   TAccountConfig extends string,
@@ -212,10 +212,10 @@ export function getInitializeFeeTierInstruction<
   >);
 }
 
-export interface ParsedInitializeFeeTierInstruction<
+export type ParsedInitializeFeeTierInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     config: TAccountMetas[0];
@@ -225,7 +225,7 @@ export interface ParsedInitializeFeeTierInstruction<
     systemProgram: TAccountMetas[4];
   };
   data: InitializeFeeTierInstructionData;
-}
+};
 
 export function parseInitializeFeeTierInstruction<
   TProgram extends string,

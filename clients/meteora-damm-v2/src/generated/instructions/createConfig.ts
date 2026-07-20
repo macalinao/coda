@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  StaticConfigParameters,
-  StaticConfigParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -41,16 +20,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getNonNullResolvedInstructionInput,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getStaticConfigParametersDecoder,
   getStaticConfigParametersEncoder,
+  type StaticConfigParameters,
+  type StaticConfigParametersArgs,
 } from "../types/index.js";
 
 export const CREATE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -97,16 +93,16 @@ export type CreateConfigInstruction<
     ]
   >;
 
-export interface CreateConfigInstructionData {
+export type CreateConfigInstructionData = {
   discriminator: ReadonlyUint8Array;
   index: bigint;
   configParameters: StaticConfigParameters;
-}
+};
 
-export interface CreateConfigInstructionDataArgs {
+export type CreateConfigInstructionDataArgs = {
   index: number | bigint;
   configParameters: StaticConfigParametersArgs;
-}
+};
 
 export function getCreateConfigInstructionDataEncoder(): Encoder<CreateConfigInstructionDataArgs> {
   return transformEncoder(
@@ -137,13 +133,13 @@ export function getCreateConfigInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateConfigAsyncInput<
+export type CreateConfigAsyncInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   config?: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -151,8 +147,11 @@ export interface CreateConfigAsyncInput<
   program?: Address<TAccountProgram>;
   index: CreateConfigInstructionDataArgs["index"];
   configParameters: CreateConfigInstructionDataArgs["configParameters"];
-}
+};
 
+/**
+ * ADMIN FUNCTIONS /////
+ */
 export async function getCreateConfigInstructionAsync<
   TAccountConfig extends string,
   TAccountAdmin extends string,
@@ -245,13 +244,13 @@ export async function getCreateConfigInstructionAsync<
   >);
 }
 
-export interface CreateConfigInput<
+export type CreateConfigInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   config: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -259,8 +258,11 @@ export interface CreateConfigInput<
   program?: Address<TAccountProgram>;
   index: CreateConfigInstructionDataArgs["index"];
   configParameters: CreateConfigInstructionDataArgs["configParameters"];
-}
+};
 
+/**
+ * ADMIN FUNCTIONS /////
+ */
 export function getCreateConfigInstruction<
   TAccountConfig extends string,
   TAccountAdmin extends string,
@@ -337,10 +339,10 @@ export function getCreateConfigInstruction<
   >);
 }
 
-export interface ParsedCreateConfigInstruction<
+export type ParsedCreateConfigInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     config: TAccountMetas[0];
@@ -350,7 +352,7 @@ export interface ParsedCreateConfigInstruction<
     program: TAccountMetas[4];
   };
   data: CreateConfigInstructionData;
-}
+};
 
 export function parseCreateConfigInstruction<
   TProgram extends string,

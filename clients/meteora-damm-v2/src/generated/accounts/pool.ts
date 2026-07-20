@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  PoolFeesStruct,
-  PoolFeesStructArgs,
-  PoolMetrics,
-  PoolMetricsArgs,
-  RewardInfo,
-  RewardInfoArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -44,13 +23,24 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getPoolFeesStructDecoder,
@@ -59,6 +49,12 @@ import {
   getPoolMetricsEncoder,
   getRewardInfoDecoder,
   getRewardInfoEncoder,
+  type PoolFeesStruct,
+  type PoolFeesStructArgs,
+  type PoolMetrics,
+  type PoolMetricsArgs,
+  type RewardInfo,
+  type RewardInfoArgs,
 } from "../types/index.js";
 
 export const POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -69,7 +65,7 @@ export function getPoolDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(POOL_DISCRIMINATOR);
 }
 
-export interface Pool {
+export type Pool = {
   discriminator: ReadonlyUint8Array;
   /** Pool fee */
   poolFees: PoolFeesStruct;
@@ -122,21 +118,21 @@ export interface Pool {
   /** padding */
   padding0: number;
   /** cumulative */
-  feeAPerLiquidity: number[];
+  feeAPerLiquidity: Array<number>;
   /** cumulative */
-  feeBPerLiquidity: number[];
+  feeBPerLiquidity: Array<number>;
   permanentLockLiquidity: bigint;
   /** metrics */
   metrics: PoolMetrics;
   /** pool creator */
   creator: Address;
   /** Padding for further use */
-  padding1: bigint[];
+  padding1: Array<bigint>;
   /** Farming reward information */
-  rewardInfos: RewardInfo[];
-}
+  rewardInfos: Array<RewardInfo>;
+};
 
-export interface PoolArgs {
+export type PoolArgs = {
   /** Pool fee */
   poolFees: PoolFeesStructArgs;
   /** token a mint */
@@ -188,9 +184,9 @@ export interface PoolArgs {
   /** padding */
   padding0: number;
   /** cumulative */
-  feeAPerLiquidity: number[];
+  feeAPerLiquidity: Array<number>;
   /** cumulative */
-  feeBPerLiquidity: number[];
+  feeBPerLiquidity: Array<number>;
   permanentLockLiquidity: number | bigint;
   /** metrics */
   metrics: PoolMetricsArgs;
@@ -199,8 +195,8 @@ export interface PoolArgs {
   /** Padding for further use */
   padding1: Array<number | bigint>;
   /** Farming reward information */
-  rewardInfos: RewardInfoArgs[];
-}
+  rewardInfos: Array<RewardInfoArgs>;
+};
 
 /** Gets the encoder for {@link PoolArgs} account data. */
 export function getPoolEncoder(): FixedSizeEncoder<PoolArgs> {
@@ -324,7 +320,7 @@ export async function fetchMaybePool<TAddress extends string = string>(
 
 export async function fetchAllPool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Pool>[]> {
   const maybeAccounts = await fetchAllMaybePool(rpc, addresses, config);
@@ -334,7 +330,7 @@ export async function fetchAllPool(
 
 export async function fetchAllMaybePool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Pool>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

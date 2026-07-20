@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemainingAccountsInfo,
-  RemainingAccountsInfoArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -41,19 +18,40 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
+  type RemainingAccountsInfo,
+  type RemainingAccountsInfoArgs,
 } from "../types/index.js";
 
 export const TWO_HOP_SWAP_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -68,32 +66,35 @@ export function getTwoHopSwapV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type TwoHopSwapV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolOne extends string | AccountMeta = string,
-  TAccountWhirlpoolTwo extends string | AccountMeta = string,
-  TAccountTokenMintInput extends string | AccountMeta = string,
-  TAccountTokenMintIntermediate extends string | AccountMeta = string,
-  TAccountTokenMintOutput extends string | AccountMeta = string,
-  TAccountTokenProgramInput extends string | AccountMeta = string,
-  TAccountTokenProgramIntermediate extends string | AccountMeta = string,
-  TAccountTokenProgramOutput extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountInput extends string | AccountMeta = string,
-  TAccountTokenVaultOneInput extends string | AccountMeta = string,
-  TAccountTokenVaultOneIntermediate extends string | AccountMeta = string,
-  TAccountTokenVaultTwoIntermediate extends string | AccountMeta = string,
-  TAccountTokenVaultTwoOutput extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountOutput extends string | AccountMeta = string,
-  TAccountTokenAuthority extends string | AccountMeta = string,
-  TAccountTickArrayOne0 extends string | AccountMeta = string,
-  TAccountTickArrayOne1 extends string | AccountMeta = string,
-  TAccountTickArrayOne2 extends string | AccountMeta = string,
-  TAccountTickArrayTwo0 extends string | AccountMeta = string,
-  TAccountTickArrayTwo1 extends string | AccountMeta = string,
-  TAccountTickArrayTwo2 extends string | AccountMeta = string,
-  TAccountOracleOne extends string | AccountMeta = string,
-  TAccountOracleTwo extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta =
+  TAccountWhirlpoolOne extends string | AccountMeta<string> = string,
+  TAccountWhirlpoolTwo extends string | AccountMeta<string> = string,
+  TAccountTokenMintInput extends string | AccountMeta<string> = string,
+  TAccountTokenMintIntermediate extends string | AccountMeta<string> = string,
+  TAccountTokenMintOutput extends string | AccountMeta<string> = string,
+  TAccountTokenProgramInput extends string | AccountMeta<string> = string,
+  TAccountTokenProgramIntermediate extends string | AccountMeta<string> =
+    string,
+  TAccountTokenProgramOutput extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountInput extends string | AccountMeta<string> = string,
+  TAccountTokenVaultOneInput extends string | AccountMeta<string> = string,
+  TAccountTokenVaultOneIntermediate extends string | AccountMeta<string> =
+    string,
+  TAccountTokenVaultTwoIntermediate extends string | AccountMeta<string> =
+    string,
+  TAccountTokenVaultTwoOutput extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountOutput extends string | AccountMeta<string> = string,
+  TAccountTokenAuthority extends string | AccountMeta<string> = string,
+  TAccountTickArrayOne0 extends string | AccountMeta<string> = string,
+  TAccountTickArrayOne1 extends string | AccountMeta<string> = string,
+  TAccountTickArrayOne2 extends string | AccountMeta<string> = string,
+  TAccountTickArrayTwo0 extends string | AccountMeta<string> = string,
+  TAccountTickArrayTwo1 extends string | AccountMeta<string> = string,
+  TAccountTickArrayTwo2 extends string | AccountMeta<string> = string,
+  TAccountOracleOne extends string | AccountMeta<string> = string,
+  TAccountOracleTwo extends string | AccountMeta<string> = string,
+  TAccountMemoProgram extends string | AccountMeta<string> =
     "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -175,7 +176,7 @@ export type TwoHopSwapV2Instruction<
     ]
   >;
 
-export interface TwoHopSwapV2InstructionData {
+export type TwoHopSwapV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
   otherAmountThreshold: bigint;
@@ -185,9 +186,9 @@ export interface TwoHopSwapV2InstructionData {
   sqrtPriceLimitOne: bigint;
   sqrtPriceLimitTwo: bigint;
   remainingAccountsInfo: Option<RemainingAccountsInfo>;
-}
+};
 
-export interface TwoHopSwapV2InstructionDataArgs {
+export type TwoHopSwapV2InstructionDataArgs = {
   amount: number | bigint;
   otherAmountThreshold: number | bigint;
   amountSpecifiedIsInput: boolean;
@@ -196,7 +197,7 @@ export interface TwoHopSwapV2InstructionDataArgs {
   sqrtPriceLimitOne: number | bigint;
   sqrtPriceLimitTwo: number | bigint;
   remainingAccountsInfo: OptionOrNullable<RemainingAccountsInfoArgs>;
-}
+};
 
 export function getTwoHopSwapV2InstructionDataEncoder(): Encoder<TwoHopSwapV2InstructionDataArgs> {
   return transformEncoder(
@@ -245,7 +246,7 @@ export function getTwoHopSwapV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface TwoHopSwapV2Input<
+export type TwoHopSwapV2Input<
   TAccountWhirlpoolOne extends string = string,
   TAccountWhirlpoolTwo extends string = string,
   TAccountTokenMintInput extends string = string,
@@ -270,7 +271,7 @@ export interface TwoHopSwapV2Input<
   TAccountOracleOne extends string = string,
   TAccountOracleTwo extends string = string,
   TAccountMemoProgram extends string = string,
-> {
+> = {
   whirlpoolOne: Address<TAccountWhirlpoolOne>;
   whirlpoolTwo: Address<TAccountWhirlpoolTwo>;
   tokenMintInput: Address<TAccountTokenMintInput>;
@@ -303,7 +304,7 @@ export interface TwoHopSwapV2Input<
   sqrtPriceLimitOne: TwoHopSwapV2InstructionDataArgs["sqrtPriceLimitOne"];
   sqrtPriceLimitTwo: TwoHopSwapV2InstructionDataArgs["sqrtPriceLimitTwo"];
   remainingAccountsInfo: TwoHopSwapV2InstructionDataArgs["remainingAccountsInfo"];
-}
+};
 
 export function getTwoHopSwapV2Instruction<
   TAccountWhirlpoolOne extends string,
@@ -536,10 +537,10 @@ export function getTwoHopSwapV2Instruction<
   >);
 }
 
-export interface ParsedTwoHopSwapV2Instruction<
+export type ParsedTwoHopSwapV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolOne: TAccountMetas[0];
@@ -568,7 +569,7 @@ export interface ParsedTwoHopSwapV2Instruction<
     memoProgram: TAccountMetas[23];
   };
   data: TwoHopSwapV2InstructionData;
-}
+};
 
 export function parseTwoHopSwapV2Instruction<
   TProgram extends string,

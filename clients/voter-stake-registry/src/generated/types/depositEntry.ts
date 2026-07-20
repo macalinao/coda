@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { Lockup, LockupArgs } from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -20,32 +14,40 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { getLockupDecoder, getLockupEncoder } from "./index.js";
+import {
+  getLockupDecoder,
+  getLockupEncoder,
+  type Lockup,
+  type LockupArgs,
+} from "./index.js";
 
-export interface DepositEntry {
+export type DepositEntry = {
   lockup: Lockup;
   amountDepositedNative: bigint;
   amountInitiallyLockedNative: bigint;
   isUsed: boolean;
   allowClawback: boolean;
   votingMintConfigIdx: number;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
-export interface DepositEntryArgs {
+export type DepositEntryArgs = {
   lockup: LockupArgs;
   amountDepositedNative: number | bigint;
   amountInitiallyLockedNative: number | bigint;
   isUsed: boolean;
   allowClawback: boolean;
   votingMintConfigIdx: number;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
 export function getDepositEntryEncoder(): FixedSizeEncoder<DepositEntryArgs> {
   return getStructEncoder([

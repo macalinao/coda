@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findFarmVaultsAuthorityPda,
@@ -58,21 +56,21 @@ export function getInitializeRewardDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeRewardInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountFarmAdmin extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TAccountRewardMint extends string | AccountMeta = string,
-  TAccountRewardVault extends string | AccountMeta = string,
-  TAccountRewardTreasuryVault extends string | AccountMeta = string,
-  TAccountFarmVaultsAuthority extends string | AccountMeta = string,
-  TAccountTreasuryVaultsAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountFarmAdmin extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountRewardMint extends string | AccountMeta<string> = string,
+  TAccountRewardVault extends string | AccountMeta<string> = string,
+  TAccountRewardTreasuryVault extends string | AccountMeta<string> = string,
+  TAccountFarmVaultsAuthority extends string | AccountMeta<string> = string,
+  TAccountTreasuryVaultsAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -115,9 +113,9 @@ export type InitializeRewardInstruction<
     ]
   >;
 
-export interface InitializeRewardInstructionData {
+export type InitializeRewardInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type InitializeRewardInstructionDataArgs = {};
 
@@ -144,7 +142,7 @@ export function getInitializeRewardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializeRewardAsyncInput<
+export type InitializeRewardAsyncInput<
   TAccountFarmAdmin extends string = string,
   TAccountFarmState extends string = string,
   TAccountGlobalConfig extends string = string,
@@ -156,7 +154,7 @@ export interface InitializeRewardAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   farmAdmin: TransactionSigner<TAccountFarmAdmin>;
   farmState: Address<TAccountFarmState>;
   globalConfig: Address<TAccountGlobalConfig>;
@@ -168,7 +166,7 @@ export interface InitializeRewardAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export async function getInitializeRewardInstructionAsync<
   TAccountFarmAdmin extends string,
@@ -336,7 +334,7 @@ export async function getInitializeRewardInstructionAsync<
   >);
 }
 
-export interface InitializeRewardInput<
+export type InitializeRewardInput<
   TAccountFarmAdmin extends string = string,
   TAccountFarmState extends string = string,
   TAccountGlobalConfig extends string = string,
@@ -348,7 +346,7 @@ export interface InitializeRewardInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   farmAdmin: TransactionSigner<TAccountFarmAdmin>;
   farmState: Address<TAccountFarmState>;
   globalConfig: Address<TAccountGlobalConfig>;
@@ -360,7 +358,7 @@ export interface InitializeRewardInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
-}
+};
 
 export function getInitializeRewardInstruction<
   TAccountFarmAdmin extends string,
@@ -485,10 +483,10 @@ export function getInitializeRewardInstruction<
   >);
 }
 
-export interface ParsedInitializeRewardInstruction<
+export type ParsedInitializeRewardInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     farmAdmin: TAccountMetas[0];
@@ -504,7 +502,7 @@ export interface ParsedInitializeRewardInstruction<
     rent: TAccountMetas[10];
   };
   data: InitializeRewardInstructionData;
-}
+};
 
 export function parseInitializeRewardInstruction<
   TProgram extends string,

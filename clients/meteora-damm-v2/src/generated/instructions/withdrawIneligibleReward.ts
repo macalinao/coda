@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,11 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getNonNullResolvedInstructionInput,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -108,14 +106,14 @@ export type WithdrawIneligibleRewardInstruction<
     ]
   >;
 
-export interface WithdrawIneligibleRewardInstructionData {
+export type WithdrawIneligibleRewardInstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
-}
+};
 
-export interface WithdrawIneligibleRewardInstructionDataArgs {
+export type WithdrawIneligibleRewardInstructionDataArgs = {
   rewardIndex: number;
-}
+};
 
 export function getWithdrawIneligibleRewardInstructionDataEncoder(): FixedSizeEncoder<WithdrawIneligibleRewardInstructionDataArgs> {
   return transformEncoder(
@@ -147,7 +145,7 @@ export function getWithdrawIneligibleRewardInstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface WithdrawIneligibleRewardAsyncInput<
+export type WithdrawIneligibleRewardAsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountRewardVault extends string = string,
@@ -157,7 +155,7 @@ export interface WithdrawIneligibleRewardAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   rewardVault?: Address<TAccountRewardVault>;
@@ -168,7 +166,7 @@ export interface WithdrawIneligibleRewardAsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   rewardIndex: WithdrawIneligibleRewardInstructionDataArgs["rewardIndex"];
-}
+};
 
 export async function getWithdrawIneligibleRewardInstructionAsync<
   TAccountPoolAuthority extends string,
@@ -293,7 +291,7 @@ export async function getWithdrawIneligibleRewardInstructionAsync<
   >);
 }
 
-export interface WithdrawIneligibleRewardInput<
+export type WithdrawIneligibleRewardInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountRewardVault extends string = string,
@@ -303,7 +301,7 @@ export interface WithdrawIneligibleRewardInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   rewardVault: Address<TAccountRewardVault>;
@@ -314,7 +312,7 @@ export interface WithdrawIneligibleRewardInput<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   rewardIndex: WithdrawIneligibleRewardInstructionDataArgs["rewardIndex"];
-}
+};
 
 export function getWithdrawIneligibleRewardInstruction<
   TAccountPoolAuthority extends string,
@@ -419,10 +417,10 @@ export function getWithdrawIneligibleRewardInstruction<
   >);
 }
 
-export interface ParsedWithdrawIneligibleRewardInstruction<
+export type ParsedWithdrawIneligibleRewardInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -436,7 +434,7 @@ export interface ParsedWithdrawIneligibleRewardInstruction<
     program: TAccountMetas[8];
   };
   data: WithdrawIneligibleRewardInstructionData;
-}
+};
 
 export function parseWithdrawIneligibleRewardInstruction<
   TProgram extends string,

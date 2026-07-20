@@ -6,40 +6,38 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface BaseFeeParameters {
+export type BaseFeeParameters = {
   cliffFeeNumerator: bigint;
   firstFactor: number;
-  secondFactor: number[];
+  secondFactor: Array<number>;
   thirdFactor: bigint;
   baseFeeMode: number;
-}
+};
 
-export interface BaseFeeParametersArgs {
+export type BaseFeeParametersArgs = {
   cliffFeeNumerator: number | bigint;
   firstFactor: number;
-  secondFactor: number[];
+  secondFactor: Array<number>;
   thirdFactor: number | bigint;
   baseFeeMode: number;
-}
+};
 
 export function getBaseFeeParametersEncoder(): FixedSizeEncoder<BaseFeeParametersArgs> {
   return getStructEncoder([

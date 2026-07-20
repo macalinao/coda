@@ -6,54 +6,50 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  BaseFeeConfig,
-  BaseFeeConfigArgs,
-  DynamicFeeConfig,
-  DynamicFeeConfigArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getBaseFeeConfigDecoder,
   getBaseFeeConfigEncoder,
   getDynamicFeeConfigDecoder,
   getDynamicFeeConfigEncoder,
+  type BaseFeeConfig,
+  type BaseFeeConfigArgs,
+  type DynamicFeeConfig,
+  type DynamicFeeConfigArgs,
 } from "./index.js";
 
-export interface PoolFeesConfig {
+export type PoolFeesConfig = {
   baseFee: BaseFeeConfig;
   dynamicFee: DynamicFeeConfig;
   protocolFeePercent: number;
   partnerFeePercent: number;
   referralFeePercent: number;
-  padding0: number[];
-  padding1: bigint[];
-}
+  padding0: Array<number>;
+  padding1: Array<bigint>;
+};
 
-export interface PoolFeesConfigArgs {
+export type PoolFeesConfigArgs = {
   baseFee: BaseFeeConfigArgs;
   dynamicFee: DynamicFeeConfigArgs;
   protocolFeePercent: number;
   partnerFeePercent: number;
   referralFeePercent: number;
-  padding0: number[];
+  padding0: Array<number>;
   padding1: Array<number | bigint>;
-}
+};
 
 export function getPoolFeesConfigEncoder(): FixedSizeEncoder<PoolFeesConfigArgs> {
   return getStructEncoder([

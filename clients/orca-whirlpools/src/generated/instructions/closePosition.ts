@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CLOSE_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -50,14 +50,14 @@ export function getClosePositionDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClosePositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountPositionAuthority extends string | AccountMeta = string,
-  TAccountReceiver extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPositionMint extends string | AccountMeta = string,
-  TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountPositionAuthority extends string | AccountMeta<string> = string,
+  TAccountReceiver extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPositionMint extends string | AccountMeta<string> = string,
+  TAccountPositionTokenAccount extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -85,9 +85,9 @@ export type ClosePositionInstruction<
     ]
   >;
 
-export interface ClosePositionInstructionData {
+export type ClosePositionInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type ClosePositionInstructionDataArgs = {};
 
@@ -114,21 +114,21 @@ export function getClosePositionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClosePositionInput<
+export type ClosePositionInput<
   TAccountPositionAuthority extends string = string,
   TAccountReceiver extends string = string,
   TAccountPosition extends string = string,
   TAccountPositionMint extends string = string,
   TAccountPositionTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   positionAuthority: TransactionSigner<TAccountPositionAuthority>;
   receiver: Address<TAccountReceiver>;
   position: Address<TAccountPosition>;
   positionMint: Address<TAccountPositionMint>;
   positionTokenAccount: Address<TAccountPositionTokenAccount>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getClosePositionInstruction<
   TAccountPositionAuthority extends string,
@@ -209,10 +209,10 @@ export function getClosePositionInstruction<
   >);
 }
 
-export interface ParsedClosePositionInstruction<
+export type ParsedClosePositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     positionAuthority: TAccountMetas[0];
@@ -223,7 +223,7 @@ export interface ParsedClosePositionInstruction<
     tokenProgram: TAccountMetas[5];
   };
   data: ClosePositionInstructionData;
-}
+};
 
 export function parseClosePositionInstruction<
   TProgram extends string,

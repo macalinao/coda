@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const WITHDRAW_GOVERNING_TOKENS_DISCRIMINATOR = 2;
@@ -44,16 +44,19 @@ export function getWithdrawGoverningTokensDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type WithdrawGoverningTokensInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountGoverningTokenHoldingAccount extends string | AccountMeta = string,
-  TAccountGoverningTokenDestinationAccount extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenHoldingAccount extends string | AccountMeta<string> =
     string,
-  TAccountGoverningTokenOwnerAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountGoverningTokenDestinationAccount extends
+    | string
+    | AccountMeta<string> = string,
+  TAccountGoverningTokenOwnerAccount extends string | AccountMeta<string> =
+    string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountRealmConfigAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmConfigAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -84,9 +87,7 @@ export type WithdrawGoverningTokensInstruction<
     ]
   >;
 
-export interface WithdrawGoverningTokensInstructionData {
-  discriminator: number;
-}
+export type WithdrawGoverningTokensInstructionData = { discriminator: number };
 
 export type WithdrawGoverningTokensInstructionDataArgs = {};
 
@@ -114,7 +115,7 @@ export function getWithdrawGoverningTokensInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface WithdrawGoverningTokensInput<
+export type WithdrawGoverningTokensInput<
   TAccountRealmAccount extends string = string,
   TAccountGoverningTokenHoldingAccount extends string = string,
   TAccountGoverningTokenDestinationAccount extends string = string,
@@ -122,7 +123,7 @@ export interface WithdrawGoverningTokensInput<
   TAccountTokenOwnerRecord extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountRealmConfigAccount extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   /** seeds=['governance', realm, governing_token_mint] */
   governingTokenHoldingAccount: Address<TAccountGoverningTokenHoldingAccount>;
@@ -134,7 +135,7 @@ export interface WithdrawGoverningTokensInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   /** seeds=['realm-config', realm] */
   realmConfigAccount: Address<TAccountRealmConfigAccount>;
-}
+};
 
 export function getWithdrawGoverningTokensInstruction<
   TAccountRealmAccount extends string,
@@ -240,10 +241,10 @@ export function getWithdrawGoverningTokensInstruction<
   >);
 }
 
-export interface ParsedWithdrawGoverningTokensInstruction<
+export type ParsedWithdrawGoverningTokensInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -259,7 +260,7 @@ export interface ParsedWithdrawGoverningTokensInstruction<
     realmConfigAccount: TAccountMetas[6];
   };
   data: WithdrawGoverningTokensInstructionData;
-}
+};
 
 export function parseWithdrawGoverningTokensInstruction<
   TProgram extends string,

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findFarmsUserStatePda, findFarmVaultPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -54,16 +52,16 @@ export function getStakeDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type StakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountUserState extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountFarmVault extends string | AccountMeta = string,
-  TAccountUserAta extends string | AccountMeta = string,
-  TAccountTokenMint extends string | AccountMeta = string,
-  TAccountScopePrices extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountUserState extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountFarmVault extends string | AccountMeta<string> = string,
+  TAccountUserAta extends string | AccountMeta<string> = string,
+  TAccountTokenMint extends string | AccountMeta<string> = string,
+  TAccountScopePrices extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -97,14 +95,12 @@ export type StakeInstruction<
     ]
   >;
 
-export interface StakeInstructionData {
+export type StakeInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-}
+};
 
-export interface StakeInstructionDataArgs {
-  amount: number | bigint;
-}
+export type StakeInstructionDataArgs = { amount: number | bigint };
 
 export function getStakeInstructionDataEncoder(): FixedSizeEncoder<StakeInstructionDataArgs> {
   return transformEncoder(
@@ -133,7 +129,7 @@ export function getStakeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface StakeAsyncInput<
+export type StakeAsyncInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -142,7 +138,7 @@ export interface StakeAsyncInput<
   TAccountTokenMint extends string = string,
   TAccountScopePrices extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState?: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -152,7 +148,7 @@ export interface StakeAsyncInput<
   scopePrices?: Address<TAccountScopePrices>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: StakeInstructionDataArgs["amount"];
-}
+};
 
 export async function getStakeInstructionAsync<
   TAccountOwner extends string,
@@ -270,7 +266,7 @@ export async function getStakeInstructionAsync<
   >);
 }
 
-export interface StakeInput<
+export type StakeInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -279,7 +275,7 @@ export interface StakeInput<
   TAccountTokenMint extends string = string,
   TAccountScopePrices extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -289,7 +285,7 @@ export interface StakeInput<
   scopePrices?: Address<TAccountScopePrices>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: StakeInstructionDataArgs["amount"];
-}
+};
 
 export function getStakeInstruction<
   TAccountOwner extends string,
@@ -381,10 +377,10 @@ export function getStakeInstruction<
   >);
 }
 
-export interface ParsedStakeInstruction<
+export type ParsedStakeInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -397,7 +393,7 @@ export interface ParsedStakeInstruction<
     tokenProgram: TAccountMetas[7];
   };
   data: StakeInstructionData;
-}
+};
 
 export function parseStakeInstruction<
   TProgram extends string,

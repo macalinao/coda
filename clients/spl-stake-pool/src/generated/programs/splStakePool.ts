@@ -6,84 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  StakePool,
-  StakePoolArgs,
-  ValidatorList,
-  ValidatorListArgs,
-} from "../accounts/index.js";
-import type {
-  AddValidatorToPoolAsyncInput,
-  CleanupRemovedValidatorEntriesInput,
-  CreateTokenMetadataAsyncInput,
-  DecreaseAdditionalValidatorStakeAsyncInput,
-  DecreaseValidatorStakeAsyncInput,
-  DecreaseValidatorStakeWithReserveAsyncInput,
-  DepositSolAsyncInput,
-  DepositSolWithSlippageAsyncInput,
-  DepositStakeAsyncInput,
-  DepositStakeWithSlippageAsyncInput,
-  IncreaseAdditionalValidatorStakeAsyncInput,
-  IncreaseValidatorStakeAsyncInput,
-  InitializeAsyncInput,
-  ParsedAddValidatorToPoolInstruction,
-  ParsedCleanupRemovedValidatorEntriesInstruction,
-  ParsedCreateTokenMetadataInstruction,
-  ParsedDecreaseAdditionalValidatorStakeInstruction,
-  ParsedDecreaseValidatorStakeInstruction,
-  ParsedDecreaseValidatorStakeWithReserveInstruction,
-  ParsedDepositSolInstruction,
-  ParsedDepositSolWithSlippageInstruction,
-  ParsedDepositStakeInstruction,
-  ParsedDepositStakeWithSlippageInstruction,
-  ParsedIncreaseAdditionalValidatorStakeInstruction,
-  ParsedIncreaseValidatorStakeInstruction,
-  ParsedInitializeInstruction,
-  ParsedRedelegateInstruction,
-  ParsedRemoveValidatorFromPoolInstruction,
-  ParsedSetFeeInstruction,
-  ParsedSetFundingAuthorityInstruction,
-  ParsedSetManagerInstruction,
-  ParsedSetPreferredValidatorInstruction,
-  ParsedSetStakerInstruction,
-  ParsedUpdateStakePoolBalanceInstruction,
-  ParsedUpdateTokenMetadataInstruction,
-  ParsedUpdateValidatorListBalanceInstruction,
-  ParsedWithdrawSolInstruction,
-  ParsedWithdrawSolWithSlippageInstruction,
-  ParsedWithdrawStakeInstruction,
-  ParsedWithdrawStakeWithSlippageInstruction,
-  RedelegateAsyncInput,
-  RemoveValidatorFromPoolAsyncInput,
-  SetFeeInput,
-  SetFundingAuthorityInput,
-  SetManagerInput,
-  SetPreferredValidatorInput,
-  SetStakerInput,
-  UpdateStakePoolBalanceAsyncInput,
-  UpdateTokenMetadataAsyncInput,
-  UpdateValidatorListBalanceAsyncInput,
-  WithdrawSolAsyncInput,
-  WithdrawSolWithSlippageAsyncInput,
-  WithdrawStakeAsyncInput,
-  WithdrawStakeWithSlippageAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -93,12 +15,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getStakePoolCodec, getValidatorListCodec } from "../accounts/index.js";
+import {
+  getStakePoolCodec,
+  getValidatorListCodec,
+  type StakePool,
+  type StakePoolArgs,
+  type ValidatorList,
+  type ValidatorListArgs,
+} from "../accounts/index.js";
 import {
   getAddValidatorToPoolInstructionAsync,
   getCleanupRemovedValidatorEntriesInstruction,
@@ -154,6 +96,60 @@ import {
   parseWithdrawSolWithSlippageInstruction,
   parseWithdrawStakeInstruction,
   parseWithdrawStakeWithSlippageInstruction,
+  type AddValidatorToPoolAsyncInput,
+  type CleanupRemovedValidatorEntriesInput,
+  type CreateTokenMetadataAsyncInput,
+  type DecreaseAdditionalValidatorStakeAsyncInput,
+  type DecreaseValidatorStakeAsyncInput,
+  type DecreaseValidatorStakeWithReserveAsyncInput,
+  type DepositSolAsyncInput,
+  type DepositSolWithSlippageAsyncInput,
+  type DepositStakeAsyncInput,
+  type DepositStakeWithSlippageAsyncInput,
+  type IncreaseAdditionalValidatorStakeAsyncInput,
+  type IncreaseValidatorStakeAsyncInput,
+  type InitializeAsyncInput,
+  type ParsedAddValidatorToPoolInstruction,
+  type ParsedCleanupRemovedValidatorEntriesInstruction,
+  type ParsedCreateTokenMetadataInstruction,
+  type ParsedDecreaseAdditionalValidatorStakeInstruction,
+  type ParsedDecreaseValidatorStakeInstruction,
+  type ParsedDecreaseValidatorStakeWithReserveInstruction,
+  type ParsedDepositSolInstruction,
+  type ParsedDepositSolWithSlippageInstruction,
+  type ParsedDepositStakeInstruction,
+  type ParsedDepositStakeWithSlippageInstruction,
+  type ParsedIncreaseAdditionalValidatorStakeInstruction,
+  type ParsedIncreaseValidatorStakeInstruction,
+  type ParsedInitializeInstruction,
+  type ParsedRedelegateInstruction,
+  type ParsedRemoveValidatorFromPoolInstruction,
+  type ParsedSetFeeInstruction,
+  type ParsedSetFundingAuthorityInstruction,
+  type ParsedSetManagerInstruction,
+  type ParsedSetPreferredValidatorInstruction,
+  type ParsedSetStakerInstruction,
+  type ParsedUpdateStakePoolBalanceInstruction,
+  type ParsedUpdateTokenMetadataInstruction,
+  type ParsedUpdateValidatorListBalanceInstruction,
+  type ParsedWithdrawSolInstruction,
+  type ParsedWithdrawSolWithSlippageInstruction,
+  type ParsedWithdrawStakeInstruction,
+  type ParsedWithdrawStakeWithSlippageInstruction,
+  type RedelegateAsyncInput,
+  type RemoveValidatorFromPoolAsyncInput,
+  type SetFeeInput,
+  type SetFundingAuthorityInput,
+  type SetManagerInput,
+  type SetPreferredValidatorInput,
+  type SetStakerInput,
+  type UpdateStakePoolBalanceAsyncInput,
+  type UpdateTokenMetadataAsyncInput,
+  type UpdateValidatorListBalanceAsyncInput,
+  type WithdrawSolAsyncInput,
+  type WithdrawSolWithSlippageAsyncInput,
+  type WithdrawStakeAsyncInput,
+  type WithdrawStakeWithSlippageAsyncInput,
 } from "../instructions/index.js";
 import {
   findEphemeralStakePda,
@@ -167,8 +163,8 @@ export const SPL_STAKE_POOL_PROGRAM_ADDRESS =
   "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy" as Address<"SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy">;
 
 export enum SplStakePoolAccount {
-  StakePool = 0,
-  ValidatorList = 1,
+  StakePool,
+  ValidatorList,
 }
 
 export function identifySplStakePoolAccount(
@@ -200,33 +196,33 @@ export function identifySplStakePoolAccount(
 }
 
 export enum SplStakePoolInstruction {
-  Initialize = 0,
-  AddValidatorToPool = 1,
-  RemoveValidatorFromPool = 2,
-  DecreaseValidatorStake = 3,
-  IncreaseValidatorStake = 4,
-  SetPreferredValidator = 5,
-  UpdateValidatorListBalance = 6,
-  UpdateStakePoolBalance = 7,
-  CleanupRemovedValidatorEntries = 8,
-  DepositStake = 9,
-  WithdrawStake = 10,
-  SetManager = 11,
-  SetFee = 12,
-  SetStaker = 13,
-  DepositSol = 14,
-  SetFundingAuthority = 15,
-  WithdrawSol = 16,
-  CreateTokenMetadata = 17,
-  UpdateTokenMetadata = 18,
-  IncreaseAdditionalValidatorStake = 19,
-  DecreaseAdditionalValidatorStake = 20,
-  DecreaseValidatorStakeWithReserve = 21,
-  Redelegate = 22,
-  DepositStakeWithSlippage = 23,
-  WithdrawStakeWithSlippage = 24,
-  DepositSolWithSlippage = 25,
-  WithdrawSolWithSlippage = 26,
+  Initialize,
+  AddValidatorToPool,
+  RemoveValidatorFromPool,
+  DecreaseValidatorStake,
+  IncreaseValidatorStake,
+  SetPreferredValidator,
+  UpdateValidatorListBalance,
+  UpdateStakePoolBalance,
+  CleanupRemovedValidatorEntries,
+  DepositStake,
+  WithdrawStake,
+  SetManager,
+  SetFee,
+  SetStaker,
+  DepositSol,
+  SetFundingAuthority,
+  WithdrawSol,
+  CreateTokenMetadata,
+  UpdateTokenMetadata,
+  IncreaseAdditionalValidatorStake,
+  DecreaseAdditionalValidatorStake,
+  DecreaseValidatorStakeWithReserve,
+  Redelegate,
+  DepositStakeWithSlippage,
+  WithdrawStakeWithSlippage,
+  DepositSolWithSlippage,
+  WithdrawSolWithSlippage,
 }
 
 export function identifySplStakePoolInstruction(
@@ -613,20 +609,23 @@ export function parseSplStakePoolInstruction<TProgram extends string>(
   }
 }
 
-export interface SplStakePoolPlugin {
+export type SplStakePoolPlugin = {
   accounts: SplStakePoolPluginAccounts;
   instructions: SplStakePoolPluginInstructions;
   pdas: SplStakePoolPluginPdas;
-}
+  identifyAccount: typeof identifySplStakePoolAccount;
+  identifyInstruction: typeof identifySplStakePoolInstruction;
+  parseInstruction: typeof parseSplStakePoolInstruction;
+};
 
-export interface SplStakePoolPluginAccounts {
+export type SplStakePoolPluginAccounts = {
   stakePool: ReturnType<typeof getStakePoolCodec> &
     SelfFetchFunctions<StakePoolArgs, StakePool>;
   validatorList: ReturnType<typeof getValidatorListCodec> &
     SelfFetchFunctions<ValidatorListArgs, ValidatorList>;
-}
+};
 
-export interface SplStakePoolPluginInstructions {
+export type SplStakePoolPluginInstructions = {
   initialize: (
     input: InitializeAsyncInput,
   ) => ReturnType<typeof getInitializeInstructionAsync> &
@@ -732,14 +731,14 @@ export interface SplStakePoolPluginInstructions {
     input: WithdrawSolWithSlippageAsyncInput,
   ) => ReturnType<typeof getWithdrawSolWithSlippageInstructionAsync> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface SplStakePoolPluginPdas {
+export type SplStakePoolPluginPdas = {
   withdrawAuthority: typeof findWithdrawAuthorityPda;
   stake: typeof findStakePda;
   transientStake: typeof findTransientStakePda;
   ephemeralStake: typeof findEphemeralStakePda;
-}
+};
 
 export type SplStakePoolPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -751,7 +750,7 @@ export type SplStakePoolPluginRequirements = ClientWithRpc<
 export function splStakePoolProgram() {
   return <T extends SplStakePoolPluginRequirements>(
     client: T,
-  ): Omit<T, "splStakePool"> & { splStakePool: SplStakePoolPlugin } => {
+  ): ExtendedClient<T, { splStakePool: SplStakePoolPlugin }> => {
     return extendClient(client, {
       splStakePool: <SplStakePoolPlugin>{
         accounts: {
@@ -904,6 +903,9 @@ export function splStakePoolProgram() {
           transientStake: findTransientStakePda,
           ephemeralStake: findEphemeralStakePda,
         },
+        identifyAccount: identifySplStakePoolAccount,
+        identifyInstruction: identifySplStakePoolInstruction,
+        parseInstruction: parseSplStakePoolInstruction,
       },
     });
   };

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DEPOSIT_OBLIGATION_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,17 +51,18 @@ export function getDepositObligationCollateralDiscriminatorBytes(): ReadonlyUint
 
 export type DepositObligationCollateralInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountDepositReserve extends string | AccountMeta = string,
-  TAccountReserveDestinationCollateral extends string | AccountMeta = string,
-  TAccountUserSourceCollateral extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountDepositReserve extends string | AccountMeta<string> = string,
+  TAccountReserveDestinationCollateral extends string | AccountMeta<string> =
+    string,
+  TAccountUserSourceCollateral extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountInstructionSysvarAccount extends string | AccountMeta =
+  TAccountInstructionSysvarAccount extends string | AccountMeta<string> =
     "Sysvar1nstructions1111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,14 +96,14 @@ export type DepositObligationCollateralInstruction<
     ]
   >;
 
-export interface DepositObligationCollateralInstructionData {
+export type DepositObligationCollateralInstructionData = {
   discriminator: ReadonlyUint8Array;
   collateralAmount: bigint;
-}
+};
 
-export interface DepositObligationCollateralInstructionDataArgs {
+export type DepositObligationCollateralInstructionDataArgs = {
   collateralAmount: number | bigint;
-}
+};
 
 export function getDepositObligationCollateralInstructionDataEncoder(): FixedSizeEncoder<DepositObligationCollateralInstructionDataArgs> {
   return transformEncoder(
@@ -134,7 +135,7 @@ export function getDepositObligationCollateralInstructionDataCodec(): FixedSizeC
   );
 }
 
-export interface DepositObligationCollateralInput<
+export type DepositObligationCollateralInput<
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
@@ -143,7 +144,7 @@ export interface DepositObligationCollateralInput<
   TAccountUserSourceCollateral extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountInstructionSysvarAccount extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -153,7 +154,7 @@ export interface DepositObligationCollateralInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
   collateralAmount: DepositObligationCollateralInstructionDataArgs["collateralAmount"];
-}
+};
 
 export function getDepositObligationCollateralInstruction<
   TAccountOwner extends string,
@@ -265,10 +266,10 @@ export function getDepositObligationCollateralInstruction<
   >);
 }
 
-export interface ParsedDepositObligationCollateralInstruction<
+export type ParsedDepositObligationCollateralInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -281,7 +282,7 @@ export interface ParsedDepositObligationCollateralInstruction<
     instructionSysvarAccount: TAccountMetas[7];
   };
   data: DepositObligationCollateralInstructionData;
-}
+};
 
 export function parseDepositObligationCollateralInstruction<
   TProgram extends string,

@@ -6,38 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ProposalSeeds } from "../pdas/index.js";
-import type {
-  InstructionExecutionFlags,
-  InstructionExecutionFlagsArgs,
-  ProposalOption,
-  ProposalOptionArgs,
-  ProposalState,
-  ProposalStateArgs,
-  Slot,
-  SlotArgs,
-  UnixTimestamp,
-  UnixTimestampArgs,
-  VoteThreshold,
-  VoteThresholdArgs,
-  VoteType,
-  VoteTypeArgs,
-} from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -55,19 +23,31 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalPda } from "../pdas/index.js";
+import { findProposalPda, type ProposalSeeds } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getInstructionExecutionFlagsDecoder,
@@ -84,6 +64,21 @@ import {
   getVoteThresholdEncoder,
   getVoteTypeDecoder,
   getVoteTypeEncoder,
+  GovernanceAccountType,
+  type InstructionExecutionFlags,
+  type InstructionExecutionFlagsArgs,
+  type ProposalOption,
+  type ProposalOptionArgs,
+  type ProposalState,
+  type ProposalStateArgs,
+  type Slot,
+  type SlotArgs,
+  type UnixTimestamp,
+  type UnixTimestampArgs,
+  type VoteThreshold,
+  type VoteThresholdArgs,
+  type VoteType,
+  type VoteTypeArgs,
 } from "../types/index.js";
 
 export const PROPOSAL_V2_ACCOUNT_TYPE: GovernanceAccountType =
@@ -93,7 +88,7 @@ export function getProposalV2AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(PROPOSAL_V2_ACCOUNT_TYPE);
 }
 
-export interface ProposalV2 {
+export type ProposalV2 = {
   accountType: GovernanceAccountType;
   governance: Address;
   governingTokenMint: Address;
@@ -102,7 +97,7 @@ export interface ProposalV2 {
   signatoriesCount: number;
   signatoriesSignedOffCount: number;
   voteType: VoteType;
-  options: ProposalOption[];
+  options: Array<ProposalOption>;
   denyVoteWeight: Option<bigint>;
   reserved1: number;
   abstainVoteWeight: Option<bigint>;
@@ -118,13 +113,13 @@ export interface ProposalV2 {
   maxVoteWeight: Option<bigint>;
   maxVotingTime: Option<number>;
   voteThreshold: Option<VoteThreshold>;
-  reserved: number[];
+  reserved: Array<number>;
   name: string;
   descriptionLink: string;
   vetoVoteWeight: bigint;
-}
+};
 
-export interface ProposalV2Args {
+export type ProposalV2Args = {
   governance: Address;
   governingTokenMint: Address;
   state: ProposalStateArgs;
@@ -132,7 +127,7 @@ export interface ProposalV2Args {
   signatoriesCount: number;
   signatoriesSignedOffCount: number;
   voteType: VoteTypeArgs;
-  options: ProposalOptionArgs[];
+  options: Array<ProposalOptionArgs>;
   denyVoteWeight: OptionOrNullable<number | bigint>;
   reserved1: number;
   abstainVoteWeight: OptionOrNullable<number | bigint>;
@@ -148,11 +143,11 @@ export interface ProposalV2Args {
   maxVoteWeight: OptionOrNullable<number | bigint>;
   maxVotingTime: OptionOrNullable<number>;
   voteThreshold: OptionOrNullable<VoteThresholdArgs>;
-  reserved: number[];
+  reserved: Array<number>;
   name: string;
   descriptionLink: string;
   vetoVoteWeight: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link ProposalV2Args} account data. */
 export function getProposalV2Encoder(): Encoder<ProposalV2Args> {
@@ -272,7 +267,7 @@ export async function fetchMaybeProposalV2<TAddress extends string = string>(
 
 export async function fetchAllProposalV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProposalV2>[]> {
   const maybeAccounts = await fetchAllMaybeProposalV2(rpc, addresses, config);
@@ -282,7 +277,7 @@ export async function fetchAllProposalV2(
 
 export async function fetchAllMaybeProposalV2(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProposalV2>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

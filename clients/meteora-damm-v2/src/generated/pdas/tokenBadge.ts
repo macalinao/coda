@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface TokenBadgeSeeds {
+export type TokenBadgeSeeds = {
   /** The token mint address */
   tokenMint: Address;
-}
+};
 
 /**
  * A token badge account that stores metadata about a token's permissions and status.

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -53,17 +51,17 @@ export function getWithdrawReferrerFeesDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type WithdrawReferrerFeesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountReferrer extends string | AccountMeta = string,
-  TAccountReferrerTokenState extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountReserveLiquidityMint extends string | AccountMeta = string,
-  TAccountReserveSupplyLiquidity extends string | AccountMeta = string,
-  TAccountReferrerTokenAccount extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountReferrer extends string | AccountMeta<string> = string,
+  TAccountReferrerTokenState extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountReserveLiquidityMint extends string | AccountMeta<string> = string,
+  TAccountReserveSupplyLiquidity extends string | AccountMeta<string> = string,
+  TAccountReferrerTokenAccount extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -100,9 +98,9 @@ export type WithdrawReferrerFeesInstruction<
     ]
   >;
 
-export interface WithdrawReferrerFeesInstructionData {
+export type WithdrawReferrerFeesInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type WithdrawReferrerFeesInstructionDataArgs = {};
 
@@ -132,7 +130,7 @@ export function getWithdrawReferrerFeesInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawReferrerFeesAsyncInput<
+export type WithdrawReferrerFeesAsyncInput<
   TAccountReferrer extends string = string,
   TAccountReferrerTokenState extends string = string,
   TAccountReserve extends string = string,
@@ -142,7 +140,7 @@ export interface WithdrawReferrerFeesAsyncInput<
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   referrer: TransactionSigner<TAccountReferrer>;
   referrerTokenState: Address<TAccountReferrerTokenState>;
   reserve: Address<TAccountReserve>;
@@ -152,7 +150,7 @@ export interface WithdrawReferrerFeesAsyncInput<
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export async function getWithdrawReferrerFeesInstructionAsync<
   TAccountReferrer extends string,
@@ -271,7 +269,7 @@ export async function getWithdrawReferrerFeesInstructionAsync<
   >);
 }
 
-export interface WithdrawReferrerFeesInput<
+export type WithdrawReferrerFeesInput<
   TAccountReferrer extends string = string,
   TAccountReferrerTokenState extends string = string,
   TAccountReserve extends string = string,
@@ -281,7 +279,7 @@ export interface WithdrawReferrerFeesInput<
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   referrer: TransactionSigner<TAccountReferrer>;
   referrerTokenState: Address<TAccountReferrerTokenState>;
   reserve: Address<TAccountReserve>;
@@ -291,7 +289,7 @@ export interface WithdrawReferrerFeesInput<
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getWithdrawReferrerFeesInstruction<
   TAccountReferrer extends string,
@@ -400,10 +398,10 @@ export function getWithdrawReferrerFeesInstruction<
   >);
 }
 
-export interface ParsedWithdrawReferrerFeesInstruction<
+export type ParsedWithdrawReferrerFeesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     referrer: TAccountMetas[0];
@@ -417,7 +415,7 @@ export interface ParsedWithdrawReferrerFeesInstruction<
     tokenProgram: TAccountMetas[8];
   };
   data: WithdrawReferrerFeesInstructionData;
-}
+};
 
 export function parseWithdrawReferrerFeesInstruction<
   TProgram extends string,

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getAddressDecoder,
@@ -35,8 +17,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const ADD_REQUIRED_SIGNATORY_DISCRIMINATOR = 29;
@@ -47,12 +47,13 @@ export function getAddRequiredSignatoryDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type AddRequiredSignatoryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountRequiredSignatoryAccount extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountRequiredSignatoryAccount extends string | AccountMeta<string> =
+    string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -75,14 +76,12 @@ export type AddRequiredSignatoryInstruction<
     ]
   >;
 
-export interface AddRequiredSignatoryInstructionData {
+export type AddRequiredSignatoryInstructionData = {
   discriminator: number;
   signatory: Address;
-}
+};
 
-export interface AddRequiredSignatoryInstructionDataArgs {
-  signatory: Address;
-}
+export type AddRequiredSignatoryInstructionDataArgs = { signatory: Address };
 
 export function getAddRequiredSignatoryInstructionDataEncoder(): FixedSizeEncoder<AddRequiredSignatoryInstructionDataArgs> {
   return transformEncoder(
@@ -114,19 +113,19 @@ export function getAddRequiredSignatoryInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface AddRequiredSignatoryInput<
+export type AddRequiredSignatoryInput<
   TAccountGovernanceAccount extends string = string,
   TAccountRequiredSignatoryAccount extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** The Governance account the config is for */
   governanceAccount: TransactionSigner<TAccountGovernanceAccount>;
   requiredSignatoryAccount: Address<TAccountRequiredSignatoryAccount>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   signatory: AddRequiredSignatoryInstructionDataArgs["signatory"];
-}
+};
 
 export function getAddRequiredSignatoryInstruction<
   TAccountGovernanceAccount extends string,
@@ -204,10 +203,10 @@ export function getAddRequiredSignatoryInstruction<
   >);
 }
 
-export interface ParsedAddRequiredSignatoryInstruction<
+export type ParsedAddRequiredSignatoryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The Governance account the config is for */
@@ -217,7 +216,7 @@ export interface ParsedAddRequiredSignatoryInstruction<
     systemProgram: TAccountMetas[3];
   };
   data: AddRequiredSignatoryInstructionData;
-}
+};
 
 export function parseAddRequiredSignatoryInstruction<
   TProgram extends string,

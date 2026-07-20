@@ -6,26 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  GovernanceParameters,
-  GovernanceParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,12 +17,30 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getGovernanceParametersDecoder,
   getGovernanceParametersEncoder,
+  type GovernanceParameters,
+  type GovernanceParametersArgs,
 } from "../types/index.js";
 
 export const SET_GOVERNANCE_PARAMS_DISCRIMINATOR: ReadonlyUint8Array =
@@ -56,9 +54,9 @@ export function getSetGovernanceParamsDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetGovernanceParamsInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountSmartWallet extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountSmartWallet extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -74,14 +72,14 @@ export type SetGovernanceParamsInstruction<
     ]
   >;
 
-export interface SetGovernanceParamsInstructionData {
+export type SetGovernanceParamsInstructionData = {
   discriminator: ReadonlyUint8Array;
   params: GovernanceParameters;
-}
+};
 
-export interface SetGovernanceParamsInstructionDataArgs {
+export type SetGovernanceParamsInstructionDataArgs = {
   params: GovernanceParametersArgs;
-}
+};
 
 export function getSetGovernanceParamsInstructionDataEncoder(): FixedSizeEncoder<SetGovernanceParamsInstructionDataArgs> {
   return transformEncoder(
@@ -113,14 +111,14 @@ export function getSetGovernanceParamsInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetGovernanceParamsInput<
+export type SetGovernanceParamsInput<
   TAccountGovernor extends string = string,
   TAccountSmartWallet extends string = string,
-> {
+> = {
   governor: Address<TAccountGovernor>;
   smartWallet: TransactionSigner<TAccountSmartWallet>;
   params: SetGovernanceParamsInstructionDataArgs["params"];
-}
+};
 
 export function getSetGovernanceParamsInstruction<
   TAccountGovernor extends string,
@@ -167,17 +165,17 @@ export function getSetGovernanceParamsInstruction<
   >);
 }
 
-export interface ParsedSetGovernanceParamsInstruction<
+export type ParsedSetGovernanceParamsInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governor: TAccountMetas[0];
     smartWallet: TAccountMetas[1];
   };
   data: SetGovernanceParamsInstructionData;
-}
+};
 
 export function parseSetGovernanceParamsInstruction<
   TProgram extends string,

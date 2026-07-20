@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,11 +17,27 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getResolvedInstructionAccountAsTransactionSigner,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findRewarderPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -99,9 +97,9 @@ export type NewRewarderV2Instruction<
     ]
   >;
 
-export interface NewRewarderV2InstructionData {
+export type NewRewarderV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type NewRewarderV2InstructionDataArgs = {};
 
@@ -128,7 +126,7 @@ export function getNewRewarderV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewRewarderV2AsyncInput<
+export type NewRewarderV2AsyncInput<
   TAccountBase extends string = string,
   TAccountRewarder extends string = string,
   TAccountInitialAuthority extends string = string,
@@ -137,7 +135,7 @@ export interface NewRewarderV2AsyncInput<
   TAccountMintWrapper extends string = string,
   TAccountRewardsTokenMint extends string = string,
   TAccountClaimFeeTokenAccount extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   rewarder?: Address<TAccountRewarder>;
   initialAuthority?: Address<TAccountInitialAuthority>;
@@ -146,7 +144,7 @@ export interface NewRewarderV2AsyncInput<
   mintWrapper: Address<TAccountMintWrapper>;
   rewardsTokenMint: Address<TAccountRewardsTokenMint>;
   claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
-}
+};
 
 export async function getNewRewarderV2InstructionAsync<
   TAccountBase extends string,
@@ -259,7 +257,7 @@ export async function getNewRewarderV2InstructionAsync<
   >);
 }
 
-export interface NewRewarderV2Input<
+export type NewRewarderV2Input<
   TAccountBase extends string = string,
   TAccountRewarder extends string = string,
   TAccountInitialAuthority extends string = string,
@@ -268,7 +266,7 @@ export interface NewRewarderV2Input<
   TAccountMintWrapper extends string = string,
   TAccountRewardsTokenMint extends string = string,
   TAccountClaimFeeTokenAccount extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   rewarder: Address<TAccountRewarder>;
   initialAuthority?: Address<TAccountInitialAuthority>;
@@ -277,7 +275,7 @@ export interface NewRewarderV2Input<
   mintWrapper: Address<TAccountMintWrapper>;
   rewardsTokenMint: Address<TAccountRewardsTokenMint>;
   claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
-}
+};
 
 export function getNewRewarderV2Instruction<
   TAccountBase extends string,
@@ -380,10 +378,10 @@ export function getNewRewarderV2Instruction<
   >);
 }
 
-export interface ParsedNewRewarderV2Instruction<
+export type ParsedNewRewarderV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     base: TAccountMetas[0];
@@ -396,7 +394,7 @@ export interface ParsedNewRewarderV2Instruction<
     claimFeeTokenAccount: TAccountMetas[7];
   };
   data: NewRewarderV2InstructionData;
-}
+};
 
 export function parseNewRewarderV2Instruction<
   TProgram extends string,

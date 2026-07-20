@@ -6,28 +6,26 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface PositionMetrics {
+export type PositionMetrics = {
   totalClaimedAFee: bigint;
   totalClaimedBFee: bigint;
-}
+};
 
-export interface PositionMetricsArgs {
+export type PositionMetricsArgs = {
   totalClaimedAFee: number | bigint;
   totalClaimedBFee: number | bigint;
-}
+};
 
 export function getPositionMetricsEncoder(): FixedSizeEncoder<PositionMetricsArgs> {
   return getStructEncoder([

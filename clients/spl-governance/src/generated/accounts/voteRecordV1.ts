@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { VoteRecordSeeds } from "../pdas/index.js";
-import type { VoteWeightV1, VoteWeightV1Args } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,14 +20,27 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVoteRecordPda } from "../pdas/index.js";
+import { findVoteRecordPda, type VoteRecordSeeds } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getVoteWeightV1Decoder,
   getVoteWeightV1Encoder,
+  GovernanceAccountType,
+  type VoteWeightV1,
+  type VoteWeightV1Args,
 } from "../types/index.js";
 
 export const VOTE_RECORD_V1_ACCOUNT_TYPE: GovernanceAccountType =
@@ -52,20 +50,20 @@ export function getVoteRecordV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(VOTE_RECORD_V1_ACCOUNT_TYPE);
 }
 
-export interface VoteRecordV1 {
+export type VoteRecordV1 = {
   accountType: GovernanceAccountType;
   proposal: Address;
   governingTokenOwner: Address;
   isRelinquished: boolean;
   voteWeight: VoteWeightV1;
-}
+};
 
-export interface VoteRecordV1Args {
+export type VoteRecordV1Args = {
   proposal: Address;
   governingTokenOwner: Address;
   isRelinquished: boolean;
   voteWeight: VoteWeightV1Args;
-}
+};
 
 /** Gets the encoder for {@link VoteRecordV1Args} account data. */
 export function getVoteRecordV1Encoder(): FixedSizeEncoder<VoteRecordV1Args> {
@@ -136,7 +134,7 @@ export async function fetchMaybeVoteRecordV1<TAddress extends string = string>(
 
 export async function fetchAllVoteRecordV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<VoteRecordV1>[]> {
   const maybeAccounts = await fetchAllMaybeVoteRecordV1(rpc, addresses, config);
@@ -146,7 +144,7 @@ export async function fetchAllVoteRecordV1(
 
 export async function fetchAllMaybeVoteRecordV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<VoteRecordV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

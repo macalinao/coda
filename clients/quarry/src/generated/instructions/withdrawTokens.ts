@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMinerPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -95,14 +93,12 @@ export type WithdrawTokensInstruction<
     ]
   >;
 
-export interface WithdrawTokensInstructionData {
+export type WithdrawTokensInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-}
+};
 
-export interface WithdrawTokensInstructionDataArgs {
-  amount: number | bigint;
-}
+export type WithdrawTokensInstructionDataArgs = { amount: number | bigint };
 
 export function getWithdrawTokensInstructionDataEncoder(): FixedSizeEncoder<WithdrawTokensInstructionDataArgs> {
   return transformEncoder(
@@ -131,7 +127,7 @@ export function getWithdrawTokensInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawTokensAsyncInput<
+export type WithdrawTokensAsyncInput<
   TAccountAuthority extends string = string,
   TAccountMiner extends string = string,
   TAccountQuarry extends string = string,
@@ -139,7 +135,7 @@ export interface WithdrawTokensAsyncInput<
   TAccountTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   miner?: Address<TAccountMiner>;
   quarry: Address<TAccountQuarry>;
@@ -148,7 +144,7 @@ export interface WithdrawTokensAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   rewarder: Address<TAccountRewarder>;
   amount: WithdrawTokensInstructionDataArgs["amount"];
-}
+};
 
 export async function getWithdrawTokensInstructionAsync<
   TAccountAuthority extends string,
@@ -248,7 +244,7 @@ export async function getWithdrawTokensInstructionAsync<
   >);
 }
 
-export interface WithdrawTokensInput<
+export type WithdrawTokensInput<
   TAccountAuthority extends string = string,
   TAccountMiner extends string = string,
   TAccountQuarry extends string = string,
@@ -256,7 +252,7 @@ export interface WithdrawTokensInput<
   TAccountTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   miner: Address<TAccountMiner>;
   quarry: Address<TAccountQuarry>;
@@ -265,7 +261,7 @@ export interface WithdrawTokensInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   rewarder: Address<TAccountRewarder>;
   amount: WithdrawTokensInstructionDataArgs["amount"];
-}
+};
 
 export function getWithdrawTokensInstruction<
   TAccountAuthority extends string,
@@ -351,10 +347,10 @@ export function getWithdrawTokensInstruction<
   >);
 }
 
-export interface ParsedWithdrawTokensInstruction<
+export type ParsedWithdrawTokensInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     authority: TAccountMetas[0];
@@ -366,7 +362,7 @@ export interface ParsedWithdrawTokensInstruction<
     rewarder: TAccountMetas[6];
   };
   data: WithdrawTokensInstructionData;
-}
+};
 
 export function parseWithdrawTokensInstruction<
   TProgram extends string,

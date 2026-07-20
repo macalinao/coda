@@ -6,20 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 /**
  * Defines which validator vote account is set during the
  * `SetPreferredValidator` instruction
  */
 export enum PreferredValidatorType {
-  Deposit = 0,
-  Withdraw = 1,
+  Deposit,
+  Withdraw,
 }
 
 export type PreferredValidatorTypeArgs = PreferredValidatorType;

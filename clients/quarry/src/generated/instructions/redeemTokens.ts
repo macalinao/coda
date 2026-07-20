@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -39,10 +22,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -97,14 +95,12 @@ export type RedeemTokensInstruction<
     ]
   >;
 
-export interface RedeemTokensInstructionData {
+export type RedeemTokensInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-}
+};
 
-export interface RedeemTokensInstructionDataArgs {
-  amount: number | bigint;
-}
+export type RedeemTokensInstructionDataArgs = { amount: number | bigint };
 
 export function getRedeemTokensInstructionDataEncoder(): FixedSizeEncoder<RedeemTokensInstructionDataArgs> {
   return transformEncoder(
@@ -133,7 +129,7 @@ export function getRedeemTokensInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RedeemTokensAsyncInput<
+export type RedeemTokensAsyncInput<
   TAccountRedeemer extends string = string,
   TAccountSourceAuthority extends string = string,
   TAccountIouMint extends string = string,
@@ -141,7 +137,7 @@ export interface RedeemTokensAsyncInput<
   TAccountRedemptionVault extends string = string,
   TAccountRedemptionDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   redeemer: Address<TAccountRedeemer>;
   sourceAuthority: TransactionSigner<TAccountSourceAuthority>;
   iouMint: Address<TAccountIouMint>;
@@ -150,7 +146,7 @@ export interface RedeemTokensAsyncInput<
   redemptionDestination: Address<TAccountRedemptionDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: RedeemTokensInstructionDataArgs["amount"];
-}
+};
 
 export async function getRedeemTokensInstructionAsync<
   TAccountRedeemer extends string,
@@ -268,7 +264,7 @@ export async function getRedeemTokensInstructionAsync<
   >);
 }
 
-export interface RedeemTokensInput<
+export type RedeemTokensInput<
   TAccountRedeemer extends string = string,
   TAccountSourceAuthority extends string = string,
   TAccountIouMint extends string = string,
@@ -276,7 +272,7 @@ export interface RedeemTokensInput<
   TAccountRedemptionVault extends string = string,
   TAccountRedemptionDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   redeemer: Address<TAccountRedeemer>;
   sourceAuthority: TransactionSigner<TAccountSourceAuthority>;
   iouMint: Address<TAccountIouMint>;
@@ -285,7 +281,7 @@ export interface RedeemTokensInput<
   redemptionDestination: Address<TAccountRedemptionDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: RedeemTokensInstructionDataArgs["amount"];
-}
+};
 
 export function getRedeemTokensInstruction<
   TAccountRedeemer extends string,
@@ -378,10 +374,10 @@ export function getRedeemTokensInstruction<
   >);
 }
 
-export interface ParsedRedeemTokensInstruction<
+export type ParsedRedeemTokensInstruction<
   TProgram extends string = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     redeemer: TAccountMetas[0];
@@ -393,7 +389,7 @@ export interface ParsedRedeemTokensInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: RedeemTokensInstructionData;
-}
+};
 
 export function parseRedeemTokensInstruction<
   TProgram extends string,

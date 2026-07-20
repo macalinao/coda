@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** AlreadyInUse: AlreadyInUse */
@@ -147,75 +147,59 @@ export type SplStakePoolError =
   | typeof SPL_STAKE_POOL_ERROR__WRONG_STAKE_STAKE;
 
 let splStakePoolErrorMessages: Record<SplStakePoolError, string> | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   splStakePoolErrorMessages = {
-    [SPL_STAKE_POOL_ERROR__ALREADY_IN_USE]: "AlreadyInUse",
-    [SPL_STAKE_POOL_ERROR__CALCULATION_FAILURE]: "CalculationFailure",
-    [SPL_STAKE_POOL_ERROR__DEPOSIT_TOO_SMALL]: "DepositTooSmall",
-    [SPL_STAKE_POOL_ERROR__EXCEEDED_SLIPPAGE]:
-      "Instruction exceeds desired slippage limit",
-    [SPL_STAKE_POOL_ERROR__FEE_INCREASE_TOO_HIGH]: "FeeIncreaseTooHigh",
-    [SPL_STAKE_POOL_ERROR__FEE_TOO_HIGH]: "FeeTooHigh",
-    [SPL_STAKE_POOL_ERROR__INCORRECT_DEPOSIT_VOTE_ADDRESS]:
-      "IncorrectDepositVoteAddress",
-    [SPL_STAKE_POOL_ERROR__INCORRECT_MINT_DECIMALS]: "IncorrectMintDecimals",
-    [SPL_STAKE_POOL_ERROR__INCORRECT_WITHDRAW_VOTE_ADDRESS]:
-      "IncorrectWithdrawVoteAddress",
-    [SPL_STAKE_POOL_ERROR__INVALID_FEE_ACCOUNT]: "InvalidFeeAccount",
-    [SPL_STAKE_POOL_ERROR__INVALID_METADATA_ACCOUNT]: "InvalidMetadataAccount",
-    [SPL_STAKE_POOL_ERROR__INVALID_MINT_FREEZE_AUTHORITY]:
-      "InvalidMintFreezeAuthority",
-    [SPL_STAKE_POOL_ERROR__INVALID_PREFERRED_VALIDATOR]:
-      "InvalidPreferredValidator",
-    [SPL_STAKE_POOL_ERROR__INVALID_PROGRAM_ADDRESS]: "InvalidProgramAddress",
-    [SPL_STAKE_POOL_ERROR__INVALID_SOL_DEPOSIT_AUTHORITY]:
-      "InvalidSolDepositAuthority",
-    [SPL_STAKE_POOL_ERROR__INVALID_SOL_WITHDRAW_AUTHORITY]:
-      "InvalidSolWithdrawAuthority",
-    [SPL_STAKE_POOL_ERROR__INVALID_STAKE_ACCOUNT_ADDRESS]:
-      "InvalidStakeAccountAddress",
-    [SPL_STAKE_POOL_ERROR__INVALID_STAKE_DEPOSIT_AUTHORITY]:
-      "InvalidStakeDepositAuthority",
-    [SPL_STAKE_POOL_ERROR__INVALID_STATE]: "InvalidState",
-    [SPL_STAKE_POOL_ERROR__INVALID_VALIDATOR_STAKE_LIST]:
-      "InvalidValidatorStakeList",
-    [SPL_STAKE_POOL_ERROR__MISSING_REQUIRED_SYSVAR]:
-      "Missing required sysvar account",
-    [SPL_STAKE_POOL_ERROR__NON_ZERO_POOL_TOKEN_SUPPLY]:
-      "NonZeroPoolTokenSupply",
-    [SPL_STAKE_POOL_ERROR__RESERVE_DEPLETED]: "ReserveDepleted",
-    [SPL_STAKE_POOL_ERROR__SIGNATURE_MISSING]: "SignatureMissing",
-    [SPL_STAKE_POOL_ERROR__SOL_WITHDRAWAL_TOO_LARGE]: "SolWithdrawalTooLarge",
-    [SPL_STAKE_POOL_ERROR__STAKE_LAMPORTS_NOT_EQUAL_TO_MINIMUM]:
-      "StakeLamportsNotEqualToMinimum",
-    [SPL_STAKE_POOL_ERROR__STAKE_LIST_AND_POOL_OUT_OF_DATE]:
-      "StakeListAndPoolOutOfDate",
-    [SPL_STAKE_POOL_ERROR__STAKE_LIST_OUT_OF_DATE]: "StakeListOutOfDate",
-    [SPL_STAKE_POOL_ERROR__TRANSIENT_ACCOUNT_IN_USE]: "TransientAccountInUse",
-    [SPL_STAKE_POOL_ERROR__UNEXPECTED_VALIDATOR_LIST_ACCOUNT_SIZE]:
-      "UnexpectedValidatorListAccountSize",
-    [SPL_STAKE_POOL_ERROR__UNKNOWN_VALIDATOR_STAKE_ACCOUNT]:
-      "UnknownValidatorStakeAccount",
-    [SPL_STAKE_POOL_ERROR__UNSUPPORTED_FEE_ACCOUNT_EXTENSION]:
-      "UnsupportedFeeAccountExtension",
-    [SPL_STAKE_POOL_ERROR__UNSUPPORTED_MINT_EXTENSION]:
-      "UnsupportedMintExtension",
-    [SPL_STAKE_POOL_ERROR__USER_STAKE_NOT_ACTIVE]: "UserStakeNotActive",
-    [SPL_STAKE_POOL_ERROR__VALIDATOR_ALREADY_ADDED]: "ValidatorAlreadyAdded",
-    [SPL_STAKE_POOL_ERROR__VALIDATOR_NOT_FOUND]: "ValidatorNotFound",
-    [SPL_STAKE_POOL_ERROR__WITHDRAWAL_TOO_SMALL]: "WithdrawalTooSmall",
-    [SPL_STAKE_POOL_ERROR__WRONG_ACCOUNT_MINT]: "WrongAccountMint",
-    [SPL_STAKE_POOL_ERROR__WRONG_MANAGER]: "WrongManager",
-    [SPL_STAKE_POOL_ERROR__WRONG_MINTING_AUTHORITY]: "WrongMintingAuthority",
-    [SPL_STAKE_POOL_ERROR__WRONG_POOL_MINT]: "WrongPoolMint",
-    [SPL_STAKE_POOL_ERROR__WRONG_STAKER]: "WrongStaker",
-    [SPL_STAKE_POOL_ERROR__WRONG_STAKE_STAKE]: "WrongStakeStake",
+    [SPL_STAKE_POOL_ERROR__ALREADY_IN_USE]: `AlreadyInUse`,
+    [SPL_STAKE_POOL_ERROR__CALCULATION_FAILURE]: `CalculationFailure`,
+    [SPL_STAKE_POOL_ERROR__DEPOSIT_TOO_SMALL]: `DepositTooSmall`,
+    [SPL_STAKE_POOL_ERROR__EXCEEDED_SLIPPAGE]: `Instruction exceeds desired slippage limit`,
+    [SPL_STAKE_POOL_ERROR__FEE_INCREASE_TOO_HIGH]: `FeeIncreaseTooHigh`,
+    [SPL_STAKE_POOL_ERROR__FEE_TOO_HIGH]: `FeeTooHigh`,
+    [SPL_STAKE_POOL_ERROR__INCORRECT_DEPOSIT_VOTE_ADDRESS]: `IncorrectDepositVoteAddress`,
+    [SPL_STAKE_POOL_ERROR__INCORRECT_MINT_DECIMALS]: `IncorrectMintDecimals`,
+    [SPL_STAKE_POOL_ERROR__INCORRECT_WITHDRAW_VOTE_ADDRESS]: `IncorrectWithdrawVoteAddress`,
+    [SPL_STAKE_POOL_ERROR__INVALID_FEE_ACCOUNT]: `InvalidFeeAccount`,
+    [SPL_STAKE_POOL_ERROR__INVALID_METADATA_ACCOUNT]: `InvalidMetadataAccount`,
+    [SPL_STAKE_POOL_ERROR__INVALID_MINT_FREEZE_AUTHORITY]: `InvalidMintFreezeAuthority`,
+    [SPL_STAKE_POOL_ERROR__INVALID_PREFERRED_VALIDATOR]: `InvalidPreferredValidator`,
+    [SPL_STAKE_POOL_ERROR__INVALID_PROGRAM_ADDRESS]: `InvalidProgramAddress`,
+    [SPL_STAKE_POOL_ERROR__INVALID_SOL_DEPOSIT_AUTHORITY]: `InvalidSolDepositAuthority`,
+    [SPL_STAKE_POOL_ERROR__INVALID_SOL_WITHDRAW_AUTHORITY]: `InvalidSolWithdrawAuthority`,
+    [SPL_STAKE_POOL_ERROR__INVALID_STAKE_ACCOUNT_ADDRESS]: `InvalidStakeAccountAddress`,
+    [SPL_STAKE_POOL_ERROR__INVALID_STAKE_DEPOSIT_AUTHORITY]: `InvalidStakeDepositAuthority`,
+    [SPL_STAKE_POOL_ERROR__INVALID_STATE]: `InvalidState`,
+    [SPL_STAKE_POOL_ERROR__INVALID_VALIDATOR_STAKE_LIST]: `InvalidValidatorStakeList`,
+    [SPL_STAKE_POOL_ERROR__MISSING_REQUIRED_SYSVAR]: `Missing required sysvar account`,
+    [SPL_STAKE_POOL_ERROR__NON_ZERO_POOL_TOKEN_SUPPLY]: `NonZeroPoolTokenSupply`,
+    [SPL_STAKE_POOL_ERROR__RESERVE_DEPLETED]: `ReserveDepleted`,
+    [SPL_STAKE_POOL_ERROR__SIGNATURE_MISSING]: `SignatureMissing`,
+    [SPL_STAKE_POOL_ERROR__SOL_WITHDRAWAL_TOO_LARGE]: `SolWithdrawalTooLarge`,
+    [SPL_STAKE_POOL_ERROR__STAKE_LAMPORTS_NOT_EQUAL_TO_MINIMUM]: `StakeLamportsNotEqualToMinimum`,
+    [SPL_STAKE_POOL_ERROR__STAKE_LIST_AND_POOL_OUT_OF_DATE]: `StakeListAndPoolOutOfDate`,
+    [SPL_STAKE_POOL_ERROR__STAKE_LIST_OUT_OF_DATE]: `StakeListOutOfDate`,
+    [SPL_STAKE_POOL_ERROR__TRANSIENT_ACCOUNT_IN_USE]: `TransientAccountInUse`,
+    [SPL_STAKE_POOL_ERROR__UNEXPECTED_VALIDATOR_LIST_ACCOUNT_SIZE]: `UnexpectedValidatorListAccountSize`,
+    [SPL_STAKE_POOL_ERROR__UNKNOWN_VALIDATOR_STAKE_ACCOUNT]: `UnknownValidatorStakeAccount`,
+    [SPL_STAKE_POOL_ERROR__UNSUPPORTED_FEE_ACCOUNT_EXTENSION]: `UnsupportedFeeAccountExtension`,
+    [SPL_STAKE_POOL_ERROR__UNSUPPORTED_MINT_EXTENSION]: `UnsupportedMintExtension`,
+    [SPL_STAKE_POOL_ERROR__USER_STAKE_NOT_ACTIVE]: `UserStakeNotActive`,
+    [SPL_STAKE_POOL_ERROR__VALIDATOR_ALREADY_ADDED]: `ValidatorAlreadyAdded`,
+    [SPL_STAKE_POOL_ERROR__VALIDATOR_NOT_FOUND]: `ValidatorNotFound`,
+    [SPL_STAKE_POOL_ERROR__WITHDRAWAL_TOO_SMALL]: `WithdrawalTooSmall`,
+    [SPL_STAKE_POOL_ERROR__WRONG_ACCOUNT_MINT]: `WrongAccountMint`,
+    [SPL_STAKE_POOL_ERROR__WRONG_MANAGER]: `WrongManager`,
+    [SPL_STAKE_POOL_ERROR__WRONG_MINTING_AUTHORITY]: `WrongMintingAuthority`,
+    [SPL_STAKE_POOL_ERROR__WRONG_POOL_MINT]: `WrongPoolMint`,
+    [SPL_STAKE_POOL_ERROR__WRONG_STAKER]: `WrongStaker`,
+    [SPL_STAKE_POOL_ERROR__WRONG_STAKE_STAKE]: `WrongStakeStake`,
   };
 }
 
 export function getSplStakePoolErrorMessage(code: SplStakePoolError): string {
-  if (process.env.NODE_ENV !== "production") {
-    return splStakePoolErrorMessages![code];
+  if (process.env["NODE_ENV"] !== "production") {
+    return (splStakePoolErrorMessages as Record<SplStakePoolError, string>)[
+      code
+    ];
   }
 
   return "Error message not available in production bundles.";

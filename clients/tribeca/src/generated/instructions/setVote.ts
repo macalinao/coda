@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,15 +14,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -52,11 +52,11 @@ export function getSetVoteDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetVoteInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountProposal extends string | AccountMeta = string,
-  TAccountVote extends string | AccountMeta = string,
-  TAccountElectorate extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountProposal extends string | AccountMeta<string> = string,
+  TAccountVote extends string | AccountMeta<string> = string,
+  TAccountElectorate extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -78,16 +78,16 @@ export type SetVoteInstruction<
     ]
   >;
 
-export interface SetVoteInstructionData {
+export type SetVoteInstructionData = {
   discriminator: ReadonlyUint8Array;
   side: number;
   weight: bigint;
-}
+};
 
-export interface SetVoteInstructionDataArgs {
+export type SetVoteInstructionDataArgs = {
   side: number;
   weight: number | bigint;
-}
+};
 
 export function getSetVoteInstructionDataEncoder(): FixedSizeEncoder<SetVoteInstructionDataArgs> {
   return transformEncoder(
@@ -118,19 +118,19 @@ export function getSetVoteInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetVoteInput<
+export type SetVoteInput<
   TAccountGovernor extends string = string,
   TAccountProposal extends string = string,
   TAccountVote extends string = string,
   TAccountElectorate extends string = string,
-> {
+> = {
   governor: Address<TAccountGovernor>;
   proposal: Address<TAccountProposal>;
   vote: Address<TAccountVote>;
   electorate: TransactionSigner<TAccountElectorate>;
   side: SetVoteInstructionDataArgs["side"];
   weight: SetVoteInstructionDataArgs["weight"];
-}
+};
 
 export function getSetVoteInstruction<
   TAccountGovernor extends string,
@@ -192,10 +192,10 @@ export function getSetVoteInstruction<
   >);
 }
 
-export interface ParsedSetVoteInstruction<
+export type ParsedSetVoteInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governor: TAccountMetas[0];
@@ -204,7 +204,7 @@ export interface ParsedSetVoteInstruction<
     electorate: TAccountMetas[3];
   };
   data: SetVoteInstructionData;
-}
+};
 
 export function parseSetVoteInstruction<
   TProgram extends string,

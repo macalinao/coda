@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,23 +14,27 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface UnstakeReplicaEvent {
+export type UnstakeReplicaEvent = {
   pool: Address;
   mm: Address;
   miner: Address;
   owner: Address;
   amount: bigint;
-}
+};
 
-export interface UnstakeReplicaEventArgs {
+export type UnstakeReplicaEventArgs = {
   pool: Address;
   mm: Address;
   miner: Address;
   owner: Address;
   amount: number | bigint;
-}
+};
 
 export function getUnstakeReplicaEventEncoder(): FixedSizeEncoder<UnstakeReplicaEventArgs> {
   return getStructEncoder([

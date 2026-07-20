@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMergeMinerPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -84,14 +82,12 @@ export type InitMergeMinerInstruction<
     ]
   >;
 
-export interface InitMergeMinerInstructionData {
+export type InitMergeMinerInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface InitMergeMinerInstructionDataArgs {
-  bump: number;
-}
+export type InitMergeMinerInstructionDataArgs = { bump: number };
 
 export function getInitMergeMinerInstructionDataEncoder(): FixedSizeEncoder<InitMergeMinerInstructionDataArgs> {
   return transformEncoder(
@@ -120,20 +116,20 @@ export function getInitMergeMinerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitMergeMinerAsyncInput<
+export type InitMergeMinerAsyncInput<
   TAccountPool extends string = string,
   TAccountOwner extends string = string,
   TAccountMm extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   owner: Address<TAccountOwner>;
   mm?: Address<TAccountMm>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: InitMergeMinerInstructionDataArgs["bump"];
-}
+};
 
 export async function getInitMergeMinerInstructionAsync<
   TAccountPool extends string,
@@ -222,20 +218,20 @@ export async function getInitMergeMinerInstructionAsync<
   >);
 }
 
-export interface InitMergeMinerInput<
+export type InitMergeMinerInput<
   TAccountPool extends string = string,
   TAccountOwner extends string = string,
   TAccountMm extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   owner: Address<TAccountOwner>;
   mm: Address<TAccountMm>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: InitMergeMinerInstructionDataArgs["bump"];
-}
+};
 
 export function getInitMergeMinerInstruction<
   TAccountPool extends string,
@@ -310,10 +306,10 @@ export function getInitMergeMinerInstruction<
   >);
 }
 
-export interface ParsedInitMergeMinerInstruction<
+export type ParsedInitMergeMinerInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -323,7 +319,7 @@ export interface ParsedInitMergeMinerInstruction<
     systemProgram: TAccountMetas[4];
   };
   data: InitMergeMinerInstructionData;
-}
+};
 
 export function parseInitMergeMinerInstruction<
   TProgram extends string,

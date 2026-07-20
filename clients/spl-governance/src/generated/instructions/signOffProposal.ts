@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SIGN_OFF_PROPOSAL_DISCRIMINATOR = 12;
@@ -44,12 +44,12 @@ export function getSignOffProposalDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SignOffProposalInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountSignatoryAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountSignatoryAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -74,9 +74,7 @@ export type SignOffProposalInstruction<
     ]
   >;
 
-export interface SignOffProposalInstructionData {
-  discriminator: number;
-}
+export type SignOffProposalInstructionData = { discriminator: number };
 
 export type SignOffProposalInstructionDataArgs = {};
 
@@ -101,13 +99,13 @@ export function getSignOffProposalInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SignOffProposalInput<
+export type SignOffProposalInput<
   TAccountRealmAccount extends string = string,
   TAccountGovernanceAccount extends string = string,
   TAccountProposalAccount extends string = string,
   TAccountSignatoryAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
-> {
+> = {
   realmAccount: Address<TAccountRealmAccount>;
   governanceAccount: Address<TAccountGovernanceAccount>;
   proposalAccount: Address<TAccountProposalAccount>;
@@ -121,7 +119,7 @@ export interface SignOffProposalInput<
    *         Or `[writable]` SignatoryRecord account, required when non owner signs off the Proposal
    */
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
-}
+};
 
 export function getSignOffProposalInstruction<
   TAccountRealmAccount extends string,
@@ -194,10 +192,10 @@ export function getSignOffProposalInstruction<
   >);
 }
 
-export interface ParsedSignOffProposalInstruction<
+export type ParsedSignOffProposalInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     realmAccount: TAccountMetas[0];
@@ -215,7 +213,7 @@ export interface ParsedSignOffProposalInstruction<
     tokenOwnerRecord: TAccountMetas[4];
   };
   data: SignOffProposalInstructionData;
-}
+};
 
 export function parseSignOffProposalInstruction<
   TProgram extends string,

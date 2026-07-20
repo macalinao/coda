@@ -6,16 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface LockerSeeds {
+export type LockerSeeds = {
   base: Address;
-}
+};
 
 /** Locker account that manages vote escrows for a specific base */
 export async function findLockerPda(

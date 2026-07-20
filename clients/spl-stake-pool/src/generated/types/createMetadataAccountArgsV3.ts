@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { DataV2, DataV2Args } from "./index.js";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -24,26 +16,36 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
-import { getDataV2Decoder, getDataV2Encoder } from "./index.js";
+import {
+  getDataV2Decoder,
+  getDataV2Encoder,
+  type DataV2,
+  type DataV2Args,
+} from "./index.js";
 
-export interface CreateMetadataAccountArgsV3 {
+export type CreateMetadataAccountArgsV3 = {
   /** Note that unique metadata is disabled for now. */
   data: DataV2;
   /** Whether you want your metadata to be changeable in the future. */
   isMutable: boolean;
   /** UNUSED If this is a collection parent NFT. */
   collectionDetails: Option<number>;
-}
+};
 
-export interface CreateMetadataAccountArgsV3Args {
+export type CreateMetadataAccountArgsV3Args = {
   /** Note that unique metadata is disabled for now. */
   data: DataV2Args;
   /** Whether you want your metadata to be changeable in the future. */
   isMutable: boolean;
   /** UNUSED If this is a collection parent NFT. */
   collectionDetails: OptionOrNullable<number>;
-}
+};
 
 export function getCreateMetadataAccountArgsV3Encoder(): Encoder<CreateMetadataAccountArgsV3Args> {
   return getStructEncoder([

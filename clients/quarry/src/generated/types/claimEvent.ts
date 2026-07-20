@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,25 +16,29 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface ClaimEvent {
+export type ClaimEvent = {
   authority: Address;
   stakedToken: Address;
   rewardsToken: Address;
   amount: bigint;
   fees: bigint;
   timestamp: bigint;
-}
+};
 
-export interface ClaimEventArgs {
+export type ClaimEventArgs = {
   authority: Address;
   stakedToken: Address;
   rewardsToken: Address;
   amount: number | bigint;
   fees: number | bigint;
   timestamp: number | bigint;
-}
+};
 
 export function getClaimEventEncoder(): FixedSizeEncoder<ClaimEventArgs> {
   return getStructEncoder([

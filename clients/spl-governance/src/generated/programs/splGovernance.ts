@@ -6,126 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  GovernanceV1,
-  GovernanceV1Args,
-  GovernanceV2,
-  GovernanceV2Args,
-  LegacyTokenOwnerRecord,
-  LegacyTokenOwnerRecordArgs,
-  ProgramMetadata,
-  ProgramMetadataArgs,
-  ProposalDeposit,
-  ProposalDepositArgs,
-  ProposalInstructionV1,
-  ProposalInstructionV1Args,
-  ProposalTransactionV2,
-  ProposalTransactionV2Args,
-  ProposalV1,
-  ProposalV1Args,
-  ProposalV2,
-  ProposalV2Args,
-  RealmConfigAccount,
-  RealmConfigAccountArgs,
-  RealmV1,
-  RealmV1Args,
-  RealmV2,
-  RealmV2Args,
-  RequiredSignatory,
-  RequiredSignatoryArgs,
-  SignatoryRecordV1,
-  SignatoryRecordV1Args,
-  SignatoryRecordV2,
-  SignatoryRecordV2Args,
-  TokenOwnerRecordV1,
-  TokenOwnerRecordV1Args,
-  TokenOwnerRecordV2,
-  TokenOwnerRecordV2Args,
-  VoteRecordV1,
-  VoteRecordV1Args,
-  VoteRecordV2,
-  VoteRecordV2Args,
-} from "../accounts/index.js";
-import type {
-  AddRequiredSignatoryInput,
-  AddSignatoryInput,
-  CancelProposalInput,
-  CastVoteInput,
-  CompleteProposalInput,
-  CreateGovernanceInput,
-  CreateMintGovernanceInput,
-  CreateNativeTreasuryInput,
-  CreateProgramGovernanceInput,
-  CreateProposalInput,
-  CreateRealmInput,
-  CreateTokenGovernanceInput,
-  CreateTokenOwnerRecordAsyncInput,
-  DepositGoverningTokensInput,
-  ExecuteTransactionInput,
-  FinalizeVoteInput,
-  FlagTransactionErrorInput,
-  InsertTransactionInput,
-  Legacy1Input,
-  ParsedAddRequiredSignatoryInstruction,
-  ParsedAddSignatoryInstruction,
-  ParsedCancelProposalInstruction,
-  ParsedCastVoteInstruction,
-  ParsedCompleteProposalInstruction,
-  ParsedCreateGovernanceInstruction,
-  ParsedCreateMintGovernanceInstruction,
-  ParsedCreateNativeTreasuryInstruction,
-  ParsedCreateProgramGovernanceInstruction,
-  ParsedCreateProposalInstruction,
-  ParsedCreateRealmInstruction,
-  ParsedCreateTokenGovernanceInstruction,
-  ParsedCreateTokenOwnerRecordInstruction,
-  ParsedDepositGoverningTokensInstruction,
-  ParsedExecuteTransactionInstruction,
-  ParsedFinalizeVoteInstruction,
-  ParsedFlagTransactionErrorInstruction,
-  ParsedInsertTransactionInstruction,
-  ParsedLegacy1Instruction,
-  ParsedRefundProposalDepositInstruction,
-  ParsedRelinquishVoteInstruction,
-  ParsedRemoveRequiredSignatoryInstruction,
-  ParsedRemoveTransactionInstruction,
-  ParsedRevokeGoverningTokensInstruction,
-  ParsedSetGovernanceConfigInstruction,
-  ParsedSetGovernanceDelegateInstruction,
-  ParsedSetRealmAuthorityInstruction,
-  ParsedSetRealmConfigInstruction,
-  ParsedSignOffProposalInstruction,
-  ParsedUpdateProgramMetadataInstruction,
-  ParsedWithdrawGoverningTokensInstruction,
-  RefundProposalDepositInput,
-  RelinquishVoteInput,
-  RemoveRequiredSignatoryInput,
-  RemoveTransactionInput,
-  RevokeGoverningTokensInput,
-  SetGovernanceConfigInput,
-  SetGovernanceDelegateInput,
-  SetRealmAuthorityInput,
-  SetRealmConfigInput,
-  SignOffProposalInput,
-  UpdateProgramMetadataInput,
-  WithdrawGoverningTokensInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -135,10 +15,23 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
   getGovernanceV1Codec,
@@ -160,6 +53,44 @@ import {
   getTokenOwnerRecordV2Codec,
   getVoteRecordV1Codec,
   getVoteRecordV2Codec,
+  type GovernanceV1,
+  type GovernanceV1Args,
+  type GovernanceV2,
+  type GovernanceV2Args,
+  type LegacyTokenOwnerRecord,
+  type LegacyTokenOwnerRecordArgs,
+  type ProgramMetadata,
+  type ProgramMetadataArgs,
+  type ProposalDeposit,
+  type ProposalDepositArgs,
+  type ProposalInstructionV1,
+  type ProposalInstructionV1Args,
+  type ProposalTransactionV2,
+  type ProposalTransactionV2Args,
+  type ProposalV1,
+  type ProposalV1Args,
+  type ProposalV2,
+  type ProposalV2Args,
+  type RealmConfigAccount,
+  type RealmConfigAccountArgs,
+  type RealmV1,
+  type RealmV1Args,
+  type RealmV2,
+  type RealmV2Args,
+  type RequiredSignatory,
+  type RequiredSignatoryArgs,
+  type SignatoryRecordV1,
+  type SignatoryRecordV1Args,
+  type SignatoryRecordV2,
+  type SignatoryRecordV2Args,
+  type TokenOwnerRecordV1,
+  type TokenOwnerRecordV1Args,
+  type TokenOwnerRecordV2,
+  type TokenOwnerRecordV2Args,
+  type VoteRecordV1,
+  type VoteRecordV1Args,
+  type VoteRecordV2,
+  type VoteRecordV2Args,
 } from "../accounts/index.js";
 import {
   getAddRequiredSignatoryInstruction,
@@ -224,6 +155,68 @@ import {
   parseSignOffProposalInstruction,
   parseUpdateProgramMetadataInstruction,
   parseWithdrawGoverningTokensInstruction,
+  type AddRequiredSignatoryInput,
+  type AddSignatoryInput,
+  type CancelProposalInput,
+  type CastVoteInput,
+  type CompleteProposalInput,
+  type CreateGovernanceInput,
+  type CreateMintGovernanceInput,
+  type CreateNativeTreasuryInput,
+  type CreateProgramGovernanceInput,
+  type CreateProposalInput,
+  type CreateRealmInput,
+  type CreateTokenGovernanceInput,
+  type CreateTokenOwnerRecordAsyncInput,
+  type DepositGoverningTokensInput,
+  type ExecuteTransactionInput,
+  type FinalizeVoteInput,
+  type FlagTransactionErrorInput,
+  type InsertTransactionInput,
+  type Legacy1Input,
+  type ParsedAddRequiredSignatoryInstruction,
+  type ParsedAddSignatoryInstruction,
+  type ParsedCancelProposalInstruction,
+  type ParsedCastVoteInstruction,
+  type ParsedCompleteProposalInstruction,
+  type ParsedCreateGovernanceInstruction,
+  type ParsedCreateMintGovernanceInstruction,
+  type ParsedCreateNativeTreasuryInstruction,
+  type ParsedCreateProgramGovernanceInstruction,
+  type ParsedCreateProposalInstruction,
+  type ParsedCreateRealmInstruction,
+  type ParsedCreateTokenGovernanceInstruction,
+  type ParsedCreateTokenOwnerRecordInstruction,
+  type ParsedDepositGoverningTokensInstruction,
+  type ParsedExecuteTransactionInstruction,
+  type ParsedFinalizeVoteInstruction,
+  type ParsedFlagTransactionErrorInstruction,
+  type ParsedInsertTransactionInstruction,
+  type ParsedLegacy1Instruction,
+  type ParsedRefundProposalDepositInstruction,
+  type ParsedRelinquishVoteInstruction,
+  type ParsedRemoveRequiredSignatoryInstruction,
+  type ParsedRemoveTransactionInstruction,
+  type ParsedRevokeGoverningTokensInstruction,
+  type ParsedSetGovernanceConfigInstruction,
+  type ParsedSetGovernanceDelegateInstruction,
+  type ParsedSetRealmAuthorityInstruction,
+  type ParsedSetRealmConfigInstruction,
+  type ParsedSignOffProposalInstruction,
+  type ParsedUpdateProgramMetadataInstruction,
+  type ParsedWithdrawGoverningTokensInstruction,
+  type RefundProposalDepositInput,
+  type RelinquishVoteInput,
+  type RemoveRequiredSignatoryInput,
+  type RemoveTransactionInput,
+  type RevokeGoverningTokensInput,
+  type SetGovernanceConfigInput,
+  type SetGovernanceDelegateInput,
+  type SetRealmAuthorityInput,
+  type SetRealmConfigInput,
+  type SignOffProposalInput,
+  type UpdateProgramMetadataInput,
+  type WithdrawGoverningTokensInput,
 } from "../instructions/index.js";
 import {
   findCommunityTokenHoldingPda,
@@ -242,33 +235,33 @@ import {
   findVoteRecordPda,
 } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeEncoder,
+  GovernanceAccountType,
 } from "../types/index.js";
 
 export const SPL_GOVERNANCE_PROGRAM_ADDRESS =
   "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">;
 
 export enum SplGovernanceAccount {
-  GovernanceV2 = 0,
-  RealmV1 = 1,
-  TokenOwnerRecordV1 = 2,
-  GovernanceV1 = 3,
-  ProposalV1 = 4,
-  SignatoryRecordV1 = 5,
-  ProposalInstructionV1 = 6,
-  VoteRecordV1 = 7,
-  ProgramMetadata = 8,
-  ProposalV2 = 9,
-  ProposalDeposit = 10,
-  ProposalTransactionV2 = 11,
-  RealmV2 = 12,
-  RealmConfigAccount = 13,
-  RequiredSignatory = 14,
-  SignatoryRecordV2 = 15,
-  TokenOwnerRecordV2 = 16,
-  LegacyTokenOwnerRecord = 17,
-  VoteRecordV2 = 18,
+  GovernanceV2,
+  RealmV1,
+  TokenOwnerRecordV1,
+  GovernanceV1,
+  ProposalV1,
+  SignatoryRecordV1,
+  ProposalInstructionV1,
+  VoteRecordV1,
+  ProgramMetadata,
+  ProposalV2,
+  ProposalDeposit,
+  ProposalTransactionV2,
+  RealmV2,
+  RealmConfigAccount,
+  RequiredSignatory,
+  SignatoryRecordV2,
+  TokenOwnerRecordV2,
+  LegacyTokenOwnerRecord,
+  VoteRecordV2,
 }
 
 export function identifySplGovernanceAccount(
@@ -487,37 +480,37 @@ export function identifySplGovernanceAccount(
 }
 
 export enum SplGovernanceInstruction {
-  CreateRealm = 0,
-  DepositGoverningTokens = 1,
-  WithdrawGoverningTokens = 2,
-  SetGovernanceDelegate = 3,
-  CreateGovernance = 4,
-  CreateProgramGovernance = 5,
-  CreateProposal = 6,
-  AddSignatory = 7,
-  Legacy1 = 8,
-  InsertTransaction = 9,
-  RemoveTransaction = 10,
-  CancelProposal = 11,
-  SignOffProposal = 12,
-  CastVote = 13,
-  FinalizeVote = 14,
-  RelinquishVote = 15,
-  ExecuteTransaction = 16,
-  CreateMintGovernance = 17,
-  CreateTokenGovernance = 18,
-  SetGovernanceConfig = 19,
-  FlagTransactionError = 20,
-  SetRealmAuthority = 21,
-  SetRealmConfig = 22,
-  CreateTokenOwnerRecord = 23,
-  UpdateProgramMetadata = 24,
-  CreateNativeTreasury = 25,
-  RevokeGoverningTokens = 26,
-  RefundProposalDeposit = 27,
-  CompleteProposal = 28,
-  AddRequiredSignatory = 29,
-  RemoveRequiredSignatory = 30,
+  CreateRealm,
+  DepositGoverningTokens,
+  WithdrawGoverningTokens,
+  SetGovernanceDelegate,
+  CreateGovernance,
+  CreateProgramGovernance,
+  CreateProposal,
+  AddSignatory,
+  Legacy1,
+  InsertTransaction,
+  RemoveTransaction,
+  CancelProposal,
+  SignOffProposal,
+  CastVote,
+  FinalizeVote,
+  RelinquishVote,
+  ExecuteTransaction,
+  CreateMintGovernance,
+  CreateTokenGovernance,
+  SetGovernanceConfig,
+  FlagTransactionError,
+  SetRealmAuthority,
+  SetRealmConfig,
+  CreateTokenOwnerRecord,
+  UpdateProgramMetadata,
+  CreateNativeTreasury,
+  RevokeGoverningTokens,
+  RefundProposalDeposit,
+  CompleteProposal,
+  AddRequiredSignatory,
+  RemoveRequiredSignatory,
 }
 
 export function identifySplGovernanceInstruction(
@@ -952,13 +945,16 @@ export function parseSplGovernanceInstruction<TProgram extends string>(
   }
 }
 
-export interface SplGovernancePlugin {
+export type SplGovernancePlugin = {
   accounts: SplGovernancePluginAccounts;
   instructions: SplGovernancePluginInstructions;
   pdas: SplGovernancePluginPdas;
-}
+  identifyAccount: typeof identifySplGovernanceAccount;
+  identifyInstruction: typeof identifySplGovernanceInstruction;
+  parseInstruction: typeof parseSplGovernanceInstruction;
+};
 
-export interface SplGovernancePluginAccounts {
+export type SplGovernancePluginAccounts = {
   governanceV2: ReturnType<typeof getGovernanceV2Codec> &
     SelfFetchFunctions<GovernanceV2Args, GovernanceV2>;
   realmV1: ReturnType<typeof getRealmV1Codec> &
@@ -997,9 +993,9 @@ export interface SplGovernancePluginAccounts {
     SelfFetchFunctions<LegacyTokenOwnerRecordArgs, LegacyTokenOwnerRecord>;
   voteRecordV2: ReturnType<typeof getVoteRecordV2Codec> &
     SelfFetchFunctions<VoteRecordV2Args, VoteRecordV2>;
-}
+};
 
-export interface SplGovernancePluginInstructions {
+export type SplGovernancePluginInstructions = {
   createRealm: (
     input: MakeOptional<CreateRealmInput, "payer">,
   ) => ReturnType<typeof getCreateRealmInstruction> & SelfPlanAndSendFunctions;
@@ -1119,9 +1115,9 @@ export interface SplGovernancePluginInstructions {
     input: RemoveRequiredSignatoryInput,
   ) => ReturnType<typeof getRemoveRequiredSignatoryInstruction> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface SplGovernancePluginPdas {
+export type SplGovernancePluginPdas = {
   realm: typeof findRealmPda;
   communityTokenHolding: typeof findCommunityTokenHoldingPda;
   councilTokenHolding: typeof findCouncilTokenHoldingPda;
@@ -1136,7 +1132,7 @@ export interface SplGovernancePluginPdas {
   proposalTransaction: typeof findProposalTransactionPda;
   voteRecord: typeof findVoteRecordPda;
   requiredSignatory: typeof findRequiredSignatoryPda;
-}
+};
 
 export type SplGovernancePluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -1148,7 +1144,7 @@ export type SplGovernancePluginRequirements = ClientWithRpc<
 export function splGovernanceProgram() {
   return <T extends SplGovernancePluginRequirements>(
     client: T,
-  ): Omit<T, "splGovernance"> & { splGovernance: SplGovernancePlugin } => {
+  ): ExtendedClient<T, { splGovernance: SplGovernancePlugin }> => {
     return extendClient(client, {
       splGovernance: <SplGovernancePlugin>{
         accounts: {
@@ -1417,6 +1413,9 @@ export function splGovernanceProgram() {
           voteRecord: findVoteRecordPda,
           requiredSignatory: findRequiredSignatoryPda,
         },
+        identifyAccount: identifySplGovernanceAccount,
+        identifyInstruction: identifySplGovernanceInstruction,
+        parseInstruction: parseSplGovernanceInstruction,
       },
     });
   };

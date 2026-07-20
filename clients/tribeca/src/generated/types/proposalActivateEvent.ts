@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,19 +14,23 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface ProposalActivateEvent {
+export type ProposalActivateEvent = {
   governor: Address;
   proposal: Address;
   votingEndsAt: bigint;
-}
+};
 
-export interface ProposalActivateEventArgs {
+export type ProposalActivateEventArgs = {
   governor: Address;
   proposal: Address;
   votingEndsAt: number | bigint;
-}
+};
 
 export function getProposalActivateEventEncoder(): FixedSizeEncoder<ProposalActivateEventArgs> {
   return getStructEncoder([

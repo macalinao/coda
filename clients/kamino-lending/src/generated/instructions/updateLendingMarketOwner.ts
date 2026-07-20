@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,8 +17,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UPDATE_LENDING_MARKET_OWNER_DISCRIMINATOR: ReadonlyUint8Array =
@@ -48,9 +48,10 @@ export function getUpdateLendingMarketOwnerDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type UpdateLendingMarketOwnerInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwnerCached extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountLendingMarketOwnerCached extends string | AccountMeta<string> =
+    string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -66,9 +67,9 @@ export type UpdateLendingMarketOwnerInstruction<
     ]
   >;
 
-export interface UpdateLendingMarketOwnerInstructionData {
+export type UpdateLendingMarketOwnerInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type UpdateLendingMarketOwnerInstructionDataArgs = {};
 
@@ -98,13 +99,13 @@ export function getUpdateLendingMarketOwnerInstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface UpdateLendingMarketOwnerInput<
+export type UpdateLendingMarketOwnerInput<
   TAccountLendingMarketOwnerCached extends string = string,
   TAccountLendingMarket extends string = string,
-> {
+> = {
   lendingMarketOwnerCached: TransactionSigner<TAccountLendingMarketOwnerCached>;
   lendingMarket: Address<TAccountLendingMarket>;
-}
+};
 
 export function getUpdateLendingMarketOwnerInstruction<
   TAccountLendingMarketOwnerCached extends string,
@@ -156,17 +157,17 @@ export function getUpdateLendingMarketOwnerInstruction<
   >);
 }
 
-export interface ParsedUpdateLendingMarketOwnerInstruction<
+export type ParsedUpdateLendingMarketOwnerInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarketOwnerCached: TAccountMetas[0];
     lendingMarket: TAccountMetas[1];
   };
   data: UpdateLendingMarketOwnerInstructionData;
-}
+};
 
 export function parseUpdateLendingMarketOwnerInstruction<
   TProgram extends string,

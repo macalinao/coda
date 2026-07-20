@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -53,14 +51,15 @@ export function getWithdrawSlashedAmountDiscriminatorBytes(): ReadonlyUint8Array
 
 export type WithdrawSlashedAmountInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountCrank extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountSlashedAmountSpillAddress extends string | AccountMeta = string,
-  TAccountFarmVault extends string | AccountMeta = string,
-  TAccountFarmVaultsAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountCrank extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountSlashedAmountSpillAddress extends string | AccountMeta<string> =
+    string,
+  TAccountFarmVault extends string | AccountMeta<string> = string,
+  TAccountFarmVaultsAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -88,9 +87,9 @@ export type WithdrawSlashedAmountInstruction<
     ]
   >;
 
-export interface WithdrawSlashedAmountInstructionData {
+export type WithdrawSlashedAmountInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type WithdrawSlashedAmountInstructionDataArgs = {};
 
@@ -120,21 +119,21 @@ export function getWithdrawSlashedAmountInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawSlashedAmountAsyncInput<
+export type WithdrawSlashedAmountAsyncInput<
   TAccountCrank extends string = string,
   TAccountFarmState extends string = string,
   TAccountSlashedAmountSpillAddress extends string = string,
   TAccountFarmVault extends string = string,
   TAccountFarmVaultsAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   crank: TransactionSigner<TAccountCrank>;
   farmState: Address<TAccountFarmState>;
   slashedAmountSpillAddress: Address<TAccountSlashedAmountSpillAddress>;
   farmVault: Address<TAccountFarmVault>;
   farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export async function getWithdrawSlashedAmountInstructionAsync<
   TAccountCrank extends string,
@@ -228,21 +227,21 @@ export async function getWithdrawSlashedAmountInstructionAsync<
   >);
 }
 
-export interface WithdrawSlashedAmountInput<
+export type WithdrawSlashedAmountInput<
   TAccountCrank extends string = string,
   TAccountFarmState extends string = string,
   TAccountSlashedAmountSpillAddress extends string = string,
   TAccountFarmVault extends string = string,
   TAccountFarmVaultsAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   crank: TransactionSigner<TAccountCrank>;
   farmState: Address<TAccountFarmState>;
   slashedAmountSpillAddress: Address<TAccountSlashedAmountSpillAddress>;
   farmVault: Address<TAccountFarmVault>;
   farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getWithdrawSlashedAmountInstruction<
   TAccountCrank extends string,
@@ -326,10 +325,10 @@ export function getWithdrawSlashedAmountInstruction<
   >);
 }
 
-export interface ParsedWithdrawSlashedAmountInstruction<
+export type ParsedWithdrawSlashedAmountInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     crank: TAccountMetas[0];
@@ -340,7 +339,7 @@ export interface ParsedWithdrawSlashedAmountInstruction<
     tokenProgram: TAccountMetas[5];
   };
   data: WithdrawSlashedAmountInstructionData;
-}
+};
 
 export function parseWithdrawSlashedAmountInstruction<
   TProgram extends string,

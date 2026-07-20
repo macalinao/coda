@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,19 +14,23 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface RevokeLockPrivilegeEvent {
+export type RevokeLockPrivilegeEvent = {
   locker: Address;
   programId: Address;
   timestamp: bigint;
-}
+};
 
-export interface RevokeLockPrivilegeEventArgs {
+export type RevokeLockPrivilegeEventArgs = {
   locker: Address;
   programId: Address;
   timestamp: number | bigint;
-}
+};
 
 export function getRevokeLockPrivilegeEventEncoder(): FixedSizeEncoder<RevokeLockPrivilegeEventArgs> {
   return getStructEncoder([

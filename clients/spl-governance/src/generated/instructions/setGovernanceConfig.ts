@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -31,12 +15,29 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
+  type GovernanceConfig,
+  type GovernanceConfigArgs,
 } from "../types/index.js";
 
 export const SET_GOVERNANCE_CONFIG_DISCRIMINATOR = 19;
@@ -47,8 +48,8 @@ export function getSetGovernanceConfigDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetGovernanceConfigInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -61,14 +62,14 @@ export type SetGovernanceConfigInstruction<
     ]
   >;
 
-export interface SetGovernanceConfigInstructionData {
+export type SetGovernanceConfigInstructionData = {
   discriminator: number;
   config: GovernanceConfig;
-}
+};
 
-export interface SetGovernanceConfigInstructionDataArgs {
+export type SetGovernanceConfigInstructionDataArgs = {
   config: GovernanceConfigArgs;
-}
+};
 
 export function getSetGovernanceConfigInstructionDataEncoder(): Encoder<SetGovernanceConfigInstructionDataArgs> {
   return transformEncoder(
@@ -100,13 +101,13 @@ export function getSetGovernanceConfigInstructionDataCodec(): Codec<
   );
 }
 
-export interface SetGovernanceConfigInput<
+export type SetGovernanceConfigInput<
   TAccountGovernanceAccount extends string = string,
-> {
+> = {
   /** The governance account the config is for */
   governanceAccount: TransactionSigner<TAccountGovernanceAccount>;
   config: SetGovernanceConfigInstructionDataArgs["config"];
-}
+};
 
 export function getSetGovernanceConfigInstruction<
   TAccountGovernanceAccount extends string,
@@ -147,17 +148,17 @@ export function getSetGovernanceConfigInstruction<
   >);
 }
 
-export interface ParsedSetGovernanceConfigInstruction<
+export type ParsedSetGovernanceConfigInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** The governance account the config is for */
     governanceAccount: TAccountMetas[0];
   };
   data: SetGovernanceConfigInstructionData;
-}
+};
 
 export function parseSetGovernanceConfigInstruction<
   TProgram extends string,
@@ -167,7 +168,7 @@ export function parseSetGovernanceConfigInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetGovernanceConfigInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length === 0) {
+  if (instruction.accounts.length < 1) {
     throw new SolanaError(
       SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
       {

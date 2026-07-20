@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { RedeemerSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,13 +21,24 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRedeemerPda } from "../pdas/index.js";
+import { findRedeemerPda, type RedeemerSeeds } from "../pdas/index.js";
 
 export const REDEEMER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   41, 191, 197, 8, 98, 64, 17, 99,
@@ -51,20 +48,20 @@ export function getRedeemerDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(REDEEMER_DISCRIMINATOR);
 }
 
-export interface Redeemer {
+export type Redeemer = {
   discriminator: ReadonlyUint8Array;
   iouMint: Address;
   redemptionMint: Address;
   bump: number;
   totalTokensRedeemed: bigint;
-}
+};
 
-export interface RedeemerArgs {
+export type RedeemerArgs = {
   iouMint: Address;
   redemptionMint: Address;
   bump: number;
   totalTokensRedeemed: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link RedeemerArgs} account data. */
 export function getRedeemerEncoder(): FixedSizeEncoder<RedeemerArgs> {
@@ -132,7 +129,7 @@ export async function fetchMaybeRedeemer<TAddress extends string = string>(
 
 export async function fetchAllRedeemer(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Redeemer>[]> {
   const maybeAccounts = await fetchAllMaybeRedeemer(rpc, addresses, config);
@@ -142,7 +139,7 @@ export async function fetchAllRedeemer(
 
 export async function fetchAllMaybeRedeemer(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Redeemer>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

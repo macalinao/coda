@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_REWARD_AUTHORITY_BY_SUPER_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,11 +51,12 @@ export function getSetRewardAuthorityBySuperAuthorityDiscriminatorBytes(): Reado
 
 export type SetRewardAuthorityBySuperAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountRewardEmissionsSuperAuthority extends string | AccountMeta = string,
-  TAccountNewRewardAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountRewardEmissionsSuperAuthority extends string | AccountMeta<string> =
+    string,
+  TAccountNewRewardAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -77,14 +78,14 @@ export type SetRewardAuthorityBySuperAuthorityInstruction<
     ]
   >;
 
-export interface SetRewardAuthorityBySuperAuthorityInstructionData {
+export type SetRewardAuthorityBySuperAuthorityInstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
-}
+};
 
-export interface SetRewardAuthorityBySuperAuthorityInstructionDataArgs {
+export type SetRewardAuthorityBySuperAuthorityInstructionDataArgs = {
   rewardIndex: number;
-}
+};
 
 export function getSetRewardAuthorityBySuperAuthorityInstructionDataEncoder(): FixedSizeEncoder<SetRewardAuthorityBySuperAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -116,18 +117,18 @@ export function getSetRewardAuthorityBySuperAuthorityInstructionDataCodec(): Fix
   );
 }
 
-export interface SetRewardAuthorityBySuperAuthorityInput<
+export type SetRewardAuthorityBySuperAuthorityInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountWhirlpool extends string = string,
   TAccountRewardEmissionsSuperAuthority extends string = string,
   TAccountNewRewardAuthority extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   whirlpool: Address<TAccountWhirlpool>;
   rewardEmissionsSuperAuthority: TransactionSigner<TAccountRewardEmissionsSuperAuthority>;
   newRewardAuthority: Address<TAccountNewRewardAuthority>;
   rewardIndex: SetRewardAuthorityBySuperAuthorityInstructionDataArgs["rewardIndex"];
-}
+};
 
 export function getSetRewardAuthorityBySuperAuthorityInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -201,10 +202,10 @@ export function getSetRewardAuthorityBySuperAuthorityInstruction<
   >);
 }
 
-export interface ParsedSetRewardAuthorityBySuperAuthorityInstruction<
+export type ParsedSetRewardAuthorityBySuperAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -213,7 +214,7 @@ export interface ParsedSetRewardAuthorityBySuperAuthorityInstruction<
     newRewardAuthority: TAccountMetas[3];
   };
   data: SetRewardAuthorityBySuperAuthorityInstructionData;
-}
+};
 
 export function parseSetRewardAuthorityBySuperAuthorityInstruction<
   TProgram extends string,

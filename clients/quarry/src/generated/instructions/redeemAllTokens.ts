@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -37,10 +20,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -94,9 +92,9 @@ export type RedeemAllTokensInstruction<
     ]
   >;
 
-export interface RedeemAllTokensInstructionData {
+export type RedeemAllTokensInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type RedeemAllTokensInstructionDataArgs = {};
 
@@ -123,7 +121,7 @@ export function getRedeemAllTokensInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RedeemAllTokensAsyncInput<
+export type RedeemAllTokensAsyncInput<
   TAccountRedeemer extends string = string,
   TAccountSourceAuthority extends string = string,
   TAccountIouMint extends string = string,
@@ -131,7 +129,7 @@ export interface RedeemAllTokensAsyncInput<
   TAccountRedemptionVault extends string = string,
   TAccountRedemptionDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   redeemer: Address<TAccountRedeemer>;
   sourceAuthority: TransactionSigner<TAccountSourceAuthority>;
   iouMint: Address<TAccountIouMint>;
@@ -139,7 +137,7 @@ export interface RedeemAllTokensAsyncInput<
   redemptionVault: Address<TAccountRedemptionVault>;
   redemptionDestination: Address<TAccountRedemptionDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export async function getRedeemAllTokensInstructionAsync<
   TAccountRedeemer extends string,
@@ -252,7 +250,7 @@ export async function getRedeemAllTokensInstructionAsync<
   >);
 }
 
-export interface RedeemAllTokensInput<
+export type RedeemAllTokensInput<
   TAccountRedeemer extends string = string,
   TAccountSourceAuthority extends string = string,
   TAccountIouMint extends string = string,
@@ -260,7 +258,7 @@ export interface RedeemAllTokensInput<
   TAccountRedemptionVault extends string = string,
   TAccountRedemptionDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   redeemer: Address<TAccountRedeemer>;
   sourceAuthority: TransactionSigner<TAccountSourceAuthority>;
   iouMint: Address<TAccountIouMint>;
@@ -268,7 +266,7 @@ export interface RedeemAllTokensInput<
   redemptionVault: Address<TAccountRedemptionVault>;
   redemptionDestination: Address<TAccountRedemptionDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getRedeemAllTokensInstruction<
   TAccountRedeemer extends string,
@@ -356,10 +354,10 @@ export function getRedeemAllTokensInstruction<
   >);
 }
 
-export interface ParsedRedeemAllTokensInstruction<
+export type ParsedRedeemAllTokensInstruction<
   TProgram extends string = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     redeemer: TAccountMetas[0];
@@ -371,7 +369,7 @@ export interface ParsedRedeemAllTokensInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: RedeemAllTokensInstructionData;
-}
+};
 
 export function parseRedeemAllTokensInstruction<
   TProgram extends string,

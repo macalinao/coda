@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface ProposalDepositSeeds {
+export type ProposalDepositSeeds = {
   proposal: Address;
   depositPayer: Address;
-}
+};
 
 /** Proposal deposit made by a specific payer */
 export async function findProposalDepositPda(

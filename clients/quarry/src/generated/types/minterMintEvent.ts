@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,21 +14,25 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface MinterMintEvent {
+export type MinterMintEvent = {
   mintWrapper: Address;
   minter: Address;
   amount: bigint;
   destination: Address;
-}
+};
 
-export interface MinterMintEventArgs {
+export type MinterMintEventArgs = {
   mintWrapper: Address;
   minter: Address;
   amount: number | bigint;
   destination: Address;
-}
+};
 
 export function getMinterMintEventEncoder(): FixedSizeEncoder<MinterMintEventArgs> {
   return getStructEncoder([

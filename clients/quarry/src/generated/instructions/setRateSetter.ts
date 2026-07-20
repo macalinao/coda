@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_RATE_SETTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -72,9 +72,9 @@ export type SetRateSetterInstruction<
     ]
   >;
 
-export interface SetRateSetterInstructionData {
+export type SetRateSetterInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type SetRateSetterInstructionDataArgs = {};
 
@@ -101,15 +101,15 @@ export function getSetRateSetterInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetRateSetterInput<
+export type SetRateSetterInput<
   TAccountOperator extends string = string,
   TAccountAdmin extends string = string,
   TAccountDelegate extends string = string,
-> {
+> = {
   operator: Address<TAccountOperator>;
   admin: TransactionSigner<TAccountAdmin>;
   delegate: Address<TAccountDelegate>;
-}
+};
 
 export function getSetRateSetterInstruction<
   TAccountOperator extends string,
@@ -157,10 +157,10 @@ export function getSetRateSetterInstruction<
   >);
 }
 
-export interface ParsedSetRateSetterInstruction<
+export type ParsedSetRateSetterInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     operator: TAccountMetas[0];
@@ -168,7 +168,7 @@ export interface ParsedSetRateSetterInstruction<
     delegate: TAccountMetas[2];
   };
   data: SetRateSetterInstructionData;
-}
+};
 
 export function parseSetRateSetterInstruction<
   TProgram extends string,

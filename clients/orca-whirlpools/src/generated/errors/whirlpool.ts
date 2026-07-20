@@ -6,134 +6,134 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** InvalidEnum: Enum value could not be converted */
-export const WHIRLPOOL_ERROR__INVALID_ENUM = 0x17_70; // 6000
+export const WHIRLPOOL_ERROR__INVALID_ENUM = 0x1770; // 6000
 /** InvalidStartTick: Invalid start tick index provided. */
-export const WHIRLPOOL_ERROR__INVALID_START_TICK = 0x17_71; // 6001
+export const WHIRLPOOL_ERROR__INVALID_START_TICK = 0x1771; // 6001
 /** TickArrayExistInPool: Tick-array already exists in this whirlpool */
-export const WHIRLPOOL_ERROR__TICK_ARRAY_EXIST_IN_POOL = 0x17_72; // 6002
+export const WHIRLPOOL_ERROR__TICK_ARRAY_EXIST_IN_POOL = 0x1772; // 6002
 /** TickArrayIndexOutofBounds: Attempt to search for a tick-array failed */
-export const WHIRLPOOL_ERROR__TICK_ARRAY_INDEX_OUTOF_BOUNDS = 0x17_73; // 6003
+export const WHIRLPOOL_ERROR__TICK_ARRAY_INDEX_OUTOF_BOUNDS = 0x1773; // 6003
 /** InvalidTickSpacing: Tick-spacing is not supported */
-export const WHIRLPOOL_ERROR__INVALID_TICK_SPACING = 0x17_74; // 6004
+export const WHIRLPOOL_ERROR__INVALID_TICK_SPACING = 0x1774; // 6004
 /** ClosePositionNotEmpty: Position is not empty It cannot be closed */
-export const WHIRLPOOL_ERROR__CLOSE_POSITION_NOT_EMPTY = 0x17_75; // 6005
+export const WHIRLPOOL_ERROR__CLOSE_POSITION_NOT_EMPTY = 0x1775; // 6005
 /** DivideByZero: Unable to divide by zero */
-export const WHIRLPOOL_ERROR__DIVIDE_BY_ZERO = 0x17_76; // 6006
+export const WHIRLPOOL_ERROR__DIVIDE_BY_ZERO = 0x1776; // 6006
 /** NumberCastError: Unable to cast number into BigInt */
-export const WHIRLPOOL_ERROR__NUMBER_CAST_ERROR = 0x17_77; // 6007
+export const WHIRLPOOL_ERROR__NUMBER_CAST_ERROR = 0x1777; // 6007
 /** NumberDownCastError: Unable to down cast number */
-export const WHIRLPOOL_ERROR__NUMBER_DOWN_CAST_ERROR = 0x17_78; // 6008
+export const WHIRLPOOL_ERROR__NUMBER_DOWN_CAST_ERROR = 0x1778; // 6008
 /** TickNotFound: Tick not found within tick array */
-export const WHIRLPOOL_ERROR__TICK_NOT_FOUND = 0x17_79; // 6009
+export const WHIRLPOOL_ERROR__TICK_NOT_FOUND = 0x1779; // 6009
 /** InvalidTickIndex: Provided tick index is either out of bounds or uninitializable */
-export const WHIRLPOOL_ERROR__INVALID_TICK_INDEX = 0x17_7a; // 6010
+export const WHIRLPOOL_ERROR__INVALID_TICK_INDEX = 0x177a; // 6010
 /** SqrtPriceOutOfBounds: Provided sqrt price out of bounds */
-export const WHIRLPOOL_ERROR__SQRT_PRICE_OUT_OF_BOUNDS = 0x17_7b; // 6011
+export const WHIRLPOOL_ERROR__SQRT_PRICE_OUT_OF_BOUNDS = 0x177b; // 6011
 /** LiquidityZero: Liquidity amount must be greater than zero */
-export const WHIRLPOOL_ERROR__LIQUIDITY_ZERO = 0x17_7c; // 6012
+export const WHIRLPOOL_ERROR__LIQUIDITY_ZERO = 0x177c; // 6012
 /** LiquidityTooHigh: Liquidity amount must be less than i64::MAX */
-export const WHIRLPOOL_ERROR__LIQUIDITY_TOO_HIGH = 0x17_7d; // 6013
+export const WHIRLPOOL_ERROR__LIQUIDITY_TOO_HIGH = 0x177d; // 6013
 /** LiquidityOverflow: Liquidity overflow */
-export const WHIRLPOOL_ERROR__LIQUIDITY_OVERFLOW = 0x17_7e; // 6014
+export const WHIRLPOOL_ERROR__LIQUIDITY_OVERFLOW = 0x177e; // 6014
 /** LiquidityUnderflow: Liquidity underflow */
-export const WHIRLPOOL_ERROR__LIQUIDITY_UNDERFLOW = 0x17_7f; // 6015
+export const WHIRLPOOL_ERROR__LIQUIDITY_UNDERFLOW = 0x177f; // 6015
 /** LiquidityNetError: Tick liquidity net underflowed or overflowed */
-export const WHIRLPOOL_ERROR__LIQUIDITY_NET_ERROR = 0x17_80; // 6016
+export const WHIRLPOOL_ERROR__LIQUIDITY_NET_ERROR = 0x1780; // 6016
 /** TokenMaxExceeded: Exceeded token max */
-export const WHIRLPOOL_ERROR__TOKEN_MAX_EXCEEDED = 0x17_81; // 6017
+export const WHIRLPOOL_ERROR__TOKEN_MAX_EXCEEDED = 0x1781; // 6017
 /** TokenMinSubceeded: Did not meet token min */
-export const WHIRLPOOL_ERROR__TOKEN_MIN_SUBCEEDED = 0x17_82; // 6018
+export const WHIRLPOOL_ERROR__TOKEN_MIN_SUBCEEDED = 0x1782; // 6018
 /** MissingOrInvalidDelegate: Position token account has a missing or invalid delegate */
-export const WHIRLPOOL_ERROR__MISSING_OR_INVALID_DELEGATE = 0x17_83; // 6019
+export const WHIRLPOOL_ERROR__MISSING_OR_INVALID_DELEGATE = 0x1783; // 6019
 /** InvalidPositionTokenAmount: Position token amount must be 1 */
-export const WHIRLPOOL_ERROR__INVALID_POSITION_TOKEN_AMOUNT = 0x17_84; // 6020
+export const WHIRLPOOL_ERROR__INVALID_POSITION_TOKEN_AMOUNT = 0x1784; // 6020
 /** InvalidTimestampConversion: Timestamp should be convertible from i64 to u64 */
-export const WHIRLPOOL_ERROR__INVALID_TIMESTAMP_CONVERSION = 0x17_85; // 6021
+export const WHIRLPOOL_ERROR__INVALID_TIMESTAMP_CONVERSION = 0x1785; // 6021
 /** InvalidTimestamp: Timestamp should be greater than the last updated timestamp */
-export const WHIRLPOOL_ERROR__INVALID_TIMESTAMP = 0x17_86; // 6022
+export const WHIRLPOOL_ERROR__INVALID_TIMESTAMP = 0x1786; // 6022
 /** InvalidTickArraySequence: Invalid tick array sequence provided for instruction. */
-export const WHIRLPOOL_ERROR__INVALID_TICK_ARRAY_SEQUENCE = 0x17_87; // 6023
+export const WHIRLPOOL_ERROR__INVALID_TICK_ARRAY_SEQUENCE = 0x1787; // 6023
 /** InvalidTokenMintOrder: Token Mint in wrong order */
-export const WHIRLPOOL_ERROR__INVALID_TOKEN_MINT_ORDER = 0x17_88; // 6024
+export const WHIRLPOOL_ERROR__INVALID_TOKEN_MINT_ORDER = 0x1788; // 6024
 /** RewardNotInitialized: Reward not initialized */
-export const WHIRLPOOL_ERROR__REWARD_NOT_INITIALIZED = 0x17_89; // 6025
+export const WHIRLPOOL_ERROR__REWARD_NOT_INITIALIZED = 0x1789; // 6025
 /** InvalidRewardIndex: Invalid reward index */
-export const WHIRLPOOL_ERROR__INVALID_REWARD_INDEX = 0x17_8a; // 6026
+export const WHIRLPOOL_ERROR__INVALID_REWARD_INDEX = 0x178a; // 6026
 /** RewardVaultAmountInsufficient: Reward vault requires amount to support emissions for at least one day */
-export const WHIRLPOOL_ERROR__REWARD_VAULT_AMOUNT_INSUFFICIENT = 0x17_8b; // 6027
+export const WHIRLPOOL_ERROR__REWARD_VAULT_AMOUNT_INSUFFICIENT = 0x178b; // 6027
 /** FeeRateMaxExceeded: Exceeded max fee rate */
-export const WHIRLPOOL_ERROR__FEE_RATE_MAX_EXCEEDED = 0x17_8c; // 6028
+export const WHIRLPOOL_ERROR__FEE_RATE_MAX_EXCEEDED = 0x178c; // 6028
 /** ProtocolFeeRateMaxExceeded: Exceeded max protocol fee rate */
-export const WHIRLPOOL_ERROR__PROTOCOL_FEE_RATE_MAX_EXCEEDED = 0x17_8d; // 6029
+export const WHIRLPOOL_ERROR__PROTOCOL_FEE_RATE_MAX_EXCEEDED = 0x178d; // 6029
 /** MultiplicationShiftRightOverflow: Multiplication with shift right overflow */
-export const WHIRLPOOL_ERROR__MULTIPLICATION_SHIFT_RIGHT_OVERFLOW = 0x17_8e; // 6030
+export const WHIRLPOOL_ERROR__MULTIPLICATION_SHIFT_RIGHT_OVERFLOW = 0x178e; // 6030
 /** MulDivOverflow: Muldiv overflow */
-export const WHIRLPOOL_ERROR__MUL_DIV_OVERFLOW = 0x17_8f; // 6031
+export const WHIRLPOOL_ERROR__MUL_DIV_OVERFLOW = 0x178f; // 6031
 /** MulDivInvalidInput: Invalid div_u256 input */
-export const WHIRLPOOL_ERROR__MUL_DIV_INVALID_INPUT = 0x17_90; // 6032
+export const WHIRLPOOL_ERROR__MUL_DIV_INVALID_INPUT = 0x1790; // 6032
 /** MultiplicationOverflow: Multiplication overflow */
-export const WHIRLPOOL_ERROR__MULTIPLICATION_OVERFLOW = 0x17_91; // 6033
+export const WHIRLPOOL_ERROR__MULTIPLICATION_OVERFLOW = 0x1791; // 6033
 /** InvalidSqrtPriceLimitDirection: Provided SqrtPriceLimit not in the same direction as the swap. */
-export const WHIRLPOOL_ERROR__INVALID_SQRT_PRICE_LIMIT_DIRECTION = 0x17_92; // 6034
+export const WHIRLPOOL_ERROR__INVALID_SQRT_PRICE_LIMIT_DIRECTION = 0x1792; // 6034
 /** ZeroTradableAmount: There are no tradable amount to swap. */
-export const WHIRLPOOL_ERROR__ZERO_TRADABLE_AMOUNT = 0x17_93; // 6035
+export const WHIRLPOOL_ERROR__ZERO_TRADABLE_AMOUNT = 0x1793; // 6035
 /** AmountOutBelowMinimum: Amount out below minimum threshold */
-export const WHIRLPOOL_ERROR__AMOUNT_OUT_BELOW_MINIMUM = 0x17_94; // 6036
+export const WHIRLPOOL_ERROR__AMOUNT_OUT_BELOW_MINIMUM = 0x1794; // 6036
 /** AmountInAboveMaximum: Amount in above maximum threshold */
-export const WHIRLPOOL_ERROR__AMOUNT_IN_ABOVE_MAXIMUM = 0x17_95; // 6037
+export const WHIRLPOOL_ERROR__AMOUNT_IN_ABOVE_MAXIMUM = 0x1795; // 6037
 /** TickArraySequenceInvalidIndex: Invalid index for tick array sequence */
-export const WHIRLPOOL_ERROR__TICK_ARRAY_SEQUENCE_INVALID_INDEX = 0x17_96; // 6038
+export const WHIRLPOOL_ERROR__TICK_ARRAY_SEQUENCE_INVALID_INDEX = 0x1796; // 6038
 /** AmountCalcOverflow: Amount calculated overflows */
-export const WHIRLPOOL_ERROR__AMOUNT_CALC_OVERFLOW = 0x17_97; // 6039
+export const WHIRLPOOL_ERROR__AMOUNT_CALC_OVERFLOW = 0x1797; // 6039
 /** AmountRemainingOverflow: Amount remaining overflows */
-export const WHIRLPOOL_ERROR__AMOUNT_REMAINING_OVERFLOW = 0x17_98; // 6040
+export const WHIRLPOOL_ERROR__AMOUNT_REMAINING_OVERFLOW = 0x1798; // 6040
 /** InvalidIntermediaryMint: Invalid intermediary mint */
-export const WHIRLPOOL_ERROR__INVALID_INTERMEDIARY_MINT = 0x17_99; // 6041
+export const WHIRLPOOL_ERROR__INVALID_INTERMEDIARY_MINT = 0x1799; // 6041
 /** DuplicateTwoHopPool: Duplicate two hop pool */
-export const WHIRLPOOL_ERROR__DUPLICATE_TWO_HOP_POOL = 0x17_9a; // 6042
+export const WHIRLPOOL_ERROR__DUPLICATE_TWO_HOP_POOL = 0x179a; // 6042
 /** InvalidBundleIndex: Bundle index is out of bounds */
-export const WHIRLPOOL_ERROR__INVALID_BUNDLE_INDEX = 0x17_9b; // 6043
+export const WHIRLPOOL_ERROR__INVALID_BUNDLE_INDEX = 0x179b; // 6043
 /** BundledPositionAlreadyOpened: Position has already been opened */
-export const WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_OPENED = 0x17_9c; // 6044
+export const WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_OPENED = 0x179c; // 6044
 /** BundledPositionAlreadyClosed: Position has already been closed */
-export const WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_CLOSED = 0x17_9d; // 6045
+export const WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_CLOSED = 0x179d; // 6045
 /** PositionBundleNotDeletable: Unable to delete PositionBundle with open positions */
-export const WHIRLPOOL_ERROR__POSITION_BUNDLE_NOT_DELETABLE = 0x17_9e; // 6046
+export const WHIRLPOOL_ERROR__POSITION_BUNDLE_NOT_DELETABLE = 0x179e; // 6046
 /** UnsupportedTokenMint: Token mint has unsupported attributes */
-export const WHIRLPOOL_ERROR__UNSUPPORTED_TOKEN_MINT = 0x17_9f; // 6047
+export const WHIRLPOOL_ERROR__UNSUPPORTED_TOKEN_MINT = 0x179f; // 6047
 /** RemainingAccountsInvalidSlice: Invalid remaining accounts */
-export const WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INVALID_SLICE = 0x17_a0; // 6048
+export const WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INVALID_SLICE = 0x17a0; // 6048
 /** RemainingAccountsInsufficient: Insufficient remaining accounts */
-export const WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INSUFFICIENT = 0x17_a1; // 6049
+export const WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INSUFFICIENT = 0x17a1; // 6049
 /** NoExtraAccountsForTransferHook: Unable to call transfer hook without extra accounts */
-export const WHIRLPOOL_ERROR__NO_EXTRA_ACCOUNTS_FOR_TRANSFER_HOOK = 0x17_a2; // 6050
+export const WHIRLPOOL_ERROR__NO_EXTRA_ACCOUNTS_FOR_TRANSFER_HOOK = 0x17a2; // 6050
 /** IntermediateTokenAmountMismatch: Output and input amount mismatch */
-export const WHIRLPOOL_ERROR__INTERMEDIATE_TOKEN_AMOUNT_MISMATCH = 0x17_a3; // 6051
+export const WHIRLPOOL_ERROR__INTERMEDIATE_TOKEN_AMOUNT_MISMATCH = 0x17a3; // 6051
 /** TransferFeeCalculationError: Transfer fee calculation failed */
-export const WHIRLPOOL_ERROR__TRANSFER_FEE_CALCULATION_ERROR = 0x17_a4; // 6052
+export const WHIRLPOOL_ERROR__TRANSFER_FEE_CALCULATION_ERROR = 0x17a4; // 6052
 /** RemainingAccountsDuplicatedAccountsType: Same accounts type is provided more than once */
-export const WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_DUPLICATED_ACCOUNTS_TYPE = 0x17_a5; // 6053
+export const WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_DUPLICATED_ACCOUNTS_TYPE = 0x17a5; // 6053
 /** FullRangeOnlyPool: This whirlpool only supports full-range positions */
-export const WHIRLPOOL_ERROR__FULL_RANGE_ONLY_POOL = 0x17_a6; // 6054
+export const WHIRLPOOL_ERROR__FULL_RANGE_ONLY_POOL = 0x17a6; // 6054
 /** TooManySupplementalTickArrays: Too many supplemental tick arrays provided */
-export const WHIRLPOOL_ERROR__TOO_MANY_SUPPLEMENTAL_TICK_ARRAYS = 0x17_a7; // 6055
+export const WHIRLPOOL_ERROR__TOO_MANY_SUPPLEMENTAL_TICK_ARRAYS = 0x17a7; // 6055
 /** DifferentWhirlpoolTickArrayAccount: TickArray account for different whirlpool provided */
-export const WHIRLPOOL_ERROR__DIFFERENT_WHIRLPOOL_TICK_ARRAY_ACCOUNT = 0x17_a8; // 6056
+export const WHIRLPOOL_ERROR__DIFFERENT_WHIRLPOOL_TICK_ARRAY_ACCOUNT = 0x17a8; // 6056
 /** PartialFillError: Trade resulted in partial fill */
-export const WHIRLPOOL_ERROR__PARTIAL_FILL_ERROR = 0x17_a9; // 6057
+export const WHIRLPOOL_ERROR__PARTIAL_FILL_ERROR = 0x17a9; // 6057
 /** PositionNotLockable: Position is not lockable */
-export const WHIRLPOOL_ERROR__POSITION_NOT_LOCKABLE = 0x17_aa; // 6058
+export const WHIRLPOOL_ERROR__POSITION_NOT_LOCKABLE = 0x17aa; // 6058
 /** OperationNotAllowedOnLockedPosition: Operation not allowed on locked position */
-export const WHIRLPOOL_ERROR__OPERATION_NOT_ALLOWED_ON_LOCKED_POSITION = 0x17_ab; // 6059
+export const WHIRLPOOL_ERROR__OPERATION_NOT_ALLOWED_ON_LOCKED_POSITION = 0x17ab; // 6059
 
 export type WhirlpoolError =
   | typeof WHIRLPOOL_ERROR__AMOUNT_CALC_OVERFLOW
@@ -198,109 +198,74 @@ export type WhirlpoolError =
   | typeof WHIRLPOOL_ERROR__ZERO_TRADABLE_AMOUNT;
 
 let whirlpoolErrorMessages: Record<WhirlpoolError, string> | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   whirlpoolErrorMessages = {
-    [WHIRLPOOL_ERROR__AMOUNT_CALC_OVERFLOW]: "Amount calculated overflows",
-    [WHIRLPOOL_ERROR__AMOUNT_IN_ABOVE_MAXIMUM]:
-      "Amount in above maximum threshold",
-    [WHIRLPOOL_ERROR__AMOUNT_OUT_BELOW_MINIMUM]:
-      "Amount out below minimum threshold",
-    [WHIRLPOOL_ERROR__AMOUNT_REMAINING_OVERFLOW]: "Amount remaining overflows",
-    [WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_CLOSED]:
-      "Position has already been closed",
-    [WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_OPENED]:
-      "Position has already been opened",
-    [WHIRLPOOL_ERROR__CLOSE_POSITION_NOT_EMPTY]:
-      "Position is not empty It cannot be closed",
-    [WHIRLPOOL_ERROR__DIFFERENT_WHIRLPOOL_TICK_ARRAY_ACCOUNT]:
-      "TickArray account for different whirlpool provided",
-    [WHIRLPOOL_ERROR__DIVIDE_BY_ZERO]: "Unable to divide by zero",
-    [WHIRLPOOL_ERROR__DUPLICATE_TWO_HOP_POOL]: "Duplicate two hop pool",
-    [WHIRLPOOL_ERROR__FEE_RATE_MAX_EXCEEDED]: "Exceeded max fee rate",
-    [WHIRLPOOL_ERROR__FULL_RANGE_ONLY_POOL]:
-      "This whirlpool only supports full-range positions",
-    [WHIRLPOOL_ERROR__INTERMEDIATE_TOKEN_AMOUNT_MISMATCH]:
-      "Output and input amount mismatch",
-    [WHIRLPOOL_ERROR__INVALID_BUNDLE_INDEX]: "Bundle index is out of bounds",
-    [WHIRLPOOL_ERROR__INVALID_ENUM]: "Enum value could not be converted",
-    [WHIRLPOOL_ERROR__INVALID_INTERMEDIARY_MINT]: "Invalid intermediary mint",
-    [WHIRLPOOL_ERROR__INVALID_POSITION_TOKEN_AMOUNT]:
-      "Position token amount must be 1",
-    [WHIRLPOOL_ERROR__INVALID_REWARD_INDEX]: "Invalid reward index",
-    [WHIRLPOOL_ERROR__INVALID_SQRT_PRICE_LIMIT_DIRECTION]:
-      "Provided SqrtPriceLimit not in the same direction as the swap.",
-    [WHIRLPOOL_ERROR__INVALID_START_TICK]: "Invalid start tick index provided.",
-    [WHIRLPOOL_ERROR__INVALID_TICK_ARRAY_SEQUENCE]:
-      "Invalid tick array sequence provided for instruction.",
-    [WHIRLPOOL_ERROR__INVALID_TICK_INDEX]:
-      "Provided tick index is either out of bounds or uninitializable",
-    [WHIRLPOOL_ERROR__INVALID_TICK_SPACING]: "Tick-spacing is not supported",
-    [WHIRLPOOL_ERROR__INVALID_TIMESTAMP]:
-      "Timestamp should be greater than the last updated timestamp",
-    [WHIRLPOOL_ERROR__INVALID_TIMESTAMP_CONVERSION]:
-      "Timestamp should be convertible from i64 to u64",
-    [WHIRLPOOL_ERROR__INVALID_TOKEN_MINT_ORDER]: "Token Mint in wrong order",
-    [WHIRLPOOL_ERROR__LIQUIDITY_NET_ERROR]:
-      "Tick liquidity net underflowed or overflowed",
-    [WHIRLPOOL_ERROR__LIQUIDITY_OVERFLOW]: "Liquidity overflow",
-    [WHIRLPOOL_ERROR__LIQUIDITY_TOO_HIGH]:
-      "Liquidity amount must be less than i64::MAX",
-    [WHIRLPOOL_ERROR__LIQUIDITY_UNDERFLOW]: "Liquidity underflow",
-    [WHIRLPOOL_ERROR__LIQUIDITY_ZERO]:
-      "Liquidity amount must be greater than zero",
-    [WHIRLPOOL_ERROR__MISSING_OR_INVALID_DELEGATE]:
-      "Position token account has a missing or invalid delegate",
-    [WHIRLPOOL_ERROR__MUL_DIV_INVALID_INPUT]: "Invalid div_u256 input",
-    [WHIRLPOOL_ERROR__MUL_DIV_OVERFLOW]: "Muldiv overflow",
-    [WHIRLPOOL_ERROR__MULTIPLICATION_OVERFLOW]: "Multiplication overflow",
-    [WHIRLPOOL_ERROR__MULTIPLICATION_SHIFT_RIGHT_OVERFLOW]:
-      "Multiplication with shift right overflow",
-    [WHIRLPOOL_ERROR__NO_EXTRA_ACCOUNTS_FOR_TRANSFER_HOOK]:
-      "Unable to call transfer hook without extra accounts",
-    [WHIRLPOOL_ERROR__NUMBER_CAST_ERROR]: "Unable to cast number into BigInt",
-    [WHIRLPOOL_ERROR__NUMBER_DOWN_CAST_ERROR]: "Unable to down cast number",
-    [WHIRLPOOL_ERROR__OPERATION_NOT_ALLOWED_ON_LOCKED_POSITION]:
-      "Operation not allowed on locked position",
-    [WHIRLPOOL_ERROR__PARTIAL_FILL_ERROR]: "Trade resulted in partial fill",
-    [WHIRLPOOL_ERROR__POSITION_BUNDLE_NOT_DELETABLE]:
-      "Unable to delete PositionBundle with open positions",
-    [WHIRLPOOL_ERROR__POSITION_NOT_LOCKABLE]: "Position is not lockable",
-    [WHIRLPOOL_ERROR__PROTOCOL_FEE_RATE_MAX_EXCEEDED]:
-      "Exceeded max protocol fee rate",
-    [WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_DUPLICATED_ACCOUNTS_TYPE]:
-      "Same accounts type is provided more than once",
-    [WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INSUFFICIENT]:
-      "Insufficient remaining accounts",
-    [WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INVALID_SLICE]:
-      "Invalid remaining accounts",
-    [WHIRLPOOL_ERROR__REWARD_NOT_INITIALIZED]: "Reward not initialized",
-    [WHIRLPOOL_ERROR__REWARD_VAULT_AMOUNT_INSUFFICIENT]:
-      "Reward vault requires amount to support emissions for at least one day",
-    [WHIRLPOOL_ERROR__SQRT_PRICE_OUT_OF_BOUNDS]:
-      "Provided sqrt price out of bounds",
-    [WHIRLPOOL_ERROR__TICK_ARRAY_EXIST_IN_POOL]:
-      "Tick-array already exists in this whirlpool",
-    [WHIRLPOOL_ERROR__TICK_ARRAY_INDEX_OUTOF_BOUNDS]:
-      "Attempt to search for a tick-array failed",
-    [WHIRLPOOL_ERROR__TICK_ARRAY_SEQUENCE_INVALID_INDEX]:
-      "Invalid index for tick array sequence",
-    [WHIRLPOOL_ERROR__TICK_NOT_FOUND]: "Tick not found within tick array",
-    [WHIRLPOOL_ERROR__TOKEN_MAX_EXCEEDED]: "Exceeded token max",
-    [WHIRLPOOL_ERROR__TOKEN_MIN_SUBCEEDED]: "Did not meet token min",
-    [WHIRLPOOL_ERROR__TOO_MANY_SUPPLEMENTAL_TICK_ARRAYS]:
-      "Too many supplemental tick arrays provided",
-    [WHIRLPOOL_ERROR__TRANSFER_FEE_CALCULATION_ERROR]:
-      "Transfer fee calculation failed",
-    [WHIRLPOOL_ERROR__UNSUPPORTED_TOKEN_MINT]:
-      "Token mint has unsupported attributes",
-    [WHIRLPOOL_ERROR__ZERO_TRADABLE_AMOUNT]:
-      "There are no tradable amount to swap.",
+    [WHIRLPOOL_ERROR__AMOUNT_CALC_OVERFLOW]: `Amount calculated overflows`,
+    [WHIRLPOOL_ERROR__AMOUNT_IN_ABOVE_MAXIMUM]: `Amount in above maximum threshold`,
+    [WHIRLPOOL_ERROR__AMOUNT_OUT_BELOW_MINIMUM]: `Amount out below minimum threshold`,
+    [WHIRLPOOL_ERROR__AMOUNT_REMAINING_OVERFLOW]: `Amount remaining overflows`,
+    [WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_CLOSED]: `Position has already been closed`,
+    [WHIRLPOOL_ERROR__BUNDLED_POSITION_ALREADY_OPENED]: `Position has already been opened`,
+    [WHIRLPOOL_ERROR__CLOSE_POSITION_NOT_EMPTY]: `Position is not empty It cannot be closed`,
+    [WHIRLPOOL_ERROR__DIFFERENT_WHIRLPOOL_TICK_ARRAY_ACCOUNT]: `TickArray account for different whirlpool provided`,
+    [WHIRLPOOL_ERROR__DIVIDE_BY_ZERO]: `Unable to divide by zero`,
+    [WHIRLPOOL_ERROR__DUPLICATE_TWO_HOP_POOL]: `Duplicate two hop pool`,
+    [WHIRLPOOL_ERROR__FEE_RATE_MAX_EXCEEDED]: `Exceeded max fee rate`,
+    [WHIRLPOOL_ERROR__FULL_RANGE_ONLY_POOL]: `This whirlpool only supports full-range positions`,
+    [WHIRLPOOL_ERROR__INTERMEDIATE_TOKEN_AMOUNT_MISMATCH]: `Output and input amount mismatch`,
+    [WHIRLPOOL_ERROR__INVALID_BUNDLE_INDEX]: `Bundle index is out of bounds`,
+    [WHIRLPOOL_ERROR__INVALID_ENUM]: `Enum value could not be converted`,
+    [WHIRLPOOL_ERROR__INVALID_INTERMEDIARY_MINT]: `Invalid intermediary mint`,
+    [WHIRLPOOL_ERROR__INVALID_POSITION_TOKEN_AMOUNT]: `Position token amount must be 1`,
+    [WHIRLPOOL_ERROR__INVALID_REWARD_INDEX]: `Invalid reward index`,
+    [WHIRLPOOL_ERROR__INVALID_SQRT_PRICE_LIMIT_DIRECTION]: `Provided SqrtPriceLimit not in the same direction as the swap.`,
+    [WHIRLPOOL_ERROR__INVALID_START_TICK]: `Invalid start tick index provided.`,
+    [WHIRLPOOL_ERROR__INVALID_TICK_ARRAY_SEQUENCE]: `Invalid tick array sequence provided for instruction.`,
+    [WHIRLPOOL_ERROR__INVALID_TICK_INDEX]: `Provided tick index is either out of bounds or uninitializable`,
+    [WHIRLPOOL_ERROR__INVALID_TICK_SPACING]: `Tick-spacing is not supported`,
+    [WHIRLPOOL_ERROR__INVALID_TIMESTAMP]: `Timestamp should be greater than the last updated timestamp`,
+    [WHIRLPOOL_ERROR__INVALID_TIMESTAMP_CONVERSION]: `Timestamp should be convertible from i64 to u64`,
+    [WHIRLPOOL_ERROR__INVALID_TOKEN_MINT_ORDER]: `Token Mint in wrong order`,
+    [WHIRLPOOL_ERROR__LIQUIDITY_NET_ERROR]: `Tick liquidity net underflowed or overflowed`,
+    [WHIRLPOOL_ERROR__LIQUIDITY_OVERFLOW]: `Liquidity overflow`,
+    [WHIRLPOOL_ERROR__LIQUIDITY_TOO_HIGH]: `Liquidity amount must be less than i64::MAX`,
+    [WHIRLPOOL_ERROR__LIQUIDITY_UNDERFLOW]: `Liquidity underflow`,
+    [WHIRLPOOL_ERROR__LIQUIDITY_ZERO]: `Liquidity amount must be greater than zero`,
+    [WHIRLPOOL_ERROR__MISSING_OR_INVALID_DELEGATE]: `Position token account has a missing or invalid delegate`,
+    [WHIRLPOOL_ERROR__MUL_DIV_INVALID_INPUT]: `Invalid div_u256 input`,
+    [WHIRLPOOL_ERROR__MUL_DIV_OVERFLOW]: `Muldiv overflow`,
+    [WHIRLPOOL_ERROR__MULTIPLICATION_OVERFLOW]: `Multiplication overflow`,
+    [WHIRLPOOL_ERROR__MULTIPLICATION_SHIFT_RIGHT_OVERFLOW]: `Multiplication with shift right overflow`,
+    [WHIRLPOOL_ERROR__NO_EXTRA_ACCOUNTS_FOR_TRANSFER_HOOK]: `Unable to call transfer hook without extra accounts`,
+    [WHIRLPOOL_ERROR__NUMBER_CAST_ERROR]: `Unable to cast number into BigInt`,
+    [WHIRLPOOL_ERROR__NUMBER_DOWN_CAST_ERROR]: `Unable to down cast number`,
+    [WHIRLPOOL_ERROR__OPERATION_NOT_ALLOWED_ON_LOCKED_POSITION]: `Operation not allowed on locked position`,
+    [WHIRLPOOL_ERROR__PARTIAL_FILL_ERROR]: `Trade resulted in partial fill`,
+    [WHIRLPOOL_ERROR__POSITION_BUNDLE_NOT_DELETABLE]: `Unable to delete PositionBundle with open positions`,
+    [WHIRLPOOL_ERROR__POSITION_NOT_LOCKABLE]: `Position is not lockable`,
+    [WHIRLPOOL_ERROR__PROTOCOL_FEE_RATE_MAX_EXCEEDED]: `Exceeded max protocol fee rate`,
+    [WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_DUPLICATED_ACCOUNTS_TYPE]: `Same accounts type is provided more than once`,
+    [WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INSUFFICIENT]: `Insufficient remaining accounts`,
+    [WHIRLPOOL_ERROR__REMAINING_ACCOUNTS_INVALID_SLICE]: `Invalid remaining accounts`,
+    [WHIRLPOOL_ERROR__REWARD_NOT_INITIALIZED]: `Reward not initialized`,
+    [WHIRLPOOL_ERROR__REWARD_VAULT_AMOUNT_INSUFFICIENT]: `Reward vault requires amount to support emissions for at least one day`,
+    [WHIRLPOOL_ERROR__SQRT_PRICE_OUT_OF_BOUNDS]: `Provided sqrt price out of bounds`,
+    [WHIRLPOOL_ERROR__TICK_ARRAY_EXIST_IN_POOL]: `Tick-array already exists in this whirlpool`,
+    [WHIRLPOOL_ERROR__TICK_ARRAY_INDEX_OUTOF_BOUNDS]: `Attempt to search for a tick-array failed`,
+    [WHIRLPOOL_ERROR__TICK_ARRAY_SEQUENCE_INVALID_INDEX]: `Invalid index for tick array sequence`,
+    [WHIRLPOOL_ERROR__TICK_NOT_FOUND]: `Tick not found within tick array`,
+    [WHIRLPOOL_ERROR__TOKEN_MAX_EXCEEDED]: `Exceeded token max`,
+    [WHIRLPOOL_ERROR__TOKEN_MIN_SUBCEEDED]: `Did not meet token min`,
+    [WHIRLPOOL_ERROR__TOO_MANY_SUPPLEMENTAL_TICK_ARRAYS]: `Too many supplemental tick arrays provided`,
+    [WHIRLPOOL_ERROR__TRANSFER_FEE_CALCULATION_ERROR]: `Transfer fee calculation failed`,
+    [WHIRLPOOL_ERROR__UNSUPPORTED_TOKEN_MINT]: `Token mint has unsupported attributes`,
+    [WHIRLPOOL_ERROR__ZERO_TRADABLE_AMOUNT]: `There are no tradable amount to swap.`,
   };
 }
 
 export function getWhirlpoolErrorMessage(code: WhirlpoolError): string {
-  if (process.env.NODE_ENV !== "production") {
-    return whirlpoolErrorMessages![code];
+  if (process.env["NODE_ENV"] !== "production") {
+    return (whirlpoolErrorMessages as Record<WhirlpoolError, string>)[code];
   }
 
   return "Error message not available in production bundles.";

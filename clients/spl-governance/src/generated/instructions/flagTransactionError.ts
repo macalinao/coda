@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -32,8 +15,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const FLAG_TRANSACTION_ERROR_DISCRIMINATOR = 20;
@@ -44,11 +44,12 @@ export function getFlagTransactionErrorDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type FlagTransactionErrorInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountProposalTransactionAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountProposalTransactionAccount extends string | AccountMeta<string> =
+    string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -70,9 +71,7 @@ export type FlagTransactionErrorInstruction<
     ]
   >;
 
-export interface FlagTransactionErrorInstructionData {
-  discriminator: number;
-}
+export type FlagTransactionErrorInstructionData = { discriminator: number };
 
 export type FlagTransactionErrorInstructionDataArgs = {};
 
@@ -100,12 +99,12 @@ export function getFlagTransactionErrorInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface FlagTransactionErrorInput<
+export type FlagTransactionErrorInput<
   TAccountProposalAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
   TAccountGovernanceAuthority extends string = string,
   TAccountProposalTransactionAccount extends string = string,
-> {
+> = {
   proposalAccount: Address<TAccountProposalAccount>;
   /** TokenOwnerRecord account of the Proposal owner */
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
@@ -113,7 +112,7 @@ export interface FlagTransactionErrorInput<
   governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
   /** ProposalTransaction account to flag */
   proposalTransactionAccount: Address<TAccountProposalTransactionAccount>;
-}
+};
 
 export function getFlagTransactionErrorInstruction<
   TAccountProposalAccount extends string,
@@ -183,10 +182,10 @@ export function getFlagTransactionErrorInstruction<
   >);
 }
 
-export interface ParsedFlagTransactionErrorInstruction<
+export type ParsedFlagTransactionErrorInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     proposalAccount: TAccountMetas[0];
@@ -198,7 +197,7 @@ export interface ParsedFlagTransactionErrorInstruction<
     proposalTransactionAccount: TAccountMetas[3];
   };
   data: FlagTransactionErrorInstructionData;
-}
+};
 
 export function parseFlagTransactionErrorInstruction<
   TProgram extends string,

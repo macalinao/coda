@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,6 +24,17 @@ import {
   getU16Decoder,
   getU16Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const WHIRLPOOLS_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
@@ -48,20 +46,20 @@ export function getWhirlpoolsConfigDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface WhirlpoolsConfig {
+export type WhirlpoolsConfig = {
   discriminator: ReadonlyUint8Array;
   feeAuthority: Address;
   collectProtocolFeesAuthority: Address;
   rewardEmissionsSuperAuthority: Address;
   defaultProtocolFeeRate: number;
-}
+};
 
-export interface WhirlpoolsConfigArgs {
+export type WhirlpoolsConfigArgs = {
   feeAuthority: Address;
   collectProtocolFeesAuthority: Address;
   rewardEmissionsSuperAuthority: Address;
   defaultProtocolFeeRate: number;
-}
+};
 
 /** Gets the encoder for {@link WhirlpoolsConfigArgs} account data. */
 export function getWhirlpoolsConfigEncoder(): FixedSizeEncoder<WhirlpoolsConfigArgs> {
@@ -139,7 +137,7 @@ export async function fetchMaybeWhirlpoolsConfig<
 
 export async function fetchAllWhirlpoolsConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<WhirlpoolsConfig>[]> {
   const maybeAccounts = await fetchAllMaybeWhirlpoolsConfig(
@@ -153,7 +151,7 @@ export async function fetchAllWhirlpoolsConfig(
 
 export async function fetchAllMaybeWhirlpoolsConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<WhirlpoolsConfig>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

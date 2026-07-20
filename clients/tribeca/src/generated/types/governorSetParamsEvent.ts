@@ -6,39 +6,35 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  GovernanceParameters,
-  GovernanceParametersArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getGovernanceParametersDecoder,
   getGovernanceParametersEncoder,
+  type GovernanceParameters,
+  type GovernanceParametersArgs,
 } from "./index.js";
 
-export interface GovernorSetParamsEvent {
+export type GovernorSetParamsEvent = {
   governor: Address;
   prevParams: GovernanceParameters;
   params: GovernanceParameters;
-}
+};
 
-export interface GovernorSetParamsEventArgs {
+export type GovernorSetParamsEventArgs = {
   governor: Address;
   prevParams: GovernanceParametersArgs;
   params: GovernanceParametersArgs;
-}
+};
 
 export function getGovernorSetParamsEventEncoder(): FixedSizeEncoder<GovernorSetParamsEventArgs> {
   return getStructEncoder([

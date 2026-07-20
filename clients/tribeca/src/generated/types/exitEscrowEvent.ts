@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -22,23 +16,27 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface ExitEscrowEvent {
+export type ExitEscrowEvent = {
   escrowOwner: Address;
   locker: Address;
   timestamp: bigint;
   lockerSupply: bigint;
   releasedAmount: bigint;
-}
+};
 
-export interface ExitEscrowEventArgs {
+export type ExitEscrowEventArgs = {
   escrowOwner: Address;
   locker: Address;
   timestamp: number | bigint;
   lockerSupply: number | bigint;
   releasedAmount: number | bigint;
-}
+};
 
 export function getExitEscrowEventEncoder(): FixedSizeEncoder<ExitEscrowEventArgs> {
   return getStructEncoder([

@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { QuarrySeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,17 +23,28 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findQuarryPda } from "../pdas/index.js";
+import { findQuarryPda, type QuarrySeeds } from "../pdas/index.js";
 
 export const QUARRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 248, 54, 182, 240, 85, 9, 77,
@@ -57,7 +54,7 @@ export function getQuarryDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(QUARRY_DISCRIMINATOR);
 }
 
-export interface Quarry {
+export type Quarry = {
   discriminator: ReadonlyUint8Array;
   rewarder: Address;
   tokenMintKey: Address;
@@ -71,9 +68,9 @@ export interface Quarry {
   rewardsShare: bigint;
   totalTokensDeposited: bigint;
   numMiners: bigint;
-}
+};
 
-export interface QuarryArgs {
+export type QuarryArgs = {
   rewarder: Address;
   tokenMintKey: Address;
   bump: number;
@@ -86,7 +83,7 @@ export interface QuarryArgs {
   rewardsShare: number | bigint;
   totalTokensDeposited: number | bigint;
   numMiners: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link QuarryArgs} account data. */
 export function getQuarryEncoder(): FixedSizeEncoder<QuarryArgs> {
@@ -170,7 +167,7 @@ export async function fetchMaybeQuarry<TAddress extends string = string>(
 
 export async function fetchAllQuarry(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Quarry>[]> {
   const maybeAccounts = await fetchAllMaybeQuarry(rpc, addresses, config);
@@ -180,7 +177,7 @@ export async function fetchAllQuarry(
 
 export async function fetchAllMaybeQuarry(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Quarry>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

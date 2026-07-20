@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { PoolFeeParameters, PoolFeeParametersArgs } from "./index.js";
 import {
   combineCodec,
   getBooleanDecoder,
@@ -22,19 +14,26 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getPoolFeeParametersDecoder,
   getPoolFeeParametersEncoder,
+  type PoolFeeParameters,
+  type PoolFeeParametersArgs,
 } from "./index.js";
 
-export interface InitializeCustomizablePoolParameters {
+export type InitializeCustomizablePoolParameters = {
   /** pool fees */
   poolFees: PoolFeeParameters;
   /** sqrt min price */
@@ -53,9 +52,9 @@ export interface InitializeCustomizablePoolParameters {
   collectFeeMode: number;
   /** activation point */
   activationPoint: Option<bigint>;
-}
+};
 
-export interface InitializeCustomizablePoolParametersArgs {
+export type InitializeCustomizablePoolParametersArgs = {
   /** pool fees */
   poolFees: PoolFeeParametersArgs;
   /** sqrt min price */
@@ -74,7 +73,7 @@ export interface InitializeCustomizablePoolParametersArgs {
   collectFeeMode: number;
   /** activation point */
   activationPoint: OptionOrNullable<number | bigint>;
-}
+};
 
 export function getInitializeCustomizablePoolParametersEncoder(): Encoder<InitializeCustomizablePoolParametersArgs> {
   return getStructEncoder([

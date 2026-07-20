@@ -6,17 +6,19 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum AssetTier {
-  Regular = 0,
-  IsolatedCollateral = 1,
-  IsolatedDebt = 2,
+  Regular,
+  IsolatedCollateral,
+  IsolatedDebt,
 }
 
 export type AssetTierArgs = AssetTier;

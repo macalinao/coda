@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INIT_MINER_M_M_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -107,14 +107,12 @@ export type InitMinerMMInstruction<
     ]
   >;
 
-export interface InitMinerMMInstructionData {
+export type InitMinerMMInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface InitMinerMMInstructionDataArgs {
-  bump: number;
-}
+export type InitMinerMMInstructionDataArgs = { bump: number };
 
 export function getInitMinerMMInstructionDataEncoder(): FixedSizeEncoder<InitMinerMMInstructionDataArgs> {
   return transformEncoder(
@@ -143,7 +141,7 @@ export function getInitMinerMMInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitMinerMMInput<
+export type InitMinerMMInput<
   TAccountPool extends string = string,
   TAccountMm extends string = string,
   TAccountMiner extends string = string,
@@ -155,7 +153,7 @@ export interface InitMinerMMInput<
   TAccountMineProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   mm: Address<TAccountMm>;
   miner: Address<TAccountMiner>;
@@ -168,7 +166,7 @@ export interface InitMinerMMInput<
   systemProgram?: Address<TAccountSystemProgram>;
   tokenProgram?: Address<TAccountTokenProgram>;
   bump: InitMinerMMInstructionDataArgs["bump"];
-}
+};
 
 export function getInitMinerMMInstruction<
   TAccountPool extends string,
@@ -287,10 +285,10 @@ export function getInitMinerMMInstruction<
   >);
 }
 
-export interface ParsedInitMinerMMInstruction<
+export type ParsedInitMinerMMInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -306,7 +304,7 @@ export interface ParsedInitMinerMMInstruction<
     tokenProgram: TAccountMetas[10];
   };
   data: InitMinerMMInstructionData;
-}
+};
 
 export function parseInitMinerMMInstruction<
   TProgram extends string,

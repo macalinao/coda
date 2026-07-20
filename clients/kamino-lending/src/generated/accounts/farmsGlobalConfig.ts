@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,11 +23,22 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const FARMS_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
@@ -52,24 +50,24 @@ export function getFarmsGlobalConfigDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface FarmsGlobalConfig {
+export type FarmsGlobalConfig = {
   discriminator: ReadonlyUint8Array;
   globalAdmin: Address;
   treasuryFeeBps: bigint;
   treasuryVaultsAuthority: Address;
   treasuryVaultsAuthorityBump: bigint;
   pendingGlobalAdmin: Address;
-  padding1: bigint[];
-}
+  padding1: Array<bigint>;
+};
 
-export interface FarmsGlobalConfigArgs {
+export type FarmsGlobalConfigArgs = {
   globalAdmin: Address;
   treasuryFeeBps: number | bigint;
   treasuryVaultsAuthority: Address;
   treasuryVaultsAuthorityBump: number | bigint;
   pendingGlobalAdmin: Address;
   padding1: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link FarmsGlobalConfigArgs} account data. */
 export function getFarmsGlobalConfigEncoder(): FixedSizeEncoder<FarmsGlobalConfigArgs> {
@@ -151,7 +149,7 @@ export async function fetchMaybeFarmsGlobalConfig<
 
 export async function fetchAllFarmsGlobalConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FarmsGlobalConfig>[]> {
   const maybeAccounts = await fetchAllMaybeFarmsGlobalConfig(
@@ -165,7 +163,7 @@ export async function fetchAllFarmsGlobalConfig(
 
 export async function fetchAllMaybeFarmsGlobalConfig(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FarmsGlobalConfig>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

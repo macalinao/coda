@@ -6,25 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  PositionMetrics,
-  PositionMetricsArgs,
-  UserRewardInfo,
-  UserRewardInfoArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,19 +23,34 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getPositionMetricsDecoder,
   getPositionMetricsEncoder,
   getUserRewardInfoDecoder,
   getUserRewardInfoEncoder,
+  type PositionMetrics,
+  type PositionMetricsArgs,
+  type UserRewardInfo,
+  type UserRewardInfoArgs,
 } from "../types/index.js";
 
 export const POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -65,15 +61,15 @@ export function getPositionDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(POSITION_DISCRIMINATOR);
 }
 
-export interface Position {
+export type Position = {
   discriminator: ReadonlyUint8Array;
   pool: Address;
   /** nft mint */
   nftMint: Address;
   /** fee a checkpoint */
-  feeAPerTokenCheckpoint: number[];
+  feeAPerTokenCheckpoint: Array<number>;
   /** fee b checkpoint */
-  feeBPerTokenCheckpoint: number[];
+  feeBPerTokenCheckpoint: Array<number>;
   /** fee a pending */
   feeAPending: bigint;
   /** fee b pending */
@@ -87,19 +83,19 @@ export interface Position {
   /** metrics */
   metrics: PositionMetrics;
   /** Farming reward information */
-  rewardInfos: UserRewardInfo[];
+  rewardInfos: Array<UserRewardInfo>;
   /** padding for future usage */
-  padding: bigint[];
-}
+  padding: Array<bigint>;
+};
 
-export interface PositionArgs {
+export type PositionArgs = {
   pool: Address;
   /** nft mint */
   nftMint: Address;
   /** fee a checkpoint */
-  feeAPerTokenCheckpoint: number[];
+  feeAPerTokenCheckpoint: Array<number>;
   /** fee b checkpoint */
-  feeBPerTokenCheckpoint: number[];
+  feeBPerTokenCheckpoint: Array<number>;
   /** fee a pending */
   feeAPending: number | bigint;
   /** fee b pending */
@@ -113,10 +109,10 @@ export interface PositionArgs {
   /** metrics */
   metrics: PositionMetricsArgs;
   /** Farming reward information */
-  rewardInfos: UserRewardInfoArgs[];
+  rewardInfos: Array<UserRewardInfoArgs>;
   /** padding for future usage */
   padding: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link PositionArgs} account data. */
 export function getPositionEncoder(): FixedSizeEncoder<PositionArgs> {
@@ -200,7 +196,7 @@ export async function fetchMaybePosition<TAddress extends string = string>(
 
 export async function fetchAllPosition(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Position>[]> {
   const maybeAccounts = await fetchAllMaybePosition(rpc, addresses, config);
@@ -210,7 +206,7 @@ export async function fetchAllPosition(
 
 export async function fetchAllMaybePosition(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Position>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

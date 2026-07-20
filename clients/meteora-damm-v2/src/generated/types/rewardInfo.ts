@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,24 +14,28 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /** Stores the state relevant for tracking liquidity mining rewards */
-export interface RewardInfo {
+export type RewardInfo = {
   /** Indicates if the reward has been initialized */
   initialized: number;
   /** reward token flag */
   rewardTokenFlag: number;
   /** padding */
-  padding0: number[];
+  padding0: Array<number>;
   /** Padding to ensure `reward_rate: u128` is 16-byte aligned */
-  padding1: number[];
+  padding1: Array<number>;
   /** Reward token mint. */
   mint: Address;
   /** Reward vault token account. */
@@ -51,7 +49,7 @@ export interface RewardInfo {
   /** reward rate */
   rewardRate: bigint;
   /** Reward per token stored */
-  rewardPerTokenStored: number[];
+  rewardPerTokenStored: Array<number>;
   /** The last time reward states were updated. */
   lastUpdateTime: bigint;
   /**
@@ -59,17 +57,17 @@ export interface RewardInfo {
    * These rewards will be carried over to the next reward time window.
    */
   cumulativeSecondsWithEmptyLiquidityReward: bigint;
-}
+};
 
-export interface RewardInfoArgs {
+export type RewardInfoArgs = {
   /** Indicates if the reward has been initialized */
   initialized: number;
   /** reward token flag */
   rewardTokenFlag: number;
   /** padding */
-  padding0: number[];
+  padding0: Array<number>;
   /** Padding to ensure `reward_rate: u128` is 16-byte aligned */
-  padding1: number[];
+  padding1: Array<number>;
   /** Reward token mint. */
   mint: Address;
   /** Reward vault token account. */
@@ -83,7 +81,7 @@ export interface RewardInfoArgs {
   /** reward rate */
   rewardRate: number | bigint;
   /** Reward per token stored */
-  rewardPerTokenStored: number[];
+  rewardPerTokenStored: Array<number>;
   /** The last time reward states were updated. */
   lastUpdateTime: number | bigint;
   /**
@@ -91,7 +89,7 @@ export interface RewardInfoArgs {
    * These rewards will be carried over to the next reward time window.
    */
   cumulativeSecondsWithEmptyLiquidityReward: number | bigint;
-}
+};
 
 export function getRewardInfoEncoder(): FixedSizeEncoder<RewardInfoArgs> {
   return getStructEncoder([

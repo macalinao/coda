@@ -6,11 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -19,9 +14,12 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface SplitPositionParameters {
+export type SplitPositionParameters = {
   /** Percentage of unlocked liquidity to split to the second position */
   unlockedLiquidityPercentage: number;
   /** Percentage of permanent locked liquidity to split to the second position */
@@ -35,8 +33,8 @@ export interface SplitPositionParameters {
   /** Percentage of reward 1 pending to split to the second position */
   reward1Percentage: number;
   /** padding for future */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
 export type SplitPositionParametersArgs = SplitPositionParameters;
 

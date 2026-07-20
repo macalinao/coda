@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -130,9 +128,9 @@ export type ClaimPositionFeeInstruction<
     ]
   >;
 
-export interface ClaimPositionFeeInstructionData {
+export type ClaimPositionFeeInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type ClaimPositionFeeInstructionDataArgs = {};
 
@@ -159,7 +157,7 @@ export function getClaimPositionFeeInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClaimPositionFeeAsyncInput<
+export type ClaimPositionFeeAsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -175,7 +173,7 @@ export interface ClaimPositionFeeAsyncInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -201,7 +199,7 @@ export interface ClaimPositionFeeAsyncInput<
   tokenBProgram?: Address<TAccountTokenBProgram>;
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export async function getClaimPositionFeeInstructionAsync<
   TAccountPoolAuthority extends string,
@@ -373,7 +371,7 @@ export async function getClaimPositionFeeInstructionAsync<
   >);
 }
 
-export interface ClaimPositionFeeInput<
+export type ClaimPositionFeeInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -389,7 +387,7 @@ export interface ClaimPositionFeeInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -415,7 +413,7 @@ export interface ClaimPositionFeeInput<
   tokenBProgram?: Address<TAccountTokenBProgram>;
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export function getClaimPositionFeeInstruction<
   TAccountPoolAuthority extends string,
@@ -555,10 +553,10 @@ export function getClaimPositionFeeInstruction<
   >);
 }
 
-export interface ParsedClaimPositionFeeInstruction<
+export type ParsedClaimPositionFeeInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -588,7 +586,7 @@ export interface ParsedClaimPositionFeeInstruction<
     program: TAccountMetas[14];
   };
   data: ClaimPositionFeeInstructionData;
-}
+};
 
 export function parseClaimPositionFeeInstruction<
   TProgram extends string,

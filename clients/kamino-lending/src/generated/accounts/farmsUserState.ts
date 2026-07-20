@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { FarmsUserStateSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,15 +23,29 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findFarmsUserStatePda } from "../pdas/index.js";
+import {
+  type FarmsUserStateSeeds,
+  findFarmsUserStatePda,
+} from "../pdas/index.js";
 
 export const FARMS_USER_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([72, 177, 85, 249, 76, 167, 186, 126]);
@@ -56,22 +56,22 @@ export function getFarmsUserStateDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface FarmsUserState {
+export type FarmsUserState = {
   discriminator: ReadonlyUint8Array;
   userId: bigint;
   farmState: Address;
   owner: Address;
   /** Indicate if this user state is part of a delegated farm */
   isFarmDelegated: number;
-  padding0: number[];
+  padding0: Array<number>;
   /**
    * Rewards tally used for computation of gained rewards
    * (scaled from `Decimal` representation).
    */
-  rewardsTallyScaled: bigint[];
+  rewardsTallyScaled: Array<bigint>;
   /** Number of reward tokens ready for claim */
-  rewardsIssuedUnclaimed: bigint[];
-  lastClaimTs: bigint[];
+  rewardsIssuedUnclaimed: Array<bigint>;
+  lastClaimTs: Array<bigint>;
   /**
    * User stake deposited and usable, generating rewards and fees.
    * (scaled from `Decimal` representation).
@@ -99,16 +99,16 @@ export interface FarmsUserState {
   /** Delegatee used for initialisation - useful to check against */
   delegatee: Address;
   lastStakeTs: bigint;
-  padding1: bigint[];
-}
+  padding1: Array<bigint>;
+};
 
-export interface FarmsUserStateArgs {
+export type FarmsUserStateArgs = {
   userId: number | bigint;
   farmState: Address;
   owner: Address;
   /** Indicate if this user state is part of a delegated farm */
   isFarmDelegated: number;
-  padding0: number[];
+  padding0: Array<number>;
   /**
    * Rewards tally used for computation of gained rewards
    * (scaled from `Decimal` representation).
@@ -145,7 +145,7 @@ export interface FarmsUserStateArgs {
   delegatee: Address;
   lastStakeTs: number | bigint;
   padding1: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link FarmsUserStateArgs} account data. */
 export function getFarmsUserStateEncoder(): FixedSizeEncoder<FarmsUserStateArgs> {
@@ -247,7 +247,7 @@ export async function fetchMaybeFarmsUserState<
 
 export async function fetchAllFarmsUserState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FarmsUserState>[]> {
   const maybeAccounts = await fetchAllMaybeFarmsUserState(
@@ -261,7 +261,7 @@ export async function fetchAllFarmsUserState(
 
 export async function fetchAllMaybeFarmsUserState(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FarmsUserState>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { RegistrarSeeds } from "../pdas/index.js";
-import type { VotingMintConfig, VotingMintConfigArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,16 +25,29 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRegistrarPda } from "../pdas/index.js";
+import { findRegistrarPda, type RegistrarSeeds } from "../pdas/index.js";
 import {
   getVotingMintConfigDecoder,
   getVotingMintConfigEncoder,
+  type VotingMintConfig,
+  type VotingMintConfigArgs,
 } from "../types/index.js";
 
 export const REGISTRAR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -60,32 +58,32 @@ export function getRegistrarDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(REGISTRAR_DISCRIMINATOR);
 }
 
-export interface Registrar {
+export type Registrar = {
   discriminator: ReadonlyUint8Array;
   governanceProgramId: Address;
   realm: Address;
   realmGoverningTokenMint: Address;
   realmAuthority: Address;
-  reserved1: number[];
-  votingMints: VotingMintConfig[];
+  reserved1: Array<number>;
+  votingMints: Array<VotingMintConfig>;
   timeOffset: bigint;
   bump: number;
-  reserved2: number[];
-  reserved3: bigint[];
-}
+  reserved2: Array<number>;
+  reserved3: Array<bigint>;
+};
 
-export interface RegistrarArgs {
+export type RegistrarArgs = {
   governanceProgramId: Address;
   realm: Address;
   realmGoverningTokenMint: Address;
   realmAuthority: Address;
-  reserved1: number[];
-  votingMints: VotingMintConfigArgs[];
+  reserved1: Array<number>;
+  votingMints: Array<VotingMintConfigArgs>;
   timeOffset: number | bigint;
   bump: number;
-  reserved2: number[];
+  reserved2: Array<number>;
   reserved3: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link RegistrarArgs} account data. */
 export function getRegistrarEncoder(): FixedSizeEncoder<RegistrarArgs> {
@@ -168,7 +166,7 @@ export async function fetchMaybeRegistrar<TAddress extends string = string>(
 
 export async function fetchAllRegistrar(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Registrar>[]> {
   const maybeAccounts = await fetchAllMaybeRegistrar(rpc, addresses, config);
@@ -178,7 +176,7 @@ export async function fetchAllRegistrar(
 
 export async function fetchAllMaybeRegistrar(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Registrar>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

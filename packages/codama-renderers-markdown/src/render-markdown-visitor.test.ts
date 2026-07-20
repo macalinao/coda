@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { programNode } from "@codama/nodes";
+import { programNode, rootNode } from "@codama/nodes";
 import { visit } from "@codama/visitors-core";
 import { renderMarkdownVisitor } from "./render-markdown-visitor.js";
 
@@ -22,15 +22,9 @@ describe("renderMarkdownVisitor", () => {
       });
 
       // Visit the program to generate markdown
-      const rootNode = {
-        kind: "rootNode" as const,
-        program,
-        additionalPrograms: [],
-        standard: "codama" as const,
-        version: "0.1.0" as const,
-      };
+      const root = rootNode(program);
       // NOTE: the visitor is async at runtime but codama types visit() as synchronous
-      await visit(rootNode, visitor);
+      await visit(root, visitor);
 
       // Check that the file was created with kebab-case naming
       const expectedFile = join(testDir, "test-program.md");
@@ -69,15 +63,9 @@ describe("renderMarkdownVisitor", () => {
       });
 
       // Visit both programs
-      const rootNode = {
-        kind: "rootNode" as const,
-        program: program1,
-        additionalPrograms: [program2],
-        standard: "codama" as const,
-        version: "0.1.0" as const,
-      };
+      const root = rootNode(program1, [program2]);
       // NOTE: the visitor is async at runtime but codama types visit() as synchronous
-      await visit(rootNode, visitor);
+      await visit(root, visitor);
 
       // Check that both files were created
       expect(existsSync(join(testDir, "first-program.md"))).toBe(true);

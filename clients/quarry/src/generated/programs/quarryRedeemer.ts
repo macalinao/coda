@@ -6,31 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type { Redeemer, RedeemerArgs } from "../accounts/index.js";
-import type {
-  CreateRedeemerAsyncInput,
-  ParsedCreateRedeemerInstruction,
-  ParsedRedeemAllTokensInstruction,
-  ParsedRedeemTokensInstruction,
-  RedeemAllTokensAsyncInput,
-  RedeemTokensAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -41,12 +16,29 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
-import { getRedeemerCodec } from "../accounts/index.js";
+import {
+  getRedeemerCodec,
+  type Redeemer,
+  type RedeemerArgs,
+} from "../accounts/index.js";
 import {
   getCreateRedeemerInstructionAsync,
   getRedeemAllTokensInstructionAsync,
@@ -54,6 +46,12 @@ import {
   parseCreateRedeemerInstruction,
   parseRedeemAllTokensInstruction,
   parseRedeemTokensInstruction,
+  type CreateRedeemerAsyncInput,
+  type ParsedCreateRedeemerInstruction,
+  type ParsedRedeemAllTokensInstruction,
+  type ParsedRedeemTokensInstruction,
+  type RedeemAllTokensAsyncInput,
+  type RedeemTokensAsyncInput,
 } from "../instructions/index.js";
 import { findRedeemerPda } from "../pdas/index.js";
 
@@ -61,7 +59,7 @@ export const QUARRY_REDEEMER_PROGRAM_ADDRESS =
   "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9" as Address<"QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9">;
 
 export enum QuarryRedeemerAccount {
-  Redeemer = 0,
+  Redeemer,
 }
 
 export function identifyQuarryRedeemerAccount(
@@ -86,9 +84,9 @@ export function identifyQuarryRedeemerAccount(
 }
 
 export enum QuarryRedeemerInstruction {
-  CreateRedeemer = 0,
-  RedeemTokens = 1,
-  RedeemAllTokens = 2,
+  CreateRedeemer,
+  RedeemTokens,
+  RedeemAllTokens,
 }
 
 export function identifyQuarryRedeemerInstruction(
@@ -184,18 +182,21 @@ export function parseQuarryRedeemerInstruction<TProgram extends string>(
   }
 }
 
-export interface QuarryRedeemerPlugin {
+export type QuarryRedeemerPlugin = {
   accounts: QuarryRedeemerPluginAccounts;
   instructions: QuarryRedeemerPluginInstructions;
   pdas: QuarryRedeemerPluginPdas;
-}
+  identifyAccount: typeof identifyQuarryRedeemerAccount;
+  identifyInstruction: typeof identifyQuarryRedeemerInstruction;
+  parseInstruction: typeof parseQuarryRedeemerInstruction;
+};
 
-export interface QuarryRedeemerPluginAccounts {
+export type QuarryRedeemerPluginAccounts = {
   redeemer: ReturnType<typeof getRedeemerCodec> &
     SelfFetchFunctions<RedeemerArgs, Redeemer>;
-}
+};
 
-export interface QuarryRedeemerPluginInstructions {
+export type QuarryRedeemerPluginInstructions = {
   createRedeemer: (
     input: MakeOptional<CreateRedeemerAsyncInput, "payer">,
   ) => ReturnType<typeof getCreateRedeemerInstructionAsync> &
@@ -208,11 +209,9 @@ export interface QuarryRedeemerPluginInstructions {
     input: RedeemAllTokensAsyncInput,
   ) => ReturnType<typeof getRedeemAllTokensInstructionAsync> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface QuarryRedeemerPluginPdas {
-  redeemer: typeof findRedeemerPda;
-}
+export type QuarryRedeemerPluginPdas = { redeemer: typeof findRedeemerPda };
 
 export type QuarryRedeemerPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -224,7 +223,7 @@ export type QuarryRedeemerPluginRequirements = ClientWithRpc<
 export function quarryRedeemerProgram() {
   return <T extends QuarryRedeemerPluginRequirements>(
     client: T,
-  ): Omit<T, "quarryRedeemer"> & { quarryRedeemer: QuarryRedeemerPlugin } => {
+  ): ExtendedClient<T, { quarryRedeemer: QuarryRedeemerPlugin }> => {
     return extendClient(client, {
       quarryRedeemer: <QuarryRedeemerPlugin>{
         accounts: {
@@ -251,6 +250,9 @@ export function quarryRedeemerProgram() {
             ),
         },
         pdas: { redeemer: findRedeemerPda },
+        identifyAccount: identifyQuarryRedeemerAccount,
+        identifyInstruction: identifyQuarryRedeemerInstruction,
+        parseInstruction: parseQuarryRedeemerInstruction,
       },
     });
   };

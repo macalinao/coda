@@ -6,18 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  FarmsTokenInfo,
-  FarmsTokenInfoArgs,
-  RewardScheduleCurve,
-  RewardScheduleCurveArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -26,21 +14,29 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getFarmsTokenInfoDecoder,
   getFarmsTokenInfoEncoder,
   getRewardScheduleCurveDecoder,
   getRewardScheduleCurveEncoder,
+  type FarmsTokenInfo,
+  type FarmsTokenInfoArgs,
+  type RewardScheduleCurve,
+  type RewardScheduleCurveArgs,
 } from "./index.js";
 
-export interface RewardInfo {
+export type RewardInfo = {
   token: FarmsTokenInfo;
   rewardsVault: Address;
   rewardsAvailable: bigint;
@@ -53,11 +49,11 @@ export interface RewardInfo {
   placeholder0: bigint;
   rewardType: number;
   rewardsPerSecondDecimals: number;
-  padding0: number[];
-  padding1: bigint[];
-}
+  padding0: Array<number>;
+  padding1: Array<bigint>;
+};
 
-export interface RewardInfoArgs {
+export type RewardInfoArgs = {
   token: FarmsTokenInfoArgs;
   rewardsVault: Address;
   rewardsAvailable: number | bigint;
@@ -70,9 +66,9 @@ export interface RewardInfoArgs {
   placeholder0: number | bigint;
   rewardType: number;
   rewardsPerSecondDecimals: number;
-  padding0: number[];
+  padding0: Array<number>;
   padding1: Array<number | bigint>;
-}
+};
 
 export function getRewardInfoEncoder(): FixedSizeEncoder<RewardInfoArgs> {
   return getStructEncoder([

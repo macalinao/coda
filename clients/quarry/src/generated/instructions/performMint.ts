@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const PERFORM_MINT_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -87,14 +87,12 @@ export type PerformMintInstruction<
     ]
   >;
 
-export interface PerformMintInstructionData {
+export type PerformMintInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-}
+};
 
-export interface PerformMintInstructionDataArgs {
-  amount: number | bigint;
-}
+export type PerformMintInstructionDataArgs = { amount: number | bigint };
 
 export function getPerformMintInstructionDataEncoder(): FixedSizeEncoder<PerformMintInstructionDataArgs> {
   return transformEncoder(
@@ -123,14 +121,14 @@ export function getPerformMintInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface PerformMintInput<
+export type PerformMintInput<
   TAccountMintWrapper extends string = string,
   TAccountMinterAuthority extends string = string,
   TAccountTokenMint extends string = string,
   TAccountDestination extends string = string,
   TAccountMinter extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   minterAuthority: TransactionSigner<TAccountMinterAuthority>;
   tokenMint: Address<TAccountTokenMint>;
@@ -138,7 +136,7 @@ export interface PerformMintInput<
   minter: Address<TAccountMinter>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: PerformMintInstructionDataArgs["amount"];
-}
+};
 
 export function getPerformMintInstruction<
   TAccountMintWrapper extends string,
@@ -222,10 +220,10 @@ export function getPerformMintInstruction<
   >);
 }
 
-export interface ParsedPerformMintInstruction<
+export type ParsedPerformMintInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mintWrapper: TAccountMetas[0];
@@ -236,7 +234,7 @@ export interface ParsedPerformMintInstruction<
     tokenProgram: TAccountMetas[5];
   };
   data: PerformMintInstructionData;
-}
+};
 
 export function parsePerformMintInstruction<
   TProgram extends string,

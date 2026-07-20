@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { MergePoolSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -37,13 +23,24 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMergePoolPda } from "../pdas/index.js";
+import { findMergePoolPda, type MergePoolSeeds } from "../pdas/index.js";
 
 export const MERGE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   15, 189, 242, 87, 188, 75, 64, 244,
@@ -53,7 +50,7 @@ export function getMergePoolDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(MERGE_POOL_DISCRIMINATOR);
 }
 
-export interface MergePool {
+export type MergePool = {
   discriminator: ReadonlyUint8Array;
   primaryMint: Address;
   bump: number;
@@ -61,10 +58,10 @@ export interface MergePool {
   mmCount: bigint;
   totalPrimaryBalance: bigint;
   totalReplicaBalance: bigint;
-  reserved: bigint[];
-}
+  reserved: Array<bigint>;
+};
 
-export interface MergePoolArgs {
+export type MergePoolArgs = {
   primaryMint: Address;
   bump: number;
   replicaMint: Address;
@@ -72,7 +69,7 @@ export interface MergePoolArgs {
   totalPrimaryBalance: number | bigint;
   totalReplicaBalance: number | bigint;
   reserved: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link MergePoolArgs} account data. */
 export function getMergePoolEncoder(): FixedSizeEncoder<MergePoolArgs> {
@@ -146,7 +143,7 @@ export async function fetchMaybeMergePool<TAddress extends string = string>(
 
 export async function fetchAllMergePool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MergePool>[]> {
   const maybeAccounts = await fetchAllMaybeMergePool(rpc, addresses, config);
@@ -156,7 +153,7 @@ export async function fetchAllMergePool(
 
 export async function fetchAllMaybeMergePool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MergePool>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

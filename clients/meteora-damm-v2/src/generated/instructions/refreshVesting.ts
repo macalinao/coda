@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,8 +17,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REFRESH_VESTING_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -72,9 +72,9 @@ export type RefreshVestingInstruction<
     ]
   >;
 
-export interface RefreshVestingInstructionData {
+export type RefreshVestingInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type RefreshVestingInstructionDataArgs = {};
 
@@ -101,18 +101,18 @@ export function getRefreshVestingInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RefreshVestingInput<
+export type RefreshVestingInput<
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
   TAccountPositionNftAccount extends string = string,
   TAccountOwner extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   /** The token account for nft */
   positionNftAccount: Address<TAccountPositionNftAccount>;
   owner: Address<TAccountOwner>;
-}
+};
 
 export function getRefreshVestingInstruction<
   TAccountPool extends string,
@@ -172,10 +172,10 @@ export function getRefreshVestingInstruction<
   >);
 }
 
-export interface ParsedRefreshVestingInstruction<
+export type ParsedRefreshVestingInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -185,7 +185,7 @@ export interface ParsedRefreshVestingInstruction<
     owner: TAccountMetas[3];
   };
   data: RefreshVestingInstructionData;
-}
+};
 
 export function parseRefreshVestingInstruction<
   TProgram extends string,

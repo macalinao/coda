@@ -6,58 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  Escrow,
-  EscrowArgs,
-  Locker,
-  LockerArgs,
-  LockerWhitelistEntry,
-  LockerWhitelistEntryArgs,
-} from "../accounts/index.js";
-import type {
-  ActivateProposalInput,
-  ApproveProgramLockPrivilegeInput,
-  CastVoteInput,
-  ExitInput,
-  LockInput,
-  LockPermissionlessInput,
-  LockWithWhitelistEntryInput,
-  LockWithWhitelistInput,
-  NewEscrowInput,
-  NewLockerInput,
-  ParsedActivateProposalInstruction,
-  ParsedApproveProgramLockPrivilegeInstruction,
-  ParsedCastVoteInstruction,
-  ParsedExitInstruction,
-  ParsedLockInstruction,
-  ParsedLockPermissionlessInstruction,
-  ParsedLockWithWhitelistEntryInstruction,
-  ParsedLockWithWhitelistInstruction,
-  ParsedNewEscrowInstruction,
-  ParsedNewLockerInstruction,
-  ParsedRevokeProgramLockPrivilegeInstruction,
-  ParsedSetLockerParamsInstruction,
-  ParsedSetVoteDelegateInstruction,
-  RevokeProgramLockPrivilegeInput,
-  SetLockerParamsInput,
-  SetVoteDelegateInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -68,15 +16,34 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
   getEscrowCodec,
   getLockerCodec,
   getLockerWhitelistEntryCodec,
+  type Escrow,
+  type EscrowArgs,
+  type Locker,
+  type LockerArgs,
+  type LockerWhitelistEntry,
+  type LockerWhitelistEntryArgs,
 } from "../accounts/index.js";
 import {
   getActivateProposalInstruction,
@@ -105,6 +72,32 @@ import {
   parseRevokeProgramLockPrivilegeInstruction,
   parseSetLockerParamsInstruction,
   parseSetVoteDelegateInstruction,
+  type ActivateProposalInput,
+  type ApproveProgramLockPrivilegeInput,
+  type CastVoteInput,
+  type ExitInput,
+  type LockInput,
+  type LockPermissionlessInput,
+  type LockWithWhitelistEntryInput,
+  type LockWithWhitelistInput,
+  type NewEscrowInput,
+  type NewLockerInput,
+  type ParsedActivateProposalInstruction,
+  type ParsedApproveProgramLockPrivilegeInstruction,
+  type ParsedCastVoteInstruction,
+  type ParsedExitInstruction,
+  type ParsedLockInstruction,
+  type ParsedLockPermissionlessInstruction,
+  type ParsedLockWithWhitelistEntryInstruction,
+  type ParsedLockWithWhitelistInstruction,
+  type ParsedNewEscrowInstruction,
+  type ParsedNewLockerInstruction,
+  type ParsedRevokeProgramLockPrivilegeInstruction,
+  type ParsedSetLockerParamsInstruction,
+  type ParsedSetVoteDelegateInstruction,
+  type RevokeProgramLockPrivilegeInput,
+  type SetLockerParamsInput,
+  type SetVoteDelegateInput,
 } from "../instructions/index.js";
 import {
   findEscrowPda,
@@ -116,9 +109,9 @@ export const LOCKED_VOTER_PROGRAM_ADDRESS =
   "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">;
 
 export enum LockedVoterAccount {
-  Locker = 0,
-  LockerWhitelistEntry = 1,
-  Escrow = 2,
+  Locker,
+  LockerWhitelistEntry,
+  Escrow,
 }
 
 export function identifyLockedVoterAccount(
@@ -165,19 +158,19 @@ export function identifyLockedVoterAccount(
 }
 
 export enum LockedVoterInstruction {
-  NewLocker = 0,
-  NewEscrow = 1,
-  Lock = 2,
-  LockWithWhitelist = 3,
-  LockWithWhitelistEntry = 4,
-  LockPermissionless = 5,
-  Exit = 6,
-  ActivateProposal = 7,
-  CastVote = 8,
-  SetVoteDelegate = 9,
-  SetLockerParams = 10,
-  ApproveProgramLockPrivilege = 11,
-  RevokeProgramLockPrivilege = 12,
+  NewLocker,
+  NewEscrow,
+  Lock,
+  LockWithWhitelist,
+  LockWithWhitelistEntry,
+  LockPermissionless,
+  Exit,
+  ActivateProposal,
+  CastVote,
+  SetVoteDelegate,
+  SetLockerParams,
+  ApproveProgramLockPrivilege,
+  RevokeProgramLockPrivilege,
 }
 
 export function identifyLockedVoterInstruction(
@@ -483,22 +476,25 @@ export function parseLockedVoterInstruction<TProgram extends string>(
   }
 }
 
-export interface LockedVoterPlugin {
+export type LockedVoterPlugin = {
   accounts: LockedVoterPluginAccounts;
   instructions: LockedVoterPluginInstructions;
   pdas: LockedVoterPluginPdas;
-}
+  identifyAccount: typeof identifyLockedVoterAccount;
+  identifyInstruction: typeof identifyLockedVoterInstruction;
+  parseInstruction: typeof parseLockedVoterInstruction;
+};
 
-export interface LockedVoterPluginAccounts {
+export type LockedVoterPluginAccounts = {
   locker: ReturnType<typeof getLockerCodec> &
     SelfFetchFunctions<LockerArgs, Locker>;
   lockerWhitelistEntry: ReturnType<typeof getLockerWhitelistEntryCodec> &
     SelfFetchFunctions<LockerWhitelistEntryArgs, LockerWhitelistEntry>;
   escrow: ReturnType<typeof getEscrowCodec> &
     SelfFetchFunctions<EscrowArgs, Escrow>;
-}
+};
 
-export interface LockedVoterPluginInstructions {
+export type LockedVoterPluginInstructions = {
   newLocker: (
     input: MakeOptional<NewLockerInput, "payer">,
   ) => ReturnType<typeof getNewLockerInstruction> & SelfPlanAndSendFunctions;
@@ -546,13 +542,13 @@ export interface LockedVoterPluginInstructions {
     input: MakeOptional<RevokeProgramLockPrivilegeInput, "payer">,
   ) => ReturnType<typeof getRevokeProgramLockPrivilegeInstruction> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface LockedVoterPluginPdas {
+export type LockedVoterPluginPdas = {
   locker: typeof findLockerPda;
   escrow: typeof findEscrowPda;
   whitelist: typeof findWhitelistPda;
-}
+};
 
 export type LockedVoterPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -564,7 +560,7 @@ export type LockedVoterPluginRequirements = ClientWithRpc<
 export function lockedVoterProgram() {
   return <T extends LockedVoterPluginRequirements>(
     client: T,
-  ): Omit<T, "lockedVoter"> & { lockedVoter: LockedVoterPlugin } => {
+  ): ExtendedClient<T, { lockedVoter: LockedVoterPlugin }> => {
     return extendClient(client, {
       lockedVoter: <LockedVoterPlugin>{
         accounts: {
@@ -656,6 +652,9 @@ export function lockedVoterProgram() {
           escrow: findEscrowPda,
           whitelist: findWhitelistPda,
         },
+        identifyAccount: identifyLockedVoterAccount,
+        identifyInstruction: identifyLockedVoterInstruction,
+        parseInstruction: parseLockedVoterInstruction,
       },
     });
   };

@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface RedeemerSeeds {
+export type RedeemerSeeds = {
   iouMint: Address;
   redemptionMint: Address;
-}
+};
 
 /** Redeemer account for exchanging IOU tokens for redemption tokens */
 export async function findRedeemerPda(

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INITIALIZE_POSITION_BUNDLE_WITH_METADATA_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,24 +49,25 @@ export function getInitializePositionBundleWithMetadataDiscriminatorBytes(): Rea
 
 export type InitializePositionBundleWithMetadataInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountPositionBundle extends string | AccountMeta = string,
-  TAccountPositionBundleMint extends string | AccountMeta = string,
-  TAccountPositionBundleMetadata extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
-  TAccountPositionBundleOwner extends string | AccountMeta = string,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountMetadataUpdateAuth extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountPositionBundle extends string | AccountMeta<string> = string,
+  TAccountPositionBundleMint extends string | AccountMeta<string> = string,
+  TAccountPositionBundleMetadata extends string | AccountMeta<string> = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta<string> =
+    string,
+  TAccountPositionBundleOwner extends string | AccountMeta<string> = string,
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountMetadataUpdateAuth extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TAccountAssociatedTokenProgram extends string | AccountMeta =
+  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountMetadataProgram extends string | AccountMeta =
+  TAccountMetadataProgram extends string | AccountMeta<string> =
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -113,9 +114,9 @@ export type InitializePositionBundleWithMetadataInstruction<
     ]
   >;
 
-export interface InitializePositionBundleWithMetadataInstructionData {
+export type InitializePositionBundleWithMetadataInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type InitializePositionBundleWithMetadataInstructionDataArgs = {};
 
@@ -145,7 +146,7 @@ export function getInitializePositionBundleWithMetadataInstructionDataCodec(): F
   );
 }
 
-export interface InitializePositionBundleWithMetadataInput<
+export type InitializePositionBundleWithMetadataInput<
   TAccountPositionBundle extends string = string,
   TAccountPositionBundleMint extends string = string,
   TAccountPositionBundleMetadata extends string = string,
@@ -158,7 +159,7 @@ export interface InitializePositionBundleWithMetadataInput<
   TAccountRent extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountMetadataProgram extends string = string,
-> {
+> = {
   positionBundle: Address<TAccountPositionBundle>;
   positionBundleMint: TransactionSigner<TAccountPositionBundleMint>;
   positionBundleMetadata: Address<TAccountPositionBundleMetadata>;
@@ -171,7 +172,7 @@ export interface InitializePositionBundleWithMetadataInput<
   rent?: Address<TAccountRent>;
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   metadataProgram?: Address<TAccountMetadataProgram>;
-}
+};
 
 export function getInitializePositionBundleWithMetadataInstruction<
   TAccountPositionBundle extends string,
@@ -324,10 +325,10 @@ export function getInitializePositionBundleWithMetadataInstruction<
   >);
 }
 
-export interface ParsedInitializePositionBundleWithMetadataInstruction<
+export type ParsedInitializePositionBundleWithMetadataInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     positionBundle: TAccountMetas[0];
@@ -344,7 +345,7 @@ export interface ParsedInitializePositionBundleWithMetadataInstruction<
     metadataProgram: TAccountMetas[11];
   };
   data: InitializePositionBundleWithMetadataInstructionData;
-}
+};
 
 export function parseInitializePositionBundleWithMetadataInstruction<
   TProgram extends string,

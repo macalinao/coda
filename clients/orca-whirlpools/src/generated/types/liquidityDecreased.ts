@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,13 +14,17 @@ import {
   getI32Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface LiquidityDecreased {
+export type LiquidityDecreased = {
   whirlpool: Address;
   position: Address;
   tickLowerIndex: number;
@@ -36,9 +34,9 @@ export interface LiquidityDecreased {
   tokenBAmount: bigint;
   tokenATransferFee: bigint;
   tokenBTransferFee: bigint;
-}
+};
 
-export interface LiquidityDecreasedArgs {
+export type LiquidityDecreasedArgs = {
   whirlpool: Address;
   position: Address;
   tickLowerIndex: number;
@@ -48,7 +46,7 @@ export interface LiquidityDecreasedArgs {
   tokenBAmount: number | bigint;
   tokenATransferFee: number | bigint;
   tokenBTransferFee: number | bigint;
-}
+};
 
 export function getLiquidityDecreasedEncoder(): FixedSizeEncoder<LiquidityDecreasedArgs> {
   return getStructEncoder([

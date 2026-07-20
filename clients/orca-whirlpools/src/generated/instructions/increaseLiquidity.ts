@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,15 +14,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INCREASE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -53,19 +53,19 @@ export function getIncreaseLiquidityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type IncreaseLiquidityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountPositionAuthority extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountA extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountB extends string | AccountMeta = string,
-  TAccountTokenVaultA extends string | AccountMeta = string,
-  TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTickArrayLower extends string | AccountMeta = string,
-  TAccountTickArrayUpper extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountPositionAuthority extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPositionTokenAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountA extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountB extends string | AccountMeta<string> = string,
+  TAccountTokenVaultA extends string | AccountMeta<string> = string,
+  TAccountTokenVaultB extends string | AccountMeta<string> = string,
+  TAccountTickArrayLower extends string | AccountMeta<string> = string,
+  TAccountTickArrayUpper extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -108,18 +108,18 @@ export type IncreaseLiquidityInstruction<
     ]
   >;
 
-export interface IncreaseLiquidityInstructionData {
+export type IncreaseLiquidityInstructionData = {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
   tokenMaxA: bigint;
   tokenMaxB: bigint;
-}
+};
 
-export interface IncreaseLiquidityInstructionDataArgs {
+export type IncreaseLiquidityInstructionDataArgs = {
   liquidityAmount: number | bigint;
   tokenMaxA: number | bigint;
   tokenMaxB: number | bigint;
-}
+};
 
 export function getIncreaseLiquidityInstructionDataEncoder(): FixedSizeEncoder<IncreaseLiquidityInstructionDataArgs> {
   return transformEncoder(
@@ -152,7 +152,7 @@ export function getIncreaseLiquidityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface IncreaseLiquidityInput<
+export type IncreaseLiquidityInput<
   TAccountWhirlpool extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountPositionAuthority extends string = string,
@@ -164,7 +164,7 @@ export interface IncreaseLiquidityInput<
   TAccountTokenVaultB extends string = string,
   TAccountTickArrayLower extends string = string,
   TAccountTickArrayUpper extends string = string,
-> {
+> = {
   whirlpool: Address<TAccountWhirlpool>;
   tokenProgram?: Address<TAccountTokenProgram>;
   positionAuthority: TransactionSigner<TAccountPositionAuthority>;
@@ -179,7 +179,7 @@ export interface IncreaseLiquidityInput<
   liquidityAmount: IncreaseLiquidityInstructionDataArgs["liquidityAmount"];
   tokenMaxA: IncreaseLiquidityInstructionDataArgs["tokenMaxA"];
   tokenMaxB: IncreaseLiquidityInstructionDataArgs["tokenMaxB"];
-}
+};
 
 export function getIncreaseLiquidityInstruction<
   TAccountWhirlpool extends string,
@@ -301,10 +301,10 @@ export function getIncreaseLiquidityInstruction<
   >);
 }
 
-export interface ParsedIncreaseLiquidityInstruction<
+export type ParsedIncreaseLiquidityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpool: TAccountMetas[0];
@@ -320,7 +320,7 @@ export interface ParsedIncreaseLiquidityInstruction<
     tickArrayUpper: TAccountMetas[10];
   };
   data: IncreaseLiquidityInstructionData;
-}
+};
 
 export function parseIncreaseLiquidityInstruction<
   TProgram extends string,

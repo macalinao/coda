@@ -6,27 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface SplitPositionParameters2 {
+export type SplitPositionParameters2 = {
   unlockedLiquidityNumerator: number;
   permanentLockedLiquidityNumerator: number;
   feeANumerator: number;
   feeBNumerator: number;
   reward0Numerator: number;
   reward1Numerator: number;
-}
+};
 
 export type SplitPositionParameters2Args = SplitPositionParameters2;
 

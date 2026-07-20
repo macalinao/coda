@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,19 +14,23 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface EvtCreateDynamicConfig {
+export type EvtCreateDynamicConfig = {
   config: Address;
   poolCreatorAuthority: Address;
   index: bigint;
-}
+};
 
-export interface EvtCreateDynamicConfigArgs {
+export type EvtCreateDynamicConfigArgs = {
   config: Address;
   poolCreatorAuthority: Address;
   index: number | bigint;
-}
+};
 
 export function getEvtCreateDynamicConfigEncoder(): FixedSizeEncoder<EvtCreateDynamicConfigArgs> {
   return getStructEncoder([

@@ -6,28 +6,23 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface SwapParameters {
-  amountIn: bigint;
-  minimumAmountOut: bigint;
-}
+export type SwapParameters = { amountIn: bigint; minimumAmountOut: bigint };
 
-export interface SwapParametersArgs {
+export type SwapParametersArgs = {
   amountIn: number | bigint;
   minimumAmountOut: number | bigint;
-}
+};
 
 export function getSwapParametersEncoder(): FixedSizeEncoder<SwapParametersArgs> {
   return getStructEncoder([

@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  ProposalInstruction,
-  ProposalInstructionArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -43,12 +21,32 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getProposalInstructionDecoder,
   getProposalInstructionEncoder,
+  type ProposalInstruction,
+  type ProposalInstructionArgs,
 } from "../types/index.js";
 
 export const CREATE_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -63,13 +61,13 @@ export function getCreateProposalDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateProposalInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountProposal extends string | AccountMeta = string,
-  TAccountProposer extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountProposal extends string | AccountMeta<string> = string,
+  TAccountProposer extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,16 +93,16 @@ export type CreateProposalInstruction<
     ]
   >;
 
-export interface CreateProposalInstructionData {
+export type CreateProposalInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-  instructions: ProposalInstruction[];
-}
+  instructions: Array<ProposalInstruction>;
+};
 
-export interface CreateProposalInstructionDataArgs {
+export type CreateProposalInstructionDataArgs = {
   bump: number;
-  instructions: ProposalInstructionArgs[];
-}
+  instructions: Array<ProposalInstructionArgs>;
+};
 
 export function getCreateProposalInstructionDataEncoder(): Encoder<CreateProposalInstructionDataArgs> {
   return transformEncoder(
@@ -135,13 +133,13 @@ export function getCreateProposalInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateProposalInput<
+export type CreateProposalInput<
   TAccountGovernor extends string = string,
   TAccountProposal extends string = string,
   TAccountProposer extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   governor: Address<TAccountGovernor>;
   proposal: Address<TAccountProposal>;
   proposer: TransactionSigner<TAccountProposer>;
@@ -149,7 +147,7 @@ export interface CreateProposalInput<
   systemProgram?: Address<TAccountSystemProgram>;
   bump: CreateProposalInstructionDataArgs["bump"];
   instructions: CreateProposalInstructionDataArgs["instructions"];
-}
+};
 
 export function getCreateProposalInstruction<
   TAccountGovernor extends string,
@@ -223,10 +221,10 @@ export function getCreateProposalInstruction<
   >);
 }
 
-export interface ParsedCreateProposalInstruction<
+export type ParsedCreateProposalInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governor: TAccountMetas[0];
@@ -236,7 +234,7 @@ export interface ParsedCreateProposalInstruction<
     systemProgram: TAccountMetas[4];
   };
   data: CreateProposalInstructionData;
-}
+};
 
 export function parseCreateProposalInstruction<
   TProgram extends string,

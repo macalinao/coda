@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const INITIALIZE_TICK_ARRAY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,12 +51,12 @@ export function getInitializeTickArrayDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitializeTickArrayInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountFunder extends string | AccountMeta = string,
-  TAccountTickArray extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountFunder extends string | AccountMeta<string> = string,
+  TAccountTickArray extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -78,14 +78,12 @@ export type InitializeTickArrayInstruction<
     ]
   >;
 
-export interface InitializeTickArrayInstructionData {
+export type InitializeTickArrayInstructionData = {
   discriminator: ReadonlyUint8Array;
   startTickIndex: number;
-}
+};
 
-export interface InitializeTickArrayInstructionDataArgs {
-  startTickIndex: number;
-}
+export type InitializeTickArrayInstructionDataArgs = { startTickIndex: number };
 
 export function getInitializeTickArrayInstructionDataEncoder(): FixedSizeEncoder<InitializeTickArrayInstructionDataArgs> {
   return transformEncoder(
@@ -117,18 +115,18 @@ export function getInitializeTickArrayInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializeTickArrayInput<
+export type InitializeTickArrayInput<
   TAccountWhirlpool extends string = string,
   TAccountFunder extends string = string,
   TAccountTickArray extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   whirlpool: Address<TAccountWhirlpool>;
   funder: TransactionSigner<TAccountFunder>;
   tickArray: Address<TAccountTickArray>;
   systemProgram?: Address<TAccountSystemProgram>;
   startTickIndex: InitializeTickArrayInstructionDataArgs["startTickIndex"];
-}
+};
 
 export function getInitializeTickArrayInstruction<
   TAccountWhirlpool extends string,
@@ -196,10 +194,10 @@ export function getInitializeTickArrayInstruction<
   >);
 }
 
-export interface ParsedInitializeTickArrayInstruction<
+export type ParsedInitializeTickArrayInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpool: TAccountMetas[0];
@@ -208,7 +206,7 @@ export interface ParsedInitializeTickArrayInstruction<
     systemProgram: TAccountMetas[3];
   };
   data: InitializeTickArrayInstructionData;
-}
+};
 
 export function parseInitializeTickArrayInstruction<
   TProgram extends string,

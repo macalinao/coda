@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { MinerSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,15 +21,26 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMinerPda } from "../pdas/index.js";
+import { findMinerPda, type MinerSeeds } from "../pdas/index.js";
 
 export const MINER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   223, 113, 15, 54, 123, 122, 140, 100,
@@ -53,7 +50,7 @@ export function getMinerDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(MINER_DISCRIMINATOR);
 }
 
-export interface Miner {
+export type Miner = {
   discriminator: ReadonlyUint8Array;
   quarry: Address;
   authority: Address;
@@ -63,9 +60,9 @@ export interface Miner {
   rewardsPerTokenPaid: bigint;
   balance: bigint;
   index: bigint;
-}
+};
 
-export interface MinerArgs {
+export type MinerArgs = {
   quarry: Address;
   authority: Address;
   bump: number;
@@ -74,7 +71,7 @@ export interface MinerArgs {
   rewardsPerTokenPaid: number | bigint;
   balance: number | bigint;
   index: number | bigint;
-}
+};
 
 /** Gets the encoder for {@link MinerArgs} account data. */
 export function getMinerEncoder(): FixedSizeEncoder<MinerArgs> {
@@ -150,7 +147,7 @@ export async function fetchMaybeMiner<TAddress extends string = string>(
 
 export async function fetchAllMiner(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Miner>[]> {
   const maybeAccounts = await fetchAllMaybeMiner(rpc, addresses, config);
@@ -160,7 +157,7 @@ export async function fetchAllMiner(
 
 export async function fetchAllMaybeMiner(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Miner>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

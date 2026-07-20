@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { UserMetadataSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,8 +26,19 @@ import {
   getU64Decoder,
   getU64Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findUserMetadataPda } from "../pdas/index.js";
+import { findUserMetadataPda, type UserMetadataSeeds } from "../pdas/index.js";
 
 export const USER_METADATA_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   157, 214, 220, 235, 98, 135, 171, 28,
@@ -53,7 +50,7 @@ export function getUserMetadataDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface UserMetadata {
+export type UserMetadata = {
   discriminator: ReadonlyUint8Array;
   /** Pubkey of the referrer/owner - pubkey::default if no referrer */
   referrer: Address;
@@ -63,11 +60,11 @@ export interface UserMetadata {
   userLookupTable: Address;
   /** User metadata account owner */
   owner: Address;
-  padding1: bigint[];
-  padding2: bigint[];
-}
+  padding1: Array<bigint>;
+  padding2: Array<bigint>;
+};
 
-export interface UserMetadataArgs {
+export type UserMetadataArgs = {
   /** Pubkey of the referrer/owner - pubkey::default if no referrer */
   referrer: Address;
   /** Bump used for validation of account address */
@@ -78,7 +75,7 @@ export interface UserMetadataArgs {
   owner: Address;
   padding1: Array<number | bigint>;
   padding2: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link UserMetadataArgs} account data. */
 export function getUserMetadataEncoder(): FixedSizeEncoder<UserMetadataArgs> {
@@ -153,7 +150,7 @@ export async function fetchMaybeUserMetadata<TAddress extends string = string>(
 
 export async function fetchAllUserMetadata(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<UserMetadata>[]> {
   const maybeAccounts = await fetchAllMaybeUserMetadata(rpc, addresses, config);
@@ -163,7 +160,7 @@ export async function fetchAllUserMetadata(
 
 export async function fetchAllMaybeUserMetadata(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<UserMetadata>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

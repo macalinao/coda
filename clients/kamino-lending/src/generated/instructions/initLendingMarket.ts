@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,10 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.js";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -57,14 +55,14 @@ export function getInitLendingMarketDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type InitLendingMarketInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarketOwner extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountLendingMarketAuthority extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountLendingMarketOwner extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountLendingMarketAuthority extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRent extends string | AccountMeta =
+  TAccountRent extends string | AccountMeta<string> =
     "SysvarRent111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -89,14 +87,14 @@ export type InitLendingMarketInstruction<
     ]
   >;
 
-export interface InitLendingMarketInstructionData {
+export type InitLendingMarketInstructionData = {
   discriminator: ReadonlyUint8Array;
-  quoteCurrency: number[];
-}
+  quoteCurrency: Array<number>;
+};
 
-export interface InitLendingMarketInstructionDataArgs {
-  quoteCurrency: number[];
-}
+export type InitLendingMarketInstructionDataArgs = {
+  quoteCurrency: Array<number>;
+};
 
 export function getInitLendingMarketInstructionDataEncoder(): FixedSizeEncoder<InitLendingMarketInstructionDataArgs> {
   return transformEncoder(
@@ -125,20 +123,20 @@ export function getInitLendingMarketInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitLendingMarketAsyncInput<
+export type InitLendingMarketAsyncInput<
   TAccountLendingMarketOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
   quoteCurrency: InitLendingMarketInstructionDataArgs["quoteCurrency"];
-}
+};
 
 export async function getInitLendingMarketInstructionAsync<
   TAccountLendingMarketOwner extends string,
@@ -233,20 +231,20 @@ export async function getInitLendingMarketInstructionAsync<
   >);
 }
 
-export interface InitLendingMarketInput<
+export type InitLendingMarketInput<
   TAccountLendingMarketOwner extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountLendingMarketAuthority extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   lendingMarketOwner: TransactionSigner<TAccountLendingMarketOwner>;
   lendingMarket: Address<TAccountLendingMarket>;
   lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   rent?: Address<TAccountRent>;
   quoteCurrency: InitLendingMarketInstructionDataArgs["quoteCurrency"];
-}
+};
 
 export function getInitLendingMarketInstruction<
   TAccountLendingMarketOwner extends string,
@@ -331,10 +329,10 @@ export function getInitLendingMarketInstruction<
   >);
 }
 
-export interface ParsedInitLendingMarketInstruction<
+export type ParsedInitLendingMarketInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarketOwner: TAccountMetas[0];
@@ -344,7 +342,7 @@ export interface ParsedInitLendingMarketInstruction<
     rent: TAccountMetas[4];
   };
   data: InitLendingMarketInstructionData;
-}
+};
 
 export function parseInitLendingMarketInstruction<
   TProgram extends string,

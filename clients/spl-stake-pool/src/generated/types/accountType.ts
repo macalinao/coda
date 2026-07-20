@@ -6,18 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 /** Enum representing the account type managed by the program */
 export enum AccountType {
-  Uninitialized = 0,
-  StakePool = 1,
-  ValidatorList = 2,
+  Uninitialized,
+  StakePool,
+  ValidatorList,
 }
 
 export type AccountTypeArgs = AccountType;

@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,6 +22,17 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const WHIRLPOOLS_CONFIG_EXTENSION_DISCRIMINATOR: ReadonlyUint8Array =
@@ -46,18 +44,18 @@ export function getWhirlpoolsConfigExtensionDiscriminatorBytes(): ReadonlyUint8A
   );
 }
 
-export interface WhirlpoolsConfigExtension {
+export type WhirlpoolsConfigExtension = {
   discriminator: ReadonlyUint8Array;
   whirlpoolsConfig: Address;
   configExtensionAuthority: Address;
   tokenBadgeAuthority: Address;
-}
+};
 
-export interface WhirlpoolsConfigExtensionArgs {
+export type WhirlpoolsConfigExtensionArgs = {
   whirlpoolsConfig: Address;
   configExtensionAuthority: Address;
   tokenBadgeAuthority: Address;
-}
+};
 
 /** Gets the encoder for {@link WhirlpoolsConfigExtensionArgs} account data. */
 export function getWhirlpoolsConfigExtensionEncoder(): FixedSizeEncoder<WhirlpoolsConfigExtensionArgs> {
@@ -148,7 +146,7 @@ export async function fetchMaybeWhirlpoolsConfigExtension<
 
 export async function fetchAllWhirlpoolsConfigExtension(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<WhirlpoolsConfigExtension>[]> {
   const maybeAccounts = await fetchAllMaybeWhirlpoolsConfigExtension(
@@ -162,7 +160,7 @@ export async function fetchAllWhirlpoolsConfigExtension(
 
 export async function fetchAllMaybeWhirlpoolsConfigExtension(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<WhirlpoolsConfigExtension>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,27 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface EvtLiquidityChange {
+export type EvtLiquidityChange = {
   pool: Address;
   position: Address;
   owner: Address;
@@ -40,9 +38,9 @@ export interface EvtLiquidityChange {
   tokenAAmountThreshold: bigint;
   tokenBAmountThreshold: bigint;
   changeType: number;
-}
+};
 
-export interface EvtLiquidityChangeArgs {
+export type EvtLiquidityChangeArgs = {
   pool: Address;
   position: Address;
   owner: Address;
@@ -56,7 +54,7 @@ export interface EvtLiquidityChangeArgs {
   tokenAAmountThreshold: number | bigint;
   tokenBAmountThreshold: number | bigint;
   changeType: number;
-}
+};
 
 export function getEvtLiquidityChangeEncoder(): FixedSizeEncoder<EvtLiquidityChangeArgs> {
   return getStructEncoder([

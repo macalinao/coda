@@ -6,23 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum AccountsType {
-  TransferHookA = 0,
-  TransferHookB = 1,
-  TransferHookReward = 2,
-  TransferHookInput = 3,
-  TransferHookIntermediate = 4,
-  TransferHookOutput = 5,
-  SupplementalTickArrays = 6,
-  SupplementalTickArraysOne = 7,
-  SupplementalTickArraysTwo = 8,
+  TransferHookA,
+  TransferHookB,
+  TransferHookReward,
+  TransferHookInput,
+  TransferHookIntermediate,
+  TransferHookOutput,
+  SupplementalTickArrays,
+  SupplementalTickArraysOne,
+  SupplementalTickArraysTwo,
 }
 
 export type AccountsTypeArgs = AccountsType;

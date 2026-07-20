@@ -6,15 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type { GoverningTokenType, GoverningTokenTypeArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -27,25 +18,33 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getGoverningTokenTypeDecoder,
   getGoverningTokenTypeEncoder,
+  type GoverningTokenType,
+  type GoverningTokenTypeArgs,
 } from "./index.js";
 
-export interface GoverningTokenConfig {
+export type GoverningTokenConfig = {
   voterWeightAddin: Option<Address>;
   maxVoterWeightAddin: Option<Address>;
   tokenType: GoverningTokenType;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
-export interface GoverningTokenConfigArgs {
+export type GoverningTokenConfigArgs = {
   voterWeightAddin: OptionOrNullable<Address>;
   maxVoterWeightAddin: OptionOrNullable<Address>;
   tokenType: GoverningTokenTypeArgs;
-  reserved: number[];
-}
+  reserved: Array<number>;
+};
 
 export function getGoverningTokenConfigEncoder(): Encoder<GoverningTokenConfigArgs> {
   return getStructEncoder([

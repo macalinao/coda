@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface QuarrySeeds {
+export type QuarrySeeds = {
   rewarder: Address;
   tokenMint: Address;
-}
+};
 
 /** Individual quarry (staking pool) for a specific token mint */
 export async function findQuarryPda(

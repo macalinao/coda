@@ -6,36 +6,34 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface PriceHeuristic {
+export type PriceHeuristic = {
   /** Lower value of acceptable price */
   lower: bigint;
   /** Upper value of acceptable price */
   upper: bigint;
   /** Number of decimals of the previously defined values */
   exp: bigint;
-}
+};
 
-export interface PriceHeuristicArgs {
+export type PriceHeuristicArgs = {
   /** Lower value of acceptable price */
   lower: number | bigint;
   /** Upper value of acceptable price */
   upper: number | bigint;
   /** Number of decimals of the previously defined values */
   exp: number | bigint;
-}
+};
 
 export function getPriceHeuristicEncoder(): FixedSizeEncoder<PriceHeuristicArgs> {
   return getStructEncoder([

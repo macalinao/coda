@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,8 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const NEW_VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -52,12 +52,12 @@ export function getNewVoteDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type NewVoteInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountProposal extends string | AccountMeta = string,
-  TAccountVote extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountProposal extends string | AccountMeta<string> = string,
+  TAccountVote extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -79,16 +79,13 @@ export type NewVoteInstruction<
     ]
   >;
 
-export interface NewVoteInstructionData {
+export type NewVoteInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
   voter: Address;
-}
+};
 
-export interface NewVoteInstructionDataArgs {
-  bump: number;
-  voter: Address;
-}
+export type NewVoteInstructionDataArgs = { bump: number; voter: Address };
 
 export function getNewVoteInstructionDataEncoder(): FixedSizeEncoder<NewVoteInstructionDataArgs> {
   return transformEncoder(
@@ -119,19 +116,19 @@ export function getNewVoteInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewVoteInput<
+export type NewVoteInput<
   TAccountProposal extends string = string,
   TAccountVote extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   proposal: Address<TAccountProposal>;
   vote: Address<TAccountVote>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: NewVoteInstructionDataArgs["bump"];
   voter: NewVoteInstructionDataArgs["voter"];
-}
+};
 
 export function getNewVoteInstruction<
   TAccountProposal extends string,
@@ -199,10 +196,10 @@ export function getNewVoteInstruction<
   >);
 }
 
-export interface ParsedNewVoteInstruction<
+export type ParsedNewVoteInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     proposal: TAccountMetas[0];
@@ -211,7 +208,7 @@ export interface ParsedNewVoteInstruction<
     systemProgram: TAccountMetas[3];
   };
   data: NewVoteInstructionData;
-}
+};
 
 export function parseNewVoteInstruction<
   TProgram extends string,

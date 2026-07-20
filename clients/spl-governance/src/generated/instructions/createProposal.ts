@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { VoteType, VoteTypeArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -36,19 +18,41 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
-import { getVoteTypeDecoder, getVoteTypeEncoder } from "../types/index.js";
+import {
+  getVoteTypeDecoder,
+  getVoteTypeEncoder,
+  type VoteType,
+  type VoteTypeArgs,
+} from "../types/index.js";
 
 export const CREATE_PROPOSAL_DISCRIMINATOR = 6;
 
@@ -58,19 +62,19 @@ export function getCreateProposalDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateProposalInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountRealmAccount extends string | AccountMeta = string,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountGovernanceAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGoverningTokenMint extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRealmAccount extends string | AccountMeta<string> = string,
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountGovernanceAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGoverningTokenMint extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountRealmConfig extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TAccountProposalDepositAccount extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountRealmConfig extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TAccountProposalDepositAccount extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -114,24 +118,24 @@ export type CreateProposalInstruction<
     ]
   >;
 
-export interface CreateProposalInstructionData {
+export type CreateProposalInstructionData = {
   discriminator: number;
   name: string;
   descriptionLink: string;
   voteType: VoteType;
-  options: string[];
+  options: Array<string>;
   useDenyOption: boolean;
   proposalSeed: Address;
-}
+};
 
-export interface CreateProposalInstructionDataArgs {
+export type CreateProposalInstructionDataArgs = {
   name: string;
   descriptionLink: string;
   voteType: VoteTypeArgs;
-  options: string[];
+  options: Array<string>;
   useDenyOption: boolean;
   proposalSeed: Address;
-}
+};
 
 export function getCreateProposalInstructionDataEncoder(): Encoder<CreateProposalInstructionDataArgs> {
   return transformEncoder(
@@ -184,7 +188,7 @@ export function getCreateProposalInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateProposalInput<
+export type CreateProposalInput<
   TAccountRealmAccount extends string = string,
   TAccountProposalAccount extends string = string,
   TAccountGovernanceAccount extends string = string,
@@ -196,7 +200,7 @@ export interface CreateProposalInput<
   TAccountRealmConfig extends string = string,
   TAccountVoterWeightRecord extends string = string,
   TAccountProposalDepositAccount extends string = string,
-> {
+> = {
   /** Realm account the created Proposal belongs to */
   realmAccount: Address<TAccountRealmAccount>;
   /** Proposal account. PDA seeds ['governance',governance, governing_token_mint, proposal_index] */
@@ -227,7 +231,7 @@ export interface CreateProposalInput<
   options: CreateProposalInstructionDataArgs["options"];
   useDenyOption: CreateProposalInstructionDataArgs["useDenyOption"];
   proposalSeed: CreateProposalInstructionDataArgs["proposalSeed"];
-}
+};
 
 export function getCreateProposalInstruction<
   TAccountRealmAccount extends string,
@@ -356,10 +360,10 @@ export function getCreateProposalInstruction<
   >);
 }
 
-export interface ParsedCreateProposalInstruction<
+export type ParsedCreateProposalInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Realm account the created Proposal belongs to */
@@ -388,7 +392,7 @@ export interface ParsedCreateProposalInstruction<
     proposalDepositAccount?: TAccountMetas[10] | undefined;
   };
   data: CreateProposalInstructionData;
-}
+};
 
 export function parseCreateProposalInstruction<
   TProgram extends string,

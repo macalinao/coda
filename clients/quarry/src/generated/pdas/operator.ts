@@ -6,16 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface OperatorSeeds {
+export type OperatorSeeds = {
   base: Address;
-}
+};
 
 /** Operator account with delegated authority to manage quarries */
 export async function findOperatorPda(

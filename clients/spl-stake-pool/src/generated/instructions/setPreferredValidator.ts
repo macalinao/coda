@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  PreferredValidatorType,
-  PreferredValidatorTypeArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -42,12 +19,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getPreferredValidatorTypeDecoder,
   getPreferredValidatorTypeEncoder,
+  type PreferredValidatorType,
+  type PreferredValidatorTypeArgs,
 } from "../types/index.js";
 
 export const SET_PREFERRED_VALIDATOR_DISCRIMINATOR = 5;
@@ -58,10 +56,10 @@ export function getSetPreferredValidatorDiscriminatorBytes(): ReadonlyUint8Array
 
 export type SetPreferredValidatorInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountStaker extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountStaker extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -80,16 +78,16 @@ export type SetPreferredValidatorInstruction<
     ]
   >;
 
-export interface SetPreferredValidatorInstructionData {
+export type SetPreferredValidatorInstructionData = {
   discriminator: number;
   validatorType: PreferredValidatorType;
   validatorVoteAddress: Option<Address>;
-}
+};
 
-export interface SetPreferredValidatorInstructionDataArgs {
+export type SetPreferredValidatorInstructionDataArgs = {
   validatorType: PreferredValidatorTypeArgs;
   validatorVoteAddress: OptionOrNullable<Address>;
-}
+};
 
 export function getSetPreferredValidatorInstructionDataEncoder(): Encoder<SetPreferredValidatorInstructionDataArgs> {
   return transformEncoder(
@@ -123,18 +121,30 @@ export function getSetPreferredValidatorInstructionDataCodec(): Codec<
   );
 }
 
-export interface SetPreferredValidatorInput<
+export type SetPreferredValidatorInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountValidatorList extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   staker: TransactionSigner<TAccountStaker>;
   validatorList: Address<TAccountValidatorList>;
   validatorType: SetPreferredValidatorInstructionDataArgs["validatorType"];
   validatorVoteAddress: SetPreferredValidatorInstructionDataArgs["validatorVoteAddress"];
-}
+};
 
+/**
+ * (Staker only) Set the preferred deposit or withdraw stake account for
+ * the stake pool
+ * In order to avoid users abusing the stake pool as a free conversion
+ * between SOL staked on different validators, the staker can force all
+ * deposits and/or withdraws to go to one chosen account, or unset that
+ * account.
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Stake pool staker
+ * 2. `[]` Validator list
+ * Fails if the validator is not part of the stake pool.
+ */
 export function getSetPreferredValidatorInstruction<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -190,10 +200,10 @@ export function getSetPreferredValidatorInstruction<
   >);
 }
 
-export interface ParsedSetPreferredValidatorInstruction<
+export type ParsedSetPreferredValidatorInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -201,7 +211,7 @@ export interface ParsedSetPreferredValidatorInstruction<
     validatorList: TAccountMetas[2];
   };
   data: SetPreferredValidatorInstructionData;
-}
+};
 
 export function parseSetPreferredValidatorInstruction<
   TProgram extends string,

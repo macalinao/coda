@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const MINTER_UPDATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -73,14 +73,12 @@ export type MinterUpdateInstruction<
     ]
   >;
 
-export interface MinterUpdateInstructionData {
+export type MinterUpdateInstructionData = {
   discriminator: ReadonlyUint8Array;
   allowance: bigint;
-}
+};
 
-export interface MinterUpdateInstructionDataArgs {
-  allowance: number | bigint;
-}
+export type MinterUpdateInstructionDataArgs = { allowance: number | bigint };
 
 export function getMinterUpdateInstructionDataEncoder(): FixedSizeEncoder<MinterUpdateInstructionDataArgs> {
   return transformEncoder(
@@ -109,16 +107,16 @@ export function getMinterUpdateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface MinterUpdateInput<
+export type MinterUpdateInput<
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
   TAccountMinter extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   admin: TransactionSigner<TAccountAdmin>;
   minter: Address<TAccountMinter>;
   allowance: MinterUpdateInstructionDataArgs["allowance"];
-}
+};
 
 export function getMinterUpdateInstruction<
   TAccountMintWrapper extends string,
@@ -171,10 +169,10 @@ export function getMinterUpdateInstruction<
   >);
 }
 
-export interface ParsedMinterUpdateInstruction<
+export type ParsedMinterUpdateInstruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mintWrapper: TAccountMetas[0];
@@ -182,7 +180,7 @@ export interface ParsedMinterUpdateInstruction<
     minter: TAccountMetas[2];
   };
   data: MinterUpdateInstructionData;
-}
+};
 
 export function parseMinterUpdateInstruction<
   TProgram extends string,

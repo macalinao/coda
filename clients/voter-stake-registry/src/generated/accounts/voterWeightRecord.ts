@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { VoterWeightRecordSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -39,13 +23,29 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVoterWeightRecordPda } from "../pdas/index.js";
+import {
+  findVoterWeightRecordPda,
+  type VoterWeightRecordSeeds,
+} from "../pdas/index.js";
 
 export const VOTER_WEIGHT_RECORD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([50, 101, 102, 57, 57, 98, 52, 98]);
@@ -56,7 +56,7 @@ export function getVoterWeightRecordDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface VoterWeightRecord {
+export type VoterWeightRecord = {
   discriminator: ReadonlyUint8Array;
   realm: Address;
   governingTokenMint: Address;
@@ -65,9 +65,9 @@ export interface VoterWeightRecord {
   voterWeightExpiry: Option<bigint>;
   weightAction: Option<number>;
   weightActionTarget: Option<Address>;
-}
+};
 
-export interface VoterWeightRecordArgs {
+export type VoterWeightRecordArgs = {
   realm: Address;
   governingTokenMint: Address;
   governingTokenOwner: Address;
@@ -75,7 +75,7 @@ export interface VoterWeightRecordArgs {
   voterWeightExpiry: OptionOrNullable<number | bigint>;
   weightAction: OptionOrNullable<number>;
   weightActionTarget: OptionOrNullable<Address>;
-}
+};
 
 /** Gets the encoder for {@link VoterWeightRecordArgs} account data. */
 export function getVoterWeightRecordEncoder(): Encoder<VoterWeightRecordArgs> {
@@ -159,7 +159,7 @@ export async function fetchMaybeVoterWeightRecord<
 
 export async function fetchAllVoterWeightRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<VoterWeightRecord>[]> {
   const maybeAccounts = await fetchAllMaybeVoterWeightRecord(
@@ -173,7 +173,7 @@ export async function fetchAllVoterWeightRecord(
 
 export async function fetchAllMaybeVoterWeightRecord(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<VoterWeightRecord>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

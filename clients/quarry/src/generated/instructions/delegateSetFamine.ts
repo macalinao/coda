@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DELEGATE_SET_FAMINE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -82,14 +82,14 @@ export type DelegateSetFamineInstruction<
     ]
   >;
 
-export interface DelegateSetFamineInstructionData {
+export type DelegateSetFamineInstructionData = {
   discriminator: ReadonlyUint8Array;
   famineTs: bigint;
-}
+};
 
-export interface DelegateSetFamineInstructionDataArgs {
+export type DelegateSetFamineInstructionDataArgs = {
   famineTs: number | bigint;
-}
+};
 
 export function getDelegateSetFamineInstructionDataEncoder(): FixedSizeEncoder<DelegateSetFamineInstructionDataArgs> {
   return transformEncoder(
@@ -118,20 +118,20 @@ export function getDelegateSetFamineInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface DelegateSetFamineInput<
+export type DelegateSetFamineInput<
   TAccountOperator extends string = string,
   TAccountDelegate extends string = string,
   TAccountRewarder extends string = string,
   TAccountQuarryMineProgram extends string = string,
   TAccountQuarry extends string = string,
-> {
+> = {
   operator: Address<TAccountOperator>;
   delegate: TransactionSigner<TAccountDelegate>;
   rewarder: Address<TAccountRewarder>;
   quarryMineProgram?: Address<TAccountQuarryMineProgram>;
   quarry: Address<TAccountQuarry>;
   famineTs: DelegateSetFamineInstructionDataArgs["famineTs"];
-}
+};
 
 export function getDelegateSetFamineInstruction<
   TAccountOperator extends string,
@@ -209,10 +209,10 @@ export function getDelegateSetFamineInstruction<
   >);
 }
 
-export interface ParsedDelegateSetFamineInstruction<
+export type ParsedDelegateSetFamineInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     operator: TAccountMetas[0];
@@ -222,7 +222,7 @@ export interface ParsedDelegateSetFamineInstruction<
     quarry: TAccountMetas[4];
   };
   data: DelegateSetFamineInstructionData;
-}
+};
 
 export function parseDelegateSetFamineInstruction<
   TProgram extends string,

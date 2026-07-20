@@ -6,11 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getI64Decoder,
@@ -19,22 +14,25 @@ import {
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /** Reserve Withdrawal Caps State */
-export interface WithdrawalCaps {
+export type WithdrawalCaps = {
   configCapacity: bigint;
   currentTotal: bigint;
   lastIntervalStartTimestamp: bigint;
   configIntervalLengthSeconds: bigint;
-}
+};
 
-export interface WithdrawalCapsArgs {
+export type WithdrawalCapsArgs = {
   configCapacity: number | bigint;
   currentTotal: number | bigint;
   lastIntervalStartTimestamp: number | bigint;
   configIntervalLengthSeconds: number | bigint;
-}
+};
 
 export function getWithdrawalCapsEncoder(): FixedSizeEncoder<WithdrawalCapsArgs> {
   return getStructEncoder([

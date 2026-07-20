@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,23 +14,27 @@ import {
   getStructEncoder,
   getU128Decoder,
   getU128Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface WhirlpoolRewardInfo {
+export type WhirlpoolRewardInfo = {
   mint: Address;
   vault: Address;
   authority: Address;
   emissionsPerSecondX64: bigint;
   growthGlobalX64: bigint;
-}
+};
 
-export interface WhirlpoolRewardInfoArgs {
+export type WhirlpoolRewardInfoArgs = {
   mint: Address;
   vault: Address;
   authority: Address;
   emissionsPerSecondX64: number | bigint;
   growthGlobalX64: number | bigint;
-}
+};
 
 export function getWhirlpoolRewardInfoEncoder(): FixedSizeEncoder<WhirlpoolRewardInfoArgs> {
   return getStructEncoder([

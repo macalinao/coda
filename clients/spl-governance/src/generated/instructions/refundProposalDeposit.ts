@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -29,8 +15,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REFUND_PROPOSAL_DEPOSIT_DISCRIMINATOR = 27;
@@ -41,10 +41,10 @@ export function getRefundProposalDepositDiscriminatorBytes(): ReadonlyUint8Array
 
 export type RefundProposalDepositInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountProposalDepositAccount extends string | AccountMeta = string,
-  TAccountProposalDepositPayer extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountProposalDepositAccount extends string | AccountMeta<string> = string,
+  TAccountProposalDepositPayer extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -62,9 +62,7 @@ export type RefundProposalDepositInstruction<
     ]
   >;
 
-export interface RefundProposalDepositInstructionData {
-  discriminator: number;
-}
+export type RefundProposalDepositInstructionData = { discriminator: number };
 
 export type RefundProposalDepositInstructionDataArgs = {};
 
@@ -92,17 +90,17 @@ export function getRefundProposalDepositInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RefundProposalDepositInput<
+export type RefundProposalDepositInput<
   TAccountProposalAccount extends string = string,
   TAccountProposalDepositAccount extends string = string,
   TAccountProposalDepositPayer extends string = string,
-> {
+> = {
   proposalAccount: Address<TAccountProposalAccount>;
   /** PDA Seeds: ['proposal-deposit', proposal, deposit payer] */
   proposalDepositAccount: Address<TAccountProposalDepositAccount>;
   /** Proposal Deposit Payer (beneficiary) account */
   proposalDepositPayer: Address<TAccountProposalDepositPayer>;
-}
+};
 
 export function getRefundProposalDepositInstruction<
   TAccountProposalAccount extends string,
@@ -163,10 +161,10 @@ export function getRefundProposalDepositInstruction<
   >);
 }
 
-export interface ParsedRefundProposalDepositInstruction<
+export type ParsedRefundProposalDepositInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     proposalAccount: TAccountMetas[0];
@@ -176,7 +174,7 @@ export interface ParsedRefundProposalDepositInstruction<
     proposalDepositPayer: TAccountMetas[2];
   };
   data: RefundProposalDepositInstructionData;
-}
+};
 
 export function parseRefundProposalDepositInstruction<
   TProgram extends string,

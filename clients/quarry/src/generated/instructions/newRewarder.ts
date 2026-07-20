@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,11 +19,27 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getResolvedInstructionAccountAsTransactionSigner,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findRewarderPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -105,14 +103,12 @@ export type NewRewarderInstruction<
     ]
   >;
 
-export interface NewRewarderInstructionData {
+export type NewRewarderInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface NewRewarderInstructionDataArgs {
-  bump: number;
-}
+export type NewRewarderInstructionDataArgs = { bump: number };
 
 export function getNewRewarderInstructionDataEncoder(): FixedSizeEncoder<NewRewarderInstructionDataArgs> {
   return transformEncoder(
@@ -141,7 +137,7 @@ export function getNewRewarderInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewRewarderAsyncInput<
+export type NewRewarderAsyncInput<
   TAccountBase extends string = string,
   TAccountRewarder extends string = string,
   TAccountInitialAuthority extends string = string,
@@ -151,7 +147,7 @@ export interface NewRewarderAsyncInput<
   TAccountMintWrapper extends string = string,
   TAccountRewardsTokenMint extends string = string,
   TAccountClaimFeeTokenAccount extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   rewarder?: Address<TAccountRewarder>;
   initialAuthority?: Address<TAccountInitialAuthority>;
@@ -162,7 +158,7 @@ export interface NewRewarderAsyncInput<
   rewardsTokenMint: Address<TAccountRewardsTokenMint>;
   claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
   bump: NewRewarderInstructionDataArgs["bump"];
-}
+};
 
 export async function getNewRewarderInstructionAsync<
   TAccountBase extends string,
@@ -286,7 +282,7 @@ export async function getNewRewarderInstructionAsync<
   >);
 }
 
-export interface NewRewarderInput<
+export type NewRewarderInput<
   TAccountBase extends string = string,
   TAccountRewarder extends string = string,
   TAccountInitialAuthority extends string = string,
@@ -296,7 +292,7 @@ export interface NewRewarderInput<
   TAccountMintWrapper extends string = string,
   TAccountRewardsTokenMint extends string = string,
   TAccountClaimFeeTokenAccount extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   rewarder: Address<TAccountRewarder>;
   initialAuthority?: Address<TAccountInitialAuthority>;
@@ -307,7 +303,7 @@ export interface NewRewarderInput<
   rewardsTokenMint: Address<TAccountRewardsTokenMint>;
   claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
   bump: NewRewarderInstructionDataArgs["bump"];
-}
+};
 
 export function getNewRewarderInstruction<
   TAccountBase extends string,
@@ -421,10 +417,10 @@ export function getNewRewarderInstruction<
   >);
 }
 
-export interface ParsedNewRewarderInstruction<
+export type ParsedNewRewarderInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     base: TAccountMetas[0];
@@ -438,7 +434,7 @@ export interface ParsedNewRewarderInstruction<
     claimFeeTokenAccount: TAccountMetas[8];
   };
   data: NewRewarderInstructionData;
-}
+};
 
 export function parseNewRewarderInstruction<
   TProgram extends string,

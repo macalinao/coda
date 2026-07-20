@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getAddressDecoder,
@@ -37,8 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_GOVERNANCE_DELEGATE_DISCRIMINATOR = 3;
@@ -49,9 +49,9 @@ export function getSetGovernanceDelegateDiscriminatorBytes(): ReadonlyUint8Array
 
 export type SetGovernanceDelegateInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountCurrentDelegateOrOwner extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountCurrentDelegateOrOwner extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -67,14 +67,14 @@ export type SetGovernanceDelegateInstruction<
     ]
   >;
 
-export interface SetGovernanceDelegateInstructionData {
+export type SetGovernanceDelegateInstructionData = {
   discriminator: number;
   newGovernanceDelegate: Option<Address>;
-}
+};
 
-export interface SetGovernanceDelegateInstructionDataArgs {
+export type SetGovernanceDelegateInstructionDataArgs = {
   newGovernanceDelegate: OptionOrNullable<Address>;
-}
+};
 
 export function getSetGovernanceDelegateInstructionDataEncoder(): Encoder<SetGovernanceDelegateInstructionDataArgs> {
   return transformEncoder(
@@ -106,15 +106,15 @@ export function getSetGovernanceDelegateInstructionDataCodec(): Codec<
   );
 }
 
-export interface SetGovernanceDelegateInput<
+export type SetGovernanceDelegateInput<
   TAccountCurrentDelegateOrOwner extends string = string,
   TAccountTokenOwnerRecord extends string = string,
-> {
+> = {
   /** Current governance delegate or governing token owner */
   currentDelegateOrOwner: TransactionSigner<TAccountCurrentDelegateOrOwner>;
   tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
   newGovernanceDelegate: SetGovernanceDelegateInstructionDataArgs["newGovernanceDelegate"];
-}
+};
 
 export function getSetGovernanceDelegateInstruction<
   TAccountCurrentDelegateOrOwner extends string,
@@ -171,10 +171,10 @@ export function getSetGovernanceDelegateInstruction<
   >);
 }
 
-export interface ParsedSetGovernanceDelegateInstruction<
+export type ParsedSetGovernanceDelegateInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Current governance delegate or governing token owner */
@@ -182,7 +182,7 @@ export interface ParsedSetGovernanceDelegateInstruction<
     tokenOwnerRecord: TAccountMetas[1];
   };
   data: SetGovernanceDelegateInstructionData;
-}
+};
 
 export function parseSetGovernanceDelegateInstruction<
   TProgram extends string,

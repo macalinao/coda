@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,10 +21,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findReplicaMintPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -97,16 +95,13 @@ export type NewPoolInstruction<
     ]
   >;
 
-export interface NewPoolInstructionData {
+export type NewPoolInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
   mintBump: number;
-}
+};
 
-export interface NewPoolInstructionDataArgs {
-  bump: number;
-  mintBump: number;
-}
+export type NewPoolInstructionDataArgs = { bump: number; mintBump: number };
 
 export function getNewPoolInstructionDataEncoder(): FixedSizeEncoder<NewPoolInstructionDataArgs> {
   return transformEncoder(
@@ -137,7 +132,7 @@ export function getNewPoolInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewPoolAsyncInput<
+export type NewPoolAsyncInput<
   TAccountPool extends string = string,
   TAccountPrimaryMint extends string = string,
   TAccountReplicaMint extends string = string,
@@ -145,7 +140,7 @@ export interface NewPoolAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   pool?: Address<TAccountPool>;
   primaryMint: Address<TAccountPrimaryMint>;
   replicaMint?: Address<TAccountReplicaMint>;
@@ -155,7 +150,7 @@ export interface NewPoolAsyncInput<
   rent?: Address<TAccountRent>;
   bump: NewPoolInstructionDataArgs["bump"];
   mintBump: NewPoolInstructionDataArgs["mintBump"];
-}
+};
 
 export async function getNewPoolInstructionAsync<
   TAccountPool extends string,
@@ -276,7 +271,7 @@ export async function getNewPoolInstructionAsync<
   >);
 }
 
-export interface NewPoolInput<
+export type NewPoolInput<
   TAccountPool extends string = string,
   TAccountPrimaryMint extends string = string,
   TAccountReplicaMint extends string = string,
@@ -284,7 +279,7 @@ export interface NewPoolInput<
   TAccountTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountRent extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   primaryMint: Address<TAccountPrimaryMint>;
   replicaMint: Address<TAccountReplicaMint>;
@@ -294,7 +289,7 @@ export interface NewPoolInput<
   rent?: Address<TAccountRent>;
   bump: NewPoolInstructionDataArgs["bump"];
   mintBump: NewPoolInstructionDataArgs["mintBump"];
-}
+};
 
 export function getNewPoolInstruction<
   TAccountPool extends string,
@@ -389,10 +384,10 @@ export function getNewPoolInstruction<
   >);
 }
 
-export interface ParsedNewPoolInstruction<
+export type ParsedNewPoolInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -404,7 +399,7 @@ export interface ParsedNewPoolInstruction<
     rent: TAccountMetas[6];
   };
   data: NewPoolInstructionData;
-}
+};
 
 export function parseNewPoolInstruction<
   TProgram extends string,

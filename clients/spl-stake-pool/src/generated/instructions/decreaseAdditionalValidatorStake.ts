@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -52,23 +50,23 @@ export function getDecreaseAdditionalValidatorStakeDiscriminatorBytes(): Readonl
 
 export type DecreaseAdditionalValidatorStakeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountStaker extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountCanonicalStake extends string | AccountMeta = string,
-  TAccountEphemeralStake extends string | AccountMeta = string,
-  TAccountTransientStake extends string | AccountMeta = string,
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountStaker extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountCanonicalStake extends string | AccountMeta<string> = string,
+  TAccountEphemeralStake extends string | AccountMeta<string> = string,
+  TAccountTransientStake extends string | AccountMeta<string> = string,
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends string | AccountMeta =
+  TAccountStakeHistorySysvar extends string | AccountMeta<string> =
     "SysvarStakeHistory1111111111111111111111111",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -114,18 +112,18 @@ export type DecreaseAdditionalValidatorStakeInstruction<
     ]
   >;
 
-export interface DecreaseAdditionalValidatorStakeInstructionData {
+export type DecreaseAdditionalValidatorStakeInstructionData = {
   discriminator: number;
   lamports: bigint;
   transientStakeSeed: bigint;
   ephemeralStakeSeed: bigint;
-}
+};
 
-export interface DecreaseAdditionalValidatorStakeInstructionDataArgs {
+export type DecreaseAdditionalValidatorStakeInstructionDataArgs = {
   lamports: number | bigint;
   transientStakeSeed: number | bigint;
   ephemeralStakeSeed: number | bigint;
-}
+};
 
 export function getDecreaseAdditionalValidatorStakeInstructionDataEncoder(): FixedSizeEncoder<DecreaseAdditionalValidatorStakeInstructionDataArgs> {
   return transformEncoder(
@@ -161,7 +159,7 @@ export function getDecreaseAdditionalValidatorStakeInstructionDataCodec(): Fixed
   );
 }
 
-export interface DecreaseAdditionalValidatorStakeAsyncInput<
+export type DecreaseAdditionalValidatorStakeAsyncInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -174,7 +172,7 @@ export interface DecreaseAdditionalValidatorStakeAsyncInput<
   TAccountStakeHistorySysvar extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   staker: TransactionSigner<TAccountStaker>;
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
@@ -190,8 +188,35 @@ export interface DecreaseAdditionalValidatorStakeAsyncInput<
   lamports: DecreaseAdditionalValidatorStakeInstructionDataArgs["lamports"];
   transientStakeSeed: DecreaseAdditionalValidatorStakeInstructionDataArgs["transientStakeSeed"];
   ephemeralStakeSeed: DecreaseAdditionalValidatorStakeInstructionDataArgs["ephemeralStakeSeed"];
-}
+};
 
+/**
+ * (Staker only) Decrease active stake again from a validator, eventually
+ * moving it to the reserve
+ * Works regardless if the transient stake account already exists.
+ * Internally, this instruction:
+ * * withdraws rent-exempt reserve lamports from the reserve into the
+ * ephemeral stake
+ * * splits a validator stake account into an ephemeral stake account
+ * * deactivates the ephemeral account
+ * * merges or splits the ephemeral account into the transient stake
+ * account delegated to the appropriate validator
+ * The amount of lamports to move must be at least
+ * `max(crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation())`.
+ * 0. `[]` Stake pool
+ * 1. `[s]` Stake pool staker
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator list
+ * 4. `[w]` Reserve stake account, to fund rent exempt reserve
+ * 5. `[w]` Canonical stake account to split from
+ * 6. `[w]` Uninitialized ephemeral stake account to receive stake
+ * 7. `[w]` Transient stake account
+ * 8. `[]` Clock sysvar
+ * 9. '[]' Stake history sysvar
+ * 10. `[]` System program
+ * 11. `[]` Stake program
+ */
 export async function getDecreaseAdditionalValidatorStakeInstructionAsync<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -335,7 +360,7 @@ export async function getDecreaseAdditionalValidatorStakeInstructionAsync<
   >);
 }
 
-export interface DecreaseAdditionalValidatorStakeInput<
+export type DecreaseAdditionalValidatorStakeInput<
   TAccountStakePool extends string = string,
   TAccountStaker extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -348,7 +373,7 @@ export interface DecreaseAdditionalValidatorStakeInput<
   TAccountStakeHistorySysvar extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   staker: TransactionSigner<TAccountStaker>;
   withdrawAuthority: Address<TAccountWithdrawAuthority>;
@@ -364,8 +389,35 @@ export interface DecreaseAdditionalValidatorStakeInput<
   lamports: DecreaseAdditionalValidatorStakeInstructionDataArgs["lamports"];
   transientStakeSeed: DecreaseAdditionalValidatorStakeInstructionDataArgs["transientStakeSeed"];
   ephemeralStakeSeed: DecreaseAdditionalValidatorStakeInstructionDataArgs["ephemeralStakeSeed"];
-}
+};
 
+/**
+ * (Staker only) Decrease active stake again from a validator, eventually
+ * moving it to the reserve
+ * Works regardless if the transient stake account already exists.
+ * Internally, this instruction:
+ * * withdraws rent-exempt reserve lamports from the reserve into the
+ * ephemeral stake
+ * * splits a validator stake account into an ephemeral stake account
+ * * deactivates the ephemeral account
+ * * merges or splits the ephemeral account into the transient stake
+ * account delegated to the appropriate validator
+ * The amount of lamports to move must be at least
+ * `max(crate::MINIMUM_ACTIVE_STAKE,
+ * solana_program::stake::tools::get_minimum_delegation())`.
+ * 0. `[]` Stake pool
+ * 1. `[s]` Stake pool staker
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Validator list
+ * 4. `[w]` Reserve stake account, to fund rent exempt reserve
+ * 5. `[w]` Canonical stake account to split from
+ * 6. `[w]` Uninitialized ephemeral stake account to receive stake
+ * 7. `[w]` Transient stake account
+ * 8. `[]` Clock sysvar
+ * 9. '[]' Stake history sysvar
+ * 10. `[]` System program
+ * 11. `[]` Stake program
+ */
 export function getDecreaseAdditionalValidatorStakeInstruction<
   TAccountStakePool extends string,
   TAccountStaker extends string,
@@ -499,10 +551,10 @@ export function getDecreaseAdditionalValidatorStakeInstruction<
   >);
 }
 
-export interface ParsedDecreaseAdditionalValidatorStakeInstruction<
+export type ParsedDecreaseAdditionalValidatorStakeInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -519,7 +571,7 @@ export interface ParsedDecreaseAdditionalValidatorStakeInstruction<
     stakeProgram: TAccountMetas[11];
   };
   data: DecreaseAdditionalValidatorStakeInstructionData;
-}
+};
 
 export function parseDecreaseAdditionalValidatorStakeInstruction<
   TProgram extends string,

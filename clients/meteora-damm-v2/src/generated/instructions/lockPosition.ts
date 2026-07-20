@@ -6,28 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  VestingParameters,
-  VestingParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,13 +17,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getVestingParametersDecoder,
   getVestingParametersEncoder,
+  type VestingParameters,
+  type VestingParametersArgs,
 } from "../types/index.js";
 
 export const LOCK_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -110,14 +108,12 @@ export type LockPositionInstruction<
     ]
   >;
 
-export interface LockPositionInstructionData {
+export type LockPositionInstructionData = {
   discriminator: ReadonlyUint8Array;
   params: VestingParameters;
-}
+};
 
-export interface LockPositionInstructionDataArgs {
-  params: VestingParametersArgs;
-}
+export type LockPositionInstructionDataArgs = { params: VestingParametersArgs };
 
 export function getLockPositionInstructionDataEncoder(): Encoder<LockPositionInstructionDataArgs> {
   return transformEncoder(
@@ -146,7 +142,7 @@ export function getLockPositionInstructionDataCodec(): Codec<
   );
 }
 
-export interface LockPositionAsyncInput<
+export type LockPositionAsyncInput<
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
   TAccountVesting extends string = string,
@@ -156,7 +152,7 @@ export interface LockPositionAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   vesting: TransactionSigner<TAccountVesting>;
@@ -169,7 +165,7 @@ export interface LockPositionAsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: LockPositionInstructionDataArgs["params"];
-}
+};
 
 export async function getLockPositionInstructionAsync<
   TAccountPool extends string,
@@ -279,7 +275,7 @@ export async function getLockPositionInstructionAsync<
   >);
 }
 
-export interface LockPositionInput<
+export type LockPositionInput<
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
   TAccountVesting extends string = string,
@@ -289,7 +285,7 @@ export interface LockPositionInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   vesting: TransactionSigner<TAccountVesting>;
@@ -302,7 +298,7 @@ export interface LockPositionInput<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: LockPositionInstructionDataArgs["params"];
-}
+};
 
 export function getLockPositionInstruction<
   TAccountPool extends string,
@@ -407,10 +403,10 @@ export function getLockPositionInstruction<
   >);
 }
 
-export interface ParsedLockPositionInstruction<
+export type ParsedLockPositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -426,7 +422,7 @@ export interface ParsedLockPositionInstruction<
     program: TAccountMetas[8];
   };
   data: LockPositionInstructionData;
-}
+};
 
 export function parseLockPositionInstruction<
   TProgram extends string,

@@ -6,42 +6,40 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
 import {
   combineCodec,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 
-export interface InitializePoolParameters {
+export type InitializePoolParameters = {
   /** initialize liquidity */
   liquidity: bigint;
   /** The init price of the pool as a sqrt(token_b/token_a) Q64.64 value */
   sqrtPrice: bigint;
   /** activation point */
   activationPoint: Option<bigint>;
-}
+};
 
-export interface InitializePoolParametersArgs {
+export type InitializePoolParametersArgs = {
   /** initialize liquidity */
   liquidity: number | bigint;
   /** The init price of the pool as a sqrt(token_b/token_a) Q64.64 value */
   sqrtPrice: number | bigint;
   /** activation point */
   activationPoint: OptionOrNullable<number | bigint>;
-}
+};
 
 export function getInitializePoolParametersEncoder(): Encoder<InitializePoolParametersArgs> {
   return getStructEncoder([

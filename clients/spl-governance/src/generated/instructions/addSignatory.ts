@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getAddressDecoder,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const ADD_SIGNATORY_DISCRIMINATOR = 7;
@@ -46,14 +46,14 @@ export function getAddSignatoryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type AddSignatoryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
-  TAccountProposalAccount extends string | AccountMeta = string,
-  TAccountTokenOwnerRecord extends string | AccountMeta = string,
-  TAccountGovernanceAuthority extends string | AccountMeta = string,
-  TAccountSignatoryRecordAccount extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountProposalAccount extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerRecord extends string | AccountMeta<string> = string,
+  TAccountGovernanceAuthority extends string | AccountMeta<string> = string,
+  TAccountSignatoryRecordAccount extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -82,14 +82,12 @@ export type AddSignatoryInstruction<
     ]
   >;
 
-export interface AddSignatoryInstructionData {
+export type AddSignatoryInstructionData = {
   discriminator: number;
   signatory: Address;
-}
+};
 
-export interface AddSignatoryInstructionDataArgs {
-  signatory: Address;
-}
+export type AddSignatoryInstructionDataArgs = { signatory: Address };
 
 export function getAddSignatoryInstructionDataEncoder(): FixedSizeEncoder<AddSignatoryInstructionDataArgs> {
   return transformEncoder(
@@ -118,14 +116,14 @@ export function getAddSignatoryInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface AddSignatoryInput<
+export type AddSignatoryInput<
   TAccountProposalAccount extends string = string,
   TAccountTokenOwnerRecord extends string = string,
   TAccountGovernanceAuthority extends string = string,
   TAccountSignatoryRecordAccount extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   /** Proposal Account associated with the governance */
   proposalAccount: Address<TAccountProposalAccount>;
   /** TokenOwnerRecord account of the Proposal owner */
@@ -137,7 +135,7 @@ export interface AddSignatoryInput<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   signatory: AddSignatoryInstructionDataArgs["signatory"];
-}
+};
 
 export function getAddSignatoryInstruction<
   TAccountProposalAccount extends string,
@@ -227,10 +225,10 @@ export function getAddSignatoryInstruction<
   >);
 }
 
-export interface ParsedAddSignatoryInstruction<
+export type ParsedAddSignatoryInstruction<
   TProgram extends string = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Proposal Account associated with the governance */
@@ -245,7 +243,7 @@ export interface ParsedAddSignatoryInstruction<
     systemProgram: TAccountMetas[5];
   };
   data: AddSignatoryInstructionData;
-}
+};
 
 export function parseAddSignatoryInstruction<
   TProgram extends string,

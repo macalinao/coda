@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemoveLiquidityParameters,
-  RemoveLiquidityParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -38,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -52,6 +46,8 @@ import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemoveLiquidityParametersDecoder,
   getRemoveLiquidityParametersEncoder,
+  type RemoveLiquidityParameters,
+  type RemoveLiquidityParametersArgs,
 } from "../types/index.js";
 
 export const REMOVE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -138,14 +134,14 @@ export type RemoveLiquidityInstruction<
     ]
   >;
 
-export interface RemoveLiquidityInstructionData {
+export type RemoveLiquidityInstructionData = {
   discriminator: ReadonlyUint8Array;
   params: RemoveLiquidityParameters;
-}
+};
 
-export interface RemoveLiquidityInstructionDataArgs {
+export type RemoveLiquidityInstructionDataArgs = {
   params: RemoveLiquidityParametersArgs;
-}
+};
 
 export function getRemoveLiquidityInstructionDataEncoder(): FixedSizeEncoder<RemoveLiquidityInstructionDataArgs> {
   return transformEncoder(
@@ -174,7 +170,7 @@ export function getRemoveLiquidityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RemoveLiquidityAsyncInput<
+export type RemoveLiquidityAsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -190,7 +186,7 @@ export interface RemoveLiquidityAsyncInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -217,7 +213,7 @@ export interface RemoveLiquidityAsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: RemoveLiquidityInstructionDataArgs["params"];
-}
+};
 
 export async function getRemoveLiquidityInstructionAsync<
   TAccountPoolAuthority extends string,
@@ -394,7 +390,7 @@ export async function getRemoveLiquidityInstructionAsync<
   >);
 }
 
-export interface RemoveLiquidityInput<
+export type RemoveLiquidityInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -410,7 +406,7 @@ export interface RemoveLiquidityInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -437,7 +433,7 @@ export interface RemoveLiquidityInput<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   params: RemoveLiquidityInstructionDataArgs["params"];
-}
+};
 
 export function getRemoveLiquidityInstruction<
   TAccountPoolAuthority extends string,
@@ -582,10 +578,10 @@ export function getRemoveLiquidityInstruction<
   >);
 }
 
-export interface ParsedRemoveLiquidityInstruction<
+export type ParsedRemoveLiquidityInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -615,7 +611,7 @@ export interface ParsedRemoveLiquidityInstruction<
     program: TAccountMetas[14];
   };
   data: RemoveLiquidityInstructionData;
-}
+};
 
 export function parseRemoveLiquidityInstruction<
   TProgram extends string,

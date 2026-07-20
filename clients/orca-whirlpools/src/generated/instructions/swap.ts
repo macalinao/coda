@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,15 +16,32 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SWAP_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -54,19 +54,19 @@ export function getSwapDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SwapInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountTokenAuthority extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountA extends string | AccountMeta = string,
-  TAccountTokenVaultA extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountB extends string | AccountMeta = string,
-  TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTickArray0 extends string | AccountMeta = string,
-  TAccountTickArray1 extends string | AccountMeta = string,
-  TAccountTickArray2 extends string | AccountMeta = string,
-  TAccountOracle extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountTokenAuthority extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountA extends string | AccountMeta<string> = string,
+  TAccountTokenVaultA extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountB extends string | AccountMeta<string> = string,
+  TAccountTokenVaultB extends string | AccountMeta<string> = string,
+  TAccountTickArray0 extends string | AccountMeta<string> = string,
+  TAccountTickArray1 extends string | AccountMeta<string> = string,
+  TAccountTickArray2 extends string | AccountMeta<string> = string,
+  TAccountOracle extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -109,22 +109,22 @@ export type SwapInstruction<
     ]
   >;
 
-export interface SwapInstructionData {
+export type SwapInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
   otherAmountThreshold: bigint;
   sqrtPriceLimit: bigint;
   amountSpecifiedIsInput: boolean;
   aToB: boolean;
-}
+};
 
-export interface SwapInstructionDataArgs {
+export type SwapInstructionDataArgs = {
   amount: number | bigint;
   otherAmountThreshold: number | bigint;
   sqrtPriceLimit: number | bigint;
   amountSpecifiedIsInput: boolean;
   aToB: boolean;
-}
+};
 
 export function getSwapInstructionDataEncoder(): FixedSizeEncoder<SwapInstructionDataArgs> {
   return transformEncoder(
@@ -161,7 +161,7 @@ export function getSwapInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SwapInput<
+export type SwapInput<
   TAccountTokenProgram extends string = string,
   TAccountTokenAuthority extends string = string,
   TAccountWhirlpool extends string = string,
@@ -173,7 +173,7 @@ export interface SwapInput<
   TAccountTickArray1 extends string = string,
   TAccountTickArray2 extends string = string,
   TAccountOracle extends string = string,
-> {
+> = {
   tokenProgram?: Address<TAccountTokenProgram>;
   tokenAuthority: TransactionSigner<TAccountTokenAuthority>;
   whirlpool: Address<TAccountWhirlpool>;
@@ -190,7 +190,7 @@ export interface SwapInput<
   sqrtPriceLimit: SwapInstructionDataArgs["sqrtPriceLimit"];
   amountSpecifiedIsInput: SwapInstructionDataArgs["amountSpecifiedIsInput"];
   aToB: SwapInstructionDataArgs["aToB"];
-}
+};
 
 export function getSwapInstruction<
   TAccountTokenProgram extends string,
@@ -306,10 +306,10 @@ export function getSwapInstruction<
   >);
 }
 
-export interface ParsedSwapInstruction<
+export type ParsedSwapInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     tokenProgram: TAccountMetas[0];
@@ -325,7 +325,7 @@ export interface ParsedSwapInstruction<
     oracle: TAccountMetas[10];
   };
   data: SwapInstructionData;
-}
+};
 
 export function parseSwapInstruction<
   TProgram extends string,

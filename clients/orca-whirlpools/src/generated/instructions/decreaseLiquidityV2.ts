@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemainingAccountsInfo,
-  RemainingAccountsInfoArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,19 +16,40 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
+  type RemainingAccountsInfo,
+  type RemainingAccountsInfoArgs,
 } from "../types/index.js";
 
 export const DECREASE_LIQUIDITY_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -65,23 +63,23 @@ export function getDecreaseLiquidityV2DiscriminatorBytes(): ReadonlyUint8Array {
 
 export type DecreaseLiquidityV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountTokenProgramA extends string | AccountMeta = string,
-  TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta =
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountTokenProgramA extends string | AccountMeta<string> = string,
+  TAccountTokenProgramB extends string | AccountMeta<string> = string,
+  TAccountMemoProgram extends string | AccountMeta<string> =
     "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
-  TAccountPositionAuthority extends string | AccountMeta = string,
-  TAccountPosition extends string | AccountMeta = string,
-  TAccountPositionTokenAccount extends string | AccountMeta = string,
-  TAccountTokenMintA extends string | AccountMeta = string,
-  TAccountTokenMintB extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountA extends string | AccountMeta = string,
-  TAccountTokenOwnerAccountB extends string | AccountMeta = string,
-  TAccountTokenVaultA extends string | AccountMeta = string,
-  TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTickArrayLower extends string | AccountMeta = string,
-  TAccountTickArrayUpper extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountPositionAuthority extends string | AccountMeta<string> = string,
+  TAccountPosition extends string | AccountMeta<string> = string,
+  TAccountPositionTokenAccount extends string | AccountMeta<string> = string,
+  TAccountTokenMintA extends string | AccountMeta<string> = string,
+  TAccountTokenMintB extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountA extends string | AccountMeta<string> = string,
+  TAccountTokenOwnerAccountB extends string | AccountMeta<string> = string,
+  TAccountTokenVaultA extends string | AccountMeta<string> = string,
+  TAccountTokenVaultB extends string | AccountMeta<string> = string,
+  TAccountTickArrayLower extends string | AccountMeta<string> = string,
+  TAccountTickArrayUpper extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -136,20 +134,20 @@ export type DecreaseLiquidityV2Instruction<
     ]
   >;
 
-export interface DecreaseLiquidityV2InstructionData {
+export type DecreaseLiquidityV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   liquidityAmount: bigint;
   tokenMinA: bigint;
   tokenMinB: bigint;
   remainingAccountsInfo: Option<RemainingAccountsInfo>;
-}
+};
 
-export interface DecreaseLiquidityV2InstructionDataArgs {
+export type DecreaseLiquidityV2InstructionDataArgs = {
   liquidityAmount: number | bigint;
   tokenMinA: number | bigint;
   tokenMinB: number | bigint;
   remainingAccountsInfo: OptionOrNullable<RemainingAccountsInfoArgs>;
-}
+};
 
 export function getDecreaseLiquidityV2InstructionDataEncoder(): Encoder<DecreaseLiquidityV2InstructionDataArgs> {
   return transformEncoder(
@@ -193,7 +191,7 @@ export function getDecreaseLiquidityV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface DecreaseLiquidityV2Input<
+export type DecreaseLiquidityV2Input<
   TAccountWhirlpool extends string = string,
   TAccountTokenProgramA extends string = string,
   TAccountTokenProgramB extends string = string,
@@ -209,7 +207,7 @@ export interface DecreaseLiquidityV2Input<
   TAccountTokenVaultB extends string = string,
   TAccountTickArrayLower extends string = string,
   TAccountTickArrayUpper extends string = string,
-> {
+> = {
   whirlpool: Address<TAccountWhirlpool>;
   tokenProgramA: Address<TAccountTokenProgramA>;
   tokenProgramB: Address<TAccountTokenProgramB>;
@@ -229,7 +227,7 @@ export interface DecreaseLiquidityV2Input<
   tokenMinA: DecreaseLiquidityV2InstructionDataArgs["tokenMinA"];
   tokenMinB: DecreaseLiquidityV2InstructionDataArgs["tokenMinB"];
   remainingAccountsInfo: DecreaseLiquidityV2InstructionDataArgs["remainingAccountsInfo"];
-}
+};
 
 export function getDecreaseLiquidityV2Instruction<
   TAccountWhirlpool extends string,
@@ -375,10 +373,10 @@ export function getDecreaseLiquidityV2Instruction<
   >);
 }
 
-export interface ParsedDecreaseLiquidityV2Instruction<
+export type ParsedDecreaseLiquidityV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpool: TAccountMetas[0];
@@ -398,7 +396,7 @@ export interface ParsedDecreaseLiquidityV2Instruction<
     tickArrayUpper: TAccountMetas[14];
   };
   data: DecreaseLiquidityV2InstructionData;
-}
+};
 
 export function parseDecreaseLiquidityV2Instruction<
   TProgram extends string,

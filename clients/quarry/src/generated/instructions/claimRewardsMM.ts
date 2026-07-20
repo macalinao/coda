@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -34,10 +20,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMinerPda, findMinterPda } from "../pdas/index.js";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -123,9 +121,9 @@ export type ClaimRewardsMMInstruction<
     ]
   >;
 
-export interface ClaimRewardsMMInstructionData {
+export type ClaimRewardsMMInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type ClaimRewardsMMInstructionDataArgs = {};
 
@@ -152,7 +150,7 @@ export function getClaimRewardsMMInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClaimRewardsMMAsyncInput<
+export type ClaimRewardsMMAsyncInput<
   TAccountMintWrapper extends string = string,
   TAccountMintWrapperProgram extends string = string,
   TAccountMinter extends string = string,
@@ -168,7 +166,7 @@ export interface ClaimRewardsMMAsyncInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   mintWrapperProgram?: Address<TAccountMintWrapperProgram>;
   minter?: Address<TAccountMinter>;
@@ -184,7 +182,7 @@ export interface ClaimRewardsMMAsyncInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export async function getClaimRewardsMMInstructionAsync<
   TAccountMintWrapper extends string,
@@ -406,7 +404,7 @@ export async function getClaimRewardsMMInstructionAsync<
   >);
 }
 
-export interface ClaimRewardsMMInput<
+export type ClaimRewardsMMInput<
   TAccountMintWrapper extends string = string,
   TAccountMintWrapperProgram extends string = string,
   TAccountMinter extends string = string,
@@ -422,7 +420,7 @@ export interface ClaimRewardsMMInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   mintWrapperProgram?: Address<TAccountMintWrapperProgram>;
   minter: Address<TAccountMinter>;
@@ -438,7 +436,7 @@ export interface ClaimRewardsMMInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export function getClaimRewardsMMInstruction<
   TAccountMintWrapper extends string,
@@ -591,10 +589,10 @@ export function getClaimRewardsMMInstruction<
   >);
 }
 
-export interface ParsedClaimRewardsMMInstruction<
+export type ParsedClaimRewardsMMInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mintWrapper: TAccountMetas[0];
@@ -614,7 +612,7 @@ export interface ParsedClaimRewardsMMInstruction<
     mineProgram: TAccountMetas[14];
   };
   data: ClaimRewardsMMInstructionData;
-}
+};
 
 export function parseClaimRewardsMMInstruction<
   TProgram extends string,

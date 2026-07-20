@@ -19,6 +19,7 @@ import {
   type ClientWithRpc,
   type ClientWithTransactionPlanning,
   type ClientWithTransactionSending,
+  type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
   type Instruction,
@@ -1195,6 +1196,8 @@ export type TokenMetadataPlugin = {
   accounts: TokenMetadataPluginAccounts;
   instructions: TokenMetadataPluginInstructions;
   pdas: TokenMetadataPluginPdas;
+  identifyInstruction: typeof identifyTokenMetadataInstruction;
+  parseInstruction: typeof parseTokenMetadataInstruction;
 };
 
 export type TokenMetadataPluginAccounts = {
@@ -1478,7 +1481,7 @@ export type TokenMetadataPluginRequirements = ClientWithRpc<
 export function tokenMetadataProgram() {
   return <T extends TokenMetadataPluginRequirements>(
     client: T,
-  ): Omit<T, "tokenMetadata"> & { tokenMetadata: TokenMetadataPlugin } => {
+  ): ExtendedClient<T, { tokenMetadata: TokenMetadataPlugin }> => {
     return extendClient(client, {
       tokenMetadata: <TokenMetadataPlugin>{
         accounts: {
@@ -1907,6 +1910,8 @@ export function tokenMetadataProgram() {
           masterEdition: findMasterEditionPda,
           tokenRecord: findTokenRecordPda,
         },
+        identifyInstruction: identifyTokenMetadataInstruction,
+        parseInstruction: parseTokenMetadataInstruction,
       },
     });
   };

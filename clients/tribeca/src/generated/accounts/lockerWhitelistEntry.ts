@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { WhitelistSeeds } from "../pdas/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -38,8 +24,19 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findWhitelistPda } from "../pdas/index.js";
+import { findWhitelistPda, type WhitelistSeeds } from "../pdas/index.js";
 
 export const LOCKER_WHITELIST_ENTRY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([128, 245, 238, 138, 226, 48, 216, 63]);
@@ -50,20 +47,20 @@ export function getLockerWhitelistEntryDiscriminatorBytes(): ReadonlyUint8Array 
   );
 }
 
-export interface LockerWhitelistEntry {
+export type LockerWhitelistEntry = {
   discriminator: ReadonlyUint8Array;
   bump: number;
   locker: Address;
   programId: Address;
   owner: Address;
-}
+};
 
-export interface LockerWhitelistEntryArgs {
+export type LockerWhitelistEntryArgs = {
   bump: number;
   locker: Address;
   programId: Address;
   owner: Address;
-}
+};
 
 /** Gets the encoder for {@link LockerWhitelistEntryArgs} account data. */
 export function getLockerWhitelistEntryEncoder(): FixedSizeEncoder<LockerWhitelistEntryArgs> {
@@ -150,7 +147,7 @@ export async function fetchMaybeLockerWhitelistEntry<
 
 export async function fetchAllLockerWhitelistEntry(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LockerWhitelistEntry>[]> {
   const maybeAccounts = await fetchAllMaybeLockerWhitelistEntry(
@@ -164,7 +161,7 @@ export async function fetchAllLockerWhitelistEntry(
 
 export async function fetchAllMaybeLockerWhitelistEntry(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LockerWhitelistEntry>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

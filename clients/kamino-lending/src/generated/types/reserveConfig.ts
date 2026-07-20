@@ -6,33 +6,21 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  BorrowRateCurve,
-  BorrowRateCurveArgs,
-  ReserveFees,
-  ReserveFeesArgs,
-  TokenInfo,
-  TokenInfoArgs,
-  WithdrawalCaps,
-  WithdrawalCapsArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getBorrowRateCurveDecoder,
@@ -43,10 +31,18 @@ import {
   getTokenInfoEncoder,
   getWithdrawalCapsDecoder,
   getWithdrawalCapsEncoder,
+  type BorrowRateCurve,
+  type BorrowRateCurveArgs,
+  type ReserveFees,
+  type ReserveFeesArgs,
+  type TokenInfo,
+  type TokenInfoArgs,
+  type WithdrawalCaps,
+  type WithdrawalCapsArgs,
 } from "./index.js";
 
 /** Reserve configuration values */
-export interface ReserveConfig {
+export type ReserveConfig = {
   /** Status of the reserve Active/Obsolete/Hidden */
   status: number;
   /** Asset tier -> 0 - regular (collateral & debt), 1 - isolated collateral, 2 - isolated debt */
@@ -59,7 +55,7 @@ export interface ReserveConfig {
    * - Reward points multiplier per obligation type
    * Can be re-used after making sure all underlying production account data is zeroed.
    */
-  reserved2: number[];
+  reserved2: Array<number>;
   /** Cut of the order execution bonus that the protocol receives, as a percentage */
   protocolOrderExecutionFeePct: number;
   /** Protocol take rate is the amount borrowed interest protocol receives, as a percentage */
@@ -106,7 +102,7 @@ export interface ReserveConfig {
   depositWithdrawalCap: WithdrawalCaps;
   /** Debt withdrawal caps - borrow & repay */
   debtWithdrawalCap: WithdrawalCaps;
-  elevationGroups: number[];
+  elevationGroups: Array<number>;
   disableUsageAsCollOutsideEmode: number;
   /** Utilization (in percentage) above which borrowing is blocked. 0 to disable. */
   utilizationLimitBlockBorrowingAbovePct: number;
@@ -118,7 +114,7 @@ export interface ReserveConfig {
    * obligations) is NOT affected by this flag.
    */
   autodeleverageEnabled: number;
-  reserved1: number[];
+  reserved1: Array<number>;
   /**
    * Maximum amount liquidity of this reserve borrowed outside all elevation groups
    * - u64::MAX for inf
@@ -131,15 +127,15 @@ export interface ReserveConfig {
    * - u64::MAX for inf
    * - 0 to disable borrows in this elevation group (expected value for the debt asset)
    */
-  borrowLimitAgainstThisCollateralInElevationGroup: bigint[];
+  borrowLimitAgainstThisCollateralInElevationGroup: Array<bigint>;
   /**
    * The rate at which the deleveraging-related liquidation bonus increases, in bps per day.
    * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
    */
   deleveragingBonusIncreaseBpsPerDay: bigint;
-}
+};
 
-export interface ReserveConfigArgs {
+export type ReserveConfigArgs = {
   /** Status of the reserve Active/Obsolete/Hidden */
   status: number;
   /** Asset tier -> 0 - regular (collateral & debt), 1 - isolated collateral, 2 - isolated debt */
@@ -152,7 +148,7 @@ export interface ReserveConfigArgs {
    * - Reward points multiplier per obligation type
    * Can be re-used after making sure all underlying production account data is zeroed.
    */
-  reserved2: number[];
+  reserved2: Array<number>;
   /** Cut of the order execution bonus that the protocol receives, as a percentage */
   protocolOrderExecutionFeePct: number;
   /** Protocol take rate is the amount borrowed interest protocol receives, as a percentage */
@@ -199,7 +195,7 @@ export interface ReserveConfigArgs {
   depositWithdrawalCap: WithdrawalCapsArgs;
   /** Debt withdrawal caps - borrow & repay */
   debtWithdrawalCap: WithdrawalCapsArgs;
-  elevationGroups: number[];
+  elevationGroups: Array<number>;
   disableUsageAsCollOutsideEmode: number;
   /** Utilization (in percentage) above which borrowing is blocked. 0 to disable. */
   utilizationLimitBlockBorrowingAbovePct: number;
@@ -211,7 +207,7 @@ export interface ReserveConfigArgs {
    * obligations) is NOT affected by this flag.
    */
   autodeleverageEnabled: number;
-  reserved1: number[];
+  reserved1: Array<number>;
   /**
    * Maximum amount liquidity of this reserve borrowed outside all elevation groups
    * - u64::MAX for inf
@@ -230,7 +226,7 @@ export interface ReserveConfigArgs {
    * Only relevant when `autodeleverage_enabled == 1`, and must not be 0 in such case.
    */
   deleveragingBonusIncreaseBpsPerDay: number | bigint;
-}
+};
 
 export function getReserveConfigEncoder(): FixedSizeEncoder<ReserveConfigArgs> {
   return getStructEncoder([

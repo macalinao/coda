@@ -6,8 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
-import { getProgramDerivedAddress, getUtf8Encoder } from "@solana/kit";
+import {
+  getProgramDerivedAddress,
+  getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
+} from "@solana/kit";
 
 /** The global pool authority PDA that has authority over all pools in the program. */
 export async function findPoolAuthorityPda(

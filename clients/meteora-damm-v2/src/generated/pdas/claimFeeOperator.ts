@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface ClaimFeeOperatorSeeds {
+export type ClaimFeeOperatorSeeds = {
   /** The operator address */
   operator: Address;
-}
+};
 
 /**
  * A claim fee operator account that authorizes an address to claim protocol fees.

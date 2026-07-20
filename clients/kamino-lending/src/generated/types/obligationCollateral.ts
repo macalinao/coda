@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,14 +14,18 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /** Obligation collateral state */
-export interface ObligationCollateral {
+export type ObligationCollateral = {
   /** Reserve collateral is deposited to */
   depositReserve: Address;
   /** Amount of collateral deposited */
@@ -41,10 +39,10 @@ export interface ObligationCollateral {
    * If the obligation have multiple collateral this value is the same for all of them.
    */
   borrowedAmountAgainstThisCollateralInElevationGroup: bigint;
-  padding: bigint[];
-}
+  padding: Array<bigint>;
+};
 
-export interface ObligationCollateralArgs {
+export type ObligationCollateralArgs = {
   /** Reserve collateral is deposited to */
   depositReserve: Address;
   /** Amount of collateral deposited */
@@ -59,7 +57,7 @@ export interface ObligationCollateralArgs {
    */
   borrowedAmountAgainstThisCollateralInElevationGroup: number | bigint;
   padding: Array<number | bigint>;
-}
+};
 
 export function getObligationCollateralEncoder(): FixedSizeEncoder<ObligationCollateralArgs> {
   return getStructEncoder([

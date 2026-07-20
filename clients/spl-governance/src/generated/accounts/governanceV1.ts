@@ -6,21 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { GovernanceSeeds } from "../pdas/index.js";
-import type { GovernanceConfig, GovernanceConfigArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -35,14 +20,27 @@ import {
   getU32Decoder,
   getU32Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findGovernancePda } from "../pdas/index.js";
+import { findGovernancePda, type GovernanceSeeds } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getGovernanceConfigDecoder,
   getGovernanceConfigEncoder,
+  GovernanceAccountType,
+  type GovernanceConfig,
+  type GovernanceConfigArgs,
 } from "../types/index.js";
 
 export const GOVERNANCE_V1_ACCOUNT_TYPE: GovernanceAccountType =
@@ -52,20 +50,20 @@ export function getGovernanceV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(GOVERNANCE_V1_ACCOUNT_TYPE);
 }
 
-export interface GovernanceV1 {
+export type GovernanceV1 = {
   accountType: GovernanceAccountType;
   realm: Address;
   governedAccount: Address;
   proposalsCount: number;
   config: GovernanceConfig;
-}
+};
 
-export interface GovernanceV1Args {
+export type GovernanceV1Args = {
   realm: Address;
   governedAccount: Address;
   proposalsCount: number;
   config: GovernanceConfigArgs;
-}
+};
 
 /** Gets the encoder for {@link GovernanceV1Args} account data. */
 export function getGovernanceV1Encoder(): Encoder<GovernanceV1Args> {
@@ -133,7 +131,7 @@ export async function fetchMaybeGovernanceV1<TAddress extends string = string>(
 
 export async function fetchAllGovernanceV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<GovernanceV1>[]> {
   const maybeAccounts = await fetchAllMaybeGovernanceV1(rpc, addresses, config);
@@ -143,7 +141,7 @@ export async function fetchAllGovernanceV1(
 
 export async function fetchAllMaybeGovernanceV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<GovernanceV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

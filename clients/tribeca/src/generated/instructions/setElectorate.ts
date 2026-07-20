@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_ELECTORATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -51,9 +51,9 @@ export function getSetElectorateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetElectorateInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountSmartWallet extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountSmartWallet extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -69,14 +69,12 @@ export type SetElectorateInstruction<
     ]
   >;
 
-export interface SetElectorateInstructionData {
+export type SetElectorateInstructionData = {
   discriminator: ReadonlyUint8Array;
   newElectorate: Address;
-}
+};
 
-export interface SetElectorateInstructionDataArgs {
-  newElectorate: Address;
-}
+export type SetElectorateInstructionDataArgs = { newElectorate: Address };
 
 export function getSetElectorateInstructionDataEncoder(): FixedSizeEncoder<SetElectorateInstructionDataArgs> {
   return transformEncoder(
@@ -105,14 +103,14 @@ export function getSetElectorateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetElectorateInput<
+export type SetElectorateInput<
   TAccountGovernor extends string = string,
   TAccountSmartWallet extends string = string,
-> {
+> = {
   governor: Address<TAccountGovernor>;
   smartWallet: TransactionSigner<TAccountSmartWallet>;
   newElectorate: SetElectorateInstructionDataArgs["newElectorate"];
-}
+};
 
 export function getSetElectorateInstruction<
   TAccountGovernor extends string,
@@ -159,17 +157,17 @@ export function getSetElectorateInstruction<
   >);
 }
 
-export interface ParsedSetElectorateInstruction<
+export type ParsedSetElectorateInstruction<
   TProgram extends string = typeof GOVERN_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     governor: TAccountMetas[0];
     smartWallet: TAccountMetas[1];
   };
   data: SetElectorateInstructionData;
-}
+};
 
 export function parseSetElectorateInstruction<
   TProgram extends string,

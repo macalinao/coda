@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface MinerSeeds {
+export type MinerSeeds = {
   quarry: Address;
   authority: Address;
-}
+};
 
 /** Miner account representing a user's staking position in a quarry */
 export async function findMinerPda(

@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ShortUrlSeeds } from "../pdas/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -42,8 +28,19 @@ import {
   getUtf8Decoder,
   getUtf8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findShortUrlPda } from "../pdas/index.js";
+import { findShortUrlPda, type ShortUrlSeeds } from "../pdas/index.js";
 
 export const SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   28, 89, 174, 25, 226, 124, 126, 212,
@@ -53,16 +50,13 @@ export function getShortUrlDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(SHORT_URL_DISCRIMINATOR);
 }
 
-export interface ShortUrl {
+export type ShortUrl = {
   discriminator: ReadonlyUint8Array;
   referrer: Address;
   shortUrl: string;
-}
+};
 
-export interface ShortUrlArgs {
-  referrer: Address;
-  shortUrl: string;
-}
+export type ShortUrlArgs = { referrer: Address; shortUrl: string };
 
 /** Gets the encoder for {@link ShortUrlArgs} account data. */
 export function getShortUrlEncoder(): Encoder<ShortUrlArgs> {
@@ -126,7 +120,7 @@ export async function fetchMaybeShortUrl<TAddress extends string = string>(
 
 export async function fetchAllShortUrl(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ShortUrl>[]> {
   const maybeAccounts = await fetchAllMaybeShortUrl(rpc, addresses, config);
@@ -136,7 +130,7 @@ export async function fetchAllShortUrl(
 
 export async function fetchAllMaybeShortUrl(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ShortUrl>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

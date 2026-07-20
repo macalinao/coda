@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { Tick, TickArgs } from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -40,8 +26,24 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { getTickDecoder, getTickEncoder } from "../types/index.js";
+import {
+  getTickDecoder,
+  getTickEncoder,
+  type Tick,
+  type TickArgs,
+} from "../types/index.js";
 
 export const TICK_ARRAY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   69, 97, 189, 190, 110, 7, 66, 187,
@@ -51,18 +53,18 @@ export function getTickArrayDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(TICK_ARRAY_DISCRIMINATOR);
 }
 
-export interface TickArray {
+export type TickArray = {
   discriminator: ReadonlyUint8Array;
   startTickIndex: number;
-  ticks: Tick[];
+  ticks: Array<Tick>;
   whirlpool: Address;
-}
+};
 
-export interface TickArrayArgs {
+export type TickArrayArgs = {
   startTickIndex: number;
-  ticks: TickArgs[];
+  ticks: Array<TickArgs>;
   whirlpool: Address;
-}
+};
 
 /** Gets the encoder for {@link TickArrayArgs} account data. */
 export function getTickArrayEncoder(): FixedSizeEncoder<TickArrayArgs> {
@@ -128,7 +130,7 @@ export async function fetchMaybeTickArray<TAddress extends string = string>(
 
 export async function fetchAllTickArray(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TickArray>[]> {
   const maybeAccounts = await fetchAllMaybeTickArray(rpc, addresses, config);
@@ -138,7 +140,7 @@ export async function fetchAllTickArray(
 
 export async function fetchAllMaybeTickArray(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TickArray>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

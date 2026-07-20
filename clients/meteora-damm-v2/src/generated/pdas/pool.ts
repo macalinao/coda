@@ -6,21 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface PoolSeeds {
+export type PoolSeeds = {
   /** The config account address */
   config: Address;
   /** The first token mint (sorted) */
   tokenAMint: Address;
   /** The second token mint (sorted) */
   tokenBMint: Address;
-}
+};
 
 /**
  * A liquidity pool account for a specific token pair under a given config.

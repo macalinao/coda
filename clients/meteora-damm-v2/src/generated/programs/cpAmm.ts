@@ -6,102 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  ClientWithPayer,
-  ClientWithRpc,
-  ClientWithTransactionPlanning,
-  ClientWithTransactionSending,
-  GetAccountInfoApi,
-  GetMultipleAccountsApi,
-  Instruction,
-  InstructionWithData,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  SelfFetchFunctions,
-  SelfPlanAndSendFunctions,
-} from "@solana/program-client-core";
-import type {
-  ClaimFeeOperator,
-  ClaimFeeOperatorArgs,
-  Config,
-  ConfigArgs,
-  Pool,
-  PoolArgs,
-  Position,
-  PositionArgs,
-  TokenBadge,
-  TokenBadgeArgs,
-  Vesting,
-  VestingArgs,
-} from "../accounts/index.js";
-import type {
-  AddLiquidityAsyncInput,
-  ClaimPartnerFeeAsyncInput,
-  ClaimPositionFeeAsyncInput,
-  ClaimProtocolFeeAsyncInput,
-  ClaimRewardAsyncInput,
-  CloseClaimFeeOperatorAsyncInput,
-  CloseConfigAsyncInput,
-  ClosePositionAsyncInput,
-  CloseTokenBadgeAsyncInput,
-  CreateClaimFeeOperatorAsyncInput,
-  CreateConfigAsyncInput,
-  CreateDynamicConfigAsyncInput,
-  CreatePositionAsyncInput,
-  CreateTokenBadgeAsyncInput,
-  FundRewardAsyncInput,
-  InitializeCustomizablePoolAsyncInput,
-  InitializePoolAsyncInput,
-  InitializePoolWithDynamicConfigAsyncInput,
-  InitializeRewardAsyncInput,
-  LockPositionAsyncInput,
-  ParsedAddLiquidityInstruction,
-  ParsedClaimPartnerFeeInstruction,
-  ParsedClaimPositionFeeInstruction,
-  ParsedClaimProtocolFeeInstruction,
-  ParsedClaimRewardInstruction,
-  ParsedCloseClaimFeeOperatorInstruction,
-  ParsedCloseConfigInstruction,
-  ParsedClosePositionInstruction,
-  ParsedCloseTokenBadgeInstruction,
-  ParsedCreateClaimFeeOperatorInstruction,
-  ParsedCreateConfigInstruction,
-  ParsedCreateDynamicConfigInstruction,
-  ParsedCreatePositionInstruction,
-  ParsedCreateTokenBadgeInstruction,
-  ParsedFundRewardInstruction,
-  ParsedInitializeCustomizablePoolInstruction,
-  ParsedInitializePoolInstruction,
-  ParsedInitializePoolWithDynamicConfigInstruction,
-  ParsedInitializeRewardInstruction,
-  ParsedLockPositionInstruction,
-  ParsedPermanentLockPositionInstruction,
-  ParsedRefreshVestingInstruction,
-  ParsedRemoveAllLiquidityInstruction,
-  ParsedRemoveLiquidityInstruction,
-  ParsedSetPoolStatusInstruction,
-  ParsedSplitPosition2Instruction,
-  ParsedSplitPositionInstruction,
-  ParsedSwap2Instruction,
-  ParsedSwapInstruction,
-  ParsedUpdateRewardDurationInstruction,
-  ParsedUpdateRewardFunderInstruction,
-  ParsedWithdrawIneligibleRewardInstruction,
-  PermanentLockPositionAsyncInput,
-  RefreshVestingInput,
-  RemoveAllLiquidityAsyncInput,
-  RemoveLiquidityAsyncInput,
-  SetPoolStatusAsyncInput,
-  SplitPosition2AsyncInput,
-  SplitPositionAsyncInput,
-  Swap2AsyncInput,
-  SwapAsyncInput,
-  UpdateRewardDurationAsyncInput,
-  UpdateRewardFunderAsyncInput,
-  WithdrawIneligibleRewardAsyncInput,
-} from "../instructions/index.js";
 import {
   assertIsInstructionWithAccounts,
   containsBytes,
@@ -112,10 +16,23 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
   SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
   SolanaError,
+  type Address,
+  type ClientWithPayer,
+  type ClientWithRpc,
+  type ClientWithTransactionPlanning,
+  type ClientWithTransactionSending,
+  type ExtendedClient,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type Instruction,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   addSelfFetchFunctions,
   addSelfPlanAndSendFunctions,
+  type SelfFetchFunctions,
+  type SelfPlanAndSendFunctions,
 } from "@solana/program-client-core";
 import {
   getClaimFeeOperatorCodec,
@@ -124,6 +41,18 @@ import {
   getPositionCodec,
   getTokenBadgeCodec,
   getVestingCodec,
+  type ClaimFeeOperator,
+  type ClaimFeeOperatorArgs,
+  type Config,
+  type ConfigArgs,
+  type Pool,
+  type PoolArgs,
+  type Position,
+  type PositionArgs,
+  type TokenBadge,
+  type TokenBadgeArgs,
+  type Vesting,
+  type VestingArgs,
 } from "../accounts/index.js";
 import {
   getAddLiquidityInstructionAsync,
@@ -190,6 +119,70 @@ import {
   parseUpdateRewardDurationInstruction,
   parseUpdateRewardFunderInstruction,
   parseWithdrawIneligibleRewardInstruction,
+  type AddLiquidityAsyncInput,
+  type ClaimPartnerFeeAsyncInput,
+  type ClaimPositionFeeAsyncInput,
+  type ClaimProtocolFeeAsyncInput,
+  type ClaimRewardAsyncInput,
+  type CloseClaimFeeOperatorAsyncInput,
+  type CloseConfigAsyncInput,
+  type ClosePositionAsyncInput,
+  type CloseTokenBadgeAsyncInput,
+  type CreateClaimFeeOperatorAsyncInput,
+  type CreateConfigAsyncInput,
+  type CreateDynamicConfigAsyncInput,
+  type CreatePositionAsyncInput,
+  type CreateTokenBadgeAsyncInput,
+  type FundRewardAsyncInput,
+  type InitializeCustomizablePoolAsyncInput,
+  type InitializePoolAsyncInput,
+  type InitializePoolWithDynamicConfigAsyncInput,
+  type InitializeRewardAsyncInput,
+  type LockPositionAsyncInput,
+  type ParsedAddLiquidityInstruction,
+  type ParsedClaimPartnerFeeInstruction,
+  type ParsedClaimPositionFeeInstruction,
+  type ParsedClaimProtocolFeeInstruction,
+  type ParsedClaimRewardInstruction,
+  type ParsedCloseClaimFeeOperatorInstruction,
+  type ParsedCloseConfigInstruction,
+  type ParsedClosePositionInstruction,
+  type ParsedCloseTokenBadgeInstruction,
+  type ParsedCreateClaimFeeOperatorInstruction,
+  type ParsedCreateConfigInstruction,
+  type ParsedCreateDynamicConfigInstruction,
+  type ParsedCreatePositionInstruction,
+  type ParsedCreateTokenBadgeInstruction,
+  type ParsedFundRewardInstruction,
+  type ParsedInitializeCustomizablePoolInstruction,
+  type ParsedInitializePoolInstruction,
+  type ParsedInitializePoolWithDynamicConfigInstruction,
+  type ParsedInitializeRewardInstruction,
+  type ParsedLockPositionInstruction,
+  type ParsedPermanentLockPositionInstruction,
+  type ParsedRefreshVestingInstruction,
+  type ParsedRemoveAllLiquidityInstruction,
+  type ParsedRemoveLiquidityInstruction,
+  type ParsedSetPoolStatusInstruction,
+  type ParsedSplitPosition2Instruction,
+  type ParsedSplitPositionInstruction,
+  type ParsedSwap2Instruction,
+  type ParsedSwapInstruction,
+  type ParsedUpdateRewardDurationInstruction,
+  type ParsedUpdateRewardFunderInstruction,
+  type ParsedWithdrawIneligibleRewardInstruction,
+  type PermanentLockPositionAsyncInput,
+  type RefreshVestingInput,
+  type RemoveAllLiquidityAsyncInput,
+  type RemoveLiquidityAsyncInput,
+  type SetPoolStatusAsyncInput,
+  type SplitPosition2AsyncInput,
+  type SplitPositionAsyncInput,
+  type Swap2AsyncInput,
+  type SwapAsyncInput,
+  type UpdateRewardDurationAsyncInput,
+  type UpdateRewardFunderAsyncInput,
+  type WithdrawIneligibleRewardAsyncInput,
 } from "../instructions/index.js";
 import {
   findClaimFeeOperatorPda,
@@ -209,12 +202,12 @@ export const CP_AMM_PROGRAM_ADDRESS =
   "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
 
 export enum CpAmmAccount {
-  ClaimFeeOperator = 0,
-  Config = 1,
-  Pool = 2,
-  Position = 3,
-  TokenBadge = 4,
-  Vesting = 5,
+  ClaimFeeOperator,
+  Config,
+  Pool,
+  Position,
+  TokenBadge,
+  Vesting,
 }
 
 export function identifyCpAmmAccount(
@@ -294,38 +287,38 @@ export function identifyCpAmmAccount(
 }
 
 export enum CpAmmInstruction {
-  AddLiquidity = 0,
-  ClaimPartnerFee = 1,
-  ClaimPositionFee = 2,
-  ClaimProtocolFee = 3,
-  ClaimReward = 4,
-  CloseClaimFeeOperator = 5,
-  CloseConfig = 6,
-  ClosePosition = 7,
-  CloseTokenBadge = 8,
-  CreateClaimFeeOperator = 9,
-  CreateConfig = 10,
-  CreateDynamicConfig = 11,
-  CreatePosition = 12,
-  CreateTokenBadge = 13,
-  FundReward = 14,
-  InitializeCustomizablePool = 15,
-  InitializePool = 16,
-  InitializePoolWithDynamicConfig = 17,
-  InitializeReward = 18,
-  LockPosition = 19,
-  PermanentLockPosition = 20,
-  RefreshVesting = 21,
-  RemoveAllLiquidity = 22,
-  RemoveLiquidity = 23,
-  SetPoolStatus = 24,
-  SplitPosition = 25,
-  SplitPosition2 = 26,
-  Swap = 27,
-  Swap2 = 28,
-  UpdateRewardDuration = 29,
-  UpdateRewardFunder = 30,
-  WithdrawIneligibleReward = 31,
+  AddLiquidity,
+  ClaimPartnerFee,
+  ClaimPositionFee,
+  ClaimProtocolFee,
+  ClaimReward,
+  CloseClaimFeeOperator,
+  CloseConfig,
+  ClosePosition,
+  CloseTokenBadge,
+  CreateClaimFeeOperator,
+  CreateConfig,
+  CreateDynamicConfig,
+  CreatePosition,
+  CreateTokenBadge,
+  FundReward,
+  InitializeCustomizablePool,
+  InitializePool,
+  InitializePoolWithDynamicConfig,
+  InitializeReward,
+  LockPosition,
+  PermanentLockPosition,
+  RefreshVesting,
+  RemoveAllLiquidity,
+  RemoveLiquidity,
+  SetPoolStatus,
+  SplitPosition,
+  SplitPosition2,
+  Swap,
+  Swap2,
+  UpdateRewardDuration,
+  UpdateRewardFunder,
+  WithdrawIneligibleReward,
 }
 
 export function identifyCpAmmInstruction(
@@ -1027,13 +1020,16 @@ export function parseCpAmmInstruction<TProgram extends string>(
   }
 }
 
-export interface CpAmmPlugin {
+export type CpAmmPlugin = {
   accounts: CpAmmPluginAccounts;
   instructions: CpAmmPluginInstructions;
   pdas: CpAmmPluginPdas;
-}
+  identifyAccount: typeof identifyCpAmmAccount;
+  identifyInstruction: typeof identifyCpAmmInstruction;
+  parseInstruction: typeof parseCpAmmInstruction;
+};
 
-export interface CpAmmPluginAccounts {
+export type CpAmmPluginAccounts = {
   claimFeeOperator: ReturnType<typeof getClaimFeeOperatorCodec> &
     SelfFetchFunctions<ClaimFeeOperatorArgs, ClaimFeeOperator>;
   config: ReturnType<typeof getConfigCodec> &
@@ -1045,9 +1041,9 @@ export interface CpAmmPluginAccounts {
     SelfFetchFunctions<TokenBadgeArgs, TokenBadge>;
   vesting: ReturnType<typeof getVestingCodec> &
     SelfFetchFunctions<VestingArgs, Vesting>;
-}
+};
 
-export interface CpAmmPluginInstructions {
+export type CpAmmPluginInstructions = {
   addLiquidity: (
     input: AddLiquidityAsyncInput,
   ) => ReturnType<typeof getAddLiquidityInstructionAsync> &
@@ -1174,9 +1170,9 @@ export interface CpAmmPluginInstructions {
     input: WithdrawIneligibleRewardAsyncInput,
   ) => ReturnType<typeof getWithdrawIneligibleRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
-}
+};
 
-export interface CpAmmPluginPdas {
+export type CpAmmPluginPdas = {
   poolAuthority: typeof findPoolAuthorityPda;
   config: typeof findConfigPda;
   pool: typeof findPoolPda;
@@ -1188,7 +1184,7 @@ export interface CpAmmPluginPdas {
   claimFeeOperator: typeof findClaimFeeOperatorPda;
   positionNftAccount: typeof findPositionNftAccountPda;
   eventAuthority: typeof findEventAuthorityPda;
-}
+};
 
 export type CpAmmPluginRequirements = ClientWithRpc<
   GetAccountInfoApi & GetMultipleAccountsApi
@@ -1200,7 +1196,7 @@ export type CpAmmPluginRequirements = ClientWithRpc<
 export function cpAmmProgram() {
   return <T extends CpAmmPluginRequirements>(
     client: T,
-  ): Omit<T, "cpAmm"> & { cpAmm: CpAmmPlugin } => {
+  ): ExtendedClient<T, { cpAmm: CpAmmPlugin }> => {
     return extendClient(client, {
       cpAmm: <CpAmmPlugin>{
         accounts: {
@@ -1413,6 +1409,9 @@ export function cpAmmProgram() {
           positionNftAccount: findPositionNftAccountPda,
           eventAuthority: findEventAuthorityPda,
         },
+        identifyAccount: identifyCpAmmAccount,
+        identifyInstruction: identifyCpAmmInstruction,
+        parseInstruction: parseCpAmmInstruction,
       },
     });
   };

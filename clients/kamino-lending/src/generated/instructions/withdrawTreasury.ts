@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findRewardTreasuryVaultPda,
@@ -58,15 +56,16 @@ export function getWithdrawTreasuryDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawTreasuryInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountGlobalAdmin extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TAccountRewardMint extends string | AccountMeta = string,
-  TAccountRewardTreasuryVault extends string | AccountMeta = string,
-  TAccountTreasuryVaultAuthority extends string | AccountMeta = string,
-  TAccountWithdrawDestinationTokenAccount extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountGlobalAdmin extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountRewardMint extends string | AccountMeta<string> = string,
+  TAccountRewardTreasuryVault extends string | AccountMeta<string> = string,
+  TAccountTreasuryVaultAuthority extends string | AccountMeta<string> = string,
+  TAccountWithdrawDestinationTokenAccount extends string | AccountMeta<string> =
+    string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -97,14 +96,12 @@ export type WithdrawTreasuryInstruction<
     ]
   >;
 
-export interface WithdrawTreasuryInstructionData {
+export type WithdrawTreasuryInstructionData = {
   discriminator: ReadonlyUint8Array;
   amount: bigint;
-}
+};
 
-export interface WithdrawTreasuryInstructionDataArgs {
-  amount: number | bigint;
-}
+export type WithdrawTreasuryInstructionDataArgs = { amount: number | bigint };
 
 export function getWithdrawTreasuryInstructionDataEncoder(): FixedSizeEncoder<WithdrawTreasuryInstructionDataArgs> {
   return transformEncoder(
@@ -133,7 +130,7 @@ export function getWithdrawTreasuryInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawTreasuryAsyncInput<
+export type WithdrawTreasuryAsyncInput<
   TAccountGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountRewardMint extends string = string,
@@ -141,7 +138,7 @@ export interface WithdrawTreasuryAsyncInput<
   TAccountTreasuryVaultAuthority extends string = string,
   TAccountWithdrawDestinationTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
   rewardMint: Address<TAccountRewardMint>;
@@ -150,7 +147,7 @@ export interface WithdrawTreasuryAsyncInput<
   withdrawDestinationTokenAccount: Address<TAccountWithdrawDestinationTokenAccount>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: WithdrawTreasuryInstructionDataArgs["amount"];
-}
+};
 
 export async function getWithdrawTreasuryInstructionAsync<
   TAccountGlobalAdmin extends string,
@@ -271,7 +268,7 @@ export async function getWithdrawTreasuryInstructionAsync<
   >);
 }
 
-export interface WithdrawTreasuryInput<
+export type WithdrawTreasuryInput<
   TAccountGlobalAdmin extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountRewardMint extends string = string,
@@ -279,7 +276,7 @@ export interface WithdrawTreasuryInput<
   TAccountTreasuryVaultAuthority extends string = string,
   TAccountWithdrawDestinationTokenAccount extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
   globalConfig: Address<TAccountGlobalConfig>;
   rewardMint: Address<TAccountRewardMint>;
@@ -288,7 +285,7 @@ export interface WithdrawTreasuryInput<
   withdrawDestinationTokenAccount: Address<TAccountWithdrawDestinationTokenAccount>;
   tokenProgram?: Address<TAccountTokenProgram>;
   amount: WithdrawTreasuryInstructionDataArgs["amount"];
-}
+};
 
 export function getWithdrawTreasuryInstruction<
   TAccountGlobalAdmin extends string,
@@ -386,10 +383,10 @@ export function getWithdrawTreasuryInstruction<
   >);
 }
 
-export interface ParsedWithdrawTreasuryInstruction<
+export type ParsedWithdrawTreasuryInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     globalAdmin: TAccountMetas[0];
@@ -401,7 +398,7 @@ export interface ParsedWithdrawTreasuryInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: WithdrawTreasuryInstructionData;
-}
+};
 
 export function parseWithdrawTreasuryInstruction<
   TProgram extends string,

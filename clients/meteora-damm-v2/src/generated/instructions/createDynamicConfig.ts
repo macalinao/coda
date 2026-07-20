@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  DynamicConfigParameters,
-  DynamicConfigParametersArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -41,16 +20,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getNonNullResolvedInstructionInput,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getDynamicConfigParametersDecoder,
   getDynamicConfigParametersEncoder,
+  type DynamicConfigParameters,
+  type DynamicConfigParametersArgs,
 } from "../types/index.js";
 
 export const CREATE_DYNAMIC_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
@@ -96,16 +92,16 @@ export type CreateDynamicConfigInstruction<
     ]
   >;
 
-export interface CreateDynamicConfigInstructionData {
+export type CreateDynamicConfigInstructionData = {
   discriminator: ReadonlyUint8Array;
   index: bigint;
   configParameters: DynamicConfigParameters;
-}
+};
 
-export interface CreateDynamicConfigInstructionDataArgs {
+export type CreateDynamicConfigInstructionDataArgs = {
   index: number | bigint;
   configParameters: DynamicConfigParametersArgs;
-}
+};
 
 export function getCreateDynamicConfigInstructionDataEncoder(): FixedSizeEncoder<CreateDynamicConfigInstructionDataArgs> {
   return transformEncoder(
@@ -139,13 +135,13 @@ export function getCreateDynamicConfigInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateDynamicConfigAsyncInput<
+export type CreateDynamicConfigAsyncInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   config?: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -153,7 +149,7 @@ export interface CreateDynamicConfigAsyncInput<
   program?: Address<TAccountProgram>;
   index: CreateDynamicConfigInstructionDataArgs["index"];
   configParameters: CreateDynamicConfigInstructionDataArgs["configParameters"];
-}
+};
 
 export async function getCreateDynamicConfigInstructionAsync<
   TAccountConfig extends string,
@@ -247,13 +243,13 @@ export async function getCreateDynamicConfigInstructionAsync<
   >);
 }
 
-export interface CreateDynamicConfigInput<
+export type CreateDynamicConfigInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   config: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -261,7 +257,7 @@ export interface CreateDynamicConfigInput<
   program?: Address<TAccountProgram>;
   index: CreateDynamicConfigInstructionDataArgs["index"];
   configParameters: CreateDynamicConfigInstructionDataArgs["configParameters"];
-}
+};
 
 export function getCreateDynamicConfigInstruction<
   TAccountConfig extends string,
@@ -339,10 +335,10 @@ export function getCreateDynamicConfigInstruction<
   >);
 }
 
-export interface ParsedCreateDynamicConfigInstruction<
+export type ParsedCreateDynamicConfigInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     config: TAccountMetas[0];
@@ -352,7 +348,7 @@ export interface ParsedCreateDynamicConfigInstruction<
     program: TAccountMetas[4];
   };
   data: CreateDynamicConfigInstructionData;
-}
+};
 
 export function parseCreateDynamicConfigInstruction<
   TProgram extends string,

@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,13 +14,17 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Traded {
+export type Traded = {
   whirlpool: Address;
   aToB: boolean;
   preSqrtPrice: bigint;
@@ -37,9 +35,9 @@ export interface Traded {
   outputTransferFee: bigint;
   lpFee: bigint;
   protocolFee: bigint;
-}
+};
 
-export interface TradedArgs {
+export type TradedArgs = {
   whirlpool: Address;
   aToB: boolean;
   preSqrtPrice: number | bigint;
@@ -50,7 +48,7 @@ export interface TradedArgs {
   outputTransferFee: number | bigint;
   lpFee: number | bigint;
   protocolFee: number | bigint;
-}
+};
 
 export function getTradedEncoder(): FixedSizeEncoder<TradedArgs> {
   return getStructEncoder([

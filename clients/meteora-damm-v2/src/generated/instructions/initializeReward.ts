@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,18 +17,34 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getNonNullResolvedInstructionInput,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda, findPoolAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -116,18 +114,18 @@ export type InitializeRewardInstruction<
     ]
   >;
 
-export interface InitializeRewardInstructionData {
+export type InitializeRewardInstructionData = {
   discriminator: ReadonlyUint8Array;
   rewardIndex: number;
   rewardDuration: bigint;
   funder: Address;
-}
+};
 
-export interface InitializeRewardInstructionDataArgs {
+export type InitializeRewardInstructionDataArgs = {
   rewardIndex: number;
   rewardDuration: number | bigint;
   funder: Address;
-}
+};
 
 export function getInitializeRewardInstructionDataEncoder(): FixedSizeEncoder<InitializeRewardInstructionDataArgs> {
   return transformEncoder(
@@ -160,7 +158,7 @@ export function getInitializeRewardInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface InitializeRewardAsyncInput<
+export type InitializeRewardAsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountRewardVault extends string = string,
@@ -171,7 +169,7 @@ export interface InitializeRewardAsyncInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   rewardVault?: Address<TAccountRewardVault>;
@@ -185,7 +183,7 @@ export interface InitializeRewardAsyncInput<
   rewardIndex: InitializeRewardInstructionDataArgs["rewardIndex"];
   rewardDuration: InitializeRewardInstructionDataArgs["rewardDuration"];
   funder: InitializeRewardInstructionDataArgs["funder"];
-}
+};
 
 export async function getInitializeRewardInstructionAsync<
   TAccountPoolAuthority extends string,
@@ -323,7 +321,7 @@ export async function getInitializeRewardInstructionAsync<
   >);
 }
 
-export interface InitializeRewardInput<
+export type InitializeRewardInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountRewardVault extends string = string,
@@ -334,7 +332,7 @@ export interface InitializeRewardInput<
   TAccountSystemProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   rewardVault: Address<TAccountRewardVault>;
@@ -348,7 +346,7 @@ export interface InitializeRewardInput<
   rewardIndex: InitializeRewardInstructionDataArgs["rewardIndex"];
   rewardDuration: InitializeRewardInstructionDataArgs["rewardDuration"];
   funder: InitializeRewardInstructionDataArgs["funder"];
-}
+};
 
 export function getInitializeRewardInstruction<
   TAccountPoolAuthority extends string,
@@ -460,10 +458,10 @@ export function getInitializeRewardInstruction<
   >);
 }
 
-export interface ParsedInitializeRewardInstruction<
+export type ParsedInitializeRewardInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -478,7 +476,7 @@ export interface ParsedInitializeRewardInstruction<
     program: TAccountMetas[9];
   };
   data: InitializeRewardInstructionData;
-}
+};
 
 export function parseInitializeRewardInstruction<
   TProgram extends string,

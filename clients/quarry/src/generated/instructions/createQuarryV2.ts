@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,10 +17,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findQuarryPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -90,9 +88,9 @@ export type CreateQuarryV2Instruction<
     ]
   >;
 
-export interface CreateQuarryV2InstructionData {
+export type CreateQuarryV2InstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type CreateQuarryV2InstructionDataArgs = {};
 
@@ -119,21 +117,21 @@ export function getCreateQuarryV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateQuarryV2AsyncInput<
+export type CreateQuarryV2AsyncInput<
   TAccountQuarry extends string = string,
   TAccountAuthority extends string = string,
   TAccountRewarder extends string = string,
   TAccountTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   quarry?: Address<TAccountQuarry>;
   authority: TransactionSigner<TAccountAuthority>;
   rewarder: Address<TAccountRewarder>;
   tokenMint: Address<TAccountTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export async function getCreateQuarryV2InstructionAsync<
   TAccountQuarry extends string,
@@ -222,21 +220,21 @@ export async function getCreateQuarryV2InstructionAsync<
   >);
 }
 
-export interface CreateQuarryV2Input<
+export type CreateQuarryV2Input<
   TAccountQuarry extends string = string,
   TAccountAuthority extends string = string,
   TAccountRewarder extends string = string,
   TAccountTokenMint extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   quarry: Address<TAccountQuarry>;
   authority: TransactionSigner<TAccountAuthority>;
   rewarder: Address<TAccountRewarder>;
   tokenMint: Address<TAccountTokenMint>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getCreateQuarryV2Instruction<
   TAccountQuarry extends string,
@@ -311,10 +309,10 @@ export function getCreateQuarryV2Instruction<
   >);
 }
 
-export interface ParsedCreateQuarryV2Instruction<
+export type ParsedCreateQuarryV2Instruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     quarry: TAccountMetas[0];
@@ -325,7 +323,7 @@ export interface ParsedCreateQuarryV2Instruction<
     systemProgram: TAccountMetas[5];
   };
   data: CreateQuarryV2InstructionData;
-}
+};
 
 export function parseCreateQuarryV2Instruction<
   TProgram extends string,

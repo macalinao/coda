@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CLOSE_BUNDLED_POSITION_DISCRIMINATOR: ReadonlyUint8Array =
@@ -51,12 +51,13 @@ export function getCloseBundledPositionDiscriminatorBytes(): ReadonlyUint8Array 
 
 export type CloseBundledPositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountBundledPosition extends string | AccountMeta = string,
-  TAccountPositionBundle extends string | AccountMeta = string,
-  TAccountPositionBundleTokenAccount extends string | AccountMeta = string,
-  TAccountPositionBundleAuthority extends string | AccountMeta = string,
-  TAccountReceiver extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountBundledPosition extends string | AccountMeta<string> = string,
+  TAccountPositionBundle extends string | AccountMeta<string> = string,
+  TAccountPositionBundleTokenAccount extends string | AccountMeta<string> =
+    string,
+  TAccountPositionBundleAuthority extends string | AccountMeta<string> = string,
+  TAccountReceiver extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -81,14 +82,12 @@ export type CloseBundledPositionInstruction<
     ]
   >;
 
-export interface CloseBundledPositionInstructionData {
+export type CloseBundledPositionInstructionData = {
   discriminator: ReadonlyUint8Array;
   bundleIndex: number;
-}
+};
 
-export interface CloseBundledPositionInstructionDataArgs {
-  bundleIndex: number;
-}
+export type CloseBundledPositionInstructionDataArgs = { bundleIndex: number };
 
 export function getCloseBundledPositionInstructionDataEncoder(): FixedSizeEncoder<CloseBundledPositionInstructionDataArgs> {
   return transformEncoder(
@@ -120,20 +119,20 @@ export function getCloseBundledPositionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CloseBundledPositionInput<
+export type CloseBundledPositionInput<
   TAccountBundledPosition extends string = string,
   TAccountPositionBundle extends string = string,
   TAccountPositionBundleTokenAccount extends string = string,
   TAccountPositionBundleAuthority extends string = string,
   TAccountReceiver extends string = string,
-> {
+> = {
   bundledPosition: Address<TAccountBundledPosition>;
   positionBundle: Address<TAccountPositionBundle>;
   positionBundleTokenAccount: Address<TAccountPositionBundleTokenAccount>;
   positionBundleAuthority: TransactionSigner<TAccountPositionBundleAuthority>;
   receiver: Address<TAccountReceiver>;
   bundleIndex: CloseBundledPositionInstructionDataArgs["bundleIndex"];
-}
+};
 
 export function getCloseBundledPositionInstruction<
   TAccountBundledPosition extends string,
@@ -213,10 +212,10 @@ export function getCloseBundledPositionInstruction<
   >);
 }
 
-export interface ParsedCloseBundledPositionInstruction<
+export type ParsedCloseBundledPositionInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     bundledPosition: TAccountMetas[0];
@@ -226,7 +225,7 @@ export interface ParsedCloseBundledPositionInstruction<
     receiver: TAccountMetas[4];
   };
   data: CloseBundledPositionInstructionData;
-}
+};
 
 export function parseCloseBundledPositionInstruction<
   TProgram extends string,

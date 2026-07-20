@@ -6,27 +6,31 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, Codec, Decoder, Encoder } from "@solana/kit";
-import type { PoolFeeParameters, PoolFeeParametersArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from "@solana/kit";
 import {
   getPoolFeeParametersDecoder,
   getPoolFeeParametersEncoder,
+  type PoolFeeParameters,
+  type PoolFeeParametersArgs,
 } from "./index.js";
 
-export interface EvtInitializePool {
+export type EvtInitializePool = {
   pool: Address;
   tokenAMint: Address;
   tokenBMint: Address;
@@ -48,9 +52,9 @@ export interface EvtInitializePool {
   totalAmountA: bigint;
   totalAmountB: bigint;
   poolType: number;
-}
+};
 
-export interface EvtInitializePoolArgs {
+export type EvtInitializePoolArgs = {
   pool: Address;
   tokenAMint: Address;
   tokenBMint: Address;
@@ -72,7 +76,7 @@ export interface EvtInitializePoolArgs {
   totalAmountA: number | bigint;
   totalAmountB: number | bigint;
   poolType: number;
-}
+};
 
 export function getEvtInitializePoolEncoder(): Encoder<EvtInitializePoolArgs> {
   return getStructEncoder([

@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,26 +48,26 @@ export function getDepositStakeWithSlippageDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type DepositStakeWithSlippageInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TAccountDepositAuthority extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountStakeToMerge extends string | AccountMeta = string,
-  TAccountValidatorStakeAccount extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountUserPoolTokenAccount extends string | AccountMeta = string,
-  TAccountFeeAccount extends string | AccountMeta = string,
-  TAccountReferralFeeAccount extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TAccountDepositAuthority extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountStakeToMerge extends string | AccountMeta<string> = string,
+  TAccountValidatorStakeAccount extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountUserPoolTokenAccount extends string | AccountMeta<string> = string,
+  TAccountFeeAccount extends string | AccountMeta<string> = string,
+  TAccountReferralFeeAccount extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends string | AccountMeta =
+  TAccountStakeHistorySysvar extends string | AccountMeta<string> =
     "SysvarStakeHistory1111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -123,14 +121,14 @@ export type DepositStakeWithSlippageInstruction<
     ]
   >;
 
-export interface DepositStakeWithSlippageInstructionData {
+export type DepositStakeWithSlippageInstructionData = {
   discriminator: number;
   minimumPoolTokensOut: bigint;
-}
+};
 
-export interface DepositStakeWithSlippageInstructionDataArgs {
+export type DepositStakeWithSlippageInstructionDataArgs = {
   minimumPoolTokensOut: number | bigint;
-}
+};
 
 export function getDepositStakeWithSlippageInstructionDataEncoder(): FixedSizeEncoder<DepositStakeWithSlippageInstructionDataArgs> {
   return transformEncoder(
@@ -162,7 +160,7 @@ export function getDepositStakeWithSlippageInstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface DepositStakeWithSlippageAsyncInput<
+export type DepositStakeWithSlippageAsyncInput<
   TAccountStakePool extends string = string,
   TAccountValidatorList extends string = string,
   TAccountDepositAuthority extends string = string,
@@ -178,7 +176,7 @@ export interface DepositStakeWithSlippageAsyncInput<
   TAccountStakeHistorySysvar extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   validatorList: Address<TAccountValidatorList>;
   depositAuthority:
@@ -197,8 +195,32 @@ export interface DepositStakeWithSlippageAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   stakeProgram?: Address<TAccountStakeProgram>;
   minimumPoolTokensOut: DepositStakeWithSlippageInstructionDataArgs["minimumPoolTokensOut"];
-}
+};
 
+/**
+ * Deposit some stake into the pool, with a specified slippage
+ * constraint. The output is a "pool" token representing ownership
+ * into the pool. Inputs are converted at the current ratio.
+ * 0. `[w]` Stake pool
+ * 1. `[w]` Validator stake list storage account
+ * 2. `[s]/[]` Stake pool deposit authority
+ * 3. `[]` Stake pool withdraw authority
+ * 4. `[w]` Stake account to join the pool (withdraw authority for the
+ * stake account should be first set to the stake pool deposit
+ * authority)
+ * 5. `[w]` Validator stake account for the stake account to be merged
+ * with
+ * 6. `[w]` Reserve stake account, to withdraw rent exempt reserve
+ * 7. `[w]` User account to receive pool tokens
+ * 8. `[w]` Account to receive pool fee tokens
+ * 9. `[w]` Account to receive a portion of pool fee tokens as referral
+ * fees
+ * 10. `[w]` Pool token mint account
+ * 11. '[]' Sysvar clock account
+ * 12. '[]' Sysvar stake history account
+ * 13. `[]` Pool token program id,
+ * 14. `[]` Stake program id,
+ */
 export async function getDepositStakeWithSlippageInstructionAsync<
   TAccountStakePool extends string,
   TAccountValidatorList extends string,
@@ -378,7 +400,7 @@ export async function getDepositStakeWithSlippageInstructionAsync<
   >);
 }
 
-export interface DepositStakeWithSlippageInput<
+export type DepositStakeWithSlippageInput<
   TAccountStakePool extends string = string,
   TAccountValidatorList extends string = string,
   TAccountDepositAuthority extends string = string,
@@ -394,7 +416,7 @@ export interface DepositStakeWithSlippageInput<
   TAccountStakeHistorySysvar extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountStakeProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   validatorList: Address<TAccountValidatorList>;
   depositAuthority:
@@ -413,8 +435,32 @@ export interface DepositStakeWithSlippageInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   stakeProgram?: Address<TAccountStakeProgram>;
   minimumPoolTokensOut: DepositStakeWithSlippageInstructionDataArgs["minimumPoolTokensOut"];
-}
+};
 
+/**
+ * Deposit some stake into the pool, with a specified slippage
+ * constraint. The output is a "pool" token representing ownership
+ * into the pool. Inputs are converted at the current ratio.
+ * 0. `[w]` Stake pool
+ * 1. `[w]` Validator stake list storage account
+ * 2. `[s]/[]` Stake pool deposit authority
+ * 3. `[]` Stake pool withdraw authority
+ * 4. `[w]` Stake account to join the pool (withdraw authority for the
+ * stake account should be first set to the stake pool deposit
+ * authority)
+ * 5. `[w]` Validator stake account for the stake account to be merged
+ * with
+ * 6. `[w]` Reserve stake account, to withdraw rent exempt reserve
+ * 7. `[w]` User account to receive pool tokens
+ * 8. `[w]` Account to receive pool fee tokens
+ * 9. `[w]` Account to receive a portion of pool fee tokens as referral
+ * fees
+ * 10. `[w]` Pool token mint account
+ * 11. '[]' Sysvar clock account
+ * 12. '[]' Sysvar stake history account
+ * 13. `[]` Pool token program id,
+ * 14. `[]` Stake program id,
+ */
 export function getDepositStakeWithSlippageInstruction<
   TAccountStakePool extends string,
   TAccountValidatorList extends string,
@@ -584,10 +630,10 @@ export function getDepositStakeWithSlippageInstruction<
   >);
 }
 
-export interface ParsedDepositStakeWithSlippageInstruction<
+export type ParsedDepositStakeWithSlippageInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -607,7 +653,7 @@ export interface ParsedDepositStakeWithSlippageInstruction<
     stakeProgram: TAccountMetas[14];
   };
   data: DepositStakeWithSlippageInstructionData;
-}
+};
 
 export function parseDepositStakeWithSlippageInstruction<
   TProgram extends string,

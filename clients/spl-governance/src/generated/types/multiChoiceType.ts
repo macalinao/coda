@@ -6,16 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
+import {
+  combineCodec,
+  getEnumDecoder,
+  getEnumEncoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
-import { combineCodec, getEnumDecoder, getEnumEncoder } from "@solana/kit";
 
 export enum MultiChoiceType {
-  FullWeight = 0,
-  Weighted = 1,
+  FullWeight,
+  Weighted,
 }
 
 export type MultiChoiceTypeArgs = MultiChoiceType;

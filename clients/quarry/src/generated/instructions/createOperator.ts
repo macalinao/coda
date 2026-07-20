@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,10 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findOperatorPda } from "../pdas/index.js";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -97,14 +95,12 @@ export type CreateOperatorInstruction<
     ]
   >;
 
-export interface CreateOperatorInstructionData {
+export type CreateOperatorInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface CreateOperatorInstructionDataArgs {
-  bump: number;
-}
+export type CreateOperatorInstructionDataArgs = { bump: number };
 
 export function getCreateOperatorInstructionDataEncoder(): FixedSizeEncoder<CreateOperatorInstructionDataArgs> {
   return transformEncoder(
@@ -133,7 +129,7 @@ export function getCreateOperatorInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateOperatorAsyncInput<
+export type CreateOperatorAsyncInput<
   TAccountBase extends string = string,
   TAccountOperator extends string = string,
   TAccountRewarder extends string = string,
@@ -141,7 +137,7 @@ export interface CreateOperatorAsyncInput<
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountQuarryMineProgram extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   operator?: Address<TAccountOperator>;
   rewarder: Address<TAccountRewarder>;
@@ -150,7 +146,7 @@ export interface CreateOperatorAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
   quarryMineProgram?: Address<TAccountQuarryMineProgram>;
   bump: CreateOperatorInstructionDataArgs["bump"];
-}
+};
 
 export async function getCreateOperatorInstructionAsync<
   TAccountBase extends string,
@@ -254,7 +250,7 @@ export async function getCreateOperatorInstructionAsync<
   >);
 }
 
-export interface CreateOperatorInput<
+export type CreateOperatorInput<
   TAccountBase extends string = string,
   TAccountOperator extends string = string,
   TAccountRewarder extends string = string,
@@ -262,7 +258,7 @@ export interface CreateOperatorInput<
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
   TAccountQuarryMineProgram extends string = string,
-> {
+> = {
   base: TransactionSigner<TAccountBase>;
   operator: Address<TAccountOperator>;
   rewarder: Address<TAccountRewarder>;
@@ -271,7 +267,7 @@ export interface CreateOperatorInput<
   systemProgram?: Address<TAccountSystemProgram>;
   quarryMineProgram?: Address<TAccountQuarryMineProgram>;
   bump: CreateOperatorInstructionDataArgs["bump"];
-}
+};
 
 export function getCreateOperatorInstruction<
   TAccountBase extends string,
@@ -365,10 +361,10 @@ export function getCreateOperatorInstruction<
   >);
 }
 
-export interface ParsedCreateOperatorInstruction<
+export type ParsedCreateOperatorInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     base: TAccountMetas[0];
@@ -380,7 +376,7 @@ export interface ParsedCreateOperatorInstruction<
     quarryMineProgram: TAccountMetas[6];
   };
   data: CreateOperatorInstructionData;
-}
+};
 
 export function parseCreateOperatorInstruction<
   TProgram extends string,

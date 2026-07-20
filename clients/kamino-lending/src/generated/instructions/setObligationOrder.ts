@@ -6,27 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  ObligationOrderInput,
-  ObligationOrderInputArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -40,12 +19,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getObligationOrderInputDecoder,
   getObligationOrderInputEncoder,
+  type ObligationOrderInput,
+  type ObligationOrderInputArgs,
 } from "../types/index.js";
 
 export const SET_OBLIGATION_ORDER_DISCRIMINATOR: ReadonlyUint8Array =
@@ -59,10 +57,10 @@ export function getSetObligationOrderDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetObligationOrderInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -81,16 +79,16 @@ export type SetObligationOrderInstruction<
     ]
   >;
 
-export interface SetObligationOrderInstructionData {
+export type SetObligationOrderInstructionData = {
   discriminator: ReadonlyUint8Array;
   index: number;
   order: ObligationOrderInput;
-}
+};
 
-export interface SetObligationOrderInstructionDataArgs {
+export type SetObligationOrderInstructionDataArgs = {
   index: number;
   order: ObligationOrderInputArgs;
-}
+};
 
 export function getSetObligationOrderInstructionDataEncoder(): FixedSizeEncoder<SetObligationOrderInstructionDataArgs> {
   return transformEncoder(
@@ -124,17 +122,17 @@ export function getSetObligationOrderInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetObligationOrderInput<
+export type SetObligationOrderInput<
   TAccountOwner extends string = string,
   TAccountObligation extends string = string,
   TAccountLendingMarket extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   obligation: Address<TAccountObligation>;
   lendingMarket: Address<TAccountLendingMarket>;
   index: SetObligationOrderInstructionDataArgs["index"];
   order: SetObligationOrderInstructionDataArgs["order"];
-}
+};
 
 export function getSetObligationOrderInstruction<
   TAccountOwner extends string,
@@ -191,10 +189,10 @@ export function getSetObligationOrderInstruction<
   >);
 }
 
-export interface ParsedSetObligationOrderInstruction<
+export type ParsedSetObligationOrderInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -202,7 +200,7 @@ export interface ParsedSetObligationOrderInstruction<
     lendingMarket: TAccountMetas[2];
   };
   data: SetObligationOrderInstructionData;
-}
+};
 
 export function parseSetObligationOrderInstruction<
   TProgram extends string,

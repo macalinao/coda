@@ -6,38 +6,36 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -50,24 +48,25 @@ export function getWithdrawSolDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type WithdrawSolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountUserTransferAuthority extends string | AccountMeta = string,
-  TAccountUserPoolTokenAccount extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountDestinationSystemAccount extends string | AccountMeta = string,
-  TAccountFeeAccount extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountClockSysvar extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountUserTransferAuthority extends string | AccountMeta<string> = string,
+  TAccountUserPoolTokenAccount extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountDestinationSystemAccount extends string | AccountMeta<string> =
+    string,
+  TAccountFeeAccount extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountClockSysvar extends string | AccountMeta<string> =
     "SysvarC1ock11111111111111111111111111111111",
-  TAccountStakeHistorySysvar extends string | AccountMeta =
+  TAccountStakeHistorySysvar extends string | AccountMeta<string> =
     "SysvarStakeHistory1111111111111111111111111",
-  TAccountStakeProgram extends string | AccountMeta =
+  TAccountStakeProgram extends string | AccountMeta<string> =
     "Stake11111111111111111111111111111111111111",
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountSolWithdrawAuthority extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSolWithdrawAuthority extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -117,14 +116,12 @@ export type WithdrawSolInstruction<
     ]
   >;
 
-export interface WithdrawSolInstructionData {
+export type WithdrawSolInstructionData = {
   discriminator: number;
   args: bigint;
-}
+};
 
-export interface WithdrawSolInstructionDataArgs {
-  args: number | bigint;
-}
+export type WithdrawSolInstructionDataArgs = { args: number | bigint };
 
 export function getWithdrawSolInstructionDataEncoder(): FixedSizeEncoder<WithdrawSolInstructionDataArgs> {
   return transformEncoder(
@@ -153,7 +150,7 @@ export function getWithdrawSolInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface WithdrawSolAsyncInput<
+export type WithdrawSolAsyncInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountUserTransferAuthority extends string = string,
@@ -167,7 +164,7 @@ export interface WithdrawSolAsyncInput<
   TAccountStakeProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSolWithdrawAuthority extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Withdraw authority */
@@ -195,8 +192,26 @@ export interface WithdrawSolAsyncInput<
   /** Sol withdraw authority */
   solWithdrawAuthority?: TransactionSigner<TAccountSolWithdrawAuthority>;
   args: WithdrawSolInstructionDataArgs["args"];
-}
+};
 
+/**
+ * Withdraw SOL directly from the pool's reserve account. Fails if the
+ * reserve does not have enough SOL.
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[s]` User transfer authority, for pool token account
+ * 3. `[w]` User account to burn pool tokens
+ * 4. `[w]` Reserve stake account, to withdraw SOL
+ * 5. `[w]` Account receiving the lamports from the reserve, must be a
+ * system account
+ * 6. `[w]` Account to receive pool fee tokens
+ * 7. `[w]` Pool token mint account
+ * 8. '[]' Clock sysvar
+ * 9. '[]' Stake history sysvar
+ * 10. `[]` Stake program account
+ * 11. `[]` Token program id
+ * 12. `[s]` (Optional) Stake pool sol withdraw authority
+ */
 export async function getWithdrawSolInstructionAsync<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -361,7 +376,7 @@ export async function getWithdrawSolInstructionAsync<
   >);
 }
 
-export interface WithdrawSolInput<
+export type WithdrawSolInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountUserTransferAuthority extends string = string,
@@ -375,7 +390,7 @@ export interface WithdrawSolInput<
   TAccountStakeProgram extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountSolWithdrawAuthority extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Withdraw authority */
@@ -403,8 +418,26 @@ export interface WithdrawSolInput<
   /** Sol withdraw authority */
   solWithdrawAuthority?: TransactionSigner<TAccountSolWithdrawAuthority>;
   args: WithdrawSolInstructionDataArgs["args"];
-}
+};
 
+/**
+ * Withdraw SOL directly from the pool's reserve account. Fails if the
+ * reserve does not have enough SOL.
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[s]` User transfer authority, for pool token account
+ * 3. `[w]` User account to burn pool tokens
+ * 4. `[w]` Reserve stake account, to withdraw SOL
+ * 5. `[w]` Account receiving the lamports from the reserve, must be a
+ * system account
+ * 6. `[w]` Account to receive pool fee tokens
+ * 7. `[w]` Pool token mint account
+ * 8. '[]' Clock sysvar
+ * 9. '[]' Stake history sysvar
+ * 10. `[]` Stake program account
+ * 11. `[]` Token program id
+ * 12. `[s]` (Optional) Stake pool sol withdraw authority
+ */
 export function getWithdrawSolInstruction<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -559,10 +592,10 @@ export function getWithdrawSolInstruction<
   >);
 }
 
-export interface ParsedWithdrawSolInstruction<
+export type ParsedWithdrawSolInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -593,7 +626,7 @@ export interface ParsedWithdrawSolInstruction<
     solWithdrawAuthority?: TAccountMetas[12] | undefined;
   };
   data: WithdrawSolInstructionData;
-}
+};
 
 export function parseWithdrawSolInstruction<
   TProgram extends string,

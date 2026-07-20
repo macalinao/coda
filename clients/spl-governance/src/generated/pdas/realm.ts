@@ -6,12 +6,16 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
-import { getProgramDerivedAddress, getUtf8Encoder } from "@solana/kit";
+import {
+  getProgramDerivedAddress,
+  getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
+} from "@solana/kit";
 
-export interface RealmSeeds {
+export type RealmSeeds = {
   name: string;
-}
+};
 
 /** Realm account identified by its name */
 export async function findRealmPda(

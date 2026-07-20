@@ -6,42 +6,40 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -54,13 +52,13 @@ export function getUpdateTokenMetadataDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type UpdateTokenMetadataInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountManager extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountMetadataAccount extends string | AccountMeta = string,
-  TAccountMetadataProgram extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountManager extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountMetadataAccount extends string | AccountMeta<string> = string,
+  TAccountMetadataProgram extends string | AccountMeta<string> =
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -85,18 +83,18 @@ export type UpdateTokenMetadataInstruction<
     ]
   >;
 
-export interface UpdateTokenMetadataInstructionData {
+export type UpdateTokenMetadataInstructionData = {
   discriminator: number;
   name: string;
   symbol: string;
   uri: string;
-}
+};
 
-export interface UpdateTokenMetadataInstructionDataArgs {
+export type UpdateTokenMetadataInstructionDataArgs = {
   name: string;
   symbol: string;
   uri: string;
-}
+};
 
 export function getUpdateTokenMetadataInstructionDataEncoder(): Encoder<UpdateTokenMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -132,13 +130,13 @@ export function getUpdateTokenMetadataInstructionDataCodec(): Codec<
   );
 }
 
-export interface UpdateTokenMetadataAsyncInput<
+export type UpdateTokenMetadataAsyncInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountMetadataAccount extends string = string,
   TAccountMetadataProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   manager: TransactionSigner<TAccountManager>;
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
@@ -147,8 +145,17 @@ export interface UpdateTokenMetadataAsyncInput<
   name: UpdateTokenMetadataInstructionDataArgs["name"];
   symbol: UpdateTokenMetadataInstructionDataArgs["symbol"];
   uri: UpdateTokenMetadataInstructionDataArgs["uri"];
-}
+};
 
+/**
+ * Update token metadata for the stake-pool token in the
+ * metaplex-token program
+ * 0. `[]` Stake pool
+ * 1. `[s]` Manager
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Token metadata account
+ * 4. `[]` Metadata program id
+ */
 export async function getUpdateTokenMetadataInstructionAsync<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -238,13 +245,13 @@ export async function getUpdateTokenMetadataInstructionAsync<
   >);
 }
 
-export interface UpdateTokenMetadataInput<
+export type UpdateTokenMetadataInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountMetadataAccount extends string = string,
   TAccountMetadataProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   manager: TransactionSigner<TAccountManager>;
   withdrawAuthority: Address<TAccountWithdrawAuthority>;
@@ -253,8 +260,17 @@ export interface UpdateTokenMetadataInput<
   name: UpdateTokenMetadataInstructionDataArgs["name"];
   symbol: UpdateTokenMetadataInstructionDataArgs["symbol"];
   uri: UpdateTokenMetadataInstructionDataArgs["uri"];
-}
+};
 
+/**
+ * Update token metadata for the stake-pool token in the
+ * metaplex-token program
+ * 0. `[]` Stake pool
+ * 1. `[s]` Manager
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[w]` Token metadata account
+ * 4. `[]` Metadata program id
+ */
 export function getUpdateTokenMetadataInstruction<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -334,10 +350,10 @@ export function getUpdateTokenMetadataInstruction<
   >);
 }
 
-export interface ParsedUpdateTokenMetadataInstruction<
+export type ParsedUpdateTokenMetadataInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -347,7 +363,7 @@ export interface ParsedUpdateTokenMetadataInstruction<
     metadataProgram: TAccountMetas[4];
   };
   data: UpdateTokenMetadataInstructionData;
-}
+};
 
 export function parseUpdateTokenMetadataInstruction<
   TProgram extends string,

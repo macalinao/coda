@@ -6,14 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type { RealmConfigParamsV1, RealmConfigParamsV1Args } from "./index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -28,10 +20,17 @@ import {
   getU64Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
 import {
   getRealmConfigParamsV1Decoder,
   getRealmConfigParamsV1Encoder,
+  type RealmConfigParamsV1,
+  type RealmConfigParamsV1Args,
 } from "./index.js";
 
 export type GovernanceInstructionV1 =

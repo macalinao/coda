@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { ProposalMetaSeeds } from "../pdas/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -42,8 +28,19 @@ import {
   getUtf8Decoder,
   getUtf8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalMetaPda } from "../pdas/index.js";
+import { findProposalMetaPda, type ProposalMetaSeeds } from "../pdas/index.js";
 
 export const PROPOSAL_META_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   50, 100, 46, 24, 151, 174, 216, 78,
@@ -55,18 +52,18 @@ export function getProposalMetaDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ProposalMeta {
+export type ProposalMeta = {
   discriminator: ReadonlyUint8Array;
   proposal: Address;
   title: string;
   descriptionLink: string;
-}
+};
 
-export interface ProposalMetaArgs {
+export type ProposalMetaArgs = {
   proposal: Address;
   title: string;
   descriptionLink: string;
-}
+};
 
 /** Gets the encoder for {@link ProposalMetaArgs} account data. */
 export function getProposalMetaEncoder(): Encoder<ProposalMetaArgs> {
@@ -138,7 +135,7 @@ export async function fetchMaybeProposalMeta<TAddress extends string = string>(
 
 export async function fetchAllProposalMeta(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProposalMeta>[]> {
   const maybeAccounts = await fetchAllMaybeProposalMeta(rpc, addresses, config);
@@ -148,7 +145,7 @@ export async function fetchAllProposalMeta(
 
 export async function fetchAllMaybeProposalMeta(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProposalMeta>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

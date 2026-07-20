@@ -6,12 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
@@ -20,21 +14,25 @@ import {
   getStructEncoder,
   getU128Decoder,
   getU128Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface EvtPermanentLockPosition {
+export type EvtPermanentLockPosition = {
   pool: Address;
   position: Address;
   lockLiquidityAmount: bigint;
   totalPermanentLockedLiquidity: bigint;
-}
+};
 
-export interface EvtPermanentLockPositionArgs {
+export type EvtPermanentLockPositionArgs = {
   pool: Address;
   position: Address;
   lockLiquidityAmount: number | bigint;
   totalPermanentLockedLiquidity: number | bigint;
-}
+};
 
 export function getEvtPermanentLockPositionEncoder(): FixedSizeEncoder<EvtPermanentLockPositionArgs> {
   return getStructEncoder([

@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,8 +17,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const UPDATE_VOTER_WEIGHT_RECORD_DISCRIMINATOR: ReadonlyUint8Array =
@@ -46,12 +46,12 @@ export function getUpdateVoterWeightRecordDiscriminatorBytes(): ReadonlyUint8Arr
 
 export type UpdateVoterWeightRecordInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVoterWeightRecord extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVoterWeightRecord extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -72,9 +72,9 @@ export type UpdateVoterWeightRecordInstruction<
     ]
   >;
 
-export interface UpdateVoterWeightRecordInstructionData {
+export type UpdateVoterWeightRecordInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type UpdateVoterWeightRecordInstructionDataArgs = {};
 
@@ -104,17 +104,17 @@ export function getUpdateVoterWeightRecordInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface UpdateVoterWeightRecordInput<
+export type UpdateVoterWeightRecordInput<
   TAccountRegistrar extends string = string,
   TAccountVoter extends string = string,
   TAccountVoterWeightRecord extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   voter: Address<TAccountVoter>;
   voterWeightRecord: Address<TAccountVoterWeightRecord>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getUpdateVoterWeightRecordInstruction<
   TAccountRegistrar extends string,
@@ -181,10 +181,10 @@ export function getUpdateVoterWeightRecordInstruction<
   >);
 }
 
-export interface ParsedUpdateVoterWeightRecordInstruction<
+export type ParsedUpdateVoterWeightRecordInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -193,7 +193,7 @@ export interface ParsedUpdateVoterWeightRecordInstruction<
     systemProgram: TAccountMetas[3];
   };
   data: UpdateVoterWeightRecordInstructionData;
-}
+};
 
 export function parseUpdateVoterWeightRecordInstruction<
   TProgram extends string,

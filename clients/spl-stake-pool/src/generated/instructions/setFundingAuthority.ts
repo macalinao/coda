@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type { FundingType, FundingTypeArgs } from "../types/index.js";
 import {
   combineCodec,
   getStructDecoder,
@@ -33,12 +15,31 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getFundingTypeDecoder,
   getFundingTypeEncoder,
+  type FundingType,
+  type FundingTypeArgs,
 } from "../types/index.js";
 
 export const SET_FUNDING_AUTHORITY_DISCRIMINATOR = 15;
@@ -49,10 +50,10 @@ export function getSetFundingAuthorityDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetFundingAuthorityInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountManager extends string | AccountMeta = string,
-  TAccountNewAuthorityPubkey extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountManager extends string | AccountMeta<string> = string,
+  TAccountNewAuthorityPubkey extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -71,14 +72,14 @@ export type SetFundingAuthorityInstruction<
     ]
   >;
 
-export interface SetFundingAuthorityInstructionData {
+export type SetFundingAuthorityInstructionData = {
   discriminator: number;
   fundingType: FundingType;
-}
+};
 
-export interface SetFundingAuthorityInstructionDataArgs {
+export type SetFundingAuthorityInstructionDataArgs = {
   fundingType: FundingTypeArgs;
-}
+};
 
 export function getSetFundingAuthorityInstructionDataEncoder(): FixedSizeEncoder<SetFundingAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -110,11 +111,11 @@ export function getSetFundingAuthorityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetFundingAuthorityInput<
+export type SetFundingAuthorityInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountNewAuthorityPubkey extends string = string,
-> {
+> = {
   /** Stake pool */
   stakePool: Address<TAccountStakePool>;
   /** Manager */
@@ -122,8 +123,15 @@ export interface SetFundingAuthorityInput<
   /** New authority pubkey */
   newAuthorityPubkey: Address<TAccountNewAuthorityPubkey>;
   fundingType: SetFundingAuthorityInstructionDataArgs["fundingType"];
-}
+};
 
+/**
+ * (Manager only) Update SOL deposit, stake deposit, or SOL withdrawal
+ * authority.
+ * 0. `[w]` Stake pool
+ * 1. `[s]` Manager
+ * 2. '[]` New authority pubkey or none
+ */
 export function getSetFundingAuthorityInstruction<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -182,10 +190,10 @@ export function getSetFundingAuthorityInstruction<
   >);
 }
 
-export interface ParsedSetFundingAuthorityInstruction<
+export type ParsedSetFundingAuthorityInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** Stake pool */
@@ -196,7 +204,7 @@ export interface ParsedSetFundingAuthorityInstruction<
     newAuthorityPubkey: TAccountMetas[2];
   };
   data: SetFundingAuthorityInstructionData;
-}
+};
 
 export function parseSetFundingAuthorityInstruction<
   TProgram extends string,

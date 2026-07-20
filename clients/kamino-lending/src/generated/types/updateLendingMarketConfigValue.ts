@@ -6,15 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  GetDiscriminatedUnionVariant,
-  GetDiscriminatedUnionVariantContent,
-} from "@solana/kit";
-import type { ElevationGroup, ElevationGroupArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -29,38 +20,49 @@ import {
   getStructEncoder,
   getTupleDecoder,
   getTupleEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type GetDiscriminatedUnionVariant,
+  type GetDiscriminatedUnionVariantContent,
 } from "@solana/kit";
-import { getElevationGroupDecoder, getElevationGroupEncoder } from "./index.js";
+import {
+  getElevationGroupDecoder,
+  getElevationGroupEncoder,
+  type ElevationGroup,
+  type ElevationGroupArgs,
+} from "./index.js";
 
 export type UpdateLendingMarketConfigValue =
   | { __kind: "Bool"; fields: readonly [boolean] }
   | { __kind: "U8"; fields: readonly [number] }
-  | { __kind: "U8Array"; fields: readonly [number[]] }
+  | { __kind: "U8Array"; fields: readonly [Array<number>] }
   | { __kind: "U16"; fields: readonly [number] }
   | { __kind: "U64"; fields: readonly [bigint] }
   | { __kind: "U128"; fields: readonly [bigint] }
   | { __kind: "Pubkey"; fields: readonly [Address] }
   | { __kind: "ElevationGroup"; fields: readonly [ElevationGroup] }
-  | { __kind: "Name"; fields: readonly [number[]] };
+  | { __kind: "Name"; fields: readonly [Array<number>] };
 
 export type UpdateLendingMarketConfigValueArgs =
   | { __kind: "Bool"; fields: readonly [boolean] }
   | { __kind: "U8"; fields: readonly [number] }
-  | { __kind: "U8Array"; fields: readonly [number[]] }
+  | { __kind: "U8Array"; fields: readonly [Array<number>] }
   | { __kind: "U16"; fields: readonly [number] }
   | { __kind: "U64"; fields: readonly [number | bigint] }
   | { __kind: "U128"; fields: readonly [number | bigint] }
   | { __kind: "Pubkey"; fields: readonly [Address] }
   | { __kind: "ElevationGroup"; fields: readonly [ElevationGroupArgs] }
-  | { __kind: "Name"; fields: readonly [number[]] };
+  | { __kind: "Name"; fields: readonly [Array<number>] };
 
 export function getUpdateLendingMarketConfigValueEncoder(): Encoder<UpdateLendingMarketConfigValueArgs> {
   return getDiscriminatedUnionEncoder([

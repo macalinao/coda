@@ -6,28 +6,28 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** Unauthorized: Unauthorized. */
-export const QUARRY_MERGE_MINE_ERROR__UNAUTHORIZED = 0x17_70; // 6000
+export const QUARRY_MERGE_MINE_ERROR__UNAUTHORIZED = 0x1770; // 6000
 /** InsufficientBalance: Insufficient balance. */
-export const QUARRY_MERGE_MINE_ERROR__INSUFFICIENT_BALANCE = 0x17_71; // 6001
+export const QUARRY_MERGE_MINE_ERROR__INSUFFICIENT_BALANCE = 0x1771; // 6001
 /** InvalidMiner: Invalid miner for the given quarry. */
-export const QUARRY_MERGE_MINE_ERROR__INVALID_MINER = 0x17_72; // 6002
+export const QUARRY_MERGE_MINE_ERROR__INVALID_MINER = 0x1772; // 6002
 /** CannotWithdrawReplicaMint: Cannot withdraw a replica mint. */
-export const QUARRY_MERGE_MINE_ERROR__CANNOT_WITHDRAW_REPLICA_MINT = 0x17_73; // 6003
+export const QUARRY_MERGE_MINE_ERROR__CANNOT_WITHDRAW_REPLICA_MINT = 0x1773; // 6003
 /** OutstandingReplicaTokens: User must first withdraw from all replica quarries. */
-export const QUARRY_MERGE_MINE_ERROR__OUTSTANDING_REPLICA_TOKENS = 0x17_74; // 6004
+export const QUARRY_MERGE_MINE_ERROR__OUTSTANDING_REPLICA_TOKENS = 0x1774; // 6004
 /** ReplicaDecimalsMismatch: The replica mint must have the same number of decimals as the primary mint. */
-export const QUARRY_MERGE_MINE_ERROR__REPLICA_DECIMALS_MISMATCH = 0x17_75; // 6005
+export const QUARRY_MERGE_MINE_ERROR__REPLICA_DECIMALS_MISMATCH = 0x1775; // 6005
 /** ReplicaNonZeroSupply: The replica mint must have zero supply. */
-export const QUARRY_MERGE_MINE_ERROR__REPLICA_NON_ZERO_SUPPLY = 0x17_76; // 6006
+export const QUARRY_MERGE_MINE_ERROR__REPLICA_NON_ZERO_SUPPLY = 0x1776; // 6006
 
 export type QuarryMergeMineError =
   | typeof QUARRY_MERGE_MINE_ERROR__CANNOT_WITHDRAW_REPLICA_MINT
@@ -41,27 +41,22 @@ export type QuarryMergeMineError =
 let quarryMergeMineErrorMessages:
   | Record<QuarryMergeMineError, string>
   | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   quarryMergeMineErrorMessages = {
-    [QUARRY_MERGE_MINE_ERROR__CANNOT_WITHDRAW_REPLICA_MINT]:
-      "Cannot withdraw a replica mint.",
-    [QUARRY_MERGE_MINE_ERROR__INSUFFICIENT_BALANCE]: "Insufficient balance.",
-    [QUARRY_MERGE_MINE_ERROR__INVALID_MINER]:
-      "Invalid miner for the given quarry.",
-    [QUARRY_MERGE_MINE_ERROR__OUTSTANDING_REPLICA_TOKENS]:
-      "User must first withdraw from all replica quarries.",
-    [QUARRY_MERGE_MINE_ERROR__REPLICA_DECIMALS_MISMATCH]:
-      "The replica mint must have the same number of decimals as the primary mint.",
-    [QUARRY_MERGE_MINE_ERROR__REPLICA_NON_ZERO_SUPPLY]:
-      "The replica mint must have zero supply.",
-    [QUARRY_MERGE_MINE_ERROR__UNAUTHORIZED]: "Unauthorized.",
+    [QUARRY_MERGE_MINE_ERROR__CANNOT_WITHDRAW_REPLICA_MINT]: `Cannot withdraw a replica mint.`,
+    [QUARRY_MERGE_MINE_ERROR__INSUFFICIENT_BALANCE]: `Insufficient balance.`,
+    [QUARRY_MERGE_MINE_ERROR__INVALID_MINER]: `Invalid miner for the given quarry.`,
+    [QUARRY_MERGE_MINE_ERROR__OUTSTANDING_REPLICA_TOKENS]: `User must first withdraw from all replica quarries.`,
+    [QUARRY_MERGE_MINE_ERROR__REPLICA_DECIMALS_MISMATCH]: `The replica mint must have the same number of decimals as the primary mint.`,
+    [QUARRY_MERGE_MINE_ERROR__REPLICA_NON_ZERO_SUPPLY]: `The replica mint must have zero supply.`,
+    [QUARRY_MERGE_MINE_ERROR__UNAUTHORIZED]: `Unauthorized.`,
   };
 }
 
 export function getQuarryMergeMineErrorMessage(
   code: QuarryMergeMineError,
 ): string {
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env["NODE_ENV"] !== "production") {
     return (
       quarryMergeMineErrorMessages as Record<QuarryMergeMineError, string>
     )[code];

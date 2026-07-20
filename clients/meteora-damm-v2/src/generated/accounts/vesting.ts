@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -36,15 +23,26 @@ import {
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const VESTING_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -55,7 +53,7 @@ export function getVestingDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(VESTING_DISCRIMINATOR);
 }
 
-export interface Vesting {
+export type Vesting = {
   discriminator: ReadonlyUint8Array;
   position: Address;
   cliffPoint: bigint;
@@ -64,11 +62,11 @@ export interface Vesting {
   liquidityPerPeriod: bigint;
   totalReleasedLiquidity: bigint;
   numberOfPeriod: number;
-  padding: number[];
-  padding2: bigint[];
-}
+  padding: Array<number>;
+  padding2: Array<bigint>;
+};
 
-export interface VestingArgs {
+export type VestingArgs = {
   position: Address;
   cliffPoint: number | bigint;
   periodFrequency: number | bigint;
@@ -76,9 +74,9 @@ export interface VestingArgs {
   liquidityPerPeriod: number | bigint;
   totalReleasedLiquidity: number | bigint;
   numberOfPeriod: number;
-  padding: number[];
+  padding: Array<number>;
   padding2: Array<number | bigint>;
-}
+};
 
 /** Gets the encoder for {@link VestingArgs} account data. */
 export function getVestingEncoder(): FixedSizeEncoder<VestingArgs> {
@@ -156,7 +154,7 @@ export async function fetchMaybeVesting<TAddress extends string = string>(
 
 export async function fetchAllVesting(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Vesting>[]> {
   const maybeAccounts = await fetchAllMaybeVesting(rpc, addresses, config);
@@ -166,7 +164,7 @@ export async function fetchAllVesting(
 
 export async function fetchAllMaybeVesting(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Vesting>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

@@ -6,24 +6,22 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  OptionOrNullable,
-  ProgramDerivedAddress,
-} from "@solana/kit";
 import {
   address,
   getAddressEncoder,
   getOptionEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type OptionOrNullable,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface WhitelistSeeds {
+export type WhitelistSeeds = {
   locker: Address;
   programId: Address;
   owner: OptionOrNullable<Address>;
-}
+};
 
 /** Whitelist entry for a program that can interact with the locker */
 export async function findWhitelistPda(

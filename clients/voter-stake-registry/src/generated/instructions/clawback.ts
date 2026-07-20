@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const CLAWBACK_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -50,14 +50,14 @@ export function getClawbackDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type ClawbackInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
-  TAccountRegistrar extends string | AccountMeta = string,
-  TAccountRealmAuthority extends string | AccountMeta = string,
-  TAccountVoter extends string | AccountMeta = string,
-  TAccountVault extends string | AccountMeta = string,
-  TAccountDestination extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountRegistrar extends string | AccountMeta<string> = string,
+  TAccountRealmAuthority extends string | AccountMeta<string> = string,
+  TAccountVoter extends string | AccountMeta<string> = string,
+  TAccountVault extends string | AccountMeta<string> = string,
+  TAccountDestination extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -85,14 +85,12 @@ export type ClawbackInstruction<
     ]
   >;
 
-export interface ClawbackInstructionData {
+export type ClawbackInstructionData = {
   discriminator: ReadonlyUint8Array;
   depositEntryIndex: number;
-}
+};
 
-export interface ClawbackInstructionDataArgs {
-  depositEntryIndex: number;
-}
+export type ClawbackInstructionDataArgs = { depositEntryIndex: number };
 
 export function getClawbackInstructionDataEncoder(): FixedSizeEncoder<ClawbackInstructionDataArgs> {
   return transformEncoder(
@@ -121,14 +119,14 @@ export function getClawbackInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClawbackInput<
+export type ClawbackInput<
   TAccountRegistrar extends string = string,
   TAccountRealmAuthority extends string = string,
   TAccountVoter extends string = string,
   TAccountVault extends string = string,
   TAccountDestination extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   registrar: Address<TAccountRegistrar>;
   realmAuthority: TransactionSigner<TAccountRealmAuthority>;
   voter: Address<TAccountVoter>;
@@ -136,7 +134,7 @@ export interface ClawbackInput<
   destination: Address<TAccountDestination>;
   tokenProgram?: Address<TAccountTokenProgram>;
   depositEntryIndex: ClawbackInstructionDataArgs["depositEntryIndex"];
-}
+};
 
 export function getClawbackInstruction<
   TAccountRegistrar extends string,
@@ -217,10 +215,10 @@ export function getClawbackInstruction<
   >);
 }
 
-export interface ParsedClawbackInstruction<
+export type ParsedClawbackInstruction<
   TProgram extends string = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     registrar: TAccountMetas[0];
@@ -231,7 +229,7 @@ export interface ParsedClawbackInstruction<
     tokenProgram: TAccountMetas[5];
   };
   data: ClawbackInstructionData;
-}
+};
 
 export function parseClawbackInstruction<
   TProgram extends string,

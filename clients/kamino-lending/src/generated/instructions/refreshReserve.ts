@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,8 +17,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REFRESH_RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
@@ -47,13 +47,13 @@ export function getRefreshReserveDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RefreshReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountReserve extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountPythOracle extends string | AccountMeta = string,
-  TAccountSwitchboardPriceOracle extends string | AccountMeta = string,
-  TAccountSwitchboardTwapOracle extends string | AccountMeta = string,
-  TAccountScopePrices extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountPythOracle extends string | AccountMeta<string> = string,
+  TAccountSwitchboardPriceOracle extends string | AccountMeta<string> = string,
+  TAccountSwitchboardTwapOracle extends string | AccountMeta<string> = string,
+  TAccountScopePrices extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -80,9 +80,9 @@ export type RefreshReserveInstruction<
     ]
   >;
 
-export interface RefreshReserveInstructionData {
+export type RefreshReserveInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type RefreshReserveInstructionDataArgs = {};
 
@@ -109,21 +109,21 @@ export function getRefreshReserveInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RefreshReserveInput<
+export type RefreshReserveInput<
   TAccountReserve extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountPythOracle extends string = string,
   TAccountSwitchboardPriceOracle extends string = string,
   TAccountSwitchboardTwapOracle extends string = string,
   TAccountScopePrices extends string = string,
-> {
+> = {
   reserve: Address<TAccountReserve>;
   lendingMarket: Address<TAccountLendingMarket>;
   pythOracle?: Address<TAccountPythOracle>;
   switchboardPriceOracle?: Address<TAccountSwitchboardPriceOracle>;
   switchboardTwapOracle?: Address<TAccountSwitchboardTwapOracle>;
   scopePrices?: Address<TAccountScopePrices>;
-}
+};
 
 export function getRefreshReserveInstruction<
   TAccountReserve extends string,
@@ -199,10 +199,10 @@ export function getRefreshReserveInstruction<
   >);
 }
 
-export interface ParsedRefreshReserveInstruction<
+export type ParsedRefreshReserveInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     reserve: TAccountMetas[0];
@@ -213,7 +213,7 @@ export interface ParsedRefreshReserveInstruction<
     scopePrices?: TAccountMetas[5] | undefined;
   };
   data: RefreshReserveInstructionData;
-}
+};
 
 export function parseRefreshReserveInstruction<
   TProgram extends string,

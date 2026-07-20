@@ -6,24 +6,24 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  SolanaError,
+import {
+  isProgramError,
+  type Address,
+  type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  type SolanaError,
 } from "@solana/kit";
-import { isProgramError } from "@solana/kit";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
 
 /** InvalidVoteSide: Invalid vote side. */
-export const GOVERN_ERROR__INVALID_VOTE_SIDE = 0x17_70; // 6000
+export const GOVERN_ERROR__INVALID_VOTE_SIDE = 0x1770; // 6000
 /** GovernorNotFound: The owner of the smart wallet doesn't match with current. */
-export const GOVERN_ERROR__GOVERNOR_NOT_FOUND = 0x17_71; // 6001
+export const GOVERN_ERROR__GOVERNOR_NOT_FOUND = 0x1771; // 6001
 /** VotingDelayNotMet: The proposal cannot be activated since it has not yet passed the voting delay. */
-export const GOVERN_ERROR__VOTING_DELAY_NOT_MET = 0x17_72; // 6002
+export const GOVERN_ERROR__VOTING_DELAY_NOT_MET = 0x1772; // 6002
 /** ProposalNotDraft: Only drafts can be canceled. */
-export const GOVERN_ERROR__PROPOSAL_NOT_DRAFT = 0x17_73; // 6003
+export const GOVERN_ERROR__PROPOSAL_NOT_DRAFT = 0x1773; // 6003
 /** ProposalNotActive: The proposal must be active. */
-export const GOVERN_ERROR__PROPOSAL_NOT_ACTIVE = 0x17_74; // 6004
+export const GOVERN_ERROR__PROPOSAL_NOT_ACTIVE = 0x1774; // 6004
 
 export type GovernError =
   | typeof GOVERN_ERROR__GOVERNOR_NOT_FOUND
@@ -33,20 +33,19 @@ export type GovernError =
   | typeof GOVERN_ERROR__VOTING_DELAY_NOT_MET;
 
 let governErrorMessages: Record<GovernError, string> | undefined;
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   governErrorMessages = {
     [GOVERN_ERROR__GOVERNOR_NOT_FOUND]: `The owner of the smart wallet doesn't match with current.`,
-    [GOVERN_ERROR__INVALID_VOTE_SIDE]: "Invalid vote side.",
-    [GOVERN_ERROR__PROPOSAL_NOT_ACTIVE]: "The proposal must be active.",
-    [GOVERN_ERROR__PROPOSAL_NOT_DRAFT]: "Only drafts can be canceled.",
-    [GOVERN_ERROR__VOTING_DELAY_NOT_MET]:
-      "The proposal cannot be activated since it has not yet passed the voting delay.",
+    [GOVERN_ERROR__INVALID_VOTE_SIDE]: `Invalid vote side.`,
+    [GOVERN_ERROR__PROPOSAL_NOT_ACTIVE]: `The proposal must be active.`,
+    [GOVERN_ERROR__PROPOSAL_NOT_DRAFT]: `Only drafts can be canceled.`,
+    [GOVERN_ERROR__VOTING_DELAY_NOT_MET]: `The proposal cannot be activated since it has not yet passed the voting delay.`,
   };
 }
 
 export function getGovernErrorMessage(code: GovernError): string {
-  if (process.env.NODE_ENV !== "production") {
-    return governErrorMessages![code];
+  if (process.env["NODE_ENV"] !== "production") {
+    return (governErrorMessages as Record<GovernError, string>)[code];
   }
 
   return "Error message not available in production bundles.";

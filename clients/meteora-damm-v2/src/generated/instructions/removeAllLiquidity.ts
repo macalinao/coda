@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,10 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -132,16 +130,16 @@ export type RemoveAllLiquidityInstruction<
     ]
   >;
 
-export interface RemoveAllLiquidityInstructionData {
+export type RemoveAllLiquidityInstructionData = {
   discriminator: ReadonlyUint8Array;
   tokenAAmountThreshold: bigint;
   tokenBAmountThreshold: bigint;
-}
+};
 
-export interface RemoveAllLiquidityInstructionDataArgs {
+export type RemoveAllLiquidityInstructionDataArgs = {
   tokenAAmountThreshold: number | bigint;
   tokenBAmountThreshold: number | bigint;
-}
+};
 
 export function getRemoveAllLiquidityInstructionDataEncoder(): FixedSizeEncoder<RemoveAllLiquidityInstructionDataArgs> {
   return transformEncoder(
@@ -175,7 +173,7 @@ export function getRemoveAllLiquidityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RemoveAllLiquidityAsyncInput<
+export type RemoveAllLiquidityAsyncInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -191,7 +189,7 @@ export interface RemoveAllLiquidityAsyncInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority?: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -219,7 +217,7 @@ export interface RemoveAllLiquidityAsyncInput<
   program?: Address<TAccountProgram>;
   tokenAAmountThreshold: RemoveAllLiquidityInstructionDataArgs["tokenAAmountThreshold"];
   tokenBAmountThreshold: RemoveAllLiquidityInstructionDataArgs["tokenBAmountThreshold"];
-}
+};
 
 export async function getRemoveAllLiquidityInstructionAsync<
   TAccountPoolAuthority extends string,
@@ -396,7 +394,7 @@ export async function getRemoveAllLiquidityInstructionAsync<
   >);
 }
 
-export interface RemoveAllLiquidityInput<
+export type RemoveAllLiquidityInput<
   TAccountPoolAuthority extends string = string,
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
@@ -412,7 +410,7 @@ export interface RemoveAllLiquidityInput<
   TAccountTokenBProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   poolAuthority: Address<TAccountPoolAuthority>;
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
@@ -440,7 +438,7 @@ export interface RemoveAllLiquidityInput<
   program?: Address<TAccountProgram>;
   tokenAAmountThreshold: RemoveAllLiquidityInstructionDataArgs["tokenAAmountThreshold"];
   tokenBAmountThreshold: RemoveAllLiquidityInstructionDataArgs["tokenBAmountThreshold"];
-}
+};
 
 export function getRemoveAllLiquidityInstruction<
   TAccountPoolAuthority extends string,
@@ -585,10 +583,10 @@ export function getRemoveAllLiquidityInstruction<
   >);
 }
 
-export interface ParsedRemoveAllLiquidityInstruction<
+export type ParsedRemoveAllLiquidityInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     poolAuthority: TAccountMetas[0];
@@ -618,7 +616,7 @@ export interface ParsedRemoveAllLiquidityInstruction<
     program: TAccountMetas[14];
   };
   data: RemoveAllLiquidityInstructionData;
-}
+};
 
 export function parseRemoveAllLiquidityInstruction<
   TProgram extends string,

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_REWARD_EMISSIONS_SUPER_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -49,11 +49,13 @@ export function getSetRewardEmissionsSuperAuthorityDiscriminatorBytes(): Readonl
 
 export type SetRewardEmissionsSuperAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountRewardEmissionsSuperAuthority extends string | AccountMeta = string,
-  TAccountNewRewardEmissionsSuperAuthority extends string | AccountMeta =
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountRewardEmissionsSuperAuthority extends string | AccountMeta<string> =
     string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountNewRewardEmissionsSuperAuthority extends
+    | string
+    | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -72,9 +74,9 @@ export type SetRewardEmissionsSuperAuthorityInstruction<
     ]
   >;
 
-export interface SetRewardEmissionsSuperAuthorityInstructionData {
+export type SetRewardEmissionsSuperAuthorityInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type SetRewardEmissionsSuperAuthorityInstructionDataArgs = {};
 
@@ -104,15 +106,15 @@ export function getSetRewardEmissionsSuperAuthorityInstructionDataCodec(): Fixed
   );
 }
 
-export interface SetRewardEmissionsSuperAuthorityInput<
+export type SetRewardEmissionsSuperAuthorityInput<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountRewardEmissionsSuperAuthority extends string = string,
   TAccountNewRewardEmissionsSuperAuthority extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   rewardEmissionsSuperAuthority: TransactionSigner<TAccountRewardEmissionsSuperAuthority>;
   newRewardEmissionsSuperAuthority: Address<TAccountNewRewardEmissionsSuperAuthority>;
-}
+};
 
 export function getSetRewardEmissionsSuperAuthorityInstruction<
   TAccountWhirlpoolsConfig extends string,
@@ -180,10 +182,10 @@ export function getSetRewardEmissionsSuperAuthorityInstruction<
   >);
 }
 
-export interface ParsedSetRewardEmissionsSuperAuthorityInstruction<
+export type ParsedSetRewardEmissionsSuperAuthorityInstruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -191,7 +193,7 @@ export interface ParsedSetRewardEmissionsSuperAuthorityInstruction<
     newRewardEmissionsSuperAuthority: TAccountMetas[2];
   };
   data: SetRewardEmissionsSuperAuthorityInstructionData;
-}
+};
 
 export function parseSetRewardEmissionsSuperAuthorityInstruction<
   TProgram extends string,

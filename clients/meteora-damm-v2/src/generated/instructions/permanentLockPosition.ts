@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.js";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
 
@@ -87,14 +87,14 @@ export type PermanentLockPositionInstruction<
     ]
   >;
 
-export interface PermanentLockPositionInstructionData {
+export type PermanentLockPositionInstructionData = {
   discriminator: ReadonlyUint8Array;
   permanentLockLiquidity: bigint;
-}
+};
 
-export interface PermanentLockPositionInstructionDataArgs {
+export type PermanentLockPositionInstructionDataArgs = {
   permanentLockLiquidity: number | bigint;
-}
+};
 
 export function getPermanentLockPositionInstructionDataEncoder(): FixedSizeEncoder<PermanentLockPositionInstructionDataArgs> {
   return transformEncoder(
@@ -126,14 +126,14 @@ export function getPermanentLockPositionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface PermanentLockPositionAsyncInput<
+export type PermanentLockPositionAsyncInput<
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
   TAccountPositionNftAccount extends string = string,
   TAccountOwner extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   /** The token account for nft */
@@ -143,7 +143,7 @@ export interface PermanentLockPositionAsyncInput<
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   permanentLockLiquidity: PermanentLockPositionInstructionDataArgs["permanentLockLiquidity"];
-}
+};
 
 export async function getPermanentLockPositionInstructionAsync<
   TAccountPool extends string,
@@ -231,14 +231,14 @@ export async function getPermanentLockPositionInstructionAsync<
   >);
 }
 
-export interface PermanentLockPositionInput<
+export type PermanentLockPositionInput<
   TAccountPool extends string = string,
   TAccountPosition extends string = string,
   TAccountPositionNftAccount extends string = string,
   TAccountOwner extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   pool: Address<TAccountPool>;
   position: Address<TAccountPosition>;
   /** The token account for nft */
@@ -248,7 +248,7 @@ export interface PermanentLockPositionInput<
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
   permanentLockLiquidity: PermanentLockPositionInstructionDataArgs["permanentLockLiquidity"];
-}
+};
 
 export function getPermanentLockPositionInstruction<
   TAccountPool extends string,
@@ -331,10 +331,10 @@ export function getPermanentLockPositionInstruction<
   >);
 }
 
-export interface ParsedPermanentLockPositionInstruction<
+export type ParsedPermanentLockPositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     pool: TAccountMetas[0];
@@ -347,7 +347,7 @@ export interface ParsedPermanentLockPositionInstruction<
     program: TAccountMetas[5];
   };
   data: PermanentLockPositionInstructionData;
-}
+};
 
 export function parsePermanentLockPositionInstruction<
   TProgram extends string,

@@ -6,22 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface WhirlpoolBumps {
-  whirlpoolBump: number;
-}
+export type WhirlpoolBumps = { whirlpoolBump: number };
 
 export type WhirlpoolBumpsArgs = WhirlpoolBumps;
 

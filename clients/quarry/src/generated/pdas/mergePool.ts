@@ -6,16 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface MergePoolSeeds {
+export type MergePoolSeeds = {
   primaryMint: Address;
-}
+};
 
 /** Merge pool that allows staking multiple quarry rewards as one */
 export async function findMergePoolPda(

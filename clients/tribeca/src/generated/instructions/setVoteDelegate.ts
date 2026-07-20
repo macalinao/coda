@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,8 +19,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const SET_VOTE_DELEGATE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -50,9 +50,9 @@ export function getSetVoteDelegateDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type SetVoteDelegateInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
-  TAccountEscrow extends string | AccountMeta = string,
-  TAccountEscrowOwner extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountEscrow extends string | AccountMeta<string> = string,
+  TAccountEscrowOwner extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -68,14 +68,12 @@ export type SetVoteDelegateInstruction<
     ]
   >;
 
-export interface SetVoteDelegateInstructionData {
+export type SetVoteDelegateInstructionData = {
   discriminator: ReadonlyUint8Array;
   newDelegate: Address;
-}
+};
 
-export interface SetVoteDelegateInstructionDataArgs {
-  newDelegate: Address;
-}
+export type SetVoteDelegateInstructionDataArgs = { newDelegate: Address };
 
 export function getSetVoteDelegateInstructionDataEncoder(): FixedSizeEncoder<SetVoteDelegateInstructionDataArgs> {
   return transformEncoder(
@@ -104,14 +102,14 @@ export function getSetVoteDelegateInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface SetVoteDelegateInput<
+export type SetVoteDelegateInput<
   TAccountEscrow extends string = string,
   TAccountEscrowOwner extends string = string,
-> {
+> = {
   escrow: Address<TAccountEscrow>;
   escrowOwner: TransactionSigner<TAccountEscrowOwner>;
   newDelegate: SetVoteDelegateInstructionDataArgs["newDelegate"];
-}
+};
 
 export function getSetVoteDelegateInstruction<
   TAccountEscrow extends string,
@@ -158,17 +156,17 @@ export function getSetVoteDelegateInstruction<
   >);
 }
 
-export interface ParsedSetVoteDelegateInstruction<
+export type ParsedSetVoteDelegateInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     escrow: TAccountMetas[0];
     escrowOwner: TAccountMetas[1];
   };
   data: SetVoteDelegateInstructionData;
-}
+};
 
 export function parseSetVoteDelegateInstruction<
   TProgram extends string,

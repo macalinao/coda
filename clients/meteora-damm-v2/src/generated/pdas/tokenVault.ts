@@ -6,19 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface TokenVaultSeeds {
+export type TokenVaultSeeds = {
   /** The token mint address */
   tokenMint: Address;
   /** The pool address */
   pool: Address;
-}
+};
 
 /**
  * A token vault account that holds tokens for a specific pool.

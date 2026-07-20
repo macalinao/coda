@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface FarmVaultSeeds {
+export type FarmVaultSeeds = {
   farmState: Address;
   tokenMint: Address;
-}
+};
 
 export async function findFarmVaultPda(
   seeds: FarmVaultSeeds,

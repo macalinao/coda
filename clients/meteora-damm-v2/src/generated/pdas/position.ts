@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface PositionSeeds {
+export type PositionSeeds = {
   /** The position NFT mint address */
   positionNft: Address;
-}
+};
 
 /**
  * A liquidity position account that tracks a user's deposited liquidity.

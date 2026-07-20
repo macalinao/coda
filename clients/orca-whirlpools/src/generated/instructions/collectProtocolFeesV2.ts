@@ -6,29 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  RemainingAccountsInfo,
-  RemainingAccountsInfoArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -42,12 +19,33 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
+  type RemainingAccountsInfo,
+  type RemainingAccountsInfoArgs,
 } from "../types/index.js";
 
 export const COLLECT_PROTOCOL_FEES_V2_DISCRIMINATOR: ReadonlyUint8Array =
@@ -61,20 +59,21 @@ export function getCollectProtocolFeesV2DiscriminatorBytes(): ReadonlyUint8Array
 
 export type CollectProtocolFeesV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
-  TAccountWhirlpoolsConfig extends string | AccountMeta = string,
-  TAccountWhirlpool extends string | AccountMeta = string,
-  TAccountCollectProtocolFeesAuthority extends string | AccountMeta = string,
-  TAccountTokenMintA extends string | AccountMeta = string,
-  TAccountTokenMintB extends string | AccountMeta = string,
-  TAccountTokenVaultA extends string | AccountMeta = string,
-  TAccountTokenVaultB extends string | AccountMeta = string,
-  TAccountTokenDestinationA extends string | AccountMeta = string,
-  TAccountTokenDestinationB extends string | AccountMeta = string,
-  TAccountTokenProgramA extends string | AccountMeta = string,
-  TAccountTokenProgramB extends string | AccountMeta = string,
-  TAccountMemoProgram extends string | AccountMeta =
+  TAccountWhirlpoolsConfig extends string | AccountMeta<string> = string,
+  TAccountWhirlpool extends string | AccountMeta<string> = string,
+  TAccountCollectProtocolFeesAuthority extends string | AccountMeta<string> =
+    string,
+  TAccountTokenMintA extends string | AccountMeta<string> = string,
+  TAccountTokenMintB extends string | AccountMeta<string> = string,
+  TAccountTokenVaultA extends string | AccountMeta<string> = string,
+  TAccountTokenVaultB extends string | AccountMeta<string> = string,
+  TAccountTokenDestinationA extends string | AccountMeta<string> = string,
+  TAccountTokenDestinationB extends string | AccountMeta<string> = string,
+  TAccountTokenProgramA extends string | AccountMeta<string> = string,
+  TAccountTokenProgramB extends string | AccountMeta<string> = string,
+  TAccountMemoProgram extends string | AccountMeta<string> =
     "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -120,14 +119,14 @@ export type CollectProtocolFeesV2Instruction<
     ]
   >;
 
-export interface CollectProtocolFeesV2InstructionData {
+export type CollectProtocolFeesV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   remainingAccountsInfo: Option<RemainingAccountsInfo>;
-}
+};
 
-export interface CollectProtocolFeesV2InstructionDataArgs {
+export type CollectProtocolFeesV2InstructionDataArgs = {
   remainingAccountsInfo: OptionOrNullable<RemainingAccountsInfoArgs>;
-}
+};
 
 export function getCollectProtocolFeesV2InstructionDataEncoder(): Encoder<CollectProtocolFeesV2InstructionDataArgs> {
   return transformEncoder(
@@ -165,7 +164,7 @@ export function getCollectProtocolFeesV2InstructionDataCodec(): Codec<
   );
 }
 
-export interface CollectProtocolFeesV2Input<
+export type CollectProtocolFeesV2Input<
   TAccountWhirlpoolsConfig extends string = string,
   TAccountWhirlpool extends string = string,
   TAccountCollectProtocolFeesAuthority extends string = string,
@@ -178,7 +177,7 @@ export interface CollectProtocolFeesV2Input<
   TAccountTokenProgramA extends string = string,
   TAccountTokenProgramB extends string = string,
   TAccountMemoProgram extends string = string,
-> {
+> = {
   whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
   whirlpool: Address<TAccountWhirlpool>;
   collectProtocolFeesAuthority: TransactionSigner<TAccountCollectProtocolFeesAuthority>;
@@ -192,7 +191,7 @@ export interface CollectProtocolFeesV2Input<
   tokenProgramB: Address<TAccountTokenProgramB>;
   memoProgram?: Address<TAccountMemoProgram>;
   remainingAccountsInfo: CollectProtocolFeesV2InstructionDataArgs["remainingAccountsInfo"];
-}
+};
 
 export function getCollectProtocolFeesV2Instruction<
   TAccountWhirlpoolsConfig extends string,
@@ -323,10 +322,10 @@ export function getCollectProtocolFeesV2Instruction<
   >);
 }
 
-export interface ParsedCollectProtocolFeesV2Instruction<
+export type ParsedCollectProtocolFeesV2Instruction<
   TProgram extends string = typeof WHIRLPOOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     whirlpoolsConfig: TAccountMetas[0];
@@ -343,7 +342,7 @@ export interface ParsedCollectProtocolFeesV2Instruction<
     memoProgram: TAccountMetas[11];
   };
   data: CollectProtocolFeesV2InstructionData;
-}
+};
 
 export function parseCollectProtocolFeesV2Instruction<
   TProgram extends string,

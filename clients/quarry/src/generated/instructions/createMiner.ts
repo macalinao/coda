@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,10 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMinerPda } from "../pdas/index.js";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -106,14 +104,12 @@ export type CreateMinerInstruction<
     ]
   >;
 
-export interface CreateMinerInstructionData {
+export type CreateMinerInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface CreateMinerInstructionDataArgs {
-  bump: number;
-}
+export type CreateMinerInstructionDataArgs = { bump: number };
 
 export function getCreateMinerInstructionDataEncoder(): FixedSizeEncoder<CreateMinerInstructionDataArgs> {
   return transformEncoder(
@@ -142,7 +138,7 @@ export function getCreateMinerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface CreateMinerAsyncInput<
+export type CreateMinerAsyncInput<
   TAccountAuthority extends string = string,
   TAccountMiner extends string = string,
   TAccountQuarry extends string = string,
@@ -152,7 +148,7 @@ export interface CreateMinerAsyncInput<
   TAccountTokenMint extends string = string,
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   miner?: Address<TAccountMiner>;
   quarry: Address<TAccountQuarry>;
@@ -163,7 +159,7 @@ export interface CreateMinerAsyncInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   bump: CreateMinerInstructionDataArgs["bump"];
-}
+};
 
 export async function getCreateMinerInstructionAsync<
   TAccountAuthority extends string,
@@ -279,7 +275,7 @@ export async function getCreateMinerInstructionAsync<
   >);
 }
 
-export interface CreateMinerInput<
+export type CreateMinerInput<
   TAccountAuthority extends string = string,
   TAccountMiner extends string = string,
   TAccountQuarry extends string = string,
@@ -289,7 +285,7 @@ export interface CreateMinerInput<
   TAccountTokenMint extends string = string,
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   miner: Address<TAccountMiner>;
   quarry: Address<TAccountQuarry>;
@@ -300,7 +296,7 @@ export interface CreateMinerInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   bump: CreateMinerInstructionDataArgs["bump"];
-}
+};
 
 export function getCreateMinerInstruction<
   TAccountAuthority extends string,
@@ -402,10 +398,10 @@ export function getCreateMinerInstruction<
   >);
 }
 
-export interface ParsedCreateMinerInstruction<
+export type ParsedCreateMinerInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     authority: TAccountMetas[0];
@@ -419,7 +415,7 @@ export interface ParsedCreateMinerInstruction<
     tokenProgram: TAccountMetas[8];
   };
   data: CreateMinerInstructionData;
-}
+};
 
 export function parseCreateMinerInstruction<
   TProgram extends string,

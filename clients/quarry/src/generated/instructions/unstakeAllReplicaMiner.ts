@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   address,
   combineCodec,
@@ -37,10 +20,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findMergeMinerPda,
@@ -114,9 +112,9 @@ export type UnstakeAllReplicaMinerInstruction<
     ]
   >;
 
-export interface UnstakeAllReplicaMinerInstructionData {
+export type UnstakeAllReplicaMinerInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type UnstakeAllReplicaMinerInstructionDataArgs = {};
 
@@ -146,7 +144,7 @@ export function getUnstakeAllReplicaMinerInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UnstakeAllReplicaMinerAsyncInput<
+export type UnstakeAllReplicaMinerAsyncInput<
   TAccountMmOwner extends string = string,
   TAccountReplicaMint extends string = string,
   TAccountReplicaMintTokenAccount extends string = string,
@@ -158,7 +156,7 @@ export interface UnstakeAllReplicaMinerAsyncInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mmOwner: TransactionSigner<TAccountMmOwner>;
   replicaMint?: Address<TAccountReplicaMint>;
   replicaMintTokenAccount?: Address<TAccountReplicaMintTokenAccount>;
@@ -170,7 +168,7 @@ export interface UnstakeAllReplicaMinerAsyncInput<
   minerVault?: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export async function getUnstakeAllReplicaMinerInstructionAsync<
   TAccountMmOwner extends string,
@@ -363,7 +361,7 @@ export async function getUnstakeAllReplicaMinerInstructionAsync<
   >);
 }
 
-export interface UnstakeAllReplicaMinerInput<
+export type UnstakeAllReplicaMinerInput<
   TAccountMmOwner extends string = string,
   TAccountReplicaMint extends string = string,
   TAccountReplicaMintTokenAccount extends string = string,
@@ -375,7 +373,7 @@ export interface UnstakeAllReplicaMinerInput<
   TAccountMinerVault extends string = string,
   TAccountTokenProgram extends string = string,
   TAccountMineProgram extends string = string,
-> {
+> = {
   mmOwner: TransactionSigner<TAccountMmOwner>;
   replicaMint: Address<TAccountReplicaMint>;
   replicaMintTokenAccount: Address<TAccountReplicaMintTokenAccount>;
@@ -387,7 +385,7 @@ export interface UnstakeAllReplicaMinerInput<
   minerVault: Address<TAccountMinerVault>;
   tokenProgram?: Address<TAccountTokenProgram>;
   mineProgram?: Address<TAccountMineProgram>;
-}
+};
 
 export function getUnstakeAllReplicaMinerInstruction<
   TAccountMmOwner extends string,
@@ -503,10 +501,10 @@ export function getUnstakeAllReplicaMinerInstruction<
   >);
 }
 
-export interface ParsedUnstakeAllReplicaMinerInstruction<
+export type ParsedUnstakeAllReplicaMinerInstruction<
   TProgram extends string = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mmOwner: TAccountMetas[0];
@@ -522,7 +520,7 @@ export interface ParsedUnstakeAllReplicaMinerInstruction<
     mineProgram: TAccountMetas[10];
   };
   data: UnstakeAllReplicaMinerInstructionData;
-}
+};
 
 export function parseUnstakeAllReplicaMinerInstruction<
   TProgram extends string,

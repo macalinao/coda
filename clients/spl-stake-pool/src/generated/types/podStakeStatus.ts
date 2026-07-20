@@ -6,27 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /**
  * Wrapper struct that can be `Pod`, containing a byte that *should* be a valid
  * `StakeStatus` underneath.
  */
-export interface PodStakeStatus {
+export type PodStakeStatus = {
   /** Pod stake status */
   status: number;
-}
+};
 
 export type PodStakeStatusArgs = PodStakeStatus;
 

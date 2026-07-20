@@ -6,17 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface MergeMinerSeeds {
+export type MergeMinerSeeds = {
   pool: Address;
   owner: Address;
-}
+};
 
 /** Merge miner account for a user in a merge pool */
 export async function findMergeMinerPda(

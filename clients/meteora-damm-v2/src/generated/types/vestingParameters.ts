@@ -6,42 +6,40 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
 import {
   combineCodec,
   getOptionDecoder,
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 
-export interface VestingParameters {
+export type VestingParameters = {
   cliffPoint: Option<bigint>;
   periodFrequency: bigint;
   cliffUnlockLiquidity: bigint;
   liquidityPerPeriod: bigint;
   numberOfPeriod: number;
-}
+};
 
-export interface VestingParametersArgs {
+export type VestingParametersArgs = {
   cliffPoint: OptionOrNullable<number | bigint>;
   periodFrequency: number | bigint;
   cliffUnlockLiquidity: number | bigint;
   liquidityPerPeriod: number | bigint;
   numberOfPeriod: number;
-}
+};
 
 export function getVestingParametersEncoder(): Encoder<VestingParametersArgs> {
   return getStructEncoder([

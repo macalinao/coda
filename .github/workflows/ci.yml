@@ -41,6 +41,14 @@ jobs:
       - name: Build all packages
         run: bun run build:ci
 
+      # build:ci excludes apps/docs, and bun install does not run the
+      # apps/docs postinstall, so the Next.js typegen output (.next/types,
+      # which declares the global LayoutProps/PageProps, and .source) is
+      # absent. Type-aware lint over apps/docs needs it, so generate it here.
+      - name: Generate docs route types (needed for type-aware lint)
+        run: bun run typegen
+        working-directory: apps/docs
+
       # oxlint runs with typeAware + typeCheck, so this both lints and
       # type-checks every package/client (replacing the old biome + eslint
       # pass). The build above produces the .d.ts files tsgolint needs for

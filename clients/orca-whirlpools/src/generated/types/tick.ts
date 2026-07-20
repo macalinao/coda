@@ -6,11 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getArrayDecoder,
@@ -23,25 +18,28 @@ import {
   getStructEncoder,
   getU128Decoder,
   getU128Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface Tick {
+export type Tick = {
   initialized: boolean;
   liquidityNet: bigint;
   liquidityGross: bigint;
   feeGrowthOutsideA: bigint;
   feeGrowthOutsideB: bigint;
-  rewardGrowthsOutside: bigint[];
-}
+  rewardGrowthsOutside: Array<bigint>;
+};
 
-export interface TickArgs {
+export type TickArgs = {
   initialized: boolean;
   liquidityNet: number | bigint;
   liquidityGross: number | bigint;
   feeGrowthOutsideA: number | bigint;
   feeGrowthOutsideB: number | bigint;
   rewardGrowthsOutside: Array<number | bigint>;
-}
+};
 
 export function getTickEncoder(): FixedSizeEncoder<TickArgs> {
   return getStructEncoder([

@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -37,8 +19,26 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const APPROVE_PROGRAM_LOCK_PRIVILEGE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -52,16 +52,16 @@ export function getApproveProgramLockPrivilegeDiscriminatorBytes(): ReadonlyUint
 
 export type ApproveProgramLockPrivilegeInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
-  TAccountLocker extends string | AccountMeta = string,
-  TAccountWhitelistEntry extends string | AccountMeta = string,
-  TAccountGovernor extends string | AccountMeta = string,
-  TAccountSmartWallet extends string | AccountMeta = string,
-  TAccountExecutableId extends string | AccountMeta = string,
-  TAccountWhitelistedOwner extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountLocker extends string | AccountMeta<string> = string,
+  TAccountWhitelistEntry extends string | AccountMeta<string> = string,
+  TAccountGovernor extends string | AccountMeta<string> = string,
+  TAccountSmartWallet extends string | AccountMeta<string> = string,
+  TAccountExecutableId extends string | AccountMeta<string> = string,
+  TAccountWhitelistedOwner extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -96,14 +96,12 @@ export type ApproveProgramLockPrivilegeInstruction<
     ]
   >;
 
-export interface ApproveProgramLockPrivilegeInstructionData {
+export type ApproveProgramLockPrivilegeInstructionData = {
   discriminator: ReadonlyUint8Array;
   bump: number;
-}
+};
 
-export interface ApproveProgramLockPrivilegeInstructionDataArgs {
-  bump: number;
-}
+export type ApproveProgramLockPrivilegeInstructionDataArgs = { bump: number };
 
 export function getApproveProgramLockPrivilegeInstructionDataEncoder(): FixedSizeEncoder<ApproveProgramLockPrivilegeInstructionDataArgs> {
   return transformEncoder(
@@ -135,7 +133,7 @@ export function getApproveProgramLockPrivilegeInstructionDataCodec(): FixedSizeC
   );
 }
 
-export interface ApproveProgramLockPrivilegeInput<
+export type ApproveProgramLockPrivilegeInput<
   TAccountLocker extends string = string,
   TAccountWhitelistEntry extends string = string,
   TAccountGovernor extends string = string,
@@ -144,7 +142,7 @@ export interface ApproveProgramLockPrivilegeInput<
   TAccountWhitelistedOwner extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   locker: Address<TAccountLocker>;
   whitelistEntry: Address<TAccountWhitelistEntry>;
   governor: Address<TAccountGovernor>;
@@ -154,7 +152,7 @@ export interface ApproveProgramLockPrivilegeInput<
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   bump: ApproveProgramLockPrivilegeInstructionDataArgs["bump"];
-}
+};
 
 export function getApproveProgramLockPrivilegeInstruction<
   TAccountLocker extends string,
@@ -249,10 +247,10 @@ export function getApproveProgramLockPrivilegeInstruction<
   >);
 }
 
-export interface ParsedApproveProgramLockPrivilegeInstruction<
+export type ParsedApproveProgramLockPrivilegeInstruction<
   TProgram extends string = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     locker: TAccountMetas[0];
@@ -265,7 +263,7 @@ export interface ParsedApproveProgramLockPrivilegeInstruction<
     systemProgram: TAccountMetas[7];
   };
   data: ApproveProgramLockPrivilegeInstructionData;
-}
+};
 
 export function parseApproveProgramLockPrivilegeInstruction<
   TProgram extends string,

@@ -6,27 +6,25 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
-  getU16Decoder,
-  getU16Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU16Decoder,
+  getU16Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
-export interface PoolInitialized {
+export type PoolInitialized = {
   whirlpool: Address;
   whirlpoolsConfig: Address;
   tokenMintA: Address;
@@ -37,9 +35,9 @@ export interface PoolInitialized {
   decimalsA: number;
   decimalsB: number;
   initialSqrtPrice: bigint;
-}
+};
 
-export interface PoolInitializedArgs {
+export type PoolInitializedArgs = {
   whirlpool: Address;
   whirlpoolsConfig: Address;
   tokenMintA: Address;
@@ -50,7 +48,7 @@ export interface PoolInitializedArgs {
   decimalsA: number;
   decimalsB: number;
   initialSqrtPrice: number | bigint;
-}
+};
 
 export function getPoolInitializedEncoder(): FixedSizeEncoder<PoolInitializedArgs> {
   return getStructEncoder([

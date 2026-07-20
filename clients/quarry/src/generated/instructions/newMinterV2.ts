@@ -6,24 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -35,11 +17,27 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getResolvedInstructionAccountAsTransactionSigner,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findMinterPda } from "../pdas/index.js";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -92,9 +90,7 @@ export type NewMinterV2Instruction<
     ]
   >;
 
-export interface NewMinterV2InstructionData {
-  discriminator: ReadonlyUint8Array;
-}
+export type NewMinterV2InstructionData = { discriminator: ReadonlyUint8Array };
 
 export type NewMinterV2InstructionDataArgs = {};
 
@@ -121,21 +117,21 @@ export function getNewMinterV2InstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface NewMinterV2AsyncInput<
+export type NewMinterV2AsyncInput<
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
   TAccountNewMinterAuthority extends string = string,
   TAccountMinter extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   admin: TransactionSigner<TAccountAdmin>;
   newMinterAuthority?: Address<TAccountNewMinterAuthority>;
   minter?: Address<TAccountMinter>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export async function getNewMinterV2InstructionAsync<
   TAccountMintWrapper extends string,
@@ -235,21 +231,21 @@ export async function getNewMinterV2InstructionAsync<
   >);
 }
 
-export interface NewMinterV2Input<
+export type NewMinterV2Input<
   TAccountMintWrapper extends string = string,
   TAccountAdmin extends string = string,
   TAccountNewMinterAuthority extends string = string,
   TAccountMinter extends string = string,
   TAccountPayer extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   mintWrapper: Address<TAccountMintWrapper>;
   admin: TransactionSigner<TAccountAdmin>;
   newMinterAuthority?: Address<TAccountNewMinterAuthority>;
   minter: Address<TAccountMinter>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-}
+};
 
 export function getNewMinterV2Instruction<
   TAccountMintWrapper extends string,
@@ -335,10 +331,10 @@ export function getNewMinterV2Instruction<
   >);
 }
 
-export interface ParsedNewMinterV2Instruction<
+export type ParsedNewMinterV2Instruction<
   TProgram extends string = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     mintWrapper: TAccountMetas[0];
@@ -349,7 +345,7 @@ export interface ParsedNewMinterV2Instruction<
     systemProgram: TAccountMetas[5];
   };
   data: NewMinterV2InstructionData;
-}
+};
 
 export function parseNewMinterV2Instruction<
   TProgram extends string,

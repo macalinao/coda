@@ -6,39 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
-import type {
-  AssetTier,
-  AssetTierArgs,
-  FeeCalculation,
-  FeeCalculationArgs,
-  ReserveFarmKind,
-  ReserveFarmKindArgs,
-  ReserveStatus,
-  ReserveStatusArgs,
-  UpdateConfigMode,
-  UpdateConfigModeArgs,
-  UpdateLendingMarketConfigValue,
-  UpdateLendingMarketConfigValueArgs,
-  UpdateLendingMarketMode,
-  UpdateLendingMarketModeArgs,
-} from "../types/index.js";
 import {
   combineCodec,
   fixDecoderSize,
@@ -50,8 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 import {
   getAssetTierDecoder,
@@ -68,6 +52,20 @@ import {
   getUpdateLendingMarketConfigValueEncoder,
   getUpdateLendingMarketModeDecoder,
   getUpdateLendingMarketModeEncoder,
+  type AssetTier,
+  type AssetTierArgs,
+  type FeeCalculation,
+  type FeeCalculationArgs,
+  type ReserveFarmKind,
+  type ReserveFarmKindArgs,
+  type ReserveStatus,
+  type ReserveStatusArgs,
+  type UpdateConfigMode,
+  type UpdateConfigModeArgs,
+  type UpdateLendingMarketConfigValue,
+  type UpdateLendingMarketConfigValueArgs,
+  type UpdateLendingMarketMode,
+  type UpdateLendingMarketModeArgs,
 } from "../types/index.js";
 
 export const IDL_MISSING_TYPES_DISCRIMINATOR: ReadonlyUint8Array =
@@ -81,11 +79,11 @@ export function getIdlMissingTypesDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type IdlMissingTypesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountSigner extends string | AccountMeta = string,
-  TAccountGlobalConfig extends string | AccountMeta = string,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountReserve extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountSigner extends string | AccountMeta<string> = string,
+  TAccountGlobalConfig extends string | AccountMeta<string> = string,
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountReserve extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -107,7 +105,7 @@ export type IdlMissingTypesInstruction<
     ]
   >;
 
-export interface IdlMissingTypesInstructionData {
+export type IdlMissingTypesInstructionData = {
   discriminator: ReadonlyUint8Array;
   reserveFarmKind: ReserveFarmKind;
   assetTier: AssetTier;
@@ -116,9 +114,9 @@ export interface IdlMissingTypesInstructionData {
   updateConfigMode: UpdateConfigMode;
   updateLendingMarketConfigValue: UpdateLendingMarketConfigValue;
   updateLendingMarketConfigMode: UpdateLendingMarketMode;
-}
+};
 
-export interface IdlMissingTypesInstructionDataArgs {
+export type IdlMissingTypesInstructionDataArgs = {
   reserveFarmKind: ReserveFarmKindArgs;
   assetTier: AssetTierArgs;
   feeCalculation: FeeCalculationArgs;
@@ -126,7 +124,7 @@ export interface IdlMissingTypesInstructionDataArgs {
   updateConfigMode: UpdateConfigModeArgs;
   updateLendingMarketConfigValue: UpdateLendingMarketConfigValueArgs;
   updateLendingMarketConfigMode: UpdateLendingMarketModeArgs;
-}
+};
 
 export function getIdlMissingTypesInstructionDataEncoder(): Encoder<IdlMissingTypesInstructionDataArgs> {
   return transformEncoder(
@@ -173,12 +171,12 @@ export function getIdlMissingTypesInstructionDataCodec(): Codec<
   );
 }
 
-export interface IdlMissingTypesInput<
+export type IdlMissingTypesInput<
   TAccountSigner extends string = string,
   TAccountGlobalConfig extends string = string,
   TAccountLendingMarket extends string = string,
   TAccountReserve extends string = string,
-> {
+> = {
   signer: TransactionSigner<TAccountSigner>;
   globalConfig: Address<TAccountGlobalConfig>;
   lendingMarket: Address<TAccountLendingMarket>;
@@ -190,7 +188,7 @@ export interface IdlMissingTypesInput<
   updateConfigMode: IdlMissingTypesInstructionDataArgs["updateConfigMode"];
   updateLendingMarketConfigValue: IdlMissingTypesInstructionDataArgs["updateLendingMarketConfigValue"];
   updateLendingMarketConfigMode: IdlMissingTypesInstructionDataArgs["updateLendingMarketConfigMode"];
-}
+};
 
 export function getIdlMissingTypesInstruction<
   TAccountSigner extends string,
@@ -253,10 +251,10 @@ export function getIdlMissingTypesInstruction<
   >);
 }
 
-export interface ParsedIdlMissingTypesInstruction<
+export type ParsedIdlMissingTypesInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     signer: TAccountMetas[0];
@@ -265,7 +263,7 @@ export interface ParsedIdlMissingTypesInstruction<
     reserve: TAccountMetas[3];
   };
   data: IdlMissingTypesInstructionData;
-}
+};
 
 export function parseIdlMissingTypesInstruction<
   TProgram extends string,

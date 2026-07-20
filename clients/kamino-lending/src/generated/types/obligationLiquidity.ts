@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type { BigFractionBytes, BigFractionBytesArgs } from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -21,18 +14,24 @@ import {
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   getU128Decoder,
   getU128Encoder,
+  getU64Decoder,
+  getU64Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getBigFractionBytesDecoder,
   getBigFractionBytesEncoder,
+  type BigFractionBytes,
+  type BigFractionBytesArgs,
 } from "./index.js";
 
 /** Obligation liquidity state */
-export interface ObligationLiquidity {
+export type ObligationLiquidity = {
   /** Reserve liquidity is borrowed from */
   borrowReserve: Address;
   /** Borrow rate used for calculating interest (big scaled fraction) */
@@ -46,10 +45,10 @@ export interface ObligationLiquidity {
   borrowFactorAdjustedMarketValueSf: bigint;
   /** Amount of liquidity borrowed outside of an elevation group */
   borrowedAmountOutsideElevationGroups: bigint;
-  padding2: bigint[];
-}
+  padding2: Array<bigint>;
+};
 
-export interface ObligationLiquidityArgs {
+export type ObligationLiquidityArgs = {
   /** Reserve liquidity is borrowed from */
   borrowReserve: Address;
   /** Borrow rate used for calculating interest (big scaled fraction) */
@@ -64,7 +63,7 @@ export interface ObligationLiquidityArgs {
   /** Amount of liquidity borrowed outside of an elevation group */
   borrowedAmountOutsideElevationGroups: number | bigint;
   padding2: Array<number | bigint>;
-}
+};
 
 export function getObligationLiquidityEncoder(): FixedSizeEncoder<ObligationLiquidityArgs> {
   return getStructEncoder([

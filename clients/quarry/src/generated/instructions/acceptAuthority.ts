@@ -6,22 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -33,8 +17,24 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const ACCEPT_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
@@ -66,9 +66,9 @@ export type AcceptAuthorityInstruction<
     ]
   >;
 
-export interface AcceptAuthorityInstructionData {
+export type AcceptAuthorityInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type AcceptAuthorityInstructionDataArgs = {};
 
@@ -95,13 +95,13 @@ export function getAcceptAuthorityInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface AcceptAuthorityInput<
+export type AcceptAuthorityInput<
   TAccountAuthority extends string = string,
   TAccountRewarder extends string = string,
-> {
+> = {
   authority: TransactionSigner<TAccountAuthority>;
   rewarder: Address<TAccountRewarder>;
-}
+};
 
 export function getAcceptAuthorityInstruction<
   TAccountAuthority extends string,
@@ -143,17 +143,17 @@ export function getAcceptAuthorityInstruction<
   >);
 }
 
-export interface ParsedAcceptAuthorityInstruction<
+export type ParsedAcceptAuthorityInstruction<
   TProgram extends string = typeof QUARRY_MINE_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     authority: TAccountMetas[0];
     rewarder: TAccountMetas[1];
   };
   data: AcceptAuthorityInstructionData;
-}
+};
 
 export function parseAcceptAuthorityInstruction<
   TProgram extends string,

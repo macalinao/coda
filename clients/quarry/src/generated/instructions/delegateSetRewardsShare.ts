@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DELEGATE_SET_REWARDS_SHARE_DISCRIMINATOR: ReadonlyUint8Array =
@@ -82,14 +82,14 @@ export type DelegateSetRewardsShareInstruction<
     ]
   >;
 
-export interface DelegateSetRewardsShareInstructionData {
+export type DelegateSetRewardsShareInstructionData = {
   discriminator: ReadonlyUint8Array;
   newShare: bigint;
-}
+};
 
-export interface DelegateSetRewardsShareInstructionDataArgs {
+export type DelegateSetRewardsShareInstructionDataArgs = {
   newShare: number | bigint;
-}
+};
 
 export function getDelegateSetRewardsShareInstructionDataEncoder(): FixedSizeEncoder<DelegateSetRewardsShareInstructionDataArgs> {
   return transformEncoder(
@@ -121,20 +121,20 @@ export function getDelegateSetRewardsShareInstructionDataCodec(): FixedSizeCodec
   );
 }
 
-export interface DelegateSetRewardsShareInput<
+export type DelegateSetRewardsShareInput<
   TAccountOperator extends string = string,
   TAccountDelegate extends string = string,
   TAccountRewarder extends string = string,
   TAccountQuarryMineProgram extends string = string,
   TAccountQuarry extends string = string,
-> {
+> = {
   operator: Address<TAccountOperator>;
   delegate: TransactionSigner<TAccountDelegate>;
   rewarder: Address<TAccountRewarder>;
   quarryMineProgram?: Address<TAccountQuarryMineProgram>;
   quarry: Address<TAccountQuarry>;
   newShare: DelegateSetRewardsShareInstructionDataArgs["newShare"];
-}
+};
 
 export function getDelegateSetRewardsShareInstruction<
   TAccountOperator extends string,
@@ -212,10 +212,10 @@ export function getDelegateSetRewardsShareInstruction<
   >);
 }
 
-export interface ParsedDelegateSetRewardsShareInstruction<
+export type ParsedDelegateSetRewardsShareInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     operator: TAccountMetas[0];
@@ -225,7 +225,7 @@ export interface ParsedDelegateSetRewardsShareInstruction<
     quarry: TAccountMetas[4];
   };
   data: DelegateSetRewardsShareInstructionData;
-}
+};
 
 export function parseDelegateSetRewardsShareInstruction<
   TProgram extends string,

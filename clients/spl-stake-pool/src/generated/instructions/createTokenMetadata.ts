@@ -6,43 +6,41 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -55,17 +53,17 @@ export function getCreateTokenMetadataDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type CreateTokenMetadataInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountManager extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountPayer extends string | AccountMeta = string,
-  TAccountMetadataAccount extends string | AccountMeta = string,
-  TAccountMetadataProgram extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountManager extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
+  TAccountMetadataAccount extends string | AccountMeta<string> = string,
+  TAccountMetadataProgram extends string | AccountMeta<string> =
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  TAccountSystemProgram extends string | AccountMeta =
+  TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -100,18 +98,18 @@ export type CreateTokenMetadataInstruction<
     ]
   >;
 
-export interface CreateTokenMetadataInstructionData {
+export type CreateTokenMetadataInstructionData = {
   discriminator: number;
   name: string;
   symbol: string;
   uri: string;
-}
+};
 
-export interface CreateTokenMetadataInstructionDataArgs {
+export type CreateTokenMetadataInstructionDataArgs = {
   name: string;
   symbol: string;
   uri: string;
-}
+};
 
 export function getCreateTokenMetadataInstructionDataEncoder(): Encoder<CreateTokenMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -147,7 +145,7 @@ export function getCreateTokenMetadataInstructionDataCodec(): Codec<
   );
 }
 
-export interface CreateTokenMetadataAsyncInput<
+export type CreateTokenMetadataAsyncInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -156,7 +154,7 @@ export interface CreateTokenMetadataAsyncInput<
   TAccountMetadataAccount extends string = string,
   TAccountMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   manager: TransactionSigner<TAccountManager>;
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
@@ -168,8 +166,20 @@ export interface CreateTokenMetadataAsyncInput<
   name: CreateTokenMetadataInstructionDataArgs["name"];
   symbol: CreateTokenMetadataInstructionDataArgs["symbol"];
   uri: CreateTokenMetadataInstructionDataArgs["uri"];
-}
+};
 
+/**
+ * Create token metadata for the stake-pool token in the
+ * metaplex-token program
+ * 0. `[]` Stake pool
+ * 1. `[s]` Manager
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[]` Pool token mint account
+ * 4. `[s, w]` Payer for creation of token metadata account
+ * 5. `[w]` Token metadata account
+ * 6. `[]` Metadata program id
+ * 7. `[]` System program id
+ */
 export async function getCreateTokenMetadataInstructionAsync<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -281,7 +291,7 @@ export async function getCreateTokenMetadataInstructionAsync<
   >);
 }
 
-export interface CreateTokenMetadataInput<
+export type CreateTokenMetadataInput<
   TAccountStakePool extends string = string,
   TAccountManager extends string = string,
   TAccountWithdrawAuthority extends string = string,
@@ -290,7 +300,7 @@ export interface CreateTokenMetadataInput<
   TAccountMetadataAccount extends string = string,
   TAccountMetadataProgram extends string = string,
   TAccountSystemProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   manager: TransactionSigner<TAccountManager>;
   withdrawAuthority: Address<TAccountWithdrawAuthority>;
@@ -302,8 +312,20 @@ export interface CreateTokenMetadataInput<
   name: CreateTokenMetadataInstructionDataArgs["name"];
   symbol: CreateTokenMetadataInstructionDataArgs["symbol"];
   uri: CreateTokenMetadataInstructionDataArgs["uri"];
-}
+};
 
+/**
+ * Create token metadata for the stake-pool token in the
+ * metaplex-token program
+ * 0. `[]` Stake pool
+ * 1. `[s]` Manager
+ * 2. `[]` Stake pool withdraw authority
+ * 3. `[]` Pool token mint account
+ * 4. `[s, w]` Payer for creation of token metadata account
+ * 5. `[w]` Token metadata account
+ * 6. `[]` Metadata program id
+ * 7. `[]` System program id
+ */
 export function getCreateTokenMetadataInstruction<
   TAccountStakePool extends string,
   TAccountManager extends string,
@@ -405,10 +427,10 @@ export function getCreateTokenMetadataInstruction<
   >);
 }
 
-export interface ParsedCreateTokenMetadataInstruction<
+export type ParsedCreateTokenMetadataInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -421,7 +443,7 @@ export interface ParsedCreateTokenMetadataInstruction<
     systemProgram: TAccountMetas[7];
   };
   data: CreateTokenMetadataInstructionData;
-}
+};
 
 export function parseCreateTokenMetadataInstruction<
   TProgram extends string,

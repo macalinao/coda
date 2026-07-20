@@ -6,17 +6,15 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
 import {
   combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 
 /**
@@ -25,19 +23,19 @@ import {
  * If either the numerator or the denominator is 0, the fee is considered to be
  * 0
  */
-export interface Fee {
+export type Fee = {
   /** denominator of the fee ratio */
   denominator: bigint;
   /** numerator of the fee ratio */
   numerator: bigint;
-}
+};
 
-export interface FeeArgs {
+export type FeeArgs = {
   /** denominator of the fee ratio */
   denominator: number | bigint;
   /** numerator of the fee ratio */
   numerator: number | bigint;
-}
+};
 
 export function getFeeEncoder(): FixedSizeEncoder<FeeArgs> {
   return getStructEncoder([

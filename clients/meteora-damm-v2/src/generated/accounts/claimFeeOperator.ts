@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -39,6 +26,17 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const CLAIM_FEE_OPERATOR_DISCRIMINATOR: ReadonlyUint8Array =
@@ -50,20 +48,20 @@ export function getClaimFeeOperatorDiscriminatorBytes(): ReadonlyUint8Array {
   );
 }
 
-export interface ClaimFeeOperator {
+export type ClaimFeeOperator = {
   discriminator: ReadonlyUint8Array;
   /** operator */
   operator: Address;
   /** Reserve */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
-export interface ClaimFeeOperatorArgs {
+export type ClaimFeeOperatorArgs = {
   /** operator */
   operator: Address;
   /** Reserve */
-  padding: number[];
-}
+  padding: Array<number>;
+};
 
 /** Gets the encoder for {@link ClaimFeeOperatorArgs} account data. */
 export function getClaimFeeOperatorEncoder(): FixedSizeEncoder<ClaimFeeOperatorArgs> {
@@ -137,7 +135,7 @@ export async function fetchMaybeClaimFeeOperator<
 
 export async function fetchAllClaimFeeOperator(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ClaimFeeOperator>[]> {
   const maybeAccounts = await fetchAllMaybeClaimFeeOperator(
@@ -151,7 +149,7 @@ export async function fetchAllClaimFeeOperator(
 
 export async function fetchAllMaybeClaimFeeOperator(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ClaimFeeOperator>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

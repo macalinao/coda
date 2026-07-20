@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  Option,
-  OptionOrNullable,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type { RealmSeeds } from "../pdas/index.js";
-import type { RealmConfig, RealmConfigArgs } from "../types/index.js";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -40,23 +23,38 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRealmPda } from "../pdas/index.js";
+import { findRealmPda, type RealmSeeds } from "../pdas/index.js";
 import {
-  GovernanceAccountType,
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   getRealmConfigDecoder,
   getRealmConfigEncoder,
+  GovernanceAccountType,
+  type RealmConfig,
+  type RealmConfigArgs,
 } from "../types/index.js";
 
 export const REALM_V1_ACCOUNT_TYPE: GovernanceAccountType =
@@ -66,24 +64,24 @@ export function getRealmV1AccountTypeBytes(): ReadonlyUint8Array {
   return getGovernanceAccountTypeEncoder().encode(REALM_V1_ACCOUNT_TYPE);
 }
 
-export interface RealmV1 {
+export type RealmV1 = {
   accountType: GovernanceAccountType;
   communityMint: Address;
   config: RealmConfig;
-  reserved: number[];
+  reserved: Array<number>;
   votingProposalCount: number;
   authority: Option<Address>;
   name: string;
-}
+};
 
-export interface RealmV1Args {
+export type RealmV1Args = {
   communityMint: Address;
   config: RealmConfigArgs;
-  reserved: number[];
+  reserved: Array<number>;
   votingProposalCount: number;
   authority: OptionOrNullable<Address>;
   name: string;
-}
+};
 
 /** Gets the encoder for {@link RealmV1Args} account data. */
 export function getRealmV1Encoder(): Encoder<RealmV1Args> {
@@ -155,7 +153,7 @@ export async function fetchMaybeRealmV1<TAddress extends string = string>(
 
 export async function fetchAllRealmV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<RealmV1>[]> {
   const maybeAccounts = await fetchAllMaybeRealmV1(rpc, addresses, config);
@@ -165,7 +163,7 @@ export async function fetchAllRealmV1(
 
 export async function fetchAllMaybeRealmV1(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<RealmV1>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

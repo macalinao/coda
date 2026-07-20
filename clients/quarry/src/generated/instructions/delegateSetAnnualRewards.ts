@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -36,8 +19,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const DELEGATE_SET_ANNUAL_REWARDS_DISCRIMINATOR: ReadonlyUint8Array =
@@ -78,14 +78,14 @@ export type DelegateSetAnnualRewardsInstruction<
     ]
   >;
 
-export interface DelegateSetAnnualRewardsInstructionData {
+export type DelegateSetAnnualRewardsInstructionData = {
   discriminator: ReadonlyUint8Array;
   newRate: bigint;
-}
+};
 
-export interface DelegateSetAnnualRewardsInstructionDataArgs {
+export type DelegateSetAnnualRewardsInstructionDataArgs = {
   newRate: number | bigint;
-}
+};
 
 export function getDelegateSetAnnualRewardsInstructionDataEncoder(): FixedSizeEncoder<DelegateSetAnnualRewardsInstructionDataArgs> {
   return transformEncoder(
@@ -117,18 +117,18 @@ export function getDelegateSetAnnualRewardsInstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface DelegateSetAnnualRewardsInput<
+export type DelegateSetAnnualRewardsInput<
   TAccountOperator extends string = string,
   TAccountDelegate extends string = string,
   TAccountRewarder extends string = string,
   TAccountQuarryMineProgram extends string = string,
-> {
+> = {
   operator: Address<TAccountOperator>;
   delegate: TransactionSigner<TAccountDelegate>;
   rewarder: Address<TAccountRewarder>;
   quarryMineProgram?: Address<TAccountQuarryMineProgram>;
   newRate: DelegateSetAnnualRewardsInstructionDataArgs["newRate"];
-}
+};
 
 export function getDelegateSetAnnualRewardsInstruction<
   TAccountOperator extends string,
@@ -200,10 +200,10 @@ export function getDelegateSetAnnualRewardsInstruction<
   >);
 }
 
-export interface ParsedDelegateSetAnnualRewardsInstruction<
+export type ParsedDelegateSetAnnualRewardsInstruction<
   TProgram extends string = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     operator: TAccountMetas[0];
@@ -212,7 +212,7 @@ export interface ParsedDelegateSetAnnualRewardsInstruction<
     quarryMineProgram: TAccountMetas[3];
   };
   data: DelegateSetAnnualRewardsInstructionData;
-}
+};
 
 export function parseDelegateSetAnnualRewardsInstruction<
   TProgram extends string,

@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findFarmsUserStatePda,
@@ -56,15 +54,15 @@ export function getWithdrawUnstakedDepositsDiscriminatorBytes(): ReadonlyUint8Ar
 
 export type WithdrawUnstakedDepositsInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
-  TAccountOwner extends string | AccountMeta = string,
-  TAccountUserState extends string | AccountMeta = string,
-  TAccountFarmState extends string | AccountMeta = string,
-  TAccountUserAta extends string | AccountMeta = string,
-  TAccountFarmVault extends string | AccountMeta = string,
-  TAccountFarmVaultsAuthority extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountOwner extends string | AccountMeta<string> = string,
+  TAccountUserState extends string | AccountMeta<string> = string,
+  TAccountFarmState extends string | AccountMeta<string> = string,
+  TAccountUserAta extends string | AccountMeta<string> = string,
+  TAccountFarmVault extends string | AccountMeta<string> = string,
+  TAccountFarmVaultsAuthority extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -95,9 +93,9 @@ export type WithdrawUnstakedDepositsInstruction<
     ]
   >;
 
-export interface WithdrawUnstakedDepositsInstructionData {
+export type WithdrawUnstakedDepositsInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type WithdrawUnstakedDepositsInstructionDataArgs = {};
 
@@ -127,7 +125,7 @@ export function getWithdrawUnstakedDepositsInstructionDataCodec(): FixedSizeCode
   );
 }
 
-export interface WithdrawUnstakedDepositsAsyncInput<
+export type WithdrawUnstakedDepositsAsyncInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -135,7 +133,7 @@ export interface WithdrawUnstakedDepositsAsyncInput<
   TAccountFarmVault extends string = string,
   TAccountFarmVaultsAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState?: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -143,7 +141,7 @@ export interface WithdrawUnstakedDepositsAsyncInput<
   farmVault: Address<TAccountFarmVault>;
   farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export async function getWithdrawUnstakedDepositsInstructionAsync<
   TAccountOwner extends string,
@@ -249,7 +247,7 @@ export async function getWithdrawUnstakedDepositsInstructionAsync<
   >);
 }
 
-export interface WithdrawUnstakedDepositsInput<
+export type WithdrawUnstakedDepositsInput<
   TAccountOwner extends string = string,
   TAccountUserState extends string = string,
   TAccountFarmState extends string = string,
@@ -257,7 +255,7 @@ export interface WithdrawUnstakedDepositsInput<
   TAccountFarmVault extends string = string,
   TAccountFarmVaultsAuthority extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   owner: TransactionSigner<TAccountOwner>;
   userState: Address<TAccountUserState>;
   farmState: Address<TAccountFarmState>;
@@ -265,7 +263,7 @@ export interface WithdrawUnstakedDepositsInput<
   farmVault: Address<TAccountFarmVault>;
   farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
 export function getWithdrawUnstakedDepositsInstruction<
   TAccountOwner extends string,
@@ -349,10 +347,10 @@ export function getWithdrawUnstakedDepositsInstruction<
   >);
 }
 
-export interface ParsedWithdrawUnstakedDepositsInstruction<
+export type ParsedWithdrawUnstakedDepositsInstruction<
   TProgram extends string = typeof FARMS_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     owner: TAccountMetas[0];
@@ -364,7 +362,7 @@ export interface ParsedWithdrawUnstakedDepositsInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: WithdrawUnstakedDepositsInstructionData;
-}
+};
 
 export function parseWithdrawUnstakedDepositsInstruction<
   TProgram extends string,

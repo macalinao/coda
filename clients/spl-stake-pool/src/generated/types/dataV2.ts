@@ -6,13 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
 import {
   addDecoderSizePrefix,
   addEncoderSizePrefix,
@@ -21,17 +14,22 @@ import {
   getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU16Decoder,
   getU16Encoder,
   getU32Decoder,
   getU32Encoder,
+  getU8Decoder,
+  getU8Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 
-export interface DataV2 {
+export type DataV2 = {
   /** The name of the asset */
   name: string;
   /** The symbol for the asset */
@@ -49,9 +47,9 @@ export interface DataV2 {
   collection: Option<number>;
   /** UNUSED Uses */
   uses: Option<number>;
-}
+};
 
-export interface DataV2Args {
+export type DataV2Args = {
   /** The name of the asset */
   name: string;
   /** The symbol for the asset */
@@ -69,7 +67,7 @@ export interface DataV2Args {
   collection: OptionOrNullable<number>;
   /** UNUSED Uses */
   uses: OptionOrNullable<number>;
-}
+};
 
 export function getDataV2Encoder(): Encoder<DataV2Args> {
   return getStructEncoder([

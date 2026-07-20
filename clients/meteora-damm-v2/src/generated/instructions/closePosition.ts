@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  AccountSignerMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -34,10 +17,25 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type AccountSignerMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -110,9 +108,9 @@ export type ClosePositionInstruction<
     ]
   >;
 
-export interface ClosePositionInstructionData {
+export type ClosePositionInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type ClosePositionInstructionDataArgs = {};
 
@@ -139,7 +137,7 @@ export function getClosePositionInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface ClosePositionAsyncInput<
+export type ClosePositionAsyncInput<
   TAccountPositionNftMint extends string = string,
   TAccountPositionNftAccount extends string = string,
   TAccountPool extends string = string,
@@ -150,7 +148,7 @@ export interface ClosePositionAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   /** position_nft_mint */
   positionNftMint: Address<TAccountPositionNftMint>;
   /** The token account for nft */
@@ -165,7 +163,7 @@ export interface ClosePositionAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   eventAuthority?: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export async function getClosePositionInstructionAsync<
   TAccountPositionNftMint extends string,
@@ -287,7 +285,7 @@ export async function getClosePositionInstructionAsync<
   >);
 }
 
-export interface ClosePositionInput<
+export type ClosePositionInput<
   TAccountPositionNftMint extends string = string,
   TAccountPositionNftAccount extends string = string,
   TAccountPool extends string = string,
@@ -298,7 +296,7 @@ export interface ClosePositionInput<
   TAccountTokenProgram extends string = string,
   TAccountEventAuthority extends string = string,
   TAccountProgram extends string = string,
-> {
+> = {
   /** position_nft_mint */
   positionNftMint: Address<TAccountPositionNftMint>;
   /** The token account for nft */
@@ -313,7 +311,7 @@ export interface ClosePositionInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   eventAuthority: Address<TAccountEventAuthority>;
   program?: Address<TAccountProgram>;
-}
+};
 
 export function getClosePositionInstruction<
   TAccountPositionNftMint extends string,
@@ -419,10 +417,10 @@ export function getClosePositionInstruction<
   >);
 }
 
-export interface ParsedClosePositionInstruction<
+export type ParsedClosePositionInstruction<
   TProgram extends string = typeof CP_AMM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     /** position_nft_mint */
@@ -441,7 +439,7 @@ export interface ParsedClosePositionInstruction<
     program: TAccountMetas[9];
   };
   data: ClosePositionInstructionData;
-}
+};
 
 export function parseClosePositionInstruction<
   TProgram extends string,

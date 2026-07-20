@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   getStructDecoder,
@@ -29,10 +15,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.js";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -45,15 +43,15 @@ export function getUpdateStakePoolBalanceDiscriminatorBytes(): ReadonlyUint8Arra
 
 export type UpdateStakePoolBalanceInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
-  TAccountStakePool extends string | AccountMeta = string,
-  TAccountWithdrawAuthority extends string | AccountMeta = string,
-  TAccountValidatorList extends string | AccountMeta = string,
-  TAccountReserveStake extends string | AccountMeta = string,
-  TAccountFeeAccount extends string | AccountMeta = string,
-  TAccountPoolMint extends string | AccountMeta = string,
-  TAccountTokenProgram extends string | AccountMeta =
+  TAccountStakePool extends string | AccountMeta<string> = string,
+  TAccountWithdrawAuthority extends string | AccountMeta<string> = string,
+  TAccountValidatorList extends string | AccountMeta<string> = string,
+  TAccountReserveStake extends string | AccountMeta<string> = string,
+  TAccountFeeAccount extends string | AccountMeta<string> = string,
+  TAccountPoolMint extends string | AccountMeta<string> = string,
+  TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -83,9 +81,7 @@ export type UpdateStakePoolBalanceInstruction<
     ]
   >;
 
-export interface UpdateStakePoolBalanceInstructionData {
-  discriminator: number;
-}
+export type UpdateStakePoolBalanceInstructionData = { discriminator: number };
 
 export type UpdateStakePoolBalanceInstructionDataArgs = {};
 
@@ -113,7 +109,7 @@ export function getUpdateStakePoolBalanceInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface UpdateStakePoolBalanceAsyncInput<
+export type UpdateStakePoolBalanceAsyncInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountValidatorList extends string = string,
@@ -121,7 +117,7 @@ export interface UpdateStakePoolBalanceAsyncInput<
   TAccountFeeAccount extends string = string,
   TAccountPoolMint extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   withdrawAuthority?: Address<TAccountWithdrawAuthority>;
   validatorList: Address<TAccountValidatorList>;
@@ -129,8 +125,19 @@ export interface UpdateStakePoolBalanceAsyncInput<
   feeAccount: Address<TAccountFeeAccount>;
   poolMint: Address<TAccountPoolMint>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
+/**
+ * Updates total pool balance based on balances in the reserve and
+ * validator list
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Validator stake list storage account
+ * 3. `[]` Reserve stake account
+ * 4. `[w]` Account to receive pool fee tokens
+ * 5. `[w]` Pool mint account
+ * 6. `[]` Pool token program
+ */
 export async function getUpdateStakePoolBalanceInstructionAsync<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -224,7 +231,7 @@ export async function getUpdateStakePoolBalanceInstructionAsync<
   >);
 }
 
-export interface UpdateStakePoolBalanceInput<
+export type UpdateStakePoolBalanceInput<
   TAccountStakePool extends string = string,
   TAccountWithdrawAuthority extends string = string,
   TAccountValidatorList extends string = string,
@@ -232,7 +239,7 @@ export interface UpdateStakePoolBalanceInput<
   TAccountFeeAccount extends string = string,
   TAccountPoolMint extends string = string,
   TAccountTokenProgram extends string = string,
-> {
+> = {
   stakePool: Address<TAccountStakePool>;
   withdrawAuthority: Address<TAccountWithdrawAuthority>;
   validatorList: Address<TAccountValidatorList>;
@@ -240,8 +247,19 @@ export interface UpdateStakePoolBalanceInput<
   feeAccount: Address<TAccountFeeAccount>;
   poolMint: Address<TAccountPoolMint>;
   tokenProgram?: Address<TAccountTokenProgram>;
-}
+};
 
+/**
+ * Updates total pool balance based on balances in the reserve and
+ * validator list
+ * 0. `[w]` Stake pool
+ * 1. `[]` Stake pool withdraw authority
+ * 2. `[w]` Validator stake list storage account
+ * 3. `[]` Reserve stake account
+ * 4. `[w]` Account to receive pool fee tokens
+ * 5. `[w]` Pool mint account
+ * 6. `[]` Pool token program
+ */
 export function getUpdateStakePoolBalanceInstruction<
   TAccountStakePool extends string,
   TAccountWithdrawAuthority extends string,
@@ -325,10 +343,10 @@ export function getUpdateStakePoolBalanceInstruction<
   >);
 }
 
-export interface ParsedUpdateStakePoolBalanceInstruction<
+export type ParsedUpdateStakePoolBalanceInstruction<
   TProgram extends string = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     stakePool: TAccountMetas[0];
@@ -340,7 +358,7 @@ export interface ParsedUpdateStakePoolBalanceInstruction<
     tokenProgram: TAccountMetas[6];
   };
   data: UpdateStakePoolBalanceInstructionData;
-}
+};
 
 export function parseUpdateStakePoolBalanceInstruction<
   TProgram extends string,

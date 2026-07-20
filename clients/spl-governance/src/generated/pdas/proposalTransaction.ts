@@ -6,20 +6,21 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type { Address, ProgramDerivedAddress } from "@solana/kit";
 import {
   getAddressEncoder,
   getProgramDerivedAddress,
-  getU8Encoder,
   getU16Encoder,
+  getU8Encoder,
   getUtf8Encoder,
+  type Address,
+  type ProgramDerivedAddress,
 } from "@solana/kit";
 
-export interface ProposalTransactionSeeds {
+export type ProposalTransactionSeeds = {
   proposal: Address;
   optionIndex: number;
   index: number;
-}
+};
 
 /** Transaction within a proposal option */
 export async function findProposalTransactionPda(

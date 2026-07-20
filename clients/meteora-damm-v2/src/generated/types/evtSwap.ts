@@ -6,18 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-} from "@solana/kit";
-import type {
-  SwapParameters,
-  SwapParametersArgs,
-  SwapResult,
-  SwapResultArgs,
-} from "./index.js";
 import {
   combineCodec,
   getAddressDecoder,
@@ -26,19 +14,27 @@ import {
   getBooleanEncoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
   getU64Decoder,
   getU64Encoder,
+  getU8Decoder,
+  getU8Encoder,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
 } from "@solana/kit";
 import {
   getSwapParametersDecoder,
   getSwapParametersEncoder,
   getSwapResultDecoder,
   getSwapResultEncoder,
+  type SwapParameters,
+  type SwapParametersArgs,
+  type SwapResult,
+  type SwapResultArgs,
 } from "./index.js";
 
-export interface EvtSwap {
+export type EvtSwap = {
   pool: Address;
   tradeDirection: number;
   hasReferral: boolean;
@@ -46,9 +42,9 @@ export interface EvtSwap {
   swapResult: SwapResult;
   actualAmountIn: bigint;
   currentTimestamp: bigint;
-}
+};
 
-export interface EvtSwapArgs {
+export type EvtSwapArgs = {
   pool: Address;
   tradeDirection: number;
   hasReferral: boolean;
@@ -56,7 +52,7 @@ export interface EvtSwapArgs {
   swapResult: SwapResultArgs;
   actualAmountIn: number | bigint;
   currentTimestamp: number | bigint;
-}
+};
 
 export function getEvtSwapEncoder(): FixedSizeEncoder<EvtSwapArgs> {
   return getStructEncoder([

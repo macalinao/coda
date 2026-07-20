@@ -6,20 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  AccountMeta,
-  Address,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  Instruction,
-  InstructionWithAccounts,
-  InstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  WritableAccount,
-} from "@solana/kit";
-import type { ResolvedInstructionAccount } from "@solana/program-client-core";
 import {
   combineCodec,
   fixDecoderSize,
@@ -31,8 +17,22 @@ import {
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
+  type AccountMeta,
+  type Address,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type WritableAccount,
 } from "@solana/kit";
-import { getAccountMetaFactory } from "@solana/program-client-core";
+import {
+  getAccountMetaFactory,
+  type ResolvedInstructionAccount,
+} from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
 
 export const REFRESH_OBLIGATION_DISCRIMINATOR: ReadonlyUint8Array =
@@ -46,9 +46,9 @@ export function getRefreshObligationDiscriminatorBytes(): ReadonlyUint8Array {
 
 export type RefreshObligationInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
-  TAccountLendingMarket extends string | AccountMeta = string,
-  TAccountObligation extends string | AccountMeta = string,
-  TRemainingAccounts extends readonly AccountMeta[] = [],
+  TAccountLendingMarket extends string | AccountMeta<string> = string,
+  TAccountObligation extends string | AccountMeta<string> = string,
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
@@ -63,9 +63,9 @@ export type RefreshObligationInstruction<
     ]
   >;
 
-export interface RefreshObligationInstructionData {
+export type RefreshObligationInstructionData = {
   discriminator: ReadonlyUint8Array;
-}
+};
 
 export type RefreshObligationInstructionDataArgs = {};
 
@@ -92,13 +92,13 @@ export function getRefreshObligationInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export interface RefreshObligationInput<
+export type RefreshObligationInput<
   TAccountLendingMarket extends string = string,
   TAccountObligation extends string = string,
-> {
+> = {
   lendingMarket: Address<TAccountLendingMarket>;
   obligation: Address<TAccountObligation>;
-}
+};
 
 export function getRefreshObligationInstruction<
   TAccountLendingMarket extends string,
@@ -141,17 +141,17 @@ export function getRefreshObligationInstruction<
   >);
 }
 
-export interface ParsedRefreshObligationInstruction<
+export type ParsedRefreshObligationInstruction<
   TProgram extends string = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
-> {
+> = {
   programAddress: Address<TProgram>;
   accounts: {
     lendingMarket: TAccountMetas[0];
     obligation: TAccountMetas[1];
   };
   data: RefreshObligationInstructionData;
-}
+};
 
 export function parseRefreshObligationInstruction<
   TProgram extends string,

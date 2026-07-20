@@ -6,23 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Account,
-  Address,
-  EncodedAccount,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  FixedSizeCodec,
-  FixedSizeDecoder,
-  FixedSizeEncoder,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
-} from "@solana/kit";
-import type {
-  WhirlpoolRewardInfo,
-  WhirlpoolRewardInfoArgs,
-} from "../types/index.js";
 import {
   assertAccountExists,
   assertAccountsExist,
@@ -42,19 +25,32 @@ import {
   getI32Encoder,
   getStructDecoder,
   getStructEncoder,
-  getU8Decoder,
-  getU8Encoder,
+  getU128Decoder,
+  getU128Encoder,
   getU16Decoder,
   getU16Encoder,
   getU64Decoder,
   getU64Encoder,
-  getU128Decoder,
-  getU128Encoder,
+  getU8Decoder,
+  getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type EncodedAccount,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
   getWhirlpoolRewardInfoDecoder,
   getWhirlpoolRewardInfoEncoder,
+  type WhirlpoolRewardInfo,
+  type WhirlpoolRewardInfoArgs,
 } from "../types/index.js";
 
 export const WHIRLPOOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
@@ -65,12 +61,12 @@ export function getWhirlpoolDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(WHIRLPOOL_DISCRIMINATOR);
 }
 
-export interface Whirlpool {
+export type Whirlpool = {
   discriminator: ReadonlyUint8Array;
   whirlpoolsConfig: Address;
-  whirlpoolBump: number[];
+  whirlpoolBump: Array<number>;
   tickSpacing: number;
-  tickSpacingSeed: number[];
+  tickSpacingSeed: Array<number>;
   feeRate: number;
   protocolFeeRate: number;
   liquidity: bigint;
@@ -85,14 +81,14 @@ export interface Whirlpool {
   tokenVaultB: Address;
   feeGrowthGlobalB: bigint;
   rewardLastUpdatedTimestamp: bigint;
-  rewardInfos: WhirlpoolRewardInfo[];
-}
+  rewardInfos: Array<WhirlpoolRewardInfo>;
+};
 
-export interface WhirlpoolArgs {
+export type WhirlpoolArgs = {
   whirlpoolsConfig: Address;
-  whirlpoolBump: number[];
+  whirlpoolBump: Array<number>;
   tickSpacing: number;
-  tickSpacingSeed: number[];
+  tickSpacingSeed: Array<number>;
   feeRate: number;
   protocolFeeRate: number;
   liquidity: number | bigint;
@@ -107,8 +103,8 @@ export interface WhirlpoolArgs {
   tokenVaultB: Address;
   feeGrowthGlobalB: number | bigint;
   rewardLastUpdatedTimestamp: number | bigint;
-  rewardInfos: WhirlpoolRewardInfoArgs[];
-}
+  rewardInfos: Array<WhirlpoolRewardInfoArgs>;
+};
 
 /** Gets the encoder for {@link WhirlpoolArgs} account data. */
 export function getWhirlpoolEncoder(): FixedSizeEncoder<WhirlpoolArgs> {
@@ -212,7 +208,7 @@ export async function fetchMaybeWhirlpool<TAddress extends string = string>(
 
 export async function fetchAllWhirlpool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Whirlpool>[]> {
   const maybeAccounts = await fetchAllMaybeWhirlpool(rpc, addresses, config);
@@ -222,7 +218,7 @@ export async function fetchAllWhirlpool(
 
 export async function fetchAllMaybeWhirlpool(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Address[],
+  addresses: Array<Address>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Whirlpool>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);

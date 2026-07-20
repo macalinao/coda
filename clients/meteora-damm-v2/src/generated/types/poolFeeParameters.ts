@@ -6,19 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import type {
-  Codec,
-  Decoder,
-  Encoder,
-  Option,
-  OptionOrNullable,
-} from "@solana/kit";
-import type {
-  BaseFeeParameters,
-  BaseFeeParametersArgs,
-  DynamicFeeParameters,
-  DynamicFeeParametersArgs,
-} from "./index.js";
 import {
   combineCodec,
   getArrayDecoder,
@@ -29,32 +16,41 @@ import {
   getStructEncoder,
   getU8Decoder,
   getU8Encoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type Option,
+  type OptionOrNullable,
 } from "@solana/kit";
 import {
   getBaseFeeParametersDecoder,
   getBaseFeeParametersEncoder,
   getDynamicFeeParametersDecoder,
   getDynamicFeeParametersEncoder,
+  type BaseFeeParameters,
+  type BaseFeeParametersArgs,
+  type DynamicFeeParameters,
+  type DynamicFeeParametersArgs,
 } from "./index.js";
 
 /** Information regarding fee charges */
-export interface PoolFeeParameters {
+export type PoolFeeParameters = {
   /** Base fee */
   baseFee: BaseFeeParameters;
   /** padding */
-  padding: number[];
+  padding: Array<number>;
   /** dynamic fee */
   dynamicFee: Option<DynamicFeeParameters>;
-}
+};
 
-export interface PoolFeeParametersArgs {
+export type PoolFeeParametersArgs = {
   /** Base fee */
   baseFee: BaseFeeParametersArgs;
   /** padding */
-  padding: number[];
+  padding: Array<number>;
   /** dynamic fee */
   dynamicFee: OptionOrNullable<DynamicFeeParametersArgs>;
-}
+};
 
 export function getPoolFeeParametersEncoder(): Encoder<PoolFeeParametersArgs> {
   return getStructEncoder([
