@@ -1,5 +1,11 @@
 # @macalinao/codama-renderers-js-esm
 
+## 0.6.1
+
+### Patch Changes
+
+- dc55630: Update dependencies to their latest versions. Notably, this upgrades `@solana/kit` and `@solana/program-client-core` to v7, `codama` (and its `@codama/*` subpackages) to v1.9, and `typescript` to v7. The generated clients were regenerated with the updated Codama renderers, so downstream consumers should use `@solana/kit` v7. All installs respect the repository's 7-day minimum release age gate.
+
 ## 0.6.0
 
 ### Minor Changes
