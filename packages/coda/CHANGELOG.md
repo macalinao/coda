@@ -1,5 +1,17 @@
 # @macalinao/grill-cli
 
+## 0.6.3
+
+### Patch Changes
+
+- dc55630: Update dependencies to their latest versions. Notably, this upgrades `@solana/kit` and `@solana/program-client-core` to v7, `codama` (and its `@codama/*` subpackages) to v1.9, and `typescript` to v7. The generated clients were regenerated with the updated Codama renderers, so downstream consumers should use `@solana/kit` v7. All installs respect the repository's 7-day minimum release age gate.
+- Updated dependencies [dc55630]
+  - @macalinao/codama-nodes-from-anchor-x@0.2.2
+  - @macalinao/codama-rename-visitor@0.4.2
+  - @macalinao/codama-renderers-js-esm@0.6.1
+  - @macalinao/codama-renderers-markdown@0.5.2
+  - @macalinao/coda-visitors@0.3.1
+
 ## 0.6.2
 
 ### Patch Changes
