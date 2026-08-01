@@ -48,8 +48,9 @@ coverage/
 *.tmp
 *.temp
 
-.devenv.flake.nix
-/nix
-/.devenv
+# Nix / direnv
+.direnv/
+result
+result-*
 
 /docs
