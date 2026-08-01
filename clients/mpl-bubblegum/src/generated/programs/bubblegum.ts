@@ -199,10 +199,18 @@ import {
 export const BUBBLEGUM_PROGRAM_ADDRESS =
   "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">;
 
-export enum BubblegumAccount {
-  TreeConfig,
-  Voucher,
-}
+const BubblegumAccountLookup = {
+  0: "TreeConfig",
+  1: "Voucher",
+  TreeConfig: 0,
+  Voucher: 1,
+} as const;
+
+export const BubblegumAccount: Omit<typeof BubblegumAccountLookup, number> =
+  BubblegumAccountLookup;
+
+export type BubblegumAccount =
+  (typeof BubblegumAccount)[keyof typeof BubblegumAccount];
 
 export function identifyBubblegumAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -236,44 +244,88 @@ export function identifyBubblegumAccount(
   );
 }
 
-export enum BubblegumInstruction {
-  Burn,
-  BurnV2,
-  CancelRedeem,
-  CloseTreeV2,
-  CollectV2,
-  Compress,
-  CreateTree,
-  CreateTreeV2,
-  DecompressV1,
-  Delegate,
-  DelegateAndFreezeV2,
-  DelegateV2,
-  FreezeV2,
-  MintToCollectionV1,
-  MintV1,
-  MintV2,
-  Redeem,
-  SetAndVerifyCollection,
-  SetCollectionV2,
-  SetDecompressableState,
-  SetDecompressibleState,
-  SetNonTransferableV2,
-  SetTreeDelegate,
-  ThawAndRevokeV2,
-  ThawV2,
-  Transfer,
-  TransferV2,
-  UnverifyCollection,
-  UnverifyCreator,
-  UnverifyCreatorV2,
-  UpdateAssetDataV2,
-  UpdateMetadata,
-  UpdateMetadataV2,
-  VerifyCollection,
-  VerifyCreator,
-  VerifyCreatorV2,
-}
+const BubblegumInstructionLookup = {
+  0: "Burn",
+  1: "BurnV2",
+  2: "CancelRedeem",
+  3: "CloseTreeV2",
+  4: "CollectV2",
+  5: "Compress",
+  6: "CreateTree",
+  7: "CreateTreeV2",
+  8: "DecompressV1",
+  9: "Delegate",
+  10: "DelegateAndFreezeV2",
+  11: "DelegateV2",
+  12: "FreezeV2",
+  13: "MintToCollectionV1",
+  14: "MintV1",
+  15: "MintV2",
+  16: "Redeem",
+  17: "SetAndVerifyCollection",
+  18: "SetCollectionV2",
+  19: "SetDecompressableState",
+  20: "SetDecompressibleState",
+  21: "SetNonTransferableV2",
+  22: "SetTreeDelegate",
+  23: "ThawAndRevokeV2",
+  24: "ThawV2",
+  25: "Transfer",
+  26: "TransferV2",
+  27: "UnverifyCollection",
+  28: "UnverifyCreator",
+  29: "UnverifyCreatorV2",
+  30: "UpdateAssetDataV2",
+  31: "UpdateMetadata",
+  32: "UpdateMetadataV2",
+  33: "VerifyCollection",
+  34: "VerifyCreator",
+  35: "VerifyCreatorV2",
+  Burn: 0,
+  BurnV2: 1,
+  CancelRedeem: 2,
+  CloseTreeV2: 3,
+  CollectV2: 4,
+  Compress: 5,
+  CreateTree: 6,
+  CreateTreeV2: 7,
+  DecompressV1: 8,
+  Delegate: 9,
+  DelegateAndFreezeV2: 10,
+  DelegateV2: 11,
+  FreezeV2: 12,
+  MintToCollectionV1: 13,
+  MintV1: 14,
+  MintV2: 15,
+  Redeem: 16,
+  SetAndVerifyCollection: 17,
+  SetCollectionV2: 18,
+  SetDecompressableState: 19,
+  SetDecompressibleState: 20,
+  SetNonTransferableV2: 21,
+  SetTreeDelegate: 22,
+  ThawAndRevokeV2: 23,
+  ThawV2: 24,
+  Transfer: 25,
+  TransferV2: 26,
+  UnverifyCollection: 27,
+  UnverifyCreator: 28,
+  UnverifyCreatorV2: 29,
+  UpdateAssetDataV2: 30,
+  UpdateMetadata: 31,
+  UpdateMetadataV2: 32,
+  VerifyCollection: 33,
+  VerifyCreator: 34,
+  VerifyCreatorV2: 35,
+} as const;
+
+export const BubblegumInstruction: Omit<
+  typeof BubblegumInstructionLookup,
+  number
+> = BubblegumInstructionLookup;
+
+export type BubblegumInstruction =
+  (typeof BubblegumInstruction)[keyof typeof BubblegumInstruction];
 
 export function identifyBubblegumInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -685,112 +737,112 @@ export type ParsedBubblegumInstruction<
   TProgram extends string = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY",
 > =
   | ({
-      instructionType: BubblegumInstruction.Burn;
+      instructionType: typeof BubblegumInstruction.Burn;
     } & ParsedBurnInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.BurnV2;
+      instructionType: typeof BubblegumInstruction.BurnV2;
     } & ParsedBurnV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.CancelRedeem;
+      instructionType: typeof BubblegumInstruction.CancelRedeem;
     } & ParsedCancelRedeemInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.CloseTreeV2;
+      instructionType: typeof BubblegumInstruction.CloseTreeV2;
     } & ParsedCloseTreeV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.CollectV2;
+      instructionType: typeof BubblegumInstruction.CollectV2;
     } & ParsedCollectV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.Compress;
+      instructionType: typeof BubblegumInstruction.Compress;
     } & ParsedCompressInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.CreateTree;
+      instructionType: typeof BubblegumInstruction.CreateTree;
     } & ParsedCreateTreeInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.CreateTreeV2;
+      instructionType: typeof BubblegumInstruction.CreateTreeV2;
     } & ParsedCreateTreeV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.DecompressV1;
+      instructionType: typeof BubblegumInstruction.DecompressV1;
     } & ParsedDecompressV1Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.Delegate;
+      instructionType: typeof BubblegumInstruction.Delegate;
     } & ParsedDelegateInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.DelegateAndFreezeV2;
+      instructionType: typeof BubblegumInstruction.DelegateAndFreezeV2;
     } & ParsedDelegateAndFreezeV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.DelegateV2;
+      instructionType: typeof BubblegumInstruction.DelegateV2;
     } & ParsedDelegateV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.FreezeV2;
+      instructionType: typeof BubblegumInstruction.FreezeV2;
     } & ParsedFreezeV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.MintToCollectionV1;
+      instructionType: typeof BubblegumInstruction.MintToCollectionV1;
     } & ParsedMintToCollectionV1Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.MintV1;
+      instructionType: typeof BubblegumInstruction.MintV1;
     } & ParsedMintV1Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.MintV2;
+      instructionType: typeof BubblegumInstruction.MintV2;
     } & ParsedMintV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.Redeem;
+      instructionType: typeof BubblegumInstruction.Redeem;
     } & ParsedRedeemInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.SetAndVerifyCollection;
+      instructionType: typeof BubblegumInstruction.SetAndVerifyCollection;
     } & ParsedSetAndVerifyCollectionInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.SetCollectionV2;
+      instructionType: typeof BubblegumInstruction.SetCollectionV2;
     } & ParsedSetCollectionV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.SetDecompressableState;
+      instructionType: typeof BubblegumInstruction.SetDecompressableState;
     } & ParsedSetDecompressableStateInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.SetDecompressibleState;
+      instructionType: typeof BubblegumInstruction.SetDecompressibleState;
     } & ParsedSetDecompressibleStateInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.SetNonTransferableV2;
+      instructionType: typeof BubblegumInstruction.SetNonTransferableV2;
     } & ParsedSetNonTransferableV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.SetTreeDelegate;
+      instructionType: typeof BubblegumInstruction.SetTreeDelegate;
     } & ParsedSetTreeDelegateInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.ThawAndRevokeV2;
+      instructionType: typeof BubblegumInstruction.ThawAndRevokeV2;
     } & ParsedThawAndRevokeV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.ThawV2;
+      instructionType: typeof BubblegumInstruction.ThawV2;
     } & ParsedThawV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.Transfer;
+      instructionType: typeof BubblegumInstruction.Transfer;
     } & ParsedTransferInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.TransferV2;
+      instructionType: typeof BubblegumInstruction.TransferV2;
     } & ParsedTransferV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.UnverifyCollection;
+      instructionType: typeof BubblegumInstruction.UnverifyCollection;
     } & ParsedUnverifyCollectionInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.UnverifyCreator;
+      instructionType: typeof BubblegumInstruction.UnverifyCreator;
     } & ParsedUnverifyCreatorInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.UnverifyCreatorV2;
+      instructionType: typeof BubblegumInstruction.UnverifyCreatorV2;
     } & ParsedUnverifyCreatorV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.UpdateAssetDataV2;
+      instructionType: typeof BubblegumInstruction.UpdateAssetDataV2;
     } & ParsedUpdateAssetDataV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.UpdateMetadata;
+      instructionType: typeof BubblegumInstruction.UpdateMetadata;
     } & ParsedUpdateMetadataInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.UpdateMetadataV2;
+      instructionType: typeof BubblegumInstruction.UpdateMetadataV2;
     } & ParsedUpdateMetadataV2Instruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.VerifyCollection;
+      instructionType: typeof BubblegumInstruction.VerifyCollection;
     } & ParsedVerifyCollectionInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.VerifyCreator;
+      instructionType: typeof BubblegumInstruction.VerifyCreator;
     } & ParsedVerifyCreatorInstruction<TProgram>)
   | ({
-      instructionType: BubblegumInstruction.VerifyCreatorV2;
+      instructionType: typeof BubblegumInstruction.VerifyCreatorV2;
     } & ParsedVerifyCreatorV2Instruction<TProgram>);
 
 export function parseBubblegumInstruction<TProgram extends string>(
@@ -1237,7 +1289,7 @@ export function bubblegumProgram() {
     client: T,
   ): ExtendedClient<T, { bubblegum: BubblegumPlugin }> => {
     return extendClient(client, {
-      bubblegum: <BubblegumPlugin>{
+      bubblegum: {
         accounts: {
           treeConfig: addSelfFetchFunctions(client, getTreeConfigCodec()),
           voucher: addSelfFetchFunctions(client, getVoucherCodec()),
@@ -1503,7 +1555,7 @@ export function bubblegumProgram() {
         identifyAccount: identifyBubblegumAccount,
         identifyInstruction: identifyBubblegumInstruction,
         parseInstruction: parseBubblegumInstruction,
-      },
+      } as BubblegumPlugin,
     });
   };
 }

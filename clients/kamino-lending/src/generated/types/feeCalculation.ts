@@ -15,11 +15,19 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const FeeCalculationLookup = {
+  0: "Exclusive",
+  1: "Inclusive",
+  Exclusive: 0,
+  Inclusive: 1,
+} as const;
+
 /** Calculate fees exlusive or inclusive of an amount */
-export enum FeeCalculation {
-  Exclusive,
-  Inclusive,
-}
+export const FeeCalculation: Omit<typeof FeeCalculationLookup, number> =
+  FeeCalculationLookup;
+
+export type FeeCalculation =
+  (typeof FeeCalculation)[keyof typeof FeeCalculation];
 
 export type FeeCalculationArgs = FeeCalculation;
 

@@ -15,12 +15,19 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const UseMethodLookup = {
+  0: "Burn",
+  1: "Multiple",
+  2: "Single",
+  Burn: 0,
+  Multiple: 1,
+  Single: 2,
+} as const;
+
 /** How the remaining uses of an asset are consumed. */
-export enum UseMethod {
-  Burn,
-  Multiple,
-  Single,
-}
+export const UseMethod: Omit<typeof UseMethodLookup, number> = UseMethodLookup;
+
+export type UseMethod = (typeof UseMethod)[keyof typeof UseMethod];
 
 export type UseMethodArgs = UseMethod;
 

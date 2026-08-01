@@ -15,28 +15,52 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const PluginTypeLookup = {
+  0: "Royalties",
+  1: "FreezeDelegate",
+  2: "BurnDelegate",
+  3: "TransferDelegate",
+  4: "UpdateDelegate",
+  5: "PermanentFreezeDelegate",
+  6: "Attributes",
+  7: "PermanentTransferDelegate",
+  8: "PermanentBurnDelegate",
+  9: "Edition",
+  10: "MasterEdition",
+  11: "AddBlocker",
+  12: "ImmutableMetadata",
+  13: "VerifiedCreators",
+  14: "Autograph",
+  15: "BubblegumV2",
+  16: "FreezeExecute",
+  17: "PermanentFreezeExecute",
+  18: "Groups",
+  Royalties: 0,
+  FreezeDelegate: 1,
+  BurnDelegate: 2,
+  TransferDelegate: 3,
+  UpdateDelegate: 4,
+  PermanentFreezeDelegate: 5,
+  Attributes: 6,
+  PermanentTransferDelegate: 7,
+  PermanentBurnDelegate: 8,
+  Edition: 9,
+  MasterEdition: 10,
+  AddBlocker: 11,
+  ImmutableMetadata: 12,
+  VerifiedCreators: 13,
+  Autograph: 14,
+  BubblegumV2: 15,
+  FreezeExecute: 16,
+  PermanentFreezeExecute: 17,
+  Groups: 18,
+} as const;
+
 /** The kind of internal plugin, without its configuration or data. */
-export enum PluginType {
-  Royalties,
-  FreezeDelegate,
-  BurnDelegate,
-  TransferDelegate,
-  UpdateDelegate,
-  PermanentFreezeDelegate,
-  Attributes,
-  PermanentTransferDelegate,
-  PermanentBurnDelegate,
-  Edition,
-  MasterEdition,
-  AddBlocker,
-  ImmutableMetadata,
-  VerifiedCreators,
-  Autograph,
-  BubblegumV2,
-  FreezeExecute,
-  PermanentFreezeExecute,
-  Groups,
-}
+export const PluginType: Omit<typeof PluginTypeLookup, number> =
+  PluginTypeLookup;
+
+export type PluginType = (typeof PluginType)[keyof typeof PluginType];
 
 export type PluginTypeArgs = PluginType;
 

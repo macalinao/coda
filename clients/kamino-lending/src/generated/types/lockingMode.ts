@@ -15,11 +15,19 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum LockingMode {
-  None,
-  Continuous,
-  WithExpiry,
-}
+const LockingModeLookup = {
+  0: "None",
+  1: "Continuous",
+  2: "WithExpiry",
+  None: 0,
+  Continuous: 1,
+  WithExpiry: 2,
+} as const;
+
+export const LockingMode: Omit<typeof LockingModeLookup, number> =
+  LockingModeLookup;
+
+export type LockingMode = (typeof LockingMode)[keyof typeof LockingMode];
 
 export type LockingModeArgs = LockingMode;
 

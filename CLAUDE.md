@@ -109,6 +109,7 @@ coda/
 - Adds `.js` extensions to all imports
 - Removes Node.js-specific environment checks
 - Ensures compatibility with `"type": "module"`
+- Emits only erasable syntax (no `enum`, no angle-bracket assertions), so generated clients compile under `erasableSyntaxOnly`
 
 ### 4. **@macalinao/clients-token-metadata**
 

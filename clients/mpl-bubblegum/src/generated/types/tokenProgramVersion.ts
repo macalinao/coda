@@ -15,11 +15,21 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const TokenProgramVersionLookup = {
+  0: "Original",
+  1: "Token2022",
+  Original: 0,
+  Token2022: 1,
+} as const;
+
 /** Which SPL token program a decompressed leaf's mint should use. */
-export enum TokenProgramVersion {
-  Original,
-  Token2022,
-}
+export const TokenProgramVersion: Omit<
+  typeof TokenProgramVersionLookup,
+  number
+> = TokenProgramVersionLookup;
+
+export type TokenProgramVersion =
+  (typeof TokenProgramVersion)[keyof typeof TokenProgramVersion];
 
 export type TokenProgramVersionArgs = TokenProgramVersion;
 

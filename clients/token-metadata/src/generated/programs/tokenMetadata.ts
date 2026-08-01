@@ -319,83 +319,171 @@ import {
 export const TOKEN_METADATA_PROGRAM_ADDRESS =
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
 
-export enum TokenMetadataAccount {
-  CollectionAuthorityRecord,
-  MetadataDelegateRecord,
-  HolderDelegateRecord,
-  Edition,
-  EditionMarker,
-  EditionMarkerV2,
-  TokenOwnedEscrow,
-  MasterEditionV2,
-  MasterEditionV1,
-  Metadata,
-  TokenRecord,
-  ReservationListV2,
-  ReservationListV1,
-  UseAuthorityRecord,
-}
+const TokenMetadataAccountLookup = {
+  0: "CollectionAuthorityRecord",
+  1: "MetadataDelegateRecord",
+  2: "HolderDelegateRecord",
+  3: "Edition",
+  4: "EditionMarker",
+  5: "EditionMarkerV2",
+  6: "TokenOwnedEscrow",
+  7: "MasterEditionV2",
+  8: "MasterEditionV1",
+  9: "Metadata",
+  10: "TokenRecord",
+  11: "ReservationListV2",
+  12: "ReservationListV1",
+  13: "UseAuthorityRecord",
+  CollectionAuthorityRecord: 0,
+  MetadataDelegateRecord: 1,
+  HolderDelegateRecord: 2,
+  Edition: 3,
+  EditionMarker: 4,
+  EditionMarkerV2: 5,
+  TokenOwnedEscrow: 6,
+  MasterEditionV2: 7,
+  MasterEditionV1: 8,
+  Metadata: 9,
+  TokenRecord: 10,
+  ReservationListV2: 11,
+  ReservationListV1: 12,
+  UseAuthorityRecord: 13,
+} as const;
 
-export enum TokenMetadataInstruction {
-  CreateMetadataAccount,
-  UpdateMetadataAccount,
-  DeprecatedCreateMasterEdition,
-  DeprecatedMintNewEditionFromMasterEditionViaPrintingToken,
-  UpdatePrimarySaleHappenedViaToken,
-  DeprecatedSetReservationList,
-  DeprecatedCreateReservationList,
-  SignMetadata,
-  DeprecatedMintPrintingTokensViaToken,
-  DeprecatedMintPrintingTokens,
-  CreateMasterEdition,
-  MintNewEditionFromMasterEditionViaToken,
-  ConvertMasterEditionV1ToV2,
-  MintNewEditionFromMasterEditionViaVaultProxy,
-  PuffMetadata,
-  UpdateMetadataAccountV2,
-  CreateMetadataAccountV2,
-  CreateMasterEditionV3,
-  VerifyCollection,
-  Utilize,
-  ApproveUseAuthority,
-  RevokeUseAuthority,
-  UnverifyCollection,
-  ApproveCollectionAuthority,
-  RevokeCollectionAuthority,
-  SetAndVerifyCollection,
-  FreezeDelegatedAccount,
-  ThawDelegatedAccount,
-  RemoveCreatorVerification,
-  BurnNft,
-  VerifySizedCollectionItem,
-  UnverifySizedCollectionItem,
-  SetAndVerifySizedCollectionItem,
-  CreateMetadataAccountV3,
-  SetCollectionSize,
-  SetTokenStandard,
-  BubblegumSetCollectionSize,
-  BurnEditionNft,
-  CreateEscrowAccount,
-  CloseEscrowAccount,
-  TransferOutOfEscrow,
-  Burn,
-  Create,
-  Mint,
-  Delegate,
-  Revoke,
-  Lock,
-  Unlock,
-  Migrate,
-  Transfer,
-  Update,
-  Use,
-  Verify,
-  Unverify,
-  Collect,
-  Print,
-  Resize,
-  CloseAccounts,
-}
+export const TokenMetadataAccount: Omit<
+  typeof TokenMetadataAccountLookup,
+  number
+> = TokenMetadataAccountLookup;
+
+export type TokenMetadataAccount =
+  (typeof TokenMetadataAccount)[keyof typeof TokenMetadataAccount];
+
+const TokenMetadataInstructionLookup = {
+  0: "CreateMetadataAccount",
+  1: "UpdateMetadataAccount",
+  2: "DeprecatedCreateMasterEdition",
+  3: "DeprecatedMintNewEditionFromMasterEditionViaPrintingToken",
+  4: "UpdatePrimarySaleHappenedViaToken",
+  5: "DeprecatedSetReservationList",
+  6: "DeprecatedCreateReservationList",
+  7: "SignMetadata",
+  8: "DeprecatedMintPrintingTokensViaToken",
+  9: "DeprecatedMintPrintingTokens",
+  10: "CreateMasterEdition",
+  11: "MintNewEditionFromMasterEditionViaToken",
+  12: "ConvertMasterEditionV1ToV2",
+  13: "MintNewEditionFromMasterEditionViaVaultProxy",
+  14: "PuffMetadata",
+  15: "UpdateMetadataAccountV2",
+  16: "CreateMetadataAccountV2",
+  17: "CreateMasterEditionV3",
+  18: "VerifyCollection",
+  19: "Utilize",
+  20: "ApproveUseAuthority",
+  21: "RevokeUseAuthority",
+  22: "UnverifyCollection",
+  23: "ApproveCollectionAuthority",
+  24: "RevokeCollectionAuthority",
+  25: "SetAndVerifyCollection",
+  26: "FreezeDelegatedAccount",
+  27: "ThawDelegatedAccount",
+  28: "RemoveCreatorVerification",
+  29: "BurnNft",
+  30: "VerifySizedCollectionItem",
+  31: "UnverifySizedCollectionItem",
+  32: "SetAndVerifySizedCollectionItem",
+  33: "CreateMetadataAccountV3",
+  34: "SetCollectionSize",
+  35: "SetTokenStandard",
+  36: "BubblegumSetCollectionSize",
+  37: "BurnEditionNft",
+  38: "CreateEscrowAccount",
+  39: "CloseEscrowAccount",
+  40: "TransferOutOfEscrow",
+  41: "Burn",
+  42: "Create",
+  43: "Mint",
+  44: "Delegate",
+  45: "Revoke",
+  46: "Lock",
+  47: "Unlock",
+  48: "Migrate",
+  49: "Transfer",
+  50: "Update",
+  51: "Use",
+  52: "Verify",
+  53: "Unverify",
+  54: "Collect",
+  55: "Print",
+  56: "Resize",
+  57: "CloseAccounts",
+  CreateMetadataAccount: 0,
+  UpdateMetadataAccount: 1,
+  DeprecatedCreateMasterEdition: 2,
+  DeprecatedMintNewEditionFromMasterEditionViaPrintingToken: 3,
+  UpdatePrimarySaleHappenedViaToken: 4,
+  DeprecatedSetReservationList: 5,
+  DeprecatedCreateReservationList: 6,
+  SignMetadata: 7,
+  DeprecatedMintPrintingTokensViaToken: 8,
+  DeprecatedMintPrintingTokens: 9,
+  CreateMasterEdition: 10,
+  MintNewEditionFromMasterEditionViaToken: 11,
+  ConvertMasterEditionV1ToV2: 12,
+  MintNewEditionFromMasterEditionViaVaultProxy: 13,
+  PuffMetadata: 14,
+  UpdateMetadataAccountV2: 15,
+  CreateMetadataAccountV2: 16,
+  CreateMasterEditionV3: 17,
+  VerifyCollection: 18,
+  Utilize: 19,
+  ApproveUseAuthority: 20,
+  RevokeUseAuthority: 21,
+  UnverifyCollection: 22,
+  ApproveCollectionAuthority: 23,
+  RevokeCollectionAuthority: 24,
+  SetAndVerifyCollection: 25,
+  FreezeDelegatedAccount: 26,
+  ThawDelegatedAccount: 27,
+  RemoveCreatorVerification: 28,
+  BurnNft: 29,
+  VerifySizedCollectionItem: 30,
+  UnverifySizedCollectionItem: 31,
+  SetAndVerifySizedCollectionItem: 32,
+  CreateMetadataAccountV3: 33,
+  SetCollectionSize: 34,
+  SetTokenStandard: 35,
+  BubblegumSetCollectionSize: 36,
+  BurnEditionNft: 37,
+  CreateEscrowAccount: 38,
+  CloseEscrowAccount: 39,
+  TransferOutOfEscrow: 40,
+  Burn: 41,
+  Create: 42,
+  Mint: 43,
+  Delegate: 44,
+  Revoke: 45,
+  Lock: 46,
+  Unlock: 47,
+  Migrate: 48,
+  Transfer: 49,
+  Update: 50,
+  Use: 51,
+  Verify: 52,
+  Unverify: 53,
+  Collect: 54,
+  Print: 55,
+  Resize: 56,
+  CloseAccounts: 57,
+} as const;
+
+export const TokenMetadataInstruction: Omit<
+  typeof TokenMetadataInstructionLookup,
+  number
+> = TokenMetadataInstructionLookup;
+
+export type TokenMetadataInstruction =
+  (typeof TokenMetadataInstruction)[keyof typeof TokenMetadataInstruction];
 
 export function identifyTokenMetadataInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -585,178 +673,178 @@ export type ParsedTokenMetadataInstruction<
   TProgram extends string = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
 > =
   | ({
-      instructionType: TokenMetadataInstruction.CreateMetadataAccount;
+      instructionType: typeof TokenMetadataInstruction.CreateMetadataAccount;
     } & ParsedCreateMetadataAccountInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.UpdateMetadataAccount;
+      instructionType: typeof TokenMetadataInstruction.UpdateMetadataAccount;
     } & ParsedUpdateMetadataAccountInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.DeprecatedCreateMasterEdition;
+      instructionType: typeof TokenMetadataInstruction.DeprecatedCreateMasterEdition;
     } & ParsedDeprecatedCreateMasterEditionInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.DeprecatedMintNewEditionFromMasterEditionViaPrintingToken;
+      instructionType: typeof TokenMetadataInstruction.DeprecatedMintNewEditionFromMasterEditionViaPrintingToken;
     } & ParsedDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.UpdatePrimarySaleHappenedViaToken;
+      instructionType: typeof TokenMetadataInstruction.UpdatePrimarySaleHappenedViaToken;
     } & ParsedUpdatePrimarySaleHappenedViaTokenInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.DeprecatedSetReservationList;
+      instructionType: typeof TokenMetadataInstruction.DeprecatedSetReservationList;
     } & ParsedDeprecatedSetReservationListInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.DeprecatedCreateReservationList;
+      instructionType: typeof TokenMetadataInstruction.DeprecatedCreateReservationList;
     } & ParsedDeprecatedCreateReservationListInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.SignMetadata;
+      instructionType: typeof TokenMetadataInstruction.SignMetadata;
     } & ParsedSignMetadataInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.DeprecatedMintPrintingTokensViaToken;
+      instructionType: typeof TokenMetadataInstruction.DeprecatedMintPrintingTokensViaToken;
     } & ParsedDeprecatedMintPrintingTokensViaTokenInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.DeprecatedMintPrintingTokens;
+      instructionType: typeof TokenMetadataInstruction.DeprecatedMintPrintingTokens;
     } & ParsedDeprecatedMintPrintingTokensInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.CreateMasterEdition;
+      instructionType: typeof TokenMetadataInstruction.CreateMasterEdition;
     } & ParsedCreateMasterEditionInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.MintNewEditionFromMasterEditionViaToken;
+      instructionType: typeof TokenMetadataInstruction.MintNewEditionFromMasterEditionViaToken;
     } & ParsedMintNewEditionFromMasterEditionViaTokenInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.ConvertMasterEditionV1ToV2;
+      instructionType: typeof TokenMetadataInstruction.ConvertMasterEditionV1ToV2;
     } & ParsedConvertMasterEditionV1ToV2Instruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.MintNewEditionFromMasterEditionViaVaultProxy;
+      instructionType: typeof TokenMetadataInstruction.MintNewEditionFromMasterEditionViaVaultProxy;
     } & ParsedMintNewEditionFromMasterEditionViaVaultProxyInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.PuffMetadata;
+      instructionType: typeof TokenMetadataInstruction.PuffMetadata;
     } & ParsedPuffMetadataInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.UpdateMetadataAccountV2;
+      instructionType: typeof TokenMetadataInstruction.UpdateMetadataAccountV2;
     } & ParsedUpdateMetadataAccountV2Instruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.CreateMetadataAccountV2;
+      instructionType: typeof TokenMetadataInstruction.CreateMetadataAccountV2;
     } & ParsedCreateMetadataAccountV2Instruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.CreateMasterEditionV3;
+      instructionType: typeof TokenMetadataInstruction.CreateMasterEditionV3;
     } & ParsedCreateMasterEditionV3Instruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.VerifyCollection;
+      instructionType: typeof TokenMetadataInstruction.VerifyCollection;
     } & ParsedVerifyCollectionInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Utilize;
+      instructionType: typeof TokenMetadataInstruction.Utilize;
     } & ParsedUtilizeInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.ApproveUseAuthority;
+      instructionType: typeof TokenMetadataInstruction.ApproveUseAuthority;
     } & ParsedApproveUseAuthorityInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.RevokeUseAuthority;
+      instructionType: typeof TokenMetadataInstruction.RevokeUseAuthority;
     } & ParsedRevokeUseAuthorityInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.UnverifyCollection;
+      instructionType: typeof TokenMetadataInstruction.UnverifyCollection;
     } & ParsedUnverifyCollectionInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.ApproveCollectionAuthority;
+      instructionType: typeof TokenMetadataInstruction.ApproveCollectionAuthority;
     } & ParsedApproveCollectionAuthorityInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.RevokeCollectionAuthority;
+      instructionType: typeof TokenMetadataInstruction.RevokeCollectionAuthority;
     } & ParsedRevokeCollectionAuthorityInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.SetAndVerifyCollection;
+      instructionType: typeof TokenMetadataInstruction.SetAndVerifyCollection;
     } & ParsedSetAndVerifyCollectionInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.FreezeDelegatedAccount;
+      instructionType: typeof TokenMetadataInstruction.FreezeDelegatedAccount;
     } & ParsedFreezeDelegatedAccountInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.ThawDelegatedAccount;
+      instructionType: typeof TokenMetadataInstruction.ThawDelegatedAccount;
     } & ParsedThawDelegatedAccountInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.RemoveCreatorVerification;
+      instructionType: typeof TokenMetadataInstruction.RemoveCreatorVerification;
     } & ParsedRemoveCreatorVerificationInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.BurnNft;
+      instructionType: typeof TokenMetadataInstruction.BurnNft;
     } & ParsedBurnNftInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.VerifySizedCollectionItem;
+      instructionType: typeof TokenMetadataInstruction.VerifySizedCollectionItem;
     } & ParsedVerifySizedCollectionItemInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.UnverifySizedCollectionItem;
+      instructionType: typeof TokenMetadataInstruction.UnverifySizedCollectionItem;
     } & ParsedUnverifySizedCollectionItemInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.SetAndVerifySizedCollectionItem;
+      instructionType: typeof TokenMetadataInstruction.SetAndVerifySizedCollectionItem;
     } & ParsedSetAndVerifySizedCollectionItemInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.CreateMetadataAccountV3;
+      instructionType: typeof TokenMetadataInstruction.CreateMetadataAccountV3;
     } & ParsedCreateMetadataAccountV3Instruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.SetCollectionSize;
+      instructionType: typeof TokenMetadataInstruction.SetCollectionSize;
     } & ParsedSetCollectionSizeInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.SetTokenStandard;
+      instructionType: typeof TokenMetadataInstruction.SetTokenStandard;
     } & ParsedSetTokenStandardInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.BubblegumSetCollectionSize;
+      instructionType: typeof TokenMetadataInstruction.BubblegumSetCollectionSize;
     } & ParsedBubblegumSetCollectionSizeInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.BurnEditionNft;
+      instructionType: typeof TokenMetadataInstruction.BurnEditionNft;
     } & ParsedBurnEditionNftInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.CreateEscrowAccount;
+      instructionType: typeof TokenMetadataInstruction.CreateEscrowAccount;
     } & ParsedCreateEscrowAccountInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.CloseEscrowAccount;
+      instructionType: typeof TokenMetadataInstruction.CloseEscrowAccount;
     } & ParsedCloseEscrowAccountInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.TransferOutOfEscrow;
+      instructionType: typeof TokenMetadataInstruction.TransferOutOfEscrow;
     } & ParsedTransferOutOfEscrowInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Burn;
+      instructionType: typeof TokenMetadataInstruction.Burn;
     } & ParsedBurnInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Create;
+      instructionType: typeof TokenMetadataInstruction.Create;
     } & ParsedCreateInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Mint;
+      instructionType: typeof TokenMetadataInstruction.Mint;
     } & ParsedMintInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Delegate;
+      instructionType: typeof TokenMetadataInstruction.Delegate;
     } & ParsedDelegateInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Revoke;
+      instructionType: typeof TokenMetadataInstruction.Revoke;
     } & ParsedRevokeInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Lock;
+      instructionType: typeof TokenMetadataInstruction.Lock;
     } & ParsedLockInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Unlock;
+      instructionType: typeof TokenMetadataInstruction.Unlock;
     } & ParsedUnlockInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Migrate;
+      instructionType: typeof TokenMetadataInstruction.Migrate;
     } & ParsedMigrateInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Transfer;
+      instructionType: typeof TokenMetadataInstruction.Transfer;
     } & ParsedTransferInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Update;
+      instructionType: typeof TokenMetadataInstruction.Update;
     } & ParsedUpdateInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Use;
+      instructionType: typeof TokenMetadataInstruction.Use;
     } & ParsedUseInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Verify;
+      instructionType: typeof TokenMetadataInstruction.Verify;
     } & ParsedVerifyInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Unverify;
+      instructionType: typeof TokenMetadataInstruction.Unverify;
     } & ParsedUnverifyInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Collect;
+      instructionType: typeof TokenMetadataInstruction.Collect;
     } & ParsedCollectInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Print;
+      instructionType: typeof TokenMetadataInstruction.Print;
     } & ParsedPrintInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.Resize;
+      instructionType: typeof TokenMetadataInstruction.Resize;
     } & ParsedResizeInstruction<TProgram>)
   | ({
-      instructionType: TokenMetadataInstruction.CloseAccounts;
+      instructionType: typeof TokenMetadataInstruction.CloseAccounts;
     } & ParsedCloseAccountsInstruction<TProgram>);
 
 export function parseTokenMetadataInstruction<TProgram extends string>(
@@ -1483,7 +1571,7 @@ export function tokenMetadataProgram() {
     client: T,
   ): ExtendedClient<T, { tokenMetadata: TokenMetadataPlugin }> => {
     return extendClient(client, {
-      tokenMetadata: <TokenMetadataPlugin>{
+      tokenMetadata: {
         accounts: {
           collectionAuthorityRecord: addSelfFetchFunctions(
             client,
@@ -1912,7 +2000,7 @@ export function tokenMetadataProgram() {
         },
         identifyInstruction: identifyTokenMetadataInstruction,
         parseInstruction: parseTokenMetadataInstruction,
-      },
+      } as TokenMetadataPlugin,
     });
   };
 }

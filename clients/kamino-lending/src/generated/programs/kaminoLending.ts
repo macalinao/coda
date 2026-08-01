@@ -274,17 +274,34 @@ import {
 export const KAMINO_LENDING_PROGRAM_ADDRESS =
   "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD" as Address<"KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD">;
 
-export enum KaminoLendingAccount {
-  UserState,
-  LendingGlobalConfig,
-  LendingMarket,
-  Obligation,
-  ReferrerState,
-  ReferrerTokenState,
-  ShortUrl,
-  UserMetadata,
-  Reserve,
-}
+const KaminoLendingAccountLookup = {
+  0: "UserState",
+  1: "LendingGlobalConfig",
+  2: "LendingMarket",
+  3: "Obligation",
+  4: "ReferrerState",
+  5: "ReferrerTokenState",
+  6: "ShortUrl",
+  7: "UserMetadata",
+  8: "Reserve",
+  UserState: 0,
+  LendingGlobalConfig: 1,
+  LendingMarket: 2,
+  Obligation: 3,
+  ReferrerState: 4,
+  ReferrerTokenState: 5,
+  ShortUrl: 6,
+  UserMetadata: 7,
+  Reserve: 8,
+} as const;
+
+export const KaminoLendingAccount: Omit<
+  typeof KaminoLendingAccountLookup,
+  number
+> = KaminoLendingAccountLookup;
+
+export type KaminoLendingAccount =
+  (typeof KaminoLendingAccount)[keyof typeof KaminoLendingAccount];
 
 export function identifyKaminoLendingAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -395,56 +412,112 @@ export function identifyKaminoLendingAccount(
   );
 }
 
-export enum KaminoLendingInstruction {
-  InitLendingMarket,
-  UpdateLendingMarket,
-  UpdateLendingMarketOwner,
-  InitReserve,
-  InitFarmsForReserve,
-  UpdateReserveConfig,
-  RedeemFees,
-  WithdrawProtocolFee,
-  SocializeLoss,
-  SocializeLossV2,
-  MarkObligationForDeleveraging,
-  RefreshReserve,
-  RefreshReservesBatch,
-  DepositReserveLiquidity,
-  RedeemReserveCollateral,
-  InitObligation,
-  InitObligationFarmsForReserve,
-  RefreshObligationFarmsForReserve,
-  RefreshObligation,
-  DepositObligationCollateral,
-  DepositObligationCollateralV2,
-  WithdrawObligationCollateral,
-  WithdrawObligationCollateralV2,
-  BorrowObligationLiquidity,
-  BorrowObligationLiquidityV2,
-  RepayObligationLiquidity,
-  RepayObligationLiquidityV2,
-  RepayAndWithdrawAndRedeem,
-  DepositAndWithdraw,
-  DepositReserveLiquidityAndObligationCollateral,
-  DepositReserveLiquidityAndObligationCollateralV2,
-  WithdrawObligationCollateralAndRedeemReserveCollateral,
-  WithdrawObligationCollateralAndRedeemReserveCollateralV2,
-  LiquidateObligationAndRedeemReserveCollateral,
-  LiquidateObligationAndRedeemReserveCollateralV2,
-  FlashRepayReserveLiquidity,
-  FlashBorrowReserveLiquidity,
-  RequestElevationGroup,
-  InitReferrerTokenState,
-  InitUserMetadata,
-  WithdrawReferrerFees,
-  InitReferrerStateAndShortUrl,
-  DeleteReferrerStateAndShortUrl,
-  SetObligationOrder,
-  InitGlobalConfig,
-  UpdateGlobalConfig,
-  UpdateGlobalConfigAdmin,
-  IdlMissingTypes,
-}
+const KaminoLendingInstructionLookup = {
+  0: "InitLendingMarket",
+  1: "UpdateLendingMarket",
+  2: "UpdateLendingMarketOwner",
+  3: "InitReserve",
+  4: "InitFarmsForReserve",
+  5: "UpdateReserveConfig",
+  6: "RedeemFees",
+  7: "WithdrawProtocolFee",
+  8: "SocializeLoss",
+  9: "SocializeLossV2",
+  10: "MarkObligationForDeleveraging",
+  11: "RefreshReserve",
+  12: "RefreshReservesBatch",
+  13: "DepositReserveLiquidity",
+  14: "RedeemReserveCollateral",
+  15: "InitObligation",
+  16: "InitObligationFarmsForReserve",
+  17: "RefreshObligationFarmsForReserve",
+  18: "RefreshObligation",
+  19: "DepositObligationCollateral",
+  20: "DepositObligationCollateralV2",
+  21: "WithdrawObligationCollateral",
+  22: "WithdrawObligationCollateralV2",
+  23: "BorrowObligationLiquidity",
+  24: "BorrowObligationLiquidityV2",
+  25: "RepayObligationLiquidity",
+  26: "RepayObligationLiquidityV2",
+  27: "RepayAndWithdrawAndRedeem",
+  28: "DepositAndWithdraw",
+  29: "DepositReserveLiquidityAndObligationCollateral",
+  30: "DepositReserveLiquidityAndObligationCollateralV2",
+  31: "WithdrawObligationCollateralAndRedeemReserveCollateral",
+  32: "WithdrawObligationCollateralAndRedeemReserveCollateralV2",
+  33: "LiquidateObligationAndRedeemReserveCollateral",
+  34: "LiquidateObligationAndRedeemReserveCollateralV2",
+  35: "FlashRepayReserveLiquidity",
+  36: "FlashBorrowReserveLiquidity",
+  37: "RequestElevationGroup",
+  38: "InitReferrerTokenState",
+  39: "InitUserMetadata",
+  40: "WithdrawReferrerFees",
+  41: "InitReferrerStateAndShortUrl",
+  42: "DeleteReferrerStateAndShortUrl",
+  43: "SetObligationOrder",
+  44: "InitGlobalConfig",
+  45: "UpdateGlobalConfig",
+  46: "UpdateGlobalConfigAdmin",
+  47: "IdlMissingTypes",
+  InitLendingMarket: 0,
+  UpdateLendingMarket: 1,
+  UpdateLendingMarketOwner: 2,
+  InitReserve: 3,
+  InitFarmsForReserve: 4,
+  UpdateReserveConfig: 5,
+  RedeemFees: 6,
+  WithdrawProtocolFee: 7,
+  SocializeLoss: 8,
+  SocializeLossV2: 9,
+  MarkObligationForDeleveraging: 10,
+  RefreshReserve: 11,
+  RefreshReservesBatch: 12,
+  DepositReserveLiquidity: 13,
+  RedeemReserveCollateral: 14,
+  InitObligation: 15,
+  InitObligationFarmsForReserve: 16,
+  RefreshObligationFarmsForReserve: 17,
+  RefreshObligation: 18,
+  DepositObligationCollateral: 19,
+  DepositObligationCollateralV2: 20,
+  WithdrawObligationCollateral: 21,
+  WithdrawObligationCollateralV2: 22,
+  BorrowObligationLiquidity: 23,
+  BorrowObligationLiquidityV2: 24,
+  RepayObligationLiquidity: 25,
+  RepayObligationLiquidityV2: 26,
+  RepayAndWithdrawAndRedeem: 27,
+  DepositAndWithdraw: 28,
+  DepositReserveLiquidityAndObligationCollateral: 29,
+  DepositReserveLiquidityAndObligationCollateralV2: 30,
+  WithdrawObligationCollateralAndRedeemReserveCollateral: 31,
+  WithdrawObligationCollateralAndRedeemReserveCollateralV2: 32,
+  LiquidateObligationAndRedeemReserveCollateral: 33,
+  LiquidateObligationAndRedeemReserveCollateralV2: 34,
+  FlashRepayReserveLiquidity: 35,
+  FlashBorrowReserveLiquidity: 36,
+  RequestElevationGroup: 37,
+  InitReferrerTokenState: 38,
+  InitUserMetadata: 39,
+  WithdrawReferrerFees: 40,
+  InitReferrerStateAndShortUrl: 41,
+  DeleteReferrerStateAndShortUrl: 42,
+  SetObligationOrder: 43,
+  InitGlobalConfig: 44,
+  UpdateGlobalConfig: 45,
+  UpdateGlobalConfigAdmin: 46,
+  IdlMissingTypes: 47,
+} as const;
+
+export const KaminoLendingInstruction: Omit<
+  typeof KaminoLendingInstructionLookup,
+  number
+> = KaminoLendingInstructionLookup;
+
+export type KaminoLendingInstruction =
+  (typeof KaminoLendingInstruction)[keyof typeof KaminoLendingInstruction];
 
 export function identifyKaminoLendingInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -988,148 +1061,148 @@ export type ParsedKaminoLendingInstruction<
   TProgram extends string = "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
 > =
   | ({
-      instructionType: KaminoLendingInstruction.InitLendingMarket;
+      instructionType: typeof KaminoLendingInstruction.InitLendingMarket;
     } & ParsedInitLendingMarketInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.UpdateLendingMarket;
+      instructionType: typeof KaminoLendingInstruction.UpdateLendingMarket;
     } & ParsedUpdateLendingMarketInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.UpdateLendingMarketOwner;
+      instructionType: typeof KaminoLendingInstruction.UpdateLendingMarketOwner;
     } & ParsedUpdateLendingMarketOwnerInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitReserve;
+      instructionType: typeof KaminoLendingInstruction.InitReserve;
     } & ParsedInitReserveInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitFarmsForReserve;
+      instructionType: typeof KaminoLendingInstruction.InitFarmsForReserve;
     } & ParsedInitFarmsForReserveInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.UpdateReserveConfig;
+      instructionType: typeof KaminoLendingInstruction.UpdateReserveConfig;
     } & ParsedUpdateReserveConfigInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RedeemFees;
+      instructionType: typeof KaminoLendingInstruction.RedeemFees;
     } & ParsedRedeemFeesInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.WithdrawProtocolFee;
+      instructionType: typeof KaminoLendingInstruction.WithdrawProtocolFee;
     } & ParsedWithdrawProtocolFeeInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.SocializeLoss;
+      instructionType: typeof KaminoLendingInstruction.SocializeLoss;
     } & ParsedSocializeLossInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.SocializeLossV2;
+      instructionType: typeof KaminoLendingInstruction.SocializeLossV2;
     } & ParsedSocializeLossV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.MarkObligationForDeleveraging;
+      instructionType: typeof KaminoLendingInstruction.MarkObligationForDeleveraging;
     } & ParsedMarkObligationForDeleveragingInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RefreshReserve;
+      instructionType: typeof KaminoLendingInstruction.RefreshReserve;
     } & ParsedRefreshReserveInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RefreshReservesBatch;
+      instructionType: typeof KaminoLendingInstruction.RefreshReservesBatch;
     } & ParsedRefreshReservesBatchInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.DepositReserveLiquidity;
+      instructionType: typeof KaminoLendingInstruction.DepositReserveLiquidity;
     } & ParsedDepositReserveLiquidityInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RedeemReserveCollateral;
+      instructionType: typeof KaminoLendingInstruction.RedeemReserveCollateral;
     } & ParsedRedeemReserveCollateralInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitObligation;
+      instructionType: typeof KaminoLendingInstruction.InitObligation;
     } & ParsedInitObligationInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitObligationFarmsForReserve;
+      instructionType: typeof KaminoLendingInstruction.InitObligationFarmsForReserve;
     } & ParsedInitObligationFarmsForReserveInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RefreshObligationFarmsForReserve;
+      instructionType: typeof KaminoLendingInstruction.RefreshObligationFarmsForReserve;
     } & ParsedRefreshObligationFarmsForReserveInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RefreshObligation;
+      instructionType: typeof KaminoLendingInstruction.RefreshObligation;
     } & ParsedRefreshObligationInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.DepositObligationCollateral;
+      instructionType: typeof KaminoLendingInstruction.DepositObligationCollateral;
     } & ParsedDepositObligationCollateralInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.DepositObligationCollateralV2;
+      instructionType: typeof KaminoLendingInstruction.DepositObligationCollateralV2;
     } & ParsedDepositObligationCollateralV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.WithdrawObligationCollateral;
+      instructionType: typeof KaminoLendingInstruction.WithdrawObligationCollateral;
     } & ParsedWithdrawObligationCollateralInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.WithdrawObligationCollateralV2;
+      instructionType: typeof KaminoLendingInstruction.WithdrawObligationCollateralV2;
     } & ParsedWithdrawObligationCollateralV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.BorrowObligationLiquidity;
+      instructionType: typeof KaminoLendingInstruction.BorrowObligationLiquidity;
     } & ParsedBorrowObligationLiquidityInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.BorrowObligationLiquidityV2;
+      instructionType: typeof KaminoLendingInstruction.BorrowObligationLiquidityV2;
     } & ParsedBorrowObligationLiquidityV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RepayObligationLiquidity;
+      instructionType: typeof KaminoLendingInstruction.RepayObligationLiquidity;
     } & ParsedRepayObligationLiquidityInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RepayObligationLiquidityV2;
+      instructionType: typeof KaminoLendingInstruction.RepayObligationLiquidityV2;
     } & ParsedRepayObligationLiquidityV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RepayAndWithdrawAndRedeem;
+      instructionType: typeof KaminoLendingInstruction.RepayAndWithdrawAndRedeem;
     } & ParsedRepayAndWithdrawAndRedeemInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.DepositAndWithdraw;
+      instructionType: typeof KaminoLendingInstruction.DepositAndWithdraw;
     } & ParsedDepositAndWithdrawInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateral;
+      instructionType: typeof KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateral;
     } & ParsedDepositReserveLiquidityAndObligationCollateralInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateralV2;
+      instructionType: typeof KaminoLendingInstruction.DepositReserveLiquidityAndObligationCollateralV2;
     } & ParsedDepositReserveLiquidityAndObligationCollateralV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateral;
+      instructionType: typeof KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateral;
     } & ParsedWithdrawObligationCollateralAndRedeemReserveCollateralInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateralV2;
+      instructionType: typeof KaminoLendingInstruction.WithdrawObligationCollateralAndRedeemReserveCollateralV2;
     } & ParsedWithdrawObligationCollateralAndRedeemReserveCollateralV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateral;
+      instructionType: typeof KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateral;
     } & ParsedLiquidateObligationAndRedeemReserveCollateralInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateralV2;
+      instructionType: typeof KaminoLendingInstruction.LiquidateObligationAndRedeemReserveCollateralV2;
     } & ParsedLiquidateObligationAndRedeemReserveCollateralV2Instruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.FlashRepayReserveLiquidity;
+      instructionType: typeof KaminoLendingInstruction.FlashRepayReserveLiquidity;
     } & ParsedFlashRepayReserveLiquidityInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.FlashBorrowReserveLiquidity;
+      instructionType: typeof KaminoLendingInstruction.FlashBorrowReserveLiquidity;
     } & ParsedFlashBorrowReserveLiquidityInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.RequestElevationGroup;
+      instructionType: typeof KaminoLendingInstruction.RequestElevationGroup;
     } & ParsedRequestElevationGroupInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitReferrerTokenState;
+      instructionType: typeof KaminoLendingInstruction.InitReferrerTokenState;
     } & ParsedInitReferrerTokenStateInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitUserMetadata;
+      instructionType: typeof KaminoLendingInstruction.InitUserMetadata;
     } & ParsedInitUserMetadataInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.WithdrawReferrerFees;
+      instructionType: typeof KaminoLendingInstruction.WithdrawReferrerFees;
     } & ParsedWithdrawReferrerFeesInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitReferrerStateAndShortUrl;
+      instructionType: typeof KaminoLendingInstruction.InitReferrerStateAndShortUrl;
     } & ParsedInitReferrerStateAndShortUrlInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.DeleteReferrerStateAndShortUrl;
+      instructionType: typeof KaminoLendingInstruction.DeleteReferrerStateAndShortUrl;
     } & ParsedDeleteReferrerStateAndShortUrlInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.SetObligationOrder;
+      instructionType: typeof KaminoLendingInstruction.SetObligationOrder;
     } & ParsedSetObligationOrderInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.InitGlobalConfig;
+      instructionType: typeof KaminoLendingInstruction.InitGlobalConfig;
     } & ParsedInitGlobalConfigInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.UpdateGlobalConfig;
+      instructionType: typeof KaminoLendingInstruction.UpdateGlobalConfig;
     } & ParsedUpdateGlobalConfigInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.UpdateGlobalConfigAdmin;
+      instructionType: typeof KaminoLendingInstruction.UpdateGlobalConfigAdmin;
     } & ParsedUpdateGlobalConfigAdminInstruction<TProgram>)
   | ({
-      instructionType: KaminoLendingInstruction.IdlMissingTypes;
+      instructionType: typeof KaminoLendingInstruction.IdlMissingTypes;
     } & ParsedIdlMissingTypesInstruction<TProgram>);
 
 export function parseKaminoLendingInstruction<TProgram extends string>(
@@ -1767,7 +1840,7 @@ export function kaminoLendingProgram() {
     client: T,
   ): ExtendedClient<T, { kaminoLending: KaminoLendingPlugin }> => {
     return extendClient(client, {
-      kaminoLending: <KaminoLendingPlugin>{
+      kaminoLending: {
         accounts: {
           userState: addSelfFetchFunctions(client, getUserStateCodec()),
           lendingGlobalConfig: addSelfFetchFunctions(
@@ -2070,7 +2143,7 @@ export function kaminoLendingProgram() {
         identifyAccount: identifyKaminoLendingAccount,
         identifyInstruction: identifyKaminoLendingInstruction,
         parseInstruction: parseKaminoLendingInstruction,
-      },
+      } as KaminoLendingPlugin,
     });
   };
 }

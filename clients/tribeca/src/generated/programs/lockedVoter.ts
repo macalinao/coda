@@ -108,11 +108,20 @@ import {
 export const LOCKED_VOTER_PROGRAM_ADDRESS =
   "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">;
 
-export enum LockedVoterAccount {
-  Locker,
-  LockerWhitelistEntry,
-  Escrow,
-}
+const LockedVoterAccountLookup = {
+  0: "Locker",
+  1: "LockerWhitelistEntry",
+  2: "Escrow",
+  Locker: 0,
+  LockerWhitelistEntry: 1,
+  Escrow: 2,
+} as const;
+
+export const LockedVoterAccount: Omit<typeof LockedVoterAccountLookup, number> =
+  LockedVoterAccountLookup;
+
+export type LockedVoterAccount =
+  (typeof LockedVoterAccount)[keyof typeof LockedVoterAccount];
 
 export function identifyLockedVoterAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -157,21 +166,42 @@ export function identifyLockedVoterAccount(
   );
 }
 
-export enum LockedVoterInstruction {
-  NewLocker,
-  NewEscrow,
-  Lock,
-  LockWithWhitelist,
-  LockWithWhitelistEntry,
-  LockPermissionless,
-  Exit,
-  ActivateProposal,
-  CastVote,
-  SetVoteDelegate,
-  SetLockerParams,
-  ApproveProgramLockPrivilege,
-  RevokeProgramLockPrivilege,
-}
+const LockedVoterInstructionLookup = {
+  0: "NewLocker",
+  1: "NewEscrow",
+  2: "Lock",
+  3: "LockWithWhitelist",
+  4: "LockWithWhitelistEntry",
+  5: "LockPermissionless",
+  6: "Exit",
+  7: "ActivateProposal",
+  8: "CastVote",
+  9: "SetVoteDelegate",
+  10: "SetLockerParams",
+  11: "ApproveProgramLockPrivilege",
+  12: "RevokeProgramLockPrivilege",
+  NewLocker: 0,
+  NewEscrow: 1,
+  Lock: 2,
+  LockWithWhitelist: 3,
+  LockWithWhitelistEntry: 4,
+  LockPermissionless: 5,
+  Exit: 6,
+  ActivateProposal: 7,
+  CastVote: 8,
+  SetVoteDelegate: 9,
+  SetLockerParams: 10,
+  ApproveProgramLockPrivilege: 11,
+  RevokeProgramLockPrivilege: 12,
+} as const;
+
+export const LockedVoterInstruction: Omit<
+  typeof LockedVoterInstructionLookup,
+  number
+> = LockedVoterInstructionLookup;
+
+export type LockedVoterInstruction =
+  (typeof LockedVoterInstruction)[keyof typeof LockedVoterInstruction];
 
 export function identifyLockedVoterInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -330,43 +360,43 @@ export type ParsedLockedVoterInstruction<
   TProgram extends string = "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw",
 > =
   | ({
-      instructionType: LockedVoterInstruction.NewLocker;
+      instructionType: typeof LockedVoterInstruction.NewLocker;
     } & ParsedNewLockerInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.NewEscrow;
+      instructionType: typeof LockedVoterInstruction.NewEscrow;
     } & ParsedNewEscrowInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.Lock;
+      instructionType: typeof LockedVoterInstruction.Lock;
     } & ParsedLockInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.LockWithWhitelist;
+      instructionType: typeof LockedVoterInstruction.LockWithWhitelist;
     } & ParsedLockWithWhitelistInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.LockWithWhitelistEntry;
+      instructionType: typeof LockedVoterInstruction.LockWithWhitelistEntry;
     } & ParsedLockWithWhitelistEntryInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.LockPermissionless;
+      instructionType: typeof LockedVoterInstruction.LockPermissionless;
     } & ParsedLockPermissionlessInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.Exit;
+      instructionType: typeof LockedVoterInstruction.Exit;
     } & ParsedExitInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.ActivateProposal;
+      instructionType: typeof LockedVoterInstruction.ActivateProposal;
     } & ParsedActivateProposalInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.CastVote;
+      instructionType: typeof LockedVoterInstruction.CastVote;
     } & ParsedCastVoteInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.SetVoteDelegate;
+      instructionType: typeof LockedVoterInstruction.SetVoteDelegate;
     } & ParsedSetVoteDelegateInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.SetLockerParams;
+      instructionType: typeof LockedVoterInstruction.SetLockerParams;
     } & ParsedSetLockerParamsInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.ApproveProgramLockPrivilege;
+      instructionType: typeof LockedVoterInstruction.ApproveProgramLockPrivilege;
     } & ParsedApproveProgramLockPrivilegeInstruction<TProgram>)
   | ({
-      instructionType: LockedVoterInstruction.RevokeProgramLockPrivilege;
+      instructionType: typeof LockedVoterInstruction.RevokeProgramLockPrivilege;
     } & ParsedRevokeProgramLockPrivilegeInstruction<TProgram>);
 
 export function parseLockedVoterInstruction<TProgram extends string>(
@@ -562,7 +592,7 @@ export function lockedVoterProgram() {
     client: T,
   ): ExtendedClient<T, { lockedVoter: LockedVoterPlugin }> => {
     return extendClient(client, {
-      lockedVoter: <LockedVoterPlugin>{
+      lockedVoter: {
         accounts: {
           locker: addSelfFetchFunctions(client, getLockerCodec()),
           lockerWhitelistEntry: addSelfFetchFunctions(
@@ -655,7 +685,7 @@ export function lockedVoterProgram() {
         identifyAccount: identifyLockedVoterAccount,
         identifyInstruction: identifyLockedVoterInstruction,
         parseInstruction: parseLockedVoterInstruction,
-      },
+      } as LockedVoterPlugin,
     });
   };
 }

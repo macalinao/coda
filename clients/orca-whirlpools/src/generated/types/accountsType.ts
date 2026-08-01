@@ -15,17 +15,31 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum AccountsType {
-  TransferHookA,
-  TransferHookB,
-  TransferHookReward,
-  TransferHookInput,
-  TransferHookIntermediate,
-  TransferHookOutput,
-  SupplementalTickArrays,
-  SupplementalTickArraysOne,
-  SupplementalTickArraysTwo,
-}
+const AccountsTypeLookup = {
+  0: "TransferHookA",
+  1: "TransferHookB",
+  2: "TransferHookReward",
+  3: "TransferHookInput",
+  4: "TransferHookIntermediate",
+  5: "TransferHookOutput",
+  6: "SupplementalTickArrays",
+  7: "SupplementalTickArraysOne",
+  8: "SupplementalTickArraysTwo",
+  TransferHookA: 0,
+  TransferHookB: 1,
+  TransferHookReward: 2,
+  TransferHookInput: 3,
+  TransferHookIntermediate: 4,
+  TransferHookOutput: 5,
+  SupplementalTickArrays: 6,
+  SupplementalTickArraysOne: 7,
+  SupplementalTickArraysTwo: 8,
+} as const;
+
+export const AccountsType: Omit<typeof AccountsTypeLookup, number> =
+  AccountsTypeLookup;
+
+export type AccountsType = (typeof AccountsType)[keyof typeof AccountsType];
 
 export type AccountsTypeArgs = AccountsType;
 

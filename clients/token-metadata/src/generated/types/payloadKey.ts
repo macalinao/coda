@@ -15,18 +15,33 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum PayloadKey {
-  Amount,
-  Authority,
-  AuthoritySeeds,
-  Delegate,
-  DelegateSeeds,
-  Destination,
-  DestinationSeeds,
-  Holder,
-  Source,
-  SourceSeeds,
-}
+const PayloadKeyLookup = {
+  0: "Amount",
+  1: "Authority",
+  2: "AuthoritySeeds",
+  3: "Delegate",
+  4: "DelegateSeeds",
+  5: "Destination",
+  6: "DestinationSeeds",
+  7: "Holder",
+  8: "Source",
+  9: "SourceSeeds",
+  Amount: 0,
+  Authority: 1,
+  AuthoritySeeds: 2,
+  Delegate: 3,
+  DelegateSeeds: 4,
+  Destination: 5,
+  DestinationSeeds: 6,
+  Holder: 7,
+  Source: 8,
+  SourceSeeds: 9,
+} as const;
+
+export const PayloadKey: Omit<typeof PayloadKeyLookup, number> =
+  PayloadKeyLookup;
+
+export type PayloadKey = (typeof PayloadKey)[keyof typeof PayloadKey];
 
 export type PayloadKeyArgs = PayloadKey;
 

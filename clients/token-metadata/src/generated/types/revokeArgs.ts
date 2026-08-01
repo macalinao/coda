@@ -15,23 +15,43 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum RevokeArgs {
-  CollectionV1,
-  SaleV1,
-  TransferV1,
-  DataV1,
-  UtilityV1,
-  StakingV1,
-  StandardV1,
-  LockedTransferV1,
-  ProgrammableConfigV1,
-  MigrationV1,
-  AuthorityItemV1,
-  DataItemV1,
-  CollectionItemV1,
-  ProgrammableConfigItemV1,
-  PrintDelegateV1,
-}
+const RevokeArgsLookup = {
+  0: "CollectionV1",
+  1: "SaleV1",
+  2: "TransferV1",
+  3: "DataV1",
+  4: "UtilityV1",
+  5: "StakingV1",
+  6: "StandardV1",
+  7: "LockedTransferV1",
+  8: "ProgrammableConfigV1",
+  9: "MigrationV1",
+  10: "AuthorityItemV1",
+  11: "DataItemV1",
+  12: "CollectionItemV1",
+  13: "ProgrammableConfigItemV1",
+  14: "PrintDelegateV1",
+  CollectionV1: 0,
+  SaleV1: 1,
+  TransferV1: 2,
+  DataV1: 3,
+  UtilityV1: 4,
+  StakingV1: 5,
+  StandardV1: 6,
+  LockedTransferV1: 7,
+  ProgrammableConfigV1: 8,
+  MigrationV1: 9,
+  AuthorityItemV1: 10,
+  DataItemV1: 11,
+  CollectionItemV1: 12,
+  ProgrammableConfigItemV1: 13,
+  PrintDelegateV1: 14,
+} as const;
+
+export const RevokeArgs: Omit<typeof RevokeArgsLookup, number> =
+  RevokeArgsLookup;
+
+export type RevokeArgs = (typeof RevokeArgs)[keyof typeof RevokeArgs];
 
 export type RevokeArgsArgs = RevokeArgs;
 

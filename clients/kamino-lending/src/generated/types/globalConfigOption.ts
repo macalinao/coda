@@ -15,10 +15,18 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum GlobalConfigOption {
-  SetPendingGlobalAdmin,
-  SetTreasuryFeeBps,
-}
+const GlobalConfigOptionLookup = {
+  0: "SetPendingGlobalAdmin",
+  1: "SetTreasuryFeeBps",
+  SetPendingGlobalAdmin: 0,
+  SetTreasuryFeeBps: 1,
+} as const;
+
+export const GlobalConfigOption: Omit<typeof GlobalConfigOptionLookup, number> =
+  GlobalConfigOptionLookup;
+
+export type GlobalConfigOption =
+  (typeof GlobalConfigOption)[keyof typeof GlobalConfigOption];
 
 export type GlobalConfigOptionArgs = GlobalConfigOption;
 

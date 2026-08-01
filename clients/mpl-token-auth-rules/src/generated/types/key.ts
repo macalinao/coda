@@ -15,12 +15,19 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const KeyLookup = {
+  0: "Uninitialized",
+  1: "RuleSet",
+  2: "Frequency",
+  Uninitialized: 0,
+  RuleSet: 1,
+  Frequency: 2,
+} as const;
+
 /** Discriminator identifying the type of an auth-rules account. */
-export enum Key {
-  Uninitialized,
-  RuleSet,
-  Frequency,
-}
+export const Key: Omit<typeof KeyLookup, number> = KeyLookup;
+
+export type Key = (typeof Key)[keyof typeof Key];
 
 export type KeyArgs = Key;
 

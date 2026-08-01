@@ -58,9 +58,15 @@ import { findRedeemerPda } from "../pdas/index.js";
 export const QUARRY_REDEEMER_PROGRAM_ADDRESS =
   "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9" as Address<"QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9">;
 
-export enum QuarryRedeemerAccount {
-  Redeemer,
-}
+const QuarryRedeemerAccountLookup = { 0: "Redeemer", Redeemer: 0 } as const;
+
+export const QuarryRedeemerAccount: Omit<
+  typeof QuarryRedeemerAccountLookup,
+  number
+> = QuarryRedeemerAccountLookup;
+
+export type QuarryRedeemerAccount =
+  (typeof QuarryRedeemerAccount)[keyof typeof QuarryRedeemerAccount];
 
 export function identifyQuarryRedeemerAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -83,11 +89,22 @@ export function identifyQuarryRedeemerAccount(
   );
 }
 
-export enum QuarryRedeemerInstruction {
-  CreateRedeemer,
-  RedeemTokens,
-  RedeemAllTokens,
-}
+const QuarryRedeemerInstructionLookup = {
+  0: "CreateRedeemer",
+  1: "RedeemTokens",
+  2: "RedeemAllTokens",
+  CreateRedeemer: 0,
+  RedeemTokens: 1,
+  RedeemAllTokens: 2,
+} as const;
+
+export const QuarryRedeemerInstruction: Omit<
+  typeof QuarryRedeemerInstructionLookup,
+  number
+> = QuarryRedeemerInstructionLookup;
+
+export type QuarryRedeemerInstruction =
+  (typeof QuarryRedeemerInstruction)[keyof typeof QuarryRedeemerInstruction];
 
 export function identifyQuarryRedeemerInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -136,13 +153,13 @@ export type ParsedQuarryRedeemerInstruction<
   TProgram extends string = "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9",
 > =
   | ({
-      instructionType: QuarryRedeemerInstruction.CreateRedeemer;
+      instructionType: typeof QuarryRedeemerInstruction.CreateRedeemer;
     } & ParsedCreateRedeemerInstruction<TProgram>)
   | ({
-      instructionType: QuarryRedeemerInstruction.RedeemTokens;
+      instructionType: typeof QuarryRedeemerInstruction.RedeemTokens;
     } & ParsedRedeemTokensInstruction<TProgram>)
   | ({
-      instructionType: QuarryRedeemerInstruction.RedeemAllTokens;
+      instructionType: typeof QuarryRedeemerInstruction.RedeemAllTokens;
     } & ParsedRedeemAllTokensInstruction<TProgram>);
 
 export function parseQuarryRedeemerInstruction<TProgram extends string>(
@@ -225,7 +242,7 @@ export function quarryRedeemerProgram() {
     client: T,
   ): ExtendedClient<T, { quarryRedeemer: QuarryRedeemerPlugin }> => {
     return extendClient(client, {
-      quarryRedeemer: <QuarryRedeemerPlugin>{
+      quarryRedeemer: {
         accounts: {
           redeemer: addSelfFetchFunctions(client, getRedeemerCodec()),
         },
@@ -253,7 +270,7 @@ export function quarryRedeemerProgram() {
         identifyAccount: identifyQuarryRedeemerAccount,
         identifyInstruction: identifyQuarryRedeemerInstruction,
         parseInstruction: parseQuarryRedeemerInstruction,
-      },
+      } as QuarryRedeemerPlugin,
     });
   };
 }

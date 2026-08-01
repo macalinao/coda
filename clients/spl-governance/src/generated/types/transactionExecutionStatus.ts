@@ -15,11 +15,22 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum TransactionExecutionStatus {
-  None,
-  Success,
-  Error,
-}
+const TransactionExecutionStatusLookup = {
+  0: "None",
+  1: "Success",
+  2: "Error",
+  None: 0,
+  Success: 1,
+  Error: 2,
+} as const;
+
+export const TransactionExecutionStatus: Omit<
+  typeof TransactionExecutionStatusLookup,
+  number
+> = TransactionExecutionStatusLookup;
+
+export type TransactionExecutionStatus =
+  (typeof TransactionExecutionStatus)[keyof typeof TransactionExecutionStatus];
 
 export type TransactionExecutionStatusArgs = TransactionExecutionStatus;
 

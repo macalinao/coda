@@ -15,15 +15,26 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const ExternalPluginAdapterSchemaLookup = {
+  0: "Binary",
+  1: "Json",
+  2: "MsgPack",
+  Binary: 0,
+  Json: 1,
+  MsgPack: 2,
+} as const;
+
 /**
  * The serialization format used for an external plugin
  * adapter's stored data: `Binary`, `Json` or `MsgPack`.
  */
-export enum ExternalPluginAdapterSchema {
-  Binary,
-  Json,
-  MsgPack,
-}
+export const ExternalPluginAdapterSchema: Omit<
+  typeof ExternalPluginAdapterSchemaLookup,
+  number
+> = ExternalPluginAdapterSchemaLookup;
+
+export type ExternalPluginAdapterSchema =
+  (typeof ExternalPluginAdapterSchema)[keyof typeof ExternalPluginAdapterSchema];
 
 export type ExternalPluginAdapterSchemaArgs = ExternalPluginAdapterSchema;
 

@@ -15,10 +15,17 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum RewardType {
-  Proportional,
-  Constant,
-}
+const RewardTypeLookup = {
+  0: "Proportional",
+  1: "Constant",
+  Proportional: 0,
+  Constant: 1,
+} as const;
+
+export const RewardType: Omit<typeof RewardTypeLookup, number> =
+  RewardTypeLookup;
+
+export type RewardType = (typeof RewardType)[keyof typeof RewardType];
 
 export type RewardTypeArgs = RewardType;
 

@@ -26,12 +26,12 @@ export function mplTokenMetadataProgram() {
     client: T,
   ): ExtendedClient<T, { mplTokenMetadata: MplTokenMetadataPlugin }> => {
     return extendClient(client, {
-      mplTokenMetadata: <MplTokenMetadataPlugin>{
+      mplTokenMetadata: {
         pdas: {
           metadata: findMetadataPda,
           masterEdition: findMasterEditionPda,
         },
-      },
+      } as MplTokenMetadataPlugin,
     });
   };
 }

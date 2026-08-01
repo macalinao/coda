@@ -15,15 +15,21 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const DataStateLookup = {
+  0: "AccountState",
+  1: "LedgerState",
+  AccountState: 0,
+  LedgerState: 1,
+} as const;
+
 /**
  * Whether an asset/collection's data lives fully on-chain
  * (`AccountState`) or in the compressed, off-chain-hashed form
  * (`LedgerState`).
  */
-export enum DataState {
-  AccountState,
-  LedgerState,
-}
+export const DataState: Omit<typeof DataStateLookup, number> = DataStateLookup;
+
+export type DataState = (typeof DataState)[keyof typeof DataState];
 
 export type DataStateArgs = DataState;
 

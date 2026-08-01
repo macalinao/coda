@@ -15,10 +15,16 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum TimeUnit {
-  Seconds,
-  Slots,
-}
+const TimeUnitLookup = {
+  0: "Seconds",
+  1: "Slots",
+  Seconds: 0,
+  Slots: 1,
+} as const;
+
+export const TimeUnit: Omit<typeof TimeUnitLookup, number> = TimeUnitLookup;
+
+export type TimeUnit = (typeof TimeUnit)[keyof typeof TimeUnit];
 
 export type TimeUnitArgs = TimeUnit;
 

@@ -15,11 +15,19 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum TokenState {
-  Unlocked,
-  Locked,
-  Listed,
-}
+const TokenStateLookup = {
+  0: "Unlocked",
+  1: "Locked",
+  2: "Listed",
+  Unlocked: 0,
+  Locked: 1,
+  Listed: 2,
+} as const;
+
+export const TokenState: Omit<typeof TokenStateLookup, number> =
+  TokenStateLookup;
+
+export type TokenState = (typeof TokenState)[keyof typeof TokenState];
 
 export type TokenStateArgs = TokenState;
 

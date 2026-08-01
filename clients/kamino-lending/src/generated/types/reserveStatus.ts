@@ -15,11 +15,19 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum ReserveStatus {
-  Active,
-  Obsolete,
-  Hidden,
-}
+const ReserveStatusLookup = {
+  0: "Active",
+  1: "Obsolete",
+  2: "Hidden",
+  Active: 0,
+  Obsolete: 1,
+  Hidden: 2,
+} as const;
+
+export const ReserveStatus: Omit<typeof ReserveStatusLookup, number> =
+  ReserveStatusLookup;
+
+export type ReserveStatus = (typeof ReserveStatus)[keyof typeof ReserveStatus];
 
 export type ReserveStatusArgs = ReserveStatus;
 

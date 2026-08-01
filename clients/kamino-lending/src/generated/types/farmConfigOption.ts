@@ -15,29 +15,56 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum FarmConfigOption {
-  UpdateRewardRps,
-  UpdateRewardMinClaimDuration,
-  WithdrawAuthority,
-  DepositWarmupPeriod,
-  WithdrawCooldownPeriod,
-  RewardType,
-  RpsDecimals,
-  LockingMode,
-  LockingStartTimestamp,
-  LockingDuration,
-  LockingEarlyWithdrawalPenaltyBps,
-  DepositCapAmount,
-  SlashedAmountSpillAddress,
-  ScopePricesAccount,
-  ScopeOraclePriceId,
-  ScopeOracleMaxAge,
-  UpdateRewardScheduleCurvePoints,
-  UpdatePendingFarmAdmin,
-  UpdateStrategyId,
-  UpdateDelegatedRpsAdmin,
-  UpdateVaultId,
-}
+const FarmConfigOptionLookup = {
+  0: "UpdateRewardRps",
+  1: "UpdateRewardMinClaimDuration",
+  2: "WithdrawAuthority",
+  3: "DepositWarmupPeriod",
+  4: "WithdrawCooldownPeriod",
+  5: "RewardType",
+  6: "RpsDecimals",
+  7: "LockingMode",
+  8: "LockingStartTimestamp",
+  9: "LockingDuration",
+  10: "LockingEarlyWithdrawalPenaltyBps",
+  11: "DepositCapAmount",
+  12: "SlashedAmountSpillAddress",
+  13: "ScopePricesAccount",
+  14: "ScopeOraclePriceId",
+  15: "ScopeOracleMaxAge",
+  16: "UpdateRewardScheduleCurvePoints",
+  17: "UpdatePendingFarmAdmin",
+  18: "UpdateStrategyId",
+  19: "UpdateDelegatedRpsAdmin",
+  20: "UpdateVaultId",
+  UpdateRewardRps: 0,
+  UpdateRewardMinClaimDuration: 1,
+  WithdrawAuthority: 2,
+  DepositWarmupPeriod: 3,
+  WithdrawCooldownPeriod: 4,
+  RewardType: 5,
+  RpsDecimals: 6,
+  LockingMode: 7,
+  LockingStartTimestamp: 8,
+  LockingDuration: 9,
+  LockingEarlyWithdrawalPenaltyBps: 10,
+  DepositCapAmount: 11,
+  SlashedAmountSpillAddress: 12,
+  ScopePricesAccount: 13,
+  ScopeOraclePriceId: 14,
+  ScopeOracleMaxAge: 15,
+  UpdateRewardScheduleCurvePoints: 16,
+  UpdatePendingFarmAdmin: 17,
+  UpdateStrategyId: 18,
+  UpdateDelegatedRpsAdmin: 19,
+  UpdateVaultId: 20,
+} as const;
+
+export const FarmConfigOption: Omit<typeof FarmConfigOptionLookup, number> =
+  FarmConfigOptionLookup;
+
+export type FarmConfigOption =
+  (typeof FarmConfigOption)[keyof typeof FarmConfigOption];
 
 export type FarmConfigOptionArgs = FarmConfigOption;
 

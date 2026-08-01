@@ -15,17 +15,26 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const TokenStandardLookup = {
+  0: "NonFungible",
+  1: "FungibleAsset",
+  2: "Fungible",
+  3: "NonFungibleEdition",
+  NonFungible: 0,
+  FungibleAsset: 1,
+  Fungible: 2,
+  NonFungibleEdition: 3,
+} as const;
+
 /**
  * Token Metadata token standard recorded on a leaf. Bubblegum
  * currently only mints `NonFungible` assets; the other variants exist
  * for compatibility with the wider Token Metadata type.
  */
-export enum TokenStandard {
-  NonFungible,
-  FungibleAsset,
-  Fungible,
-  NonFungibleEdition,
-}
+export const TokenStandard: Omit<typeof TokenStandardLookup, number> =
+  TokenStandardLookup;
+
+export type TokenStandard = (typeof TokenStandard)[keyof typeof TokenStandard];
 
 export type TokenStandardArgs = TokenStandard;
 

@@ -15,15 +15,28 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum TokenDelegateRole {
-  Sale,
-  Transfer,
-  Utility,
-  Staking,
-  Standard,
-  LockedTransfer,
-  Migration,
-}
+const TokenDelegateRoleLookup = {
+  0: "Sale",
+  1: "Transfer",
+  2: "Utility",
+  3: "Staking",
+  4: "Standard",
+  5: "LockedTransfer",
+  6: "Migration",
+  Sale: 0,
+  Transfer: 1,
+  Utility: 2,
+  Staking: 3,
+  Standard: 4,
+  LockedTransfer: 5,
+  Migration: 6,
+} as const;
+
+export const TokenDelegateRole: Omit<typeof TokenDelegateRoleLookup, number> =
+  TokenDelegateRoleLookup;
+
+export type TokenDelegateRole =
+  (typeof TokenDelegateRole)[keyof typeof TokenDelegateRole];
 
 export type TokenDelegateRoleArgs = TokenDelegateRole;
 

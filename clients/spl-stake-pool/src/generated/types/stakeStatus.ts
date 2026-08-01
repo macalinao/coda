@@ -15,14 +15,24 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const StakeStatusLookup = {
+  0: "Active",
+  1: "DeactivatingTransient",
+  2: "ReadyForRemoval",
+  3: "DeactivatingValidator",
+  4: "DeactivatingAll",
+  Active: 0,
+  DeactivatingTransient: 1,
+  ReadyForRemoval: 2,
+  DeactivatingValidator: 3,
+  DeactivatingAll: 4,
+} as const;
+
 /** Status of the stake account in the validator list, for accounting */
-export enum StakeStatus {
-  Active,
-  DeactivatingTransient,
-  ReadyForRemoval,
-  DeactivatingValidator,
-  DeactivatingAll,
-}
+export const StakeStatus: Omit<typeof StakeStatusLookup, number> =
+  StakeStatusLookup;
+
+export type StakeStatus = (typeof StakeStatus)[keyof typeof StakeStatus];
 
 export type StakeStatusArgs = StakeStatus;
 

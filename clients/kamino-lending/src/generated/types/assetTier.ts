@@ -15,11 +15,18 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum AssetTier {
-  Regular,
-  IsolatedCollateral,
-  IsolatedDebt,
-}
+const AssetTierLookup = {
+  0: "Regular",
+  1: "IsolatedCollateral",
+  2: "IsolatedDebt",
+  Regular: 0,
+  IsolatedCollateral: 1,
+  IsolatedDebt: 2,
+} as const;
+
+export const AssetTier: Omit<typeof AssetTierLookup, number> = AssetTierLookup;
+
+export type AssetTier = (typeof AssetTier)[keyof typeof AssetTier];
 
 export type AssetTierArgs = AssetTier;
 

@@ -15,16 +15,32 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum MetadataDelegateRole {
-  AuthorityItem,
-  Collection,
-  Use,
-  Data,
-  ProgrammableConfig,
-  DataItem,
-  CollectionItem,
-  ProgrammableConfigItem,
-}
+const MetadataDelegateRoleLookup = {
+  0: "AuthorityItem",
+  1: "Collection",
+  2: "Use",
+  3: "Data",
+  4: "ProgrammableConfig",
+  5: "DataItem",
+  6: "CollectionItem",
+  7: "ProgrammableConfigItem",
+  AuthorityItem: 0,
+  Collection: 1,
+  Use: 2,
+  Data: 3,
+  ProgrammableConfig: 4,
+  DataItem: 5,
+  CollectionItem: 6,
+  ProgrammableConfigItem: 7,
+} as const;
+
+export const MetadataDelegateRole: Omit<
+  typeof MetadataDelegateRoleLookup,
+  number
+> = MetadataDelegateRoleLookup;
+
+export type MetadataDelegateRole =
+  (typeof MetadataDelegateRole)[keyof typeof MetadataDelegateRole];
 
 export type MetadataDelegateRoleArgs = MetadataDelegateRole;
 

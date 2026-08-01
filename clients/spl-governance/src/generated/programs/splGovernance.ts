@@ -242,27 +242,54 @@ import {
 export const SPL_GOVERNANCE_PROGRAM_ADDRESS =
   "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">;
 
-export enum SplGovernanceAccount {
-  GovernanceV2,
-  RealmV1,
-  TokenOwnerRecordV1,
-  GovernanceV1,
-  ProposalV1,
-  SignatoryRecordV1,
-  ProposalInstructionV1,
-  VoteRecordV1,
-  ProgramMetadata,
-  ProposalV2,
-  ProposalDeposit,
-  ProposalTransactionV2,
-  RealmV2,
-  RealmConfigAccount,
-  RequiredSignatory,
-  SignatoryRecordV2,
-  TokenOwnerRecordV2,
-  LegacyTokenOwnerRecord,
-  VoteRecordV2,
-}
+const SplGovernanceAccountLookup = {
+  0: "GovernanceV2",
+  1: "RealmV1",
+  2: "TokenOwnerRecordV1",
+  3: "GovernanceV1",
+  4: "ProposalV1",
+  5: "SignatoryRecordV1",
+  6: "ProposalInstructionV1",
+  7: "VoteRecordV1",
+  8: "ProgramMetadata",
+  9: "ProposalV2",
+  10: "ProposalDeposit",
+  11: "ProposalTransactionV2",
+  12: "RealmV2",
+  13: "RealmConfigAccount",
+  14: "RequiredSignatory",
+  15: "SignatoryRecordV2",
+  16: "TokenOwnerRecordV2",
+  17: "LegacyTokenOwnerRecord",
+  18: "VoteRecordV2",
+  GovernanceV2: 0,
+  RealmV1: 1,
+  TokenOwnerRecordV1: 2,
+  GovernanceV1: 3,
+  ProposalV1: 4,
+  SignatoryRecordV1: 5,
+  ProposalInstructionV1: 6,
+  VoteRecordV1: 7,
+  ProgramMetadata: 8,
+  ProposalV2: 9,
+  ProposalDeposit: 10,
+  ProposalTransactionV2: 11,
+  RealmV2: 12,
+  RealmConfigAccount: 13,
+  RequiredSignatory: 14,
+  SignatoryRecordV2: 15,
+  TokenOwnerRecordV2: 16,
+  LegacyTokenOwnerRecord: 17,
+  VoteRecordV2: 18,
+} as const;
+
+export const SplGovernanceAccount: Omit<
+  typeof SplGovernanceAccountLookup,
+  number
+> = SplGovernanceAccountLookup;
+
+export type SplGovernanceAccount =
+  (typeof SplGovernanceAccount)[keyof typeof SplGovernanceAccount];
 
 export function identifySplGovernanceAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -479,39 +506,78 @@ export function identifySplGovernanceAccount(
   );
 }
 
-export enum SplGovernanceInstruction {
-  CreateRealm,
-  DepositGoverningTokens,
-  WithdrawGoverningTokens,
-  SetGovernanceDelegate,
-  CreateGovernance,
-  CreateProgramGovernance,
-  CreateProposal,
-  AddSignatory,
-  Legacy1,
-  InsertTransaction,
-  RemoveTransaction,
-  CancelProposal,
-  SignOffProposal,
-  CastVote,
-  FinalizeVote,
-  RelinquishVote,
-  ExecuteTransaction,
-  CreateMintGovernance,
-  CreateTokenGovernance,
-  SetGovernanceConfig,
-  FlagTransactionError,
-  SetRealmAuthority,
-  SetRealmConfig,
-  CreateTokenOwnerRecord,
-  UpdateProgramMetadata,
-  CreateNativeTreasury,
-  RevokeGoverningTokens,
-  RefundProposalDeposit,
-  CompleteProposal,
-  AddRequiredSignatory,
-  RemoveRequiredSignatory,
-}
+const SplGovernanceInstructionLookup = {
+  0: "CreateRealm",
+  1: "DepositGoverningTokens",
+  2: "WithdrawGoverningTokens",
+  3: "SetGovernanceDelegate",
+  4: "CreateGovernance",
+  5: "CreateProgramGovernance",
+  6: "CreateProposal",
+  7: "AddSignatory",
+  8: "Legacy1",
+  9: "InsertTransaction",
+  10: "RemoveTransaction",
+  11: "CancelProposal",
+  12: "SignOffProposal",
+  13: "CastVote",
+  14: "FinalizeVote",
+  15: "RelinquishVote",
+  16: "ExecuteTransaction",
+  17: "CreateMintGovernance",
+  18: "CreateTokenGovernance",
+  19: "SetGovernanceConfig",
+  20: "FlagTransactionError",
+  21: "SetRealmAuthority",
+  22: "SetRealmConfig",
+  23: "CreateTokenOwnerRecord",
+  24: "UpdateProgramMetadata",
+  25: "CreateNativeTreasury",
+  26: "RevokeGoverningTokens",
+  27: "RefundProposalDeposit",
+  28: "CompleteProposal",
+  29: "AddRequiredSignatory",
+  30: "RemoveRequiredSignatory",
+  CreateRealm: 0,
+  DepositGoverningTokens: 1,
+  WithdrawGoverningTokens: 2,
+  SetGovernanceDelegate: 3,
+  CreateGovernance: 4,
+  CreateProgramGovernance: 5,
+  CreateProposal: 6,
+  AddSignatory: 7,
+  Legacy1: 8,
+  InsertTransaction: 9,
+  RemoveTransaction: 10,
+  CancelProposal: 11,
+  SignOffProposal: 12,
+  CastVote: 13,
+  FinalizeVote: 14,
+  RelinquishVote: 15,
+  ExecuteTransaction: 16,
+  CreateMintGovernance: 17,
+  CreateTokenGovernance: 18,
+  SetGovernanceConfig: 19,
+  FlagTransactionError: 20,
+  SetRealmAuthority: 21,
+  SetRealmConfig: 22,
+  CreateTokenOwnerRecord: 23,
+  UpdateProgramMetadata: 24,
+  CreateNativeTreasury: 25,
+  RevokeGoverningTokens: 26,
+  RefundProposalDeposit: 27,
+  CompleteProposal: 28,
+  AddRequiredSignatory: 29,
+  RemoveRequiredSignatory: 30,
+} as const;
+
+export const SplGovernanceInstruction: Omit<
+  typeof SplGovernanceInstructionLookup,
+  number
+> = SplGovernanceInstructionLookup;
+
+export type SplGovernanceInstruction =
+  (typeof SplGovernanceInstruction)[keyof typeof SplGovernanceInstruction];
 
 export function identifySplGovernanceInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -620,97 +686,97 @@ export type ParsedSplGovernanceInstruction<
   TProgram extends string = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
 > =
   | ({
-      instructionType: SplGovernanceInstruction.CreateRealm;
+      instructionType: typeof SplGovernanceInstruction.CreateRealm;
     } & ParsedCreateRealmInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.DepositGoverningTokens;
+      instructionType: typeof SplGovernanceInstruction.DepositGoverningTokens;
     } & ParsedDepositGoverningTokensInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.WithdrawGoverningTokens;
+      instructionType: typeof SplGovernanceInstruction.WithdrawGoverningTokens;
     } & ParsedWithdrawGoverningTokensInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.SetGovernanceDelegate;
+      instructionType: typeof SplGovernanceInstruction.SetGovernanceDelegate;
     } & ParsedSetGovernanceDelegateInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CreateGovernance;
+      instructionType: typeof SplGovernanceInstruction.CreateGovernance;
     } & ParsedCreateGovernanceInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CreateProgramGovernance;
+      instructionType: typeof SplGovernanceInstruction.CreateProgramGovernance;
     } & ParsedCreateProgramGovernanceInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CreateProposal;
+      instructionType: typeof SplGovernanceInstruction.CreateProposal;
     } & ParsedCreateProposalInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.AddSignatory;
+      instructionType: typeof SplGovernanceInstruction.AddSignatory;
     } & ParsedAddSignatoryInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.Legacy1;
+      instructionType: typeof SplGovernanceInstruction.Legacy1;
     } & ParsedLegacy1Instruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.InsertTransaction;
+      instructionType: typeof SplGovernanceInstruction.InsertTransaction;
     } & ParsedInsertTransactionInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.RemoveTransaction;
+      instructionType: typeof SplGovernanceInstruction.RemoveTransaction;
     } & ParsedRemoveTransactionInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CancelProposal;
+      instructionType: typeof SplGovernanceInstruction.CancelProposal;
     } & ParsedCancelProposalInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.SignOffProposal;
+      instructionType: typeof SplGovernanceInstruction.SignOffProposal;
     } & ParsedSignOffProposalInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CastVote;
+      instructionType: typeof SplGovernanceInstruction.CastVote;
     } & ParsedCastVoteInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.FinalizeVote;
+      instructionType: typeof SplGovernanceInstruction.FinalizeVote;
     } & ParsedFinalizeVoteInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.RelinquishVote;
+      instructionType: typeof SplGovernanceInstruction.RelinquishVote;
     } & ParsedRelinquishVoteInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.ExecuteTransaction;
+      instructionType: typeof SplGovernanceInstruction.ExecuteTransaction;
     } & ParsedExecuteTransactionInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CreateMintGovernance;
+      instructionType: typeof SplGovernanceInstruction.CreateMintGovernance;
     } & ParsedCreateMintGovernanceInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CreateTokenGovernance;
+      instructionType: typeof SplGovernanceInstruction.CreateTokenGovernance;
     } & ParsedCreateTokenGovernanceInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.SetGovernanceConfig;
+      instructionType: typeof SplGovernanceInstruction.SetGovernanceConfig;
     } & ParsedSetGovernanceConfigInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.FlagTransactionError;
+      instructionType: typeof SplGovernanceInstruction.FlagTransactionError;
     } & ParsedFlagTransactionErrorInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.SetRealmAuthority;
+      instructionType: typeof SplGovernanceInstruction.SetRealmAuthority;
     } & ParsedSetRealmAuthorityInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.SetRealmConfig;
+      instructionType: typeof SplGovernanceInstruction.SetRealmConfig;
     } & ParsedSetRealmConfigInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CreateTokenOwnerRecord;
+      instructionType: typeof SplGovernanceInstruction.CreateTokenOwnerRecord;
     } & ParsedCreateTokenOwnerRecordInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.UpdateProgramMetadata;
+      instructionType: typeof SplGovernanceInstruction.UpdateProgramMetadata;
     } & ParsedUpdateProgramMetadataInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CreateNativeTreasury;
+      instructionType: typeof SplGovernanceInstruction.CreateNativeTreasury;
     } & ParsedCreateNativeTreasuryInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.RevokeGoverningTokens;
+      instructionType: typeof SplGovernanceInstruction.RevokeGoverningTokens;
     } & ParsedRevokeGoverningTokensInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.RefundProposalDeposit;
+      instructionType: typeof SplGovernanceInstruction.RefundProposalDeposit;
     } & ParsedRefundProposalDepositInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.CompleteProposal;
+      instructionType: typeof SplGovernanceInstruction.CompleteProposal;
     } & ParsedCompleteProposalInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.AddRequiredSignatory;
+      instructionType: typeof SplGovernanceInstruction.AddRequiredSignatory;
     } & ParsedAddRequiredSignatoryInstruction<TProgram>)
   | ({
-      instructionType: SplGovernanceInstruction.RemoveRequiredSignatory;
+      instructionType: typeof SplGovernanceInstruction.RemoveRequiredSignatory;
     } & ParsedRemoveRequiredSignatoryInstruction<TProgram>);
 
 export function parseSplGovernanceInstruction<TProgram extends string>(
@@ -1146,7 +1212,7 @@ export function splGovernanceProgram() {
     client: T,
   ): ExtendedClient<T, { splGovernance: SplGovernancePlugin }> => {
     return extendClient(client, {
-      splGovernance: <SplGovernancePlugin>{
+      splGovernance: {
         accounts: {
           governanceV2: addSelfFetchFunctions(client, getGovernanceV2Codec()),
           realmV1: addSelfFetchFunctions(client, getRealmV1Codec()),
@@ -1416,7 +1482,7 @@ export function splGovernanceProgram() {
         identifyAccount: identifySplGovernanceAccount,
         identifyInstruction: identifySplGovernanceInstruction,
         parseInstruction: parseSplGovernanceInstruction,
-      },
+      } as SplGovernancePlugin,
     });
   };
 }

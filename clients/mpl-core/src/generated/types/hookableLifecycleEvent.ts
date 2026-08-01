@@ -15,18 +15,31 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const HookableLifecycleEventLookup = {
+  0: "Create",
+  1: "Transfer",
+  2: "Burn",
+  3: "Update",
+  4: "Execute",
+  Create: 0,
+  Transfer: 1,
+  Burn: 2,
+  Update: 3,
+  Execute: 4,
+} as const;
+
 /**
  * A lifecycle event that can trigger an external plugin
  * adapter's check: `Create`, `Transfer`, `Burn`, `Update` or
  * `Execute`.
  */
-export enum HookableLifecycleEvent {
-  Create,
-  Transfer,
-  Burn,
-  Update,
-  Execute,
-}
+export const HookableLifecycleEvent: Omit<
+  typeof HookableLifecycleEventLookup,
+  number
+> = HookableLifecycleEventLookup;
+
+export type HookableLifecycleEvent =
+  (typeof HookableLifecycleEvent)[keyof typeof HookableLifecycleEvent];
 
 export type HookableLifecycleEventArgs = HookableLifecycleEvent;
 

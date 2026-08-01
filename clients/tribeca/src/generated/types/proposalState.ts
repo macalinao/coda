@@ -15,14 +15,25 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum ProposalState {
-  Draft,
-  Active,
-  Canceled,
-  Defeated,
-  Succeeded,
-  Queued,
-}
+const ProposalStateLookup = {
+  0: "Draft",
+  1: "Active",
+  2: "Canceled",
+  3: "Defeated",
+  4: "Succeeded",
+  5: "Queued",
+  Draft: 0,
+  Active: 1,
+  Canceled: 2,
+  Defeated: 3,
+  Succeeded: 4,
+  Queued: 5,
+} as const;
+
+export const ProposalState: Omit<typeof ProposalStateLookup, number> =
+  ProposalStateLookup;
+
+export type ProposalState = (typeof ProposalState)[keyof typeof ProposalState];
 
 export type ProposalStateArgs = ProposalState;
 

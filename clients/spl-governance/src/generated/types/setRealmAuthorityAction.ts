@@ -15,11 +15,22 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum SetRealmAuthorityAction {
-  SetUnchecked,
-  SetChecked,
-  Remove,
-}
+const SetRealmAuthorityActionLookup = {
+  0: "SetUnchecked",
+  1: "SetChecked",
+  2: "Remove",
+  SetUnchecked: 0,
+  SetChecked: 1,
+  Remove: 2,
+} as const;
+
+export const SetRealmAuthorityAction: Omit<
+  typeof SetRealmAuthorityActionLookup,
+  number
+> = SetRealmAuthorityActionLookup;
+
+export type SetRealmAuthorityAction =
+  (typeof SetRealmAuthorityAction)[keyof typeof SetRealmAuthorityAction];
 
 export type SetRealmAuthorityActionArgs = SetRealmAuthorityAction;
 

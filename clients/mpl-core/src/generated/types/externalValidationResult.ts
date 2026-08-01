@@ -15,15 +15,26 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const ExternalValidationResultLookup = {
+  0: "Approved",
+  1: "Rejected",
+  2: "Pass",
+  Approved: 0,
+  Rejected: 1,
+  Pass: 2,
+} as const;
+
 /**
  * The outcome of an external plugin adapter's check for a
  * lifecycle event: `Approved`, `Rejected` or `Pass` (abstain).
  */
-export enum ExternalValidationResult {
-  Approved,
-  Rejected,
-  Pass,
-}
+export const ExternalValidationResult: Omit<
+  typeof ExternalValidationResultLookup,
+  number
+> = ExternalValidationResultLookup;
+
+export type ExternalValidationResult =
+  (typeof ExternalValidationResult)[keyof typeof ExternalValidationResult];
 
 export type ExternalValidationResultArgs = ExternalValidationResult;
 

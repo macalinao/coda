@@ -15,19 +15,30 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const KeyLookup = {
+  0: "Uninitialized",
+  1: "AssetV1",
+  2: "HashedAssetV1",
+  3: "PluginHeaderV1",
+  4: "PluginRegistryV1",
+  5: "CollectionV1",
+  6: "GroupV1",
+  Uninitialized: 0,
+  AssetV1: 1,
+  HashedAssetV1: 2,
+  PluginHeaderV1: 3,
+  PluginRegistryV1: 4,
+  CollectionV1: 5,
+  GroupV1: 6,
+} as const;
+
 /**
  * Account discriminator identifying which kind of MPL Core
  * account a given account is.
  */
-export enum Key {
-  Uninitialized,
-  AssetV1,
-  HashedAssetV1,
-  PluginHeaderV1,
-  PluginRegistryV1,
-  CollectionV1,
-  GroupV1,
-}
+export const Key: Omit<typeof KeyLookup, number> = KeyLookup;
+
+export type Key = (typeof Key)[keyof typeof Key];
 
 export type KeyArgs = Key;
 

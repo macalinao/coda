@@ -8,6 +8,7 @@ import { getRenderMapVisitor } from "@codama/renderers-js";
 import type { InstructionNode, ProgramNode, RootNode } from "codama";
 import { rootNodeVisitor, visit } from "codama";
 import { ESM_DEPENDENCY_MAP } from "./constants.ts";
+import { makeSyntaxErasable } from "./erasable-syntax.ts";
 
 /**
  * Renders an instruction's `docs` as a top-level JSDoc block. Returns an empty
@@ -131,7 +132,10 @@ export function renderESMTypeScriptVisitor(
           },
         );
 
-      return injectInstructionDocs(updated, instructions);
+      // The upstream renderer emits `enum` declarations and an angle-bracket
+      // assertion on the program plugin, neither of which survives
+      // `erasableSyntaxOnly` or Node.js type stripping.
+      return makeSyntaxErasable(injectInstructionDocs(updated, instructions));
     });
 
     writeRenderMap(renderMap, path);

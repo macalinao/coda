@@ -15,13 +15,23 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum LockupKind {
-  None,
-  Daily,
-  Monthly,
-  Cliff,
-  Constant,
-}
+const LockupKindLookup = {
+  0: "None",
+  1: "Daily",
+  2: "Monthly",
+  3: "Cliff",
+  4: "Constant",
+  None: 0,
+  Daily: 1,
+  Monthly: 2,
+  Cliff: 3,
+  Constant: 4,
+} as const;
+
+export const LockupKind: Omit<typeof LockupKindLookup, number> =
+  LockupKindLookup;
+
+export type LockupKind = (typeof LockupKind)[keyof typeof LockupKind];
 
 export type LockupKindArgs = LockupKind;
 
