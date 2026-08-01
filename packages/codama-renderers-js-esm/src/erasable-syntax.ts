@@ -16,16 +16,58 @@
  */
 
 /**
- * Matches an `export enum Name { ... }` declaration, optionally preceded by the
- * docblock rendered directly above it and optionally followed by the stray
- * semicolon the defined-type fragment appends.
+ * Matches an `export enum Name { ... }` declaration, optionally followed by the
+ * stray semicolon the defined-type fragment appends.
  *
- * The docblock group cannot span a comment terminator, so it only ever captures
- * the comment immediately above the declaration. Enum bodies contain nothing
- * but variant names and commas, so `[^}]*` safely stops at the closing brace.
+ * The docblock rendered directly above the declaration is deliberately not part
+ * of this pattern. Matching it as an optional prefix makes the search
+ * super-linear, because every position that fails at `export enum` first
+ * re-scans a candidate comment; it is recovered by {@link precedingDocblock}
+ * instead, which walks backwards from the match in constant time.
+ *
+ * Enum bodies contain nothing but variant names and commas, so `[^}]*` safely
+ * stops at the closing brace.
  */
-const ENUM_DECLARATION =
-  /(?:(\/\*\*(?:[^*]|\*(?!\/))*\*\/)\r?\n)?export enum (\w+) \{([^}]*)\};?/g;
+const ENUM_DECLARATION = /export enum (\w+) \{([^}]*)\};?/g;
+
+interface PrecedingDocblock {
+  /** The docblock text without its trailing newline, or `""` when absent. */
+  comment: string;
+  /** Index the docblock starts at, or the match index itself when absent. */
+  start: number;
+}
+
+/**
+ * Returns the docblock rendered directly above `index`, along with where it
+ * starts so the caller can move it onto the declaration it documents.
+ *
+ * Deliberately written without a regular expression: the scan runs once per
+ * declaration, from a known end position, so it cannot backtrack.
+ */
+function precedingDocblock(code: string, index: number): PrecedingDocblock {
+  const absent: PrecedingDocblock = { comment: "", start: index };
+  if (!code.startsWith("\n", index - 1)) {
+    return absent;
+  }
+  let end = index - 1;
+  if (code.startsWith("\r", end - 1)) {
+    end -= 1;
+  }
+  if (!code.startsWith("*/", end - 2)) {
+    return absent;
+  }
+  const start = code.lastIndexOf("/**", end - 4);
+  if (start === -1) {
+    return absent;
+  }
+  const comment = code.slice(start, end);
+  // A docblock cannot contain its own terminator, so an interior `*/` means
+  // `start` belongs to an earlier comment and this one is not a docblock.
+  if (comment.slice(0, -2).includes("*/")) {
+    return absent;
+  }
+  return { comment, start };
+}
 
 /** Matches an angle-bracket type assertion on the program plugin object. */
 const PLUGIN_ASSERTION = /<(\w+Plugin)>\{/g;
@@ -82,22 +124,26 @@ function replaceEnumDeclarations(code: string): {
   enumNames: Set<string>;
 } {
   const enumNames = new Set<string>();
-  const updated = code.replace(
-    ENUM_DECLARATION,
-    (_match, docblock: string | undefined, name: string, body: string) => {
-      const variantNames = body
-        .split(",")
-        .map((variant) => variant.trim())
-        .filter((variant) => variant.length > 0);
-      enumNames.add(name);
-      return renderErasableEnum(
-        name,
-        variantNames,
-        docblock ? `${docblock}\n` : "",
-      );
-    },
-  );
-  return { code: updated, enumNames };
+  const pieces: string[] = [];
+  let cursor = 0;
+  for (const match of code.matchAll(ENUM_DECLARATION)) {
+    const [matched, name = "", body = ""] = match;
+    const { comment, start } = precedingDocblock(code, match.index);
+    // The docblock moves onto the exported declaration, so it is dropped from
+    // the text preceding the match rather than copied through.
+    pieces.push(code.slice(cursor, start));
+    const variantNames = body
+      .split(",")
+      .map((variant) => variant.trim())
+      .filter((variant) => variant.length > 0);
+    enumNames.add(name);
+    pieces.push(
+      renderErasableEnum(name, variantNames, comment ? `${comment}\n` : ""),
+    );
+    cursor = match.index + matched.length;
+  }
+  pieces.push(code.slice(cursor));
+  return { code: pieces.join(""), enumNames };
 }
 
 /**
