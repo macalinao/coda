@@ -1,5 +1,25 @@
 # @macalinao/grill-cli
 
+## 0.6.4
+
+### Patch Changes
+
+- f608019: Use `.ts` relative import extensions in hand-written package source.
+
+  Package sources now import each other with `.ts` extensions, enabled by
+  `allowImportingTsExtensions` and `rewriteRelativeImportExtensions`. TypeScript
+  rewrites these to `.js` on emit, so published output is unchanged — `dist`
+  still ships `.js` specifiers in both the JavaScript and declaration files.
+
+  Generated clients are unaffected and continue to use `.js` extensions.
+
+- Updated dependencies [f608019]
+  - @macalinao/codama-nodes-from-anchor-x@0.2.3
+  - @macalinao/codama-renderers-markdown@0.5.3
+  - @macalinao/codama-renderers-js-esm@0.6.2
+  - @macalinao/codama-rename-visitor@0.4.3
+  - @macalinao/coda-visitors@0.3.2
+
 ## 0.6.3
 
 ### Patch Changes

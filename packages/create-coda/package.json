@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/create-coda",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Create a new Coda client project",
   "type": "module",
   "bin": {
