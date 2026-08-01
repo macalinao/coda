@@ -1,9 +1,9 @@
 import type { Node, Visitor } from "codama";
-import type { ProgramRenameOptions } from "./types.js";
+import type { ProgramRenameOptions } from "./types.ts";
 import { bottomUpTransformerVisitor, rootNodeVisitor, visit } from "codama";
-import { renameAccountTransform } from "./rename-accounts-visitor.js";
-import { renameDefinedTypeTransform } from "./rename-defined-types-visitor.js";
-import { renameInstructionTransform } from "./rename-instructions-visitor.js";
+import { renameAccountTransform } from "./rename-accounts-visitor.ts";
+import { renameDefinedTypeTransform } from "./rename-defined-types-visitor.ts";
+import { renameInstructionTransform } from "./rename-instructions-visitor.ts";
 
 /**
  * Creates a visitor that renames accounts, instructions, and defined types in specific programs.

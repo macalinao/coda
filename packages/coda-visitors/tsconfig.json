@@ -1,6 +1,8 @@
 {
   "extends": "@macalinao/tsconfig/tsconfig.base.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
     "isolatedDeclarations": false,
     "types": ["bun"]
   },

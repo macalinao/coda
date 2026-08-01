@@ -1,6 +1,6 @@
 // Re-export useful visitors and utilities
 
-export type { CodaConfig, VisitorContext } from "./config.js";
+export type { CodaConfig, VisitorContext } from "./config.ts";
 export * from "@macalinao/coda-visitors";
 export { renameVisitor } from "@macalinao/codama-rename-visitor";
 export {
@@ -8,4 +8,4 @@ export {
   renderESMTypeScriptVisitor,
 } from "@macalinao/codama-renderers-js-esm";
 export * from "codama";
-export { defineConfig } from "./config.js";
+export { defineConfig } from "./config.ts";

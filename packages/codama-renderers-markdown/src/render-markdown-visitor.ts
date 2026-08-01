@@ -1,4 +1,4 @@
-import type { RenderMarkdownOptions } from "./types.js";
+import type { RenderMarkdownOptions } from "./types.ts";
 import { getAllPrograms } from "@codama/nodes";
 import {
   addToRenderMap,
@@ -12,7 +12,7 @@ import {
   visit,
 } from "@codama/visitors-core";
 import * as prettier from "prettier";
-import { renderProgram } from "./renderers/render-program.js";
+import { renderProgram } from "./renderers/render-program.ts";
 
 const CAPITAL_LETTER_REGEX = /([A-Z])/g;
 const LEADING_DASH_REGEX = /^-/;

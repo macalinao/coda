@@ -1,8 +1,8 @@
-export { applyCustomVisitors } from "./apply-custom-visitors.js";
-export { createCodamaFromIdls } from "./create-codama-from-idls.js";
-export { ensureEntryBarrel } from "./ensure-entry-barrel.js";
-export { fileExists } from "./file-exists.js";
-export { loadConfig } from "./load-config.js";
-export { loadIdls } from "./load-idls.js";
-export { processIdls } from "./process-idls.js";
-export { resolveIdlPaths } from "./resolve-idl-paths.js";
+export { applyCustomVisitors } from "./apply-custom-visitors.ts";
+export { createCodamaFromIdls } from "./create-codama-from-idls.ts";
+export { ensureEntryBarrel } from "./ensure-entry-barrel.ts";
+export { fileExists } from "./file-exists.ts";
+export { loadConfig } from "./load-config.ts";
+export { loadIdls } from "./load-idls.ts";
+export { processIdls } from "./process-idls.ts";
+export { resolveIdlPaths } from "./resolve-idl-paths.ts";

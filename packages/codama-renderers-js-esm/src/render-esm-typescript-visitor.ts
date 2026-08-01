@@ -7,7 +7,7 @@ import {
 import { getRenderMapVisitor } from "@codama/renderers-js";
 import type { InstructionNode, ProgramNode, RootNode } from "codama";
 import { rootNodeVisitor, visit } from "codama";
-import { ESM_DEPENDENCY_MAP } from "./constants.js";
+import { ESM_DEPENDENCY_MAP } from "./constants.ts";
 
 /**
  * Renders an instruction's `docs` as a top-level JSDoc block. Returns an empty

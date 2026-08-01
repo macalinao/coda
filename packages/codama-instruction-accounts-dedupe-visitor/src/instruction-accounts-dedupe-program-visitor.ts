@@ -6,7 +6,7 @@ import {
   camelCase,
   visit,
 } from "codama";
-import { instructionAccountNodesFromAnchorV01 } from "./instruction-account-nodes-from-anchor-v01.js";
+import { instructionAccountNodesFromAnchorV01 } from "./instruction-account-nodes-from-anchor-v01.ts";
 
 /**
  * Creates a Codama program visitor that deduplicates and flattens nested instruction accounts from an Anchor IDL.

@@ -11,7 +11,7 @@ import {
   rootNode,
   visit,
 } from "codama";
-import { renameDefinedTypesVisitor } from "./rename-defined-types-visitor.js";
+import { renameDefinedTypesVisitor } from "./rename-defined-types-visitor.ts";
 
 describe("renameDefinedTypesVisitor", () => {
   it("should rename defined types based on the mapping", () => {

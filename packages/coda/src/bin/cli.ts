@@ -5,8 +5,8 @@ import { renderVisitor as renderRustVisitor } from "@codama/renderers-rust";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
 import { renderMarkdownVisitor } from "@macalinao/codama-renderers-markdown";
 import { Command } from "commander";
-import { CONFIG_TEMPLATE } from "../config-template.js";
-import { ensureEntryBarrel, fileExists, processIdls } from "../utils/index.js";
+import { CONFIG_TEMPLATE } from "../config-template.ts";
+import { ensureEntryBarrel, fileExists, processIdls } from "../utils/index.ts";
 
 const program = new Command();
 

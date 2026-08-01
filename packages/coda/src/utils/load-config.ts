@@ -1,6 +1,6 @@
-import type { CodaConfig } from "../config.js";
+import type { CodaConfig } from "../config.ts";
 import { extname } from "node:path";
-import { fileExists } from "./file-exists.js";
+import { fileExists } from "./file-exists.ts";
 
 /**
  * Config file extensions that Coda can load, in order of preference.

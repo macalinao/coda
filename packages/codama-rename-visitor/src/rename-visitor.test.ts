@@ -11,7 +11,7 @@ import {
   rootNode,
   visit,
 } from "codama";
-import { renameVisitor } from "./rename-visitor.js";
+import { renameVisitor } from "./rename-visitor.ts";
 
 describe("renameVisitor (program-specific format)", () => {
   it("should rename instructions in specific programs", () => {

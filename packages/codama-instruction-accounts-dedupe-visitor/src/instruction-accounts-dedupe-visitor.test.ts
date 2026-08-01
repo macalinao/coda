@@ -5,7 +5,7 @@ import type { RootNode } from "codama";
 import { describe, expect, it } from "bun:test";
 import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
 import { camelCase, visit } from "codama";
-import { instructionAccountsDedupeVisitor } from "./instruction-accounts-dedupe-visitor.js";
+import { instructionAccountsDedupeVisitor } from "./instruction-accounts-dedupe-visitor.ts";
 
 describe("instructionAccountsDedupeVisitor", () => {
   it("should only flatten nested instruction accounts when the flattened result would have duplicates", () => {

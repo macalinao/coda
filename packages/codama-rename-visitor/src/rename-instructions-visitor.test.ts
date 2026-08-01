@@ -10,7 +10,7 @@ import {
   rootNode,
   visit,
 } from "codama";
-import { renameInstructionsVisitor } from "./rename-instructions-visitor.js";
+import { renameInstructionsVisitor } from "./rename-instructions-visitor.ts";
 
 describe("renameInstructionsVisitor", () => {
   it("should rename instructions based on the mapping", () => {

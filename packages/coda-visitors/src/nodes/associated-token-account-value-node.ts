@@ -7,7 +7,7 @@ import {
   publicKeyTypeNode,
   variablePdaSeedNode,
 } from "codama";
-import { TOKEN_PROGRAM_VALUE_NODE } from "./program-value-nodes.js";
+import { TOKEN_PROGRAM_VALUE_NODE } from "./program-value-nodes.ts";
 
 export const associatedTokenAccountPdaNode = pdaNode({
   name: "associatedTokenAccount",

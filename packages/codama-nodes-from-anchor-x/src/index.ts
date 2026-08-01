@@ -1,3 +1,3 @@
-export { programNodeFromAnchor } from "./program-node-from-anchor.js";
-export { rootNodeFromAnchor } from "./root-node-from-anchor.js";
-export { rootNodeFromAnchorIdls } from "./root-node-from-anchor-idls.js";
+export { programNodeFromAnchor } from "./program-node-from-anchor.ts";
+export { rootNodeFromAnchor } from "./root-node-from-anchor.ts";
+export { rootNodeFromAnchorIdls } from "./root-node-from-anchor-idls.ts";

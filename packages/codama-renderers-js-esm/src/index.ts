@@ -1,2 +1,2 @@
-export { ESM_DEPENDENCY_MAP } from "./constants.js";
-export { renderESMTypeScriptVisitor } from "./render-esm-typescript-visitor.js";
+export { ESM_DEPENDENCY_MAP } from "./constants.ts";
+export { renderESMTypeScriptVisitor } from "./render-esm-typescript-visitor.ts";

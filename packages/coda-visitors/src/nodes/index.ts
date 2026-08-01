@@ -1,2 +1,2 @@
-export * from "./associated-token-account-value-node.js";
-export * from "./program-value-nodes.js";
+export * from "./associated-token-account-value-node.ts";
+export * from "./program-value-nodes.ts";

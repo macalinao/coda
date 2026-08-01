@@ -4,7 +4,7 @@ import type { IdlV01InstructionAccountItem } from "@codama/nodes-from-anchor";
 import type { AccountNode, InstructionArgumentNode } from "codama";
 import { describe, expect, it } from "bun:test";
 import { camelCase } from "codama";
-import { instructionAccountNodesFromAnchorV01 } from "./instruction-account-nodes-from-anchor-v01.js";
+import { instructionAccountNodesFromAnchorV01 } from "./instruction-account-nodes-from-anchor-v01.ts";
 
 describe("instructionAccountNodesFromAnchorV01", () => {
   const mockAccounts: AccountNode[] = [];
