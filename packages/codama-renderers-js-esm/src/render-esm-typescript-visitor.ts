@@ -102,18 +102,8 @@ export function renderESMTypeScriptVisitor(
 
     renderMap = mapRenderMapContent(renderMap, (code) => {
       const updated = code
-        // .replace(/= 0x([\da-f]+), \/\//g, "= 0x$1; //")
-        .replaceAll("process.env.NODE_ENV !== 'production'", "true")
-        .replaceAll(";;", ";")
-        // Add return type annotations for functions that return simple types
-        .replace(
-          /export const (\w+DISCRIMINATOR)\s*=\s*new Uint8Array\(/g,
-          "export const $1: ReadonlyUint8Array = new Uint8Array(",
-        )
-        .replace(
-          /export function (get\w+DiscriminatorBytes)\(\)\s*{/g,
-          "export function $1(): ReadonlyUint8Array {",
-        )
+        // Add the `.js` extension required by ESM resolution to relative
+        // re-exports and `from "."` imports.
         .replace(
           /(export\s+\*\s+from\s+['"])(\.\/[^'"]+?)(?<!\.(js|ts|mjs|cjs|json))(['"])/g,
           (_: string, prefix: string, importPath: string) =>

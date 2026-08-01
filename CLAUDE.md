@@ -209,6 +209,8 @@ export default defineConfig({
 
 1. `bun run build` - Check for TypeScript errors
 2. `bun run lint:fix` - Fix linting and formatting issues
+3. `bun run changeset` - Record the version bump before opening a PR (see
+   [Changesets on Every PR](#changesets-on-every-pr))
 
 ### oxlint Configuration
 
@@ -276,6 +278,25 @@ GitHub Actions workflow runs on push/PR to main:
 2. Version packages: `bun run ci:version`
 3. Publish to npm: `bun run ci:publish`
 4. Changesets handle version bumping and changelog generation
+
+### Changesets on Every PR
+
+**Every new PR must include a changeset.** Releases are cut from the
+changesets on master, so a PR without one ships its changes with no version
+bump and no changelog entry.
+
+1. Run `bun run changeset`
+2. Select the package(s) the PR affects
+3. Choose the semver bump: `patch` for fixes and internals, `minor` for new
+   backwards-compatible features, `major` for breaking changes
+4. Write a summary aimed at consumers of the package — it becomes the
+   changelog entry
+5. Commit the generated file in `.changeset/` as part of the PR
+
+For changes with no effect on published output — docs, CI workflows, repo
+tooling — use `bun run changeset --empty` to record the deliberate decision,
+or say in the PR description why no changeset is needed. This is the
+exception; anything that changes what a package publishes needs a real bump.
 
 ## Package Structure Guidelines
 
