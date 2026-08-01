@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@macalinao/coda": "^0.4.10",
-    "@macalinao/tsconfig": "^3.2.5",
+    "@macalinao/tsconfig": "^4.0.0",
     "@solana/kit": "*",
     "@solana/program-client-core": "*",
     "@types/bun": "catalog:",
