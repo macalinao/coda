@@ -41,7 +41,9 @@ export function eventsToDefinedTypesVisitor() {
               ? event.data.type
               : event.data;
           return definedTypeNode({
-            docs: event.docs,
+            // Omit `docs` entirely when absent: exactOptionalPropertyTypes
+            // distinguishes a missing key from an explicit `undefined`.
+            ...(event.docs !== undefined && { docs: event.docs }),
             name: event.name,
             type,
           });

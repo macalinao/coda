@@ -138,8 +138,11 @@ program
 
       // Apply the markdown visitor with options from config
       console.log(`Generating documentation to ${outputPath}...`);
+      const npmPackageName = config.docs?.npmPackageName;
+      // Omit `npmPackageName` entirely when absent: exactOptionalPropertyTypes
+      // distinguishes a missing key from an explicit `undefined`.
       const markdownOptions = {
-        npmPackageName: config.docs?.npmPackageName,
+        ...(npmPackageName !== undefined && { npmPackageName }),
       };
       codama.accept(renderMarkdownVisitor(outputPath, markdownOptions));
 

@@ -1,3 +1,9 @@
 {
-  "extends": "@macalinao/tsconfig/tsconfig.base.json"
+  "extends": "@macalinao/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    // Codama emits TypeScript `enum` declarations for IDL enum types, which
+    // erasableSyntaxOnly (enabled by the shared base) rejects with TS1294.
+    // Generated code cannot be hand-edited, so opt out for generated clients.
+    "erasableSyntaxOnly": false
+  }
 }

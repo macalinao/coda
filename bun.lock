@@ -382,7 +382,7 @@
     "@codama/nodes-from-anchor": "^1.5.2",
     "@codama/renderers-core": "^1.3.10",
     "@codama/visitors-core": "^1.9.0",
-    "@macalinao/tsconfig": "^3.2.5",
+    "@macalinao/tsconfig": "^4.0.0",
     "@solana/kit": "^7.0.0",
     "@solana/program-client-core": "^7.0.0",
     "@types/bun": "^1.3.14",
@@ -648,7 +648,7 @@
 
     "@macalinao/create-coda": ["@macalinao/create-coda@workspace:packages/create-coda"],
 
-    "@macalinao/tsconfig": ["@macalinao/tsconfig@3.2.5", "", {}, "sha512-qtP+OqdAXhGZFjRs9VM7NfwIFQA2ufGdw6GBmhqmS7qBkeEf1gW5fa23j2/RxvyqBPSQhTgR2lNGhpbYn9IzgQ=="],
+    "@macalinao/tsconfig": ["@macalinao/tsconfig@4.0.0", "", {}, "sha512-XRDcRVQOkrl1j6eqXJncuMIewGEAjRORDCkQ3fibI1UVN3o8UvrbT7HtFVuAl8RK5QzCNwHaNTdyw/lIPXQCQw=="],
 
     "@manypkg/find-root": ["@manypkg/find-root@1.1.0", "", { "dependencies": { "@babel/runtime": "^7.5.5", "@types/node": "^12.7.1", "find-up": "^4.1.0", "fs-extra": "^8.1.0" } }, "sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA=="],
 
