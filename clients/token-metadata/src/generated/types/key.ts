@@ -15,23 +15,42 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum Key {
-  Uninitialized,
-  EditionV1,
-  MasterEditionV1,
-  ReservationListV1,
-  MetadataV1,
-  ReservationListV2,
-  MasterEditionV2,
-  EditionMarker,
-  UseAuthorityRecord,
-  CollectionAuthorityRecord,
-  TokenOwnedEscrow,
-  TokenRecord,
-  MetadataDelegate,
-  EditionMarkerV2,
-  HolderDelegate,
-}
+const KeyLookup = {
+  0: "Uninitialized",
+  1: "EditionV1",
+  2: "MasterEditionV1",
+  3: "ReservationListV1",
+  4: "MetadataV1",
+  5: "ReservationListV2",
+  6: "MasterEditionV2",
+  7: "EditionMarker",
+  8: "UseAuthorityRecord",
+  9: "CollectionAuthorityRecord",
+  10: "TokenOwnedEscrow",
+  11: "TokenRecord",
+  12: "MetadataDelegate",
+  13: "EditionMarkerV2",
+  14: "HolderDelegate",
+  Uninitialized: 0,
+  EditionV1: 1,
+  MasterEditionV1: 2,
+  ReservationListV1: 3,
+  MetadataV1: 4,
+  ReservationListV2: 5,
+  MasterEditionV2: 6,
+  EditionMarker: 7,
+  UseAuthorityRecord: 8,
+  CollectionAuthorityRecord: 9,
+  TokenOwnedEscrow: 10,
+  TokenRecord: 11,
+  MetadataDelegate: 12,
+  EditionMarkerV2: 13,
+  HolderDelegate: 14,
+} as const;
+
+export const Key: Omit<typeof KeyLookup, number> = KeyLookup;
+
+export type Key = (typeof Key)[keyof typeof Key];
 
 export type KeyArgs = Key;
 

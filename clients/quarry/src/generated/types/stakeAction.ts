@@ -15,10 +15,17 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum StakeAction {
-  Stake,
-  Withdraw,
-}
+const StakeActionLookup = {
+  0: "Stake",
+  1: "Withdraw",
+  Stake: 0,
+  Withdraw: 1,
+} as const;
+
+export const StakeAction: Omit<typeof StakeActionLookup, number> =
+  StakeActionLookup;
+
+export type StakeAction = (typeof StakeAction)[keyof typeof StakeAction];
 
 export type StakeActionArgs = StakeAction;
 

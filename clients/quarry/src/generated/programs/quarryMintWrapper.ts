@@ -81,10 +81,20 @@ import { findMinterPda, findMintWrapperPda } from "../pdas/index.js";
 export const QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS =
   "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV" as Address<"QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV">;
 
-export enum QuarryMintWrapperAccount {
-  MintWrapper,
-  Minter,
-}
+const QuarryMintWrapperAccountLookup = {
+  0: "MintWrapper",
+  1: "Minter",
+  MintWrapper: 0,
+  Minter: 1,
+} as const;
+
+export const QuarryMintWrapperAccount: Omit<
+  typeof QuarryMintWrapperAccountLookup,
+  number
+> = QuarryMintWrapperAccountLookup;
+
+export type QuarryMintWrapperAccount =
+  (typeof QuarryMintWrapperAccount)[keyof typeof QuarryMintWrapperAccount];
 
 export function identifyQuarryMintWrapperAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -118,16 +128,32 @@ export function identifyQuarryMintWrapperAccount(
   );
 }
 
-export enum QuarryMintWrapperInstruction {
-  NewWrapper,
-  NewWrapperV2,
-  TransferAdmin,
-  AcceptAdmin,
-  NewMinter,
-  NewMinterV2,
-  MinterUpdate,
-  PerformMint,
-}
+const QuarryMintWrapperInstructionLookup = {
+  0: "NewWrapper",
+  1: "NewWrapperV2",
+  2: "TransferAdmin",
+  3: "AcceptAdmin",
+  4: "NewMinter",
+  5: "NewMinterV2",
+  6: "MinterUpdate",
+  7: "PerformMint",
+  NewWrapper: 0,
+  NewWrapperV2: 1,
+  TransferAdmin: 2,
+  AcceptAdmin: 3,
+  NewMinter: 4,
+  NewMinterV2: 5,
+  MinterUpdate: 6,
+  PerformMint: 7,
+} as const;
+
+export const QuarryMintWrapperInstruction: Omit<
+  typeof QuarryMintWrapperInstructionLookup,
+  number
+> = QuarryMintWrapperInstructionLookup;
+
+export type QuarryMintWrapperInstruction =
+  (typeof QuarryMintWrapperInstruction)[keyof typeof QuarryMintWrapperInstruction];
 
 export function identifyQuarryMintWrapperInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -231,28 +257,28 @@ export type ParsedQuarryMintWrapperInstruction<
   TProgram extends string = "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
 > =
   | ({
-      instructionType: QuarryMintWrapperInstruction.NewWrapper;
+      instructionType: typeof QuarryMintWrapperInstruction.NewWrapper;
     } & ParsedNewWrapperInstruction<TProgram>)
   | ({
-      instructionType: QuarryMintWrapperInstruction.NewWrapperV2;
+      instructionType: typeof QuarryMintWrapperInstruction.NewWrapperV2;
     } & ParsedNewWrapperV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMintWrapperInstruction.TransferAdmin;
+      instructionType: typeof QuarryMintWrapperInstruction.TransferAdmin;
     } & ParsedTransferAdminInstruction<TProgram>)
   | ({
-      instructionType: QuarryMintWrapperInstruction.AcceptAdmin;
+      instructionType: typeof QuarryMintWrapperInstruction.AcceptAdmin;
     } & ParsedAcceptAdminInstruction<TProgram>)
   | ({
-      instructionType: QuarryMintWrapperInstruction.NewMinter;
+      instructionType: typeof QuarryMintWrapperInstruction.NewMinter;
     } & ParsedNewMinterInstruction<TProgram>)
   | ({
-      instructionType: QuarryMintWrapperInstruction.NewMinterV2;
+      instructionType: typeof QuarryMintWrapperInstruction.NewMinterV2;
     } & ParsedNewMinterV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMintWrapperInstruction.MinterUpdate;
+      instructionType: typeof QuarryMintWrapperInstruction.MinterUpdate;
     } & ParsedMinterUpdateInstruction<TProgram>)
   | ({
-      instructionType: QuarryMintWrapperInstruction.PerformMint;
+      instructionType: typeof QuarryMintWrapperInstruction.PerformMint;
     } & ParsedPerformMintInstruction<TProgram>);
 
 export function parseQuarryMintWrapperInstruction<TProgram extends string>(
@@ -392,7 +418,7 @@ export function quarryMintWrapperProgram() {
     client: T,
   ): ExtendedClient<T, { quarryMintWrapper: QuarryMintWrapperPlugin }> => {
     return extendClient(client, {
-      quarryMintWrapper: <QuarryMintWrapperPlugin>{
+      quarryMintWrapper: {
         accounts: {
           mintWrapper: addSelfFetchFunctions(client, getMintWrapperCodec()),
           minter: addSelfFetchFunctions(client, getMinterCodec()),
@@ -455,7 +481,7 @@ export function quarryMintWrapperProgram() {
         identifyAccount: identifyQuarryMintWrapperAccount,
         identifyInstruction: identifyQuarryMintWrapperInstruction,
         parseInstruction: parseQuarryMintWrapperInstruction,
-      },
+      } as QuarryMintWrapperPlugin,
     });
   };
 }

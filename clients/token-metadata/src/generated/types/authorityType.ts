@@ -15,13 +15,23 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum AuthorityType {
-  None,
-  Metadata,
-  Holder,
-  MetadataDelegate,
-  TokenDelegate,
-}
+const AuthorityTypeLookup = {
+  0: "None",
+  1: "Metadata",
+  2: "Holder",
+  3: "MetadataDelegate",
+  4: "TokenDelegate",
+  None: 0,
+  Metadata: 1,
+  Holder: 2,
+  MetadataDelegate: 3,
+  TokenDelegate: 4,
+} as const;
+
+export const AuthorityType: Omit<typeof AuthorityTypeLookup, number> =
+  AuthorityTypeLookup;
+
+export type AuthorityType = (typeof AuthorityType)[keyof typeof AuthorityType];
 
 export type AuthorityTypeArgs = AuthorityType;
 

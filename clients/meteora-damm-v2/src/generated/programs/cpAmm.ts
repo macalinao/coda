@@ -201,14 +201,25 @@ import {
 export const CP_AMM_PROGRAM_ADDRESS =
   "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
 
-export enum CpAmmAccount {
-  ClaimFeeOperator,
-  Config,
-  Pool,
-  Position,
-  TokenBadge,
-  Vesting,
-}
+const CpAmmAccountLookup = {
+  0: "ClaimFeeOperator",
+  1: "Config",
+  2: "Pool",
+  3: "Position",
+  4: "TokenBadge",
+  5: "Vesting",
+  ClaimFeeOperator: 0,
+  Config: 1,
+  Pool: 2,
+  Position: 3,
+  TokenBadge: 4,
+  Vesting: 5,
+} as const;
+
+export const CpAmmAccount: Omit<typeof CpAmmAccountLookup, number> =
+  CpAmmAccountLookup;
+
+export type CpAmmAccount = (typeof CpAmmAccount)[keyof typeof CpAmmAccount];
 
 export function identifyCpAmmAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -286,40 +297,78 @@ export function identifyCpAmmAccount(
   );
 }
 
-export enum CpAmmInstruction {
-  AddLiquidity,
-  ClaimPartnerFee,
-  ClaimPositionFee,
-  ClaimProtocolFee,
-  ClaimReward,
-  CloseClaimFeeOperator,
-  CloseConfig,
-  ClosePosition,
-  CloseTokenBadge,
-  CreateClaimFeeOperator,
-  CreateConfig,
-  CreateDynamicConfig,
-  CreatePosition,
-  CreateTokenBadge,
-  FundReward,
-  InitializeCustomizablePool,
-  InitializePool,
-  InitializePoolWithDynamicConfig,
-  InitializeReward,
-  LockPosition,
-  PermanentLockPosition,
-  RefreshVesting,
-  RemoveAllLiquidity,
-  RemoveLiquidity,
-  SetPoolStatus,
-  SplitPosition,
-  SplitPosition2,
-  Swap,
-  Swap2,
-  UpdateRewardDuration,
-  UpdateRewardFunder,
-  WithdrawIneligibleReward,
-}
+const CpAmmInstructionLookup = {
+  0: "AddLiquidity",
+  1: "ClaimPartnerFee",
+  2: "ClaimPositionFee",
+  3: "ClaimProtocolFee",
+  4: "ClaimReward",
+  5: "CloseClaimFeeOperator",
+  6: "CloseConfig",
+  7: "ClosePosition",
+  8: "CloseTokenBadge",
+  9: "CreateClaimFeeOperator",
+  10: "CreateConfig",
+  11: "CreateDynamicConfig",
+  12: "CreatePosition",
+  13: "CreateTokenBadge",
+  14: "FundReward",
+  15: "InitializeCustomizablePool",
+  16: "InitializePool",
+  17: "InitializePoolWithDynamicConfig",
+  18: "InitializeReward",
+  19: "LockPosition",
+  20: "PermanentLockPosition",
+  21: "RefreshVesting",
+  22: "RemoveAllLiquidity",
+  23: "RemoveLiquidity",
+  24: "SetPoolStatus",
+  25: "SplitPosition",
+  26: "SplitPosition2",
+  27: "Swap",
+  28: "Swap2",
+  29: "UpdateRewardDuration",
+  30: "UpdateRewardFunder",
+  31: "WithdrawIneligibleReward",
+  AddLiquidity: 0,
+  ClaimPartnerFee: 1,
+  ClaimPositionFee: 2,
+  ClaimProtocolFee: 3,
+  ClaimReward: 4,
+  CloseClaimFeeOperator: 5,
+  CloseConfig: 6,
+  ClosePosition: 7,
+  CloseTokenBadge: 8,
+  CreateClaimFeeOperator: 9,
+  CreateConfig: 10,
+  CreateDynamicConfig: 11,
+  CreatePosition: 12,
+  CreateTokenBadge: 13,
+  FundReward: 14,
+  InitializeCustomizablePool: 15,
+  InitializePool: 16,
+  InitializePoolWithDynamicConfig: 17,
+  InitializeReward: 18,
+  LockPosition: 19,
+  PermanentLockPosition: 20,
+  RefreshVesting: 21,
+  RemoveAllLiquidity: 22,
+  RemoveLiquidity: 23,
+  SetPoolStatus: 24,
+  SplitPosition: 25,
+  SplitPosition2: 26,
+  Swap: 27,
+  Swap2: 28,
+  UpdateRewardDuration: 29,
+  UpdateRewardFunder: 30,
+  WithdrawIneligibleReward: 31,
+} as const;
+
+export const CpAmmInstruction: Omit<typeof CpAmmInstructionLookup, number> =
+  CpAmmInstructionLookup;
+
+export type CpAmmInstruction =
+  (typeof CpAmmInstruction)[keyof typeof CpAmmInstruction];
 
 export function identifyCpAmmInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -687,100 +736,100 @@ export type ParsedCpAmmInstruction<
   TProgram extends string = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
 > =
   | ({
-      instructionType: CpAmmInstruction.AddLiquidity;
+      instructionType: typeof CpAmmInstruction.AddLiquidity;
     } & ParsedAddLiquidityInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.ClaimPartnerFee;
+      instructionType: typeof CpAmmInstruction.ClaimPartnerFee;
     } & ParsedClaimPartnerFeeInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.ClaimPositionFee;
+      instructionType: typeof CpAmmInstruction.ClaimPositionFee;
     } & ParsedClaimPositionFeeInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.ClaimProtocolFee;
+      instructionType: typeof CpAmmInstruction.ClaimProtocolFee;
     } & ParsedClaimProtocolFeeInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.ClaimReward;
+      instructionType: typeof CpAmmInstruction.ClaimReward;
     } & ParsedClaimRewardInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CloseClaimFeeOperator;
+      instructionType: typeof CpAmmInstruction.CloseClaimFeeOperator;
     } & ParsedCloseClaimFeeOperatorInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CloseConfig;
+      instructionType: typeof CpAmmInstruction.CloseConfig;
     } & ParsedCloseConfigInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.ClosePosition;
+      instructionType: typeof CpAmmInstruction.ClosePosition;
     } & ParsedClosePositionInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CloseTokenBadge;
+      instructionType: typeof CpAmmInstruction.CloseTokenBadge;
     } & ParsedCloseTokenBadgeInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CreateClaimFeeOperator;
+      instructionType: typeof CpAmmInstruction.CreateClaimFeeOperator;
     } & ParsedCreateClaimFeeOperatorInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CreateConfig;
+      instructionType: typeof CpAmmInstruction.CreateConfig;
     } & ParsedCreateConfigInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CreateDynamicConfig;
+      instructionType: typeof CpAmmInstruction.CreateDynamicConfig;
     } & ParsedCreateDynamicConfigInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CreatePosition;
+      instructionType: typeof CpAmmInstruction.CreatePosition;
     } & ParsedCreatePositionInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.CreateTokenBadge;
+      instructionType: typeof CpAmmInstruction.CreateTokenBadge;
     } & ParsedCreateTokenBadgeInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.FundReward;
+      instructionType: typeof CpAmmInstruction.FundReward;
     } & ParsedFundRewardInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.InitializeCustomizablePool;
+      instructionType: typeof CpAmmInstruction.InitializeCustomizablePool;
     } & ParsedInitializeCustomizablePoolInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.InitializePool;
+      instructionType: typeof CpAmmInstruction.InitializePool;
     } & ParsedInitializePoolInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.InitializePoolWithDynamicConfig;
+      instructionType: typeof CpAmmInstruction.InitializePoolWithDynamicConfig;
     } & ParsedInitializePoolWithDynamicConfigInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.InitializeReward;
+      instructionType: typeof CpAmmInstruction.InitializeReward;
     } & ParsedInitializeRewardInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.LockPosition;
+      instructionType: typeof CpAmmInstruction.LockPosition;
     } & ParsedLockPositionInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.PermanentLockPosition;
+      instructionType: typeof CpAmmInstruction.PermanentLockPosition;
     } & ParsedPermanentLockPositionInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.RefreshVesting;
+      instructionType: typeof CpAmmInstruction.RefreshVesting;
     } & ParsedRefreshVestingInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.RemoveAllLiquidity;
+      instructionType: typeof CpAmmInstruction.RemoveAllLiquidity;
     } & ParsedRemoveAllLiquidityInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.RemoveLiquidity;
+      instructionType: typeof CpAmmInstruction.RemoveLiquidity;
     } & ParsedRemoveLiquidityInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.SetPoolStatus;
+      instructionType: typeof CpAmmInstruction.SetPoolStatus;
     } & ParsedSetPoolStatusInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.SplitPosition;
+      instructionType: typeof CpAmmInstruction.SplitPosition;
     } & ParsedSplitPositionInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.SplitPosition2;
+      instructionType: typeof CpAmmInstruction.SplitPosition2;
     } & ParsedSplitPosition2Instruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.Swap;
+      instructionType: typeof CpAmmInstruction.Swap;
     } & ParsedSwapInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.Swap2;
+      instructionType: typeof CpAmmInstruction.Swap2;
     } & ParsedSwap2Instruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.UpdateRewardDuration;
+      instructionType: typeof CpAmmInstruction.UpdateRewardDuration;
     } & ParsedUpdateRewardDurationInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.UpdateRewardFunder;
+      instructionType: typeof CpAmmInstruction.UpdateRewardFunder;
     } & ParsedUpdateRewardFunderInstruction<TProgram>)
   | ({
-      instructionType: CpAmmInstruction.WithdrawIneligibleReward;
+      instructionType: typeof CpAmmInstruction.WithdrawIneligibleReward;
     } & ParsedWithdrawIneligibleRewardInstruction<TProgram>);
 
 export function parseCpAmmInstruction<TProgram extends string>(
@@ -1198,7 +1247,7 @@ export function cpAmmProgram() {
     client: T,
   ): ExtendedClient<T, { cpAmm: CpAmmPlugin }> => {
     return extendClient(client, {
-      cpAmm: <CpAmmPlugin>{
+      cpAmm: {
         accounts: {
           claimFeeOperator: addSelfFetchFunctions(
             client,
@@ -1412,7 +1461,7 @@ export function cpAmmProgram() {
         identifyAccount: identifyCpAmmAccount,
         identifyInstruction: identifyCpAmmInstruction,
         parseInstruction: parseCpAmmInstruction,
-      },
+      } as CpAmmPlugin,
     });
   };
 }

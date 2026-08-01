@@ -124,11 +124,22 @@ import {
 export const VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS =
   "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ" as Address<"vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ">;
 
-export enum VoterStakeRegistryAccount {
-  Registrar,
-  Voter,
-  VoterWeightRecord,
-}
+const VoterStakeRegistryAccountLookup = {
+  0: "Registrar",
+  1: "Voter",
+  2: "VoterWeightRecord",
+  Registrar: 0,
+  Voter: 1,
+  VoterWeightRecord: 2,
+} as const;
+
+export const VoterStakeRegistryAccount: Omit<
+  typeof VoterStakeRegistryAccountLookup,
+  number
+> = VoterStakeRegistryAccountLookup;
+
+export type VoterStakeRegistryAccount =
+  (typeof VoterStakeRegistryAccount)[keyof typeof VoterStakeRegistryAccount];
 
 export function identifyVoterStakeRegistryAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -173,25 +184,50 @@ export function identifyVoterStakeRegistryAccount(
   );
 }
 
-export enum VoterStakeRegistryInstruction {
-  CreateRegistrar,
-  ConfigureVotingMint,
-  CreateVoter,
-  CreateDepositEntry,
-  Deposit,
-  Withdraw,
-  Grant,
-  Clawback,
-  CloseDepositEntry,
-  ResetLockup,
-  InternalTransferLocked,
-  InternalTransferUnlocked,
-  UpdateVoterWeightRecord,
-  UpdateMaxVoteWeight,
-  CloseVoter,
-  LogVoterInfo,
-  SetTimeOffset,
-}
+const VoterStakeRegistryInstructionLookup = {
+  0: "CreateRegistrar",
+  1: "ConfigureVotingMint",
+  2: "CreateVoter",
+  3: "CreateDepositEntry",
+  4: "Deposit",
+  5: "Withdraw",
+  6: "Grant",
+  7: "Clawback",
+  8: "CloseDepositEntry",
+  9: "ResetLockup",
+  10: "InternalTransferLocked",
+  11: "InternalTransferUnlocked",
+  12: "UpdateVoterWeightRecord",
+  13: "UpdateMaxVoteWeight",
+  14: "CloseVoter",
+  15: "LogVoterInfo",
+  16: "SetTimeOffset",
+  CreateRegistrar: 0,
+  ConfigureVotingMint: 1,
+  CreateVoter: 2,
+  CreateDepositEntry: 3,
+  Deposit: 4,
+  Withdraw: 5,
+  Grant: 6,
+  Clawback: 7,
+  CloseDepositEntry: 8,
+  ResetLockup: 9,
+  InternalTransferLocked: 10,
+  InternalTransferUnlocked: 11,
+  UpdateVoterWeightRecord: 12,
+  UpdateMaxVoteWeight: 13,
+  CloseVoter: 14,
+  LogVoterInfo: 15,
+  SetTimeOffset: 16,
+} as const;
+
+export const VoterStakeRegistryInstruction: Omit<
+  typeof VoterStakeRegistryInstructionLookup,
+  number
+> = VoterStakeRegistryInstructionLookup;
+
+export type VoterStakeRegistryInstruction =
+  (typeof VoterStakeRegistryInstruction)[keyof typeof VoterStakeRegistryInstruction];
 
 export function identifyVoterStakeRegistryInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -394,55 +430,55 @@ export type ParsedVoterStakeRegistryInstruction<
   TProgram extends string = "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ",
 > =
   | ({
-      instructionType: VoterStakeRegistryInstruction.CreateRegistrar;
+      instructionType: typeof VoterStakeRegistryInstruction.CreateRegistrar;
     } & ParsedCreateRegistrarInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.ConfigureVotingMint;
+      instructionType: typeof VoterStakeRegistryInstruction.ConfigureVotingMint;
     } & ParsedConfigureVotingMintInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.CreateVoter;
+      instructionType: typeof VoterStakeRegistryInstruction.CreateVoter;
     } & ParsedCreateVoterInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.CreateDepositEntry;
+      instructionType: typeof VoterStakeRegistryInstruction.CreateDepositEntry;
     } & ParsedCreateDepositEntryInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.Deposit;
+      instructionType: typeof VoterStakeRegistryInstruction.Deposit;
     } & ParsedDepositInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.Withdraw;
+      instructionType: typeof VoterStakeRegistryInstruction.Withdraw;
     } & ParsedWithdrawInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.Grant;
+      instructionType: typeof VoterStakeRegistryInstruction.Grant;
     } & ParsedGrantInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.Clawback;
+      instructionType: typeof VoterStakeRegistryInstruction.Clawback;
     } & ParsedClawbackInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.CloseDepositEntry;
+      instructionType: typeof VoterStakeRegistryInstruction.CloseDepositEntry;
     } & ParsedCloseDepositEntryInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.ResetLockup;
+      instructionType: typeof VoterStakeRegistryInstruction.ResetLockup;
     } & ParsedResetLockupInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.InternalTransferLocked;
+      instructionType: typeof VoterStakeRegistryInstruction.InternalTransferLocked;
     } & ParsedInternalTransferLockedInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.InternalTransferUnlocked;
+      instructionType: typeof VoterStakeRegistryInstruction.InternalTransferUnlocked;
     } & ParsedInternalTransferUnlockedInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.UpdateVoterWeightRecord;
+      instructionType: typeof VoterStakeRegistryInstruction.UpdateVoterWeightRecord;
     } & ParsedUpdateVoterWeightRecordInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.UpdateMaxVoteWeight;
+      instructionType: typeof VoterStakeRegistryInstruction.UpdateMaxVoteWeight;
     } & ParsedUpdateMaxVoteWeightInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.CloseVoter;
+      instructionType: typeof VoterStakeRegistryInstruction.CloseVoter;
     } & ParsedCloseVoterInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.LogVoterInfo;
+      instructionType: typeof VoterStakeRegistryInstruction.LogVoterInfo;
     } & ParsedLogVoterInfoInstruction<TProgram>)
   | ({
-      instructionType: VoterStakeRegistryInstruction.SetTimeOffset;
+      instructionType: typeof VoterStakeRegistryInstruction.SetTimeOffset;
     } & ParsedSetTimeOffsetInstruction<TProgram>);
 
 export function parseVoterStakeRegistryInstruction<TProgram extends string>(
@@ -680,7 +716,7 @@ export function voterStakeRegistryProgram() {
     client: T,
   ): ExtendedClient<T, { voterStakeRegistry: VoterStakeRegistryPlugin }> => {
     return extendClient(client, {
-      voterStakeRegistry: <VoterStakeRegistryPlugin>{
+      voterStakeRegistry: {
         accounts: {
           registrar: addSelfFetchFunctions(client, getRegistrarCodec()),
           voter: addSelfFetchFunctions(client, getVoterCodec()),
@@ -787,7 +823,7 @@ export function voterStakeRegistryProgram() {
         identifyAccount: identifyVoterStakeRegistryAccount,
         identifyInstruction: identifyVoterStakeRegistryInstruction,
         parseInstruction: parseVoterStakeRegistryInstruction,
-      },
+      } as VoterStakeRegistryPlugin,
     });
   };
 }

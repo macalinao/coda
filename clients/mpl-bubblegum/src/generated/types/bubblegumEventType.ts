@@ -15,14 +15,22 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const BubblegumEventTypeLookup = {
+  0: "Uninitialized",
+  1: "LeafSchemaEvent",
+  Uninitialized: 0,
+  LeafSchemaEvent: 1,
+} as const;
+
 /**
  * Discriminator for events Bubblegum logs via the noop program, read
  * back by off-chain indexers to reconstruct tree state.
  */
-export enum BubblegumEventType {
-  Uninitialized,
-  LeafSchemaEvent,
-}
+export const BubblegumEventType: Omit<typeof BubblegumEventTypeLookup, number> =
+  BubblegumEventTypeLookup;
+
+export type BubblegumEventType =
+  (typeof BubblegumEventType)[keyof typeof BubblegumEventType];
 
 export type BubblegumEventTypeArgs = BubblegumEventType;
 

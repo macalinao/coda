@@ -15,9 +15,16 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum HolderDelegateRole {
-  PrintDelegate,
-}
+const HolderDelegateRoleLookup = {
+  0: "PrintDelegate",
+  PrintDelegate: 0,
+} as const;
+
+export const HolderDelegateRole: Omit<typeof HolderDelegateRoleLookup, number> =
+  HolderDelegateRoleLookup;
+
+export type HolderDelegateRole =
+  (typeof HolderDelegateRole)[keyof typeof HolderDelegateRole];
 
 export type HolderDelegateRoleArgs = HolderDelegateRole;
 

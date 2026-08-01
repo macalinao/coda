@@ -15,15 +15,23 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const UpdateTypeLookup = {
+  0: "Mint",
+  1: "Add",
+  2: "Remove",
+  Mint: 0,
+  Add: 1,
+  Remove: 2,
+} as const;
+
 /**
  * Whether an `updateCollectionInfoV1` call records a `Mint`, or
  * an `Add`/`Remove` adjustment to collection size.
  */
-export enum UpdateType {
-  Mint,
-  Add,
-  Remove,
-}
+export const UpdateType: Omit<typeof UpdateTypeLookup, number> =
+  UpdateTypeLookup;
+
+export type UpdateType = (typeof UpdateType)[keyof typeof UpdateType];
 
 export type UpdateTypeArgs = UpdateType;
 

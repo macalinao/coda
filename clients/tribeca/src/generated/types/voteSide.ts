@@ -15,12 +15,20 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum VoteSide {
-  Pending,
-  Against,
-  For,
-  Abstain,
-}
+const VoteSideLookup = {
+  0: "Pending",
+  1: "Against",
+  2: "For",
+  3: "Abstain",
+  Pending: 0,
+  Against: 1,
+  For: 2,
+  Abstain: 3,
+} as const;
+
+export const VoteSide: Omit<typeof VoteSideLookup, number> = VoteSideLookup;
+
+export type VoteSide = (typeof VoteSide)[keyof typeof VoteSide];
 
 export type VoteSideArgs = VoteSide;
 

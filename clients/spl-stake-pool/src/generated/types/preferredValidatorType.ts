@@ -15,14 +15,24 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const PreferredValidatorTypeLookup = {
+  0: "Deposit",
+  1: "Withdraw",
+  Deposit: 0,
+  Withdraw: 1,
+} as const;
+
 /**
  * Defines which validator vote account is set during the
  * `SetPreferredValidator` instruction
  */
-export enum PreferredValidatorType {
-  Deposit,
-  Withdraw,
-}
+export const PreferredValidatorType: Omit<
+  typeof PreferredValidatorTypeLookup,
+  number
+> = PreferredValidatorTypeLookup;
+
+export type PreferredValidatorType =
+  (typeof PreferredValidatorType)[keyof typeof PreferredValidatorType];
 
 export type PreferredValidatorTypeArgs = PreferredValidatorType;
 

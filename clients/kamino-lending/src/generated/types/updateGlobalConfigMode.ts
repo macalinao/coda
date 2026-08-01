@@ -15,10 +15,20 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum UpdateGlobalConfigMode {
-  PendingAdmin,
-  FeeCollector,
-}
+const UpdateGlobalConfigModeLookup = {
+  0: "PendingAdmin",
+  1: "FeeCollector",
+  PendingAdmin: 0,
+  FeeCollector: 1,
+} as const;
+
+export const UpdateGlobalConfigMode: Omit<
+  typeof UpdateGlobalConfigModeLookup,
+  number
+> = UpdateGlobalConfigModeLookup;
+
+export type UpdateGlobalConfigMode =
+  (typeof UpdateGlobalConfigMode)[keyof typeof UpdateGlobalConfigMode];
 
 export type UpdateGlobalConfigModeArgs = UpdateGlobalConfigMode;
 

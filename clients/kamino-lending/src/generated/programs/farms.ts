@@ -162,12 +162,21 @@ import {
 export const FARMS_PROGRAM_ADDRESS =
   "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr" as Address<"FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr">;
 
-export enum FarmsAccount {
-  FarmState,
-  FarmsGlobalConfig,
-  FarmsUserState,
-  OraclePrices,
-}
+const FarmsAccountLookup = {
+  0: "FarmState",
+  1: "FarmsGlobalConfig",
+  2: "FarmsUserState",
+  3: "OraclePrices",
+  FarmState: 0,
+  FarmsGlobalConfig: 1,
+  FarmsUserState: 2,
+  OraclePrices: 3,
+} as const;
+
+export const FarmsAccount: Omit<typeof FarmsAccountLookup, number> =
+  FarmsAccountLookup;
+
+export type FarmsAccount = (typeof FarmsAccount)[keyof typeof FarmsAccount];
 
 export function identifyFarmsAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -223,33 +232,64 @@ export function identifyFarmsAccount(
   );
 }
 
-export enum FarmsInstruction {
-  InitializeGlobalConfig,
-  UpdateGlobalConfig,
-  InitializeFarm,
-  InitializeFarmDelegated,
-  InitializeReward,
-  AddRewards,
-  UpdateFarmConfig,
-  InitializeUser,
-  TransferOwnership,
-  RewardUserOnce,
-  RefreshFarm,
-  Stake,
-  SetStakeDelegated,
-  HarvestReward,
-  Unstake,
-  RefreshUserState,
-  WithdrawUnstakedDeposits,
-  WithdrawTreasury,
-  DepositToFarmVault,
-  WithdrawFromFarmVault,
-  WithdrawSlashedAmount,
-  UpdateFarmAdmin,
-  UpdateGlobalConfigAdmin,
-  WithdrawReward,
-  FarmsIdlMissingTypes,
-}
+const FarmsInstructionLookup = {
+  0: "InitializeGlobalConfig",
+  1: "UpdateGlobalConfig",
+  2: "InitializeFarm",
+  3: "InitializeFarmDelegated",
+  4: "InitializeReward",
+  5: "AddRewards",
+  6: "UpdateFarmConfig",
+  7: "InitializeUser",
+  8: "TransferOwnership",
+  9: "RewardUserOnce",
+  10: "RefreshFarm",
+  11: "Stake",
+  12: "SetStakeDelegated",
+  13: "HarvestReward",
+  14: "Unstake",
+  15: "RefreshUserState",
+  16: "WithdrawUnstakedDeposits",
+  17: "WithdrawTreasury",
+  18: "DepositToFarmVault",
+  19: "WithdrawFromFarmVault",
+  20: "WithdrawSlashedAmount",
+  21: "UpdateFarmAdmin",
+  22: "UpdateGlobalConfigAdmin",
+  23: "WithdrawReward",
+  24: "FarmsIdlMissingTypes",
+  InitializeGlobalConfig: 0,
+  UpdateGlobalConfig: 1,
+  InitializeFarm: 2,
+  InitializeFarmDelegated: 3,
+  InitializeReward: 4,
+  AddRewards: 5,
+  UpdateFarmConfig: 6,
+  InitializeUser: 7,
+  TransferOwnership: 8,
+  RewardUserOnce: 9,
+  RefreshFarm: 10,
+  Stake: 11,
+  SetStakeDelegated: 12,
+  HarvestReward: 13,
+  Unstake: 14,
+  RefreshUserState: 15,
+  WithdrawUnstakedDeposits: 16,
+  WithdrawTreasury: 17,
+  DepositToFarmVault: 18,
+  WithdrawFromFarmVault: 19,
+  WithdrawSlashedAmount: 20,
+  UpdateFarmAdmin: 21,
+  UpdateGlobalConfigAdmin: 22,
+  WithdrawReward: 23,
+  FarmsIdlMissingTypes: 24,
+} as const;
+
+export const FarmsInstruction: Omit<typeof FarmsInstructionLookup, number> =
+  FarmsInstructionLookup;
+
+export type FarmsInstruction =
+  (typeof FarmsInstruction)[keyof typeof FarmsInstruction];
 
 export function identifyFarmsInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -540,79 +580,79 @@ export type ParsedFarmsInstruction<
   TProgram extends string = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
 > =
   | ({
-      instructionType: FarmsInstruction.InitializeGlobalConfig;
+      instructionType: typeof FarmsInstruction.InitializeGlobalConfig;
     } & ParsedInitializeGlobalConfigInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.UpdateGlobalConfig;
+      instructionType: typeof FarmsInstruction.UpdateGlobalConfig;
     } & ParsedUpdateGlobalConfigInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.InitializeFarm;
+      instructionType: typeof FarmsInstruction.InitializeFarm;
     } & ParsedInitializeFarmInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.InitializeFarmDelegated;
+      instructionType: typeof FarmsInstruction.InitializeFarmDelegated;
     } & ParsedInitializeFarmDelegatedInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.InitializeReward;
+      instructionType: typeof FarmsInstruction.InitializeReward;
     } & ParsedInitializeRewardInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.AddRewards;
+      instructionType: typeof FarmsInstruction.AddRewards;
     } & ParsedAddRewardsInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.UpdateFarmConfig;
+      instructionType: typeof FarmsInstruction.UpdateFarmConfig;
     } & ParsedUpdateFarmConfigInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.InitializeUser;
+      instructionType: typeof FarmsInstruction.InitializeUser;
     } & ParsedInitializeUserInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.TransferOwnership;
+      instructionType: typeof FarmsInstruction.TransferOwnership;
     } & ParsedTransferOwnershipInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.RewardUserOnce;
+      instructionType: typeof FarmsInstruction.RewardUserOnce;
     } & ParsedRewardUserOnceInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.RefreshFarm;
+      instructionType: typeof FarmsInstruction.RefreshFarm;
     } & ParsedRefreshFarmInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.Stake;
+      instructionType: typeof FarmsInstruction.Stake;
     } & ParsedStakeInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.SetStakeDelegated;
+      instructionType: typeof FarmsInstruction.SetStakeDelegated;
     } & ParsedSetStakeDelegatedInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.HarvestReward;
+      instructionType: typeof FarmsInstruction.HarvestReward;
     } & ParsedHarvestRewardInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.Unstake;
+      instructionType: typeof FarmsInstruction.Unstake;
     } & ParsedUnstakeInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.RefreshUserState;
+      instructionType: typeof FarmsInstruction.RefreshUserState;
     } & ParsedRefreshUserStateInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.WithdrawUnstakedDeposits;
+      instructionType: typeof FarmsInstruction.WithdrawUnstakedDeposits;
     } & ParsedWithdrawUnstakedDepositsInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.WithdrawTreasury;
+      instructionType: typeof FarmsInstruction.WithdrawTreasury;
     } & ParsedWithdrawTreasuryInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.DepositToFarmVault;
+      instructionType: typeof FarmsInstruction.DepositToFarmVault;
     } & ParsedDepositToFarmVaultInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.WithdrawFromFarmVault;
+      instructionType: typeof FarmsInstruction.WithdrawFromFarmVault;
     } & ParsedWithdrawFromFarmVaultInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.WithdrawSlashedAmount;
+      instructionType: typeof FarmsInstruction.WithdrawSlashedAmount;
     } & ParsedWithdrawSlashedAmountInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.UpdateFarmAdmin;
+      instructionType: typeof FarmsInstruction.UpdateFarmAdmin;
     } & ParsedUpdateFarmAdminInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.UpdateGlobalConfigAdmin;
+      instructionType: typeof FarmsInstruction.UpdateGlobalConfigAdmin;
     } & ParsedUpdateGlobalConfigAdminInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.WithdrawReward;
+      instructionType: typeof FarmsInstruction.WithdrawReward;
     } & ParsedWithdrawRewardInstruction<TProgram>)
   | ({
-      instructionType: FarmsInstruction.FarmsIdlMissingTypes;
+      instructionType: typeof FarmsInstruction.FarmsIdlMissingTypes;
     } & ParsedFarmsIdlMissingTypesInstruction<TProgram>);
 
 export function parseFarmsInstruction<TProgram extends string>(
@@ -944,7 +984,7 @@ export function farmsProgram() {
     client: T,
   ): ExtendedClient<T, { farms: FarmsPlugin }> => {
     return extendClient(client, {
-      farms: <FarmsPlugin>{
+      farms: {
         accounts: {
           farmState: addSelfFetchFunctions(client, getFarmStateCodec()),
           farmsGlobalConfig: addSelfFetchFunctions(
@@ -1101,7 +1141,7 @@ export function farmsProgram() {
         identifyAccount: identifyFarmsAccount,
         identifyInstruction: identifyFarmsInstruction,
         parseInstruction: parseFarmsInstruction,
-      },
+      } as FarmsPlugin,
     });
   };
 }

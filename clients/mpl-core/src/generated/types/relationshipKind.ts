@@ -15,17 +15,27 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const RelationshipKindLookup = {
+  0: "Collection",
+  1: "ChildGroup",
+  2: "ParentGroup",
+  3: "Asset",
+  Collection: 0,
+  ChildGroup: 1,
+  ParentGroup: 2,
+  Asset: 3,
+} as const;
+
 /**
  * The kind of relationship a `RelationshipEntry` records:
  * membership in a `Collection`, a `ChildGroup`, a
  * `ParentGroup`, or an `Asset`.
  */
-export enum RelationshipKind {
-  Collection,
-  ChildGroup,
-  ParentGroup,
-  Asset,
-}
+export const RelationshipKind: Omit<typeof RelationshipKindLookup, number> =
+  RelationshipKindLookup;
+
+export type RelationshipKind =
+  (typeof RelationshipKind)[keyof typeof RelationshipKind];
 
 export type RelationshipKindArgs = RelationshipKind;
 

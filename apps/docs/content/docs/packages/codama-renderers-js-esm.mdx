@@ -25,6 +25,7 @@ While `@codama/renderers-js` generates excellent TypeScript code, it produces Co
 2. **TypeScript ESM Compatibility**: Works correctly with `"type": "module"`
 3. **Production-Ready Code**: Removes Node.js-specific environment checks
 4. **Type Safety Improvements**: Enhanced type assertions and null checks
+5. **Erasable Syntax**: Emits no TypeScript syntax that carries runtime behaviour
 
 ## Usage
 
@@ -126,6 +127,29 @@ Removes Node.js-specific code for broader runtime support:
 // Works in: Browser, Deno, Bun, Node.js, etc.
 ```
 
+### 5. Erasable Syntax Only
+
+`erasableSyntaxOnly` — and Node.js type stripping, which enforces the same rule — reject TypeScript syntax that carries runtime behaviour. The standard renderer emits `enum` declarations for IDL enums; this renderer emits a `const` object paired with a union type of the same name instead:
+
+```typescript
+// Before
+export enum Version {
+  V1,
+  V2,
+}
+
+// After
+const VersionLookup = { 0: "V1", 1: "V2", V1: 0, V2: 1 } as const;
+
+export const Version: Omit<typeof VersionLookup, number> = VersionLookup;
+
+export type Version = (typeof Version)[keyof typeof Version];
+```
+
+The object keeps the exact runtime shape a numeric `enum` compiles to, reverse mapping included, because `@solana/codecs` derives an enum's keys and values by inspecting that shape. `Version` remains usable as both a type and a value, so `Version.V1`, `getVersionEncoder()` and `getVersionDecoder()` are unchanged.
+
+The program plugin's angle-bracket type assertion — also non-erasable, since it is ambiguous with JSX — becomes an equivalent `as` assertion.
+
 ## Comparison with Standard Renderer
 
 | Feature           | @codama/renderers-js | @macalinao/codama-renderers-js-esm |
@@ -135,6 +159,7 @@ Removes Node.js-specific code for broader runtime support:
 | TypeScript Config | Standard             | ESM-native                         |
 | Runtime Checks    | Node.js-specific     | Universal                          |
 | Null Checks       | Loose (`==`)         | Strict (`===`)                     |
+| Enums             | `enum` declarations  | Erasable `const` objects           |
 | Tree Shaking      | Good                 | Excellent                          |
 
 ## Configuration

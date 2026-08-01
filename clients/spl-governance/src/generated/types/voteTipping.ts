@@ -15,11 +15,19 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum VoteTipping {
-  Strict,
-  Early,
-  Disabled,
-}
+const VoteTippingLookup = {
+  0: "Strict",
+  1: "Early",
+  2: "Disabled",
+  Strict: 0,
+  Early: 1,
+  Disabled: 2,
+} as const;
+
+export const VoteTipping: Omit<typeof VoteTippingLookup, number> =
+  VoteTippingLookup;
+
+export type VoteTipping = (typeof VoteTipping)[keyof typeof VoteTipping];
 
 export type VoteTippingArgs = VoteTipping;
 

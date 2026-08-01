@@ -90,9 +90,15 @@ import { findOperatorPda } from "../pdas/index.js";
 export const QUARRY_OPERATOR_PROGRAM_ADDRESS =
   "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz" as Address<"QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz">;
 
-export enum QuarryOperatorAccount {
-  Operator,
-}
+const QuarryOperatorAccountLookup = { 0: "Operator", Operator: 0 } as const;
+
+export const QuarryOperatorAccount: Omit<
+  typeof QuarryOperatorAccountLookup,
+  number
+> = QuarryOperatorAccountLookup;
+
+export type QuarryOperatorAccount =
+  (typeof QuarryOperatorAccount)[keyof typeof QuarryOperatorAccount];
 
 export function identifyQuarryOperatorAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -115,19 +121,38 @@ export function identifyQuarryOperatorAccount(
   );
 }
 
-export enum QuarryOperatorInstruction {
-  CreateOperator,
-  CreateOperatorV2,
-  SetAdmin,
-  SetRateSetter,
-  SetQuarryCreator,
-  SetShareAllocator,
-  DelegateSetAnnualRewards,
-  DelegateCreateQuarry,
-  DelegateCreateQuarryV2,
-  DelegateSetRewardsShare,
-  DelegateSetFamine,
-}
+const QuarryOperatorInstructionLookup = {
+  0: "CreateOperator",
+  1: "CreateOperatorV2",
+  2: "SetAdmin",
+  3: "SetRateSetter",
+  4: "SetQuarryCreator",
+  5: "SetShareAllocator",
+  6: "DelegateSetAnnualRewards",
+  7: "DelegateCreateQuarry",
+  8: "DelegateCreateQuarryV2",
+  9: "DelegateSetRewardsShare",
+  10: "DelegateSetFamine",
+  CreateOperator: 0,
+  CreateOperatorV2: 1,
+  SetAdmin: 2,
+  SetRateSetter: 3,
+  SetQuarryCreator: 4,
+  SetShareAllocator: 5,
+  DelegateSetAnnualRewards: 6,
+  DelegateCreateQuarry: 7,
+  DelegateCreateQuarryV2: 8,
+  DelegateSetRewardsShare: 9,
+  DelegateSetFamine: 10,
+} as const;
+
+export const QuarryOperatorInstruction: Omit<
+  typeof QuarryOperatorInstructionLookup,
+  number
+> = QuarryOperatorInstructionLookup;
+
+export type QuarryOperatorInstruction =
+  (typeof QuarryOperatorInstruction)[keyof typeof QuarryOperatorInstruction];
 
 export function identifyQuarryOperatorInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -264,37 +289,37 @@ export type ParsedQuarryOperatorInstruction<
   TProgram extends string = "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz",
 > =
   | ({
-      instructionType: QuarryOperatorInstruction.CreateOperator;
+      instructionType: typeof QuarryOperatorInstruction.CreateOperator;
     } & ParsedCreateOperatorInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.CreateOperatorV2;
+      instructionType: typeof QuarryOperatorInstruction.CreateOperatorV2;
     } & ParsedCreateOperatorV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.SetAdmin;
+      instructionType: typeof QuarryOperatorInstruction.SetAdmin;
     } & ParsedSetAdminInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.SetRateSetter;
+      instructionType: typeof QuarryOperatorInstruction.SetRateSetter;
     } & ParsedSetRateSetterInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.SetQuarryCreator;
+      instructionType: typeof QuarryOperatorInstruction.SetQuarryCreator;
     } & ParsedSetQuarryCreatorInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.SetShareAllocator;
+      instructionType: typeof QuarryOperatorInstruction.SetShareAllocator;
     } & ParsedSetShareAllocatorInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.DelegateSetAnnualRewards;
+      instructionType: typeof QuarryOperatorInstruction.DelegateSetAnnualRewards;
     } & ParsedDelegateSetAnnualRewardsInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.DelegateCreateQuarry;
+      instructionType: typeof QuarryOperatorInstruction.DelegateCreateQuarry;
     } & ParsedDelegateCreateQuarryInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.DelegateCreateQuarryV2;
+      instructionType: typeof QuarryOperatorInstruction.DelegateCreateQuarryV2;
     } & ParsedDelegateCreateQuarryV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.DelegateSetRewardsShare;
+      instructionType: typeof QuarryOperatorInstruction.DelegateSetRewardsShare;
     } & ParsedDelegateSetRewardsShareInstruction<TProgram>)
   | ({
-      instructionType: QuarryOperatorInstruction.DelegateSetFamine;
+      instructionType: typeof QuarryOperatorInstruction.DelegateSetFamine;
     } & ParsedDelegateSetFamineInstruction<TProgram>);
 
 export function parseQuarryOperatorInstruction<TProgram extends string>(
@@ -464,7 +489,7 @@ export function quarryOperatorProgram() {
     client: T,
   ): ExtendedClient<T, { quarryOperator: QuarryOperatorPlugin }> => {
     return extendClient(client, {
-      quarryOperator: <QuarryOperatorPlugin>{
+      quarryOperator: {
         accounts: {
           operator: addSelfFetchFunctions(client, getOperatorCodec()),
         },
@@ -538,7 +563,7 @@ export function quarryOperatorProgram() {
         identifyAccount: identifyQuarryOperatorAccount,
         identifyInstruction: identifyQuarryOperatorInstruction,
         parseInstruction: parseQuarryOperatorInstruction,
-      },
+      } as QuarryOperatorPlugin,
     });
   };
 }

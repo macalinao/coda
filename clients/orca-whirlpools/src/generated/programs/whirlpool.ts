@@ -264,17 +264,32 @@ import {
 export const WHIRLPOOL_PROGRAM_ADDRESS =
   "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc" as Address<"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc">;
 
-export enum WhirlpoolAccount {
-  WhirlpoolsConfig,
-  WhirlpoolsConfigExtension,
-  FeeTier,
-  LockConfig,
-  Position,
-  PositionBundle,
-  TickArray,
-  TokenBadge,
-  Whirlpool,
-}
+const WhirlpoolAccountLookup = {
+  0: "WhirlpoolsConfig",
+  1: "WhirlpoolsConfigExtension",
+  2: "FeeTier",
+  3: "LockConfig",
+  4: "Position",
+  5: "PositionBundle",
+  6: "TickArray",
+  7: "TokenBadge",
+  8: "Whirlpool",
+  WhirlpoolsConfig: 0,
+  WhirlpoolsConfigExtension: 1,
+  FeeTier: 2,
+  LockConfig: 3,
+  Position: 4,
+  PositionBundle: 5,
+  TickArray: 6,
+  TokenBadge: 7,
+  Whirlpool: 8,
+} as const;
+
+export const WhirlpoolAccount: Omit<typeof WhirlpoolAccountLookup, number> =
+  WhirlpoolAccountLookup;
+
+export type WhirlpoolAccount =
+  (typeof WhirlpoolAccount)[keyof typeof WhirlpoolAccount];
 
 export function identifyWhirlpoolAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -385,57 +400,114 @@ export function identifyWhirlpoolAccount(
   );
 }
 
-export enum WhirlpoolInstruction {
-  InitializeConfig,
-  InitializePool,
-  InitializeTickArray,
-  InitializeFeeTier,
-  InitializeReward,
-  SetRewardEmissions,
-  OpenPosition,
-  OpenPositionWithMetadata,
-  IncreaseLiquidity,
-  DecreaseLiquidity,
-  UpdateFeesAndRewards,
-  CollectFees,
-  CollectReward,
-  CollectProtocolFees,
-  Swap,
-  ClosePosition,
-  SetDefaultFeeRate,
-  SetDefaultProtocolFeeRate,
-  SetFeeRate,
-  SetProtocolFeeRate,
-  SetFeeAuthority,
-  SetCollectProtocolFeesAuthority,
-  SetRewardAuthority,
-  SetRewardAuthorityBySuperAuthority,
-  SetRewardEmissionsSuperAuthority,
-  TwoHopSwap,
-  InitializePositionBundle,
-  InitializePositionBundleWithMetadata,
-  DeletePositionBundle,
-  OpenBundledPosition,
-  CloseBundledPosition,
-  OpenPositionWithTokenExtensions,
-  ClosePositionWithTokenExtensions,
-  LockPosition,
-  CollectFeesV2,
-  CollectProtocolFeesV2,
-  CollectRewardV2,
-  DecreaseLiquidityV2,
-  IncreaseLiquidityV2,
-  InitializePoolV2,
-  InitializeRewardV2,
-  SetRewardEmissionsV2,
-  SwapV2,
-  TwoHopSwapV2,
-  InitializeConfigExtension,
-  SetConfigExtensionAuthority,
-  SetTokenBadgeAuthority,
-  InitializeTokenBadge,
-  DeleteTokenBadge,
-}
+const WhirlpoolInstructionLookup = {
+  0: "InitializeConfig",
+  1: "InitializePool",
+  2: "InitializeTickArray",
+  3: "InitializeFeeTier",
+  4: "InitializeReward",
+  5: "SetRewardEmissions",
+  6: "OpenPosition",
+  7: "OpenPositionWithMetadata",
+  8: "IncreaseLiquidity",
+  9: "DecreaseLiquidity",
+  10: "UpdateFeesAndRewards",
+  11: "CollectFees",
+  12: "CollectReward",
+  13: "CollectProtocolFees",
+  14: "Swap",
+  15: "ClosePosition",
+  16: "SetDefaultFeeRate",
+  17: "SetDefaultProtocolFeeRate",
+  18: "SetFeeRate",
+  19: "SetProtocolFeeRate",
+  20: "SetFeeAuthority",
+  21: "SetCollectProtocolFeesAuthority",
+  22: "SetRewardAuthority",
+  23: "SetRewardAuthorityBySuperAuthority",
+  24: "SetRewardEmissionsSuperAuthority",
+  25: "TwoHopSwap",
+  26: "InitializePositionBundle",
+  27: "InitializePositionBundleWithMetadata",
+  28: "DeletePositionBundle",
+  29: "OpenBundledPosition",
+  30: "CloseBundledPosition",
+  31: "OpenPositionWithTokenExtensions",
+  32: "ClosePositionWithTokenExtensions",
+  33: "LockPosition",
+  34: "CollectFeesV2",
+  35: "CollectProtocolFeesV2",
+  36: "CollectRewardV2",
+  37: "DecreaseLiquidityV2",
+  38: "IncreaseLiquidityV2",
+  39: "InitializePoolV2",
+  40: "InitializeRewardV2",
+  41: "SetRewardEmissionsV2",
+  42: "SwapV2",
+  43: "TwoHopSwapV2",
+  44: "InitializeConfigExtension",
+  45: "SetConfigExtensionAuthority",
+  46: "SetTokenBadgeAuthority",
+  47: "InitializeTokenBadge",
+  48: "DeleteTokenBadge",
+  InitializeConfig: 0,
+  InitializePool: 1,
+  InitializeTickArray: 2,
+  InitializeFeeTier: 3,
+  InitializeReward: 4,
+  SetRewardEmissions: 5,
+  OpenPosition: 6,
+  OpenPositionWithMetadata: 7,
+  IncreaseLiquidity: 8,
+  DecreaseLiquidity: 9,
+  UpdateFeesAndRewards: 10,
+  CollectFees: 11,
+  CollectReward: 12,
+  CollectProtocolFees: 13,
+  Swap: 14,
+  ClosePosition: 15,
+  SetDefaultFeeRate: 16,
+  SetDefaultProtocolFeeRate: 17,
+  SetFeeRate: 18,
+  SetProtocolFeeRate: 19,
+  SetFeeAuthority: 20,
+  SetCollectProtocolFeesAuthority: 21,
+  SetRewardAuthority: 22,
+  SetRewardAuthorityBySuperAuthority: 23,
+  SetRewardEmissionsSuperAuthority: 24,
+  TwoHopSwap: 25,
+  InitializePositionBundle: 26,
+  InitializePositionBundleWithMetadata: 27,
+  DeletePositionBundle: 28,
+  OpenBundledPosition: 29,
+  CloseBundledPosition: 30,
+  OpenPositionWithTokenExtensions: 31,
+  ClosePositionWithTokenExtensions: 32,
+  LockPosition: 33,
+  CollectFeesV2: 34,
+  CollectProtocolFeesV2: 35,
+  CollectRewardV2: 36,
+  DecreaseLiquidityV2: 37,
+  IncreaseLiquidityV2: 38,
+  InitializePoolV2: 39,
+  InitializeRewardV2: 40,
+  SetRewardEmissionsV2: 41,
+  SwapV2: 42,
+  TwoHopSwapV2: 43,
+  InitializeConfigExtension: 44,
+  SetConfigExtensionAuthority: 45,
+  SetTokenBadgeAuthority: 46,
+  InitializeTokenBadge: 47,
+  DeleteTokenBadge: 48,
+} as const;
+
+export const WhirlpoolInstruction: Omit<
+  typeof WhirlpoolInstructionLookup,
+  number
+> = WhirlpoolInstructionLookup;
+
+export type WhirlpoolInstruction =
+  (typeof WhirlpoolInstruction)[keyof typeof WhirlpoolInstruction];
 
 export function identifyWhirlpoolInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -990,151 +1062,151 @@ export type ParsedWhirlpoolInstruction<
   TProgram extends string = "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
 > =
   | ({
-      instructionType: WhirlpoolInstruction.InitializeConfig;
+      instructionType: typeof WhirlpoolInstruction.InitializeConfig;
     } & ParsedInitializeConfigInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializePool;
+      instructionType: typeof WhirlpoolInstruction.InitializePool;
     } & ParsedInitializePoolInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializeTickArray;
+      instructionType: typeof WhirlpoolInstruction.InitializeTickArray;
     } & ParsedInitializeTickArrayInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializeFeeTier;
+      instructionType: typeof WhirlpoolInstruction.InitializeFeeTier;
     } & ParsedInitializeFeeTierInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializeReward;
+      instructionType: typeof WhirlpoolInstruction.InitializeReward;
     } & ParsedInitializeRewardInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetRewardEmissions;
+      instructionType: typeof WhirlpoolInstruction.SetRewardEmissions;
     } & ParsedSetRewardEmissionsInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.OpenPosition;
+      instructionType: typeof WhirlpoolInstruction.OpenPosition;
     } & ParsedOpenPositionInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.OpenPositionWithMetadata;
+      instructionType: typeof WhirlpoolInstruction.OpenPositionWithMetadata;
     } & ParsedOpenPositionWithMetadataInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.IncreaseLiquidity;
+      instructionType: typeof WhirlpoolInstruction.IncreaseLiquidity;
     } & ParsedIncreaseLiquidityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.DecreaseLiquidity;
+      instructionType: typeof WhirlpoolInstruction.DecreaseLiquidity;
     } & ParsedDecreaseLiquidityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.UpdateFeesAndRewards;
+      instructionType: typeof WhirlpoolInstruction.UpdateFeesAndRewards;
     } & ParsedUpdateFeesAndRewardsInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.CollectFees;
+      instructionType: typeof WhirlpoolInstruction.CollectFees;
     } & ParsedCollectFeesInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.CollectReward;
+      instructionType: typeof WhirlpoolInstruction.CollectReward;
     } & ParsedCollectRewardInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.CollectProtocolFees;
+      instructionType: typeof WhirlpoolInstruction.CollectProtocolFees;
     } & ParsedCollectProtocolFeesInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.Swap;
+      instructionType: typeof WhirlpoolInstruction.Swap;
     } & ParsedSwapInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.ClosePosition;
+      instructionType: typeof WhirlpoolInstruction.ClosePosition;
     } & ParsedClosePositionInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetDefaultFeeRate;
+      instructionType: typeof WhirlpoolInstruction.SetDefaultFeeRate;
     } & ParsedSetDefaultFeeRateInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetDefaultProtocolFeeRate;
+      instructionType: typeof WhirlpoolInstruction.SetDefaultProtocolFeeRate;
     } & ParsedSetDefaultProtocolFeeRateInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetFeeRate;
+      instructionType: typeof WhirlpoolInstruction.SetFeeRate;
     } & ParsedSetFeeRateInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetProtocolFeeRate;
+      instructionType: typeof WhirlpoolInstruction.SetProtocolFeeRate;
     } & ParsedSetProtocolFeeRateInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetFeeAuthority;
+      instructionType: typeof WhirlpoolInstruction.SetFeeAuthority;
     } & ParsedSetFeeAuthorityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetCollectProtocolFeesAuthority;
+      instructionType: typeof WhirlpoolInstruction.SetCollectProtocolFeesAuthority;
     } & ParsedSetCollectProtocolFeesAuthorityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetRewardAuthority;
+      instructionType: typeof WhirlpoolInstruction.SetRewardAuthority;
     } & ParsedSetRewardAuthorityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetRewardAuthorityBySuperAuthority;
+      instructionType: typeof WhirlpoolInstruction.SetRewardAuthorityBySuperAuthority;
     } & ParsedSetRewardAuthorityBySuperAuthorityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetRewardEmissionsSuperAuthority;
+      instructionType: typeof WhirlpoolInstruction.SetRewardEmissionsSuperAuthority;
     } & ParsedSetRewardEmissionsSuperAuthorityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.TwoHopSwap;
+      instructionType: typeof WhirlpoolInstruction.TwoHopSwap;
     } & ParsedTwoHopSwapInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializePositionBundle;
+      instructionType: typeof WhirlpoolInstruction.InitializePositionBundle;
     } & ParsedInitializePositionBundleInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializePositionBundleWithMetadata;
+      instructionType: typeof WhirlpoolInstruction.InitializePositionBundleWithMetadata;
     } & ParsedInitializePositionBundleWithMetadataInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.DeletePositionBundle;
+      instructionType: typeof WhirlpoolInstruction.DeletePositionBundle;
     } & ParsedDeletePositionBundleInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.OpenBundledPosition;
+      instructionType: typeof WhirlpoolInstruction.OpenBundledPosition;
     } & ParsedOpenBundledPositionInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.CloseBundledPosition;
+      instructionType: typeof WhirlpoolInstruction.CloseBundledPosition;
     } & ParsedCloseBundledPositionInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.OpenPositionWithTokenExtensions;
+      instructionType: typeof WhirlpoolInstruction.OpenPositionWithTokenExtensions;
     } & ParsedOpenPositionWithTokenExtensionsInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.ClosePositionWithTokenExtensions;
+      instructionType: typeof WhirlpoolInstruction.ClosePositionWithTokenExtensions;
     } & ParsedClosePositionWithTokenExtensionsInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.LockPosition;
+      instructionType: typeof WhirlpoolInstruction.LockPosition;
     } & ParsedLockPositionInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.CollectFeesV2;
+      instructionType: typeof WhirlpoolInstruction.CollectFeesV2;
     } & ParsedCollectFeesV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.CollectProtocolFeesV2;
+      instructionType: typeof WhirlpoolInstruction.CollectProtocolFeesV2;
     } & ParsedCollectProtocolFeesV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.CollectRewardV2;
+      instructionType: typeof WhirlpoolInstruction.CollectRewardV2;
     } & ParsedCollectRewardV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.DecreaseLiquidityV2;
+      instructionType: typeof WhirlpoolInstruction.DecreaseLiquidityV2;
     } & ParsedDecreaseLiquidityV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.IncreaseLiquidityV2;
+      instructionType: typeof WhirlpoolInstruction.IncreaseLiquidityV2;
     } & ParsedIncreaseLiquidityV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializePoolV2;
+      instructionType: typeof WhirlpoolInstruction.InitializePoolV2;
     } & ParsedInitializePoolV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializeRewardV2;
+      instructionType: typeof WhirlpoolInstruction.InitializeRewardV2;
     } & ParsedInitializeRewardV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetRewardEmissionsV2;
+      instructionType: typeof WhirlpoolInstruction.SetRewardEmissionsV2;
     } & ParsedSetRewardEmissionsV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SwapV2;
+      instructionType: typeof WhirlpoolInstruction.SwapV2;
     } & ParsedSwapV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.TwoHopSwapV2;
+      instructionType: typeof WhirlpoolInstruction.TwoHopSwapV2;
     } & ParsedTwoHopSwapV2Instruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializeConfigExtension;
+      instructionType: typeof WhirlpoolInstruction.InitializeConfigExtension;
     } & ParsedInitializeConfigExtensionInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetConfigExtensionAuthority;
+      instructionType: typeof WhirlpoolInstruction.SetConfigExtensionAuthority;
     } & ParsedSetConfigExtensionAuthorityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.SetTokenBadgeAuthority;
+      instructionType: typeof WhirlpoolInstruction.SetTokenBadgeAuthority;
     } & ParsedSetTokenBadgeAuthorityInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.InitializeTokenBadge;
+      instructionType: typeof WhirlpoolInstruction.InitializeTokenBadge;
     } & ParsedInitializeTokenBadgeInstruction<TProgram>)
   | ({
-      instructionType: WhirlpoolInstruction.DeleteTokenBadge;
+      instructionType: typeof WhirlpoolInstruction.DeleteTokenBadge;
     } & ParsedDeleteTokenBadgeInstruction<TProgram>);
 
 export function parseWhirlpoolInstruction<TProgram extends string>(
@@ -1734,7 +1806,7 @@ export function whirlpoolProgram() {
     client: T,
   ): ExtendedClient<T, { whirlpool: WhirlpoolPlugin }> => {
     return extendClient(client, {
-      whirlpool: <WhirlpoolPlugin>{
+      whirlpool: {
         accounts: {
           whirlpoolsConfig: addSelfFetchFunctions(
             client,
@@ -1999,7 +2071,7 @@ export function whirlpoolProgram() {
         identifyAccount: identifyWhirlpoolAccount,
         identifyInstruction: identifyWhirlpoolInstruction,
         parseInstruction: parseWhirlpoolInstruction,
-      },
+      } as WhirlpoolPlugin,
     });
   };
 }

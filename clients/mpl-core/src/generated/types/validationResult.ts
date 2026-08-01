@@ -15,16 +15,26 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const ValidationResultLookup = {
+  0: "Approved",
+  1: "Rejected",
+  2: "Pass",
+  3: "ForceApproved",
+  Approved: 0,
+  Rejected: 1,
+  Pass: 2,
+  ForceApproved: 3,
+} as const;
+
 /**
  * The outcome of a plugin's check for a lifecycle event:
  * `Approved`, `Rejected`, `Pass` (abstain), or `ForceApproved`.
  */
-export enum ValidationResult {
-  Approved,
-  Rejected,
-  Pass,
-  ForceApproved,
-}
+export const ValidationResult: Omit<typeof ValidationResultLookup, number> =
+  ValidationResultLookup;
+
+export type ValidationResult =
+  (typeof ValidationResult)[keyof typeof ValidationResult];
 
 export type ValidationResultArgs = ValidationResult;
 

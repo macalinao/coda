@@ -162,10 +162,20 @@ import { AccountType, getAccountTypeEncoder } from "../types/index.js";
 export const SPL_STAKE_POOL_PROGRAM_ADDRESS =
   "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy" as Address<"SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy">;
 
-export enum SplStakePoolAccount {
-  StakePool,
-  ValidatorList,
-}
+const SplStakePoolAccountLookup = {
+  0: "StakePool",
+  1: "ValidatorList",
+  StakePool: 0,
+  ValidatorList: 1,
+} as const;
+
+export const SplStakePoolAccount: Omit<
+  typeof SplStakePoolAccountLookup,
+  number
+> = SplStakePoolAccountLookup;
+
+export type SplStakePoolAccount =
+  (typeof SplStakePoolAccount)[keyof typeof SplStakePoolAccount];
 
 export function identifySplStakePoolAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -195,35 +205,70 @@ export function identifySplStakePoolAccount(
   );
 }
 
-export enum SplStakePoolInstruction {
-  Initialize,
-  AddValidatorToPool,
-  RemoveValidatorFromPool,
-  DecreaseValidatorStake,
-  IncreaseValidatorStake,
-  SetPreferredValidator,
-  UpdateValidatorListBalance,
-  UpdateStakePoolBalance,
-  CleanupRemovedValidatorEntries,
-  DepositStake,
-  WithdrawStake,
-  SetManager,
-  SetFee,
-  SetStaker,
-  DepositSol,
-  SetFundingAuthority,
-  WithdrawSol,
-  CreateTokenMetadata,
-  UpdateTokenMetadata,
-  IncreaseAdditionalValidatorStake,
-  DecreaseAdditionalValidatorStake,
-  DecreaseValidatorStakeWithReserve,
-  Redelegate,
-  DepositStakeWithSlippage,
-  WithdrawStakeWithSlippage,
-  DepositSolWithSlippage,
-  WithdrawSolWithSlippage,
-}
+const SplStakePoolInstructionLookup = {
+  0: "Initialize",
+  1: "AddValidatorToPool",
+  2: "RemoveValidatorFromPool",
+  3: "DecreaseValidatorStake",
+  4: "IncreaseValidatorStake",
+  5: "SetPreferredValidator",
+  6: "UpdateValidatorListBalance",
+  7: "UpdateStakePoolBalance",
+  8: "CleanupRemovedValidatorEntries",
+  9: "DepositStake",
+  10: "WithdrawStake",
+  11: "SetManager",
+  12: "SetFee",
+  13: "SetStaker",
+  14: "DepositSol",
+  15: "SetFundingAuthority",
+  16: "WithdrawSol",
+  17: "CreateTokenMetadata",
+  18: "UpdateTokenMetadata",
+  19: "IncreaseAdditionalValidatorStake",
+  20: "DecreaseAdditionalValidatorStake",
+  21: "DecreaseValidatorStakeWithReserve",
+  22: "Redelegate",
+  23: "DepositStakeWithSlippage",
+  24: "WithdrawStakeWithSlippage",
+  25: "DepositSolWithSlippage",
+  26: "WithdrawSolWithSlippage",
+  Initialize: 0,
+  AddValidatorToPool: 1,
+  RemoveValidatorFromPool: 2,
+  DecreaseValidatorStake: 3,
+  IncreaseValidatorStake: 4,
+  SetPreferredValidator: 5,
+  UpdateValidatorListBalance: 6,
+  UpdateStakePoolBalance: 7,
+  CleanupRemovedValidatorEntries: 8,
+  DepositStake: 9,
+  WithdrawStake: 10,
+  SetManager: 11,
+  SetFee: 12,
+  SetStaker: 13,
+  DepositSol: 14,
+  SetFundingAuthority: 15,
+  WithdrawSol: 16,
+  CreateTokenMetadata: 17,
+  UpdateTokenMetadata: 18,
+  IncreaseAdditionalValidatorStake: 19,
+  DecreaseAdditionalValidatorStake: 20,
+  DecreaseValidatorStakeWithReserve: 21,
+  Redelegate: 22,
+  DepositStakeWithSlippage: 23,
+  WithdrawStakeWithSlippage: 24,
+  DepositSolWithSlippage: 25,
+  WithdrawSolWithSlippage: 26,
+} as const;
+
+export const SplStakePoolInstruction: Omit<
+  typeof SplStakePoolInstructionLookup,
+  number
+> = SplStakePoolInstructionLookup;
+
+export type SplStakePoolInstruction =
+  (typeof SplStakePoolInstruction)[keyof typeof SplStakePoolInstruction];
 
 export function identifySplStakePoolInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -320,85 +365,85 @@ export type ParsedSplStakePoolInstruction<
   TProgram extends string = "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy",
 > =
   | ({
-      instructionType: SplStakePoolInstruction.Initialize;
+      instructionType: typeof SplStakePoolInstruction.Initialize;
     } & ParsedInitializeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.AddValidatorToPool;
+      instructionType: typeof SplStakePoolInstruction.AddValidatorToPool;
     } & ParsedAddValidatorToPoolInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.RemoveValidatorFromPool;
+      instructionType: typeof SplStakePoolInstruction.RemoveValidatorFromPool;
     } & ParsedRemoveValidatorFromPoolInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.DecreaseValidatorStake;
+      instructionType: typeof SplStakePoolInstruction.DecreaseValidatorStake;
     } & ParsedDecreaseValidatorStakeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.IncreaseValidatorStake;
+      instructionType: typeof SplStakePoolInstruction.IncreaseValidatorStake;
     } & ParsedIncreaseValidatorStakeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.SetPreferredValidator;
+      instructionType: typeof SplStakePoolInstruction.SetPreferredValidator;
     } & ParsedSetPreferredValidatorInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.UpdateValidatorListBalance;
+      instructionType: typeof SplStakePoolInstruction.UpdateValidatorListBalance;
     } & ParsedUpdateValidatorListBalanceInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.UpdateStakePoolBalance;
+      instructionType: typeof SplStakePoolInstruction.UpdateStakePoolBalance;
     } & ParsedUpdateStakePoolBalanceInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.CleanupRemovedValidatorEntries;
+      instructionType: typeof SplStakePoolInstruction.CleanupRemovedValidatorEntries;
     } & ParsedCleanupRemovedValidatorEntriesInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.DepositStake;
+      instructionType: typeof SplStakePoolInstruction.DepositStake;
     } & ParsedDepositStakeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.WithdrawStake;
+      instructionType: typeof SplStakePoolInstruction.WithdrawStake;
     } & ParsedWithdrawStakeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.SetManager;
+      instructionType: typeof SplStakePoolInstruction.SetManager;
     } & ParsedSetManagerInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.SetFee;
+      instructionType: typeof SplStakePoolInstruction.SetFee;
     } & ParsedSetFeeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.SetStaker;
+      instructionType: typeof SplStakePoolInstruction.SetStaker;
     } & ParsedSetStakerInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.DepositSol;
+      instructionType: typeof SplStakePoolInstruction.DepositSol;
     } & ParsedDepositSolInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.SetFundingAuthority;
+      instructionType: typeof SplStakePoolInstruction.SetFundingAuthority;
     } & ParsedSetFundingAuthorityInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.WithdrawSol;
+      instructionType: typeof SplStakePoolInstruction.WithdrawSol;
     } & ParsedWithdrawSolInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.CreateTokenMetadata;
+      instructionType: typeof SplStakePoolInstruction.CreateTokenMetadata;
     } & ParsedCreateTokenMetadataInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.UpdateTokenMetadata;
+      instructionType: typeof SplStakePoolInstruction.UpdateTokenMetadata;
     } & ParsedUpdateTokenMetadataInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.IncreaseAdditionalValidatorStake;
+      instructionType: typeof SplStakePoolInstruction.IncreaseAdditionalValidatorStake;
     } & ParsedIncreaseAdditionalValidatorStakeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.DecreaseAdditionalValidatorStake;
+      instructionType: typeof SplStakePoolInstruction.DecreaseAdditionalValidatorStake;
     } & ParsedDecreaseAdditionalValidatorStakeInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.DecreaseValidatorStakeWithReserve;
+      instructionType: typeof SplStakePoolInstruction.DecreaseValidatorStakeWithReserve;
     } & ParsedDecreaseValidatorStakeWithReserveInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.Redelegate;
+      instructionType: typeof SplStakePoolInstruction.Redelegate;
     } & ParsedRedelegateInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.DepositStakeWithSlippage;
+      instructionType: typeof SplStakePoolInstruction.DepositStakeWithSlippage;
     } & ParsedDepositStakeWithSlippageInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.WithdrawStakeWithSlippage;
+      instructionType: typeof SplStakePoolInstruction.WithdrawStakeWithSlippage;
     } & ParsedWithdrawStakeWithSlippageInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.DepositSolWithSlippage;
+      instructionType: typeof SplStakePoolInstruction.DepositSolWithSlippage;
     } & ParsedDepositSolWithSlippageInstruction<TProgram>)
   | ({
-      instructionType: SplStakePoolInstruction.WithdrawSolWithSlippage;
+      instructionType: typeof SplStakePoolInstruction.WithdrawSolWithSlippage;
     } & ParsedWithdrawSolWithSlippageInstruction<TProgram>);
 
 export function parseSplStakePoolInstruction<TProgram extends string>(
@@ -752,7 +797,7 @@ export function splStakePoolProgram() {
     client: T,
   ): ExtendedClient<T, { splStakePool: SplStakePoolPlugin }> => {
     return extendClient(client, {
-      splStakePool: <SplStakePoolPlugin>{
+      splStakePool: {
         accounts: {
           stakePool: addSelfFetchFunctions(client, getStakePoolCodec()),
           validatorList: addSelfFetchFunctions(client, getValidatorListCodec()),
@@ -906,7 +951,7 @@ export function splStakePoolProgram() {
         identifyAccount: identifySplStakePoolAccount,
         identifyInstruction: identifySplStakePoolInstruction,
         parseInstruction: parseSplStakePoolInstruction,
-      },
+      } as SplStakePoolPlugin,
     });
   };
 }

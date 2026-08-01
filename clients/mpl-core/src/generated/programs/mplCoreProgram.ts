@@ -227,59 +227,123 @@ import { findAssetSignerPda } from "../pdas/index.js";
 export const MPL_CORE_PROGRAM_PROGRAM_ADDRESS =
   "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d" as Address<"CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d">;
 
-export enum MplCoreProgramAccount {
-  PluginHeaderV1,
-  PluginRegistryV1,
-  AssetV1,
-  CollectionV1,
-  GroupV1,
-  HashedAssetV1,
-}
+const MplCoreProgramAccountLookup = {
+  0: "PluginHeaderV1",
+  1: "PluginRegistryV1",
+  2: "AssetV1",
+  3: "CollectionV1",
+  4: "GroupV1",
+  5: "HashedAssetV1",
+  PluginHeaderV1: 0,
+  PluginRegistryV1: 1,
+  AssetV1: 2,
+  CollectionV1: 3,
+  GroupV1: 4,
+  HashedAssetV1: 5,
+} as const;
 
-export enum MplCoreProgramInstruction {
-  CreateV1,
-  CreateCollectionV1,
-  AddPluginV1,
-  AddCollectionPluginV1,
-  RemovePluginV1,
-  RemoveCollectionPluginV1,
-  UpdatePluginV1,
-  UpdateCollectionPluginV1,
-  ApprovePluginAuthorityV1,
-  ApproveCollectionPluginAuthorityV1,
-  RevokePluginAuthorityV1,
-  RevokeCollectionPluginAuthorityV1,
-  BurnV1,
-  BurnCollectionV1,
-  TransferV1,
-  UpdateV1,
-  UpdateCollectionV1,
-  CompressV1,
-  DecompressV1,
-  Collect,
-  CreateV2,
-  CreateCollectionV2,
-  AddExternalPluginAdapterV1,
-  AddCollectionExternalPluginAdapterV1,
-  RemoveExternalPluginAdapterV1,
-  RemoveCollectionExternalPluginAdapterV1,
-  UpdateExternalPluginAdapterV1,
-  UpdateCollectionExternalPluginAdapterV1,
-  WriteExternalPluginAdapterDataV1,
-  WriteCollectionExternalPluginAdapterDataV1,
-  UpdateV2,
-  ExecuteV1,
-  UpdateCollectionInfoV1,
-  AddCollectionsToGroupV1,
-  RemoveCollectionsFromGroupV1,
-  AddAssetsToGroupV1,
-  RemoveAssetsFromGroupV1,
-  AddGroupsToGroupV1,
-  RemoveGroupsFromGroupV1,
-  CreateGroupV1,
-  CloseGroupV1,
-  UpdateGroupV1,
-}
+export const MplCoreProgramAccount: Omit<
+  typeof MplCoreProgramAccountLookup,
+  number
+> = MplCoreProgramAccountLookup;
+
+export type MplCoreProgramAccount =
+  (typeof MplCoreProgramAccount)[keyof typeof MplCoreProgramAccount];
+
+const MplCoreProgramInstructionLookup = {
+  0: "CreateV1",
+  1: "CreateCollectionV1",
+  2: "AddPluginV1",
+  3: "AddCollectionPluginV1",
+  4: "RemovePluginV1",
+  5: "RemoveCollectionPluginV1",
+  6: "UpdatePluginV1",
+  7: "UpdateCollectionPluginV1",
+  8: "ApprovePluginAuthorityV1",
+  9: "ApproveCollectionPluginAuthorityV1",
+  10: "RevokePluginAuthorityV1",
+  11: "RevokeCollectionPluginAuthorityV1",
+  12: "BurnV1",
+  13: "BurnCollectionV1",
+  14: "TransferV1",
+  15: "UpdateV1",
+  16: "UpdateCollectionV1",
+  17: "CompressV1",
+  18: "DecompressV1",
+  19: "Collect",
+  20: "CreateV2",
+  21: "CreateCollectionV2",
+  22: "AddExternalPluginAdapterV1",
+  23: "AddCollectionExternalPluginAdapterV1",
+  24: "RemoveExternalPluginAdapterV1",
+  25: "RemoveCollectionExternalPluginAdapterV1",
+  26: "UpdateExternalPluginAdapterV1",
+  27: "UpdateCollectionExternalPluginAdapterV1",
+  28: "WriteExternalPluginAdapterDataV1",
+  29: "WriteCollectionExternalPluginAdapterDataV1",
+  30: "UpdateV2",
+  31: "ExecuteV1",
+  32: "UpdateCollectionInfoV1",
+  33: "AddCollectionsToGroupV1",
+  34: "RemoveCollectionsFromGroupV1",
+  35: "AddAssetsToGroupV1",
+  36: "RemoveAssetsFromGroupV1",
+  37: "AddGroupsToGroupV1",
+  38: "RemoveGroupsFromGroupV1",
+  39: "CreateGroupV1",
+  40: "CloseGroupV1",
+  41: "UpdateGroupV1",
+  CreateV1: 0,
+  CreateCollectionV1: 1,
+  AddPluginV1: 2,
+  AddCollectionPluginV1: 3,
+  RemovePluginV1: 4,
+  RemoveCollectionPluginV1: 5,
+  UpdatePluginV1: 6,
+  UpdateCollectionPluginV1: 7,
+  ApprovePluginAuthorityV1: 8,
+  ApproveCollectionPluginAuthorityV1: 9,
+  RevokePluginAuthorityV1: 10,
+  RevokeCollectionPluginAuthorityV1: 11,
+  BurnV1: 12,
+  BurnCollectionV1: 13,
+  TransferV1: 14,
+  UpdateV1: 15,
+  UpdateCollectionV1: 16,
+  CompressV1: 17,
+  DecompressV1: 18,
+  Collect: 19,
+  CreateV2: 20,
+  CreateCollectionV2: 21,
+  AddExternalPluginAdapterV1: 22,
+  AddCollectionExternalPluginAdapterV1: 23,
+  RemoveExternalPluginAdapterV1: 24,
+  RemoveCollectionExternalPluginAdapterV1: 25,
+  UpdateExternalPluginAdapterV1: 26,
+  UpdateCollectionExternalPluginAdapterV1: 27,
+  WriteExternalPluginAdapterDataV1: 28,
+  WriteCollectionExternalPluginAdapterDataV1: 29,
+  UpdateV2: 30,
+  ExecuteV1: 31,
+  UpdateCollectionInfoV1: 32,
+  AddCollectionsToGroupV1: 33,
+  RemoveCollectionsFromGroupV1: 34,
+  AddAssetsToGroupV1: 35,
+  RemoveAssetsFromGroupV1: 36,
+  AddGroupsToGroupV1: 37,
+  RemoveGroupsFromGroupV1: 38,
+  CreateGroupV1: 39,
+  CloseGroupV1: 40,
+  UpdateGroupV1: 41,
+} as const;
+
+export const MplCoreProgramInstruction: Omit<
+  typeof MplCoreProgramInstructionLookup,
+  number
+> = MplCoreProgramInstructionLookup;
+
+export type MplCoreProgramInstruction =
+  (typeof MplCoreProgramInstruction)[keyof typeof MplCoreProgramInstruction];
 
 export function identifyMplCoreProgramInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -421,130 +485,130 @@ export type ParsedMplCoreProgramInstruction<
   TProgram extends string = "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
 > =
   | ({
-      instructionType: MplCoreProgramInstruction.CreateV1;
+      instructionType: typeof MplCoreProgramInstruction.CreateV1;
     } & ParsedCreateV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.CreateCollectionV1;
+      instructionType: typeof MplCoreProgramInstruction.CreateCollectionV1;
     } & ParsedCreateCollectionV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.AddPluginV1;
+      instructionType: typeof MplCoreProgramInstruction.AddPluginV1;
     } & ParsedAddPluginV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.AddCollectionPluginV1;
+      instructionType: typeof MplCoreProgramInstruction.AddCollectionPluginV1;
     } & ParsedAddCollectionPluginV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RemovePluginV1;
+      instructionType: typeof MplCoreProgramInstruction.RemovePluginV1;
     } & ParsedRemovePluginV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RemoveCollectionPluginV1;
+      instructionType: typeof MplCoreProgramInstruction.RemoveCollectionPluginV1;
     } & ParsedRemoveCollectionPluginV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdatePluginV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdatePluginV1;
     } & ParsedUpdatePluginV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateCollectionPluginV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdateCollectionPluginV1;
     } & ParsedUpdateCollectionPluginV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.ApprovePluginAuthorityV1;
+      instructionType: typeof MplCoreProgramInstruction.ApprovePluginAuthorityV1;
     } & ParsedApprovePluginAuthorityV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.ApproveCollectionPluginAuthorityV1;
+      instructionType: typeof MplCoreProgramInstruction.ApproveCollectionPluginAuthorityV1;
     } & ParsedApproveCollectionPluginAuthorityV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RevokePluginAuthorityV1;
+      instructionType: typeof MplCoreProgramInstruction.RevokePluginAuthorityV1;
     } & ParsedRevokePluginAuthorityV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RevokeCollectionPluginAuthorityV1;
+      instructionType: typeof MplCoreProgramInstruction.RevokeCollectionPluginAuthorityV1;
     } & ParsedRevokeCollectionPluginAuthorityV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.BurnV1;
+      instructionType: typeof MplCoreProgramInstruction.BurnV1;
     } & ParsedBurnV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.BurnCollectionV1;
+      instructionType: typeof MplCoreProgramInstruction.BurnCollectionV1;
     } & ParsedBurnCollectionV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.TransferV1;
+      instructionType: typeof MplCoreProgramInstruction.TransferV1;
     } & ParsedTransferV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdateV1;
     } & ParsedUpdateV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateCollectionV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdateCollectionV1;
     } & ParsedUpdateCollectionV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.CompressV1;
+      instructionType: typeof MplCoreProgramInstruction.CompressV1;
     } & ParsedCompressV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.DecompressV1;
+      instructionType: typeof MplCoreProgramInstruction.DecompressV1;
     } & ParsedDecompressV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.Collect;
+      instructionType: typeof MplCoreProgramInstruction.Collect;
     } & ParsedCollectInstruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.CreateV2;
+      instructionType: typeof MplCoreProgramInstruction.CreateV2;
     } & ParsedCreateV2Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.CreateCollectionV2;
+      instructionType: typeof MplCoreProgramInstruction.CreateCollectionV2;
     } & ParsedCreateCollectionV2Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.AddExternalPluginAdapterV1;
+      instructionType: typeof MplCoreProgramInstruction.AddExternalPluginAdapterV1;
     } & ParsedAddExternalPluginAdapterV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.AddCollectionExternalPluginAdapterV1;
+      instructionType: typeof MplCoreProgramInstruction.AddCollectionExternalPluginAdapterV1;
     } & ParsedAddCollectionExternalPluginAdapterV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RemoveExternalPluginAdapterV1;
+      instructionType: typeof MplCoreProgramInstruction.RemoveExternalPluginAdapterV1;
     } & ParsedRemoveExternalPluginAdapterV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RemoveCollectionExternalPluginAdapterV1;
+      instructionType: typeof MplCoreProgramInstruction.RemoveCollectionExternalPluginAdapterV1;
     } & ParsedRemoveCollectionExternalPluginAdapterV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateExternalPluginAdapterV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdateExternalPluginAdapterV1;
     } & ParsedUpdateExternalPluginAdapterV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateCollectionExternalPluginAdapterV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdateCollectionExternalPluginAdapterV1;
     } & ParsedUpdateCollectionExternalPluginAdapterV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.WriteExternalPluginAdapterDataV1;
+      instructionType: typeof MplCoreProgramInstruction.WriteExternalPluginAdapterDataV1;
     } & ParsedWriteExternalPluginAdapterDataV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.WriteCollectionExternalPluginAdapterDataV1;
+      instructionType: typeof MplCoreProgramInstruction.WriteCollectionExternalPluginAdapterDataV1;
     } & ParsedWriteCollectionExternalPluginAdapterDataV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateV2;
+      instructionType: typeof MplCoreProgramInstruction.UpdateV2;
     } & ParsedUpdateV2Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.ExecuteV1;
+      instructionType: typeof MplCoreProgramInstruction.ExecuteV1;
     } & ParsedExecuteV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateCollectionInfoV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdateCollectionInfoV1;
     } & ParsedUpdateCollectionInfoV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.AddCollectionsToGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.AddCollectionsToGroupV1;
     } & ParsedAddCollectionsToGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RemoveCollectionsFromGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.RemoveCollectionsFromGroupV1;
     } & ParsedRemoveCollectionsFromGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.AddAssetsToGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.AddAssetsToGroupV1;
     } & ParsedAddAssetsToGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RemoveAssetsFromGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.RemoveAssetsFromGroupV1;
     } & ParsedRemoveAssetsFromGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.AddGroupsToGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.AddGroupsToGroupV1;
     } & ParsedAddGroupsToGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.RemoveGroupsFromGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.RemoveGroupsFromGroupV1;
     } & ParsedRemoveGroupsFromGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.CreateGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.CreateGroupV1;
     } & ParsedCreateGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.CloseGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.CloseGroupV1;
     } & ParsedCloseGroupV1Instruction<TProgram>)
   | ({
-      instructionType: MplCoreProgramInstruction.UpdateGroupV1;
+      instructionType: typeof MplCoreProgramInstruction.UpdateGroupV1;
     } & ParsedUpdateGroupV1Instruction<TProgram>);
 
 export function parseMplCoreProgramInstruction<TProgram extends string>(
@@ -1076,7 +1140,7 @@ export function mplCoreProgramProgram() {
     client: T,
   ): ExtendedClient<T, { mplCoreProgram: MplCoreProgramPlugin }> => {
     return extendClient(client, {
-      mplCoreProgram: <MplCoreProgramPlugin>{
+      mplCoreProgram: {
         accounts: {
           pluginHeaderV1: addSelfFetchFunctions(
             client,
@@ -1423,7 +1487,7 @@ export function mplCoreProgramProgram() {
         pdas: { assetSigner: findAssetSignerPda },
         identifyInstruction: identifyMplCoreProgramInstruction,
         parseInstruction: parseMplCoreProgramInstruction,
-      },
+      } as MplCoreProgramPlugin,
     });
   };
 }

@@ -136,11 +136,20 @@ import { findMinerPda, findQuarryPda, findRewarderPda } from "../pdas/index.js";
 export const QUARRY_MINE_PROGRAM_ADDRESS =
   "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
 
-export enum QuarryMineAccount {
-  Rewarder,
-  Quarry,
-  Miner,
-}
+const QuarryMineAccountLookup = {
+  0: "Rewarder",
+  1: "Quarry",
+  2: "Miner",
+  Rewarder: 0,
+  Quarry: 1,
+  Miner: 2,
+} as const;
+
+export const QuarryMineAccount: Omit<typeof QuarryMineAccountLookup, number> =
+  QuarryMineAccountLookup;
+
+export type QuarryMineAccount =
+  (typeof QuarryMineAccount)[keyof typeof QuarryMineAccount];
 
 export function identifyQuarryMineAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -185,29 +194,58 @@ export function identifyQuarryMineAccount(
   );
 }
 
-export enum QuarryMineInstruction {
-  NewRewarder,
-  NewRewarderV2,
-  SetPauseAuthority,
-  Pause,
-  Unpause,
-  TransferAuthority,
-  AcceptAuthority,
-  SetAnnualRewards,
-  CreateQuarry,
-  CreateQuarryV2,
-  SetRewardsShare,
-  SetFamine,
-  UpdateQuarryRewards,
-  CreateMiner,
-  CreateMinerV2,
-  ClaimRewards,
-  ClaimRewardsV2,
-  StakeTokens,
-  WithdrawTokens,
-  RescueTokens,
-  ExtractFees,
-}
+const QuarryMineInstructionLookup = {
+  0: "NewRewarder",
+  1: "NewRewarderV2",
+  2: "SetPauseAuthority",
+  3: "Pause",
+  4: "Unpause",
+  5: "TransferAuthority",
+  6: "AcceptAuthority",
+  7: "SetAnnualRewards",
+  8: "CreateQuarry",
+  9: "CreateQuarryV2",
+  10: "SetRewardsShare",
+  11: "SetFamine",
+  12: "UpdateQuarryRewards",
+  13: "CreateMiner",
+  14: "CreateMinerV2",
+  15: "ClaimRewards",
+  16: "ClaimRewardsV2",
+  17: "StakeTokens",
+  18: "WithdrawTokens",
+  19: "RescueTokens",
+  20: "ExtractFees",
+  NewRewarder: 0,
+  NewRewarderV2: 1,
+  SetPauseAuthority: 2,
+  Pause: 3,
+  Unpause: 4,
+  TransferAuthority: 5,
+  AcceptAuthority: 6,
+  SetAnnualRewards: 7,
+  CreateQuarry: 8,
+  CreateQuarryV2: 9,
+  SetRewardsShare: 10,
+  SetFamine: 11,
+  UpdateQuarryRewards: 12,
+  CreateMiner: 13,
+  CreateMinerV2: 14,
+  ClaimRewards: 15,
+  ClaimRewardsV2: 16,
+  StakeTokens: 17,
+  WithdrawTokens: 18,
+  RescueTokens: 19,
+  ExtractFees: 20,
+} as const;
+
+export const QuarryMineInstruction: Omit<
+  typeof QuarryMineInstructionLookup,
+  number
+> = QuarryMineInstructionLookup;
+
+export type QuarryMineInstruction =
+  (typeof QuarryMineInstruction)[keyof typeof QuarryMineInstruction];
 
 export function identifyQuarryMineInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -454,67 +492,67 @@ export type ParsedQuarryMineInstruction<
   TProgram extends string = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
 > =
   | ({
-      instructionType: QuarryMineInstruction.NewRewarder;
+      instructionType: typeof QuarryMineInstruction.NewRewarder;
     } & ParsedNewRewarderInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.NewRewarderV2;
+      instructionType: typeof QuarryMineInstruction.NewRewarderV2;
     } & ParsedNewRewarderV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.SetPauseAuthority;
+      instructionType: typeof QuarryMineInstruction.SetPauseAuthority;
     } & ParsedSetPauseAuthorityInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.Pause;
+      instructionType: typeof QuarryMineInstruction.Pause;
     } & ParsedPauseInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.Unpause;
+      instructionType: typeof QuarryMineInstruction.Unpause;
     } & ParsedUnpauseInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.TransferAuthority;
+      instructionType: typeof QuarryMineInstruction.TransferAuthority;
     } & ParsedTransferAuthorityInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.AcceptAuthority;
+      instructionType: typeof QuarryMineInstruction.AcceptAuthority;
     } & ParsedAcceptAuthorityInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.SetAnnualRewards;
+      instructionType: typeof QuarryMineInstruction.SetAnnualRewards;
     } & ParsedSetAnnualRewardsInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.CreateQuarry;
+      instructionType: typeof QuarryMineInstruction.CreateQuarry;
     } & ParsedCreateQuarryInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.CreateQuarryV2;
+      instructionType: typeof QuarryMineInstruction.CreateQuarryV2;
     } & ParsedCreateQuarryV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.SetRewardsShare;
+      instructionType: typeof QuarryMineInstruction.SetRewardsShare;
     } & ParsedSetRewardsShareInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.SetFamine;
+      instructionType: typeof QuarryMineInstruction.SetFamine;
     } & ParsedSetFamineInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.UpdateQuarryRewards;
+      instructionType: typeof QuarryMineInstruction.UpdateQuarryRewards;
     } & ParsedUpdateQuarryRewardsInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.CreateMiner;
+      instructionType: typeof QuarryMineInstruction.CreateMiner;
     } & ParsedCreateMinerInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.CreateMinerV2;
+      instructionType: typeof QuarryMineInstruction.CreateMinerV2;
     } & ParsedCreateMinerV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.ClaimRewards;
+      instructionType: typeof QuarryMineInstruction.ClaimRewards;
     } & ParsedClaimRewardsInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.ClaimRewardsV2;
+      instructionType: typeof QuarryMineInstruction.ClaimRewardsV2;
     } & ParsedClaimRewardsV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.StakeTokens;
+      instructionType: typeof QuarryMineInstruction.StakeTokens;
     } & ParsedStakeTokensInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.WithdrawTokens;
+      instructionType: typeof QuarryMineInstruction.WithdrawTokens;
     } & ParsedWithdrawTokensInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.RescueTokens;
+      instructionType: typeof QuarryMineInstruction.RescueTokens;
     } & ParsedRescueTokensInstruction<TProgram>)
   | ({
-      instructionType: QuarryMineInstruction.ExtractFees;
+      instructionType: typeof QuarryMineInstruction.ExtractFees;
     } & ParsedExtractFeesInstruction<TProgram>);
 
 export function parseQuarryMineInstruction<TProgram extends string>(
@@ -798,7 +836,7 @@ export function quarryMineProgram() {
     client: T,
   ): ExtendedClient<T, { quarryMine: QuarryMinePlugin }> => {
     return extendClient(client, {
-      quarryMine: <QuarryMinePlugin>{
+      quarryMine: {
         accounts: {
           rewarder: addSelfFetchFunctions(client, getRewarderCodec()),
           quarry: addSelfFetchFunctions(client, getQuarryCodec()),
@@ -928,7 +966,7 @@ export function quarryMineProgram() {
         identifyAccount: identifyQuarryMineAccount,
         identifyInstruction: identifyQuarryMineInstruction,
         parseInstruction: parseQuarryMineInstruction,
-      },
+      } as QuarryMinePlugin,
     });
   };
 }

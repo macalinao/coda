@@ -15,10 +15,17 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum MigrationType {
-  CollectionV1,
-  ProgrammableV1,
-}
+const MigrationTypeLookup = {
+  0: "CollectionV1",
+  1: "ProgrammableV1",
+  CollectionV1: 0,
+  ProgrammableV1: 1,
+} as const;
+
+export const MigrationType: Omit<typeof MigrationTypeLookup, number> =
+  MigrationTypeLookup;
+
+export type MigrationType = (typeof MigrationType)[keyof typeof MigrationType];
 
 export type MigrationTypeArgs = MigrationType;
 

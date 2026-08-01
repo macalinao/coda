@@ -15,11 +15,20 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum OptionVoteResult {
-  None,
-  Succeeded,
-  Defeated,
-}
+const OptionVoteResultLookup = {
+  0: "None",
+  1: "Succeeded",
+  2: "Defeated",
+  None: 0,
+  Succeeded: 1,
+  Defeated: 2,
+} as const;
+
+export const OptionVoteResult: Omit<typeof OptionVoteResultLookup, number> =
+  OptionVoteResultLookup;
+
+export type OptionVoteResult =
+  (typeof OptionVoteResult)[keyof typeof OptionVoteResult];
 
 export type OptionVoteResultArgs = OptionVoteResult;
 

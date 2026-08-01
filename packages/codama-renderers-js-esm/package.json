@@ -38,7 +38,8 @@
   },
   "scripts": {
     "build": "tsdown",
-    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
+    "test": "bun test src/"
   },
   "dependencies": {
     "@codama/renderers-core": "catalog:",

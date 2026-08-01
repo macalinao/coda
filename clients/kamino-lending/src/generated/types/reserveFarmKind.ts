@@ -15,10 +15,18 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum ReserveFarmKind {
-  Collateral,
-  Debt,
-}
+const ReserveFarmKindLookup = {
+  0: "Collateral",
+  1: "Debt",
+  Collateral: 0,
+  Debt: 1,
+} as const;
+
+export const ReserveFarmKind: Omit<typeof ReserveFarmKindLookup, number> =
+  ReserveFarmKindLookup;
+
+export type ReserveFarmKind =
+  (typeof ReserveFarmKind)[keyof typeof ReserveFarmKind];
 
 export type ReserveFarmKindArgs = ReserveFarmKind;
 

@@ -15,16 +15,31 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const ExternalPluginAdapterTypeLookup = {
+  0: "LifecycleHook",
+  1: "Oracle",
+  2: "AppData",
+  3: "LinkedLifecycleHook",
+  4: "LinkedAppData",
+  5: "DataSection",
+  6: "AgentIdentity",
+  LifecycleHook: 0,
+  Oracle: 1,
+  AppData: 2,
+  LinkedLifecycleHook: 3,
+  LinkedAppData: 4,
+  DataSection: 5,
+  AgentIdentity: 6,
+} as const;
+
 /** The kind of external plugin adapter, without its configuration or data. */
-export enum ExternalPluginAdapterType {
-  LifecycleHook,
-  Oracle,
-  AppData,
-  LinkedLifecycleHook,
-  LinkedAppData,
-  DataSection,
-  AgentIdentity,
-}
+export const ExternalPluginAdapterType: Omit<
+  typeof ExternalPluginAdapterTypeLookup,
+  number
+> = ExternalPluginAdapterTypeLookup;
+
+export type ExternalPluginAdapterType =
+  (typeof ExternalPluginAdapterType)[keyof typeof ExternalPluginAdapterType];
 
 export type ExternalPluginAdapterTypeArgs = ExternalPluginAdapterType;
 

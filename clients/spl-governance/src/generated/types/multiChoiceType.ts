@@ -15,10 +15,18 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum MultiChoiceType {
-  FullWeight,
-  Weighted,
-}
+const MultiChoiceTypeLookup = {
+  0: "FullWeight",
+  1: "Weighted",
+  FullWeight: 0,
+  Weighted: 1,
+} as const;
+
+export const MultiChoiceType: Omit<typeof MultiChoiceTypeLookup, number> =
+  MultiChoiceTypeLookup;
+
+export type MultiChoiceType =
+  (typeof MultiChoiceType)[keyof typeof MultiChoiceType];
 
 export type MultiChoiceTypeArgs = MultiChoiceType;
 

@@ -15,11 +15,22 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum InstructionExecutionFlags {
-  None,
-  Ordered,
-  UseTransaction,
-}
+const InstructionExecutionFlagsLookup = {
+  0: "None",
+  1: "Ordered",
+  2: "UseTransaction",
+  None: 0,
+  Ordered: 1,
+  UseTransaction: 2,
+} as const;
+
+export const InstructionExecutionFlags: Omit<
+  typeof InstructionExecutionFlagsLookup,
+  number
+> = InstructionExecutionFlagsLookup;
+
+export type InstructionExecutionFlags =
+  (typeof InstructionExecutionFlags)[keyof typeof InstructionExecutionFlags];
 
 export type InstructionExecutionFlagsArgs = InstructionExecutionFlags;
 

@@ -100,12 +100,21 @@ import {
 export const GOVERN_PROGRAM_ADDRESS =
   "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw" as Address<"Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw">;
 
-export enum GovernAccount {
-  Governor,
-  Proposal,
-  ProposalMeta,
-  Vote,
-}
+const GovernAccountLookup = {
+  0: "Governor",
+  1: "Proposal",
+  2: "ProposalMeta",
+  3: "Vote",
+  Governor: 0,
+  Proposal: 1,
+  ProposalMeta: 2,
+  Vote: 3,
+} as const;
+
+export const GovernAccount: Omit<typeof GovernAccountLookup, number> =
+  GovernAccountLookup;
+
+export type GovernAccount = (typeof GovernAccount)[keyof typeof GovernAccount];
 
 export function identifyGovernAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -161,18 +170,34 @@ export function identifyGovernAccount(
   );
 }
 
-export enum GovernInstruction {
-  CreateGovernor,
-  CreateProposal,
-  ActivateProposal,
-  CancelProposal,
-  QueueProposal,
-  NewVote,
-  SetVote,
-  SetGovernanceParams,
-  SetElectorate,
-  CreateProposalMeta,
-}
+const GovernInstructionLookup = {
+  0: "CreateGovernor",
+  1: "CreateProposal",
+  2: "ActivateProposal",
+  3: "CancelProposal",
+  4: "QueueProposal",
+  5: "NewVote",
+  6: "SetVote",
+  7: "SetGovernanceParams",
+  8: "SetElectorate",
+  9: "CreateProposalMeta",
+  CreateGovernor: 0,
+  CreateProposal: 1,
+  ActivateProposal: 2,
+  CancelProposal: 3,
+  QueueProposal: 4,
+  NewVote: 5,
+  SetVote: 6,
+  SetGovernanceParams: 7,
+  SetElectorate: 8,
+  CreateProposalMeta: 9,
+} as const;
+
+export const GovernInstruction: Omit<typeof GovernInstructionLookup, number> =
+  GovernInstructionLookup;
+
+export type GovernInstruction =
+  (typeof GovernInstruction)[keyof typeof GovernInstruction];
 
 export function identifyGovernInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -298,34 +323,34 @@ export type ParsedGovernInstruction<
   TProgram extends string = "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw",
 > =
   | ({
-      instructionType: GovernInstruction.CreateGovernor;
+      instructionType: typeof GovernInstruction.CreateGovernor;
     } & ParsedCreateGovernorInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.CreateProposal;
+      instructionType: typeof GovernInstruction.CreateProposal;
     } & ParsedCreateProposalInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.ActivateProposal;
+      instructionType: typeof GovernInstruction.ActivateProposal;
     } & ParsedActivateProposalInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.CancelProposal;
+      instructionType: typeof GovernInstruction.CancelProposal;
     } & ParsedCancelProposalInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.QueueProposal;
+      instructionType: typeof GovernInstruction.QueueProposal;
     } & ParsedQueueProposalInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.NewVote;
+      instructionType: typeof GovernInstruction.NewVote;
     } & ParsedNewVoteInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.SetVote;
+      instructionType: typeof GovernInstruction.SetVote;
     } & ParsedSetVoteInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.SetGovernanceParams;
+      instructionType: typeof GovernInstruction.SetGovernanceParams;
     } & ParsedSetGovernanceParamsInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.SetElectorate;
+      instructionType: typeof GovernInstruction.SetElectorate;
     } & ParsedSetElectorateInstruction<TProgram>)
   | ({
-      instructionType: GovernInstruction.CreateProposalMeta;
+      instructionType: typeof GovernInstruction.CreateProposalMeta;
     } & ParsedCreateProposalMetaInstruction<TProgram>);
 
 export function parseGovernInstruction<TProgram extends string>(
@@ -490,7 +515,7 @@ export function governProgram() {
     client: T,
   ): ExtendedClient<T, { govern: GovernPlugin }> => {
     return extendClient(client, {
-      govern: <GovernPlugin>{
+      govern: {
         accounts: {
           governor: addSelfFetchFunctions(client, getGovernorCodec()),
           proposal: addSelfFetchFunctions(client, getProposalCodec()),
@@ -570,7 +595,7 @@ export function governProgram() {
         identifyAccount: identifyGovernAccount,
         identifyInstruction: identifyGovernInstruction,
         parseInstruction: parseGovernInstruction,
-      },
+      } as GovernPlugin,
     });
   };
 }

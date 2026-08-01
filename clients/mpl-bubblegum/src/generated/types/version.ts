@@ -15,15 +15,16 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const VersionLookup = { 0: "V1", 1: "V2", V1: 0, V2: 1 } as const;
+
 /**
  * Schema version of a tree's leaves: `V1` (Token Metadata
  * collections) or `V2` (MPL Core collections, freezing, and
  * non-transferable assets).
  */
-export enum Version {
-  V1,
-  V2,
-}
+export const Version: Omit<typeof VersionLookup, number> = VersionLookup;
+
+export type Version = (typeof Version)[keyof typeof Version];
 
 export type VersionArgs = Version;
 

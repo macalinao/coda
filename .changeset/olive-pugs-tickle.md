@@ -29,7 +29,4 @@ The shared base config now enables `exactOptionalPropertyTypes`,
 dropped their local copies of the import-extension flags now that the base
 supplies them.
 
-Generated clients opt out of `erasableSyntaxOnly`, since Codama emits
-TypeScript `enum` declarations for IDL enum types.
-
 Published output is unchanged; these are compile-time checks only.

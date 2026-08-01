@@ -15,15 +15,25 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const DecompressibleStateLookup = {
+  0: "Enabled",
+  1: "Disabled",
+  Enabled: 0,
+  Disabled: 1,
+} as const;
+
 /**
  * Whether leaves in a tree may be redeemed and decompressed into
  * regular SPL/Token Metadata NFTs. Set per-tree with
  * `setDecompressibleState`.
  */
-export enum DecompressibleState {
-  Enabled,
-  Disabled,
-}
+export const DecompressibleState: Omit<
+  typeof DecompressibleStateLookup,
+  number
+> = DecompressibleStateLookup;
+
+export type DecompressibleState =
+  (typeof DecompressibleState)[keyof typeof DecompressibleState];
 
 export type DecompressibleStateArgs = DecompressibleState;
 

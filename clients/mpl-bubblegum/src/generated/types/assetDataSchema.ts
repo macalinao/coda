@@ -15,15 +15,24 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const AssetDataSchemaLookup = {
+  0: "Binary",
+  1: "Json",
+  2: "MsgPack",
+  Binary: 0,
+  Json: 1,
+  MsgPack: 2,
+} as const;
+
 /**
  * Format of the optional off-chain `assetData` blob attached to a
  * `LeafSchema` V2 asset. Reserved for future use.
  */
-export enum AssetDataSchema {
-  Binary,
-  Json,
-  MsgPack,
-}
+export const AssetDataSchema: Omit<typeof AssetDataSchemaLookup, number> =
+  AssetDataSchemaLookup;
+
+export type AssetDataSchema =
+  (typeof AssetDataSchema)[keyof typeof AssetDataSchema];
 
 export type AssetDataSchemaArgs = AssetDataSchema;
 

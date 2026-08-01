@@ -15,12 +15,20 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const AccountTypeLookup = {
+  0: "Uninitialized",
+  1: "StakePool",
+  2: "ValidatorList",
+  Uninitialized: 0,
+  StakePool: 1,
+  ValidatorList: 2,
+} as const;
+
 /** Enum representing the account type managed by the program */
-export enum AccountType {
-  Uninitialized,
-  StakePool,
-  ValidatorList,
-}
+export const AccountType: Omit<typeof AccountTypeLookup, number> =
+  AccountTypeLookup;
+
+export type AccountType = (typeof AccountType)[keyof typeof AccountType];
 
 export type AccountTypeArgs = AccountType;
 

@@ -15,9 +15,12 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum LockTypeLabel {
-  Permanent,
-}
+const LockTypeLabelLookup = { 0: "Permanent", Permanent: 0 } as const;
+
+export const LockTypeLabel: Omit<typeof LockTypeLabelLookup, number> =
+  LockTypeLabelLookup;
+
+export type LockTypeLabel = (typeof LockTypeLabel)[keyof typeof LockTypeLabel];
 
 export type LockTypeLabelArgs = LockTypeLabel;
 

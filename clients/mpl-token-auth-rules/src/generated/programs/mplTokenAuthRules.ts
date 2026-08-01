@@ -60,16 +60,37 @@ import { findRuleSetBufferPda, findRuleSetPda } from "../pdas/index.js";
 export const MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS =
   "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg" as Address<"auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg">;
 
-export enum MplTokenAuthRulesAccount {
-  FrequencyAccount,
-}
+const MplTokenAuthRulesAccountLookup = {
+  0: "FrequencyAccount",
+  FrequencyAccount: 0,
+} as const;
 
-export enum MplTokenAuthRulesInstruction {
-  CreateOrUpdate,
-  Validate,
-  WriteToBuffer,
-  PuffRuleSet,
-}
+export const MplTokenAuthRulesAccount: Omit<
+  typeof MplTokenAuthRulesAccountLookup,
+  number
+> = MplTokenAuthRulesAccountLookup;
+
+export type MplTokenAuthRulesAccount =
+  (typeof MplTokenAuthRulesAccount)[keyof typeof MplTokenAuthRulesAccount];
+
+const MplTokenAuthRulesInstructionLookup = {
+  0: "CreateOrUpdate",
+  1: "Validate",
+  2: "WriteToBuffer",
+  3: "PuffRuleSet",
+  CreateOrUpdate: 0,
+  Validate: 1,
+  WriteToBuffer: 2,
+  PuffRuleSet: 3,
+} as const;
+
+export const MplTokenAuthRulesInstruction: Omit<
+  typeof MplTokenAuthRulesInstructionLookup,
+  number
+> = MplTokenAuthRulesInstructionLookup;
+
+export type MplTokenAuthRulesInstruction =
+  (typeof MplTokenAuthRulesInstruction)[keyof typeof MplTokenAuthRulesInstruction];
 
 export function identifyMplTokenAuthRulesInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -97,16 +118,16 @@ export type ParsedMplTokenAuthRulesInstruction<
   TProgram extends string = "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg",
 > =
   | ({
-      instructionType: MplTokenAuthRulesInstruction.CreateOrUpdate;
+      instructionType: typeof MplTokenAuthRulesInstruction.CreateOrUpdate;
     } & ParsedCreateOrUpdateInstruction<TProgram>)
   | ({
-      instructionType: MplTokenAuthRulesInstruction.Validate;
+      instructionType: typeof MplTokenAuthRulesInstruction.Validate;
     } & ParsedValidateInstruction<TProgram>)
   | ({
-      instructionType: MplTokenAuthRulesInstruction.WriteToBuffer;
+      instructionType: typeof MplTokenAuthRulesInstruction.WriteToBuffer;
     } & ParsedWriteToBufferInstruction<TProgram>)
   | ({
-      instructionType: MplTokenAuthRulesInstruction.PuffRuleSet;
+      instructionType: typeof MplTokenAuthRulesInstruction.PuffRuleSet;
     } & ParsedPuffRuleSetInstruction<TProgram>);
 
 export function parseMplTokenAuthRulesInstruction<TProgram extends string>(
@@ -200,7 +221,7 @@ export function mplTokenAuthRulesProgram() {
     client: T,
   ): ExtendedClient<T, { mplTokenAuthRules: MplTokenAuthRulesPlugin }> => {
     return extendClient(client, {
-      mplTokenAuthRules: <MplTokenAuthRulesPlugin>{
+      mplTokenAuthRules: {
         accounts: {
           frequencyAccount: addSelfFetchFunctions(
             client,
@@ -238,7 +259,7 @@ export function mplTokenAuthRulesProgram() {
         pdas: { ruleSet: findRuleSetPda, ruleSetBuffer: findRuleSetBufferPda },
         identifyInstruction: identifyMplTokenAuthRulesInstruction,
         parseInstruction: parseMplTokenAuthRulesInstruction,
-      },
+      } as MplTokenAuthRulesPlugin,
     });
   };
 }

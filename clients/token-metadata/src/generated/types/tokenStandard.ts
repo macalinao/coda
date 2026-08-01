@@ -15,14 +15,25 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum TokenStandard {
-  NonFungible,
-  FungibleAsset,
-  Fungible,
-  NonFungibleEdition,
-  ProgrammableNonFungible,
-  ProgrammableNonFungibleEdition,
-}
+const TokenStandardLookup = {
+  0: "NonFungible",
+  1: "FungibleAsset",
+  2: "Fungible",
+  3: "NonFungibleEdition",
+  4: "ProgrammableNonFungible",
+  5: "ProgrammableNonFungibleEdition",
+  NonFungible: 0,
+  FungibleAsset: 1,
+  Fungible: 2,
+  NonFungibleEdition: 3,
+  ProgrammableNonFungible: 4,
+  ProgrammableNonFungibleEdition: 5,
+} as const;
+
+export const TokenStandard: Omit<typeof TokenStandardLookup, number> =
+  TokenStandardLookup;
+
+export type TokenStandard = (typeof TokenStandard)[keyof typeof TokenStandard];
 
 export type TokenStandardArgs = TokenStandard;
 

@@ -15,9 +15,11 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum LockType {
-  Permanent,
-}
+const LockTypeLookup = { 0: "Permanent", Permanent: 0 } as const;
+
+export const LockType: Omit<typeof LockTypeLookup, number> = LockTypeLookup;
+
+export type LockType = (typeof LockType)[keyof typeof LockType];
 
 export type LockTypeArgs = LockType;
 

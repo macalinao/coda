@@ -15,10 +15,18 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum VerificationArgs {
-  CreatorV1,
-  CollectionV1,
-}
+const VerificationArgsLookup = {
+  0: "CreatorV1",
+  1: "CollectionV1",
+  CreatorV1: 0,
+  CollectionV1: 1,
+} as const;
+
+export const VerificationArgs: Omit<typeof VerificationArgsLookup, number> =
+  VerificationArgsLookup;
+
+export type VerificationArgs =
+  (typeof VerificationArgs)[keyof typeof VerificationArgs];
 
 export type VerificationArgsArgs = VerificationArgs;
 

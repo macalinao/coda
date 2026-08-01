@@ -105,10 +105,20 @@ import {
 export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;
 
-export enum QuarryMergeMineAccount {
-  MergePool,
-  MergeMiner,
-}
+const QuarryMergeMineAccountLookup = {
+  0: "MergePool",
+  1: "MergeMiner",
+  MergePool: 0,
+  MergeMiner: 1,
+} as const;
+
+export const QuarryMergeMineAccount: Omit<
+  typeof QuarryMergeMineAccountLookup,
+  number
+> = QuarryMergeMineAccountLookup;
+
+export type QuarryMergeMineAccount =
+  (typeof QuarryMergeMineAccount)[keyof typeof QuarryMergeMineAccount];
 
 export function identifyQuarryMergeMineAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -142,21 +152,42 @@ export function identifyQuarryMergeMineAccount(
   );
 }
 
-export enum QuarryMergeMineInstruction {
-  NewPool,
-  NewPoolV2,
-  InitMergeMiner,
-  InitMergeMinerV2,
-  InitMinerMM,
-  InitMinerMMV2,
-  StakePrimaryMiner,
-  StakeReplicaMiner,
-  UnstakePrimaryMiner,
-  UnstakeAllReplicaMiner,
-  WithdrawTokensMM,
-  RescueTokensMM,
-  ClaimRewardsMM,
-}
+const QuarryMergeMineInstructionLookup = {
+  0: "NewPool",
+  1: "NewPoolV2",
+  2: "InitMergeMiner",
+  3: "InitMergeMinerV2",
+  4: "InitMinerMM",
+  5: "InitMinerMMV2",
+  6: "StakePrimaryMiner",
+  7: "StakeReplicaMiner",
+  8: "UnstakePrimaryMiner",
+  9: "UnstakeAllReplicaMiner",
+  10: "WithdrawTokensMM",
+  11: "RescueTokensMM",
+  12: "ClaimRewardsMM",
+  NewPool: 0,
+  NewPoolV2: 1,
+  InitMergeMiner: 2,
+  InitMergeMinerV2: 3,
+  InitMinerMM: 4,
+  InitMinerMMV2: 5,
+  StakePrimaryMiner: 6,
+  StakeReplicaMiner: 7,
+  UnstakePrimaryMiner: 8,
+  UnstakeAllReplicaMiner: 9,
+  WithdrawTokensMM: 10,
+  RescueTokensMM: 11,
+  ClaimRewardsMM: 12,
+} as const;
+
+export const QuarryMergeMineInstruction: Omit<
+  typeof QuarryMergeMineInstructionLookup,
+  number
+> = QuarryMergeMineInstructionLookup;
+
+export type QuarryMergeMineInstruction =
+  (typeof QuarryMergeMineInstruction)[keyof typeof QuarryMergeMineInstruction];
 
 export function identifyQuarryMergeMineInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -315,43 +346,43 @@ export type ParsedQuarryMergeMineInstruction<
   TProgram extends string = "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto",
 > =
   | ({
-      instructionType: QuarryMergeMineInstruction.NewPool;
+      instructionType: typeof QuarryMergeMineInstruction.NewPool;
     } & ParsedNewPoolInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.NewPoolV2;
+      instructionType: typeof QuarryMergeMineInstruction.NewPoolV2;
     } & ParsedNewPoolV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.InitMergeMiner;
+      instructionType: typeof QuarryMergeMineInstruction.InitMergeMiner;
     } & ParsedInitMergeMinerInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.InitMergeMinerV2;
+      instructionType: typeof QuarryMergeMineInstruction.InitMergeMinerV2;
     } & ParsedInitMergeMinerV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.InitMinerMM;
+      instructionType: typeof QuarryMergeMineInstruction.InitMinerMM;
     } & ParsedInitMinerMMInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.InitMinerMMV2;
+      instructionType: typeof QuarryMergeMineInstruction.InitMinerMMV2;
     } & ParsedInitMinerMMV2Instruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.StakePrimaryMiner;
+      instructionType: typeof QuarryMergeMineInstruction.StakePrimaryMiner;
     } & ParsedStakePrimaryMinerInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.StakeReplicaMiner;
+      instructionType: typeof QuarryMergeMineInstruction.StakeReplicaMiner;
     } & ParsedStakeReplicaMinerInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.UnstakePrimaryMiner;
+      instructionType: typeof QuarryMergeMineInstruction.UnstakePrimaryMiner;
     } & ParsedUnstakePrimaryMinerInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.UnstakeAllReplicaMiner;
+      instructionType: typeof QuarryMergeMineInstruction.UnstakeAllReplicaMiner;
     } & ParsedUnstakeAllReplicaMinerInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.WithdrawTokensMM;
+      instructionType: typeof QuarryMergeMineInstruction.WithdrawTokensMM;
     } & ParsedWithdrawTokensMMInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.RescueTokensMM;
+      instructionType: typeof QuarryMergeMineInstruction.RescueTokensMM;
     } & ParsedRescueTokensMMInstruction<TProgram>)
   | ({
-      instructionType: QuarryMergeMineInstruction.ClaimRewardsMM;
+      instructionType: typeof QuarryMergeMineInstruction.ClaimRewardsMM;
     } & ParsedClaimRewardsMMInstruction<TProgram>);
 
 export function parseQuarryMergeMineInstruction<TProgram extends string>(
@@ -548,7 +579,7 @@ export function quarryMergeMineProgram() {
     client: T,
   ): ExtendedClient<T, { quarryMergeMine: QuarryMergeMinePlugin }> => {
     return extendClient(client, {
-      quarryMergeMine: <QuarryMergeMinePlugin>{
+      quarryMergeMine: {
         accounts: {
           mergePool: addSelfFetchFunctions(client, getMergePoolCodec()),
           mergeMiner: addSelfFetchFunctions(client, getMergeMinerCodec()),
@@ -646,7 +677,7 @@ export function quarryMergeMineProgram() {
         identifyAccount: identifyQuarryMergeMineAccount,
         identifyInstruction: identifyQuarryMergeMineInstruction,
         parseInstruction: parseQuarryMergeMineInstruction,
-      },
+      } as QuarryMergeMinePlugin,
     });
   };
 }

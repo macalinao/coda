@@ -15,15 +15,23 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
+const FundingTypeLookup = {
+  0: "StakeDeposit",
+  1: "SolDeposit",
+  2: "SolWithdraw",
+  StakeDeposit: 0,
+  SolDeposit: 1,
+  SolWithdraw: 2,
+} as const;
+
 /**
  * Defines which authority to update in the `SetFundingAuthority`
  * instruction
  */
-export enum FundingType {
-  StakeDeposit,
-  SolDeposit,
-  SolWithdraw,
-}
+export const FundingType: Omit<typeof FundingTypeLookup, number> =
+  FundingTypeLookup;
+
+export type FundingType = (typeof FundingType)[keyof typeof FundingType];
 
 export type FundingTypeArgs = FundingType;
 

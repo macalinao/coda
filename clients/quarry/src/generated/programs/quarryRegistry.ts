@@ -54,9 +54,15 @@ import { findRegistryPda } from "../pdas/index.js";
 export const QUARRY_REGISTRY_PROGRAM_ADDRESS =
   "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc" as Address<"QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc">;
 
-export enum QuarryRegistryAccount {
-  Registry,
-}
+const QuarryRegistryAccountLookup = { 0: "Registry", Registry: 0 } as const;
+
+export const QuarryRegistryAccount: Omit<
+  typeof QuarryRegistryAccountLookup,
+  number
+> = QuarryRegistryAccountLookup;
+
+export type QuarryRegistryAccount =
+  (typeof QuarryRegistryAccount)[keyof typeof QuarryRegistryAccount];
 
 export function identifyQuarryRegistryAccount(
   account: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -79,10 +85,20 @@ export function identifyQuarryRegistryAccount(
   );
 }
 
-export enum QuarryRegistryInstruction {
-  NewRegistry,
-  SyncQuarry,
-}
+const QuarryRegistryInstructionLookup = {
+  0: "NewRegistry",
+  1: "SyncQuarry",
+  NewRegistry: 0,
+  SyncQuarry: 1,
+} as const;
+
+export const QuarryRegistryInstruction: Omit<
+  typeof QuarryRegistryInstructionLookup,
+  number
+> = QuarryRegistryInstructionLookup;
+
+export type QuarryRegistryInstruction =
+  (typeof QuarryRegistryInstruction)[keyof typeof QuarryRegistryInstruction];
 
 export function identifyQuarryRegistryInstruction(
   instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
@@ -120,10 +136,10 @@ export type ParsedQuarryRegistryInstruction<
   TProgram extends string = "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc",
 > =
   | ({
-      instructionType: QuarryRegistryInstruction.NewRegistry;
+      instructionType: typeof QuarryRegistryInstruction.NewRegistry;
     } & ParsedNewRegistryInstruction<TProgram>)
   | ({
-      instructionType: QuarryRegistryInstruction.SyncQuarry;
+      instructionType: typeof QuarryRegistryInstruction.SyncQuarry;
     } & ParsedSyncQuarryInstruction<TProgram>);
 
 export function parseQuarryRegistryInstruction<TProgram extends string>(
@@ -194,7 +210,7 @@ export function quarryRegistryProgram() {
     client: T,
   ): ExtendedClient<T, { quarryRegistry: QuarryRegistryPlugin }> => {
     return extendClient(client, {
-      quarryRegistry: <QuarryRegistryPlugin>{
+      quarryRegistry: {
         accounts: {
           registry: addSelfFetchFunctions(client, getRegistryCodec()),
         },
@@ -217,7 +233,7 @@ export function quarryRegistryProgram() {
         identifyAccount: identifyQuarryRegistryAccount,
         identifyInstruction: identifyQuarryRegistryInstruction,
         parseInstruction: parseQuarryRegistryInstruction,
-      },
+      } as QuarryRegistryPlugin,
     });
   };
 }

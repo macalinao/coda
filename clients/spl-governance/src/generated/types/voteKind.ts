@@ -15,10 +15,16 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum VoteKind {
-  Electorate,
-  Veto,
-}
+const VoteKindLookup = {
+  0: "Electorate",
+  1: "Veto",
+  Electorate: 0,
+  Veto: 1,
+} as const;
+
+export const VoteKind: Omit<typeof VoteKindLookup, number> = VoteKindLookup;
+
+export type VoteKind = (typeof VoteKind)[keyof typeof VoteKind];
 
 export type VoteKindArgs = VoteKind;
 

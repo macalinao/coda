@@ -15,11 +15,20 @@ import {
   type FixedSizeEncoder,
 } from "@solana/kit";
 
-export enum GoverningTokenType {
-  Liquid,
-  Membership,
-  Dormant,
-}
+const GoverningTokenTypeLookup = {
+  0: "Liquid",
+  1: "Membership",
+  2: "Dormant",
+  Liquid: 0,
+  Membership: 1,
+  Dormant: 2,
+} as const;
+
+export const GoverningTokenType: Omit<typeof GoverningTokenTypeLookup, number> =
+  GoverningTokenTypeLookup;
+
+export type GoverningTokenType =
+  (typeof GoverningTokenType)[keyof typeof GoverningTokenType];
 
 export type GoverningTokenTypeArgs = GoverningTokenType;
 
