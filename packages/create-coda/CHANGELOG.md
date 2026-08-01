@@ -1,5 +1,18 @@
 # @macalinao/create-coda
 
+## 0.4.2
+
+### Patch Changes
+
+- f608019: Use `.ts` relative import extensions in hand-written package source.
+
+  Package sources now import each other with `.ts` extensions, enabled by
+  `allowImportingTsExtensions` and `rewriteRelativeImportExtensions`. TypeScript
+  rewrites these to `.js` on emit, so published output is unchanged — `dist`
+  still ships `.js` specifiers in both the JavaScript and declaration files.
+
+  Generated clients are unaffected and continue to use `.js` extensions.
+
 ## 0.4.1
 
 ### Patch Changes
