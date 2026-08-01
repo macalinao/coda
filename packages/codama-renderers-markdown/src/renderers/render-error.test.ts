@@ -1,7 +1,7 @@
 /// <reference types="bun" />
 import { describe, expect, test } from "bun:test";
 import { errorNode } from "@codama/nodes";
-import { renderError } from "./render-error.js";
+import { renderError } from "./render-error.ts";
 
 describe("renderError", () => {
   test("renders error node", () => {

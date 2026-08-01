@@ -2,9 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ensureEntryBarrel } from "./ensure-entry-barrel.js";
+import { ensureEntryBarrel } from "./ensure-entry-barrel.ts";
 
-const BARREL = 'export * from "./generated/index.js";\n';
+const BARREL = 'export * from "./generated/index.ts";\n';
 
 async function makeGeneratedDir(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "coda-barrel-"));
@@ -28,7 +28,7 @@ describe("ensureEntryBarrel", () => {
     const generated = await makeGeneratedDir();
     const entry = join(generated, "..", "index.ts");
     const custom =
-      'export * from "./generated/index.js";\nexport const custom = 1;\n';
+      'export * from "./generated/index.ts";\nexport const custom = 1;\n';
     await writeFile(entry, custom, "utf-8");
 
     const written = await ensureEntryBarrel(generated);

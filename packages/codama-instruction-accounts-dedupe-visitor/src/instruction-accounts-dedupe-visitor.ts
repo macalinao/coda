@@ -1,6 +1,6 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import { rootNodeVisitor } from "codama";
-import { instructionAccountsDedupeProgramVisitor } from "./instruction-accounts-dedupe-program-visitor.js";
+import { instructionAccountsDedupeProgramVisitor } from "./instruction-accounts-dedupe-program-visitor.ts";
 
 /**
  * Creates a Codama visitor that deduplicates and flattens nested instruction accounts from an Anchor IDL.

@@ -1,6 +1,6 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import type { Codama } from "codama";
-import type { CodaConfig } from "../config.js";
+import type { CodaConfig } from "../config.ts";
 
 /**
  * Apply custom visitors from configuration

@@ -1,6 +1,6 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import { readFile } from "node:fs/promises";
-import { fileExists } from "./file-exists.js";
+import { fileExists } from "./file-exists.ts";
 
 /**
  * Load IDL files from the specified paths

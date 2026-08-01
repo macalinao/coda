@@ -1,5 +1,5 @@
 import type { DefinedTypeNode, TypeNode } from "@codama/nodes";
-import type { RenderContext } from "../types.js";
+import type { RenderContext } from "../types.ts";
 import { isNode } from "@codama/nodes";
 
 export function renderDefinedType(

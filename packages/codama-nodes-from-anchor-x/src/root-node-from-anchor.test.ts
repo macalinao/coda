@@ -1,6 +1,6 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import { describe, expect, it } from "bun:test";
-import { rootNodeFromAnchor } from "./root-node-from-anchor.js";
+import { rootNodeFromAnchor } from "./root-node-from-anchor.ts";
 
 describe("rootNodeFromAnchor", () => {
   const createMockIdl = (name: string, version = "0.0.0"): AnchorIdl => ({

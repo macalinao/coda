@@ -1,6 +1,6 @@
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import type { Codama } from "codama";
-import type { CodaConfig } from "../config.js";
+import type { CodaConfig } from "../config.ts";
 import { resolve } from "node:path";
 import {
   ASSOCIATED_TOKEN_PROGRAM_VALUE_NODE,
@@ -18,11 +18,11 @@ import {
   publicKeyValueNode,
   setInstructionAccountDefaultValuesVisitor,
 } from "codama";
-import { applyCustomVisitors } from "./apply-custom-visitors.js";
-import { createCodamaFromIdls } from "./create-codama-from-idls.js";
-import { loadConfig } from "./load-config.js";
-import { loadIdls } from "./load-idls.js";
-import { resolveIdlPaths } from "./resolve-idl-paths.js";
+import { applyCustomVisitors } from "./apply-custom-visitors.ts";
+import { createCodamaFromIdls } from "./create-codama-from-idls.ts";
+import { loadConfig } from "./load-config.ts";
+import { loadIdls } from "./load-idls.ts";
+import { resolveIdlPaths } from "./resolve-idl-paths.ts";
 
 const ASSOCIATED_TOKEN_PROGRAM_ACCOUNT_REGEX =
   /associatedTokenProgram|ataProgram|splAtaProgram/;

@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { programNode, rootNode } from "@codama/nodes";
 import { visit } from "@codama/visitors-core";
-import { renderMarkdownVisitor } from "./render-markdown-visitor.js";
+import { renderMarkdownVisitor } from "./render-markdown-visitor.ts";
 
 describe("renderMarkdownVisitor", () => {
   test("generates markdown files for programs", async () => {

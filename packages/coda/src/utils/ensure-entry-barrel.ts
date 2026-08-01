@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
-import { fileExists } from "./file-exists.js";
+import { fileExists } from "./file-exists.ts";
 
 /**
  * Ensure a barrel entry module re-exports the generated client.
@@ -33,7 +33,7 @@ export async function ensureEntryBarrel(
 
   await writeFile(
     entryPath,
-    'export * from "./generated/index.js";\n',
+    'export * from "./generated/index.ts";\n',
     "utf-8",
   );
   return entryPath;

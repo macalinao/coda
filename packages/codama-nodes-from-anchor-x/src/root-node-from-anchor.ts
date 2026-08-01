@@ -1,7 +1,7 @@
 import type { RootNode } from "@codama/nodes";
 import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import { rootNode } from "@codama/nodes";
-import { programNodeFromAnchor } from "./program-node-from-anchor.js";
+import { programNodeFromAnchor } from "./program-node-from-anchor.ts";
 
 /**
  * Creates a Codama root node from a single Anchor IDL.

@@ -1,11 +1,11 @@
 /// <reference types="bun" />
 
-import type { RenderContext } from "../types.js";
+import type { RenderContext } from "../types.ts";
 import { describe, expect, test } from "bun:test";
 import { numberTypeNode, pdaNode, variablePdaSeedNode } from "@codama/nodes";
 import { LinkableDictionary } from "@codama/visitors-core";
 import * as prettier from "prettier";
-import { renderPda } from "./render-pda.js";
+import { renderPda } from "./render-pda.ts";
 
 const mockContext: RenderContext = {
   linkables: new LinkableDictionary(),

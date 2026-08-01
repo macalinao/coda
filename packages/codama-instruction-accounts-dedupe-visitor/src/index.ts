@@ -1,3 +1,3 @@
-export { instructionAccountNodesFromAnchorV01 } from "./instruction-account-nodes-from-anchor-v01.js";
-export { instructionAccountsDedupeProgramVisitor } from "./instruction-accounts-dedupe-program-visitor.js";
-export { instructionAccountsDedupeVisitor } from "./instruction-accounts-dedupe-visitor.js";
+export { instructionAccountNodesFromAnchorV01 } from "./instruction-account-nodes-from-anchor-v01.ts";
+export { instructionAccountsDedupeProgramVisitor } from "./instruction-accounts-dedupe-program-visitor.ts";
+export { instructionAccountsDedupeVisitor } from "./instruction-accounts-dedupe-visitor.ts";

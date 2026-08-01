@@ -3,9 +3,9 @@ import type {
   InstructionArgumentNode,
   InstructionNode,
 } from "@codama/nodes";
-import type { RenderContext } from "../types.js";
-import { renderDiscriminators } from "./render-discriminators.js";
-import { renderTypeNode } from "./render-type.js";
+import type { RenderContext } from "../types.ts";
+import { renderDiscriminators } from "./render-discriminators.ts";
+import { renderTypeNode } from "./render-type.ts";
 
 export function renderInstruction(
   instruction: InstructionNode,
