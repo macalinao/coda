@@ -168,4 +168,16 @@ describe("makeSyntaxErasable", () => {
 
     expect(makeSyntaxErasable(code)).toBe(code);
   });
+
+  test("stays linear on many unterminated enum declarations", () => {
+    // The witness CodeQL reported for js/polynomial-redos: every prefix looks
+    // like a declaration but none closes, so a pattern that scans for the
+    // closing brace restarts that scan at each one. Quadratic behaviour takes
+    // minutes here; linear behaviour takes milliseconds.
+    const code = "export enum A {|".repeat(50_000);
+
+    const started = performance.now();
+    expect(makeSyntaxErasable(code)).toBe(code);
+    expect(performance.now() - started).toBeLessThan(1_000);
+  });
 });

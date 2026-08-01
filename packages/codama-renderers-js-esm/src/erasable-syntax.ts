@@ -15,20 +15,57 @@
  * @see https://github.com/codama-idl/renderers-js/pull/178
  */
 
+/** The text every `enum` declaration the renderer emits starts with. */
+const ENUM_KEYWORD = "export enum ";
+
 /**
- * Matches an `export enum Name { ... }` declaration, optionally followed by the
- * stray semicolon the defined-type fragment appends.
- *
- * The docblock rendered directly above the declaration is deliberately not part
- * of this pattern. Matching it as an optional prefix makes the search
- * super-linear, because every position that fails at `export enum` first
- * re-scans a candidate comment; it is recovered by {@link precedingDocblock}
- * instead, which walks backwards from the match in constant time.
- *
- * Enum bodies contain nothing but variant names and commas, so `[^}]*` safely
- * stops at the closing brace.
+ * Reads the declared name. Sticky rather than searching, so it runs at a known
+ * offset, and terminal, so nothing after it can force it to backtrack.
  */
-const ENUM_DECLARATION = /export enum (\w+) \{([^}]*)\};?/g;
+const ENUM_NAME = /\w+/y;
+
+interface EnumDeclaration {
+  /** The declared name. */
+  name: string;
+  /** The comma separated variant names between the braces. */
+  body: string;
+  /** Index just past the declaration, including its stray trailing semicolon. */
+  end: number;
+}
+
+/**
+ * Reads the `export enum Name { ... }` declaration starting at `start`, or
+ * returns `null` when the text there only looks like one.
+ *
+ * Scanned by hand rather than matched with a single pattern. Expressing the
+ * whole declaration as a regular expression requires an unbounded search for
+ * the closing brace, which turns quadratic on a file holding many `export enum`
+ * prefixes and no brace: every one of them scans to the end before failing.
+ * Locating the brace with `indexOf` from a known offset keeps it linear. The
+ * same reasoning is why {@link replacePluginAssertions} scans for its own
+ * closing brace.
+ */
+function readEnumDeclaration(
+  code: string,
+  start: number,
+): EnumDeclaration | null {
+  ENUM_NAME.lastIndex = start + ENUM_KEYWORD.length;
+  const name = ENUM_NAME.exec(code)?.[0];
+  if (name === undefined || !code.startsWith(" {", ENUM_NAME.lastIndex)) {
+    return null;
+  }
+  const bodyStart = ENUM_NAME.lastIndex + " {".length;
+  const bodyEnd = code.indexOf("}", bodyStart);
+  if (bodyEnd === -1) {
+    return null;
+  }
+  const end = bodyEnd + 1;
+  return {
+    name,
+    body: code.slice(bodyStart, bodyEnd),
+    end: code.startsWith(";", end) ? end + 1 : end,
+  };
+}
 
 interface PrecedingDocblock {
   /** The docblock text without its trailing newline, or `""` when absent. */
@@ -126,21 +163,31 @@ function replaceEnumDeclarations(code: string): {
   const enumNames = new Set<string>();
   const pieces: string[] = [];
   let cursor = 0;
-  for (const match of code.matchAll(ENUM_DECLARATION)) {
-    const [matched, name = "", body = ""] = match;
-    const { comment, start } = precedingDocblock(code, match.index);
+  let index = code.indexOf(ENUM_KEYWORD);
+  while (index !== -1) {
+    const declaration = readEnumDeclaration(code, index);
+    if (declaration === null) {
+      index = code.indexOf(ENUM_KEYWORD, index + ENUM_KEYWORD.length);
+      continue;
+    }
+    const { comment, start } = precedingDocblock(code, index);
     // The docblock moves onto the exported declaration, so it is dropped from
     // the text preceding the match rather than copied through.
     pieces.push(code.slice(cursor, start));
-    const variantNames = body
+    const variantNames = declaration.body
       .split(",")
       .map((variant) => variant.trim())
       .filter((variant) => variant.length > 0);
-    enumNames.add(name);
+    enumNames.add(declaration.name);
     pieces.push(
-      renderErasableEnum(name, variantNames, comment ? `${comment}\n` : ""),
+      renderErasableEnum(
+        declaration.name,
+        variantNames,
+        comment ? `${comment}\n` : "",
+      ),
     );
-    cursor = match.index + matched.length;
+    cursor = declaration.end;
+    index = code.indexOf(ENUM_KEYWORD, cursor);
   }
   pieces.push(code.slice(cursor));
   return { code: pieces.join(""), enumNames };
