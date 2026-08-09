@@ -1,5 +1,22 @@
 # @macalinao/codama-nodes-from-anchor-x
 
+## 0.2.4
+
+### Patch Changes
+
+- b00b5d6: Upgrade `@macalinao/tsconfig` to v4 and tighten type checking.
+
+  The shared base config now enables `exactOptionalPropertyTypes`,
+  `noImplicitReturns`, `noUncheckedSideEffectImports`, `erasableSyntaxOnly`,
+  `moduleDetection: "force"`, and the `.ts` import-extension flags. Packages
+  dropped their local copies of the import-extension flags now that the base
+  supplies them.
+
+  Published output is unchanged; these are compile-time checks only.
+
+- Updated dependencies [b00b5d6]
+  - @macalinao/codama-instruction-accounts-dedupe-visitor@0.5.4
+
 ## 0.2.3
 
 ### Patch Changes

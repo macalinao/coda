@@ -1,5 +1,19 @@
 # @macalinao/codama-rename-visitor
 
+## 0.4.4
+
+### Patch Changes
+
+- b00b5d6: Upgrade `@macalinao/tsconfig` to v4 and tighten type checking.
+
+  The shared base config now enables `exactOptionalPropertyTypes`,
+  `noImplicitReturns`, `noUncheckedSideEffectImports`, `erasableSyntaxOnly`,
+  `moduleDetection: "force"`, and the `.ts` import-extension flags. Packages
+  dropped their local copies of the import-extension flags now that the base
+  supplies them.
+
+  Published output is unchanged; these are compile-time checks only.
+
 ## 0.4.3
 
 ### Patch Changes

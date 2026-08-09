@@ -1,5 +1,39 @@
 # @macalinao/clients-mpl-token-auth-rules
 
+## 0.4.0
+
+### Minor Changes
+
+- 8222bd6: Generate only erasable TypeScript syntax, so clients compile under
+  `erasableSyntaxOnly` and can be stripped rather than compiled.
+
+  `enum` declarations — scalar IDL enums plus the program account and instruction
+  enums — are now emitted as a `const` object paired with a union type of the same
+  name, and the program plugin's angle-bracket assertion became an `as` assertion.
+  The `const` objects keep the exact runtime shape of the enums they replace,
+  reverse mapping included, so `getEnumEncoder`/`getEnumDecoder` and every
+  `Enum.Variant` reference behave identically.
+
+  Clients no longer opt out of `erasableSyntaxOnly`; the shared base config's
+  setting now applies to generated code too.
+
+  This mirrors the `erasableSyntax` option proposed upstream in
+  [codama-idl/renderers-js#178](https://github.com/codama-idl/renderers-js/pull/178).
+  Unlike upstream it is always on, since Coda is opinionated about emitting modern
+  ESM/TypeScript.
+
+### Patch Changes
+
+- b00b5d6: Upgrade `@macalinao/tsconfig` to v4 and tighten type checking.
+
+  The shared base config now enables `exactOptionalPropertyTypes`,
+  `noImplicitReturns`, `noUncheckedSideEffectImports`, `erasableSyntaxOnly`,
+  `moduleDetection: "force"`, and the `.ts` import-extension flags. Packages
+  dropped their local copies of the import-extension flags now that the base
+  supplies them.
+
+  Published output is unchanged; these are compile-time checks only.
+
 ## 0.3.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@macalinao/clients-orca-whirlpools",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "TypeScript client for Orca Whirlpools program",
   "type": "module",
   "sideEffects": false,
