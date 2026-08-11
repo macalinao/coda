@@ -1,0 +1,230 @@
+[
+  {
+    "name": "kamino-lending: one instruction",
+    "path": "clients/kamino-lending/dist/index.js",
+    "import": "{ getBorrowObligationLiquidityInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "750 B"
+  },
+  {
+    "name": "kamino-lending: entire client",
+    "path": "clients/kamino-lending/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "29.5 KB"
+  },
+  {
+    "name": "meteora-damm-v2: one instruction",
+    "path": "clients/meteora-damm-v2/dist/index.js",
+    "import": "{ getSwapInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "750 B"
+  },
+  {
+    "name": "meteora-damm-v2: entire client",
+    "path": "clients/meteora-damm-v2/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "15.5 KB"
+  },
+  {
+    "name": "mpl-bubblegum: one instruction",
+    "path": "clients/mpl-bubblegum/dist/index.js",
+    "import": "{ getCreateTreeInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "700 B"
+  },
+  {
+    "name": "mpl-bubblegum: entire client",
+    "path": "clients/mpl-bubblegum/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "13 KB"
+  },
+  {
+    "name": "mpl-core: one instruction",
+    "path": "clients/mpl-core/dist/index.js",
+    "import": "{ getBurnV1Instruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "1.4 KB"
+  },
+  {
+    "name": "mpl-core: entire client",
+    "path": "clients/mpl-core/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "14 KB"
+  },
+  {
+    "name": "mpl-token-auth-rules: one instruction",
+    "path": "clients/mpl-token-auth-rules/dist/index.js",
+    "import": "{ getValidateInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "800 B"
+  },
+  {
+    "name": "mpl-token-auth-rules: entire client",
+    "path": "clients/mpl-token-auth-rules/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "3.4 KB"
+  },
+  {
+    "name": "orca-whirlpools: one instruction",
+    "path": "clients/orca-whirlpools/dist/index.js",
+    "import": "{ getSwapInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "700 B"
+  },
+  {
+    "name": "orca-whirlpools: entire client",
+    "path": "clients/orca-whirlpools/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "15 KB"
+  },
+  {
+    "name": "quarry: one instruction",
+    "path": "clients/quarry/dist/index.js",
+    "import": "{ getClaimRewardsInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "750 B"
+  },
+  {
+    "name": "quarry: entire client",
+    "path": "clients/quarry/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "18 KB"
+  },
+  {
+    "name": "spl-governance: one instruction",
+    "path": "clients/spl-governance/dist/index.js",
+    "import": "{ getCastVoteInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "800 B"
+  },
+  {
+    "name": "spl-governance: entire client",
+    "path": "clients/spl-governance/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "14.5 KB"
+  },
+  {
+    "name": "spl-stake-pool: one instruction",
+    "path": "clients/spl-stake-pool/dist/index.js",
+    "import": "{ getDepositStakeInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "750 B"
+  },
+  {
+    "name": "spl-stake-pool: entire client",
+    "path": "clients/spl-stake-pool/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "9.5 KB"
+  },
+  {
+    "name": "token-metadata: one instruction",
+    "path": "clients/token-metadata/dist/index.js",
+    "import": "{ getCreateInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "1.2 KB"
+  },
+  {
+    "name": "token-metadata: entire client",
+    "path": "clients/token-metadata/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "19 KB"
+  },
+  {
+    "name": "tribeca: one instruction",
+    "path": "clients/tribeca/dist/index.js",
+    "import": "{ getCastVoteInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "500 B"
+  },
+  {
+    "name": "tribeca: entire client",
+    "path": "clients/tribeca/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "9 KB"
+  },
+  {
+    "name": "voter-stake-registry: one instruction",
+    "path": "clients/voter-stake-registry/dist/index.js",
+    "import": "{ getDepositInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "600 B"
+  },
+  {
+    "name": "voter-stake-registry: entire client",
+    "path": "clients/voter-stake-registry/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "7 KB"
+  }
+]

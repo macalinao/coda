@@ -1,0 +1,114 @@
+---
+title: Tree Shaking
+description: What a Coda client actually costs in your bundle, why it tree-shakes, and how to measure it yourself
+---
+
+A generated client exports everything a program can do — every instruction, account decoder, PDA helper, and type. For a large program that is a lot of code. It is also code you almost never ship, because Coda clients are built to tree-shake down to only what you import.
+
+## What you actually ship
+
+These are the pre-generated clients in the Coda repository, measured with esbuild, minified, **brotli / gzip**. The `@solana/kit` and `@solana/program-client-core` peer dependencies are excluded, so these numbers are the client's own cost on top of the Solana libraries you already have.
+
+| Client | One instruction | Entire client |
+| --- | --- | --- |
+| `@macalinao/clients-kamino-lending` | 602 B / 725 B | 24.9 kB / 36.1 kB |
+| `@macalinao/clients-meteora-damm-v2` | 618 B / 714 B | 13.0 kB / 18.6 kB |
+| `@macalinao/clients-mpl-bubblegum` | 572 B / 662 B | 11.1 kB / 16.1 kB |
+| `@macalinao/clients-mpl-core` | 1.1 kB / 1.4 kB | 11.9 kB / 16.6 kB |
+| `@macalinao/clients-mpl-token-auth-rules` | 658 B / 753 B | 2.8 kB / 3.3 kB |
+| `@macalinao/clients-orca-whirlpools` | 558 B / 665 B | 12.8 kB / 17.9 kB |
+| `@macalinao/clients-quarry` | 606 B / 678 B | 15.5 kB / 22.2 kB |
+| `@macalinao/clients-spl-governance` | 632 B / 714 B | 12.1 kB / 16.3 kB |
+| `@macalinao/clients-spl-stake-pool` | 602 B / 691 B | 8.0 kB / 10.6 kB |
+| `@macalinao/clients-token-metadata` | 969 B / 1.1 kB | 16.7 kB / 23.2 kB |
+| `@macalinao/clients-tribeca` | 400 B / 474 B | 7.6 kB / 10.1 kB |
+| `@macalinao/clients-voter-stake-registry` | 467 B / 545 B | 5.8 kB / 7.4 kB |
+
+The gap between the columns is the point. `@macalinao/clients-kamino-lending` covers 71 instructions and weighs 25 kB if you take all of it — but a dApp that borrows against an obligation imports one instruction builder and pays 602 bytes.
+
+This is also why a headline "bundle size" badge is misleading for these packages. A single number can only report the `export *` ceiling, which is the one import pattern nobody uses.
+
+<Callout type="info">
+  The per-instruction numbers exclude `@solana/kit`. You pay for the Solana
+  libraries once, regardless of how many Coda clients you use — they are peer
+  dependencies, so they are never duplicated into a client's bundle.
+</Callout>
+
+## Why it works
+
+Three properties have to hold together. Miss any one and a bundler falls back to including the whole module.
+
+### One module per item
+
+Coda generates a separate file for every instruction, account, type, and PDA, and tsdown builds with `unbundle: true`, which preserves that structure in `dist/` instead of concatenating it:
+
+```
+dist/
+├── index.js                          # re-export barrel
+└── generated/
+    ├── accounts/                     # one file per account
+    ├── errors/
+    ├── instructions/                 # one file per instruction
+    ├── pdas/
+    ├── programs/
+    └── types/
+```
+
+Bundlers do their best work at module granularity. When `getSwapInstruction` lives in its own module, dropping the other 48 instructions is trivial rather than a whole-program dead-code analysis.
+
+### `sideEffects: false`
+
+Every generated client sets `sideEffects: false` in its `package.json`. Without it, a bundler must assume that merely evaluating a module could do something observable, so it keeps modules alive even when nothing imports their exports. The flag is what lets the barrel in `index.js` be dissolved entirely.
+
+### ESM with no top-level state
+
+Generated code is pure ES modules — no CommonJS interop shims, no singletons, no registry populated at import time, no environment sniffing. Every export is a plain function or constant. There is nothing for a bundler to be conservative about.
+
+## Measuring your own bundle
+
+For a one-off answer, bundle a single import and look at the output:
+
+```bash
+esbuild --bundle --minify --format=esm \
+  --external:'@solana/*' \
+  entry.ts | gzip | wc -c
+```
+
+To keep it honest over time, put budgets in CI. Coda's own repository uses [size-limit](https://github.com/ai/size-limit), with two entries per client:
+
+```json title=".size-limit.json"
+[
+  {
+    "name": "orca-whirlpools: one instruction",
+    "path": "node_modules/@macalinao/clients-orca-whirlpools/dist/index.js",
+    "import": "{ getSwapInstruction }",
+    "ignore": ["@solana/kit", "@solana/program-client-core"],
+    "limit": "700 B"
+  },
+  {
+    "name": "orca-whirlpools: entire client",
+    "path": "node_modules/@macalinao/clients-orca-whirlpools/dist/index.js",
+    "ignore": ["@solana/kit", "@solana/program-client-core"],
+    "limit": "15 KB"
+  }
+]
+```
+
+The per-import entry is the one that matters. A regression that breaks tree-shaking — an accidental side effect, a barrel that stops dissolving — blows that budget immediately while the full-client number barely moves.
+
+For an existing app, a bundle analyzer will show you what actually landed: [`rollup-plugin-visualizer`](https://github.com/btd/rollup-plugin-visualizer) for Vite and Rollup, [`@next/bundle-analyzer`](https://www.npmjs.com/package/@next/bundle-analyzer) for Next.js, or [`source-map-explorer`](https://github.com/danvk/source-map-explorer) against any build with source maps.
+
+## What breaks it
+
+Tree-shaking is easy to defeat from the consuming side:
+
+- **Namespace imports.** `import * as tokenMetadata from "@macalinao/clients-token-metadata"` pulls in the entire client if the namespace object is passed around or indexed dynamically. Import named bindings instead.
+- **Dynamic access.** `client[instructionName]` forces the bundler to keep every export, since it cannot know which key you will use.
+- **Re-export barrels in your own code.** A `src/solana/index.ts` that re-exports from several clients is fine only if your own package also sets `sideEffects: false`. Otherwise you have reintroduced the problem one layer up.
+- **CommonJS consumers.** `require()` of an ESM-only client goes through interop that materializes the full namespace. Tree-shaking needs a real ESM build target.
+- **Development builds.** Bundlers skip tree-shaking in dev mode. Always measure a production build.
+
+## Related
+
+- [Why Coda?](/docs/why-coda) — how generated clients compare to Anchor's built-in TypeScript client
+- [Generating Clients](/docs/generating-clients) — the generation pipeline that produces this file layout
