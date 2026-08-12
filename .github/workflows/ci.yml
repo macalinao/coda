@@ -62,6 +62,15 @@ jobs:
       - name: Typecheck coda.config.ts files
         run: bun run typecheck
 
+      # Enforce the bundle-size budgets in .size-limit.json. The @solana/*
+      # peer deps are ignored, so these measure each client's own cost. Two
+      # entries per client: a single instruction (the tree-shaken path almost
+      # every consumer takes) and the full `export *` ceiling. A codegen or
+      # renderer change that breaks tree-shaking blows the per-instruction
+      # budget long before the full-client one moves.
+      - name: Check client bundle sizes
+        run: bun run size
+
       # Gate the native Node.js config-load path: run the compiled CLI with
       # `node` directly (not bun) against every client so each coda.config.ts
       # must load and apply its visitors via native type stripping. `idl` is
