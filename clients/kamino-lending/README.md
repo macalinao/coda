@@ -1,20 +1,20 @@
-# @macalinao/clients-kamino-lending
+# @solana-programs/kamino-lending
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-kamino-lending.svg)](https://www.npmjs.com/package/@macalinao/clients-kamino-lending)
-[![npm downloads](https://img.shields.io/npm/dm/@macalinao/clients-kamino-lending.svg)](https://www.npmjs.com/package/@macalinao/clients-kamino-lending)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/kamino-lending.svg)](https://www.npmjs.com/package/@solana-programs/kamino-lending)
+[![npm downloads](https://img.shields.io/npm/dm/@solana-programs/kamino-lending.svg)](https://www.npmjs.com/package/@solana-programs/kamino-lending)
 
 Low-level TypeScript client for the Kamino Lending and Farms programs on Solana.
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-kamino-lending
+bun add @solana-programs/kamino-lending
 ```
 
 Or with npm:
 
 ```bash
-npm install @macalinao/clients-kamino-lending
+npm install @solana-programs/kamino-lending
 ```
 
 ## Program Information
@@ -29,7 +29,7 @@ import {
   getInitLendingMarketInstruction,
   fetchLendingMarket,
   // ... other exports
-} from "@macalinao/clients-kamino-lending";
+} from "@solana-programs/kamino-lending";
 import { createSolanaRpc } from "@solana/web3.js";
 
 // Connect to Solana

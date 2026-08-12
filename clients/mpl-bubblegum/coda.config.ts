@@ -215,7 +215,7 @@ const masterEditionPdaOf = (mintAccount: string) =>
 export default defineConfig({
   outputDir: "./src/generated",
   docs: {
-    npmPackageName: "@macalinao/clients-mpl-bubblegum",
+    npmPackageName: "@solana-programs/mpl-bubblegum",
   },
 
   visitors: [

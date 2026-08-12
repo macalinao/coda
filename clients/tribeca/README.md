@@ -1,13 +1,13 @@
-# @macalinao/clients-tribeca
+# @solana-programs/tribeca
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-tribeca.svg)](https://www.npmjs.com/package/@macalinao/clients-tribeca)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/tribeca.svg)](https://www.npmjs.com/package/@solana-programs/tribeca)
 
 TypeScript client for Tribeca governance programs (Govern and Locked Voter), generated using Coda CLI with full ESM support.
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-tribeca
+bun add @solana-programs/tribeca
 ```
 
 ## About Tribeca
@@ -57,7 +57,7 @@ import {
   fetchProposal,
   getCreateEscrowInstruction,
   fetchLocker,
-} from "@macalinao/clients-tribeca";
+} from "@solana-programs/tribeca";
 
 // Governance example
 const governor = await fetchGovernor(rpc, governorAddress);

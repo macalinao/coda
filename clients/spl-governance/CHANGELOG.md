@@ -1,4 +1,4 @@
-# @macalinao/clients-spl-governance
+# @solana-programs/spl-governance
 
 ## 0.4.0
 

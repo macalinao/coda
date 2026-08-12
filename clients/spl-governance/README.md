@@ -1,6 +1,6 @@
-# @macalinao/clients-spl-governance
+# @solana-programs/spl-governance
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-spl-governance.svg)](https://www.npmjs.com/package/@macalinao/clients-spl-governance)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/spl-governance.svg)](https://www.npmjs.com/package/@solana-programs/spl-governance)
 
 TypeScript client for the SPL Governance program, generated using Coda with full ESM support.
 
@@ -12,7 +12,7 @@ IDL changes:
 ## Installation
 
 ```bash
-bun add @macalinao/clients-spl-governance
+bun add @solana-programs/spl-governance
 ```
 
 ## Development
@@ -43,7 +43,7 @@ The `coda.config.ts` file defines custom PDAs for the SPL Governance program, in
 import {
   getCreateRealmInstruction,
   findRealmPda,
-} from "@macalinao/clients-spl-governance";
+} from "@solana-programs/spl-governance";
 
 // Create a new realm
 const realmPda = await findRealmPda({ name: "my-dao" });

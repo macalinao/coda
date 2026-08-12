@@ -18,7 +18,7 @@ import {
 export default defineConfig({
   outputDir: "./src/generated",
   docs: {
-    npmPackageName: "@macalinao/clients-mpl-token-auth-rules",
+    npmPackageName: "@solana-programs/mpl-token-auth-rules",
   },
 
   visitors: [

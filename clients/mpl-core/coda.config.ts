@@ -18,7 +18,7 @@ import {
 export default defineConfig({
   outputDir: "./src/generated",
   docs: {
-    npmPackageName: "@macalinao/clients-mpl-core",
+    npmPackageName: "@solana-programs/mpl-core",
   },
 
   // mpl-core assets and collections are keypair-generated accounts rather than

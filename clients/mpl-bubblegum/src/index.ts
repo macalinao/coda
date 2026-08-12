@@ -1,5 +1,5 @@
 /**
- * @macalinao/clients-mpl-bubblegum
+ * @solana-programs/mpl-bubblegum
  *
  * TypeScript client for the Metaplex Bubblegum program.
  * Generated using Codama with full ESM support.
