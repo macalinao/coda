@@ -80,14 +80,14 @@ To keep it honest over time, put budgets in CI. Coda's own repository uses [size
 [
   {
     "name": "orca-whirlpools: one instruction",
-    "path": "node_modules/@solana-programs/orca-whirlpools/dist/index.js",
+    "path": "clients/orca-whirlpools/dist/index.js",
     "import": "{ getSwapInstruction }",
     "ignore": ["@solana/kit", "@solana/program-client-core"],
     "limit": "700 B"
   },
   {
     "name": "orca-whirlpools: entire client",
-    "path": "node_modules/@solana-programs/orca-whirlpools/dist/index.js",
+    "path": "clients/orca-whirlpools/dist/index.js",
     "ignore": ["@solana/kit", "@solana/program-client-core"],
     "limit": "15 KB"
   }
