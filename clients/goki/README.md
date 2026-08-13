@@ -17,7 +17,7 @@ Goki is a multisig and smart wallet protocol on Solana, made up of two programs:
 - **Smart Wallet**: An owner-threshold multisig that proposes, approves, and executes arbitrary instructions, optionally behind a timelock
 - **Token Signer**: Lets the holder of an NFT sign instructions on behalf of a PDA derived from that NFT's mint
 
-This client pairs with [`@macalinao/clients-tribeca`](../tribeca): Tribeca governance executes passed proposals through a Goki smart wallet, so the two are almost always used together.
+This client pairs with [`@solana-programs/tribeca`](../tribeca): Tribeca governance executes passed proposals through a Goki smart wallet, so the two are almost always used together.
 
 ## Programs Included
 
