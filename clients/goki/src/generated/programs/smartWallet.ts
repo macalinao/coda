@@ -96,9 +96,11 @@ import {
   type UnapproveInput,
 } from "../instructions/index.js";
 import {
+  findOwnerInvokerPda,
   findSmartWalletPda,
   findSubaccountInfoPda,
   findTransactionPda,
+  findWalletDerivedPda,
 } from "../pdas/index.js";
 
 export const SMART_WALLET_PROGRAM_ADDRESS =
@@ -549,6 +551,8 @@ export type SmartWalletPluginPdas = {
   smartWallet: typeof findSmartWalletPda;
   transaction: typeof findTransactionPda;
   subaccountInfo: typeof findSubaccountInfoPda;
+  walletDerived: typeof findWalletDerivedPda;
+  ownerInvoker: typeof findOwnerInvokerPda;
 };
 
 export type SmartWalletPluginRequirements = ClientWithRpc<
@@ -641,6 +645,8 @@ export function smartWalletProgram() {
           smartWallet: findSmartWalletPda,
           transaction: findTransactionPda,
           subaccountInfo: findSubaccountInfoPda,
+          walletDerived: findWalletDerivedPda,
+          ownerInvoker: findOwnerInvokerPda,
         },
         identifyAccount: identifySmartWalletAccount,
         identifyInstruction: identifySmartWalletInstruction,

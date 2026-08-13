@@ -7,6 +7,8 @@
  */
 
 export * from "./nftSigner.js";
+export * from "./ownerInvoker.js";
 export * from "./smartWallet.js";
 export * from "./subaccountInfo.js";
 export * from "./transaction.js";
+export * from "./walletDerived.js";

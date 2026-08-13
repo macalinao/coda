@@ -47,6 +47,19 @@ bun run build
 
 The IDLs are legacy Anchor 0.x IDLs that declare their PDA seeds inline on instruction accounts, which the Anchor-to-Codama parser does not carry over. `coda.config.ts` redeclares those seeds so the client ships PDA helpers, and links each account to its PDA.
 
+The full set of PDA helpers:
+
+| Helper | Seeds |
+| --- | --- |
+| `findSmartWalletPda({ base })` | `"GokiSmartWallet"`, base |
+| `findTransactionPda({ smartWallet, index })` | `"GokiTransaction"`, smart wallet, index |
+| `findSubaccountInfoPda({ subaccount })` | `"GokiSubaccountInfo"`, subaccount |
+| `findWalletDerivedPda({ smartWallet, index })` | `"GokiSmartWalletDerived"`, smart wallet, index |
+| `findOwnerInvokerPda({ smartWallet, index })` | `"GokiSmartWalletOwnerInvoker"`, smart wallet, index |
+| `findNftSignerPda({ mint })` | `"GokiTokenSigner"`, mint |
+
+`walletDerived` and `ownerInvoker` are subaccount addresses rather than stored accounts — they back `executeTransactionDerived` and `ownerInvokeInstruction` respectively, and have no on-chain struct to decode.
+
 ## Usage
 
 ```typescript

@@ -46,6 +46,31 @@ export default defineConfig({
             variablePdaSeedNode("subaccount", publicKeyTypeNode()),
           ],
         },
+        {
+          name: "walletDerived",
+          docs: [
+            "Subaccount derived from a smart wallet, which the wallet can sign for",
+          ],
+          seeds: [
+            constantPdaSeedNodeFromString("utf8", "GokiSmartWalletDerived"),
+            variablePdaSeedNode("smartWallet", publicKeyTypeNode()),
+            variablePdaSeedNode("index", numberTypeNode("u64")),
+          ],
+        },
+        {
+          name: "ownerInvoker",
+          docs: [
+            "Subaccount an owner of a smart wallet can invoke instructions through",
+          ],
+          seeds: [
+            constantPdaSeedNodeFromString(
+              "utf8",
+              "GokiSmartWalletOwnerInvoker",
+            ),
+            variablePdaSeedNode("smartWallet", publicKeyTypeNode()),
+            variablePdaSeedNode("index", numberTypeNode("u64")),
+          ],
+        },
       ],
       tokenSigner: [
         {
