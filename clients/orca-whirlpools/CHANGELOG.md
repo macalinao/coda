@@ -1,4 +1,4 @@
-# @macalinao/clients-orca-whirlpools
+# @solana-programs/orca-whirlpools
 
 ## 0.6.0
 

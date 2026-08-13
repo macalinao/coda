@@ -1,9 +1,9 @@
 # Quarry Redeemer Program
 
-[![npm version](https://badge.fury.io/js/%40macalinao%2Fclients-quarry.svg)](https://www.npmjs.com/package/%40macalinao%2Fclients-quarry)
+[![npm version](https://badge.fury.io/js/%40solana-programs%2Fquarry.svg)](https://www.npmjs.com/package/%40solana-programs%2Fquarry)
 
 - Program ID: `QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9`
-- TypeScript Client: [`@macalinao/clients-quarry`](https://www.npmjs.com/package/@macalinao/clients-quarry)
+- TypeScript Client: [`@solana-programs/quarry`](https://www.npmjs.com/package/@solana-programs/quarry)
 
 ## Table of Contents
 

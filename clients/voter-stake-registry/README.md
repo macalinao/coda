@@ -1,13 +1,13 @@
-# @macalinao/clients-voter-stake-registry
+# @solana-programs/voter-stake-registry
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-voter-stake-registry.svg)](https://www.npmjs.com/package/@macalinao/clients-voter-stake-registry)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/voter-stake-registry.svg)](https://www.npmjs.com/package/@solana-programs/voter-stake-registry)
 
 TypeScript client for the Realms [Voter Stake Registry program](https://github.com/Grape-Labs/voter-stake-registry/) by Grape, generated using Coda with full ESM support.
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-voter-stake-registry
+bun add @solana-programs/voter-stake-registry
 ```
 
 ## Development
@@ -37,7 +37,7 @@ import {
   findRegistrarPda,
   findVoterPda,
   findVoterWeightRecordPda,
-} from "@macalinao/clients-voter-stake-registry";
+} from "@solana-programs/voter-stake-registry";
 
 // Get the registrar PDA
 const registrarPda = await findRegistrarPda({

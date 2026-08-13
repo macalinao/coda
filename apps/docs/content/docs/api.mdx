@@ -7,14 +7,14 @@ Coda provides pre-built TypeScript client libraries for popular Solana programs.
 
 ## Available Clients
 
-### @macalinao/clients-token-metadata
+### @solana-programs/token-metadata
 
 Pre-generated client for the Metaplex Token Metadata program.
 
 **Installation:**
 
 ```bash
-bun add @macalinao/clients-token-metadata
+bun add @solana-programs/token-metadata
 ```
 
 **Usage:**
@@ -23,7 +23,7 @@ bun add @macalinao/clients-token-metadata
 import {
   createMetadataInstruction,
   findMetadataPda,
-} from "@macalinao/clients-token-metadata";
+} from "@solana-programs/token-metadata";
 
 // Find the metadata PDA for a mint
 const [metadataAddress] = await findMetadataPda({

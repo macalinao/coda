@@ -1,4 +1,4 @@
-# @macalinao/clients-mpl-core
+# @solana-programs/mpl-core
 
 ## 0.4.0
 

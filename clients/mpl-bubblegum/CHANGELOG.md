@@ -1,4 +1,4 @@
-# @macalinao/clients-mpl-bubblegum
+# @solana-programs/mpl-bubblegum
 
 ## 0.4.0
 

@@ -1,13 +1,13 @@
-# @macalinao/clients-quarry
+# @solana-programs/quarry
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-quarry.svg)](https://www.npmjs.com/package/@macalinao/clients-quarry)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/quarry.svg)](https://www.npmjs.com/package/@solana-programs/quarry)
 
 TypeScript client for the Quarry protocol programs, generated using Coda CLI with full ESM support.
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-quarry
+bun add @solana-programs/quarry
 ```
 
 ## Programs Included
@@ -43,7 +43,7 @@ The `coda.config.ts` file is configured to load all Quarry protocol IDLs and gen
 import {
   getCreateMinerInstruction,
   fetchMiner,
-} from "@macalinao/clients-quarry";
+} from "@solana-programs/quarry";
 
 // Fetch miner account
 const miner = await fetchMiner(rpc, minerAddress);
