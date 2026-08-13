@@ -1,4 +1,4 @@
-# @macalinao/clients-tribeca
+# @solana-programs/tribeca
 
 ## 0.3.0
 

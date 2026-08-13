@@ -1,9 +1,9 @@
 # Quarry Mine Program
 
-[![npm version](https://badge.fury.io/js/%40macalinao%2Fclients-quarry.svg)](https://www.npmjs.com/package/%40macalinao%2Fclients-quarry)
+[![npm version](https://badge.fury.io/js/%40solana-programs%2Fquarry.svg)](https://www.npmjs.com/package/%40solana-programs%2Fquarry)
 
 - Program ID: `QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB`
-- TypeScript Client: [`@macalinao/clients-quarry`](https://www.npmjs.com/package/@macalinao/clients-quarry)
+- TypeScript Client: [`@solana-programs/quarry`](https://www.npmjs.com/package/@solana-programs/quarry)
 
 ## Table of Contents
 

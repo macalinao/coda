@@ -1,5 +1,5 @@
 {
-  "name": "@macalinao/clients-kamino-lending",
+  "name": "@solana-programs/kamino-lending",
   "version": "0.7.0",
   "description": "TypeScript client for the Kamino Lending program",
   "type": "module",

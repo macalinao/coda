@@ -1,4 +1,4 @@
-# @macalinao/clients-kamino-lending
+# @solana-programs/kamino-lending
 
 ## 0.7.0
 

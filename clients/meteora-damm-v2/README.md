@@ -1,13 +1,13 @@
-# @macalinao/clients-meteora-damm-v2
+# @solana-programs/meteora-damm-v2
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-meteora-damm-v2.svg)](https://www.npmjs.com/package/@macalinao/clients-meteora-damm-v2)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/meteora-damm-v2.svg)](https://www.npmjs.com/package/@solana-programs/meteora-damm-v2)
 
 TypeScript client for the [Meteora DAMM V2](https://github.com/MeteoraAg/damm-v2) (CP-AMM) program, generated using [Coda CLI](https://github.com/macalinao/coda).
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-meteora-damm-v2
+bun add @solana-programs/meteora-damm-v2
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ import {
   getSwapInstructionAsync,
   fetchPool,
   findPoolPda,
-} from "@macalinao/clients-meteora-damm-v2";
+} from "@solana-programs/meteora-damm-v2";
 
 // Find and fetch a pool
 const [poolAddress] = await findPoolPda({

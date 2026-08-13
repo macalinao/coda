@@ -11,20 +11,20 @@ These are the pre-generated clients in the Coda repository, measured with esbuil
 
 | Client | One instruction | Entire client |
 | --- | --- | --- |
-| `@macalinao/clients-kamino-lending` | 602 B / 725 B | 24.9 kB / 36.1 kB |
-| `@macalinao/clients-meteora-damm-v2` | 618 B / 714 B | 13.0 kB / 18.6 kB |
-| `@macalinao/clients-mpl-bubblegum` | 572 B / 662 B | 11.1 kB / 16.1 kB |
-| `@macalinao/clients-mpl-core` | 1.1 kB / 1.4 kB | 11.9 kB / 16.6 kB |
-| `@macalinao/clients-mpl-token-auth-rules` | 658 B / 753 B | 2.8 kB / 3.3 kB |
-| `@macalinao/clients-orca-whirlpools` | 558 B / 665 B | 12.8 kB / 17.9 kB |
-| `@macalinao/clients-quarry` | 606 B / 678 B | 15.5 kB / 22.2 kB |
-| `@macalinao/clients-spl-governance` | 632 B / 714 B | 12.1 kB / 16.3 kB |
-| `@macalinao/clients-spl-stake-pool` | 602 B / 691 B | 8.0 kB / 10.6 kB |
-| `@macalinao/clients-token-metadata` | 969 B / 1.1 kB | 16.7 kB / 23.2 kB |
-| `@macalinao/clients-tribeca` | 400 B / 474 B | 7.6 kB / 10.1 kB |
-| `@macalinao/clients-voter-stake-registry` | 467 B / 545 B | 5.8 kB / 7.4 kB |
+| `@solana-programs/kamino-lending` | 602 B / 725 B | 24.9 kB / 36.1 kB |
+| `@solana-programs/meteora-damm-v2` | 618 B / 714 B | 13.0 kB / 18.6 kB |
+| `@solana-programs/mpl-bubblegum` | 572 B / 662 B | 11.1 kB / 16.1 kB |
+| `@solana-programs/mpl-core` | 1.1 kB / 1.4 kB | 11.9 kB / 16.6 kB |
+| `@solana-programs/mpl-token-auth-rules` | 658 B / 753 B | 2.8 kB / 3.3 kB |
+| `@solana-programs/orca-whirlpools` | 558 B / 665 B | 12.8 kB / 17.9 kB |
+| `@solana-programs/quarry` | 606 B / 678 B | 15.5 kB / 22.2 kB |
+| `@solana-programs/spl-governance` | 632 B / 714 B | 12.1 kB / 16.3 kB |
+| `@solana-programs/spl-stake-pool` | 602 B / 691 B | 8.0 kB / 10.6 kB |
+| `@solana-programs/token-metadata` | 969 B / 1.1 kB | 16.7 kB / 23.2 kB |
+| `@solana-programs/tribeca` | 400 B / 474 B | 7.6 kB / 10.1 kB |
+| `@solana-programs/voter-stake-registry` | 467 B / 545 B | 5.8 kB / 7.4 kB |
 
-The gap between the columns is the point. `@macalinao/clients-kamino-lending` covers 71 instructions and weighs 25 kB if you take all of it — but a dApp that borrows against an obligation imports one instruction builder and pays 602 bytes.
+The gap between the columns is the point. `@solana-programs/kamino-lending` covers 71 instructions and weighs 25 kB if you take all of it — but a dApp that borrows against an obligation imports one instruction builder and pays 602 bytes.
 
 This is also why a headline "bundle size" badge is misleading for these packages. A single number can only report the `export *` ceiling, which is the one import pattern nobody uses.
 
@@ -80,14 +80,14 @@ To keep it honest over time, put budgets in CI. Coda's own repository uses [size
 [
   {
     "name": "orca-whirlpools: one instruction",
-    "path": "node_modules/@macalinao/clients-orca-whirlpools/dist/index.js",
+    "path": "clients/orca-whirlpools/dist/index.js",
     "import": "{ getSwapInstruction }",
     "ignore": ["@solana/kit", "@solana/program-client-core"],
     "limit": "700 B"
   },
   {
     "name": "orca-whirlpools: entire client",
-    "path": "node_modules/@macalinao/clients-orca-whirlpools/dist/index.js",
+    "path": "clients/orca-whirlpools/dist/index.js",
     "ignore": ["@solana/kit", "@solana/program-client-core"],
     "limit": "15 KB"
   }
@@ -102,7 +102,7 @@ For an existing app, a bundle analyzer will show you what actually landed: [`rol
 
 Tree-shaking is easy to defeat from the consuming side:
 
-- **Namespace imports.** `import * as tokenMetadata from "@macalinao/clients-token-metadata"` pulls in the entire client if the namespace object is passed around or indexed dynamically. Import named bindings instead.
+- **Namespace imports.** `import * as tokenMetadata from "@solana-programs/token-metadata"` pulls in the entire client if the namespace object is passed around or indexed dynamically. Import named bindings instead.
 - **Dynamic access.** `client[instructionName]` forces the bundler to keep every export, since it cannot know which key you will use.
 - **Re-export barrels in your own code.** A `src/solana/index.ts` that re-exports from several clients is fine only if your own package also sets `sideEffects: false`. Otherwise you have reintroduced the problem one layer up.
 - **CommonJS consumers.** `require()` of an ESM-only client goes through interop that materializes the full namespace. Tree-shaking needs a real ESM build target.

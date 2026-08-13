@@ -1,4 +1,4 @@
-# @macalinao/token-metadata-client
+# @solana-programs/token-metadata
 
 ## 0.7.0
 

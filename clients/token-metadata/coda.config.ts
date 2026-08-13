@@ -186,7 +186,7 @@ const ataOf = (mintAccount: string, ownerAccount: string) =>
 export default defineConfig({
   outputDir: "./src/generated",
   docs: {
-    npmPackageName: "@macalinao/clients-token-metadata",
+    npmPackageName: "@solana-programs/token-metadata",
   },
   instructionAccountDefaultValues: [
     // Metadata PDA of the mint.

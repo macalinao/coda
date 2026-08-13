@@ -1,4 +1,4 @@
-# @macalinao/clients-mpl-token-auth-rules
+# @solana-programs/mpl-token-auth-rules
 
 ## 0.4.0
 

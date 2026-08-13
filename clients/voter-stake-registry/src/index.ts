@@ -1,7 +1,7 @@
 /**
- * @macalinao/clients-spl-governance
+ * @solana-programs/voter-stake-registry
  *
- * TypeScript client for the SPL Governance program.
+ * TypeScript client for the Voter Stake Registry program.
  * Generated using Codama with full ESM support.
  */
 

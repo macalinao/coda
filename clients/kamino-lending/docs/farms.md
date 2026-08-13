@@ -1,9 +1,9 @@
 # Farms Program
 
-[![npm version](https://badge.fury.io/js/%40macalinao%2Fclients-kamino-lending.svg)](https://www.npmjs.com/package/%40macalinao%2Fclients-kamino-lending)
+[![npm version](https://badge.fury.io/js/%40solana-programs%2Fkamino-lending.svg)](https://www.npmjs.com/package/%40solana-programs%2Fkamino-lending)
 
 - Program ID: `FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr`
-- TypeScript Client: [`@macalinao/clients-kamino-lending`](https://www.npmjs.com/package/@macalinao/clients-kamino-lending)
+- TypeScript Client: [`@solana-programs/kamino-lending`](https://www.npmjs.com/package/@solana-programs/kamino-lending)
 
 ## Table of Contents
 

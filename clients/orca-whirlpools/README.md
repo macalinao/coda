@@ -1,13 +1,13 @@
-# @macalinao/clients-orca-whirlpools
+# @solana-programs/orca-whirlpools
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-orca-whirlpools.svg)](https://www.npmjs.com/package/@macalinao/clients-orca-whirlpools)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/orca-whirlpools.svg)](https://www.npmjs.com/package/@solana-programs/orca-whirlpools)
 
 TypeScript client for the Orca Whirlpools program, generated using Coda CLI with full ESM support.
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-orca-whirlpools
+bun add @solana-programs/orca-whirlpools
 ```
 
 ## About Orca Whirlpools
@@ -36,7 +36,7 @@ The `coda.config.ts` file can be customized to add PDAs and other Codama visitor
 import {
   getSwapInstruction,
   fetchWhirlpool,
-} from "@macalinao/clients-orca-whirlpools";
+} from "@solana-programs/orca-whirlpools";
 
 // Fetch whirlpool account
 const whirlpool = await fetchWhirlpool(rpc, whirlpoolAddress);

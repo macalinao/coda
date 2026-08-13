@@ -1,5 +1,5 @@
 {
-  "name": "@macalinao/clients-spl-stake-pool",
+  "name": "@solana-programs/spl-stake-pool",
   "version": "0.3.0",
   "description": "TypeScript client for the SPL Stake Pool program",
   "type": "module",

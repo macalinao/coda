@@ -1,5 +1,5 @@
 {
-  "name": "@macalinao/clients-tribeca",
+  "name": "@solana-programs/tribeca",
   "version": "0.3.0",
   "description": "TypeScript client for Tribeca governance programs (Govern and Locked Voter)",
   "type": "module",
