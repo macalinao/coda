@@ -1,5 +1,5 @@
 /**
- * @macalinao/clients-spl-governance
+ * @solana-programs/spl-governance
  *
  * TypeScript client for the SPL Governance program.
  * Generated using Codama with full ESM support.

@@ -111,7 +111,7 @@ coda/
 - Ensures compatibility with `"type": "module"`
 - Emits only erasable syntax (no `enum`, no angle-bracket assertions), so generated clients compile under `erasableSyntaxOnly`
 
-### 4. **@macalinao/clients-token-metadata**
+### 4. **@solana-programs/token-metadata**
 
 - Pre-generated client for Metaplex Token Metadata program
 - Includes custom PDAs and type definitions
@@ -272,7 +272,7 @@ Example package.json for a client:
 
 ```json
 {
-  "name": "@macalinao/clients-[program-name]",
+  "name": "@solana-programs/[program-name]",
   "scripts": {
     "build": "tsdown",
     "codegen": "coda generate",

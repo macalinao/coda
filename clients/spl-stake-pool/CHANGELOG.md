@@ -1,4 +1,4 @@
-# @macalinao/clients-spl-stake-pool
+# @solana-programs/spl-stake-pool
 
 ## 0.3.0
 

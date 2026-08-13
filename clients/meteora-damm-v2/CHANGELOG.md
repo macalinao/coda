@@ -1,4 +1,4 @@
-# @macalinao/clients-meteora-damm-v2
+# @solana-programs/meteora-damm-v2
 
 ## 0.3.0
 

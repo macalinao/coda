@@ -23,7 +23,7 @@ export default defineConfig({
   // Use glob pattern to match both IDL files
   outputDir: "./src/generated",
   docs: {
-    npmPackageName: "@macalinao/clients-spl-stake-pool",
+    npmPackageName: "@solana-programs/spl-stake-pool",
   },
   visitors: [
     setAccountDiscriminatorFromFieldVisitor({

@@ -67,7 +67,7 @@ const addCustomPDAsVisitor = addPdasVisitor({
 export default defineConfig({
   outputDir: "./src/generated",
   docs: {
-    npmPackageName: "@macalinao/clients-voter-stake-registry",
+    npmPackageName: "@solana-programs/voter-stake-registry",
   },
   visitors: [
     addCustomPDAsVisitor,

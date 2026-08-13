@@ -1,13 +1,13 @@
-# @macalinao/clients-spl-stake-pool
+# @solana-programs/spl-stake-pool
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-spl-stake-pool.svg)](https://www.npmjs.com/package/@macalinao/clients-spl-stake-pool)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/spl-stake-pool.svg)](https://www.npmjs.com/package/@solana-programs/spl-stake-pool)
 
 TypeScript client for the SPL Stake Pool program, generated using Coda with full ESM support.
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-spl-stake-pool
+bun add @solana-programs/spl-stake-pool
 ```
 
 ## Development
@@ -38,7 +38,7 @@ The `coda.config.ts` file defines custom PDAs for the SPL Stake Pool program, in
 import {
   findWithdrawAuthorityPda,
   findStakePda,
-} from "@macalinao/clients-spl-stake-pool";
+} from "@solana-programs/spl-stake-pool";
 
 // Get withdraw authority PDA
 const withdrawAuthorityPda = await findWithdrawAuthorityPda({

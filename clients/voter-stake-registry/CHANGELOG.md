@@ -1,4 +1,4 @@
-# @macalinao/clients-voter-stake-registry
+# @solana-programs/voter-stake-registry
 
 ## 0.4.0
 

@@ -1,13 +1,13 @@
-# @macalinao/clients-token-metadata
+# @solana-programs/token-metadata
 
-[![npm version](https://img.shields.io/npm/v/@macalinao/clients-token-metadata.svg)](https://www.npmjs.com/package/@macalinao/clients-token-metadata)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/token-metadata.svg)](https://www.npmjs.com/package/@solana-programs/token-metadata)
 
 TypeScript client for the Metaplex Token Metadata program, generated using Codama with full ESM support.
 
 ## Installation
 
 ```bash
-bun add @macalinao/clients-token-metadata
+bun add @solana-programs/token-metadata
 ```
 
 ## Development
@@ -32,7 +32,7 @@ The `coda.config.ts` file adds custom PDAs to the generated client, including th
 import {
   getCreateMetadataAccountInstruction,
   fetchMetadata,
-} from "@macalinao/clients-token-metadata";
+} from "@solana-programs/token-metadata";
 
 // Fetch metadata account
 const metadata = await fetchMetadata(rpc, metadataAddress);
