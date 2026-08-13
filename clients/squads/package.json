@@ -1,0 +1,59 @@
+{
+  "name": "@solana-programs/squads",
+  "version": "0.1.0",
+  "description": "TypeScript client for the Squads Protocol v4 multisig program",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://coda.ianm.com",
+  "license": "Apache-2.0",
+  "keywords": [
+    "coda",
+    "solana",
+    "squads",
+    "multisig",
+    "sqds",
+    "treasury",
+    "client",
+    "esm",
+    "typescript",
+    "ian-macalinao"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/squads"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
+    "codegen": "coda generate"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*",
+    "@solana/program-client-core": "*"
+  },
+  "devDependencies": {
+    "@macalinao/coda": "workspace:^",
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "catalog:",
+    "@solana/program-client-core": "catalog:",
+    "typescript": "catalog:",
+    "tsdown": "catalog:"
+  }
+}

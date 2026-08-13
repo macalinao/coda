@@ -171,6 +171,25 @@
     "limit": "9.5 KB"
   },
   {
+    "name": "squads: one instruction",
+    "path": "clients/squads/dist/index.js",
+    "import": "{ getVaultTransactionCreateInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "600 B"
+  },
+  {
+    "name": "squads: entire client",
+    "path": "clients/squads/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "11 KB"
+  },
+  {
     "name": "token-metadata: one instruction",
     "path": "clients/token-metadata/dist/index.js",
     "import": "{ getCreateInstruction }",
