@@ -1,0 +1,56 @@
+{
+  "name": "@solana-programs/goki",
+  "version": "0.1.0",
+  "description": "TypeScript client for Goki programs (Smart Wallet and Token Signer)",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://coda.ianm.com",
+  "license": "Apache-2.0",
+  "keywords": [
+    "coda",
+    "solana",
+    "goki",
+    "smart-wallet",
+    "multisig",
+    "client",
+    "typescript"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
+    "codegen": "rm -fr src/generated/ && coda generate"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*",
+    "@solana/program-client-core": "*"
+  },
+  "devDependencies": {
+    "@macalinao/coda": "workspace:^",
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "catalog:",
+    "@solana/program-client-core": "catalog:",
+    "typescript": "catalog:",
+    "tsdown": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/goki"
+  }
+}
