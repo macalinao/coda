@@ -40,8 +40,8 @@ import {
 import {
   findFarmsUserStatePda,
   findFarmVaultsAuthorityPda,
-} from "../pdas/index.js";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_UNSTAKED_DEPOSITS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([36, 102, 187, 49, 220, 36, 132, 67]);

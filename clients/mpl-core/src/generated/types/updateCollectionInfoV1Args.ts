@@ -21,7 +21,7 @@ import {
   getUpdateTypeEncoder,
   type UpdateType,
   type UpdateTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `updateCollectionInfoV1`. */
 export type UpdateCollectionInfoV1Args = {

@@ -41,8 +41,8 @@ import {
   findMasterEditionPda,
   findMetadataPda,
   findTokenRecordPda,
-} from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const MIGRATE_DISCRIMINATOR = 48;
 

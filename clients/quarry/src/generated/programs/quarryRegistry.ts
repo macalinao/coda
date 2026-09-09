@@ -38,7 +38,7 @@ import {
   getRegistryCodec,
   type Registry,
   type RegistryArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getNewRegistryInstructionAsync,
   getSyncQuarryInstruction,
@@ -48,8 +48,8 @@ import {
   type ParsedNewRegistryInstruction,
   type ParsedSyncQuarryInstruction,
   type SyncQuarryInput,
-} from "../instructions/index.js";
-import { findRegistryPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findRegistryPda } from "../pdas/index.ts";
 
 export const QUARRY_REGISTRY_PROGRAM_ADDRESS =
   "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc" as Address<"QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc">;

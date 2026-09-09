@@ -28,7 +28,7 @@ import {
   getPoolFeeParametersEncoder,
   type PoolFeeParameters,
   type PoolFeeParametersArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type EvtInitializePool = {
   pool: Address;

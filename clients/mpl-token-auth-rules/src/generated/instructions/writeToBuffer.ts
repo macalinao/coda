@@ -35,14 +35,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findRuleSetBufferPda } from "../pdas/index.js";
-import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findRuleSetBufferPda } from "../pdas/index.ts";
+import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getWriteToBufferArgsDecoder,
   getWriteToBufferArgsEncoder,
   type WriteToBufferArgs,
   type WriteToBufferArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const WRITE_TO_BUFFER_DISCRIMINATOR = 2;
 

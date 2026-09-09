@@ -36,8 +36,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const UNVERIFY_COLLECTION_DISCRIMINATOR = 22;
 

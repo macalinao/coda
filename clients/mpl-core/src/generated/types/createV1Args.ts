@@ -35,7 +35,7 @@ import {
   type DataStateArgs,
   type PluginAuthorityPair,
   type PluginAuthorityPairArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `createV1`. */
 export type CreateV1Args = {

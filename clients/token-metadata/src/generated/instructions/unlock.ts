@@ -41,14 +41,14 @@ import {
   findMasterEditionPda,
   findMetadataPda,
   findTokenRecordPda,
-} from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getUnlockArgsDecoder,
   getUnlockArgsEncoder,
   type UnlockArgs,
   type UnlockArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const UNLOCK_DISCRIMINATOR = 47;
 

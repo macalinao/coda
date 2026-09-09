@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** InvalidInstruction: Invalid instruction passed to program */
 export const SPL_GOVERNANCE_ERROR__INVALID_INSTRUCTION = 0x1f4; // 500

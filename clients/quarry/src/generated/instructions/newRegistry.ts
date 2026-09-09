@@ -43,7 +43,7 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
+import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const NEW_REGISTRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   237, 187, 50, 70, 74, 26, 144, 230,

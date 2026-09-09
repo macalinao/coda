@@ -39,7 +39,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INITIALIZE_REWARD_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([91, 1, 77, 50, 235, 229, 133, 49]);

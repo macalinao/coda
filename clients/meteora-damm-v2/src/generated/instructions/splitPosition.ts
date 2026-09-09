@@ -36,14 +36,14 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getSplitPositionParametersDecoder,
   getSplitPositionParametersEncoder,
   type SplitPositionParameters,
   type SplitPositionParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SPLIT_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   172, 241, 221, 138, 161, 29, 253, 42,

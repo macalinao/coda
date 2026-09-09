@@ -32,7 +32,7 @@ import {
   type SplitPositionInfoArgs,
   type SplitPositionParameters2,
   type SplitPositionParameters2Args,
-} from "./index.js";
+} from "./index.ts";
 
 export type EvtSplitPosition2 = {
   pool: Address;

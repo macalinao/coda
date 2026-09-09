@@ -30,7 +30,7 @@ import {
   type ExtraAccountArgs,
   type ValidationResultsOffset,
   type ValidationResultsOffsetArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * External plugin adapter that reads a `ValidationResult` from

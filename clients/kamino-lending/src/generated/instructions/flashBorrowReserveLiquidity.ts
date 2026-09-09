@@ -42,8 +42,8 @@ import {
 import {
   findLendingMarketAuthPda,
   findReserveFeeVaultPda,
-} from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const FLASH_BORROW_RESERVE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([135, 231, 52, 167, 7, 52, 212, 193]);

@@ -36,7 +36,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getAssetTierDecoder,
   getAssetTierEncoder,
@@ -66,7 +66,7 @@ import {
   type UpdateLendingMarketConfigValueArgs,
   type UpdateLendingMarketMode,
   type UpdateLendingMarketModeArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const IDL_MISSING_TYPES_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([130, 80, 38, 153, 80, 212, 182, 253]);

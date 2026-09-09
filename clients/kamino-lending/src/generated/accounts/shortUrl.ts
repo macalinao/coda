@@ -40,7 +40,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findShortUrlPda, type ShortUrlSeeds } from "../pdas/index.js";
+import { findShortUrlPda, type ShortUrlSeeds } from "../pdas/index.ts";
 
 export const SHORT_URL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   28, 89, 174, 25, 226, 124, 126, 212,

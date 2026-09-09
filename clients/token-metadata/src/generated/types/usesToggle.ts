@@ -27,7 +27,7 @@ import {
   getUsesEncoder,
   type Uses,
   type UsesArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type UsesToggle =
   | { __kind: "None" }

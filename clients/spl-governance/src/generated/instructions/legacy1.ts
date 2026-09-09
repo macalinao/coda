@@ -23,7 +23,7 @@ import {
   type InstructionWithData,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const LEGACY1_DISCRIMINATOR = 8;
 

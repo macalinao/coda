@@ -40,13 +40,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getRealmConfigParamsDecoder,
   getRealmConfigParamsEncoder,
   type RealmConfigParams,
   type RealmConfigParamsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_REALM_DISCRIMINATOR = 0;
 

@@ -41,8 +41,8 @@ import {
   getResolvedInstructionAccountAsTransactionSigner,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMintWrapperPda } from "../pdas/index.js";
-import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMintWrapperPda } from "../pdas/index.ts";
+import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const NEW_WRAPPER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   140, 106, 205, 202, 15, 176, 85, 19,

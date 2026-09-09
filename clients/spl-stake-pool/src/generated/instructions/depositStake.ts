@@ -35,8 +35,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findWithdrawAuthorityPda } from "../pdas/index.js";
-import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findWithdrawAuthorityPda } from "../pdas/index.ts";
+import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DEPOSIT_STAKE_DISCRIMINATOR = 9;
 

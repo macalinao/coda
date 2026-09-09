@@ -91,7 +91,7 @@ import {
   type VoteRecordV1Args,
   type VoteRecordV2,
   type VoteRecordV2Args,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getAddRequiredSignatoryInstruction,
   getAddSignatoryInstruction,
@@ -217,7 +217,7 @@ import {
   type SignOffProposalInput,
   type UpdateProgramMetadataInput,
   type WithdrawGoverningTokensInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findCommunityTokenHoldingPda,
   findCouncilTokenHoldingPda,
@@ -233,11 +233,11 @@ import {
   findSignatoryRecordPda,
   findTokenOwnerRecordPda,
   findVoteRecordPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeEncoder,
   GovernanceAccountType,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SPL_GOVERNANCE_PROGRAM_ADDRESS =
   "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">;

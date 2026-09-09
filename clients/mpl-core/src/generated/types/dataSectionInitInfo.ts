@@ -23,7 +23,7 @@ import {
   type ExternalPluginAdapterSchemaArgs,
   type LinkedDataKey,
   type LinkedDataKeyArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Initialization data for the `DataSection` external plugin adapter. */
 export type DataSectionInitInfo = {

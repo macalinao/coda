@@ -45,7 +45,7 @@ import {
 import {
   findFarmsUserStatePda,
   type FarmsUserStateSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const FARMS_USER_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([72, 177, 85, 249, 76, 167, 186, 126]);

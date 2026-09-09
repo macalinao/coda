@@ -37,7 +37,7 @@ import {
   type ScopeConfigurationArgs,
   type SwitchboardConfiguration,
   type SwitchboardConfigurationArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type TokenInfo = {
   /** UTF-8 encoded name of the token (null-terminated) */

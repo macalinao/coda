@@ -13,6 +13,11 @@
  * - "errors" maps to "../errors/index.js" for error type definitions
  * - "generatedAccounts" maps to "../accounts/index.js" for account structures
  * - "hooked" maps to "../../hooked/index.js" for hook implementations
+ *
+ * @deprecated `@codama/renderers-js` >= 2.4.0 appends import extensions itself
+ * via its `importExtension: "js"` option, which this renderer now uses. The map
+ * is no longer applied to the render and is kept only for consumers who pass it
+ * to `getRenderMapVisitor` directly. It will be removed in the next major.
  */
 export const ESM_DEPENDENCY_MAP = {
   errors: "../errors/index.js",

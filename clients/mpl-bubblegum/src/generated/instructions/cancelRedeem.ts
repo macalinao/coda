@@ -41,8 +41,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findTreeConfigPda } from "../pdas/index.js";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findTreeConfigPda } from "../pdas/index.ts";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CANCEL_REDEEM_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   111, 76, 232, 50, 39, 175, 48, 242,

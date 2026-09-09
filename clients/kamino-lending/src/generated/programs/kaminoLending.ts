@@ -62,7 +62,7 @@ import {
   type UserMetadataArgs,
   type UserState,
   type UserStateArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getBorrowObligationLiquidityInstructionAsync,
   getBorrowObligationLiquidityV2InstructionAsync,
@@ -256,7 +256,7 @@ import {
   type WithdrawObligationCollateralV2AsyncInput,
   type WithdrawProtocolFeeAsyncInput,
   type WithdrawReferrerFeesAsyncInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findLendingGlobalConfigStatePda,
   findLendingMarketAuthPda,
@@ -269,7 +269,7 @@ import {
   findReserveLiquiditySupplyPda,
   findShortUrlPda,
   findUserMetadataPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const KAMINO_LENDING_PROGRAM_ADDRESS =
   "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD" as Address<"KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD">;

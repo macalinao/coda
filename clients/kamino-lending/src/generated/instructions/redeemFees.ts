@@ -37,8 +37,8 @@ import {
 import {
   findLendingMarketAuthPda,
   findReserveFeeVaultPda,
-} from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REDEEM_FEES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   215, 39, 180, 41, 173, 46, 248, 220,

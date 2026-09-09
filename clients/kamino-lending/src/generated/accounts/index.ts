@@ -6,16 +6,16 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./farmsGlobalConfig.js";
-export * from "./farmState.js";
-export * from "./farmsUserState.js";
-export * from "./lendingGlobalConfig.js";
-export * from "./lendingMarket.js";
-export * from "./obligation.js";
-export * from "./oraclePrices.js";
-export * from "./referrerState.js";
-export * from "./referrerTokenState.js";
-export * from "./reserve.js";
-export * from "./shortUrl.js";
-export * from "./userMetadata.js";
-export * from "./userState.js";
+export * from "./farmsGlobalConfig.ts";
+export * from "./farmState.ts";
+export * from "./farmsUserState.ts";
+export * from "./lendingGlobalConfig.ts";
+export * from "./lendingMarket.ts";
+export * from "./obligation.ts";
+export * from "./oraclePrices.ts";
+export * from "./referrerState.ts";
+export * from "./referrerTokenState.ts";
+export * from "./reserve.ts";
+export * from "./shortUrl.ts";
+export * from "./userMetadata.ts";
+export * from "./userState.ts";

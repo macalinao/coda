@@ -41,7 +41,7 @@ import {
   type ExternalPluginAdapterTypeArgs,
   type HookableLifecycleEvent,
   type HookableLifecycleEventArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * An entry in `PluginRegistryV1` describing one external plugin

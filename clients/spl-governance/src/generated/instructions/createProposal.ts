@@ -46,13 +46,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getVoteTypeDecoder,
   getVoteTypeEncoder,
   type VoteType,
   type VoteTypeArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_PROPOSAL_DISCRIMINATOR = 6;
 

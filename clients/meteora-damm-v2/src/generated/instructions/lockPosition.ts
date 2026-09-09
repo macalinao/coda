@@ -37,14 +37,14 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getVestingParametersDecoder,
   getVestingParametersEncoder,
   type VestingParameters,
   type VestingParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const LOCK_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   227, 62, 2, 252, 247, 10, 171, 185,

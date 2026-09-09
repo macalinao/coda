@@ -6,9 +6,9 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./quarryMergeMine.js";
-export * from "./quarryMine.js";
-export * from "./quarryMintWrapper.js";
-export * from "./quarryOperator.js";
-export * from "./quarryRedeemer.js";
-export * from "./quarryRegistry.js";
+export * from "./quarryMergeMine.ts";
+export * from "./quarryMine.ts";
+export * from "./quarryMintWrapper.ts";
+export * from "./quarryOperator.ts";
+export * from "./quarryRedeemer.ts";
+export * from "./quarryRegistry.ts";

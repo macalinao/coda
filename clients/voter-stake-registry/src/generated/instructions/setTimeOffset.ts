@@ -37,7 +37,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
+import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SET_TIME_OFFSET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [89, 238, 89, 160, 239, 113, 25, 123],

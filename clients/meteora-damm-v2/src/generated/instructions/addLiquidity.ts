@@ -37,14 +37,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda, findTokenVaultPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda, findTokenVaultPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getAddLiquidityParametersDecoder,
   getAddLiquidityParametersEncoder,
   type AddLiquidityParameters,
   type AddLiquidityParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const ADD_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   181, 157, 89, 67, 143, 182, 52, 72,

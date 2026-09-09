@@ -25,7 +25,7 @@ import {
   getLockupKindEncoder,
   type LockupKind,
   type LockupKindArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type Lockup = {
   startTs: bigint;

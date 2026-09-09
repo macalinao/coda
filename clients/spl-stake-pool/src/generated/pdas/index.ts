@@ -6,7 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./ephemeralStake.js";
-export * from "./stake.js";
-export * from "./transientStake.js";
-export * from "./withdrawAuthority.js";
+export * from "./ephemeralStake.ts";
+export * from "./stake.ts";
+export * from "./transientStake.ts";
+export * from "./withdrawAuthority.ts";

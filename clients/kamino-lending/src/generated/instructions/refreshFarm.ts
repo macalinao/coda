@@ -33,7 +33,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REFRESH_FARM_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   214, 131, 138, 183, 144, 194, 172, 42,

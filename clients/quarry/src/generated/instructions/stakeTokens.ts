@@ -39,8 +39,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMinerPda } from "../pdas/index.js";
-import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMinerPda } from "../pdas/index.ts";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const STAKE_TOKENS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   136, 126, 91, 162, 40, 131, 13, 127,

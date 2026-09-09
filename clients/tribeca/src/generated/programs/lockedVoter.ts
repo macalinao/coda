@@ -44,7 +44,7 @@ import {
   type LockerArgs,
   type LockerWhitelistEntry,
   type LockerWhitelistEntryArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getActivateProposalInstruction,
   getApproveProgramLockPrivilegeInstruction,
@@ -98,12 +98,12 @@ import {
   type RevokeProgramLockPrivilegeInput,
   type SetLockerParamsInput,
   type SetVoteDelegateInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findEscrowPda,
   findLockerPda,
   findWhitelistPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const LOCKED_VOTER_PROGRAM_ADDRESS =
   "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">;

@@ -27,7 +27,7 @@ import {
   type CreatorArgs,
   type RuleSet,
   type RuleSetArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Internal plugin enforcing creator royalty payments on secondary sales. */
 export type Royalties = {

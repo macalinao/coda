@@ -40,7 +40,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
+import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SET_VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   171, 33, 83, 172, 148, 215, 239, 97,

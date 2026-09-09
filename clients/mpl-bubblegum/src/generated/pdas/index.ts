@@ -6,10 +6,10 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./assetId.js";
-export * from "./bubblegumSigner.js";
-export * from "./masterEdition.js";
-export * from "./metadata.js";
-export * from "./mintAuthority.js";
-export * from "./treeConfig.js";
-export * from "./voucher.js";
+export * from "./assetId.ts";
+export * from "./bubblegumSigner.ts";
+export * from "./masterEdition.ts";
+export * from "./metadata.ts";
+export * from "./mintAuthority.ts";
+export * from "./treeConfig.ts";
+export * from "./voucher.ts";

@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getRevokePluginAuthorityV1ArgsDecoder,
   getRevokePluginAuthorityV1ArgsEncoder,
   type RevokePluginAuthorityV1Args,
   type RevokePluginAuthorityV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const REVOKE_PLUGIN_AUTHORITY_V1_DISCRIMINATOR = 10;
 

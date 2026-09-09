@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findUserMetadataPda, type UserMetadataSeeds } from "../pdas/index.js";
+import { findUserMetadataPda, type UserMetadataSeeds } from "../pdas/index.ts";
 
 export const USER_METADATA_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   157, 214, 220, 235, 98, 135, 171, 28,

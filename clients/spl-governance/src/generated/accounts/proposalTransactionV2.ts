@@ -45,7 +45,7 @@ import {
 import {
   findProposalTransactionPda,
   type ProposalTransactionSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -62,7 +62,7 @@ import {
   type TransactionExecutionStatusArgs,
   type UnixTimestamp,
   type UnixTimestampArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROPOSAL_TRANSACTION_V2_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.ProposalTransactionV2;

@@ -38,8 +38,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findQuarryPda } from "../pdas/index.js";
-import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findQuarryPda } from "../pdas/index.ts";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_QUARRY_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([46, 84, 33, 67, 174, 252, 67, 148]);

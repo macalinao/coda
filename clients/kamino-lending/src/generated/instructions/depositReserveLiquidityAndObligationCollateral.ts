@@ -43,8 +43,8 @@ import {
   findLendingMarketAuthPda,
   findReserveCollateralMintPda,
   findReserveLiquiditySupplyPda,
-} from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DEPOSIT_RESERVE_LIQUIDITY_AND_OBLIGATION_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([129, 199, 4, 2, 222, 39, 26, 46]);

@@ -37,7 +37,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
+import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CLOSE_DEPOSIT_ENTRY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([236, 190, 87, 34, 251, 131, 138, 237]);

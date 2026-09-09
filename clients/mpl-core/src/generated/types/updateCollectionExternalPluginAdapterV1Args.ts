@@ -23,7 +23,7 @@ import {
   type ExternalPluginAdapterKeyArgs,
   type ExternalPluginAdapterUpdateInfo,
   type ExternalPluginAdapterUpdateInfoArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `updateCollectionExternalPluginAdapterV1`. */
 export type UpdateCollectionExternalPluginAdapterV1Args = {

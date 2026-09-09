@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getUpdateV1ArgsDecoder,
   getUpdateV1ArgsEncoder,
   type UpdateV1Args,
   type UpdateV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const UPDATE_V1_DISCRIMINATOR = 15;
 

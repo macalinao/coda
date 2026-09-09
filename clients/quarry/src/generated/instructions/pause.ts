@@ -35,7 +35,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const PAUSE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   211, 22, 221, 251, 74, 121, 193, 47,

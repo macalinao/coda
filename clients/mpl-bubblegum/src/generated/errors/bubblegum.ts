@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** AssetOwnerMismatch: Asset Owner Does not match */
 export const BUBBLEGUM_ERROR__ASSET_OWNER_MISMATCH = 0x1770; // 6000

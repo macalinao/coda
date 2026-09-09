@@ -39,8 +39,8 @@ import {
   getResolvedInstructionAccountAsTransactionSigner,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findRewarderPda } from "../pdas/index.js";
-import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findRewarderPda } from "../pdas/index.ts";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const NEW_REWARDER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [173, 189, 26, 25, 79, 177, 60, 173],

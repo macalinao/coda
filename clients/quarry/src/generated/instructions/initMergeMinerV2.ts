@@ -37,8 +37,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMergeMinerPda } from "../pdas/index.js";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMergeMinerPda } from "../pdas/index.ts";
+import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INIT_MERGE_MINER_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([153, 44, 29, 197, 171, 114, 71, 208]);

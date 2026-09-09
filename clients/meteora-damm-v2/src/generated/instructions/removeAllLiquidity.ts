@@ -43,8 +43,8 @@ import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REMOVE_ALL_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([10, 51, 61, 35, 112, 105, 24, 85]);

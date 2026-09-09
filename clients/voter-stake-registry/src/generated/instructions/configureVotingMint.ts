@@ -48,7 +48,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
+import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CONFIGURE_VOTING_MINT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([113, 153, 141, 236, 184, 9, 135, 15]);

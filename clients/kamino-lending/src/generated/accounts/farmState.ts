@@ -53,7 +53,7 @@ import {
   type FarmsTokenInfoArgs,
   type RewardInfo,
   type RewardInfoArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const FARM_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   198, 102, 216, 74, 63, 66, 163, 190,

@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** InvalidMarketAuthority: Market authority is invalid */
 export const KAMINO_LENDING_ERROR__INVALID_MARKET_AUTHORITY = 0x1770; // 6000

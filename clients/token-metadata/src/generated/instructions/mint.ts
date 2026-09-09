@@ -41,14 +41,14 @@ import {
   findMasterEditionPda,
   findMetadataPda,
   findTokenRecordPda,
-} from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMintArgsDecoder,
   getMintArgsEncoder,
   type MintArgs,
   type MintArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MINT_DISCRIMINATOR = 43;
 

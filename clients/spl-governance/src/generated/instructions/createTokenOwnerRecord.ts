@@ -35,8 +35,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findTokenOwnerRecordPda } from "../pdas/index.js";
-import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findTokenOwnerRecordPda } from "../pdas/index.ts";
+import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR = 23;
 

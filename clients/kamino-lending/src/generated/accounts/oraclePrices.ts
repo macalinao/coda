@@ -41,7 +41,7 @@ import {
   getDatedPriceEncoder,
   type DatedPrice,
   type DatedPriceArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const ORACLE_PRICES_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   89, 128, 118, 221, 6, 72, 180, 146,

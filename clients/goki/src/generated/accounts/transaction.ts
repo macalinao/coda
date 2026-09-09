@@ -46,13 +46,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTransactionPda, type TransactionSeeds } from "../pdas/index.js";
+import { findTransactionPda, type TransactionSeeds } from "../pdas/index.ts";
 import {
   getTXInstructionDecoder,
   getTXInstructionEncoder,
   type TXInstruction,
   type TXInstructionArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const TRANSACTION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   11, 24, 174, 129, 203, 117, 242, 23,

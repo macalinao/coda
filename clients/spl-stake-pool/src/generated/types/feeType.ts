@@ -27,7 +27,7 @@ import {
   getFeeEncoder,
   type Fee,
   type FeeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** The type of fees that can be set on the stake pool */
 export type FeeType =

@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getApproveCollectionPluginAuthorityV1ArgsDecoder,
   getApproveCollectionPluginAuthorityV1ArgsEncoder,
   type ApproveCollectionPluginAuthorityV1Args,
   type ApproveCollectionPluginAuthorityV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const APPROVE_COLLECTION_PLUGIN_AUTHORITY_V1_DISCRIMINATOR = 9;
 

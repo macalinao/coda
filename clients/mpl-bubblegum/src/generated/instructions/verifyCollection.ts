@@ -51,14 +51,14 @@ import {
   findMasterEditionPda,
   findMetadataPda,
   findTreeConfigPda,
-} from "../pdas/index.js";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
   type MetadataArgs,
   type MetadataArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VERIFY_COLLECTION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([56, 113, 101, 253, 79, 55, 122, 169]);

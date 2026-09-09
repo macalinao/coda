@@ -34,7 +34,7 @@ import {
   type ProofInfoArgs,
   type SeedsVec,
   type SeedsVecArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type PayloadType =
   | { __kind: "Pubkey"; fields: readonly [Address] }

@@ -41,7 +41,7 @@ import {
   getLockTypeLabelEncoder,
   type LockTypeLabel,
   type LockTypeLabelArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const LOCK_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   106, 47, 238, 159, 124, 12, 160, 192,

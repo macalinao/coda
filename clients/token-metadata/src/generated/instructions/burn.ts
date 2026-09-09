@@ -36,14 +36,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getBurnArgsDecoder,
   getBurnArgsEncoder,
   type BurnArgs,
   type BurnArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const BURN_DISCRIMINATOR = 41;
 

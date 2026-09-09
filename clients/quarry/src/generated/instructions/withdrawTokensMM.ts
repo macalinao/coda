@@ -40,8 +40,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMergeMinerPda } from "../pdas/index.js";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMergeMinerPda } from "../pdas/index.ts";
+import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_TOKENS_M_M_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([2, 4, 225, 61, 19, 182, 106, 170]);

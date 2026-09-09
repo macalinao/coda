@@ -38,7 +38,7 @@ import {
   getKeyEncoder,
   type Key,
   type KeyArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export type EditionMarkerV2 = { key: Key; ledger: ReadonlyUint8Array };
 

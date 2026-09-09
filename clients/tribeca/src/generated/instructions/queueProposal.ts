@@ -38,7 +38,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
+import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const QUEUE_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   168, 219, 139, 211, 205, 152, 125, 110,

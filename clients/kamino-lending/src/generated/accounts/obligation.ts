@@ -42,7 +42,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findObligationPda, type ObligationSeeds } from "../pdas/index.js";
+import { findObligationPda, type ObligationSeeds } from "../pdas/index.ts";
 import {
   getLastUpdateDecoder,
   getLastUpdateEncoder,
@@ -60,7 +60,7 @@ import {
   type ObligationLiquidityArgs,
   type ObligationOrder,
   type ObligationOrderArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const OBLIGATION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   168, 206, 141, 106, 88, 76, 172, 167,

@@ -28,7 +28,7 @@ import {
   getAuthorityEncoder,
   type Authority,
   type AuthorityArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Identifies which linked adapter (`LinkedLifecycleHook` or

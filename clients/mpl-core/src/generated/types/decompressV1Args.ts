@@ -19,7 +19,7 @@ import {
   getCompressionProofEncoder,
   type CompressionProof,
   type CompressionProofArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `decompressV1`. */
 export type DecompressV1Args = {

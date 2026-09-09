@@ -36,8 +36,8 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findLendingGlobalConfigStatePda } from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findLendingGlobalConfigStatePda } from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INIT_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([140, 136, 214, 48, 87, 0, 120, 255]);

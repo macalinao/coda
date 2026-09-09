@@ -47,7 +47,7 @@ import {
   getPoolFeesConfigEncoder,
   type PoolFeesConfig,
   type PoolFeesConfigArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   155, 12, 170, 224, 30, 250, 204, 130,

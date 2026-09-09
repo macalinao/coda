@@ -43,8 +43,8 @@ import {
   findReserveCollateralSupplyPda,
   findReserveFeeVaultPda,
   findReserveLiquiditySupplyPda,
-} from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INIT_RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   138, 245, 71, 225, 153, 4, 3, 43,

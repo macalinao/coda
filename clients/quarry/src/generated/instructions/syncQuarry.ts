@@ -33,7 +33,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
+import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SYNC_QUARRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   48, 99, 184, 151, 219, 101, 253, 170,

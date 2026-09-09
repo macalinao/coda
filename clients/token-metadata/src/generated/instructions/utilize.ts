@@ -36,14 +36,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getUtilizeArgsDecoder,
   getUtilizeArgsEncoder,
   type UtilizeArgs,
   type UtilizeArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const UTILIZE_DISCRIMINATOR = 19;
 

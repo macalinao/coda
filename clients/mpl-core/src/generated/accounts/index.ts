@@ -6,9 +6,9 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./assetV1.js";
-export * from "./collectionV1.js";
-export * from "./groupV1.js";
-export * from "./hashedAssetV1.js";
-export * from "./pluginHeaderV1.js";
-export * from "./pluginRegistryV1.js";
+export * from "./assetV1.ts";
+export * from "./collectionV1.ts";
+export * from "./groupV1.ts";
+export * from "./hashedAssetV1.ts";
+export * from "./pluginHeaderV1.ts";
+export * from "./pluginRegistryV1.ts";

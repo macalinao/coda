@@ -27,7 +27,7 @@ import {
   getMultiChoiceTypeEncoder,
   type MultiChoiceType,
   type MultiChoiceTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type VoteType =
   | { __kind: "SingleChoice" }

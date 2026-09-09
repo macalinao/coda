@@ -26,7 +26,7 @@ import {
   getProposalInstructionEncoder,
   type ProposalInstruction,
   type ProposalInstructionArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type ProposalCreateEvent = {
   governor: Address;

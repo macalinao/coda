@@ -45,7 +45,7 @@ import {
 import {
   findVoterWeightRecordPda,
   type VoterWeightRecordSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const VOTER_WEIGHT_RECORD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([50, 101, 102, 57, 57, 98, 52, 98]);

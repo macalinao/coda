@@ -24,7 +24,7 @@ import {
   getRemoveLiquidityParametersEncoder,
   type RemoveLiquidityParameters,
   type RemoveLiquidityParametersArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type EvtRemoveLiquidity = {
   pool: Address;

@@ -21,7 +21,7 @@ import {
   getRewardPerTimeUnitPointEncoder,
   type RewardPerTimeUnitPoint,
   type RewardPerTimeUnitPointArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type RewardScheduleCurve = {
   /**

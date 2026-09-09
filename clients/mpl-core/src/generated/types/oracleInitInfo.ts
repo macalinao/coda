@@ -46,7 +46,7 @@ import {
   type HookableLifecycleEventArgs,
   type ValidationResultsOffset,
   type ValidationResultsOffsetArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Initialization data for the `Oracle` external plugin adapter. */
 export type OracleInitInfo = {

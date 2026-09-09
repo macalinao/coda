@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** InvalidOwner: The given owner is not part of this smart wallet. */
 export const SMART_WALLET_ERROR__INVALID_OWNER = 0x1770; // 6000

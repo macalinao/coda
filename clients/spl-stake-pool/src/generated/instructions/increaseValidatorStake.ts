@@ -41,8 +41,8 @@ import {
 import {
   findTransientStakePda,
   findWithdrawAuthorityPda,
-} from "../pdas/index.js";
-import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INCREASE_VALIDATOR_STAKE_DISCRIMINATOR = 4;
 

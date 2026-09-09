@@ -34,7 +34,7 @@ import {
   type AuthorityArgs,
   type LinkedDataKey,
   type LinkedDataKeyArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Identifies a specific external plugin adapter instance, e.g.

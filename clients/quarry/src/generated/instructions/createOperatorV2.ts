@@ -38,8 +38,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findOperatorPda } from "../pdas/index.js";
-import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findOperatorPda } from "../pdas/index.ts";
+import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_OPERATOR_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([179, 106, 174, 35, 45, 26, 10, 67]);

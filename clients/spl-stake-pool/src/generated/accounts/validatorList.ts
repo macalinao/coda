@@ -40,7 +40,7 @@ import {
   getValidatorStakeInfoEncoder,
   type ValidatorStakeInfo,
   type ValidatorStakeInfoArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VALIDATOR_LIST_ACCOUNT_TYPE: AccountType =
   AccountType.ValidatorList;

@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMinterPda, type MinterSeeds } from "../pdas/index.js";
+import { findMinterPda, type MinterSeeds } from "../pdas/index.ts";
 
 export const MINTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   28, 69, 107, 166, 41, 139, 205, 247,

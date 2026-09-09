@@ -21,7 +21,7 @@ import {
   getCurvePointEncoder,
   type CurvePoint,
   type CurvePointArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type BorrowRateCurve = { points: Array<CurvePoint> };
 

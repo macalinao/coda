@@ -41,8 +41,8 @@ import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CLAIM_POSITION_FEE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([180, 38, 154, 17, 133, 33, 162, 211]);

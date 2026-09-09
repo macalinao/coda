@@ -21,7 +21,7 @@ import {
   getRemainingAccountsSliceEncoder,
   type RemainingAccountsSlice,
   type RemainingAccountsSliceArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type RemainingAccountsInfo = { slices: Array<RemainingAccountsSlice> };
 

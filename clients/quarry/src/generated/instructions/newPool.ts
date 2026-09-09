@@ -41,8 +41,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findReplicaMintPda } from "../pdas/index.js";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findReplicaMintPda } from "../pdas/index.ts";
+import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const NEW_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   38, 63, 210, 32, 246, 20, 239, 112,

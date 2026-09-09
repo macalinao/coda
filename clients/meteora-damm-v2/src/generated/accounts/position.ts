@@ -51,7 +51,7 @@ import {
   type PositionMetricsArgs,
   type UserRewardInfo,
   type UserRewardInfoArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   170, 188, 143, 228, 122, 64, 247, 208,

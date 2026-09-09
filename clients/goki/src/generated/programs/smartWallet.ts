@@ -44,7 +44,7 @@ import {
   type SubaccountInfoArgs,
   type Transaction,
   type TransactionArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getApproveInstruction,
   getChangeThresholdInstruction,
@@ -94,14 +94,14 @@ import {
   type ParsedUnapproveInstruction,
   type SetOwnersInput,
   type UnapproveInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findOwnerInvokerPda,
   findSmartWalletPda,
   findSubaccountInfoPda,
   findTransactionPda,
   findWalletDerivedPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const SMART_WALLET_PROGRAM_ADDRESS =
   "GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH" as Address<"GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH">;

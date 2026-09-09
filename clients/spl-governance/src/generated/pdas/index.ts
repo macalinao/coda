@@ -6,17 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./communityTokenHolding.js";
-export * from "./councilTokenHolding.js";
-export * from "./governance.js";
-export * from "./governingTokenHolding.js";
-export * from "./nativeTreasury.js";
-export * from "./proposal.js";
-export * from "./proposalDeposit.js";
-export * from "./proposalTransaction.js";
-export * from "./realm.js";
-export * from "./realmConfig.js";
-export * from "./requiredSignatory.js";
-export * from "./signatoryRecord.js";
-export * from "./tokenOwnerRecord.js";
-export * from "./voteRecord.js";
+export * from "./communityTokenHolding.ts";
+export * from "./councilTokenHolding.ts";
+export * from "./governance.ts";
+export * from "./governingTokenHolding.ts";
+export * from "./nativeTreasury.ts";
+export * from "./proposal.ts";
+export * from "./proposalDeposit.ts";
+export * from "./proposalTransaction.ts";
+export * from "./realm.ts";
+export * from "./realmConfig.ts";
+export * from "./requiredSignatory.ts";
+export * from "./signatoryRecord.ts";
+export * from "./tokenOwnerRecord.ts";
+export * from "./voteRecord.ts";

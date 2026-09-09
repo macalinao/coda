@@ -21,7 +21,7 @@ import {
   getKeyEncoder,
   type Key,
   type KeyArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** On-chain header at the start of a RuleSet PDA, locating its revision map. */
 export type RuleSetHeader = {

@@ -43,13 +43,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getTXInstructionDecoder,
   getTXInstructionEncoder,
   type TXInstruction,
   type TXInstructionArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_TRANSACTION_WITH_TIMELOCK_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([93, 252, 41, 108, 86, 76, 89, 237]);

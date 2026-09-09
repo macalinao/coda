@@ -43,8 +43,8 @@ import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findPositionNftAccountPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [48, 215, 197, 153, 96, 203, 180, 133],

@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./smartWallet.js";
-export * from "./tokenSigner.js";
+export * from "./smartWallet.ts";
+export * from "./tokenSigner.ts";

@@ -42,8 +42,8 @@ import {
 import {
   findFarmVaultsAuthorityPda,
   findRewardVaultPda,
-} from "../pdas/index.js";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [191, 187, 176, 137, 9, 25, 187, 244],

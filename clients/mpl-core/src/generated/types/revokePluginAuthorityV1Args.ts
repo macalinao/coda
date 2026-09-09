@@ -19,7 +19,7 @@ import {
   getPluginTypeEncoder,
   type PluginType,
   type PluginTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `revokePluginAuthorityV1`. */
 export type RevokePluginAuthorityV1Args = {

@@ -6,16 +6,16 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./accountType.js";
-export * from "./createMetadataAccountArgsV3.js";
-export * from "./dataV2.js";
-export * from "./fee.js";
-export * from "./feeType.js";
-export * from "./fundingType.js";
-export * from "./futureEpoch.js";
-export * from "./lockup.js";
-export * from "./podStakeStatus.js";
-export * from "./preferredValidatorType.js";
-export * from "./stakeStatus.js";
-export * from "./updateMetadataAccountArgsV2.js";
-export * from "./validatorStakeInfo.js";
+export * from "./accountType.ts";
+export * from "./createMetadataAccountArgsV3.ts";
+export * from "./dataV2.ts";
+export * from "./fee.ts";
+export * from "./feeType.ts";
+export * from "./fundingType.ts";
+export * from "./futureEpoch.ts";
+export * from "./lockup.ts";
+export * from "./podStakeStatus.ts";
+export * from "./preferredValidatorType.ts";
+export * from "./stakeStatus.ts";
+export * from "./updateMetadataAccountArgsV2.ts";
+export * from "./validatorStakeInfo.ts";

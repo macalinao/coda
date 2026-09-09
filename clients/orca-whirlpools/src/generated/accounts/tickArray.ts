@@ -43,7 +43,7 @@ import {
   getTickEncoder,
   type Tick,
   type TickArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const TICK_ARRAY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   69, 97, 189, 190, 110, 7, 66, 187,

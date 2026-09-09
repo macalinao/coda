@@ -6,6 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./masterEdition.js";
-export * from "./metadata.js";
-export * from "./tokenRecord.js";
+export * from "./masterEdition.ts";
+export * from "./metadata.ts";
+export * from "./tokenRecord.ts";

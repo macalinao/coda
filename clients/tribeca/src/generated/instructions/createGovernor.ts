@@ -41,13 +41,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
+import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getGovernanceParametersDecoder,
   getGovernanceParametersEncoder,
   type GovernanceParameters,
   type GovernanceParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_GOVERNOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [103, 30, 78, 252, 28, 128, 40, 3],

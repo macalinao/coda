@@ -40,8 +40,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findVoterPda, findVoterWeightRecordPda } from "../pdas/index.js";
-import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findVoterPda, findVoterWeightRecordPda } from "../pdas/index.ts";
+import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_VOTER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   6, 24, 245, 52, 243, 255, 148, 25,

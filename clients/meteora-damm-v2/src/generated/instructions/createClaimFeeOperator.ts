@@ -39,8 +39,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_CLAIM_FEE_OPERATOR_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([169, 62, 207, 107, 58, 187, 162, 109]);

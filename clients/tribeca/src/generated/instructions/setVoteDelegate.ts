@@ -37,7 +37,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SET_VOTE_DELEGATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([46, 236, 241, 243, 251, 108, 156, 12]);

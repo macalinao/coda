@@ -39,13 +39,13 @@ import {
 import {
   findSubaccountInfoPda,
   type SubaccountInfoSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getSubaccountTypeDecoder,
   getSubaccountTypeEncoder,
   type SubaccountType,
   type SubaccountTypeArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SUBACCOUNT_INFO_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [255, 94, 30, 46, 165, 11, 49, 76],

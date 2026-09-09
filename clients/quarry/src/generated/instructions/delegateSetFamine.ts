@@ -38,7 +38,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DELEGATE_SET_FAMINE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([1, 196, 52, 171, 199, 237, 240, 134]);

@@ -36,13 +36,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVoucherPda, type VoucherSeeds } from "../pdas/index.js";
+import { findVoucherPda, type VoucherSeeds } from "../pdas/index.ts";
 import {
   getLeafSchemaDecoder,
   getLeafSchemaEncoder,
   type LeafSchema,
   type LeafSchemaArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VOUCHER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   191, 204, 149, 234, 213, 165, 13, 65,

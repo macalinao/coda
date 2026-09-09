@@ -47,7 +47,7 @@ import {
   type ProposalMetaArgs,
   type Vote,
   type VoteArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getActivateProposalInstruction,
   getCancelProposalInstruction,
@@ -89,13 +89,13 @@ import {
   type SetElectorateInput,
   type SetGovernanceParamsInput,
   type SetVoteInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findGovernorPda,
   findProposalMetaPda,
   findProposalPda,
   findVotePda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const GOVERN_PROGRAM_ADDRESS =
   "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw" as Address<"Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw">;

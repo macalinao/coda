@@ -39,11 +39,11 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findLendingMarketAuthPda } from "../pdas/index.js";
+import { findLendingMarketAuthPda } from "../pdas/index.ts";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
-} from "../programs/index.js";
+} from "../programs/index.ts";
 
 export const DEPOSIT_OBLIGATION_COLLATERAL_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([137, 145, 151, 94, 167, 113, 4, 145]);

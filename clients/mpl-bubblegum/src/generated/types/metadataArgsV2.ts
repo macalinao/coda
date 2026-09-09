@@ -42,7 +42,7 @@ import {
   type CreatorArgs,
   type TokenStandard,
   type TokenStandardArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Metadata for a `LeafSchema` V2 compressed NFT leaf.

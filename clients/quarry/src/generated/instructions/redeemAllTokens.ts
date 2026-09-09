@@ -40,7 +40,7 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REDEEM_ALL_TOKENS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([68, 38, 47, 47, 226, 176, 31, 48]);

@@ -37,8 +37,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findLendingMarketAuthPda } from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findLendingMarketAuthPda } from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_REFERRER_FEES_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([171, 118, 121, 201, 233, 140, 23, 228]);

@@ -19,7 +19,7 @@ import {
   getPluginEncoder,
   type Plugin,
   type PluginArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `updatePluginV1`. */
 export type UpdatePluginV1Args = {

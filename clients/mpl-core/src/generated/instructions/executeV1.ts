@@ -36,14 +36,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findAssetSignerPda } from "../pdas/index.js";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findAssetSignerPda } from "../pdas/index.ts";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getExecuteV1ArgsDecoder,
   getExecuteV1ArgsEncoder,
   type ExecuteV1Args,
   type ExecuteV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const EXECUTE_V1_DISCRIMINATOR = 31;
 

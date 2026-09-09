@@ -39,8 +39,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findLendingMarketAuthPda } from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findLendingMarketAuthPda } from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_OBLIGATION_COLLATERAL_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([37, 116, 205, 103, 243, 192, 92, 198]);

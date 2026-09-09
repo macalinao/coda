@@ -6,17 +6,17 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./collectionAuthorityRecord.js";
-export * from "./edition.js";
-export * from "./editionMarker.js";
-export * from "./editionMarkerV2.js";
-export * from "./holderDelegateRecord.js";
-export * from "./masterEditionV1.js";
-export * from "./masterEditionV2.js";
-export * from "./metadata.js";
-export * from "./metadataDelegateRecord.js";
-export * from "./reservationListV1.js";
-export * from "./reservationListV2.js";
-export * from "./tokenOwnedEscrow.js";
-export * from "./tokenRecord.js";
-export * from "./useAuthorityRecord.js";
+export * from "./collectionAuthorityRecord.ts";
+export * from "./edition.ts";
+export * from "./editionMarker.ts";
+export * from "./editionMarkerV2.ts";
+export * from "./holderDelegateRecord.ts";
+export * from "./masterEditionV1.ts";
+export * from "./masterEditionV2.ts";
+export * from "./metadata.ts";
+export * from "./metadataDelegateRecord.ts";
+export * from "./reservationListV1.ts";
+export * from "./reservationListV2.ts";
+export * from "./tokenOwnedEscrow.ts";
+export * from "./tokenRecord.ts";
+export * from "./useAuthorityRecord.ts";

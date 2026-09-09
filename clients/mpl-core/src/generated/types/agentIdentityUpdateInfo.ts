@@ -37,7 +37,7 @@ import {
   type ExternalCheckResultArgs,
   type HookableLifecycleEvent,
   type HookableLifecycleEventArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Update data for the `AgentIdentity` external plugin adapter. */
 export type AgentIdentityUpdateInfo = {

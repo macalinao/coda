@@ -22,7 +22,7 @@ import {
   getLockerParamsEncoder,
   type LockerParams,
   type LockerParamsArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type NewLockerEvent = {
   governor: Address;

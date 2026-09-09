@@ -6,11 +6,11 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./depositEntry.js";
-export * from "./depositEntryInfo.js";
-export * from "./lockingInfo.js";
-export * from "./lockup.js";
-export * from "./lockupKind.js";
-export * from "./vestingInfo.js";
-export * from "./voterInfo.js";
-export * from "./votingMintConfig.js";
+export * from "./depositEntry.ts";
+export * from "./depositEntryInfo.ts";
+export * from "./lockingInfo.ts";
+export * from "./lockup.ts";
+export * from "./lockupKind.ts";
+export * from "./vestingInfo.ts";
+export * from "./voterInfo.ts";
+export * from "./votingMintConfig.ts";

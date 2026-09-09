@@ -27,7 +27,7 @@ import {
   getCollectionDetailsEncoder,
   type CollectionDetails,
   type CollectionDetailsArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type CollectionDetailsToggle =
   | { __kind: "None" }

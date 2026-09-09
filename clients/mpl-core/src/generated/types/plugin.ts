@@ -97,7 +97,7 @@ import {
   type UpdateDelegateArgs,
   type VerifiedCreators,
   type VerifiedCreatorsArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** A configured internal plugin and its current data, keyed by plugin type. */
 export type Plugin =

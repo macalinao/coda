@@ -23,7 +23,7 @@ import {
   getCompressionProofEncoder,
   type CompressionProof,
   type CompressionProofArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `burnV1`. */
 export type BurnV1Args = {

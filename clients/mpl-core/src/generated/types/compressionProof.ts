@@ -36,7 +36,7 @@ import {
   type HashablePluginSchemaArgs,
   type UpdateAuthority,
   type UpdateAuthorityArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * The asset's core data and plugins as they existed at the time

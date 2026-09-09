@@ -36,14 +36,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getApproveUseAuthorityArgsDecoder,
   getApproveUseAuthorityArgsEncoder,
   type ApproveUseAuthorityArgs,
   type ApproveUseAuthorityArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const APPROVE_USE_AUTHORITY_DISCRIMINATOR = 20;
 

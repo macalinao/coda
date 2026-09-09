@@ -6,13 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./mergeMiner.js";
-export * from "./mergePool.js";
-export * from "./miner.js";
-export * from "./minter.js";
-export * from "./mintWrapper.js";
-export * from "./operator.js";
-export * from "./quarry.js";
-export * from "./redeemer.js";
-export * from "./registry.js";
-export * from "./rewarder.js";
+export * from "./mergeMiner.ts";
+export * from "./mergePool.ts";
+export * from "./miner.ts";
+export * from "./minter.ts";
+export * from "./mintWrapper.ts";
+export * from "./operator.ts";
+export * from "./quarry.ts";
+export * from "./redeemer.ts";
+export * from "./registry.ts";
+export * from "./rewarder.ts";

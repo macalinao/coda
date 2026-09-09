@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMergeMinerPda, type MergeMinerSeeds } from "../pdas/index.js";
+import { findMergeMinerPda, type MergeMinerSeeds } from "../pdas/index.ts";
 
 export const MERGE_MINER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 97, 253, 80, 19, 210, 148, 120,

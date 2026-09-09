@@ -36,7 +36,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SET_SHARE_ALLOCATOR_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([96, 77, 203, 216, 167, 175, 61, 189]);

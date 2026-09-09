@@ -32,8 +32,8 @@ import {
   parseInvokeSignedInstructionInstruction,
   type InvokeSignedInstructionInput,
   type ParsedInvokeSignedInstructionInstruction,
-} from "../instructions/index.js";
-import { findNftSignerPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findNftSignerPda } from "../pdas/index.ts";
 
 export const TOKEN_SIGNER_PROGRAM_ADDRESS =
   "NFTUJzSHuUCsMMqMRJpB7PmbsaU7Wm51acdPk2FXMLn" as Address<"NFTUJzSHuUCsMMqMRJpB7PmbsaU7Wm51acdPk2FXMLn">;

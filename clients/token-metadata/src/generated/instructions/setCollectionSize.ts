@@ -36,14 +36,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getSetCollectionSizeArgsDecoder,
   getSetCollectionSizeArgsEncoder,
   type SetCollectionSizeArgs,
   type SetCollectionSizeArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SET_COLLECTION_SIZE_DISCRIMINATOR = 34;
 

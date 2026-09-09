@@ -36,7 +36,7 @@ import {
   getFrequencyAccountCodec,
   type FrequencyAccount,
   type FrequencyAccountArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getCreateOrUpdateInstructionAsync,
   getPuffRuleSetInstruction,
@@ -54,8 +54,8 @@ import {
   type PuffRuleSetInput,
   type ValidateInput,
   type WriteToBufferAsyncInput,
-} from "../instructions/index.js";
-import { findRuleSetBufferPda, findRuleSetPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findRuleSetBufferPda, findRuleSetPda } from "../pdas/index.ts";
 
 export const MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS =
   "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg" as Address<"auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg">;

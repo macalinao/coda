@@ -56,7 +56,7 @@ import {
   type TokenStandardArgs,
   type UsesToggle,
   type UsesToggleArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type UpdateArgs =
   | {

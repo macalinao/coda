@@ -50,8 +50,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findTreeConfigPda } from "../pdas/index.js";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findTreeConfigPda } from "../pdas/index.ts";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMetadataArgsV2Decoder,
   getMetadataArgsV2Encoder,
@@ -61,7 +61,7 @@ import {
   type MetadataArgsV2Args,
   type UpdateArgs,
   type UpdateArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const UPDATE_METADATA_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([43, 103, 89, 42, 121, 242, 62, 72]);

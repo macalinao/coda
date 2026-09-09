@@ -41,14 +41,14 @@ import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getSwapParametersDecoder,
   getSwapParametersEncoder,
   type SwapParameters,
   type SwapParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SWAP_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   248, 198, 158, 145, 225, 117, 135, 200,

@@ -37,12 +37,12 @@ import {
 import {
   findProposalDepositPda,
   type ProposalDepositSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   GovernanceAccountType,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROPOSAL_DEPOSIT_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.ProposalDeposit;

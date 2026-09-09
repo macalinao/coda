@@ -42,13 +42,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getSubaccountTypeDecoder,
   getSubaccountTypeEncoder,
   type SubaccountType,
   type SubaccountTypeArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_SUBACCOUNT_INFO_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([196, 132, 49, 16, 91, 57, 67, 139]);

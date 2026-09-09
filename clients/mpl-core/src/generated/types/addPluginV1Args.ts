@@ -27,7 +27,7 @@ import {
   type AuthorityArgs,
   type Plugin,
   type PluginArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `addPluginV1`. */
 export type AddPluginV1Args = {

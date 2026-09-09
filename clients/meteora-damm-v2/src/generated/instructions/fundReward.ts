@@ -44,8 +44,8 @@ import {
   getNonNullResolvedInstructionInput,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda, findRewardVaultPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda, findRewardVaultPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const FUND_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   188, 50, 249, 165, 93, 151, 38, 63,

@@ -39,8 +39,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findFarmVaultsAuthorityPda } from "../pdas/index.js";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findFarmVaultsAuthorityPda } from "../pdas/index.ts";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_FROM_FARM_VAULT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([22, 82, 128, 250, 86, 79, 124, 78]);

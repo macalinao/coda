@@ -46,14 +46,14 @@ import {
   findPoolPda,
   findPositionNftAccountPda,
   findTokenVaultPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getInitializeCustomizablePoolParametersDecoder,
   getInitializeCustomizablePoolParametersEncoder,
   type InitializeCustomizablePoolParameters,
   type InitializeCustomizablePoolParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const INITIALIZE_POOL_WITH_DYNAMIC_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([149, 82, 72, 197, 253, 252, 68, 15]);

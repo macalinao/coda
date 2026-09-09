@@ -29,7 +29,7 @@ import {
   getUpdateAuthorityEncoder,
   type UpdateAuthority,
   type UpdateAuthorityArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `updateV1`. */
 export type UpdateV1Args = {

@@ -25,7 +25,7 @@ import {
   type AuthorityArgs,
   type PluginType,
   type PluginTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * An entry in `PluginRegistryV1` describing one internal plugin

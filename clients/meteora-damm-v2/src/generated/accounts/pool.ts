@@ -55,7 +55,7 @@ import {
   type PoolMetricsArgs,
   type RewardInfo,
   type RewardInfoArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   241, 154, 109, 4, 17, 177, 109, 188,

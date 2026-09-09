@@ -38,13 +38,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findLockerPda, type LockerSeeds } from "../pdas/index.js";
+import { findLockerPda, type LockerSeeds } from "../pdas/index.ts";
 import {
   getLockerParamsDecoder,
   getLockerParamsEncoder,
   type LockerParams,
   type LockerParamsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const LOCKER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   74, 246, 6, 113, 249, 228, 75, 169,

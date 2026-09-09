@@ -43,14 +43,14 @@ import {
   findMasterEditionPda,
   findMetadataPda,
   findTokenRecordPda,
-} from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getTransferArgsDecoder,
   getTransferArgsEncoder,
   type TransferArgs,
   type TransferArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const TRANSFER_DISCRIMINATOR = 49;
 

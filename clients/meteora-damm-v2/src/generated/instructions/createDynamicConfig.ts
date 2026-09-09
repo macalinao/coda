@@ -40,14 +40,14 @@ import {
   getNonNullResolvedInstructionInput,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getDynamicConfigParametersDecoder,
   getDynamicConfigParametersEncoder,
   type DynamicConfigParameters,
   type DynamicConfigParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_DYNAMIC_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([81, 251, 122, 78, 66, 57, 208, 82]);

@@ -1,13 +1,7 @@
-import {
-  addToRenderMap,
-  mapFragmentContent,
-  mapRenderMapContent,
-  writeRenderMap,
-} from "@codama/renderers-core";
+import { mapRenderMapContent, writeRenderMap } from "@codama/renderers-core";
 import { getRenderMapVisitor } from "@codama/renderers-js";
 import type { InstructionNode, ProgramNode, RootNode } from "codama";
 import { rootNodeVisitor, visit } from "codama";
-import { ESM_DEPENDENCY_MAP } from "./constants.ts";
 import { makeSyntaxErasable } from "./erasable-syntax.ts";
 
 /**
@@ -80,65 +74,23 @@ export function renderESMTypeScriptVisitor(
     let renderMap = visit(
       root,
       getRenderMapVisitor({
-        dependencyMap: ESM_DEPENDENCY_MAP,
-        // TOOD(igm): this is not typed correctly; breaking changes in patch versions
+        // `@codama/renderers-js` >= 2.4.0 appends an explicit extension to
+        // every relative import and barrel re-export. Emit `.ts` so the
+        // generated sources run as-is under Node's type stripping, which
+        // resolves specifiers literally. `rewriteRelativeImportExtensions`
+        // rewrites them back to `.js` for the published `dist` build.
+        importExtension: "ts",
       }),
     );
 
     // Instruction-level docs are dropped by the upstream renderer; re-inject.
     const instructions = getAllInstructions(root);
 
-    const index = renderMap.get("index.ts");
-    if (!index) {
-      throw new Error("Index file not found");
-    }
-    renderMap = addToRenderMap(
-      renderMap,
-      "index.ts",
-      mapFragmentContent(index, (content) =>
-        content.replace(
-          /(export\s+\*\s+from\s+['"])(\.\/[^'"]+)(['"])/g,
-          (_: string, prefix: string, importPath: string, quote: string) =>
-            `${prefix}${importPath}/index.js${quote}`,
-        ),
-      ),
-    );
-
     renderMap = mapRenderMapContent(renderMap, (code) => {
-      const updated = code
-        // Add the `.js` extension required by ESM resolution to relative
-        // re-exports and `from "."` imports.
-        .replace(
-          /(export\s+\*\s+from\s+['"])(\.\/[^'"]+?)(?<!\.(js|ts|mjs|cjs|json))(['"])/g,
-          (_: string, prefix: string, importPath: string) =>
-            `${prefix}${importPath}.js'`,
-        )
-        .replace(/from\s+['"]\.['"]/g, 'from "./index.js"')
-        // Newer `@codama/renderers-js` merges the type-only `<Name>Seeds`
-        // import from the PDA module into the value import of `find<Name>Pda`
-        // (e.g. `import { findTreeConfigPda, TreeConfigSeeds }`), which fails
-        // to build under `verbatimModuleSyntax`. Re-add the inline `type`
-        // modifier on any `*Seeds` specifier imported from a `pdas` module.
-        .replace(
-          /import\s+\{([^}]*)\}\s+from\s+(['"][^'"]*pdas\/index\.js['"])/g,
-          (_: string, specifiers: string, source: string) => {
-            const fixed = specifiers
-              .split(",")
-              .map((specifier) => {
-                const trimmed = specifier.trim();
-                return trimmed.endsWith("Seeds") && !trimmed.startsWith("type ")
-                  ? ` type ${trimmed}`
-                  : specifier;
-              })
-              .join(",");
-            return `import {${fixed}} from ${source}`;
-          },
-        );
-
       // The upstream renderer emits `enum` declarations and an angle-bracket
       // assertion on the program plugin, neither of which survives
       // `erasableSyntaxOnly` or Node.js type stripping.
-      return makeSyntaxErasable(injectInstructionDocs(updated, instructions));
+      return makeSyntaxErasable(injectInstructionDocs(code, instructions));
     });
 
     writeRenderMap(renderMap, path);

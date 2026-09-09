@@ -37,14 +37,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getCreateMetadataAccountArgsV3Decoder,
   getCreateMetadataAccountArgsV3Encoder,
   type CreateMetadataAccountArgsV3,
   type CreateMetadataAccountArgsV3Args,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_METADATA_ACCOUNT_V3_DISCRIMINATOR = 33;
 
