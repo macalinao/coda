@@ -57,8 +57,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/kamino-lending": {
@@ -73,8 +73,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/meteora-damm-v2": {
@@ -89,8 +89,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/mpl-bubblegum": {
@@ -105,8 +105,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/mpl-core": {
@@ -121,8 +121,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/mpl-token-auth-rules": {
@@ -137,8 +137,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/orca-whirlpools": {
@@ -153,8 +153,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/quarry": {
@@ -170,8 +170,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/spl-governance": {
@@ -186,8 +186,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/spl-stake-pool": {
@@ -202,8 +202,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/token-metadata": {
@@ -218,8 +218,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/tribeca": {
@@ -234,8 +234,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "clients/voter-stake-registry": {
@@ -250,8 +250,8 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "@solana/kit": "*",
-        "@solana/program-client-core": "*",
+        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "packages/coda": {
