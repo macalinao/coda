@@ -224,12 +224,15 @@ export async function getNewPoolInstructionAsync<
     });
   }
   if (!accounts.replicaMint.value) {
-    accounts.replicaMint.value = await findReplicaMintPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.replicaMint.value = await findReplicaMintPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

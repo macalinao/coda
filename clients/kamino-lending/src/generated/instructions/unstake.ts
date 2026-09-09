@@ -168,16 +168,19 @@ export async function getUnstakeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.userState.value) {
-    accounts.userState.value = await findFarmsUserStatePda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "owner",
-        accounts.owner.value,
-      ),
-    });
+    accounts.userState.value = await findFarmsUserStatePda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "owner",
+          accounts.owner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

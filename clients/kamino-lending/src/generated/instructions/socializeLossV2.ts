@@ -243,12 +243,15 @@ export async function getSocializeLossV2InstructionAsync<
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.farmsProgram.value) {
     accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;

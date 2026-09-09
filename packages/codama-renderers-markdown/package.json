@@ -35,7 +35,7 @@
     "@codama/renderers-core": "catalog:",
     "@codama/visitors-core": "catalog:",
     "codama": "catalog:",
-    "prettier": "^3.7.4"
+    "prettier": "^3.9.6"
   },
   "devDependencies": {
     "@macalinao/tsconfig": "catalog:",

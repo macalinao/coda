@@ -203,16 +203,19 @@ export async function getNewMinterInstructionAsync<
       ).address;
   }
   if (!accounts.minter.value) {
-    accounts.minter.value = await findMinterPda({
-      wrapper: getAddressFromResolvedInstructionAccount(
-        "mintWrapper",
-        accounts.mintWrapper.value,
-      ),
-      authority: getAddressFromResolvedInstructionAccount(
-        "newMinterAuthority",
-        accounts.newMinterAuthority.value,
-      ),
-    });
+    accounts.minter.value = await findMinterPda(
+      {
+        wrapper: getAddressFromResolvedInstructionAccount(
+          "mintWrapper",
+          accounts.mintWrapper.value,
+        ),
+        authority: getAddressFromResolvedInstructionAccount(
+          "newMinterAuthority",
+          accounts.newMinterAuthority.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

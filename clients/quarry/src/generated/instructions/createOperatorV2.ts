@@ -195,12 +195,15 @@ export async function getCreateOperatorV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.operator.value) {
-    accounts.operator.value = await findOperatorPda({
-      base: getAddressFromResolvedInstructionAccount(
-        "base",
-        accounts.base.value,
-      ),
-    });
+    accounts.operator.value = await findOperatorPda(
+      {
+        base: getAddressFromResolvedInstructionAccount(
+          "base",
+          accounts.base.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

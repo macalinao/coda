@@ -62,7 +62,9 @@ export function renderTypeNode(type: TypeNode, context: RenderContext): string {
     return "`enum`";
   }
   if (isNode(type, ["tupleTypeNode"])) {
-    const items = type.items.map((item) => renderTypeNode(item, context));
+    const items = (type.items ?? []).map((item) =>
+      renderTypeNode(item, context),
+    );
     return `[${items.join(", ")}]`;
   }
   if (isNode(type, ["mapTypeNode"])) {
@@ -91,7 +93,7 @@ export function renderTypeNodeAsTypeScript(
   context: RenderContext,
 ): string {
   if (isNode(type, ["structTypeNode"])) {
-    const fields = type.fields.map((field) => {
+    const fields = (type.fields ?? []).map((field) => {
       const fieldType = renderTypeNodeAsTypeScript(field.type, context);
       return `  ${field.name}: ${fieldType};`;
     });
@@ -99,7 +101,7 @@ export function renderTypeNodeAsTypeScript(
   }
 
   if (isNode(type, ["enumTypeNode"])) {
-    const variants = type.variants.map((variant) => {
+    const variants = (type.variants ?? []).map((variant) => {
       if (isNode(variant, ["enumEmptyVariantTypeNode"])) {
         return `  | { kind: "${variant.name}" }`;
       }
@@ -144,7 +146,7 @@ export function renderTypeNodeAsTypeScript(
   }
 
   if (isNode(type, ["tupleTypeNode"])) {
-    const items = type.items.map((item) =>
+    const items = (type.items ?? []).map((item) =>
       renderTypeNodeAsTypeScript(item, context),
     );
     return `[${items.join(", ")}]`;

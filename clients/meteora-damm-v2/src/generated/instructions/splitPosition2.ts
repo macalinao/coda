@@ -234,7 +234,9 @@ export async function getSplitPosition2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

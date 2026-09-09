@@ -179,16 +179,19 @@ export async function getInitMergeMinerInstructionAsync<
 
   // Resolve default values.
   if (!accounts.mm.value) {
-    accounts.mm.value = await findMergeMinerPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "owner",
-        accounts.owner.value,
-      ),
-    });
+    accounts.mm.value = await findMergeMinerPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "owner",
+          accounts.owner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

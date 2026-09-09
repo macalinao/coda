@@ -37,7 +37,7 @@ describe("renameDefinedTypesVisitor", () => {
     });
 
     const updatedRoot = visit(root, visitor) as RootNode;
-    const types = updatedRoot.program.definedTypes;
+    const types = updatedRoot.program.definedTypes ?? [];
 
     expect(types[0].name.toString()).toBe("counterAccount");
     expect(types[1].name.toString()).toBe("programConfig");

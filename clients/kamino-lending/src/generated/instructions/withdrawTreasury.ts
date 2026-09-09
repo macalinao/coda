@@ -213,25 +213,31 @@ export async function getWithdrawTreasuryInstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewardTreasuryVault.value) {
-    accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda({
-      globalConfig: getAddressFromResolvedInstructionAccount(
-        "globalConfig",
-        accounts.globalConfig.value,
-      ),
-      rewardMint: getAddressFromResolvedInstructionAccount(
-        "rewardMint",
-        accounts.rewardMint.value,
-      ),
-    });
-  }
-  if (!accounts.treasuryVaultAuthority.value) {
-    accounts.treasuryVaultAuthority.value =
-      await findTreasuryVaultsAuthorityPda({
+    accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda(
+      {
         globalConfig: getAddressFromResolvedInstructionAccount(
           "globalConfig",
           accounts.globalConfig.value,
         ),
-      });
+        rewardMint: getAddressFromResolvedInstructionAccount(
+          "rewardMint",
+          accounts.rewardMint.value,
+        ),
+      },
+      { programAddress },
+    );
+  }
+  if (!accounts.treasuryVaultAuthority.value) {
+    accounts.treasuryVaultAuthority.value =
+      await findTreasuryVaultsAuthorityPda(
+        {
+          globalConfig: getAddressFromResolvedInstructionAccount(
+            "globalConfig",
+            accounts.globalConfig.value,
+          ),
+        },
+        { programAddress },
+      );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

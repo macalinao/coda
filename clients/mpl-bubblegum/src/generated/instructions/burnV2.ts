@@ -403,12 +403,15 @@ export async function getBurnV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.treeAuthority.value) {
-    accounts.treeAuthority.value = await findTreeConfigPda({
-      merkleTree: getAddressFromResolvedInstructionAccount(
-        "merkleTree",
-        accounts.merkleTree.value,
-      ),
-    });
+    accounts.treeAuthority.value = await findTreeConfigPda(
+      {
+        merkleTree: getAddressFromResolvedInstructionAccount(
+          "merkleTree",
+          accounts.merkleTree.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.mplCoreCpiSigner.value) {
     if (accounts.coreCollection.value) {

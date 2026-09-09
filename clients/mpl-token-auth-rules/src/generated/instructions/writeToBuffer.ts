@@ -174,12 +174,15 @@ export async function getWriteToBufferInstructionAsync<
 
   // Resolve default values.
   if (!accounts.bufferPda.value) {
-    accounts.bufferPda.value = await findRuleSetBufferPda({
-      owner: getAddressFromResolvedInstructionAccount(
-        "payer",
-        accounts.payer.value,
-      ),
-    });
+    accounts.bufferPda.value = await findRuleSetBufferPda(
+      {
+        owner: getAddressFromResolvedInstructionAccount(
+          "payer",
+          accounts.payer.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

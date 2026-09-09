@@ -63,7 +63,7 @@ describe("renameVisitor (program-specific format)", () => {
     });
 
     const updatedRoot = visit(root, visitor) as RootNode;
-    const quarryInstructions = updatedRoot.program.instructions;
+    const quarryInstructions = updatedRoot.program.instructions ?? [];
     const tokenInstructions =
       updatedRoot.additionalPrograms?.[0]?.instructions ?? [];
 
@@ -101,7 +101,7 @@ describe("renameVisitor (program-specific format)", () => {
     });
 
     const updatedRoot = visit(root, visitor) as RootNode;
-    const types = updatedRoot.program.definedTypes;
+    const types = updatedRoot.program.definedTypes ?? [];
 
     expect(types[0].name.toString()).toBe("nftMintedEvent");
     expect(types[1].name.toString()).toBe("counterAccount");
@@ -134,7 +134,7 @@ describe("renameVisitor (program-specific format)", () => {
     });
 
     const updatedRoot = visit(root, visitor) as RootNode;
-    const instructions = updatedRoot.program.instructions;
+    const instructions = updatedRoot.program.instructions ?? [];
 
     expect(instructions[0].name.toString()).toBe("claimRewardsMergeMine");
     expect(instructions[1].name.toString()).toBe("stake"); // Unchanged
@@ -169,7 +169,7 @@ describe("renameVisitor (program-specific format)", () => {
     });
 
     const updatedRoot = visit(root, visitor) as RootNode;
-    const instructions = updatedRoot.program.instructions;
+    const instructions = updatedRoot.program.instructions ?? [];
 
     expect(instructions[0].name.toString()).toBe("sendTokens");
   });

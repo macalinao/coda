@@ -240,24 +240,30 @@ export async function getStakeReplicaMinerInstructionAsync<
 
   // Resolve default values.
   if (!accounts.replicaMint.value) {
-    accounts.replicaMint.value = await findReplicaMintPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.replicaMint.value = await findReplicaMintPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.mm.value) {
-    accounts.mm.value = await findMergeMinerPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "mmOwner",
-        accounts.mmOwner.value,
-      ),
-    });
+    accounts.mm.value = await findMergeMinerPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "mmOwner",
+          accounts.mmOwner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.replicaMintTokenAccount.value) {
     accounts.replicaMintTokenAccount.value = await getProgramDerivedAddress({

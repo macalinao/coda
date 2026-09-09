@@ -292,12 +292,15 @@ export async function getDepositSolWithSlippageInstructionAsync<
 
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
-    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: getAddressFromResolvedInstructionAccount(
-        "stakePool",
-        accounts.stakePool.value,
-      ),
-    });
+    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda(
+      {
+        stakePoolAddress: getAddressFromResolvedInstructionAccount(
+          "stakePool",
+          accounts.stakePool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

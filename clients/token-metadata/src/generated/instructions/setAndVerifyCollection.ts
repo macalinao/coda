@@ -223,22 +223,28 @@ export async function getSetAndVerifyCollectionInstructionAsync<
 
   // Resolve default values.
   if (!accounts.collection.value) {
-    accounts.collection.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "collectionMint",
-        accounts.collectionMint.value,
-      ),
-    });
+    accounts.collection.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "collectionMint",
+          accounts.collectionMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.collectionMasterEditionAccount.value) {
-    accounts.collectionMasterEditionAccount.value = await findMasterEditionPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "collectionMint",
-        accounts.collectionMint.value,
-      ),
-    });
+    accounts.collectionMasterEditionAccount.value = await findMasterEditionPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "collectionMint",
+          accounts.collectionMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");

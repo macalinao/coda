@@ -230,23 +230,28 @@ export async function getFundRewardInstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewardVault.value) {
-    accounts.rewardVault.value = await findRewardVaultPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-      rewardIndex: getNonNullResolvedInstructionInput(
-        "rewardIndex",
-        args.rewardIndex,
-      ),
-    });
+    accounts.rewardVault.value = await findRewardVaultPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+        rewardIndex: getNonNullResolvedInstructionInput(
+          "rewardIndex",
+          args.rewardIndex,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

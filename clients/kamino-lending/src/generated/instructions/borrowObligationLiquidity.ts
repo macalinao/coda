@@ -282,12 +282,15 @@ export async function getBorrowObligationLiquidityInstructionAsync<
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

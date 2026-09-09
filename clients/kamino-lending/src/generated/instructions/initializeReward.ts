@@ -245,45 +245,57 @@ export async function getInitializeRewardInstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewardVault.value) {
-    accounts.rewardVault.value = await findRewardVaultPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      rewardMint: getAddressFromResolvedInstructionAccount(
-        "rewardMint",
-        accounts.rewardMint.value,
-      ),
-    });
+    accounts.rewardVault.value = await findRewardVaultPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        rewardMint: getAddressFromResolvedInstructionAccount(
+          "rewardMint",
+          accounts.rewardMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.rewardTreasuryVault.value) {
-    accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda({
-      globalConfig: getAddressFromResolvedInstructionAccount(
-        "globalConfig",
-        accounts.globalConfig.value,
-      ),
-      rewardMint: getAddressFromResolvedInstructionAccount(
-        "rewardMint",
-        accounts.rewardMint.value,
-      ),
-    });
-  }
-  if (!accounts.farmVaultsAuthority.value) {
-    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-    });
-  }
-  if (!accounts.treasuryVaultsAuthority.value) {
-    accounts.treasuryVaultsAuthority.value =
-      await findTreasuryVaultsAuthorityPda({
+    accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda(
+      {
         globalConfig: getAddressFromResolvedInstructionAccount(
           "globalConfig",
           accounts.globalConfig.value,
         ),
-      });
+        rewardMint: getAddressFromResolvedInstructionAccount(
+          "rewardMint",
+          accounts.rewardMint.value,
+        ),
+      },
+      { programAddress },
+    );
+  }
+  if (!accounts.farmVaultsAuthority.value) {
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+      },
+      { programAddress },
+    );
+  }
+  if (!accounts.treasuryVaultsAuthority.value) {
+    accounts.treasuryVaultsAuthority.value =
+      await findTreasuryVaultsAuthorityPda(
+        {
+          globalConfig: getAddressFromResolvedInstructionAccount(
+            "globalConfig",
+            accounts.globalConfig.value,
+          ),
+        },
+        { programAddress },
+      );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

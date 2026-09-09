@@ -318,12 +318,15 @@ export async function getRedeemInstructionAsync<
 
   // Resolve default values.
   if (!accounts.treeAuthority.value) {
-    accounts.treeAuthority.value = await findTreeConfigPda({
-      merkleTree: getAddressFromResolvedInstructionAccount(
-        "merkleTree",
-        accounts.merkleTree.value,
-      ),
-    });
+    accounts.treeAuthority.value = await findTreeConfigPda(
+      {
+        merkleTree: getAddressFromResolvedInstructionAccount(
+          "merkleTree",
+          accounts.merkleTree.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.logWrapper.value) {
     accounts.logWrapper.value =

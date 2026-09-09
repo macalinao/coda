@@ -40,7 +40,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { type EscrowSeeds, findEscrowPda } from "../pdas/index.js";
+import { findEscrowPda, type EscrowSeeds } from "../pdas/index.js";
 
 export const ESCROW_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   31, 213, 123, 187, 186, 22, 218, 155,

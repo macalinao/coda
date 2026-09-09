@@ -294,35 +294,44 @@ export async function getUnlockInstructionAsync<
 
   // Resolve default values.
   if (!accounts.metadata.value) {
-    accounts.metadata.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.metadata.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.edition.value) {
-    accounts.edition.value = await findMasterEditionPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.edition.value = await findMasterEditionPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenRecord.value) {
-    accounts.tokenRecord.value = await findTokenRecordPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-      token: getAddressFromResolvedInstructionAccount(
-        "token",
-        accounts.token.value,
-      ),
-    });
+    accounts.tokenRecord.value = await findTokenRecordPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+        token: getAddressFromResolvedInstructionAccount(
+          "token",
+          accounts.token.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

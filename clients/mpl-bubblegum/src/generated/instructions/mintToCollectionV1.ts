@@ -391,12 +391,15 @@ export async function getMintToCollectionV1InstructionAsync<
 
   // Resolve default values.
   if (!accounts.treeAuthority.value) {
-    accounts.treeAuthority.value = await findTreeConfigPda({
-      merkleTree: getAddressFromResolvedInstructionAccount(
-        "merkleTree",
-        accounts.merkleTree.value,
-      ),
-    });
+    accounts.treeAuthority.value = await findTreeConfigPda(
+      {
+        merkleTree: getAddressFromResolvedInstructionAccount(
+          "merkleTree",
+          accounts.merkleTree.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.collectionAuthorityRecordPda.value) {
     accounts.collectionAuthorityRecordPda.value = programAddress;
@@ -421,7 +424,9 @@ export async function getMintToCollectionV1InstructionAsync<
     });
   }
   if (!accounts.bubblegumSigner.value) {
-    accounts.bubblegumSigner.value = await findBubblegumSignerPda();
+    accounts.bubblegumSigner.value = await findBubblegumSignerPda({
+      programAddress,
+    });
   }
   if (!accounts.logWrapper.value) {
     accounts.logWrapper.value =

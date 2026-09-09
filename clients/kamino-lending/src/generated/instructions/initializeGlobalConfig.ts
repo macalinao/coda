@@ -166,12 +166,15 @@ export async function getInitializeGlobalConfigInstructionAsync<
   // Resolve default values.
   if (!accounts.treasuryVaultsAuthority.value) {
     accounts.treasuryVaultsAuthority.value =
-      await findTreasuryVaultsAuthorityPda({
-        globalConfig: getAddressFromResolvedInstructionAccount(
-          "globalConfig",
-          accounts.globalConfig.value,
-        ),
-      });
+      await findTreasuryVaultsAuthorityPda(
+        {
+          globalConfig: getAddressFromResolvedInstructionAccount(
+            "globalConfig",
+            accounts.globalConfig.value,
+          ),
+        },
+        { programAddress },
+      );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

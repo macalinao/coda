@@ -204,12 +204,15 @@ export async function getWithdrawFromFarmVaultInstructionAsync<
 
   // Resolve default values.
   if (!accounts.farmVaultsAuthority.value) {
-    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-    });
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

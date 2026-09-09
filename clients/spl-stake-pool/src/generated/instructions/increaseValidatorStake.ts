@@ -333,28 +333,34 @@ export async function getIncreaseValidatorStakeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
-    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: getAddressFromResolvedInstructionAccount(
-        "stakePool",
-        accounts.stakePool.value,
-      ),
-    });
+    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda(
+      {
+        stakePoolAddress: getAddressFromResolvedInstructionAccount(
+          "stakePool",
+          accounts.stakePool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.transientStakeAccount.value) {
-    accounts.transientStakeAccount.value = await findTransientStakePda({
-      voteAccountAddress: getAddressFromResolvedInstructionAccount(
-        "validatorVoteAccount",
-        accounts.validatorVoteAccount.value,
-      ),
-      stakePoolAddress: getAddressFromResolvedInstructionAccount(
-        "stakePool",
-        accounts.stakePool.value,
-      ),
-      seed: getNonNullResolvedInstructionInput(
-        "transientStakeSeed",
-        args.transientStakeSeed,
-      ),
-    });
+    accounts.transientStakeAccount.value = await findTransientStakePda(
+      {
+        voteAccountAddress: getAddressFromResolvedInstructionAccount(
+          "validatorVoteAccount",
+          accounts.validatorVoteAccount.value,
+        ),
+        stakePoolAddress: getAddressFromResolvedInstructionAccount(
+          "stakePool",
+          accounts.stakePool.value,
+        ),
+        seed: getNonNullResolvedInstructionInput(
+          "transientStakeSeed",
+          args.transientStakeSeed,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.clockSysvar.value) {
     accounts.clockSysvar.value =

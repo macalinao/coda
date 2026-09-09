@@ -210,13 +210,16 @@ export async function getBubblegumSetCollectionSizeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.collectionMetadata.value) {
-    accounts.collectionMetadata.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "collectionMint",
-        accounts.collectionMint.value,
-      ),
-    });
+    accounts.collectionMetadata.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "collectionMint",
+          accounts.collectionMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");

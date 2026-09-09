@@ -191,12 +191,15 @@ export async function getCreateOrUpdateInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.bufferPda.value) {
-    accounts.bufferPda.value = await findRuleSetBufferPda({
-      owner: getAddressFromResolvedInstructionAccount(
-        "payer",
-        accounts.payer.value,
-      ),
-    });
+    accounts.bufferPda.value = await findRuleSetBufferPda(
+      {
+        owner: getAddressFromResolvedInstructionAccount(
+          "payer",
+          accounts.payer.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

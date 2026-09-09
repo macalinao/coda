@@ -391,48 +391,60 @@ export async function getTransferInstructionAsync<
     });
   }
   if (!accounts.metadata.value) {
-    accounts.metadata.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.metadata.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.edition.value) {
-    accounts.edition.value = await findMasterEditionPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.edition.value = await findMasterEditionPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.ownerTokenRecord.value) {
-    accounts.ownerTokenRecord.value = await findTokenRecordPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-      token: getAddressFromResolvedInstructionAccount(
-        "token",
-        accounts.token.value,
-      ),
-    });
+    accounts.ownerTokenRecord.value = await findTokenRecordPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+        token: getAddressFromResolvedInstructionAccount(
+          "token",
+          accounts.token.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.destinationTokenRecord.value) {
-    accounts.destinationTokenRecord.value = await findTokenRecordPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-      token: getAddressFromResolvedInstructionAccount(
-        "destination",
-        accounts.destination.value,
-      ),
-    });
+    accounts.destinationTokenRecord.value = await findTokenRecordPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+        token: getAddressFromResolvedInstructionAccount(
+          "destination",
+          accounts.destination.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

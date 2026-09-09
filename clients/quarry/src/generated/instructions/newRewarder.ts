@@ -232,12 +232,15 @@ export async function getNewRewarderInstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewarder.value) {
-    accounts.rewarder.value = await findRewarderPda({
-      base: getAddressFromResolvedInstructionAccount(
-        "base",
-        accounts.base.value,
-      ),
-    });
+    accounts.rewarder.value = await findRewarderPda(
+      {
+        base: getAddressFromResolvedInstructionAccount(
+          "base",
+          accounts.base.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.initialAuthority.value) {
     accounts.initialAuthority.value =

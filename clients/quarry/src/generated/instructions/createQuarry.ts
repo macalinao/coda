@@ -203,16 +203,19 @@ export async function getCreateQuarryInstructionAsync<
 
   // Resolve default values.
   if (!accounts.quarry.value) {
-    accounts.quarry.value = await findQuarryPda({
-      rewarder: getAddressFromResolvedInstructionAccount(
-        "rewarder",
-        accounts.rewarder.value,
-      ),
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.quarry.value = await findQuarryPda(
+      {
+        rewarder: getAddressFromResolvedInstructionAccount(
+          "rewarder",
+          accounts.rewarder.value,
+        ),
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

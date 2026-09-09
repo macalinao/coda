@@ -222,22 +222,28 @@ export async function getCreateMasterEditionInstructionAsync<
 
   // Resolve default values.
   if (!accounts.edition.value) {
-    accounts.edition.value = await findMasterEditionPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.edition.value = await findMasterEditionPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.metadata.value) {
-    accounts.metadata.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.metadata.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

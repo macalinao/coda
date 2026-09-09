@@ -222,16 +222,19 @@ export async function getStakePrimaryMinerInstructionAsync<
 
   // Resolve default values.
   if (!accounts.mm.value) {
-    accounts.mm.value = await findMergeMinerPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "mmOwner",
-        accounts.mmOwner.value,
-      ),
-    });
+    accounts.mm.value = await findMergeMinerPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "mmOwner",
+          accounts.mmOwner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({

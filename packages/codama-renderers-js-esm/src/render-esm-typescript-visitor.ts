@@ -60,8 +60,11 @@ function injectInstructionDocs(code: string, instructions: InstructionNode[]) {
  * program and any additional programs.
  */
 function getAllInstructions(root: RootNode): InstructionNode[] {
-  const programs: ProgramNode[] = [root.program, ...root.additionalPrograms];
-  return programs.flatMap((program) => program.instructions);
+  const programs: ProgramNode[] = [
+    root.program,
+    ...(root.additionalPrograms ?? []),
+  ];
+  return programs.flatMap((program) => program.instructions ?? []);
 }
 
 /**

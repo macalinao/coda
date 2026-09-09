@@ -225,28 +225,34 @@ export async function getCreateVoterInstructionAsync<
 
   // Resolve default values.
   if (!accounts.voter.value) {
-    accounts.voter.value = await findVoterPda({
-      registrar: getAddressFromResolvedInstructionAccount(
-        "registrar",
-        accounts.registrar.value,
-      ),
-      voterAuthority: getAddressFromResolvedInstructionAccount(
-        "voterAuthority",
-        accounts.voterAuthority.value,
-      ),
-    });
+    accounts.voter.value = await findVoterPda(
+      {
+        registrar: getAddressFromResolvedInstructionAccount(
+          "registrar",
+          accounts.registrar.value,
+        ),
+        voterAuthority: getAddressFromResolvedInstructionAccount(
+          "voterAuthority",
+          accounts.voterAuthority.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.voterWeightRecord.value) {
-    accounts.voterWeightRecord.value = await findVoterWeightRecordPda({
-      registrar: getAddressFromResolvedInstructionAccount(
-        "registrar",
-        accounts.registrar.value,
-      ),
-      voterAuthority: getAddressFromResolvedInstructionAccount(
-        "voterAuthority",
-        accounts.voterAuthority.value,
-      ),
-    });
+    accounts.voterWeightRecord.value = await findVoterWeightRecordPda(
+      {
+        registrar: getAddressFromResolvedInstructionAccount(
+          "registrar",
+          accounts.registrar.value,
+        ),
+        voterAuthority: getAddressFromResolvedInstructionAccount(
+          "voterAuthority",
+          accounts.voterAuthority.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

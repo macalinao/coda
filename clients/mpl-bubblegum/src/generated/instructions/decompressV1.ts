@@ -346,12 +346,15 @@ export async function getDecompressV1InstructionAsync<
     });
   }
   if (!accounts.mintAuthority.value) {
-    accounts.mintAuthority.value = await findMintAuthorityPda({
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.mintAuthority.value = await findMintAuthorityPda(
+      {
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({

@@ -194,16 +194,19 @@ export async function getWithdrawTokensMMInstructionAsync<
 
   // Resolve default values.
   if (!accounts.mm.value) {
-    accounts.mm.value = await findMergeMinerPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "owner",
-        accounts.owner.value,
-      ),
-    });
+    accounts.mm.value = await findMergeMinerPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "owner",
+          accounts.owner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.mmTokenAccount.value) {
     accounts.mmTokenAccount.value = await getProgramDerivedAddress({

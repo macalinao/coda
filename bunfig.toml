@@ -9,6 +9,9 @@ minimumReleaseAgeExcludes = [
   "typescript",
   "@types/node",
   "@types/bun",
+  # @types/bun re-exports bun-types, which is published in lockstep with it,
+  # so the transitive dep needs the same exemption or the install fails.
+  "bun-types",
   "oxlint",
   "oxlint-tsgolint",
   "oxfmt",

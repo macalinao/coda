@@ -203,16 +203,19 @@ export async function getInitializeUserInstructionAsync<
 
   // Resolve default values.
   if (!accounts.userState.value) {
-    accounts.userState.value = await findFarmsUserStatePda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "delegatee",
-        accounts.delegatee.value,
-      ),
-    });
+    accounts.userState.value = await findFarmsUserStatePda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "delegatee",
+          accounts.delegatee.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

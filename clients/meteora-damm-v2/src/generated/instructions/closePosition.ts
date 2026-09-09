@@ -232,22 +232,29 @@ export async function getClosePositionInstructionAsync<
 
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
-    accounts.positionNftAccount.value = await findPositionNftAccountPda({
-      positionNftMint: getAddressFromResolvedInstructionAccount(
-        "positionNftMint",
-        accounts.positionNftMint.value,
-      ),
-    });
+    accounts.positionNftAccount.value = await findPositionNftAccountPda(
+      {
+        positionNftMint: getAddressFromResolvedInstructionAccount(
+          "positionNftMint",
+          accounts.positionNftMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value = await findPoolAuthorityPda();
+    accounts.poolAuthority.value = await findPoolAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" as Address<"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

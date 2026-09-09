@@ -192,12 +192,15 @@ export async function getInitLendingMarketInstructionAsync<
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

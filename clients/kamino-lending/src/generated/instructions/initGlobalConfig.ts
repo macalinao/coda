@@ -170,7 +170,9 @@ export async function getInitGlobalConfigInstructionAsync<
 
   // Resolve default values.
   if (!accounts.globalConfig.value) {
-    accounts.globalConfig.value = await findLendingGlobalConfigStatePda();
+    accounts.globalConfig.value = await findLendingGlobalConfigStatePda({
+      programAddress,
+    });
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

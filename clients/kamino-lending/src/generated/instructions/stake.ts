@@ -209,28 +209,34 @@ export async function getStakeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.userState.value) {
-    accounts.userState.value = await findFarmsUserStatePda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "owner",
-        accounts.owner.value,
-      ),
-    });
+    accounts.userState.value = await findFarmsUserStatePda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "owner",
+          accounts.owner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.farmVault.value) {
-    accounts.farmVault.value = await findFarmVaultPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.farmVault.value = await findFarmVaultPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

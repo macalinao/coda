@@ -194,12 +194,15 @@ export async function getUpdateStakePoolBalanceInstructionAsync<
 
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
-    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: getAddressFromResolvedInstructionAccount(
-        "stakePool",
-        accounts.stakePool.value,
-      ),
-    });
+    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda(
+      {
+        stakePoolAddress: getAddressFromResolvedInstructionAccount(
+          "stakePool",
+          accounts.stakePool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

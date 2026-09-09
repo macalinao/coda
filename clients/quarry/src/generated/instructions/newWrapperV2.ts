@@ -205,12 +205,15 @@ export async function getNewWrapperV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.mintWrapper.value) {
-    accounts.mintWrapper.value = await findMintWrapperPda({
-      base: getAddressFromResolvedInstructionAccount(
-        "base",
-        accounts.base.value,
-      ),
-    });
+    accounts.mintWrapper.value = await findMintWrapperPda(
+      {
+        base: getAddressFromResolvedInstructionAccount(
+          "base",
+          accounts.base.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.admin.value) {
     accounts.admin.value = getResolvedInstructionAccountAsTransactionSigner(

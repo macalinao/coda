@@ -231,12 +231,15 @@ export async function getExecuteV1InstructionAsync<
 
   // Resolve default values.
   if (!accounts.assetSigner.value) {
-    accounts.assetSigner.value = await findAssetSignerPda({
-      asset: getAddressFromResolvedInstructionAccount(
-        "asset",
-        accounts.asset.value,
-      ),
-    });
+    accounts.assetSigner.value = await findAssetSignerPda(
+      {
+        asset: getAddressFromResolvedInstructionAccount(
+          "asset",
+          accounts.asset.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

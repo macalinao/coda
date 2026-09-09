@@ -229,12 +229,15 @@ export async function getUpdateValidatorListBalanceInstructionAsync<
 
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
-    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: getAddressFromResolvedInstructionAccount(
-        "stakePool",
-        accounts.stakePool.value,
-      ),
-    });
+    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda(
+      {
+        stakePoolAddress: getAddressFromResolvedInstructionAccount(
+          "stakePool",
+          accounts.stakePool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.clockSysvar.value) {
     accounts.clockSysvar.value =

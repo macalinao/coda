@@ -356,12 +356,15 @@ export async function getDepositReserveLiquidityAndObligationCollateralV2Instruc
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.reserveLiquiditySupply.value) {
     accounts.reserveLiquiditySupply.value = await findReserveLiquiditySupplyPda(
@@ -375,19 +378,23 @@ export async function getDepositReserveLiquidityAndObligationCollateralV2Instruc
           accounts.reserveLiquidityMint.value,
         ),
       },
+      { programAddress },
     );
   }
   if (!accounts.reserveCollateralMint.value) {
-    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-      mint: getAddressFromResolvedInstructionAccount(
-        "reserveLiquidityMint",
-        accounts.reserveLiquidityMint.value,
-      ),
-    });
+    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+        mint: getAddressFromResolvedInstructionAccount(
+          "reserveLiquidityMint",
+          accounts.reserveLiquidityMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.collateralTokenProgram.value) {
     accounts.collateralTokenProgram.value =

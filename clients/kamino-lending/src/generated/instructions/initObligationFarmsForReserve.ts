@@ -255,12 +255,15 @@ export async function getInitObligationFarmsForReserveInstructionAsync<
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.farmsProgram.value) {
     accounts.farmsProgram.value = FARMS_PROGRAM_ADDRESS;

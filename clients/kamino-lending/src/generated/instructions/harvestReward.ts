@@ -254,16 +254,19 @@ export async function getHarvestRewardInstructionAsync<
 
   // Resolve default values.
   if (!accounts.userState.value) {
-    accounts.userState.value = await findFarmsUserStatePda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "owner",
-        accounts.owner.value,
-      ),
-    });
+    accounts.userState.value = await findFarmsUserStatePda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "owner",
+          accounts.owner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
@@ -296,36 +299,45 @@ export async function getHarvestRewardInstructionAsync<
     });
   }
   if (!accounts.rewardsVault.value) {
-    accounts.rewardsVault.value = await findRewardVaultPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      rewardMint: getAddressFromResolvedInstructionAccount(
-        "rewardMint",
-        accounts.rewardMint.value,
-      ),
-    });
+    accounts.rewardsVault.value = await findRewardVaultPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        rewardMint: getAddressFromResolvedInstructionAccount(
+          "rewardMint",
+          accounts.rewardMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.rewardsTreasuryVault.value) {
-    accounts.rewardsTreasuryVault.value = await findRewardTreasuryVaultPda({
-      globalConfig: getAddressFromResolvedInstructionAccount(
-        "globalConfig",
-        accounts.globalConfig.value,
-      ),
-      rewardMint: getAddressFromResolvedInstructionAccount(
-        "rewardMint",
-        accounts.rewardMint.value,
-      ),
-    });
+    accounts.rewardsTreasuryVault.value = await findRewardTreasuryVaultPda(
+      {
+        globalConfig: getAddressFromResolvedInstructionAccount(
+          "globalConfig",
+          accounts.globalConfig.value,
+        ),
+        rewardMint: getAddressFromResolvedInstructionAccount(
+          "rewardMint",
+          accounts.rewardMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.farmVaultsAuthority.value) {
-    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-    });
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

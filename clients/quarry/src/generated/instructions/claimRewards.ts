@@ -309,16 +309,19 @@ export async function getClaimRewardsInstructionAsync<
     });
   }
   if (!accounts.miner.value) {
-    accounts.miner.value = await findMinerPda({
-      quarry: getAddressFromResolvedInstructionAccount(
-        "quarry",
-        accounts.quarry.value,
-      ),
-      authority: getAddressFromResolvedInstructionAccount(
-        "authority",
-        accounts.authority.value,
-      ),
-    });
+    accounts.miner.value = await findMinerPda(
+      {
+        quarry: getAddressFromResolvedInstructionAccount(
+          "quarry",
+          accounts.quarry.value,
+        ),
+        authority: getAddressFromResolvedInstructionAccount(
+          "authority",
+          accounts.authority.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

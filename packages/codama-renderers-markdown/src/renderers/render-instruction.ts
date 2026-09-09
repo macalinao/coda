@@ -24,26 +24,28 @@ export function renderInstruction(
   }
 
   // Accounts
-  if (instruction.accounts.length > 0) {
+  const accounts = instruction.accounts ?? [];
+  if (accounts.length > 0) {
     lines.push("**Accounts:**");
     lines.push("");
     lines.push("| Account | Type | Description |");
     lines.push("| ------- | ---- | ----------- |");
 
-    for (const account of instruction.accounts) {
+    for (const account of accounts) {
       lines.push(renderInstructionAccount(account));
     }
     lines.push("");
   }
 
   // Arguments
-  if (instruction.arguments.length > 0) {
+  const args = instruction.arguments ?? [];
+  if (args.length > 0) {
     lines.push("**Arguments:**");
     lines.push("");
     lines.push("| Argument | Type | Description |");
     lines.push("| -------- | ---- | ----------- |");
 
-    for (const arg of instruction.arguments) {
+    for (const arg of args) {
       lines.push(renderInstructionArgument(arg, context));
     }
     lines.push("");

@@ -215,24 +215,30 @@ export async function getInitializeFarmInstructionAsync<
 
   // Resolve default values.
   if (!accounts.farmVault.value) {
-    accounts.farmVault.value = await findFarmVaultPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.farmVault.value = await findFarmVaultPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.farmVaultsAuthority.value) {
-    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-    });
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

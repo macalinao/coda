@@ -165,13 +165,16 @@ export async function getCloseAccountsInstructionAsync<
 
   // Resolve default values.
   if (!accounts.metadata.value) {
-    accounts.metadata.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.metadata.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
