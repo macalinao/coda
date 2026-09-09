@@ -47,7 +47,7 @@
     },
     "clients/goki": {
       "name": "@solana-programs/goki",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -63,7 +63,7 @@
     },
     "clients/kamino-lending": {
       "name": "@solana-programs/kamino-lending",
-      "version": "0.8.0",
+      "version": "0.9.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -79,7 +79,7 @@
     },
     "clients/meteora-damm-v2": {
       "name": "@solana-programs/meteora-damm-v2",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -95,7 +95,7 @@
     },
     "clients/mpl-bubblegum": {
       "name": "@solana-programs/mpl-bubblegum",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -111,7 +111,7 @@
     },
     "clients/mpl-core": {
       "name": "@solana-programs/mpl-core",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -127,7 +127,7 @@
     },
     "clients/mpl-token-auth-rules": {
       "name": "@solana-programs/mpl-token-auth-rules",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -143,7 +143,7 @@
     },
     "clients/orca-whirlpools": {
       "name": "@solana-programs/orca-whirlpools",
-      "version": "0.7.0",
+      "version": "0.8.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -159,7 +159,7 @@
     },
     "clients/quarry": {
       "name": "@solana-programs/quarry",
-      "version": "0.7.0",
+      "version": "0.8.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/codama-rename-visitor": "workspace:^",
@@ -176,7 +176,7 @@
     },
     "clients/spl-governance": {
       "name": "@solana-programs/spl-governance",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -192,7 +192,7 @@
     },
     "clients/spl-stake-pool": {
       "name": "@solana-programs/spl-stake-pool",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -208,7 +208,7 @@
     },
     "clients/token-metadata": {
       "name": "@solana-programs/token-metadata",
-      "version": "0.8.0",
+      "version": "0.9.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -224,7 +224,7 @@
     },
     "clients/tribeca": {
       "name": "@solana-programs/tribeca",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -240,7 +240,7 @@
     },
     "clients/voter-stake-registry": {
       "name": "@solana-programs/voter-stake-registry",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "devDependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
@@ -375,7 +375,7 @@
     },
     "packages/create-coda": {
       "name": "@macalinao/create-coda",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "bin": {
         "create-coda": "./dist/bin.js",
       },
