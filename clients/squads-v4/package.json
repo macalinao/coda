@@ -1,5 +1,5 @@
 {
-  "name": "@solana-programs/squads",
+  "name": "@solana-programs/squads-v4",
   "version": "0.1.0",
   "description": "TypeScript client for the Squads Protocol v4 multisig program",
   "type": "module",
@@ -37,7 +37,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
-    "directory": "clients/squads"
+    "directory": "clients/squads-v4"
   },
   "scripts": {
     "build": "tsdown",

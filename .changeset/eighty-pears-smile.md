@@ -1,8 +1,8 @@
 ---
-"@solana-programs/squads": minor
+"@solana-programs/squads-v4": minor
 ---
 
-Add `@solana-programs/squads`, a `@solana/kit`-native TypeScript client for
+Add `@solana-programs/squads-v4`, a `@solana/kit`-native TypeScript client for
 Squads Protocol v4 (`SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf`).
 
 Covers all 36 instructions, 9 accounts and 45 errors from the Squads v4 IDL,

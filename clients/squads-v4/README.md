@@ -1,6 +1,6 @@
-# @solana-programs/squads
+# @solana-programs/squads-v4
 
-[![npm version](https://img.shields.io/npm/v/@solana-programs/squads.svg)](https://www.npmjs.com/package/@solana-programs/squads)
+[![npm version](https://img.shields.io/npm/v/@solana-programs/squads-v4.svg)](https://www.npmjs.com/package/@solana-programs/squads-v4)
 
 TypeScript client for [Squads Protocol v4](https://squads.so) (`SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf`), generated using Coda with full ESM support.
 
@@ -15,7 +15,7 @@ IDL changes:
 ## Installation
 
 ```bash
-bun add @solana-programs/squads @solana/kit
+bun add @solana-programs/squads-v4 @solana/kit
 ```
 
 ## Concepts
@@ -42,7 +42,7 @@ import {
   findProposalPda,
   findTransactionPda,
   findVaultPda,
-} from "@solana-programs/squads";
+} from "@solana-programs/squads-v4";
 
 const [multisig] = await findMultisigPda({ createKey: createKeySigner.address });
 
@@ -64,7 +64,7 @@ import {
   fetchProgramConfig,
   findProgramConfigPda,
   getMultisigCreateV2InstructionAsync,
-} from "@solana-programs/squads";
+} from "@solana-programs/squads-v4";
 
 const [programConfigPda] = await findProgramConfigPda();
 const programConfig = await fetchProgramConfig(rpc, programConfigPda);
@@ -106,7 +106,7 @@ import {
   getProposalApproveInstruction,
   getProposalCreateInstruction,
   getVaultTransactionCreateInstruction,
-} from "@solana-programs/squads";
+} from "@solana-programs/squads-v4";
 
 const multisigAccount = await fetchMultisig(rpc, multisig);
 
@@ -151,7 +151,7 @@ const instructions = [
 
 ```typescript
 import { address } from "@solana/kit";
-import { getVaultTransactionMessageEncoder } from "@solana-programs/squads";
+import { getVaultTransactionMessageEncoder } from "@solana-programs/squads-v4";
 
 const SYSTEM_PROGRAM_ADDRESS = address("11111111111111111111111111111111");
 
@@ -177,7 +177,7 @@ const transactionMessage = getVaultTransactionMessageEncoder().encode({
 
 ```typescript
 import { AccountRole } from "@solana/kit";
-import { getVaultTransactionExecuteInstruction } from "@solana-programs/squads";
+import { getVaultTransactionExecuteInstruction } from "@solana-programs/squads-v4";
 
 const ix = getVaultTransactionExecuteInstruction({ multisig, proposal, transaction, member: alice });
 
@@ -197,7 +197,7 @@ Signer flags on remaining accounts must be `false` even for the vault — the pr
 ### Reading accounts
 
 ```typescript
-import { fetchMultisig, fetchProposal, fetchVaultTransaction } from "@solana-programs/squads";
+import { fetchMultisig, fetchProposal, fetchVaultTransaction } from "@solana-programs/squads-v4";
 
 const { data: multisigData } = await fetchMultisig(rpc, multisig);
 console.log(multisigData.threshold, multisigData.members.length);

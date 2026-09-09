@@ -198,7 +198,7 @@ const addCustomPdasVisitor = addPdasVisitor({
 export default defineConfig({
   outputDir: "./src/generated",
   docs: {
-    npmPackageName: "@solana-programs/squads",
+    npmPackageName: "@solana-programs/squads-v4",
   },
   instructionAccountDefaultValues: [
     {

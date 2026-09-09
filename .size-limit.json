@@ -171,8 +171,8 @@
     "limit": "9.5 KB"
   },
   {
-    "name": "squads: one instruction",
-    "path": "clients/squads/dist/index.js",
+    "name": "squads-v4: one instruction",
+    "path": "clients/squads-v4/dist/index.js",
     "import": "{ getVaultTransactionCreateInstruction }",
     "ignore": [
       "@solana/kit",
@@ -181,8 +181,8 @@
     "limit": "600 B"
   },
   {
-    "name": "squads: entire client",
-    "path": "clients/squads/dist/index.js",
+    "name": "squads-v4: entire client",
+    "path": "clients/squads-v4/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
