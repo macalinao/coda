@@ -48,13 +48,13 @@ import {
   type OptionOrNullable,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMultisigPda, type MultisigSeeds } from "../pdas/index.js";
+import { findMultisigPda, type MultisigSeeds } from "../pdas/index.ts";
 import {
   getMemberDecoder,
   getMemberEncoder,
   type Member,
   type MemberArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MULTISIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   224, 116, 121, 186, 68, 161, 79, 236,

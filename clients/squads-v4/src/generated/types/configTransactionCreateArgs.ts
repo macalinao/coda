@@ -31,7 +31,7 @@ import {
   getConfigActionEncoder,
   type ConfigAction,
   type ConfigActionArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type ConfigTransactionCreateArgs = {
   actions: Array<ConfigAction>;

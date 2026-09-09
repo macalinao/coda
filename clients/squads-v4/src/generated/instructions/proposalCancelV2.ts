@@ -36,13 +36,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getProposalVoteArgsDecoder,
   getProposalVoteArgsEncoder,
   type ProposalVoteArgs,
   type ProposalVoteArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROPOSAL_CANCEL_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([205, 41, 194, 61, 220, 139, 16, 247]);

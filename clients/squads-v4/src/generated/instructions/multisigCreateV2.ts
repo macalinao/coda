@@ -38,14 +38,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMultisigPda, findProgramConfigPda } from "../pdas/index.js";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMultisigPda, findProgramConfigPda } from "../pdas/index.ts";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMultisigCreateArgsV2Decoder,
   getMultisigCreateArgsV2Encoder,
   type MultisigCreateArgsV2,
   type MultisigCreateArgsV2Args,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MULTISIG_CREATE_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([50, 221, 199, 93, 40, 245, 139, 233]);
@@ -208,15 +208,20 @@ export async function getMultisigCreateV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.programConfig.value) {
-    accounts.programConfig.value = await findProgramConfigPda();
+    accounts.programConfig.value = await findProgramConfigPda({
+      programAddress,
+    });
   }
   if (!accounts.multisig.value) {
-    accounts.multisig.value = await findMultisigPda({
-      createKey: getAddressFromResolvedInstructionAccount(
-        "createKey",
-        accounts.createKey.value,
-      ),
-    });
+    accounts.multisig.value = await findMultisigPda(
+      {
+        createKey: getAddressFromResolvedInstructionAccount(
+          "createKey",
+          accounts.createKey.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

@@ -35,14 +35,14 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findProgramConfigPda } from "../pdas/index.js";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findProgramConfigPda } from "../pdas/index.ts";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getProgramConfigSetTreasuryArgsDecoder,
   getProgramConfigSetTreasuryArgsEncoder,
   type ProgramConfigSetTreasuryArgs,
   type ProgramConfigSetTreasuryArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROGRAM_CONFIG_SET_TREASURY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([111, 46, 243, 117, 144, 188, 162, 107]);
@@ -159,7 +159,9 @@ export async function getProgramConfigSetTreasuryInstructionAsync<
 
   // Resolve default values.
   if (!accounts.programConfig.value) {
-    accounts.programConfig.value = await findProgramConfigPda();
+    accounts.programConfig.value = await findProgramConfigPda({
+      programAddress,
+    });
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

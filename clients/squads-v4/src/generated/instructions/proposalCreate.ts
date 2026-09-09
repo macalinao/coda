@@ -37,13 +37,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getProposalCreateArgsDecoder,
   getProposalCreateArgsEncoder,
   type ProposalCreateArgs,
   type ProposalCreateArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROPOSAL_CREATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [220, 60, 73, 224, 30, 108, 79, 159],

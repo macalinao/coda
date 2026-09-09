@@ -61,7 +61,7 @@ import {
   type VaultBatchTransactionArgs,
   type VaultTransaction,
   type VaultTransactionArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getBatchAccountsCloseInstruction,
   getBatchAddTransactionInstruction,
@@ -207,7 +207,7 @@ import {
   type VaultTransactionCreateFromBufferInput,
   type VaultTransactionCreateInput,
   type VaultTransactionExecuteInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findBatchTransactionPda,
   findEphemeralSignerPda,
@@ -217,7 +217,7 @@ import {
   findSpendingLimitPda,
   findTransactionPda,
   findVaultPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const SQUADS_PROGRAM_ADDRESS =
   "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf" as Address<"SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf">;

@@ -37,13 +37,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getVaultTransactionCreateArgsDecoder,
   getVaultTransactionCreateArgsEncoder,
   type VaultTransactionCreateArgs,
   type VaultTransactionCreateArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VAULT_TRANSACTION_CREATE_FROM_BUFFER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([222, 54, 149, 68, 87, 246, 48, 231]);

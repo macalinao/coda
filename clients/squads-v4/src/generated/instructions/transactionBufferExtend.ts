@@ -36,13 +36,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getTransactionBufferExtendArgsDecoder,
   getTransactionBufferExtendArgsEncoder,
   type TransactionBufferExtendArgs,
   type TransactionBufferExtendArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const TRANSACTION_BUFFER_EXTEND_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([230, 157, 67, 56, 5, 238, 245, 146]);

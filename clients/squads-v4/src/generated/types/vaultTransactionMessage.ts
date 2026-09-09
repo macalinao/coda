@@ -30,7 +30,7 @@ import {
   type MultisigCompiledInstructionArgs,
   type MultisigMessageAddressTableLookup,
   type MultisigMessageAddressTableLookupArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type VaultTransactionMessage = {
   /** The number of signer pubkeys in the account_keys vec. */

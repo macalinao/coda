@@ -38,7 +38,7 @@ import {
   getPeriodEncoder,
   type Period,
   type PeriodArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type MultisigAddSpendingLimitArgs = {
   /** Key that is used to seed the SpendingLimit PDA. */

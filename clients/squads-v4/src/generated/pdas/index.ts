@@ -6,11 +6,11 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./batchTransaction.js";
-export * from "./ephemeralSigner.js";
-export * from "./multisig.js";
-export * from "./programConfig.js";
-export * from "./proposal.js";
-export * from "./spendingLimit.js";
-export * from "./transaction.js";
-export * from "./vault.js";
+export * from "./batchTransaction.ts";
+export * from "./ephemeralSigner.ts";
+export * from "./multisig.ts";
+export * from "./programConfig.ts";
+export * from "./proposal.ts";
+export * from "./spendingLimit.ts";
+export * from "./transaction.ts";
+export * from "./vault.ts";

@@ -29,7 +29,7 @@ import {
   getMemberEncoder,
   type Member,
   type MemberArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type MultisigAddMemberArgs = {
   newMember: Member;

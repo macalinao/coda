@@ -37,13 +37,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMultisigSetConfigAuthorityArgsDecoder,
   getMultisigSetConfigAuthorityArgsEncoder,
   type MultisigSetConfigAuthorityArgs,
   type MultisigSetConfigAuthorityArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MULTISIG_SET_CONFIG_AUTHORITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([143, 93, 199, 143, 92, 169, 193, 232]);

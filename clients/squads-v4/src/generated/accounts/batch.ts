@@ -40,7 +40,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTransactionPda, type TransactionSeeds } from "../pdas/index.js";
+import { findTransactionPda, type TransactionSeeds } from "../pdas/index.ts";
 
 export const BATCH_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   156, 194, 70, 44, 22, 88, 137, 44,

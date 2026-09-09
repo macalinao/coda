@@ -37,13 +37,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getBatchCreateArgsDecoder,
   getBatchCreateArgsEncoder,
   type BatchCreateArgs,
   type BatchCreateArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const BATCH_CREATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   194, 142, 141, 17, 55, 185, 20, 248,

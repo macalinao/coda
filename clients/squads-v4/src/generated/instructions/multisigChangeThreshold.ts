@@ -37,13 +37,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMultisigChangeThresholdArgsDecoder,
   getMultisigChangeThresholdArgsEncoder,
   type MultisigChangeThresholdArgs,
   type MultisigChangeThresholdArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MULTISIG_CHANGE_THRESHOLD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([141, 42, 15, 126, 169, 92, 62, 181]);

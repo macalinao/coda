@@ -42,13 +42,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTransactionPda, type TransactionSeeds } from "../pdas/index.js";
+import { findTransactionPda, type TransactionSeeds } from "../pdas/index.ts";
 import {
   getVaultTransactionMessageDecoder,
   getVaultTransactionMessageEncoder,
   type VaultTransactionMessage,
   type VaultTransactionMessageArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VAULT_TRANSACTION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([168, 250, 162, 100, 81, 14, 162, 207]);

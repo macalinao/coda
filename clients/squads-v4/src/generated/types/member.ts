@@ -22,7 +22,7 @@ import {
   getPermissionsEncoder,
   type Permissions,
   type PermissionsArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type Member = { key: Address; permissions: Permissions };
 

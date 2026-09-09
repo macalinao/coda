@@ -40,7 +40,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProgramConfigPda } from "../pdas/index.js";
+import { findProgramConfigPda } from "../pdas/index.ts";
 
 export const PROGRAM_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   196, 210, 90, 231, 144, 149, 140, 63,

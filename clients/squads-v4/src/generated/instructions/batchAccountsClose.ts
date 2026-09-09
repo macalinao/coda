@@ -33,7 +33,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const BATCH_ACCOUNTS_CLOSE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([218, 196, 7, 175, 130, 102, 11, 255]);

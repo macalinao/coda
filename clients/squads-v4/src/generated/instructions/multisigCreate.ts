@@ -32,7 +32,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const MULTISIG_CREATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [122, 77, 80, 159, 84, 88, 90, 197],

@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** DuplicateMember: Found multiple members with the same pubkey */
 export const SQUADS_ERROR__DUPLICATE_MEMBER = 0x1770; // 6000

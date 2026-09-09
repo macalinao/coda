@@ -39,15 +39,15 @@ import {
   type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
-  type BatchTransactionSeeds,
   findBatchTransactionPda,
-} from "../pdas/index.js";
+  type BatchTransactionSeeds,
+} from "../pdas/index.ts";
 import {
   getVaultTransactionMessageDecoder,
   getVaultTransactionMessageEncoder,
   type VaultTransactionMessage,
   type VaultTransactionMessageArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VAULT_BATCH_TRANSACTION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([196, 121, 46, 36, 12, 19, 252, 7]);

@@ -36,13 +36,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMultisigRemoveSpendingLimitArgsDecoder,
   getMultisigRemoveSpendingLimitArgsEncoder,
   type MultisigRemoveSpendingLimitArgs,
   type MultisigRemoveSpendingLimitArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MULTISIG_REMOVE_SPENDING_LIMIT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([228, 198, 136, 111, 123, 4, 178, 113]);

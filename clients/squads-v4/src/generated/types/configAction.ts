@@ -44,7 +44,7 @@ import {
   type MemberArgs,
   type Period,
   type PeriodArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type ConfigAction =
   | { __kind: "AddMember"; newMember: Member }

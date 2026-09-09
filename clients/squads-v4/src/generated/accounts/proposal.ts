@@ -40,13 +40,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalPda, type ProposalSeeds } from "../pdas/index.js";
+import { findProposalPda, type ProposalSeeds } from "../pdas/index.ts";
 import {
   getProposalStatusDecoder,
   getProposalStatusEncoder,
   type ProposalStatus,
   type ProposalStatusArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   26, 94, 189, 187, 116, 136, 53, 33,

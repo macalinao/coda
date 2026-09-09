@@ -45,13 +45,13 @@ import {
 import {
   findSpendingLimitPda,
   type SpendingLimitSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getPeriodDecoder,
   getPeriodEncoder,
   type Period,
   type PeriodArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SPENDING_LIMIT_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   10, 201, 27, 160, 218, 195, 222, 152,

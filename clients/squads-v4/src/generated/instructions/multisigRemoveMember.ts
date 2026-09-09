@@ -37,13 +37,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SQUADS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMultisigRemoveMemberArgsDecoder,
   getMultisigRemoveMemberArgsEncoder,
   type MultisigRemoveMemberArgs,
   type MultisigRemoveMemberArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MULTISIG_REMOVE_MEMBER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([217, 117, 177, 210, 182, 145, 218, 72]);

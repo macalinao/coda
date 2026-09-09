@@ -40,13 +40,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTransactionPda, type TransactionSeeds } from "../pdas/index.js";
+import { findTransactionPda, type TransactionSeeds } from "../pdas/index.ts";
 import {
   getConfigActionDecoder,
   getConfigActionEncoder,
   type ConfigAction,
   type ConfigActionArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CONFIG_TRANSACTION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([94, 8, 4, 35, 113, 139, 139, 112]);
