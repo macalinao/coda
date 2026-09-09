@@ -48,8 +48,8 @@
     "codegen": "coda generate"
   },
   "peerDependencies": {
-    "@solana/kit": "*",
-    "@solana/program-client-core": "*"
+    "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+    "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0"
   },
   "devDependencies": {
     "@macalinao/coda": "workspace:^",
