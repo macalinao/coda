@@ -47,7 +47,7 @@ import {
   type FarmsUserStateArgs,
   type OraclePrices,
   type OraclePricesArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getAddRewardsInstructionAsync,
   getDepositToFarmVaultInstruction,
@@ -149,7 +149,7 @@ import {
   type WithdrawSlashedAmountAsyncInput,
   type WithdrawTreasuryAsyncInput,
   type WithdrawUnstakedDepositsAsyncInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findFarmsUserStatePda,
   findFarmVaultPda,
@@ -157,7 +157,7 @@ import {
   findRewardTreasuryVaultPda,
   findRewardVaultPda,
   findTreasuryVaultsAuthorityPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const FARMS_PROGRAM_ADDRESS =
   "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr" as Address<"FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr">;

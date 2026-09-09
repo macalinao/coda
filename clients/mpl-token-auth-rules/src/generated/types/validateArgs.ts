@@ -37,7 +37,7 @@ import {
   getPayloadEncoder,
   type Payload,
   type PayloadArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Versioned arguments for the `validate` instruction. */
 export type ValidateArgs = {

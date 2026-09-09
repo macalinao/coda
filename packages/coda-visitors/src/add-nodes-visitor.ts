@@ -33,17 +33,20 @@ export function addNodesVisitor(map: Record<string, ProgramAdditions>) {
               assertIsNode(node, "programNode");
               return programNode({
                 ...node,
-                accounts: [...node.accounts, ...(updates.accounts ?? [])],
+                accounts: [
+                  ...(node.accounts ?? []),
+                  ...(updates.accounts ?? []),
+                ],
                 instructions: [
-                  ...node.instructions,
+                  ...(node.instructions ?? []),
                   ...(updates.instructions ?? []),
                 ],
                 definedTypes: [
-                  ...node.definedTypes,
+                  ...(node.definedTypes ?? []),
                   ...(updates.definedTypes ?? []),
                 ],
-                errors: [...node.errors, ...(updates.errors ?? [])],
-                pdas: [...node.pdas, ...(updates.pdas ?? [])],
+                errors: [...(node.errors ?? []), ...(updates.errors ?? [])],
+                pdas: [...(node.pdas ?? []), ...(updates.pdas ?? [])],
               });
             },
           },

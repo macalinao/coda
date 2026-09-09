@@ -24,7 +24,7 @@ import {
   getAddLiquidityParametersEncoder,
   type AddLiquidityParameters,
   type AddLiquidityParametersArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type EvtAddLiquidity = {
   pool: Address;

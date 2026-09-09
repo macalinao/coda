@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getAddCollectionPluginV1ArgsDecoder,
   getAddCollectionPluginV1ArgsEncoder,
   type AddCollectionPluginV1Args,
   type AddCollectionPluginV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const ADD_COLLECTION_PLUGIN_V1_DISCRIMINATOR = 3;
 

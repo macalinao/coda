@@ -23,7 +23,7 @@ import {
   getExternalPluginAdapterSchemaEncoder,
   type ExternalPluginAdapterSchema,
   type ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Update data for the `LinkedAppData` external plugin adapter. */
 export type LinkedAppDataUpdateInfo = {

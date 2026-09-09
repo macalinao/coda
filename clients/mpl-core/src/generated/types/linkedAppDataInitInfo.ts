@@ -27,7 +27,7 @@ import {
   type AuthorityArgs,
   type ExternalPluginAdapterSchema,
   type ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Initialization data for the `LinkedAppData` external plugin adapter. */
 export type LinkedAppDataInitInfo = {

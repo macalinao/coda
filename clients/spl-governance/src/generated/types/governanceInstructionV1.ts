@@ -31,7 +31,7 @@ import {
   getRealmConfigParamsV1Encoder,
   type RealmConfigParamsV1,
   type RealmConfigParamsV1Args,
-} from "./index.js";
+} from "./index.ts";
 
 export type GovernanceInstructionV1 =
   | { __kind: "CreateRealm"; name: string; configArgs: RealmConfigParamsV1 }

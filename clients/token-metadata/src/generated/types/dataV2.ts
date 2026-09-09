@@ -41,7 +41,7 @@ import {
   type CreatorArgs,
   type Uses,
   type UsesArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type DataV2 = {
   name: string;

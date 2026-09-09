@@ -22,7 +22,7 @@ import {
   getRelationshipKindEncoder,
   type RelationshipKind,
   type RelationshipKindArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * A single membership relationship (e.g. to a collection or

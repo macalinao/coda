@@ -29,7 +29,7 @@ import {
   type CollectionDetailsArgs,
   type DataV2,
   type DataV2Args,
-} from "./index.js";
+} from "./index.ts";
 
 export type CreateMetadataAccountArgsV3 = {
   data: DataV2;

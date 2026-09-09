@@ -27,7 +27,7 @@ import {
   type InstructionWithData,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REFRESH_RESERVES_BATCH_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([144, 110, 26, 103, 162, 204, 252, 147]);

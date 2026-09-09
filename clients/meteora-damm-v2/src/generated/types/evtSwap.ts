@@ -32,7 +32,7 @@ import {
   type SwapParametersArgs,
   type SwapResult,
   type SwapResultArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type EvtSwap = {
   pool: Address;

@@ -23,7 +23,7 @@ import {
   getCompressionProofEncoder,
   type CompressionProof,
   type CompressionProofArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `transferV1`. */
 export type TransferV1Args = {

@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** AlreadyInUse: AlreadyInUse */
 export const SPL_STAKE_POOL_ERROR__ALREADY_IN_USE = 0x0; // 0

@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./treeConfig.js";
-export * from "./voucher.js";
+export * from "./treeConfig.ts";
+export * from "./voucher.ts";

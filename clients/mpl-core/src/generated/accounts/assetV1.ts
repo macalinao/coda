@@ -49,7 +49,7 @@ import {
   type KeyArgs,
   type UpdateAuthority,
   type UpdateAuthorityArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 /**
  * An MPL Core asset: a single account holding an NFT's owner,

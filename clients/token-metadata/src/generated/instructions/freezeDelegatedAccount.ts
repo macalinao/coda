@@ -34,7 +34,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const FREEZE_DELEGATED_ACCOUNT_DISCRIMINATOR = 26;
 

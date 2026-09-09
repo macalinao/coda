@@ -44,7 +44,7 @@ import {
   type VoterArgs,
   type VoterWeightRecord,
   type VoterWeightRecordArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getClawbackInstruction,
   getCloseDepositEntryInstruction,
@@ -114,12 +114,12 @@ import {
   type UpdateMaxVoteWeightInput,
   type UpdateVoterWeightRecordInput,
   type WithdrawInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findRegistrarPda,
   findVoterPda,
   findVoterWeightRecordPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS =
   "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ" as Address<"vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ">;

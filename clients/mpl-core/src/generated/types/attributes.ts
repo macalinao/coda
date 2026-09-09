@@ -21,7 +21,7 @@ import {
   getAttributeEncoder,
   type Attribute,
   type AttributeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Internal plugin that stores an arbitrary list of on-chain

@@ -34,7 +34,7 @@ import {
   type ProofInfoArgs,
   type SeedsVec,
   type SeedsVecArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** A single typed value supplied in a `validate` payload. */
 export type PayloadType =

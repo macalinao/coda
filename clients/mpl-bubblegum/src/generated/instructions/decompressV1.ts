@@ -44,14 +44,14 @@ import {
   findMasterEditionPda,
   findMetadataPda,
   findMintAuthorityPda,
-} from "../pdas/index.js";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
   type MetadataArgs,
   type MetadataArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const DECOMPRESS_V1_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   54, 85, 76, 70, 228, 250, 164, 81,
@@ -346,12 +346,15 @@ export async function getDecompressV1InstructionAsync<
     });
   }
   if (!accounts.mintAuthority.value) {
-    accounts.mintAuthority.value = await findMintAuthorityPda({
-      mint: getAddressFromResolvedInstructionAccount(
-        "mint",
-        accounts.mint.value,
-      ),
-    });
+    accounts.mintAuthority.value = await findMintAuthorityPda(
+      {
+        mint: getAddressFromResolvedInstructionAccount(
+          "mint",
+          accounts.mint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.metadata.value) {
     accounts.metadata.value = await findMetadataPda({

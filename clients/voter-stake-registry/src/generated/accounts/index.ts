@@ -6,6 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./registrar.js";
-export * from "./voter.js";
-export * from "./voterWeightRecord.js";
+export * from "./registrar.ts";
+export * from "./voter.ts";
+export * from "./voterWeightRecord.ts";

@@ -41,7 +41,7 @@ import {
   type MinterArgs,
   type MintWrapper,
   type MintWrapperArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getAcceptAdminInstruction,
   getMinterUpdateInstruction,
@@ -75,8 +75,8 @@ import {
   type ParsedTransferAdminInstruction,
   type PerformMintInput,
   type TransferAdminInput,
-} from "../instructions/index.js";
-import { findMinterPda, findMintWrapperPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findMinterPda, findMintWrapperPda } from "../pdas/index.ts";
 
 export const QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS =
   "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV" as Address<"QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV">;

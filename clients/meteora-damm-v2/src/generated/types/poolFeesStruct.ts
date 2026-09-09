@@ -29,7 +29,7 @@ import {
   type BaseFeeStructArgs,
   type DynamicFeeStruct,
   type DynamicFeeStructArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Information regarding fee charges

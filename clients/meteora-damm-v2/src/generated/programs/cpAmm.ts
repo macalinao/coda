@@ -53,7 +53,7 @@ import {
   type TokenBadgeArgs,
   type Vesting,
   type VestingArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getAddLiquidityInstructionAsync,
   getClaimPartnerFeeInstructionAsync,
@@ -183,7 +183,7 @@ import {
   type UpdateRewardDurationAsyncInput,
   type UpdateRewardFunderAsyncInput,
   type WithdrawIneligibleRewardAsyncInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findClaimFeeOperatorPda,
   findConfigPda,
@@ -196,7 +196,7 @@ import {
   findRewardVaultPda,
   findTokenBadgePda,
   findTokenVaultPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const CP_AMM_PROGRAM_ADDRESS =
   "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;

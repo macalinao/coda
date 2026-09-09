@@ -45,8 +45,8 @@ import {
   findMinerPda,
   findQuarryPda,
   findReplicaMintPda,
-} from "../pdas/index.js";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const STAKE_REPLICA_MINER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([246, 171, 25, 201, 242, 145, 94, 47]);
@@ -240,24 +240,30 @@ export async function getStakeReplicaMinerInstructionAsync<
 
   // Resolve default values.
   if (!accounts.replicaMint.value) {
-    accounts.replicaMint.value = await findReplicaMintPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.replicaMint.value = await findReplicaMintPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.mm.value) {
-    accounts.mm.value = await findMergeMinerPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "mmOwner",
-        accounts.mmOwner.value,
-      ),
-    });
+    accounts.mm.value = await findMergeMinerPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "mmOwner",
+          accounts.mmOwner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.replicaMintTokenAccount.value) {
     accounts.replicaMintTokenAccount.value = await getProgramDerivedAddress({

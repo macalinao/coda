@@ -43,8 +43,8 @@ import {
   getResolvedInstructionAccountAsTransactionSigner,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMintWrapperPda } from "../pdas/index.js";
-import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMintWrapperPda } from "../pdas/index.ts";
+import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const NEW_WRAPPER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   106, 226, 139, 13, 35, 121, 62, 171,
@@ -212,12 +212,15 @@ export async function getNewWrapperInstructionAsync<
 
   // Resolve default values.
   if (!accounts.mintWrapper.value) {
-    accounts.mintWrapper.value = await findMintWrapperPda({
-      base: getAddressFromResolvedInstructionAccount(
-        "base",
-        accounts.base.value,
-      ),
-    });
+    accounts.mintWrapper.value = await findMintWrapperPda(
+      {
+        base: getAddressFromResolvedInstructionAccount(
+          "base",
+          accounts.base.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.admin.value) {
     accounts.admin.value = getResolvedInstructionAccountAsTransactionSigner(

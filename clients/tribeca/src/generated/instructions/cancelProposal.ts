@@ -36,7 +36,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
+import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CANCEL_PROPOSAL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [106, 74, 128, 146, 19, 65, 39, 23],

@@ -40,13 +40,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getWhirlpoolBumpsDecoder,
   getWhirlpoolBumpsEncoder,
   type WhirlpoolBumps,
   type WhirlpoolBumpsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const INITIALIZE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [95, 180, 10, 172, 84, 174, 232, 40],

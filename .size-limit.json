@@ -1,5 +1,24 @@
 [
   {
+    "name": "goki: one instruction",
+    "path": "clients/goki/dist/index.js",
+    "import": "{ getApproveInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "400 B"
+  },
+  {
+    "name": "goki: entire client",
+    "path": "clients/goki/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "5.5 KB"
+  },
+  {
     "name": "kamino-lending: one instruction",
     "path": "clients/kamino-lending/dist/index.js",
     "import": "{ getBorrowObligationLiquidityInstruction }",

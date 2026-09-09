@@ -42,7 +42,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const TWO_HOP_SWAP_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   195, 96, 237, 108, 68, 162, 219, 230,

@@ -21,7 +21,7 @@ import {
   getAutographSignatureEncoder,
   type AutographSignature,
   type AutographSignatureArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Internal plugin that collects a guestbook of signatures left

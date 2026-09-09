@@ -53,7 +53,7 @@ describe("renameInstructionsVisitor", () => {
     });
 
     const updatedRoot = visit(root, visitor) as RootNode;
-    const instructions = updatedRoot.program.instructions;
+    const instructions = updatedRoot.program.instructions ?? [];
 
     expect(instructions[0].name.toString()).toBe("transferTokens");
     expect(instructions[1].name.toString()).toBe("mintNft");
@@ -77,7 +77,7 @@ describe("renameInstructionsVisitor", () => {
     });
 
     const updatedRoot = visit(root, visitor) as RootNode;
-    const instructions = updatedRoot.program.instructions;
+    const instructions = updatedRoot.program.instructions ?? [];
 
     expect(instructions[0].name.toString()).toBe("burn");
   });

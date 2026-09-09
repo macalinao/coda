@@ -30,7 +30,7 @@ import {
   getExternalPluginAdapterKeyEncoder,
   type ExternalPluginAdapterKey,
   type ExternalPluginAdapterKeyArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `writeCollectionExternalPluginAdapterDataV1`. */
 export type WriteCollectionExternalPluginAdapterDataV1Args = {

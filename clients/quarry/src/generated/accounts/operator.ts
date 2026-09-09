@@ -40,7 +40,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findOperatorPda, type OperatorSeeds } from "../pdas/index.js";
+import { findOperatorPda, type OperatorSeeds } from "../pdas/index.ts";
 
 export const OPERATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   219, 31, 188, 145, 69, 139, 204, 117,

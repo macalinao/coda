@@ -23,7 +23,7 @@ import {
   type AuthorityArgs,
   type PluginType,
   type PluginTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `approveCollectionPluginAuthorityV1`. */
 export type ApproveCollectionPluginAuthorityV1Args = {

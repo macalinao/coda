@@ -40,13 +40,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getPreferredValidatorTypeDecoder,
   getPreferredValidatorTypeEncoder,
   type PreferredValidatorType,
   type PreferredValidatorTypeArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SET_PREFERRED_VALIDATOR_DISCRIMINATOR = 5;
 

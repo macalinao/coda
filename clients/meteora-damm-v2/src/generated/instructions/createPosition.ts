@@ -43,8 +43,8 @@ import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findPositionNftAccountPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [48, 215, 197, 153, 96, 203, 180, 133],
@@ -246,12 +246,15 @@ export async function getCreatePositionInstructionAsync<
 
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
-    accounts.positionNftAccount.value = await findPositionNftAccountPda({
-      positionNftMint: getAddressFromResolvedInstructionAccount(
-        "positionNftMint",
-        accounts.positionNftMint.value,
-      ),
-    });
+    accounts.positionNftAccount.value = await findPositionNftAccountPda(
+      {
+        positionNftMint: getAddressFromResolvedInstructionAccount(
+          "positionNftMint",
+          accounts.positionNftMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.position.value) {
     accounts.position.value = await getProgramDerivedAddress({
@@ -270,7 +273,9 @@ export async function getCreatePositionInstructionAsync<
     });
   }
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value = await findPoolAuthorityPda();
+    accounts.poolAuthority.value = await findPoolAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
@@ -281,7 +286,9 @@ export async function getCreatePositionInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

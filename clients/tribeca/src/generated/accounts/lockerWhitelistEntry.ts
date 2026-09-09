@@ -36,7 +36,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findWhitelistPda, type WhitelistSeeds } from "../pdas/index.js";
+import { findWhitelistPda, type WhitelistSeeds } from "../pdas/index.ts";
 
 export const LOCKER_WHITELIST_ENTRY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([128, 245, 238, 138, 226, 48, 216, 63]);

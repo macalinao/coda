@@ -46,7 +46,7 @@ import {
   type OptionOrNullable,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalPda, type ProposalSeeds } from "../pdas/index.js";
+import { findProposalPda, type ProposalSeeds } from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -71,7 +71,7 @@ import {
   type UnixTimestampArgs,
   type VoteThreshold,
   type VoteThresholdArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROPOSAL_V1_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.ProposalV1;

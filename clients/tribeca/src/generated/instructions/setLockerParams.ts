@@ -36,13 +36,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getLockerParamsDecoder,
   getLockerParamsEncoder,
   type LockerParams,
   type LockerParamsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SET_LOCKER_PARAMS_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([106, 39, 132, 84, 254, 77, 161, 169]);

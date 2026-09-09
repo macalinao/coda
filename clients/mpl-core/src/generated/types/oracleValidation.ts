@@ -25,7 +25,7 @@ import {
   getExternalValidationResultEncoder,
   type ExternalValidationResult,
   type ExternalValidationResultArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * The result stored in an oracle account: `Uninitialized`, or

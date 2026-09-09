@@ -41,7 +41,7 @@ export function instructionAccountsDedupeProgramVisitor(
   idl: AnchorIdl,
   programNode: ProgramNode,
 ): ProgramNode {
-  const accountNodes = programNode.accounts;
+  const accountNodes = programNode.accounts ?? [];
   const instructionVisitor = bottomUpTransformerVisitor([
     {
       select: "[instructionNode]",
@@ -55,8 +55,9 @@ export function instructionAccountsDedupeProgramVisitor(
             `Instruction ${instructionNode.name} not found in IDL`,
           );
         }
-        const hasDuplicates = instructionNode.accounts.some((account) =>
-          instructionNode.accounts.some(
+        const ixAccounts = instructionNode.accounts ?? [];
+        const hasDuplicates = ixAccounts.some((account) =>
+          ixAccounts.some(
             (otherAccount) =>
               otherAccount.name === account.name && otherAccount !== account,
           ),
@@ -67,10 +68,10 @@ export function instructionAccountsDedupeProgramVisitor(
           accounts: hasDuplicates
             ? instructionAccountNodesFromAnchorV01(
                 accountNodes,
-                instructionNode.arguments,
+                instructionNode.arguments ?? [],
                 idlIx.accounts,
               )
-            : instructionNode.accounts,
+            : ixAccounts,
         };
       },
     },

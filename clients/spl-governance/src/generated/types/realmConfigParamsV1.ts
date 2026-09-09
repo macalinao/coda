@@ -23,7 +23,7 @@ import {
   getMintMaxVoterWeightSourceEncoder,
   type MintMaxVoterWeightSource,
   type MintMaxVoterWeightSourceArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type RealmConfigParamsV1 = {
   useCouncilMint: boolean;

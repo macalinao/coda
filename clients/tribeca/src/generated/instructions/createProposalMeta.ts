@@ -45,7 +45,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
+import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_PROPOSAL_META_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([238, 138, 212, 160, 46, 53, 51, 88]);

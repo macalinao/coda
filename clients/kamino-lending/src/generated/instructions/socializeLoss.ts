@@ -38,7 +38,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SOCIALIZE_LOSS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   245, 75, 91, 0, 236, 97, 19, 3,

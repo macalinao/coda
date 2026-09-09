@@ -38,7 +38,7 @@ import {
   getRedeemerCodec,
   type Redeemer,
   type RedeemerArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getCreateRedeemerInstructionAsync,
   getRedeemAllTokensInstructionAsync,
@@ -52,8 +52,8 @@ import {
   type ParsedRedeemTokensInstruction,
   type RedeemAllTokensAsyncInput,
   type RedeemTokensAsyncInput,
-} from "../instructions/index.js";
-import { findRedeemerPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findRedeemerPda } from "../pdas/index.ts";
 
 export const QUARRY_REDEEMER_PROGRAM_ADDRESS =
   "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9" as Address<"QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9">;

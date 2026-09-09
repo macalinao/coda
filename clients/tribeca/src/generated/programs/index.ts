@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./govern.js";
-export * from "./lockedVoter.js";
+export * from "./govern.ts";
+export * from "./lockedVoter.ts";

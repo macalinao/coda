@@ -40,7 +40,7 @@ import {
   getElevationGroupEncoder,
   type ElevationGroup,
   type ElevationGroupArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type UpdateLendingMarketConfigValue =
   | { __kind: "Bool"; fields: readonly [boolean] }

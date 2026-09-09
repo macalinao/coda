@@ -42,7 +42,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRewarderPda, type RewarderSeeds } from "../pdas/index.js";
+import { findRewarderPda, type RewarderSeeds } from "../pdas/index.ts";
 
 export const REWARDER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   83, 3, 203, 174, 244, 30, 172, 198,

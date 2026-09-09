@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./feeTier.js";
-export * from "./lockConfig.js";
-export * from "./position.js";
-export * from "./positionBundle.js";
-export * from "./tickArray.js";
-export * from "./tokenBadge.js";
-export * from "./whirlpool.js";
-export * from "./whirlpoolsConfig.js";
-export * from "./whirlpoolsConfigExtension.js";
+export * from "./feeTier.ts";
+export * from "./lockConfig.ts";
+export * from "./position.ts";
+export * from "./positionBundle.ts";
+export * from "./tickArray.ts";
+export * from "./tokenBadge.ts";
+export * from "./whirlpool.ts";
+export * from "./whirlpoolsConfig.ts";
+export * from "./whirlpoolsConfigExtension.ts";

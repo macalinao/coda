@@ -27,7 +27,7 @@ import {
   getAuthorizationDataEncoder,
   type AuthorizationData,
   type AuthorizationDataArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type UnlockArgs = {
   __kind: "V1";

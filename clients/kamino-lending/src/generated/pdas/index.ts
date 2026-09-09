@@ -6,20 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./farmsUserState.js";
-export * from "./farmVault.js";
-export * from "./farmVaultsAuthority.js";
-export * from "./lendingGlobalConfigState.js";
-export * from "./lendingMarketAuth.js";
-export * from "./obligation.js";
-export * from "./referrerState.js";
-export * from "./referrerTokenState.js";
-export * from "./reserveCollateralMint.js";
-export * from "./reserveCollateralSupply.js";
-export * from "./reserveFeeVault.js";
-export * from "./reserveLiquiditySupply.js";
-export * from "./rewardTreasuryVault.js";
-export * from "./rewardVault.js";
-export * from "./shortUrl.js";
-export * from "./treasuryVaultsAuthority.js";
-export * from "./userMetadata.js";
+export * from "./farmsUserState.ts";
+export * from "./farmVault.ts";
+export * from "./farmVaultsAuthority.ts";
+export * from "./lendingGlobalConfigState.ts";
+export * from "./lendingMarketAuth.ts";
+export * from "./obligation.ts";
+export * from "./referrerState.ts";
+export * from "./referrerTokenState.ts";
+export * from "./reserveCollateralMint.ts";
+export * from "./reserveCollateralSupply.ts";
+export * from "./reserveFeeVault.ts";
+export * from "./reserveLiquiditySupply.ts";
+export * from "./rewardTreasuryVault.ts";
+export * from "./rewardVault.ts";
+export * from "./shortUrl.ts";
+export * from "./treasuryVaultsAuthority.ts";
+export * from "./userMetadata.ts";

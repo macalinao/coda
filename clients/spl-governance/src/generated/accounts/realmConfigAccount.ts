@@ -30,7 +30,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRealmConfigPda, type RealmConfigSeeds } from "../pdas/index.js";
+import { findRealmConfigPda, type RealmConfigSeeds } from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -43,7 +43,7 @@ import {
   type GoverningTokenConfigArgs,
   type Reserved110,
   type Reserved110Args,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const REALM_CONFIG_ACCOUNT_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.RealmConfig;

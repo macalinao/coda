@@ -29,11 +29,12 @@ export function eventsToDefinedTypesVisitor() {
       select: "[programNode]",
       transform: (node) => {
         const program = node as ProgramNode;
-        if (program.events.length === 0) {
+        const events = program.events ?? [];
+        if (events.length === 0) {
           return node;
         }
 
-        const eventTypes: DefinedTypeNode[] = program.events.map((event) => {
+        const eventTypes: DefinedTypeNode[] = events.map((event) => {
           // Event data is a hiddenPrefixTypeNode wrapping the struct with the
           // Anchor discriminator prefix. Unwrap it to emit a plain struct.
           const type: TypeNode =
@@ -51,7 +52,7 @@ export function eventsToDefinedTypesVisitor() {
 
         return {
           ...program,
-          definedTypes: [...program.definedTypes, ...eventTypes],
+          definedTypes: [...(program.definedTypes ?? []), ...eventTypes],
           events: [],
         };
       },

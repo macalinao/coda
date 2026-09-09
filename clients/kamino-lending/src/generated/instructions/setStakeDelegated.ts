@@ -37,7 +37,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SET_STAKE_DELEGATED_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([73, 171, 184, 75, 30, 56, 198, 223]);

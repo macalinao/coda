@@ -51,14 +51,14 @@ import {
   findMasterEditionPda,
   findMetadataPda,
   findTreeConfigPda,
-} from "../pdas/index.js";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMetadataArgsDecoder,
   getMetadataArgsEncoder,
   type MetadataArgs,
   type MetadataArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VERIFY_COLLECTION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([56, 113, 101, 253, 79, 55, 122, 169]);
@@ -461,12 +461,15 @@ export async function getVerifyCollectionInstructionAsync<
 
   // Resolve default values.
   if (!accounts.treeAuthority.value) {
-    accounts.treeAuthority.value = await findTreeConfigPda({
-      merkleTree: getAddressFromResolvedInstructionAccount(
-        "merkleTree",
-        accounts.merkleTree.value,
-      ),
-    });
+    accounts.treeAuthority.value = await findTreeConfigPda(
+      {
+        merkleTree: getAddressFromResolvedInstructionAccount(
+          "merkleTree",
+          accounts.merkleTree.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.collectionAuthorityRecordPda.value) {
     accounts.collectionAuthorityRecordPda.value = programAddress;
@@ -491,7 +494,9 @@ export async function getVerifyCollectionInstructionAsync<
     });
   }
   if (!accounts.bubblegumSigner.value) {
-    accounts.bubblegumSigner.value = await findBubblegumSignerPda();
+    accounts.bubblegumSigner.value = await findBubblegumSignerPda({
+      programAddress,
+    });
   }
   if (!accounts.logWrapper.value) {
     accounts.logWrapper.value =

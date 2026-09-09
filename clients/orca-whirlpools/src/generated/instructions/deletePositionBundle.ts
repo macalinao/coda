@@ -36,7 +36,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DELETE_POSITION_BUNDLE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([100, 25, 99, 2, 217, 239, 124, 173]);

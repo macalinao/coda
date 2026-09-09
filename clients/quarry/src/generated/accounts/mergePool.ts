@@ -40,7 +40,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMergePoolPda, type MergePoolSeeds } from "../pdas/index.js";
+import { findMergePoolPda, type MergePoolSeeds } from "../pdas/index.ts";
 
 export const MERGE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   15, 189, 242, 87, 188, 75, 64, 244,

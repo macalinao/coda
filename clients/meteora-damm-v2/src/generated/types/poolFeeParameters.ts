@@ -31,7 +31,7 @@ import {
   type BaseFeeParametersArgs,
   type DynamicFeeParameters,
   type DynamicFeeParametersArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Information regarding fee charges */
 export type PoolFeeParameters = {

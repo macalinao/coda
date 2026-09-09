@@ -27,7 +27,7 @@ import {
   getPayloadTypeEncoder,
   type PayloadType,
   type PayloadTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type Payload = { map: Map<string, PayloadType> };
 

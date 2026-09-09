@@ -42,13 +42,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRegistrarPda, type RegistrarSeeds } from "../pdas/index.js";
+import { findRegistrarPda, type RegistrarSeeds } from "../pdas/index.ts";
 import {
   getVotingMintConfigDecoder,
   getVotingMintConfigEncoder,
   type VotingMintConfig,
   type VotingMintConfigArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const REGISTRAR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   193, 202, 205, 51, 78, 168, 150, 128,

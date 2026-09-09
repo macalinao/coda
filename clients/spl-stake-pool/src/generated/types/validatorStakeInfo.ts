@@ -26,7 +26,7 @@ import {
   getPodStakeStatusEncoder,
   type PodStakeStatus,
   type PodStakeStatusArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Information about a validator in the pool

@@ -35,7 +35,7 @@ import {
   getCreatorEncoder,
   type Creator,
   type CreatorArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Metadata fields to change on a leaf via `updateMetadata` /

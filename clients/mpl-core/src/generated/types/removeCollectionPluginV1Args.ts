@@ -19,7 +19,7 @@ import {
   getPluginTypeEncoder,
   type PluginType,
   type PluginTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `removeCollectionPluginV1`. */
 export type RemoveCollectionPluginV1Args = {

@@ -32,7 +32,7 @@ import {
   getAuthorizationDataEncoder,
   type AuthorizationData,
   type AuthorizationDataArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type DelegateArgs =
   | { __kind: "CollectionV1"; authorizationData: Option<AuthorizationData> }

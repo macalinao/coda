@@ -37,7 +37,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const TRANSFER_OWNERSHIP_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([65, 177, 215, 73, 53, 45, 99, 47]);

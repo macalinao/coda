@@ -41,7 +41,7 @@ import {
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
-} from "../programs/index.js";
+} from "../programs/index.ts";
 
 export const DEPOSIT_AND_WITHDRAW_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([141, 153, 39, 15, 64, 61, 88, 84]);

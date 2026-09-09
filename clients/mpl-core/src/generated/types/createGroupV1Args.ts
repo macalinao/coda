@@ -27,7 +27,7 @@ import {
   getRelationshipEntryEncoder,
   type RelationshipEntry,
   type RelationshipEntryArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `createGroupV1`. */
 export type CreateGroupV1Args = {

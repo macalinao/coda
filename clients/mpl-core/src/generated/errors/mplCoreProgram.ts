@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** InvalidSystemProgram: Invalid System Program */
 export const MPL_CORE_PROGRAM_ERROR__INVALID_SYSTEM_PROGRAM = 0x0; // 0

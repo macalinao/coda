@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./ruleSet.js";
-export * from "./ruleSetBuffer.js";
+export * from "./ruleSet.ts";
+export * from "./ruleSetBuffer.ts";

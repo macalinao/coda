@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@codama/nodes-from-anchor": "catalog:",
-    "@codama/renderers-rust": "^3.1.0",
+    "@codama/renderers-rust": "^3.1.3",
     "@macalinao/coda-visitors": "workspace:^",
     "@macalinao/codama-nodes-from-anchor-x": "workspace:^",
     "@macalinao/codama-rename-visitor": "workspace:^",
@@ -62,7 +62,7 @@
   "devDependencies": {
     "@macalinao/tsconfig": "catalog:",
     "@types/bun": "catalog:",
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.5.0",
     "typescript": "catalog:",
     "tsdown": "catalog:"
   }

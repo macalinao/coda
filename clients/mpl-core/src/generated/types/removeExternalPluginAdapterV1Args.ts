@@ -19,7 +19,7 @@ import {
   getExternalPluginAdapterKeyEncoder,
   type ExternalPluginAdapterKey,
   type ExternalPluginAdapterKeyArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `removeExternalPluginAdapterV1`. */
 export type RemoveExternalPluginAdapterV1Args = {

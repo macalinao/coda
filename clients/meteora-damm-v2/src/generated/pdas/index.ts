@@ -6,14 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./claimFeeOperator.js";
-export * from "./config.js";
-export * from "./customizablePool.js";
-export * from "./eventAuthority.js";
-export * from "./pool.js";
-export * from "./poolAuthority.js";
-export * from "./position.js";
-export * from "./positionNftAccount.js";
-export * from "./rewardVault.js";
-export * from "./tokenBadge.js";
-export * from "./tokenVault.js";
+export * from "./claimFeeOperator.ts";
+export * from "./config.ts";
+export * from "./customizablePool.ts";
+export * from "./eventAuthority.ts";
+export * from "./pool.ts";
+export * from "./poolAuthority.ts";
+export * from "./position.ts";
+export * from "./positionNftAccount.ts";
+export * from "./rewardVault.ts";
+export * from "./tokenBadge.ts";
+export * from "./tokenVault.ts";

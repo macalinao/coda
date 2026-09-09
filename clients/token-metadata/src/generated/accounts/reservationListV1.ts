@@ -45,7 +45,7 @@ import {
   type KeyArgs,
   type ReservationV1,
   type ReservationV1Args,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export type ReservationListV1 = {
   key: Key;

@@ -31,7 +31,7 @@ describe("rootNodeFromAnchorIdls", () => {
 
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("testProgram");
-    expect(root.additionalPrograms).toHaveLength(0);
+    expect(root.additionalPrograms ?? []).toHaveLength(0);
   });
 
   it("should create a root node from multiple IDLs", () => {
@@ -44,8 +44,8 @@ describe("rootNodeFromAnchorIdls", () => {
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("programOne");
     expect(root.additionalPrograms).toHaveLength(2);
-    expect(root.additionalPrograms[0]!.name as string).toBe("programTwo");
-    expect(root.additionalPrograms[1]!.name as string).toBe("programThree");
+    expect(root.additionalPrograms![0]!.name as string).toBe("programTwo");
+    expect(root.additionalPrograms![1]!.name as string).toBe("programThree");
   });
 
   it("should handle IDL v0.1.0 format", () => {
@@ -67,9 +67,9 @@ describe("rootNodeFromAnchorIdls", () => {
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("oldProgram");
     expect(root.additionalPrograms).toHaveLength(1);
-    expect(root.additionalPrograms[0]!.name as string).toBe("newProgram");
+    expect(root.additionalPrograms![0]!.name as string).toBe("newProgram");
     // V0.1.0 IDL includes address in metadata but might not be exposed in the program node
-    expect(root.additionalPrograms[0]!.name as string).toBe("newProgram");
+    expect(root.additionalPrograms![0]!.name as string).toBe("newProgram");
   });
 
   it("should throw an error when no IDLs are provided", () => {
@@ -96,9 +96,9 @@ describe("rootNodeFromAnchorIdls", () => {
     const root = rootNodeFromAnchorIdls(idls);
 
     expect(root.program.name as string).toBe("first");
-    expect(root.additionalPrograms[0]!.name as string).toBe("second");
-    expect(root.additionalPrograms[1]!.name as string).toBe("third");
-    expect(root.additionalPrograms[2]!.name as string).toBe("fourth");
+    expect(root.additionalPrograms![0]!.name as string).toBe("second");
+    expect(root.additionalPrograms![1]!.name as string).toBe("third");
+    expect(root.additionalPrograms![2]!.name as string).toBe("fourth");
   });
 
   it("should handle IDLs with instructions and accounts", () => {
@@ -130,8 +130,8 @@ describe("rootNodeFromAnchorIdls", () => {
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("complexProgram");
     expect(root.program.instructions).toHaveLength(1);
-    expect(root.program.instructions[0]!.name as string).toBe("initialize");
+    expect(root.program.instructions![0]!.name as string).toBe("initialize");
     expect(root.program.accounts).toHaveLength(1);
-    expect(root.program.accounts[0]!.name as string).toBe("myAccount");
+    expect(root.program.accounts![0]!.name as string).toBe("myAccount");
   });
 });

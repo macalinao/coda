@@ -39,7 +39,7 @@ import {
   type EscrowAuthorityArgs,
   type Key,
   type KeyArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export type TokenOwnedEscrow = {
   key: Key;

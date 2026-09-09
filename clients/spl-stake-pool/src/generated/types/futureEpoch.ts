@@ -27,7 +27,7 @@ import {
   getFeeEncoder,
   type Fee,
   type FeeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Wrapper type that "counts down" epochs, which is Borsh-compatible with the

@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** NumericalOverflow: Numerical Overflow */
 export const MPL_TOKEN_AUTH_RULES_ERROR__NUMERICAL_OVERFLOW = 0x0; // 0

@@ -6,14 +6,14 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./createOrUpdateArgs.js";
-export * from "./key.js";
-export * from "./payload.js";
-export * from "./payloadType.js";
-export * from "./proofInfo.js";
-export * from "./puffRuleSetArgs.js";
-export * from "./ruleSetHeader.js";
-export * from "./ruleSetRevisionMapV1.js";
-export * from "./seedsVec.js";
-export * from "./validateArgs.js";
-export * from "./writeToBufferArgs.js";
+export * from "./createOrUpdateArgs.ts";
+export * from "./key.ts";
+export * from "./payload.ts";
+export * from "./payloadType.ts";
+export * from "./proofInfo.ts";
+export * from "./puffRuleSetArgs.ts";
+export * from "./ruleSetHeader.ts";
+export * from "./ruleSetRevisionMapV1.ts";
+export * from "./seedsVec.ts";
+export * from "./validateArgs.ts";
+export * from "./writeToBufferArgs.ts";

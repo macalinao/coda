@@ -6,18 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./assetDataSchema.js";
-export * from "./bubblegumEventType.js";
-export * from "./collection.js";
-export * from "./creator.js";
-export * from "./decompressibleState.js";
-export * from "./instructionName.js";
-export * from "./leafSchema.js";
-export * from "./metadataArgs.js";
-export * from "./metadataArgsV2.js";
-export * from "./tokenProgramVersion.js";
-export * from "./tokenStandard.js";
-export * from "./updateArgs.js";
-export * from "./useMethod.js";
-export * from "./uses.js";
-export * from "./version.js";
+export * from "./assetDataSchema.ts";
+export * from "./bubblegumEventType.ts";
+export * from "./collection.ts";
+export * from "./creator.ts";
+export * from "./decompressibleState.ts";
+export * from "./instructionName.ts";
+export * from "./leafSchema.ts";
+export * from "./metadataArgs.ts";
+export * from "./metadataArgsV2.ts";
+export * from "./tokenProgramVersion.ts";
+export * from "./tokenStandard.ts";
+export * from "./updateArgs.ts";
+export * from "./useMethod.ts";
+export * from "./uses.ts";
+export * from "./version.ts";

@@ -37,8 +37,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const SET_AND_VERIFY_SIZED_COLLECTION_ITEM_DISCRIMINATOR = 32;
 
@@ -228,22 +228,28 @@ export async function getSetAndVerifySizedCollectionItemInstructionAsync<
 
   // Resolve default values.
   if (!accounts.collection.value) {
-    accounts.collection.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "collectionMint",
-        accounts.collectionMint.value,
-      ),
-    });
+    accounts.collection.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "collectionMint",
+          accounts.collectionMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.collectionMasterEditionAccount.value) {
-    accounts.collectionMasterEditionAccount.value = await findMasterEditionPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "collectionMint",
-        accounts.collectionMint.value,
-      ),
-    });
+    accounts.collectionMasterEditionAccount.value = await findMasterEditionPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "collectionMint",
+          accounts.collectionMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");

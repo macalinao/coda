@@ -42,7 +42,7 @@ import {
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
-} from "../programs/index.js";
+} from "../programs/index.ts";
 
 export const REPAY_AND_WITHDRAW_AND_REDEEM_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([2, 54, 152, 3, 148, 96, 109, 218]);

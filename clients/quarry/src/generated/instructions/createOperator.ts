@@ -40,8 +40,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findOperatorPda } from "../pdas/index.js";
-import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findOperatorPda } from "../pdas/index.ts";
+import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_OPERATOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [145, 40, 238, 75, 181, 252, 59, 11],
@@ -207,12 +207,15 @@ export async function getCreateOperatorInstructionAsync<
 
   // Resolve default values.
   if (!accounts.operator.value) {
-    accounts.operator.value = await findOperatorPda({
-      base: getAddressFromResolvedInstructionAccount(
-        "base",
-        accounts.base.value,
-      ),
-    });
+    accounts.operator.value = await findOperatorPda(
+      {
+        base: getAddressFromResolvedInstructionAccount(
+          "base",
+          accounts.base.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

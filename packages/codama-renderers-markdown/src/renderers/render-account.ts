@@ -41,7 +41,7 @@ export function renderAccount(
 
   const resolvedData = resolveNestedTypeNode(account.data);
   if (isNode(resolvedData, ["structTypeNode"])) {
-    for (const field of resolvedData.fields) {
+    for (const field of resolvedData.fields ?? []) {
       const fieldType = renderTypeNode(field.type, context);
       const description = field.docs?.join(" ") ?? "-";
       lines.push(`| \`${field.name}\` | ${fieldType} | ${description} |`);

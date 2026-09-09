@@ -23,7 +23,7 @@ import {
   type AuthorityArgs,
   type ExternalPluginAdapterSchema,
   type ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * External plugin adapter like `AppData`, but for collections:

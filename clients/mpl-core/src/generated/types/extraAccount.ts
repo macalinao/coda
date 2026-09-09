@@ -34,7 +34,7 @@ import {
   getSeedEncoder,
   type Seed,
   type SeedArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * An additional account to forward to a `LifecycleHook`'s

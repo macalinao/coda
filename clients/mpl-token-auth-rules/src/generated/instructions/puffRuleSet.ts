@@ -34,13 +34,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getPuffRuleSetArgsDecoder,
   getPuffRuleSetArgsEncoder,
   type PuffRuleSetArgs,
   type PuffRuleSetArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PUFF_RULE_SET_DISCRIMINATOR = 3;
 

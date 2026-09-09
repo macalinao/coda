@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** MathOverflow: Math operation overflow */
 export const CP_AMM_ERROR__MATH_OVERFLOW = 0x1770; // 6000

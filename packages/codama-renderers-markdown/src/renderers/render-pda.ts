@@ -21,7 +21,7 @@ export function renderPda(pda: PdaNode, context: RenderContext): string {
   lines.push("| Seed | Type | Description |");
   lines.push("| ---- | ---- | ----------- |");
 
-  for (const seed of pda.seeds) {
+  for (const seed of pda.seeds ?? []) {
     const row = renderPdaSeed(seed, context);
     if (row != null) {
       lines.push(row);
@@ -55,7 +55,7 @@ function renderConstantSeedValue(value: ConstantPdaSeedNode["value"]): string {
 }
 
 function renderPdaSeed(
-  seed: PdaNode["seeds"][number],
+  seed: NonNullable<PdaNode["seeds"]>[number],
   context: RenderContext,
 ): string | null {
   if (isNode(seed, ["constantPdaSeedNode"])) {

@@ -55,7 +55,7 @@ import {
   type ReserveConfigArgs,
   type ReserveLiquidity,
   type ReserveLiquidityArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   43, 242, 204, 202, 26, 247, 59, 127,

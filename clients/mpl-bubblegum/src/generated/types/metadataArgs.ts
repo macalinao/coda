@@ -53,7 +53,7 @@ import {
   type TokenStandardArgs,
   type Uses,
   type UsesArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Metadata for a V1 (`LeafSchema` V1) compressed NFT leaf.

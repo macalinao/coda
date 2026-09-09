@@ -35,7 +35,7 @@ import {
   type ExternalPluginAdapterInitInfoArgs,
   type PluginAuthorityPair,
   type PluginAuthorityPairArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `createCollectionV2`. */
 export type CreateCollectionV2Args = {

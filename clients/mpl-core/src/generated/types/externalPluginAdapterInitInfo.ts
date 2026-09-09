@@ -49,7 +49,7 @@ import {
   type LinkedLifecycleHookInitInfoArgs,
   type OracleInitInfo,
   type OracleInitInfoArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Initialization data for adding a new external plugin adapter,

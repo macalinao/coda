@@ -39,13 +39,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getUpdateGlobalConfigModeDecoder,
   getUpdateGlobalConfigModeEncoder,
   type UpdateGlobalConfigMode,
   type UpdateGlobalConfigModeArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const UPDATE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([164, 84, 130, 189, 111, 58, 250, 200]);

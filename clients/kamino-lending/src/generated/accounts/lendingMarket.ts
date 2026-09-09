@@ -49,7 +49,7 @@ import {
   getElevationGroupPodEncoder,
   type ElevationGroupPod,
   type ElevationGroupPodArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const LENDING_MARKET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   246, 114, 50, 98, 72, 157, 28, 120,

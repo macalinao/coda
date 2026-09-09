@@ -31,7 +31,7 @@ import {
   getPluginAuthorityPairEncoder,
   type PluginAuthorityPair,
   type PluginAuthorityPairArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `createCollectionV1`. */
 export type CreateCollectionV1Args = {

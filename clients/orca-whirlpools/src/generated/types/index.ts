@@ -6,18 +6,18 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./accountsType.js";
-export * from "./liquidityDecreased.js";
-export * from "./liquidityIncreased.js";
-export * from "./lockType.js";
-export * from "./lockTypeLabel.js";
-export * from "./openPositionBumps.js";
-export * from "./openPositionWithMetadataBumps.js";
-export * from "./poolInitialized.js";
-export * from "./positionRewardInfo.js";
-export * from "./remainingAccountsInfo.js";
-export * from "./remainingAccountsSlice.js";
-export * from "./tick.js";
-export * from "./traded.js";
-export * from "./whirlpoolBumps.js";
-export * from "./whirlpoolRewardInfo.js";
+export * from "./accountsType.ts";
+export * from "./liquidityDecreased.ts";
+export * from "./liquidityIncreased.ts";
+export * from "./lockType.ts";
+export * from "./lockTypeLabel.ts";
+export * from "./openPositionBumps.ts";
+export * from "./openPositionWithMetadataBumps.ts";
+export * from "./poolInitialized.ts";
+export * from "./positionRewardInfo.ts";
+export * from "./remainingAccountsInfo.ts";
+export * from "./remainingAccountsSlice.ts";
+export * from "./tick.ts";
+export * from "./traded.ts";
+export * from "./whirlpoolBumps.ts";
+export * from "./whirlpoolRewardInfo.ts";

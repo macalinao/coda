@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getAddAssetsToGroupV1ArgsDecoder,
   getAddAssetsToGroupV1ArgsEncoder,
   type AddAssetsToGroupV1Args,
   type AddAssetsToGroupV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const ADD_ASSETS_TO_GROUP_V1_DISCRIMINATOR = 35;
 

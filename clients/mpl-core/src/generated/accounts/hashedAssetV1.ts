@@ -35,7 +35,7 @@ import {
   getKeyEncoder,
   type Key,
   type KeyArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 /**
  * The compressed (`LedgerState`) representation of an asset:

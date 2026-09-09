@@ -33,13 +33,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getFeeTypeDecoder,
   getFeeTypeEncoder,
   type FeeType,
   type FeeTypeArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SET_FEE_DISCRIMINATOR = 12;
 

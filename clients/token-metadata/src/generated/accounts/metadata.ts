@@ -36,7 +36,7 @@ import {
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
-import { findMetadataPda, type MetadataSeeds } from "../pdas/index.js";
+import { findMetadataPda, type MetadataSeeds } from "../pdas/index.ts";
 import {
   getCollectionDecoder,
   getCollectionDetailsDecoder,
@@ -66,7 +66,7 @@ import {
   type TokenStandardArgs,
   type Uses,
   type UsesArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export type Metadata = {
   key: Key;

@@ -31,7 +31,7 @@ import {
   getAccountMetaDataEncoder,
   type AccountMetaData,
   type AccountMetaDataArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type InstructionData = {
   programId: Address;

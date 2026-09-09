@@ -29,7 +29,7 @@ import {
   getOptionVoteResultEncoder,
   type OptionVoteResult,
   type OptionVoteResultArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type ProposalOption = {
   label: string;

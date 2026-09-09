@@ -31,7 +31,7 @@ import {
   getProposalAccountMetaEncoder,
   type ProposalAccountMeta,
   type ProposalAccountMetaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type ProposalInstruction = {
   programId: Address;

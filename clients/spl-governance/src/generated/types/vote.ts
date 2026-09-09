@@ -29,7 +29,7 @@ import {
   getVoteChoiceEncoder,
   type VoteChoice,
   type VoteChoiceArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type Vote =
   | { __kind: "Approve"; fields: readonly [Array<VoteChoice>] }

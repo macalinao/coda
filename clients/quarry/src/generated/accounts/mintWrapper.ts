@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findMintWrapperPda, type MintWrapperSeeds } from "../pdas/index.js";
+import { findMintWrapperPda, type MintWrapperSeeds } from "../pdas/index.ts";
 
 export const MINT_WRAPPER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   154, 166, 64, 239, 170, 99, 74, 158,

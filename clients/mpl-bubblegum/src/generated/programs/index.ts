@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./bubblegum.js";
-export * from "./mplTokenMetadata.js";
+export * from "./bubblegum.ts";
+export * from "./mplTokenMetadata.ts";

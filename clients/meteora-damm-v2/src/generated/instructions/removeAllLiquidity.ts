@@ -43,8 +43,8 @@ import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REMOVE_ALL_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([10, 51, 61, 35, 112, 105, 24, 85]);
@@ -309,31 +309,39 @@ export async function getRemoveAllLiquidityInstructionAsync<
 
   // Resolve default values.
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value = await findPoolAuthorityPda();
+    accounts.poolAuthority.value = await findPoolAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.tokenAVault.value) {
-    accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenAMint",
-        accounts.tokenAMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenAVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenAMint",
+          accounts.tokenAMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenBVault.value) {
-    accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenBMint",
-        accounts.tokenBMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenBVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenBMint",
+          accounts.tokenBMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenAProgram.value) {
     accounts.tokenAProgram.value =
@@ -344,7 +352,9 @@ export async function getRemoveAllLiquidityInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

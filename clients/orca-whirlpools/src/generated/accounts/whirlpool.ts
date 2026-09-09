@@ -51,7 +51,7 @@ import {
   getWhirlpoolRewardInfoEncoder,
   type WhirlpoolRewardInfo,
   type WhirlpoolRewardInfoArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const WHIRLPOOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   63, 149, 209, 12, 225, 128, 99, 9,

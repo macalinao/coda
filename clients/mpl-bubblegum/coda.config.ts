@@ -193,7 +193,7 @@ const addTokenMetadataProgramVisitor = bottomUpTransformerVisitor([
     transform: (node) => {
       assertIsNode(node, "rootNode");
       return rootNode(node.program, [
-        ...node.additionalPrograms,
+        ...(node.additionalPrograms ?? []),
         tokenMetadataProgramNode,
       ]);
     },

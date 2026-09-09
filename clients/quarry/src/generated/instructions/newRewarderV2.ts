@@ -39,8 +39,8 @@ import {
   getResolvedInstructionAccountAsTransactionSigner,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findRewarderPda } from "../pdas/index.js";
-import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findRewarderPda } from "../pdas/index.ts";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const NEW_REWARDER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [173, 189, 26, 25, 79, 177, 60, 173],
@@ -211,12 +211,15 @@ export async function getNewRewarderV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewarder.value) {
-    accounts.rewarder.value = await findRewarderPda({
-      base: getAddressFromResolvedInstructionAccount(
-        "base",
-        accounts.base.value,
-      ),
-    });
+    accounts.rewarder.value = await findRewarderPda(
+      {
+        base: getAddressFromResolvedInstructionAccount(
+          "base",
+          accounts.base.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.initialAuthority.value) {
     accounts.initialAuthority.value =

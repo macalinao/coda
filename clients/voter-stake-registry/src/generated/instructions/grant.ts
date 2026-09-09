@@ -49,13 +49,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.js";
+import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getLockupKindDecoder,
   getLockupKindEncoder,
   type LockupKind,
   type LockupKindArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const GRANT_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   145, 189, 68, 153, 161, 231, 76, 107,

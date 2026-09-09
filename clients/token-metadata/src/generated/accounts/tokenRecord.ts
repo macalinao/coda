@@ -49,7 +49,7 @@ import {
   type TokenDelegateRoleArgs,
   type TokenState,
   type TokenStateArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export type TokenRecord = {
   key: Key;
