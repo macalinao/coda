@@ -99,6 +99,6 @@ fi
 
 # Tag the release in git
 echo "Creating git tags via Changeset..."
-changeset tag
+changeset git-tag
 
 echo "Publishing complete!"

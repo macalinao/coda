@@ -50,7 +50,7 @@
     "format": "oxfmt"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.1",
+    "@changesets/cli": "^3.0.1",
     "@size-limit/preset-small-lib": "13.0.3",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
@@ -78,6 +78,10 @@
     "@codama/errors": "^1.9.0",
     "@codama/nodes": "^1.9.0",
     "@codama/renderers-core": "^1.3.10",
-    "@codama/visitors-core": "^1.9.0"
+    "@codama/visitors-core": "^1.9.0",
+    "js-yaml": "^4.3.2",
+    "brace-expansion": "^5.0.9",
+    "mdast-util-to-hast": "^13.2.1",
+    "baseline-browser-mapping": "^2.11.0"
   }
 }
