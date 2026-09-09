@@ -15,7 +15,7 @@
       "@macalinao/tsconfig": "^4.0.0",
       "@solana/kit": "^7.0.0",
       "@solana/program-client-core": "^7.0.0",
-      "@types/bun": "^1.3.14",
+      "@types/bun": "~1.3.14",
       "codama": "^1.9.0",
       "@codama/nodes": "^1.9.0",
       "@codama/nodes-from-anchor": "^1.5.2",
