@@ -23,7 +23,7 @@ import {
   type ExternalPluginAdapterSchemaArgs,
   type LinkedDataKey,
   type LinkedDataKeyArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Internal storage plugin holding the raw payload for a

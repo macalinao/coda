@@ -50,14 +50,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findTreeConfigPda } from "../pdas/index.js";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findTreeConfigPda } from "../pdas/index.ts";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMetadataArgsV2Decoder,
   getMetadataArgsV2Encoder,
   type MetadataArgsV2,
   type MetadataArgsV2Args,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SET_COLLECTION_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([229, 35, 61, 91, 15, 14, 99, 160]);
@@ -432,12 +432,15 @@ export async function getSetCollectionV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.treeAuthority.value) {
-    accounts.treeAuthority.value = await findTreeConfigPda({
-      merkleTree: getAddressFromResolvedInstructionAccount(
-        "merkleTree",
-        accounts.merkleTree.value,
-      ),
-    });
+    accounts.treeAuthority.value = await findTreeConfigPda(
+      {
+        merkleTree: getAddressFromResolvedInstructionAccount(
+          "merkleTree",
+          accounts.merkleTree.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.mplCoreCpiSigner.value) {
     accounts.mplCoreCpiSigner.value =

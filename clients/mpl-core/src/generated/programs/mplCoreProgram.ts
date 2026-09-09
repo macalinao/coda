@@ -51,7 +51,7 @@ import {
   type PluginHeaderV1Args,
   type PluginRegistryV1,
   type PluginRegistryV1Args,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getAddAssetsToGroupV1Instruction,
   getAddCollectionExternalPluginAdapterV1Instruction,
@@ -221,8 +221,8 @@ import {
   type UpdateV2Input,
   type WriteCollectionExternalPluginAdapterDataV1Input,
   type WriteExternalPluginAdapterDataV1Input,
-} from "../instructions/index.js";
-import { findAssetSignerPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findAssetSignerPda } from "../pdas/index.ts";
 
 export const MPL_CORE_PROGRAM_PROGRAM_ADDRESS =
   "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d" as Address<"CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d">;

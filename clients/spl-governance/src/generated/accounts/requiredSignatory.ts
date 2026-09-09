@@ -35,12 +35,12 @@ import {
 import {
   findRequiredSignatoryPda,
   type RequiredSignatorySeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   GovernanceAccountType,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const REQUIRED_SIGNATORY_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.RequiredSignatory;

@@ -19,7 +19,7 @@ import {
   getPayloadEncoder,
   type Payload,
   type PayloadArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type AuthorizationData = { payload: Payload };
 

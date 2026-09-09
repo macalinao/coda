@@ -25,7 +25,7 @@ import {
   getPriceEncoder,
   type Price,
   type PriceArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type DatedPrice = {
   price: Price;

@@ -42,8 +42,8 @@ import {
 import {
   findFarmVaultsAuthorityPda,
   findRewardVaultPda,
-} from "../pdas/index.js";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_REWARD_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [191, 187, 176, 137, 9, 25, 187, 244],
@@ -227,24 +227,30 @@ export async function getWithdrawRewardInstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewardVault.value) {
-    accounts.rewardVault.value = await findRewardVaultPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-      rewardMint: getAddressFromResolvedInstructionAccount(
-        "rewardMint",
-        accounts.rewardMint.value,
-      ),
-    });
+    accounts.rewardVault.value = await findRewardVaultPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+        rewardMint: getAddressFromResolvedInstructionAccount(
+          "rewardMint",
+          accounts.rewardMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.farmVaultsAuthority.value) {
-    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda({
-      farmState: getAddressFromResolvedInstructionAccount(
-        "farmState",
-        accounts.farmState.value,
-      ),
-    });
+    accounts.farmVaultsAuthority.value = await findFarmVaultsAuthorityPda(
+      {
+        farmState: getAddressFromResolvedInstructionAccount(
+          "farmState",
+          accounts.farmState.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

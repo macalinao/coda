@@ -46,13 +46,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getRemainingAccountsInfoDecoder,
   getRemainingAccountsInfoEncoder,
   type RemainingAccountsInfo,
   type RemainingAccountsInfoArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SWAP_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   43, 4, 237, 11, 26, 201, 30, 98,

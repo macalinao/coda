@@ -6,4 +6,4 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./whirlpool.js";
+export * from "./whirlpool.ts";

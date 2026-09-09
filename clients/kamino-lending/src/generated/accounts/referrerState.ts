@@ -37,7 +37,7 @@ import {
 import {
   findReferrerStatePda,
   type ReferrerStateSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const REFERRER_STATE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   194, 81, 217, 103, 12, 19, 12, 66,

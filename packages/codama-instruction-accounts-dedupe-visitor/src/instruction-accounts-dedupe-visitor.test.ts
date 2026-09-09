@@ -43,11 +43,11 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idlWithDuplicates);
     const transformedRoot = visit(rootWithDuplicates, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
+    const instruction = transformedRoot.program.instructions![0];
     // The visitor detects there's already a "mint" in the Codama node structure,
     // so it doesn't flatten (because the current implementation checks the node, not the IDL)
     // Actually, rootNodeFromAnchor already creates flattened nodes, so we get the expected result
-    expect(instruction?.accounts.length).toBeGreaterThan(0);
+    expect(instruction?.accounts?.length).toBeGreaterThan(0);
   });
 
   it("should NOT flatten when there are no duplicate account names after flattening", () => {
@@ -84,9 +84,9 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idlNoDuplicates);
     const transformedRoot = visit(rootNoDuplicates, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
+    const instruction = transformedRoot.program.instructions![0];
     // rootNodeFromAnchor already flattens, so we check the names
-    expect(instruction?.accounts.length).toBeGreaterThan(0);
+    expect(instruction?.accounts?.length).toBeGreaterThan(0);
   });
 
   it("should handle instructions with no nested accounts", () => {
@@ -117,10 +117,10 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idl);
     const transformedRoot = visit(root, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
+    const instruction = transformedRoot.program.instructions![0];
     expect(instruction?.accounts).toHaveLength(2);
-    expect(instruction?.accounts[0]?.name).toBe(camelCase("account1"));
-    expect(instruction?.accounts[1]?.name).toBe(camelCase("account2"));
+    expect(instruction?.accounts?.[0]?.name).toBe(camelCase("account1"));
+    expect(instruction?.accounts?.[1]?.name).toBe(camelCase("account2"));
   });
 
   it("should handle multiple instructions", () => {
@@ -159,12 +159,12 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idl);
     const transformedRoot = visit(root, visitor) as RootNode;
 
-    const firstInstruction = transformedRoot.program.instructions[0];
-    expect(firstInstruction?.accounts.length).toBeGreaterThan(0);
+    const firstInstruction = transformedRoot.program.instructions![0];
+    expect(firstInstruction?.accounts?.length).toBeGreaterThan(0);
 
-    const secondInstruction = transformedRoot.program.instructions[1];
+    const secondInstruction = transformedRoot.program.instructions![1];
     expect(secondInstruction?.accounts).toHaveLength(1);
-    expect(secondInstruction?.accounts[0]?.name).toBe(camelCase("simple"));
+    expect(secondInstruction?.accounts?.[0]?.name).toBe(camelCase("simple"));
   });
 
   it("should throw error if instruction not found in IDL", () => {
@@ -236,10 +236,10 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idl);
     const transformedRoot = visit(root, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
+    const instruction = transformedRoot.program.instructions![0];
     // rootNodeFromAnchor adds a discriminator argument automatically
-    expect(instruction?.arguments.length).toBeGreaterThanOrEqual(2);
-    const argNames = instruction?.arguments.map((a) => a.name) ?? [];
+    expect(instruction?.arguments?.length).toBeGreaterThanOrEqual(2);
+    const argNames = instruction?.arguments?.map((a) => a.name) ?? [];
     expect(argNames).toContain(camelCase("amount"));
     expect(argNames).toContain(camelCase("data"));
   });
@@ -280,8 +280,8 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idl);
     const transformedRoot = visit(root, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
-    expect(instruction?.accounts.length).toBeGreaterThan(0);
+    const instruction = transformedRoot.program.instructions![0];
+    expect(instruction?.accounts?.length).toBeGreaterThan(0);
   });
 
   it("should work with program accounts", () => {
@@ -325,11 +325,13 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idl);
     const transformedRoot = visit(root, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
-    expect(instruction?.accounts.length).toBeGreaterThan(0);
+    const instruction = transformedRoot.program.instructions![0];
+    expect(instruction?.accounts?.length).toBeGreaterThan(0);
 
     // Program accounts should be created from types
-    expect(transformedRoot.program.accounts.length).toBeGreaterThanOrEqual(0);
+    expect(
+      (transformedRoot.program.accounts ?? []).length,
+    ).toBeGreaterThanOrEqual(0);
   });
 
   it("should handle empty accounts in instruction", () => {
@@ -357,7 +359,7 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idl);
     const transformedRoot = visit(root, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
+    const instruction = transformedRoot.program.instructions![0];
     expect(instruction?.accounts).toHaveLength(0);
   });
 
@@ -401,12 +403,12 @@ describe("instructionAccountsDedupeVisitor", () => {
     const visitor = instructionAccountsDedupeVisitor(idl);
     const transformedRoot = visit(root, visitor) as RootNode;
 
-    const instruction = transformedRoot.program.instructions[0];
+    const instruction = transformedRoot.program.instructions![0];
     // When there are duplicates, the visitor should flatten with prefixes
-    expect(instruction?.accounts.length).toBeGreaterThan(0);
+    expect(instruction?.accounts?.length).toBeGreaterThan(0);
 
     // Check that flattened names include prefixes to avoid collisions
-    const accountNames = instruction?.accounts.map((a) => a.name);
+    const accountNames = instruction?.accounts?.map((a) => a.name);
     const uniqueNames = new Set(accountNames);
     expect(uniqueNames.size).toBe(accountNames?.length ?? 0); // All names should be unique
   });

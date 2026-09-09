@@ -46,7 +46,7 @@ import {
   type ExtraAccountArgs,
   type HookableLifecycleEvent,
   type HookableLifecycleEventArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Initialization data for the `LinkedLifecycleHook` external

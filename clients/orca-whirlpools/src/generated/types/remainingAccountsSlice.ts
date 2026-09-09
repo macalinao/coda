@@ -21,7 +21,7 @@ import {
   getAccountsTypeEncoder,
   type AccountsType,
   type AccountsTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type RemainingAccountsSlice = {
   accountsType: AccountsType;

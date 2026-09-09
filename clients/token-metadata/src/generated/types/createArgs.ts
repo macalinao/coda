@@ -33,7 +33,7 @@ import {
   type AssetDataArgs,
   type PrintSupply,
   type PrintSupplyArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type CreateArgs = {
   __kind: "V1";

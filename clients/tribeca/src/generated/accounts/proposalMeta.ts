@@ -40,7 +40,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findProposalMetaPda, type ProposalMetaSeeds } from "../pdas/index.js";
+import { findProposalMetaPda, type ProposalMetaSeeds } from "../pdas/index.ts";
 
 export const PROPOSAL_META_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   50, 100, 46, 24, 151, 174, 216, 78,

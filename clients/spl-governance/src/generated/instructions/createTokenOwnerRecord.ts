@@ -35,8 +35,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findTokenOwnerRecordPda } from "../pdas/index.js";
-import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findTokenOwnerRecordPda } from "../pdas/index.ts";
+import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_TOKEN_OWNER_RECORD_DISCRIMINATOR = 23;
 
@@ -185,20 +185,23 @@ export async function getCreateTokenOwnerRecordInstructionAsync<
 
   // Resolve default values.
   if (!accounts.tokenOwnerRecord.value) {
-    accounts.tokenOwnerRecord.value = await findTokenOwnerRecordPda({
-      realm: getAddressFromResolvedInstructionAccount(
-        "realmAccount",
-        accounts.realmAccount.value,
-      ),
-      governingTokenMint: getAddressFromResolvedInstructionAccount(
-        "governingTokenMint",
-        accounts.governingTokenMint.value,
-      ),
-      governingTokenOwner: getAddressFromResolvedInstructionAccount(
-        "governingTokenOwnerAccount",
-        accounts.governingTokenOwnerAccount.value,
-      ),
-    });
+    accounts.tokenOwnerRecord.value = await findTokenOwnerRecordPda(
+      {
+        realm: getAddressFromResolvedInstructionAccount(
+          "realmAccount",
+          accounts.realmAccount.value,
+        ),
+        governingTokenMint: getAddressFromResolvedInstructionAccount(
+          "governingTokenMint",
+          accounts.governingTokenMint.value,
+        ),
+        governingTokenOwner: getAddressFromResolvedInstructionAccount(
+          "governingTokenOwnerAccount",
+          accounts.governingTokenOwnerAccount.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

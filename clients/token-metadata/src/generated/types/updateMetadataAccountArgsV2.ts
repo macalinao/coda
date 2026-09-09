@@ -28,7 +28,7 @@ import {
   getDataV2Encoder,
   type DataV2,
   type DataV2Args,
-} from "./index.js";
+} from "./index.ts";
 
 export type UpdateMetadataAccountArgsV2 = {
   data: Option<DataV2>;

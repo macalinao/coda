@@ -43,9 +43,9 @@ import {
   type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
-  type FarmsUserStateSeeds,
   findFarmsUserStatePda,
-} from "../pdas/index.js";
+  type FarmsUserStateSeeds,
+} from "../pdas/index.ts";
 
 export const FARMS_USER_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([72, 177, 85, 249, 76, 167, 186, 126]);

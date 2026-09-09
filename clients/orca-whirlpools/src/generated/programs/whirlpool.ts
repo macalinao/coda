@@ -61,7 +61,7 @@ import {
   type WhirlpoolsConfigArgs,
   type WhirlpoolsConfigExtension,
   type WhirlpoolsConfigExtensionArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getCloseBundledPositionInstruction,
   getClosePositionInstruction,
@@ -259,7 +259,7 @@ import {
   type TwoHopSwapInput,
   type TwoHopSwapV2Input,
   type UpdateFeesAndRewardsInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 
 export const WHIRLPOOL_PROGRAM_ADDRESS =
   "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc" as Address<"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc">;

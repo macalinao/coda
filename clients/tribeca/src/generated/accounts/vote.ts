@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVotePda, type VoteSeeds } from "../pdas/index.js";
+import { findVotePda, type VoteSeeds } from "../pdas/index.ts";
 
 export const VOTE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   96, 91, 104, 57, 145, 35, 172, 155,

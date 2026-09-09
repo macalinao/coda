@@ -38,8 +38,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findTreeConfigPda } from "../pdas/index.js";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findTreeConfigPda } from "../pdas/index.ts";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const COMPRESS_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   82, 193, 176, 117, 176, 21, 115, 253,
@@ -307,12 +307,15 @@ export async function getCompressInstructionAsync<
 
   // Resolve default values.
   if (!accounts.treeAuthority.value) {
-    accounts.treeAuthority.value = await findTreeConfigPda({
-      merkleTree: getAddressFromResolvedInstructionAccount(
-        "merkleTree",
-        accounts.merkleTree.value,
-      ),
-    });
+    accounts.treeAuthority.value = await findTreeConfigPda(
+      {
+        merkleTree: getAddressFromResolvedInstructionAccount(
+          "merkleTree",
+          accounts.merkleTree.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.logWrapper.value) {
     accounts.logWrapper.value =

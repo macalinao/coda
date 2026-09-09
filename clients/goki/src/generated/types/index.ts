@@ -6,13 +6,13 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./subaccountType.js";
-export * from "./transactionApproveEvent.js";
-export * from "./transactionCreateEvent.js";
-export * from "./transactionExecuteEvent.js";
-export * from "./transactionUnapproveEvent.js";
-export * from "./tXAccountMeta.js";
-export * from "./tXInstruction.js";
-export * from "./walletChangeThresholdEvent.js";
-export * from "./walletCreateEvent.js";
-export * from "./walletSetOwnersEvent.js";
+export * from "./subaccountType.ts";
+export * from "./transactionApproveEvent.ts";
+export * from "./transactionCreateEvent.ts";
+export * from "./transactionExecuteEvent.ts";
+export * from "./transactionUnapproveEvent.ts";
+export * from "./tXAccountMeta.ts";
+export * from "./tXInstruction.ts";
+export * from "./walletChangeThresholdEvent.ts";
+export * from "./walletCreateEvent.ts";
+export * from "./walletSetOwnersEvent.ts";

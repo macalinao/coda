@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findVoteRecordPda, type VoteRecordSeeds } from "../pdas/index.js";
+import { findVoteRecordPda, type VoteRecordSeeds } from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -47,7 +47,7 @@ import {
   GovernanceAccountType,
   type Vote,
   type VoteArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const VOTE_RECORD_V2_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.VoteRecordV2;

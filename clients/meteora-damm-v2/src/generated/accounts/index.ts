@@ -6,9 +6,9 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./claimFeeOperator.js";
-export * from "./config.js";
-export * from "./pool.js";
-export * from "./position.js";
-export * from "./tokenBadge.js";
-export * from "./vesting.js";
+export * from "./claimFeeOperator.ts";
+export * from "./config.ts";
+export * from "./pool.ts";
+export * from "./position.ts";
+export * from "./tokenBadge.ts";
+export * from "./vesting.ts";

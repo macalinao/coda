@@ -21,7 +21,7 @@ import {
   getUseMethodEncoder,
   type UseMethod,
   type UseMethodArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type Uses = { useMethod: UseMethod; remaining: bigint; total: bigint };
 

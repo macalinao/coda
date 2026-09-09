@@ -27,7 +27,7 @@ import {
   type GoverningTokenConfigParamsArgs,
   type MintMaxVoterWeightSource,
   type MintMaxVoterWeightSourceArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type RealmConfigParams = {
   useCouncilMint: boolean;

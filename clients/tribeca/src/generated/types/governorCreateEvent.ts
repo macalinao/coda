@@ -22,7 +22,7 @@ import {
   getGovernanceParametersEncoder,
   type GovernanceParameters,
   type GovernanceParametersArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type GovernorCreateEvent = {
   governor: Address;

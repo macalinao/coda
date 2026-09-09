@@ -6,16 +6,16 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./approve.js";
-export * from "./changeThreshold.js";
-export * from "./createSmartWallet.js";
-export * from "./createSubaccountInfo.js";
-export * from "./createTransaction.js";
-export * from "./createTransactionWithTimelock.js";
-export * from "./executeTransaction.js";
-export * from "./executeTransactionDerived.js";
-export * from "./invokeSignedInstruction.js";
-export * from "./ownerInvokeInstruction.js";
-export * from "./ownerInvokeInstructionV2.js";
-export * from "./setOwners.js";
-export * from "./unapprove.js";
+export * from "./approve.ts";
+export * from "./changeThreshold.ts";
+export * from "./createSmartWallet.ts";
+export * from "./createSubaccountInfo.ts";
+export * from "./createTransaction.ts";
+export * from "./createTransactionWithTimelock.ts";
+export * from "./executeTransaction.ts";
+export * from "./executeTransactionDerived.ts";
+export * from "./invokeSignedInstruction.ts";
+export * from "./ownerInvokeInstruction.ts";
+export * from "./ownerInvokeInstructionV2.ts";
+export * from "./setOwners.ts";
+export * from "./unapprove.ts";

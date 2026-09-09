@@ -39,7 +39,7 @@ import {
   type TokenInfoArgs,
   type WithdrawalCaps,
   type WithdrawalCapsArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Reserve configuration values */
 export type ReserveConfig = {

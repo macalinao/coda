@@ -37,14 +37,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda, findTokenVaultPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda, findTokenVaultPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getAddLiquidityParametersDecoder,
   getAddLiquidityParametersEncoder,
   type AddLiquidityParameters,
   type AddLiquidityParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const ADD_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   181, 157, 89, 67, 143, 182, 52, 72,
@@ -292,28 +292,34 @@ export async function getAddLiquidityInstructionAsync<
 
   // Resolve default values.
   if (!accounts.tokenAVault.value) {
-    accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenAMint",
-        accounts.tokenAMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenAVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenAMint",
+          accounts.tokenAMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenBVault.value) {
-    accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenBMint",
-        accounts.tokenBMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenBVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenBMint",
+          accounts.tokenBMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenAProgram.value) {
     accounts.tokenAProgram.value =
@@ -324,7 +330,9 @@ export async function getAddLiquidityInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

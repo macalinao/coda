@@ -36,7 +36,7 @@ import {
   type ExternalPluginAdapterSchemaArgs,
   type ExtraAccount,
   type ExtraAccountArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * External plugin adapter that invokes a program via CPI at

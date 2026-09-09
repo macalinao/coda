@@ -41,7 +41,7 @@ import {
   type ExternalCheckResultArgs,
   type HookableLifecycleEvent,
   type HookableLifecycleEventArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Initialization data for the `AgentIdentity` external plugin adapter. */
 export type AgentIdentityInitInfo = {

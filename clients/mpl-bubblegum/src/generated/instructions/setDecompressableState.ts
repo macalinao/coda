@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getDecompressibleStateDecoder,
   getDecompressibleStateEncoder,
   type DecompressibleState,
   type DecompressibleStateArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SET_DECOMPRESSABLE_STATE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([18, 135, 238, 168, 246, 195, 61, 115]);

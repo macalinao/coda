@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getBurnV1ArgsDecoder,
   getBurnV1ArgsEncoder,
   type BurnV1Args,
   type BurnV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const BURN_V1_DISCRIMINATOR = 12;
 

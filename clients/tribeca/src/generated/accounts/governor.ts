@@ -38,13 +38,13 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findGovernorPda, type GovernorSeeds } from "../pdas/index.js";
+import { findGovernorPda, type GovernorSeeds } from "../pdas/index.ts";
 import {
   getGovernanceParametersDecoder,
   getGovernanceParametersEncoder,
   type GovernanceParameters,
   type GovernanceParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const GOVERNOR_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   37, 136, 44, 80, 68, 85, 213, 178,

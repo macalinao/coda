@@ -30,7 +30,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CONVERT_MASTER_EDITION_V1_TO_V2_DISCRIMINATOR = 12;
 

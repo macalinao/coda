@@ -39,7 +39,7 @@ import {
   getKeyEncoder,
   type Key,
   type KeyArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 /**
  * An MPL Core collection: a single account grouping assets under

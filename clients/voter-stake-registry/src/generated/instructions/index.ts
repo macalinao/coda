@@ -6,20 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./clawback.js";
-export * from "./closeDepositEntry.js";
-export * from "./closeVoter.js";
-export * from "./configureVotingMint.js";
-export * from "./createDepositEntry.js";
-export * from "./createRegistrar.js";
-export * from "./createVoter.js";
-export * from "./deposit.js";
-export * from "./grant.js";
-export * from "./internalTransferLocked.js";
-export * from "./internalTransferUnlocked.js";
-export * from "./logVoterInfo.js";
-export * from "./resetLockup.js";
-export * from "./setTimeOffset.js";
-export * from "./updateMaxVoteWeight.js";
-export * from "./updateVoterWeightRecord.js";
-export * from "./withdraw.js";
+export * from "./clawback.ts";
+export * from "./closeDepositEntry.ts";
+export * from "./closeVoter.ts";
+export * from "./configureVotingMint.ts";
+export * from "./createDepositEntry.ts";
+export * from "./createRegistrar.ts";
+export * from "./createVoter.ts";
+export * from "./deposit.ts";
+export * from "./grant.ts";
+export * from "./internalTransferLocked.ts";
+export * from "./internalTransferUnlocked.ts";
+export * from "./logVoterInfo.ts";
+export * from "./resetLockup.ts";
+export * from "./setTimeOffset.ts";
+export * from "./updateMaxVoteWeight.ts";
+export * from "./updateVoterWeightRecord.ts";
+export * from "./withdraw.ts";

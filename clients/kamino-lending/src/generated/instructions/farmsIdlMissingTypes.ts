@@ -35,7 +35,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getFarmConfigOptionDecoder,
   getFarmConfigOptionEncoder,
@@ -57,7 +57,7 @@ import {
   type RewardTypeArgs,
   type TimeUnit,
   type TimeUnitArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const FARMS_IDL_MISSING_TYPES_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([130, 80, 38, 153, 80, 212, 182, 253]);

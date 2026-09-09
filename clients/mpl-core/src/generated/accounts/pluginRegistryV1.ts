@@ -41,7 +41,7 @@ import {
   type KeyArgs,
   type RegistryRecord,
   type RegistryRecordArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 /**
  * The index of every internal plugin and external plugin adapter

@@ -41,7 +41,7 @@ import {
   type MergeMinerArgs,
   type MergePool,
   type MergePoolArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getClaimRewardsMMInstructionAsync,
   getInitMergeMinerInstructionAsync,
@@ -95,12 +95,12 @@ import {
   type UnstakeAllReplicaMinerAsyncInput,
   type UnstakePrimaryMinerAsyncInput,
   type WithdrawTokensMMAsyncInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findMergeMinerPda,
   findMergePoolPda,
   findReplicaMintPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const QUARRY_MERGE_MINE_PROGRAM_ADDRESS =
   "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">;

@@ -6,6 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./smartWallet.js";
-export * from "./subaccountInfo.js";
-export * from "./transaction.js";
+export * from "./smartWallet.ts";
+export * from "./subaccountInfo.ts";
+export * from "./transaction.ts";

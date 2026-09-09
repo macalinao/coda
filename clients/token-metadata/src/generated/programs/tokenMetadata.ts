@@ -75,7 +75,7 @@ import {
   type TokenRecordArgs,
   type UseAuthorityRecord,
   type UseAuthorityRecordArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getApproveCollectionAuthorityInstructionAsync,
   getApproveUseAuthorityInstructionAsync,
@@ -309,12 +309,12 @@ import {
   type VerifyCollectionAsyncInput,
   type VerifyInput,
   type VerifySizedCollectionItemAsyncInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findMasterEditionPda,
   findMetadataPda,
   findTokenRecordPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const TOKEN_METADATA_PROGRAM_ADDRESS =
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;

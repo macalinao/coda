@@ -31,7 +31,7 @@ describe("rootNodeFromAnchor", () => {
 
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("testProgram");
-    expect(root.additionalPrograms).toHaveLength(0);
+    expect(root.additionalPrograms ?? []).toHaveLength(0);
   });
 
   it("should create a root node from a v0.1.0 IDL", () => {
@@ -40,7 +40,7 @@ describe("rootNodeFromAnchor", () => {
 
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("newFormatProgram");
-    expect(root.additionalPrograms).toHaveLength(0);
+    expect(root.additionalPrograms ?? []).toHaveLength(0);
   });
 
   it("should convert snake_case names to camelCase", () => {
@@ -93,10 +93,10 @@ describe("rootNodeFromAnchor", () => {
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("complexProgram");
     expect(root.program.instructions).toHaveLength(2);
-    expect(root.program.instructions[0]!.name as string).toBe("initialize");
-    expect(root.program.instructions[1]!.name as string).toBe("transfer");
+    expect(root.program.instructions![0]!.name as string).toBe("initialize");
+    expect(root.program.instructions![1]!.name as string).toBe("transfer");
     expect(root.program.accounts).toHaveLength(1);
-    expect(root.program.accounts[0]!.name as string).toBe("myAccount");
+    expect(root.program.accounts![0]!.name as string).toBe("myAccount");
     expect(root.program.errors).toHaveLength(1);
   });
 
@@ -114,8 +114,8 @@ describe("rootNodeFromAnchor", () => {
 
     expect(root.kind).toBe("rootNode");
     expect(root.program.name as string).toBe("emptyProgram");
-    expect(root.program.instructions).toHaveLength(0);
-    expect(root.program.accounts).toHaveLength(0);
-    expect(root.program.errors).toHaveLength(0);
+    expect(root.program.instructions ?? []).toHaveLength(0);
+    expect(root.program.accounts ?? []).toHaveLength(0);
+    expect(root.program.errors ?? []).toHaveLength(0);
   });
 });

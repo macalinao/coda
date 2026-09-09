@@ -38,7 +38,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REPAY_OBLIGATION_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([145, 178, 13, 225, 76, 240, 147, 72]);

@@ -33,7 +33,7 @@ import {
   getCreatorEncoder,
   type Creator,
   type CreatorArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type Data = {
   name: string;

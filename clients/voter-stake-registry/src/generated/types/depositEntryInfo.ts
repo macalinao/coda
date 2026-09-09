@@ -27,7 +27,7 @@ import {
   getLockingInfoEncoder,
   type LockingInfo,
   type LockingInfoArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type DepositEntryInfo = {
   depositEntryIndex: number;

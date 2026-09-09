@@ -21,7 +21,7 @@ import {
   getVerifiedCreatorsSignatureEncoder,
   type VerifiedCreatorsSignature,
   type VerifiedCreatorsSignatureArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Internal plugin listing creators who have cryptographically

@@ -45,7 +45,7 @@ import {
   type LinkedLifecycleHookUpdateInfoArgs,
   type OracleUpdateInfo,
   type OracleUpdateInfoArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Update data for an existing external plugin adapter, keyed by

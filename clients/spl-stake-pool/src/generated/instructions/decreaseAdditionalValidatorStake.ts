@@ -37,8 +37,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findWithdrawAuthorityPda } from "../pdas/index.js";
-import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findWithdrawAuthorityPda } from "../pdas/index.ts";
+import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DECREASE_ADDITIONAL_VALIDATOR_STAKE_DISCRIMINATOR = 20;
 
@@ -299,12 +299,15 @@ export async function getDecreaseAdditionalValidatorStakeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.withdrawAuthority.value) {
-    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda({
-      stakePoolAddress: getAddressFromResolvedInstructionAccount(
-        "stakePool",
-        accounts.stakePool.value,
-      ),
-    });
+    accounts.withdrawAuthority.value = await findWithdrawAuthorityPda(
+      {
+        stakePoolAddress: getAddressFromResolvedInstructionAccount(
+          "stakePool",
+          accounts.stakePool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.clockSysvar.value) {
     accounts.clockSysvar.value =

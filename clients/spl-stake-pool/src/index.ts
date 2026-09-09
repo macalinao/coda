@@ -5,4 +5,4 @@
  * Generated using Codama with full ESM support.
  */
 
-export * from "./generated/index.js";
+export * from "./generated/index.ts";

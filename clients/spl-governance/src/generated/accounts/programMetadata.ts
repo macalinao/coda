@@ -46,7 +46,7 @@ import {
   GovernanceAccountType,
   type Slot,
   type SlotArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const PROGRAM_METADATA_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.ProgramMetadata;

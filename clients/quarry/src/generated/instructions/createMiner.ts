@@ -40,8 +40,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMinerPda } from "../pdas/index.js";
-import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMinerPda } from "../pdas/index.ts";
+import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const CREATE_MINER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   126, 23, 157, 1, 147, 94, 245, 69,
@@ -224,16 +224,19 @@ export async function getCreateMinerInstructionAsync<
 
   // Resolve default values.
   if (!accounts.miner.value) {
-    accounts.miner.value = await findMinerPda({
-      quarry: getAddressFromResolvedInstructionAccount(
-        "quarry",
-        accounts.quarry.value,
-      ),
-      authority: getAddressFromResolvedInstructionAccount(
-        "authority",
-        accounts.authority.value,
-      ),
-    });
+    accounts.miner.value = await findMinerPda(
+      {
+        quarry: getAddressFromResolvedInstructionAccount(
+          "quarry",
+          accounts.quarry.value,
+        ),
+        authority: getAddressFromResolvedInstructionAccount(
+          "authority",
+          accounts.authority.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

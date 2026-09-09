@@ -27,7 +27,7 @@ import {
   type AuthorityArgs,
   type ExternalPluginAdapterSchema,
   type ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Initialization data for the `AppData` external plugin adapter. */
 export type AppDataInitInfo = {

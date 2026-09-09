@@ -54,7 +54,7 @@ import {
   type FutureEpochArgs,
   type Lockup,
   type LockupArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const STAKE_POOL_ACCOUNT_TYPE: AccountType = AccountType.StakePool;
 

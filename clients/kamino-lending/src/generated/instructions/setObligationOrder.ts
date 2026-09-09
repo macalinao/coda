@@ -38,13 +38,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getObligationOrderInputDecoder,
   getObligationOrderInputEncoder,
   type ObligationOrderInput,
   type ObligationOrderInputArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SET_OBLIGATION_ORDER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([81, 1, 99, 156, 211, 83, 78, 46]);

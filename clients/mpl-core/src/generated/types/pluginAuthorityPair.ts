@@ -27,7 +27,7 @@ import {
   type AuthorityArgs,
   type Plugin,
   type PluginArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * A plugin paired with the authority that should manage it,

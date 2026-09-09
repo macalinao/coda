@@ -35,14 +35,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findRuleSetBufferPda } from "../pdas/index.js";
-import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findRuleSetBufferPda } from "../pdas/index.ts";
+import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getCreateOrUpdateArgsDecoder,
   getCreateOrUpdateArgsEncoder,
   type CreateOrUpdateArgs,
   type CreateOrUpdateArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CREATE_OR_UPDATE_DISCRIMINATOR = 0;
 
@@ -191,12 +191,15 @@ export async function getCreateOrUpdateInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.bufferPda.value) {
-    accounts.bufferPda.value = await findRuleSetBufferPda({
-      owner: getAddressFromResolvedInstructionAccount(
-        "payer",
-        accounts.payer.value,
-      ),
-    });
+    accounts.bufferPda.value = await findRuleSetBufferPda(
+      {
+        owner: getAddressFromResolvedInstructionAccount(
+          "payer",
+          accounts.payer.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

@@ -19,7 +19,7 @@ import {
   getExternalPluginAdapterInitInfoEncoder,
   type ExternalPluginAdapterInitInfo,
   type ExternalPluginAdapterInitInfoArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Arguments for `addExternalPluginAdapterV1`. */
 export type AddExternalPluginAdapterV1Args = {

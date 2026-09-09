@@ -33,7 +33,7 @@ import {
   getKeyEncoder,
   type Key,
   type KeyArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export type FrequencyAccount = { key: Key; lastUpdate: bigint; period: bigint };
 

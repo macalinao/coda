@@ -44,7 +44,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findQuarryPda, type QuarrySeeds } from "../pdas/index.js";
+import { findQuarryPda, type QuarrySeeds } from "../pdas/index.ts";
 
 export const QUARRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   243, 248, 54, 182, 240, 85, 9, 77,

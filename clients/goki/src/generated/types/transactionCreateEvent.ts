@@ -26,7 +26,7 @@ import {
   getTXInstructionEncoder,
   type TXInstruction,
   type TXInstructionArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type TransactionCreateEvent = {
   smartWallet: Address;

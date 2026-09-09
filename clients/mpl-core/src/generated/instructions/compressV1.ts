@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getCompressV1ArgsDecoder,
   getCompressV1ArgsEncoder,
   type CompressV1Args,
   type CompressV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const COMPRESS_V1_DISCRIMINATOR = 17;
 

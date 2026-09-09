@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRegistryPda, type RegistrySeeds } from "../pdas/index.js";
+import { findRegistryPda, type RegistrySeeds } from "../pdas/index.ts";
 
 export const REGISTRY_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   47, 174, 110, 246, 184, 182, 252, 218,

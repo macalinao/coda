@@ -28,7 +28,7 @@ import {
   getBigFractionBytesEncoder,
   type BigFractionBytes,
   type BigFractionBytesArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Reserve liquidity */
 export type ReserveLiquidity = {

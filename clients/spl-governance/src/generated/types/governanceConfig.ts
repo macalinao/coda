@@ -29,7 +29,7 @@ import {
   type VoteThresholdArgs,
   type VoteTipping,
   type VoteTippingArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type GovernanceConfig = {
   communityVoteThreshold: VoteThreshold;

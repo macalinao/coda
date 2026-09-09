@@ -43,8 +43,8 @@ import {
   findLendingMarketAuthPda,
   findReserveCollateralMintPda,
   findReserveLiquiditySupplyPda,
-} from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DEPOSIT_RESERVE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([169, 201, 30, 126, 6, 205, 102, 68]);
@@ -290,12 +290,15 @@ export async function getDepositReserveLiquidityInstructionAsync<
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.reserveLiquiditySupply.value) {
     accounts.reserveLiquiditySupply.value = await findReserveLiquiditySupplyPda(
@@ -309,19 +312,23 @@ export async function getDepositReserveLiquidityInstructionAsync<
           accounts.reserveLiquidityMint.value,
         ),
       },
+      { programAddress },
     );
   }
   if (!accounts.reserveCollateralMint.value) {
-    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-      mint: getAddressFromResolvedInstructionAccount(
-        "reserveLiquidityMint",
-        accounts.reserveLiquidityMint.value,
-      ),
-    });
+    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+        mint: getAddressFromResolvedInstructionAccount(
+          "reserveLiquidityMint",
+          accounts.reserveLiquidityMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.collateralTokenProgram.value) {
     accounts.collateralTokenProgram.value =

@@ -39,8 +39,8 @@ import {
   getResolvedInstructionAccountAsTransactionSigner,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMinterPda } from "../pdas/index.js";
-import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMinterPda } from "../pdas/index.ts";
+import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const NEW_MINTER_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   7, 93, 245, 202, 126, 212, 61, 195,
@@ -192,16 +192,19 @@ export async function getNewMinterV2InstructionAsync<
       ).address;
   }
   if (!accounts.minter.value) {
-    accounts.minter.value = await findMinterPda({
-      wrapper: getAddressFromResolvedInstructionAccount(
-        "mintWrapper",
-        accounts.mintWrapper.value,
-      ),
-      authority: getAddressFromResolvedInstructionAccount(
-        "newMinterAuthority",
-        accounts.newMinterAuthority.value,
-      ),
-    });
+    accounts.minter.value = await findMinterPda(
+      {
+        wrapper: getAddressFromResolvedInstructionAccount(
+          "mintWrapper",
+          accounts.mintWrapper.value,
+        ),
+        authority: getAddressFromResolvedInstructionAccount(
+          "newMinterAuthority",
+          accounts.newMinterAuthority.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

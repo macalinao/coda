@@ -29,7 +29,7 @@ import {
   getAuthorizationDataEncoder,
   type AuthorizationData,
   type AuthorizationDataArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type MintArgs = {
   __kind: "V1";

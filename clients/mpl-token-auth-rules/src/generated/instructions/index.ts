@@ -6,7 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./createOrUpdate.js";
-export * from "./puffRuleSet.js";
-export * from "./validate.js";
-export * from "./writeToBuffer.js";
+export * from "./createOrUpdate.ts";
+export * from "./puffRuleSet.ts";
+export * from "./validate.ts";
+export * from "./writeToBuffer.ts";

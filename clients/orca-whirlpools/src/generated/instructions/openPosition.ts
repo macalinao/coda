@@ -38,13 +38,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getOpenPositionBumpsDecoder,
   getOpenPositionBumpsEncoder,
   type OpenPositionBumps,
   type OpenPositionBumpsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const OPEN_POSITION_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   135, 128, 47, 77, 15, 152, 240, 49,

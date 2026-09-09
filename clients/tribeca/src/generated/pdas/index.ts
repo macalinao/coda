@@ -6,10 +6,10 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./escrow.js";
-export * from "./governor.js";
-export * from "./locker.js";
-export * from "./proposal.js";
-export * from "./proposalMeta.js";
-export * from "./vote.js";
-export * from "./whitelist.js";
+export * from "./escrow.ts";
+export * from "./governor.ts";
+export * from "./locker.ts";
+export * from "./proposal.ts";
+export * from "./proposalMeta.ts";
+export * from "./vote.ts";
+export * from "./whitelist.ts";

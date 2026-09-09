@@ -49,7 +49,7 @@ import {
   type LinkedLifecycleHookArgs,
   type Oracle,
   type OracleArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * A configured external plugin adapter and its current data,

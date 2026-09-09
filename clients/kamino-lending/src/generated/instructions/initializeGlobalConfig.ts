@@ -37,8 +37,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findTreasuryVaultsAuthorityPda } from "../pdas/index.js";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findTreasuryVaultsAuthorityPda } from "../pdas/index.ts";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INITIALIZE_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([113, 216, 122, 131, 225, 209, 22, 55]);
@@ -166,12 +166,15 @@ export async function getInitializeGlobalConfigInstructionAsync<
   // Resolve default values.
   if (!accounts.treasuryVaultsAuthority.value) {
     accounts.treasuryVaultsAuthority.value =
-      await findTreasuryVaultsAuthorityPda({
-        globalConfig: getAddressFromResolvedInstructionAccount(
-          "globalConfig",
-          accounts.globalConfig.value,
-        ),
-      });
+      await findTreasuryVaultsAuthorityPda(
+        {
+          globalConfig: getAddressFromResolvedInstructionAccount(
+            "globalConfig",
+            accounts.globalConfig.value,
+          ),
+        },
+        { programAddress },
+      );
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

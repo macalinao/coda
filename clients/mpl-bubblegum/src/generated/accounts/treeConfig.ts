@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findTreeConfigPda, type TreeConfigSeeds } from "../pdas/index.js";
+import { findTreeConfigPda, type TreeConfigSeeds } from "../pdas/index.ts";
 import {
   getDecompressibleStateDecoder,
   getDecompressibleStateEncoder,
@@ -48,7 +48,7 @@ import {
   type DecompressibleStateArgs,
   type Version,
   type VersionArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const TREE_CONFIG_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   122, 245, 175, 248, 171, 34, 0, 207,

@@ -40,7 +40,7 @@ import {
   type StakePoolArgs,
   type ValidatorList,
   type ValidatorListArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getAddValidatorToPoolInstructionAsync,
   getCleanupRemovedValidatorEntriesInstruction,
@@ -150,14 +150,14 @@ import {
   type WithdrawSolWithSlippageAsyncInput,
   type WithdrawStakeAsyncInput,
   type WithdrawStakeWithSlippageAsyncInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findEphemeralStakePda,
   findStakePda,
   findTransientStakePda,
   findWithdrawAuthorityPda,
-} from "../pdas/index.js";
-import { AccountType, getAccountTypeEncoder } from "../types/index.js";
+} from "../pdas/index.ts";
+import { AccountType, getAccountTypeEncoder } from "../types/index.ts";
 
 export const SPL_STAKE_POOL_PROGRAM_ADDRESS =
   "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy" as Address<"SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy">;

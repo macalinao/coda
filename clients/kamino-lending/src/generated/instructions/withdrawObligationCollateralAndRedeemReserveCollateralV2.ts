@@ -43,11 +43,11 @@ import {
   findLendingMarketAuthPda,
   findReserveCollateralMintPda,
   findReserveLiquiditySupplyPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   FARMS_PROGRAM_ADDRESS,
   KAMINO_LENDING_PROGRAM_ADDRESS,
-} from "../programs/index.js";
+} from "../programs/index.ts";
 
 export const WITHDRAW_OBLIGATION_COLLATERAL_AND_REDEEM_RESERVE_COLLATERAL_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([235, 52, 119, 152, 149, 197, 20, 7]);
@@ -353,24 +353,30 @@ export async function getWithdrawObligationCollateralAndRedeemReserveCollateralV
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.reserveCollateralMint.value) {
-    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-      mint: getAddressFromResolvedInstructionAccount(
-        "reserveLiquidityMint",
-        accounts.reserveLiquidityMint.value,
-      ),
-    });
+    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+        mint: getAddressFromResolvedInstructionAccount(
+          "reserveLiquidityMint",
+          accounts.reserveLiquidityMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.reserveLiquiditySupply.value) {
     accounts.reserveLiquiditySupply.value = await findReserveLiquiditySupplyPda(
@@ -384,6 +390,7 @@ export async function getWithdrawObligationCollateralAndRedeemReserveCollateralV
           accounts.reserveLiquidityMint.value,
         ),
       },
+      { programAddress },
     );
   }
   if (!accounts.collateralTokenProgram.value) {

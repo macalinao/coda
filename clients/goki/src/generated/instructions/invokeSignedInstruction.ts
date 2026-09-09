@@ -39,7 +39,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { TOKEN_SIGNER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { TOKEN_SIGNER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INVOKE_SIGNED_INSTRUCTION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([59, 95, 104, 235, 80, 237, 61, 225]);

@@ -23,7 +23,7 @@ import {
   getExternalPluginAdapterSchemaEncoder,
   type ExternalPluginAdapterSchema,
   type ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Update data for the `AppData` external plugin adapter. */
 export type AppDataUpdateInfo = {

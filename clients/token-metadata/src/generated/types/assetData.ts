@@ -54,7 +54,7 @@ import {
   type TokenStandardArgs,
   type Uses,
   type UsesArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type AssetData = {
   name: string;

@@ -44,14 +44,14 @@ import {
   findPoolPda,
   findPositionNftAccountPda,
   findTokenVaultPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getInitializePoolParametersDecoder,
   getInitializePoolParametersEncoder,
   type InitializePoolParameters,
   type InitializePoolParametersArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const INITIALIZE_POOL_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
   [95, 180, 10, 172, 84, 174, 232, 40],
@@ -373,32 +373,38 @@ export async function getInitializePoolInstructionAsync<
 
   // Resolve default values.
   if (!accounts.positionNftAccount.value) {
-    accounts.positionNftAccount.value = await findPositionNftAccountPda({
-      positionNftMint: getAddressFromResolvedInstructionAccount(
-        "positionNftMint",
-        accounts.positionNftMint.value,
-      ),
-    });
+    accounts.positionNftAccount.value = await findPositionNftAccountPda(
+      {
+        positionNftMint: getAddressFromResolvedInstructionAccount(
+          "positionNftMint",
+          accounts.positionNftMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.poolAuthority.value) {
     accounts.poolAuthority.value =
       "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC" as Address<"HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC">;
   }
   if (!accounts.pool.value) {
-    accounts.pool.value = await findPoolPda({
-      config: getAddressFromResolvedInstructionAccount(
-        "config",
-        accounts.config.value,
-      ),
-      tokenAMint: getAddressFromResolvedInstructionAccount(
-        "tokenAMint",
-        accounts.tokenAMint.value,
-      ),
-      tokenBMint: getAddressFromResolvedInstructionAccount(
-        "tokenBMint",
-        accounts.tokenBMint.value,
-      ),
-    });
+    accounts.pool.value = await findPoolPda(
+      {
+        config: getAddressFromResolvedInstructionAccount(
+          "config",
+          accounts.config.value,
+        ),
+        tokenAMint: getAddressFromResolvedInstructionAccount(
+          "tokenAMint",
+          accounts.tokenAMint.value,
+        ),
+        tokenBMint: getAddressFromResolvedInstructionAccount(
+          "tokenBMint",
+          accounts.tokenBMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.position.value) {
     accounts.position.value = await getProgramDerivedAddress({
@@ -417,28 +423,34 @@ export async function getInitializePoolInstructionAsync<
     });
   }
   if (!accounts.tokenAVault.value) {
-    accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenAMint",
-        accounts.tokenAMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenAVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenAMint",
+          accounts.tokenAMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenBVault.value) {
-    accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenBMint",
-        accounts.tokenBMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenBVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenBMint",
+          accounts.tokenBMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenAProgram.value) {
     accounts.tokenAProgram.value =
@@ -457,7 +469,9 @@ export async function getInitializePoolInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

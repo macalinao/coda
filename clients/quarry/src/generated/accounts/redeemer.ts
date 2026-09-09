@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRedeemerPda, type RedeemerSeeds } from "../pdas/index.js";
+import { findRedeemerPda, type RedeemerSeeds } from "../pdas/index.ts";
 
 export const REDEEMER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   41, 191, 197, 8, 98, 64, 17, 99,

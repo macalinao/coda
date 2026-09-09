@@ -25,7 +25,7 @@ import {
   type AuthorityArgs,
   type Plugin,
   type PluginArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * A plugin's index, authority and data as included in a

@@ -37,7 +37,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.js";
+import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INITIALIZE_TOKEN_BADGE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([253, 77, 205, 95, 27, 224, 89, 223]);

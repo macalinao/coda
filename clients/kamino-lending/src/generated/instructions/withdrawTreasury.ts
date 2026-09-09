@@ -42,8 +42,8 @@ import {
 import {
   findRewardTreasuryVaultPda,
   findTreasuryVaultsAuthorityPda,
-} from "../pdas/index.js";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const WITHDRAW_TREASURY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([40, 63, 122, 158, 144, 216, 83, 96]);
@@ -213,25 +213,31 @@ export async function getWithdrawTreasuryInstructionAsync<
 
   // Resolve default values.
   if (!accounts.rewardTreasuryVault.value) {
-    accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda({
-      globalConfig: getAddressFromResolvedInstructionAccount(
-        "globalConfig",
-        accounts.globalConfig.value,
-      ),
-      rewardMint: getAddressFromResolvedInstructionAccount(
-        "rewardMint",
-        accounts.rewardMint.value,
-      ),
-    });
-  }
-  if (!accounts.treasuryVaultAuthority.value) {
-    accounts.treasuryVaultAuthority.value =
-      await findTreasuryVaultsAuthorityPda({
+    accounts.rewardTreasuryVault.value = await findRewardTreasuryVaultPda(
+      {
         globalConfig: getAddressFromResolvedInstructionAccount(
           "globalConfig",
           accounts.globalConfig.value,
         ),
-      });
+        rewardMint: getAddressFromResolvedInstructionAccount(
+          "rewardMint",
+          accounts.rewardMint.value,
+        ),
+      },
+      { programAddress },
+    );
+  }
+  if (!accounts.treasuryVaultAuthority.value) {
+    accounts.treasuryVaultAuthority.value =
+      await findTreasuryVaultsAuthorityPda(
+        {
+          globalConfig: getAddressFromResolvedInstructionAccount(
+            "globalConfig",
+            accounts.globalConfig.value,
+          ),
+        },
+        { programAddress },
+      );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =

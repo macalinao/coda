@@ -6,5 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./stakePool.js";
-export * from "./validatorList.js";
+export * from "./stakePool.ts";
+export * from "./validatorList.ts";

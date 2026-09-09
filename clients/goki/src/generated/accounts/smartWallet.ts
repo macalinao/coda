@@ -44,7 +44,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findSmartWalletPda, type SmartWalletSeeds } from "../pdas/index.js";
+import { findSmartWalletPda, type SmartWalletSeeds } from "../pdas/index.ts";
 
 export const SMART_WALLET_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   67, 59, 220, 179, 41, 10, 60, 177,

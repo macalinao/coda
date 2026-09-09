@@ -33,7 +33,7 @@ import {
   getKeyEncoder,
   type Key,
   type KeyArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 /**
  * Marker account data written after an asset/collection's core

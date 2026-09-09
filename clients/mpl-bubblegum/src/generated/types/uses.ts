@@ -21,7 +21,7 @@ import {
   getUseMethodEncoder,
   type UseMethod,
   type UseMethodArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * Consumable-use configuration for an asset (e.g. tickets or

@@ -36,7 +36,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const RESCUE_TOKENS_M_M_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([222, 81, 199, 209, 182, 62, 62, 186]);

@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** InstructionUnpackError */
 export const TOKEN_METADATA_ERROR__INSTRUCTION_UNPACK_ERROR = 0x0; // 0

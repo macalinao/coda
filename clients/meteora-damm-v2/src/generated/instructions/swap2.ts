@@ -41,14 +41,14 @@ import {
   findEventAuthorityPda,
   findPoolAuthorityPda,
   findTokenVaultPda,
-} from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getSwapParameters2Decoder,
   getSwapParameters2Encoder,
   type SwapParameters2,
   type SwapParameters2Args,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SWAP2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   65, 75, 63, 76, 235, 91, 91, 136,
@@ -299,31 +299,39 @@ export async function getSwap2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value = await findPoolAuthorityPda();
+    accounts.poolAuthority.value = await findPoolAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.tokenAVault.value) {
-    accounts.tokenAVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenAMint",
-        accounts.tokenAMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenAVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenAMint",
+          accounts.tokenAMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenBVault.value) {
-    accounts.tokenBVault.value = await findTokenVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenBMint",
-        accounts.tokenBMint.value,
-      ),
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-    });
+    accounts.tokenBVault.value = await findTokenVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenBMint",
+          accounts.tokenBMint.value,
+        ),
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenAProgram.value) {
     accounts.tokenAProgram.value =
@@ -334,7 +342,9 @@ export async function getSwap2InstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

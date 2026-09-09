@@ -32,7 +32,7 @@ import {
   getMintMaxVoterWeightSourceEncoder,
   type MintMaxVoterWeightSource,
   type MintMaxVoterWeightSourceArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type RealmConfig = {
   legacy1: number;

@@ -29,7 +29,7 @@ import {
   type BaseFeeConfigArgs,
   type DynamicFeeConfig,
   type DynamicFeeConfigArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type PoolFeesConfig = {
   baseFee: BaseFeeConfig;

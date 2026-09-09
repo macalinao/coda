@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.js";
+import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** ProgramNotWhitelisted: CPI caller not whitelisted to invoke lock instruction. */
 export const LOCKED_VOTER_ERROR__PROGRAM_NOT_WHITELISTED = 0x1770; // 6000

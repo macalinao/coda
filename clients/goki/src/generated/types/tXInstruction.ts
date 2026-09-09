@@ -31,7 +31,7 @@ import {
   getTXAccountMetaEncoder,
   type TXAccountMeta,
   type TXAccountMetaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type TXInstruction = {
   programId: Address;

@@ -34,13 +34,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getVoteDecoder,
   getVoteEncoder,
   type Vote,
   type VoteArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const CAST_VOTE_DISCRIMINATOR = 13;
 

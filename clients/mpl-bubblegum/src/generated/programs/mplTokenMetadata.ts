@@ -7,7 +7,7 @@
  */
 
 import { extendClient, type Address, type ExtendedClient } from "@solana/kit";
-import { findMasterEditionPda, findMetadataPda } from "../pdas/index.js";
+import { findMasterEditionPda, findMetadataPda } from "../pdas/index.ts";
 
 export const MPL_TOKEN_METADATA_PROGRAM_ADDRESS =
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;

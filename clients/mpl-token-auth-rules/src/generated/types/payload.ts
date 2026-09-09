@@ -27,7 +27,7 @@ import {
   getPayloadTypeEncoder,
   type PayloadType,
   type PayloadTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * The runtime values passed to `validate`, keyed by the field name a

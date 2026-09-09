@@ -12,7 +12,7 @@ import {
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
-import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.js";
+import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 /** InvalidVoteSide: Invalid vote side. */
 export const GOVERN_ERROR__INVALID_VOTE_SIDE = 0x1770; // 6000

@@ -35,12 +35,12 @@ import {
 import {
   findSignatoryRecordPda,
   type SignatoryRecordSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   GovernanceAccountType,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const SIGNATORY_RECORD_V1_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.SignatoryRecordV1;

@@ -13,24 +13,24 @@
     "postinstall": "fumadocs-mdx && next typegen"
   },
   "dependencies": {
-    "fumadocs-core": "^16.0.0",
-    "fumadocs-mdx": "^15.0.0",
-    "fumadocs-ui": "^16.0.0",
-    "lucide-react": "^1.17.0",
+    "fumadocs-core": "^16.15.4",
+    "fumadocs-mdx": "^15.4.0",
+    "fumadocs-ui": "^16.15.4",
+    "lucide-react": "^1.39.0",
     "next": "16.3.4",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.2",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/mdx": "^2.0.14",
-    "@types/node": "^26.1.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "baseline-browser-mapping": "^2.10.43",
-    "postcss": "^8.5.17",
-    "tailwindcss": "^4.3.2",
+    "@types/node": "^26.5.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "baseline-browser-mapping": "^2.11.20",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
   }
 }

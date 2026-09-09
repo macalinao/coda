@@ -41,7 +41,7 @@ import {
   type TreeConfigArgs,
   type Voucher,
   type VoucherArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getBurnInstructionAsync,
   getBurnV2InstructionAsync,
@@ -187,14 +187,14 @@ import {
   type VerifyCollectionAsyncInput,
   type VerifyCreatorAsyncInput,
   type VerifyCreatorV2AsyncInput,
-} from "../instructions/index.js";
+} from "../instructions/index.ts";
 import {
   findAssetIdPda,
   findBubblegumSignerPda,
   findMintAuthorityPda,
   findTreeConfigPda,
   findVoucherPda,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 
 export const BUBBLEGUM_PROGRAM_ADDRESS =
   "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">;

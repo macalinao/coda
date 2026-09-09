@@ -43,8 +43,8 @@ import {
   findReserveCollateralSupplyPda,
   findReserveFeeVaultPda,
   findReserveLiquiditySupplyPda,
-} from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INIT_RESERVE_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   138, 245, 71, 225, 153, 4, 3, 43,
@@ -295,12 +295,15 @@ export async function getInitReserveInstructionAsync<
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.reserveLiquiditySupply.value) {
     accounts.reserveLiquiditySupply.value = await findReserveLiquiditySupplyPda(
@@ -314,35 +317,12 @@ export async function getInitReserveInstructionAsync<
           accounts.reserveLiquidityMint.value,
         ),
       },
+      { programAddress },
     );
   }
   if (!accounts.feeReceiver.value) {
-    accounts.feeReceiver.value = await findReserveFeeVaultPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-      mint: getAddressFromResolvedInstructionAccount(
-        "reserveLiquidityMint",
-        accounts.reserveLiquidityMint.value,
-      ),
-    });
-  }
-  if (!accounts.reserveCollateralMint.value) {
-    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-      mint: getAddressFromResolvedInstructionAccount(
-        "reserveLiquidityMint",
-        accounts.reserveLiquidityMint.value,
-      ),
-    });
-  }
-  if (!accounts.reserveCollateralSupply.value) {
-    accounts.reserveCollateralSupply.value =
-      await findReserveCollateralSupplyPda({
+    accounts.feeReceiver.value = await findReserveFeeVaultPda(
+      {
         lendingMarket: getAddressFromResolvedInstructionAccount(
           "lendingMarket",
           accounts.lendingMarket.value,
@@ -351,7 +331,40 @@ export async function getInitReserveInstructionAsync<
           "reserveLiquidityMint",
           accounts.reserveLiquidityMint.value,
         ),
-      });
+      },
+      { programAddress },
+    );
+  }
+  if (!accounts.reserveCollateralMint.value) {
+    accounts.reserveCollateralMint.value = await findReserveCollateralMintPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+        mint: getAddressFromResolvedInstructionAccount(
+          "reserveLiquidityMint",
+          accounts.reserveLiquidityMint.value,
+        ),
+      },
+      { programAddress },
+    );
+  }
+  if (!accounts.reserveCollateralSupply.value) {
+    accounts.reserveCollateralSupply.value =
+      await findReserveCollateralSupplyPda(
+        {
+          lendingMarket: getAddressFromResolvedInstructionAccount(
+            "lendingMarket",
+            accounts.lendingMarket.value,
+          ),
+          mint: getAddressFromResolvedInstructionAccount(
+            "reserveLiquidityMint",
+            accounts.reserveLiquidityMint.value,
+          ),
+        },
+        { programAddress },
+      );
   }
   if (!accounts.rent.value) {
     accounts.rent.value =

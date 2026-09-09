@@ -36,14 +36,14 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMetadataPda } from "../pdas/index.js";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMetadataPda } from "../pdas/index.ts";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getSetCollectionSizeArgsDecoder,
   getSetCollectionSizeArgsEncoder,
   type SetCollectionSizeArgs,
   type SetCollectionSizeArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const BUBBLEGUM_SET_COLLECTION_SIZE_DISCRIMINATOR = 36;
 
@@ -210,13 +210,16 @@ export async function getBubblegumSetCollectionSizeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.collectionMetadata.value) {
-    accounts.collectionMetadata.value = await findMetadataPda({
-      programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-      mint: getAddressFromResolvedInstructionAccount(
-        "collectionMint",
-        accounts.collectionMint.value,
-      ),
-    });
+    accounts.collectionMetadata.value = await findMetadataPda(
+      {
+        programId: address("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+        mint: getAddressFromResolvedInstructionAccount(
+          "collectionMint",
+          accounts.collectionMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");

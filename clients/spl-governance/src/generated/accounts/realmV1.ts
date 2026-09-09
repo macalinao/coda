@@ -46,7 +46,7 @@ import {
   type OptionOrNullable,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findRealmPda, type RealmSeeds } from "../pdas/index.js";
+import { findRealmPda, type RealmSeeds } from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
@@ -55,7 +55,7 @@ import {
   GovernanceAccountType,
   type RealmConfig,
   type RealmConfigArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const REALM_V1_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.RealmV1;

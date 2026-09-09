@@ -43,12 +43,12 @@ import {
 import {
   findTokenOwnerRecordPda,
   type TokenOwnerRecordSeeds,
-} from "../pdas/index.js";
+} from "../pdas/index.ts";
 import {
   getGovernanceAccountTypeDecoder,
   getGovernanceAccountTypeEncoder,
   GovernanceAccountType,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const TOKEN_OWNER_RECORD_V2_ACCOUNT_TYPE: GovernanceAccountType =
   GovernanceAccountType.TokenOwnerRecordV2;

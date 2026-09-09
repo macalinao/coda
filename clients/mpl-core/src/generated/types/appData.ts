@@ -23,7 +23,7 @@ import {
   type AuthorityArgs,
   type ExternalPluginAdapterSchema,
   type ExternalPluginAdapterSchemaArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * External plugin adapter storing arbitrary application data,

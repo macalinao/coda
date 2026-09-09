@@ -44,7 +44,7 @@ import {
   type QuarryArgs,
   type Rewarder,
   type RewarderArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getAcceptAuthorityInstruction,
   getClaimRewardsInstructionAsync,
@@ -130,8 +130,8 @@ import {
   type UnpauseInput,
   type UpdateQuarryRewardsInput,
   type WithdrawTokensAsyncInput,
-} from "../instructions/index.js";
-import { findMinerPda, findQuarryPda, findRewarderPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findMinerPda, findQuarryPda, findRewarderPda } from "../pdas/index.ts";
 
 export const QUARRY_MINE_PROGRAM_ADDRESS =
   "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;

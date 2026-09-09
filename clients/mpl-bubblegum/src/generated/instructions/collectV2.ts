@@ -32,7 +32,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const COLLECT_V2_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
   21, 11, 159, 47, 4, 195, 106, 56,

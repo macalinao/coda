@@ -37,8 +37,8 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findMergeMinerPda, findMinerPda } from "../pdas/index.js";
-import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findMergeMinerPda, findMinerPda } from "../pdas/index.ts";
+import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const STAKE_PRIMARY_MINER_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([72, 59, 23, 242, 117, 178, 129, 138]);
@@ -222,16 +222,19 @@ export async function getStakePrimaryMinerInstructionAsync<
 
   // Resolve default values.
   if (!accounts.mm.value) {
-    accounts.mm.value = await findMergeMinerPda({
-      pool: getAddressFromResolvedInstructionAccount(
-        "pool",
-        accounts.pool.value,
-      ),
-      owner: getAddressFromResolvedInstructionAccount(
-        "mmOwner",
-        accounts.mmOwner.value,
-      ),
-    });
+    accounts.mm.value = await findMergeMinerPda(
+      {
+        pool: getAddressFromResolvedInstructionAccount(
+          "pool",
+          accounts.pool.value,
+        ),
+        owner: getAddressFromResolvedInstructionAccount(
+          "mmOwner",
+          accounts.mmOwner.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.miner.value) {
     accounts.miner.value = await findMinerPda({

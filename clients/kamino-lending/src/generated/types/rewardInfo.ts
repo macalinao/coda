@@ -34,7 +34,7 @@ import {
   type FarmsTokenInfoArgs,
   type RewardScheduleCurve,
   type RewardScheduleCurveArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type RewardInfo = {
   token: FarmsTokenInfo;

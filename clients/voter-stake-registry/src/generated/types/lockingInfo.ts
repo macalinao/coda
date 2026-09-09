@@ -25,7 +25,7 @@ import {
   getVestingInfoEncoder,
   type VestingInfo,
   type VestingInfoArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type LockingInfo = {
   amount: bigint;

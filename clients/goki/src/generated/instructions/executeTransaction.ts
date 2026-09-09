@@ -36,7 +36,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.js";
+import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const EXECUTE_TRANSACTION_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([231, 173, 49, 91, 235, 24, 68, 19]);

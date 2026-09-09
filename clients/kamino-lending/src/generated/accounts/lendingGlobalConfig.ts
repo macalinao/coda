@@ -38,7 +38,7 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
-import { findLendingGlobalConfigStatePda } from "../pdas/index.js";
+import { findLendingGlobalConfigStatePda } from "../pdas/index.ts";
 
 export const LENDING_GLOBAL_CONFIG_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([149, 8, 156, 202, 160, 252, 176, 217]);

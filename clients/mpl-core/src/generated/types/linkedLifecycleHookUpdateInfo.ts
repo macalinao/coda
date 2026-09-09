@@ -39,7 +39,7 @@ import {
   type ExtraAccountArgs,
   type HookableLifecycleEvent,
   type HookableLifecycleEventArgs,
-} from "./index.js";
+} from "./index.ts";
 
 /** Update data for the `LinkedLifecycleHook` external plugin adapter. */
 export type LinkedLifecycleHookUpdateInfo = {

@@ -46,8 +46,8 @@ import {
   getNonNullResolvedInstructionInput,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { findEventAuthorityPda, findPoolAuthorityPda } from "../pdas/index.js";
-import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { findEventAuthorityPda, findPoolAuthorityPda } from "../pdas/index.ts";
+import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INITIALIZE_REWARD_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([95, 135, 192, 196, 242, 129, 230, 68]);
@@ -252,7 +252,9 @@ export async function getInitializeRewardInstructionAsync<
 
   // Resolve default values.
   if (!accounts.poolAuthority.value) {
-    accounts.poolAuthority.value = await findPoolAuthorityPda();
+    accounts.poolAuthority.value = await findPoolAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.rewardVault.value) {
     accounts.rewardVault.value = await getProgramDerivedAddress({
@@ -281,7 +283,9 @@ export async function getInitializeRewardInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
   if (!accounts.eventAuthority.value) {
-    accounts.eventAuthority.value = await findEventAuthorityPda();
+    accounts.eventAuthority.value = await findEventAuthorityPda({
+      programAddress,
+    });
   }
   if (!accounts.program.value) {
     accounts.program.value =

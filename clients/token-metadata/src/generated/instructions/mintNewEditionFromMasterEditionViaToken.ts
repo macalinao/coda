@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.js";
+import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMintNewEditionFromMasterEditionViaTokenArgsDecoder,
   getMintNewEditionFromMasterEditionViaTokenArgsEncoder,
   type MintNewEditionFromMasterEditionViaTokenArgs,
   type MintNewEditionFromMasterEditionViaTokenArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_DISCRIMINATOR = 11;
 

@@ -6,9 +6,9 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./nftSigner.js";
-export * from "./ownerInvoker.js";
-export * from "./smartWallet.js";
-export * from "./subaccountInfo.js";
-export * from "./transaction.js";
-export * from "./walletDerived.js";
+export * from "./nftSigner.ts";
+export * from "./ownerInvoker.ts";
+export * from "./smartWallet.ts";
+export * from "./subaccountInfo.ts";
+export * from "./transaction.ts";
+export * from "./walletDerived.ts";

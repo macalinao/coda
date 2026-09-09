@@ -35,13 +35,13 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.js";
+import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getRemoveGroupsFromGroupV1ArgsDecoder,
   getRemoveGroupsFromGroupV1ArgsEncoder,
   type RemoveGroupsFromGroupV1Args,
   type RemoveGroupsFromGroupV1ArgsArgs,
-} from "../types/index.js";
+} from "../types/index.ts";
 
 export const REMOVE_GROUPS_FROM_GROUP_V1_DISCRIMINATOR = 38;
 

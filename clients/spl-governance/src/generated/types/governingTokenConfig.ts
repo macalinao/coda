@@ -30,7 +30,7 @@ import {
   getGoverningTokenTypeEncoder,
   type GoverningTokenType,
   type GoverningTokenTypeArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type GoverningTokenConfig = {
   voterWeightAddin: Option<Address>;

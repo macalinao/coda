@@ -27,7 +27,7 @@ import {
   getLockupEncoder,
   type Lockup,
   type LockupArgs,
-} from "./index.js";
+} from "./index.ts";
 
 export type DepositEntry = {
   lockup: Lockup;

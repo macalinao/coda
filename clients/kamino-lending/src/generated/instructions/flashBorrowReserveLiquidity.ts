@@ -42,8 +42,8 @@ import {
 import {
   findLendingMarketAuthPda,
   findReserveFeeVaultPda,
-} from "../pdas/index.js";
-import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.js";
+} from "../pdas/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const FLASH_BORROW_RESERVE_LIQUIDITY_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([135, 231, 52, 167, 7, 52, 212, 193]);
@@ -283,24 +283,30 @@ export async function getFlashBorrowReserveLiquidityInstructionAsync<
 
   // Resolve default values.
   if (!accounts.lendingMarketAuthority.value) {
-    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-    });
+    accounts.lendingMarketAuthority.value = await findLendingMarketAuthPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.reserveLiquidityFeeReceiver.value) {
-    accounts.reserveLiquidityFeeReceiver.value = await findReserveFeeVaultPda({
-      lendingMarket: getAddressFromResolvedInstructionAccount(
-        "lendingMarket",
-        accounts.lendingMarket.value,
-      ),
-      mint: getAddressFromResolvedInstructionAccount(
-        "reserveLiquidityMint",
-        accounts.reserveLiquidityMint.value,
-      ),
-    });
+    accounts.reserveLiquidityFeeReceiver.value = await findReserveFeeVaultPda(
+      {
+        lendingMarket: getAddressFromResolvedInstructionAccount(
+          "lendingMarket",
+          accounts.lendingMarket.value,
+        ),
+        mint: getAddressFromResolvedInstructionAccount(
+          "reserveLiquidityMint",
+          accounts.reserveLiquidityMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.sysvarInfo.value) {
     accounts.sysvarInfo.value =

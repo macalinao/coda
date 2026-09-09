@@ -38,7 +38,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import { FARMS_PROGRAM_ADDRESS } from "../programs/index.js";
+import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DEPOSIT_TO_FARM_VAULT_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([131, 166, 64, 94, 108, 213, 114, 183]);

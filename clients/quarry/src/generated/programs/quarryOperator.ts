@@ -38,7 +38,7 @@ import {
   getOperatorCodec,
   type Operator,
   type OperatorArgs,
-} from "../accounts/index.js";
+} from "../accounts/index.ts";
 import {
   getCreateOperatorInstructionAsync,
   getCreateOperatorV2InstructionAsync,
@@ -84,8 +84,8 @@ import {
   type SetQuarryCreatorInput,
   type SetRateSetterInput,
   type SetShareAllocatorInput,
-} from "../instructions/index.js";
-import { findOperatorPda } from "../pdas/index.js";
+} from "../instructions/index.ts";
+import { findOperatorPda } from "../pdas/index.ts";
 
 export const QUARRY_OPERATOR_PROGRAM_ADDRESS =
   "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz" as Address<"QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz">;
