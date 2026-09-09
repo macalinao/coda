@@ -56,8 +56,16 @@ publish_dir() {
   tarball="$(echo "$out"/*.tgz)"
 
   echo "Publishing $name@$version..."
-  if npm publish "$tarball" --access public; then
+  local log="$out/publish.log"
+  if npm publish "$tarball" --access public 2>&1 | tee "$log"; then
     PUBLISHED+=("$name@$version")
+  elif grep -q "cannot publish over the previously published versions" "$log"; then
+    # The check above is a read against a replica and can miss a version that
+    # is already there -- a bootstrap publish racing this run, or propagation
+    # lag on a name that did not exist moments earlier. The registry is the
+    # source of truth, and it says the version is present. Same benign case.
+    echo "Skipping $name@$version (already published -- registry raced the check)"
+    SKIPPED+=("$name@$version")
   else
     echo "::error::Failed to publish $name@$version"
     FAILED+=("$name@$version")
