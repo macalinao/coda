@@ -73,6 +73,9 @@
     "*.{js,mjs,cjs,jsx,ts,tsx}": "oxfmt --write"
   },
   "overrides": {
+    "//": "brace-expansion and mdast-util-to-hast are pulled in transitively; pinned forward off vulnerable releases (CVE-2026-69152, CVE-2026-14257, CVE-2025-66400).",
+    "brace-expansion": "^5.0.9",
+    "mdast-util-to-hast": "^13.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "@codama/errors": "^1.10.2",
