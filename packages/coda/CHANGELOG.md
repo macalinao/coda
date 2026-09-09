@@ -1,5 +1,34 @@
 # @macalinao/grill-cli
 
+## 0.7.0
+
+### Minor Changes
+
+- 068c8a9: Update dependencies to latest, most notably `@solana/kit` 8 and Codama 1.10.
+  
+  - **`@solana/kit` and `@solana/program-client-core` move to `^8.2.0`.** Both are
+    peer dependencies of every generated client, so consumers should upgrade
+    alongside this release.
+  - **Generated PDA finders now receive the instruction's `programAddress`.**
+    `@codama/renderers-js` 2.4.0 threads the resolved program address into
+    `find<Name>Pda(...)` calls when resolving default accounts, so PDAs on clients
+    rendered for a non-default program address now derive correctly.
+  - **Codama 1.10 omits empty arrays** on `rootNode`, `programNode`,
+    `instructionNode`, `pdaNode` and the type nodes rather than emitting `[]`.
+    The visitors and the Markdown renderer now treat those fields as optional, so
+    IDLs with no accounts, arguments, seeds, fields or variants no longer crash
+    code generation.
+
+### Patch Changes
+
+- Updated dependencies [965f183]
+- Updated dependencies [068c8a9]
+  - @macalinao/codama-renderers-js-esm@0.8.0
+  - @macalinao/codama-nodes-from-anchor-x@0.3.0
+  - @macalinao/codama-rename-visitor@0.5.0
+  - @macalinao/codama-renderers-markdown@0.6.0
+  - @macalinao/coda-visitors@0.4.0
+
 ## 0.6.5
 
 ### Patch Changes
