@@ -44,10 +44,10 @@
     "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@solana-program/memo": "^0.13.1",
+    "@solana-program/memo": "^0.14.1",
     "@solana-program/system": "^0.14.1",
     "@solana-program/token": "^0.16.1",
-    "@solana-program/token-2022": "^0.17.0",
+    "@solana-program/token-2022": "^0.18.0",
     "@solana/sysvars": "^8.3.0",
     "codama": "catalog:"
   },
