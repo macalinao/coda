@@ -62,6 +62,15 @@ jobs:
       - name: Typecheck coda.config.ts files
         run: bun run typecheck
 
+      # typedoc only ever ran on push to master (typedoc.yml), so a PR could
+      # merge green and take the docs build down -- which is exactly what
+      # happened when #169 raised the root typescript pin past typedoc's peer
+      # range and every subsequent master push failed. Generating the docs
+      # here makes that a PR failure instead. Warnings are not fatal (there is
+      # a standing backlog of them); this catches typedoc failing to run.
+      - name: Generate API docs (typedoc)
+        run: bun run typedoc
+
       # Enforce the bundle-size budgets in .size-limit.json. The @solana/*
       # peer deps are ignored, so these measure each client's own cost. Two
       # entries per client: a single instruction (the tree-shaken path almost
