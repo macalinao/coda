@@ -1,6 +1,6 @@
 {
   "name": "@solana-programs/token-metadata",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "TypeScript client for the Metaplex Token Metadata program",
   "type": "module",
   "sideEffects": false,
