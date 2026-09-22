@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@macalinao/tsconfig": "catalog:",
-    "@types/node": "^26.5.0",
+    "@types/node": "^26.6.2",
     "typescript": "catalog:",
     "tsdown": "catalog:"
   }
