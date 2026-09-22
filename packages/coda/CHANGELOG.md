@@ -1,5 +1,27 @@
 # @macalinao/grill-cli
 
+## 0.7.1
+
+### Patch Changes
+
+- 9162594: Update dependencies to their latest release-age-eligible versions.
+  
+  - **`@solana/kit` and `@solana/program-client-core` move to `^8.3.0`** in the
+    workspace catalog. The published peer ranges
+    (`^6.10.0 || ^7.0.0 || ^8.0.0`) are unchanged, so consumers are not forced to
+    upgrade.
+  - **`@solana-program/token-2022` moves to `^0.17.0`** in `@macalinao/coda-visitors`.
+  - **The scaffolded project from `create-coda` now pins `@macalinao/coda` at
+    `^0.7.0`** instead of the long-stale `^0.4.10`.
+  - Build toolchain: TypeScript `7.0.2`, tsdown `0.23.0`, turbo `2.10.13`. No
+    source changes were required, and `coda generate` output is byte-identical.
+- Updated dependencies [9162594]
+  - @macalinao/codama-nodes-from-anchor-x@0.3.1
+  - @macalinao/codama-rename-visitor@0.5.1
+  - @macalinao/codama-renderers-js-esm@0.8.1
+  - @macalinao/codama-renderers-markdown@0.6.1
+  - @macalinao/coda-visitors@0.4.1
+
 ## 0.7.0
 
 ### Minor Changes
