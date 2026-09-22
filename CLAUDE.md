@@ -14,7 +14,7 @@ The monorepo contains:
 
 ## Technology Stack
 
-- **Package Manager**: Bun (v1.3.13)
+- **Package Manager**: Bun (v1.4.2)
 - **Build System**: Turbo for monorepo orchestration
 - **Language**: TypeScript with ES modules
 - **Code Generation**: Codama for AST transformations
@@ -24,7 +24,7 @@ The monorepo contains:
 ## Dev Environment
 
 The repo ships a Nix flake (`flake.nix`) that provides the *runtimes* — Bun
-1.3.13, Node 24, `git`, and `nixfmt`. Everything else (oxlint, oxfmt,
+1.4.2, Node 24, `git`, and `nixfmt`. Everything else (oxlint, oxfmt,
 oxlint-tsgolint, TypeScript, turbo) is pinned in `package.json` and resolved
 from `node_modules/.bin`, so there is exactly one copy of each on PATH and it
 is the same one CI installs from the lockfile.
@@ -36,7 +36,7 @@ direnv allow         # or let direnv enter it automatically (uses .envrc)
 
 `.envrc` runs `use flake`, which auto-watches `flake.nix` and `flake.lock`, and
 `dotenv_if_exists` to load a local `.env`. Nix is optional — if you already
-have Bun 1.3.13+ and Node 24+ on PATH, `bun install` works without it.
+have Bun 1.4.2+ and Node 24+ on PATH, `bun install` works without it.
 `engines` in the root `package.json` records the expected versions.
 
 ## Essential Commands
