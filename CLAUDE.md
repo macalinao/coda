@@ -49,13 +49,24 @@ there:
   `typedoc` resolves (its peer range tops out at 6.0.x)
 - **`apps/docs`**, because `next build` and `next typegen` need the same API
 
-TypeScript 7 is the native tsgo rewrite and ships only `tsc.js`, not the classic
-`lib/typescript.js` compiler API both tools call into. Raising either pin makes
-the Typedoc Docs workflow crash on startup with `TypeError: Cannot read
-properties of undefined (reading 'PropertyDeclaration')`. A dependency sweep
-that sees these two lag the catalog and "syncs" them is reintroducing the bug —
-this has already happened twice (#114, #169). Unpin only once `typedoc` ships a
-release whose `typescript` peer range includes 7.x.
+TypeScript 7 is the native tsgo rewrite. Its npm package ships `lib/tsc.js` and
+a version stub as the bare `"typescript"` export — the classic
+`lib/typescript.js` compiler API is gone, replaced by a new RPC-backed one under
+the `typescript/unstable/*` subpaths. So `import ts from "typescript"` now
+resolves to the stub, and any tool that walks the AST or uses the checker
+through the old API breaks. For typedoc that surfaces as a crash on startup:
+
+```
+TypeError: Cannot read properties of undefined (reading 'PropertyDeclaration')
+```
+
+A dependency sweep that sees these two lag the catalog and "syncs" them is
+reintroducing the bug — this has already happened twice (#114, #169).
+
+Unpin only once `typedoc` ships a release whose `typescript` peer range includes
+7.x. Upstream is porting to the new API in TypeStrong/typedoc#3098; as of
+2026-09 the maintainer has it mostly working and is targeting around the TS 7.1
+RC (2026-11-10). `apps/docs` unpins separately, whenever Next.js ports.
 
 ## Essential Commands
 
