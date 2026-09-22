@@ -39,6 +39,24 @@ direnv allow         # or let direnv enter it automatically (uses .envrc)
 have Bun 1.4.2+ and Node 24+ on PATH, `bun install` works without it.
 `engines` in the root `package.json` records the expected versions.
 
+### TypeScript 6 vs 7 — do not "fix" these pins
+
+The workspace `catalog` is on `typescript` ^7.0.2 and the published packages
+build with it. Two places are deliberately held back to ^6.0.3 and must stay
+there:
+
+- the **root** `devDependencies.typescript`, because the hoisted copy is what
+  `typedoc` resolves (its peer range tops out at 6.0.x)
+- **`apps/docs`**, because `next build` and `next typegen` need the same API
+
+TypeScript 7 is the native tsgo rewrite and ships only `tsc.js`, not the classic
+`lib/typescript.js` compiler API both tools call into. Raising either pin makes
+the Typedoc Docs workflow crash on startup with `TypeError: Cannot read
+properties of undefined (reading 'PropertyDeclaration')`. A dependency sweep
+that sees these two lag the catalog and "syncs" them is reintroducing the bug —
+this has already happened twice (#114, #169). Unpin only once `typedoc` ships a
+release whose `typescript` peer range includes 7.x.
+
 ## Essential Commands
 
 ```bash
