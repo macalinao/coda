@@ -132,7 +132,7 @@ describe("renderESMTypeScriptVisitor with externalPrograms", () => {
       "import { findMetadataPda } from '@solana-programs/token-metadata';",
     );
 
-    expect(await readdir(join(outDir, "programs"))).toEqual([
+    expect((await readdir(join(outDir, "programs"))).toSorted()).toEqual([
       "bubblegum.ts",
       "index.ts",
     ]);
