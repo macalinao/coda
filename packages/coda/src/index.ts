@@ -9,3 +9,8 @@ export {
 } from "@macalinao/codama-renderers-js-esm";
 export * from "codama";
 export { defineConfig } from "./config.ts";
+export type {
+  ProcessConfigOptions,
+  ResolveIdlPathsOptions,
+} from "./utils/index.ts";
+export { processConfig, resolveIdlPaths } from "./utils/index.ts";
