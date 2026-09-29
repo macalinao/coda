@@ -3,14 +3,19 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ES2024",
-    "lib": ["ES2024"],
+    "lib": [
+      "ES2024"
+    ],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "types": []
+    "types": [
+      "node"
+    ],
+    "allowImportingTsExtensions": true
   },
   "include": [
-    "clients/*/coda.config.ts",
+    "programs/*/program.config.ts",
     "packages/create-coda/template/coda.config.ts"
   ]
 }

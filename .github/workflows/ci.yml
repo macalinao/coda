@@ -77,13 +77,13 @@ jobs:
       - name: Check client bundle sizes
         run: bun run size
 
-      # Gate the native Node.js config-load path: run the compiled CLI with
-      # `node` directly (not bun) against every client so each coda.config.ts
-      # must load and apply its visitors via native type stripping. `idl` is
-      # non-destructive (prints to stdout, writes no files).
-      - name: Verify coda.config.ts loads under native Node
+      # Rebuild the megagraph and every client package from programs/ and
+      # fail if the checked-in output differs. The graph step runs under
+      # `node` directly (not bun), so every program.config.ts must also load
+      # and apply its visitors via native type stripping.
+      - name: Verify graph/ and clients/ are generated from programs/
         run: |
-          for dir in clients/*/; do
-            echo "== ${dir} =="
-            ( cd "${dir}" && node "${GITHUB_WORKSPACE}/packages/coda/dist/bin/cli.js" idl > /dev/null )
-          done
+          node tools/megagraph/src/cli.ts graph
+          bun tools/megagraph/src/cli.ts generate
+          git add --all --intent-to-add graph clients
+          git diff --exit-code -- graph clients

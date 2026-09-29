@@ -10,7 +10,8 @@ The monorepo contains:
 
 - **Coda CLI** - The main tool for generating TypeScript clients from Anchor IDLs
 - **Codama utilities** - Custom visitors and renderers for enhanced code generation
-- **Generated clients** - Pre-built clients for popular Solana programs
+- **Program megagraph** - Every program's IDL and config under `programs/`, merged into one Codama graph (`graph/codama.json`)
+- **Generated clients** - Pre-built clients for popular Solana programs, one package per program, generated entirely from `programs/`
 
 ## Technology Stack
 
@@ -49,7 +50,8 @@ bun run build:watch          # Watch mode for all packages
 bun run build:watch:packages # Watch mode for packages only
 
 # Code Generation
-bun run codegen             # Run code generation for all clients
+bun run graph               # Rebuild graph/ (the megagraph) from programs/
+bun run codegen             # Rebuild graph/, then regenerate every package under clients/
 coda generate               # Generate client with Coda CLI
 coda init                  # Initialize coda.config.ts
 
@@ -79,9 +81,13 @@ coda/
 │   ├── coda/               # Main CLI tool (@macalinao/coda)
 │   ├── codama-instruction-accounts-dedupe-visitor/  # Flattens nested accounts
 │   └── codama-renderers-js-esm/                    # ESM-native renderer
-├── clients/                # Generated client libraries
-│   └── token-metadata/     # Metaplex Token Metadata client
-├── docs/                   # Documentation site (Fumadocs + Next.js)
+├── programs/               # Source of truth for every client: one dir per program
+│   └── token-metadata/     # idl.json, program.config.ts, optional README.md
+├── graph/                  # Generated: codama.json (merged megagraph), packages.json
+├── clients/                # Generated client packages (do not edit by hand)
+│   └── token-metadata/     # @solana-programs/token-metadata
+├── tools/megagraph/        # Private tool that builds graph/ and clients/
+├── apps/docs/              # Documentation site (Fumadocs + Next.js)
 ├── scripts/               # Build and CI scripts
 └── vendor/                 # Vendored dependencies for reference
     └── fumadocs/          # Fumadocs source for configuration reference
@@ -137,7 +143,7 @@ Coda automatically discovers IDLs without any configuration:
 
 ### Single IDL Configuration
 
-For projects with a single program (like [token-metadata](https://github.com/macalinao/coda/tree/master/clients/token-metadata)):
+For projects with a single program:
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
@@ -159,7 +165,7 @@ export default defineConfig({
 
 ### Multiple IDL Configuration with Glob Pattern
 
-For projects with multiple programs (like [quarry](https://github.com/macalinao/coda/tree/master/clients/quarry)):
+For projects with multiple programs:
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
@@ -255,31 +261,52 @@ Tasks are defined in turbo.json:
 
 - `build`: Depends on upstream builds, outputs to `./dist/**`
 - `test`: Depends on build, no caching
-- `codegen`: Outputs to `./src/generated/**`, no caching
+- `graph` / `codegen`: Only defined by `tools/megagraph`; depend on upstream builds, no caching
 - Tasks run in topological order respecting dependencies
+
+## Program Megagraph
+
+`programs/` is the single source of truth for every client. Each
+`programs/<slug>/` holds:
+
+- `idl.json` - the program's Anchor IDL
+- `program.config.ts` - `defineProgram({ package, instructionAccountDefaultValues, visitors })`
+  from `@macalinao/megagraph`; `package` is the npm metadata (name, description,
+  keywords, `initialVersion`)
+- `README.md` (optional) - hand-written body inserted into the generated README
+
+`bun run graph` runs every config on a root whose main program is that program
+(so bare selectors like `pdaLinkNode("miner")` refer to it), merges the results
+into one root, validates it (every link resolves, program and package names
+are unique, no package cycles) and writes `graph/codama.json` and
+`graph/packages.json`. `bun run codegen` then regenerates every
+`clients/<slug>/` from `graph/`: `package.json`, `tsconfig.json`, `README.md`,
+`docs/`, `src/index.ts` and `src/generated/`. Only `CHANGELOG.md` (owned by
+changesets) and the `version` in `package.json` survive regeneration.
+
+**Cross-program references** are written only as program-qualified links in
+the referencing program's config, e.g.
+`pdaValueNode(pdaLinkNode("metadata", "tokenMetadata"), [...])` or
+`programLinkNode("farms")`. The generator turns each link into a
+`"<owning package>": "workspace:*"` dependency and makes the generated code
+import the linked helpers from that package instead of re-emitting them.
+`linkOverrides` in `@codama/renderers-js` are keyed by name only, so the
+renderer refuses to import a linked name that the local program also declares;
+rename one side if that happens.
 
 ## Adding a New Client
 
-1. **Add IDL file**: Place in `clients/[program-name]/idls/`
-2. **Create config**: Add `coda.config.ts` with any custom visitors
-3. **Add package.json**: Include build (`"build": "tsdown"`) and codegen scripts
-4. **Generate client**: Run `bun run codegen`
-5. **Build**: Run `bun run build`
+1. Create `programs/<slug>/idl.json` and `programs/<slug>/program.config.ts`
+   (copy an existing one; `<slug>` becomes `clients/<slug>/`)
+2. Optionally add `programs/<slug>/README.md`
+3. Run `bun run codegen`, then `bun install` (to link the new workspace
+   package) and `bun run build`
+4. Add size budgets for the package to `.size-limit.json`
+5. Add a changeset; a brand new npm name also needs a bootstrap publish and a
+   trusted publisher (see `scripts/bootstrap-publish.sh`)
 
-No per-package `tsdown.config.ts` is needed — tsdown walks up to the shared root `tsdown.config.ts`.
-
-Example package.json for a client:
-
-```json
-{
-  "name": "@solana-programs/[program-name]",
-  "scripts": {
-    "build": "tsdown",
-    "codegen": "coda generate",
-    "clean": "rm -fr dist/"
-  }
-}
-```
+Never edit files under `clients/` by hand: CI regenerates them and fails on
+any difference.
 
 ## CI/CD
 
@@ -289,7 +316,8 @@ GitHub Actions workflow runs on push/PR to main:
 - Builds all packages
 - Runs oxlint (lint + type-aware type-checking) and checks formatting with oxfmt
 - Runs tests
-- Type-checks the coda.config.ts files
+- Type-checks the program.config.ts files
+- Regenerates `graph/` and `clients/` (the graph step under native Node) and fails on any diff
 
 ## Publishing Workflow
 
@@ -380,7 +408,7 @@ When writing documentation for Coda or generated clients:
    - Keep examples concise but complete
 
 5. **Links and References**:
-   - Link to example repositories (e.g., token-metadata for single IDL, quarry for multiple IDLs)
+   - Link to example programs (e.g., `programs/token-metadata` for a single program, the `programs/quarry-*` suite for linked programs)
    - Reference the official Codama documentation where appropriate
    - Include links to Anchor documentation for IDL-related topics
 
