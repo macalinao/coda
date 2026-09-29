@@ -7,9 +7,10 @@ export default defineProgram({
   package: {
     description: "TypeScript client for Orca Whirlpools program",
     keywords: ["orca", "whirlpools", "dex", "amm"],
-    version: "0.8.2",
+    version: "0.9.0",
     releaseNotes: [
-      "Generated from the program megagraph in macalinao/coda. The generated code is unchanged; the README, reference docs and package metadata are regenerated.",
+      "**Breaking:** now has a peer dependency on `@solana-program/token` (`^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0`): the generated code imports the token program addresses (`TOKEN_PROGRAM_ADDRESS`, `ASSOCIATED_TOKEN_PROGRAM_ADDRESS`) and `findAssociatedTokenPda` from it instead of inlining them.",
+      "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
     ],
   },
 });

@@ -5,7 +5,8 @@
     "import": "{ getApproveInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "400 B"
   },
@@ -14,7 +15,8 @@
     "path": "clients/packages/goki/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "5.5 KB"
   },
@@ -24,7 +26,8 @@
     "import": "{ getApproveInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "400 B"
   },
@@ -33,7 +36,8 @@
     "path": "clients/packages/goki/smart-wallet/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "5 KB"
   },
@@ -43,7 +47,8 @@
     "import": "{ getInvokeSignedInstructionInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "400 B"
   },
@@ -52,7 +57,8 @@
     "path": "clients/packages/goki/token-signer/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "1.5 KB"
   },
@@ -62,7 +68,8 @@
     "import": "{ getBorrowObligationLiquidityInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "750 B"
   },
@@ -71,7 +78,8 @@
     "path": "clients/packages/kamino/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "29.5 KB"
   },
@@ -81,7 +89,8 @@
     "import": "{ getStakeInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "550 B"
   },
@@ -90,7 +99,8 @@
     "path": "clients/packages/kamino/farms/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "10 KB"
   },
@@ -100,7 +110,8 @@
     "import": "{ getBorrowObligationLiquidityInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "750 B"
   },
@@ -109,7 +120,8 @@
     "path": "clients/packages/kamino/lending/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "22 KB"
   },
@@ -119,7 +131,8 @@
     "import": "{ getSwapInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "750 B"
   },
@@ -128,7 +141,8 @@
     "path": "clients/packages/meteora/damm-v2/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "15.5 KB"
   },
@@ -138,7 +152,8 @@
     "import": "{ getCreateTreeInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "700 B"
   },
@@ -147,7 +162,8 @@
     "path": "clients/packages/metaplex/bubblegum/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "13 KB"
   },
@@ -157,7 +173,8 @@
     "import": "{ getBurnV1Instruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "1.4 KB"
   },
@@ -166,7 +183,8 @@
     "path": "clients/packages/metaplex/core/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "14 KB"
   },
@@ -176,7 +194,8 @@
     "import": "{ getValidateInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "800 B"
   },
@@ -185,7 +204,8 @@
     "path": "clients/packages/metaplex/token-auth-rules/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "3.4 KB"
   },
@@ -195,7 +215,8 @@
     "import": "{ getSwapInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "700 B"
   },
@@ -204,7 +225,8 @@
     "path": "clients/packages/orca/whirlpools/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "15 KB"
   },
@@ -214,7 +236,8 @@
     "import": "{ getClaimRewardsInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "750 B"
   },
@@ -223,7 +246,8 @@
     "path": "clients/packages/quarry/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "18 KB"
   },
@@ -233,7 +257,8 @@
     "import": "{ getStakePrimaryMinerInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "650 B"
   },
@@ -242,7 +267,8 @@
     "path": "clients/packages/quarry/merge-mine/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "6 KB"
   },
@@ -252,7 +278,8 @@
     "import": "{ getClaimRewardsInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "700 B"
   },
@@ -261,7 +288,8 @@
     "path": "clients/packages/quarry/mine/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "7.5 KB"
   },
@@ -271,7 +299,8 @@
     "import": "{ getPerformMintInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "550 B"
   },
@@ -280,7 +309,8 @@
     "path": "clients/packages/quarry/mint-wrapper/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "4 KB"
   },
@@ -290,7 +320,8 @@
     "import": "{ getSetAdminInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "400 B"
   },
@@ -299,7 +330,8 @@
     "path": "clients/packages/quarry/operator/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "4 KB"
   },
@@ -309,7 +341,8 @@
     "import": "{ getRedeemTokensInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "550 B"
   },
@@ -318,7 +351,8 @@
     "path": "clients/packages/quarry/redeemer/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "3 KB"
   },
@@ -328,7 +362,8 @@
     "import": "{ getSyncQuarryInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "350 B"
   },
@@ -337,7 +372,8 @@
     "path": "clients/packages/quarry/registry/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "2 KB"
   },
@@ -347,7 +383,8 @@
     "import": "{ getCastVoteInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "800 B"
   },
@@ -356,7 +393,8 @@
     "path": "clients/packages/spl/governance/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "14.5 KB"
   },
@@ -366,7 +404,8 @@
     "import": "{ getDepositStakeInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "750 B"
   },
@@ -375,7 +414,8 @@
     "path": "clients/packages/spl/stake-pool/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "9.5 KB"
   },
@@ -385,7 +425,8 @@
     "import": "{ getCreateInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "1.2 KB"
   },
@@ -394,7 +435,8 @@
     "path": "clients/packages/metaplex/token-metadata/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "19 KB"
   },
@@ -404,7 +446,8 @@
     "import": "{ getCastVoteInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "500 B"
   },
@@ -413,7 +456,8 @@
     "path": "clients/packages/tribeca/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "10.5 KB"
   },
@@ -423,7 +467,8 @@
     "import": "{ getCreateProposalInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "600 B"
   },
@@ -432,7 +477,8 @@
     "path": "clients/packages/tribeca/govern/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "5 KB"
   },
@@ -442,7 +488,8 @@
     "import": "{ getCastVoteInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "500 B"
   },
@@ -451,7 +498,8 @@
     "path": "clients/packages/tribeca/locked-voter/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "5.5 KB"
   },
@@ -461,7 +509,8 @@
     "import": "{ getDepositInstruction }",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "600 B"
   },
@@ -470,7 +519,8 @@
     "path": "clients/packages/spl/voter-stake-registry/dist/index.js",
     "ignore": [
       "@solana/kit",
-      "@solana/program-client-core"
+      "@solana/program-client-core",
+      "@solana-program/token"
     ],
     "limit": "7 KB"
   }

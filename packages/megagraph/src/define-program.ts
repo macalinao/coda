@@ -102,3 +102,87 @@ export interface ProtocolConfig {
 export function defineProtocol(config: ProtocolConfig): ProtocolConfig {
   return config;
 }
+
+/**
+ * An external program: one whose client is published by someone else (e.g.
+ * `@solana-program/token`). It is part of the graph so links into it resolve
+ * and are validated, but it is never rendered and gets no package. Links into
+ * it are imported from `package`, which the linking packages peer-depend on.
+ */
+export interface ExternalProgramConfig {
+  /** npm package that exports the program's generated client. */
+  package: string;
+  /** Peer dependency range of that package for the packages linking to it. */
+  peerRange: string;
+  /** Where the vendored Codama IDL (`idl.json`) comes from. */
+  source: {
+    repository: string;
+    /** Git tag of the release the IDL was taken from. */
+    tag: string;
+    commit: string;
+    path: string;
+  };
+  /**
+   * Typed handles the config exports for other configs to link against. The
+   * graph build asserts each one matches the IDL exactly (name, seeds and
+   * program), so a vendored IDL update cannot silently drift from them.
+   */
+  handles: {
+    programs?: { name: string }[];
+    pdas?: { program: string; name: string; node: unknown }[];
+  };
+}
+
+/**
+ * Configuration of an external program under
+ * `programs/<protocol>/<program>/program.config.ts`. Its `idl.json` is a
+ * Codama IDL (not an Anchor IDL) and may contain several programs.
+ */
+export interface ExternalProgramDefinition {
+  external: ExternalProgramConfig;
+}
+
+/**
+ * Define an external program in `programs/<protocol>/<program>/program.config.ts`.
+ */
+export function defineExternalProgram(
+  config: ExternalProgramDefinition,
+): ExternalProgramDefinition {
+  return config;
+}
+
+/**
+ * Repository-wide settings of the megagraph, `programs/megagraph.config.ts`.
+ */
+export interface MegagraphConfig {
+  /** Peer dependencies every generated package declares. */
+  peerDependencies: Record<string, string>;
+  /** The generated workspace (`clients/`), also the published mirror. */
+  workspace: {
+    /** Root package name. */
+    name: string;
+    /** GitHub repository the workspace is published to, e.g. `org/repo`. */
+    repository: string;
+    /**
+     * Catalog entries the generated manifests use (`catalog:`); versions are
+     * read from the repository's root package.json catalog.
+     */
+    catalog: string[];
+    /**
+     * Root devDependencies of the workspace; versions are read from the
+     * repository's root package.json (devDependencies, then catalog).
+     */
+    devDependencies: string[];
+    /** Files copied from the repository root into the workspace root. */
+    copyFiles: string[];
+  };
+  /** GitHub repository the packages are generated and published from. */
+  sourceRepository: string;
+}
+
+/**
+ * Define the repository-wide settings in `programs/megagraph.config.ts`.
+ */
+export function defineMegagraph(config: MegagraphConfig): MegagraphConfig {
+  return config;
+}

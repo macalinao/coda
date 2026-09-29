@@ -7,39 +7,39 @@ A generated client exports everything a program can do — every instruction, ac
 
 ## What you actually ship
 
-These are the pre-generated clients in the Coda repository, measured with esbuild, minified, **brotli / gzip**. The `@solana/kit` and `@solana/program-client-core` peer dependencies are excluded, so these numbers are the client's own cost on top of the Solana libraries you already have.
+These are the pre-generated clients in the Coda repository, measured with esbuild, minified, **brotli / gzip**. The peer dependencies (`@solana/kit`, `@solana/program-client-core` and, for clients that use it, `@solana-program/token`) are excluded, so these numbers are the client's own cost on top of the Solana libraries you already have.
 
 | Client | One instruction | Entire client |
 | --- | --- | --- |
 | `@solana-programs/goki` (umbrella) | 321 B / 398 B | 4.5 kB / 5.8 kB |
 | `@solana-programs/goki-smart-wallet` | 321 B / 398 B | 4.2 kB / 5.3 kB |
 | `@solana-programs/goki-token-signer` | 345 B / 424 B | 1.1 kB / 1.2 kB |
-| `@solana-programs/kamino-farms` | 476 B / 562 B | 8.5 kB / 11.2 kB |
-| `@solana-programs/kamino-lending` | 602 B / 726 B | 18.5 kB / 26.6 kB |
-| `@solana-programs/kamino` (umbrella) | 602 B / 726 B | 27.6 kB / 39.5 kB |
-| `@solana-programs/meteora-damm-v2` | 618 B / 714 B | 12.9 kB / 18.6 kB |
-| `@solana-programs/mpl-bubblegum` | 572 B / 662 B | 11.0 kB / 16.1 kB |
+| `@solana-programs/kamino` (umbrella) | 601 B / 726 B | 27.8 kB / 39.8 kB |
+| `@solana-programs/kamino-farms` | 486 B / 564 B | 8.5 kB / 11.2 kB |
+| `@solana-programs/kamino-lending` | 601 B / 726 B | 18.7 kB / 26.8 kB |
+| `@solana-programs/meteora-damm-v2` | 603 B / 718 B | 13.0 kB / 18.8 kB |
+| `@solana-programs/mpl-bubblegum` | 572 B / 662 B | 11.1 kB / 16.1 kB |
 | `@solana-programs/mpl-core` | 1.1 kB / 1.4 kB | 12.0 kB / 16.6 kB |
 | `@solana-programs/mpl-token-auth-rules` | 658 B / 753 B | 2.8 kB / 3.3 kB |
-| `@solana-programs/orca-whirlpools` | 558 B / 665 B | 12.8 kB / 17.9 kB |
-| `@solana-programs/quarry` (umbrella) | 582 B / 678 B | 15.7 kB / 22.9 kB |
-| `@solana-programs/quarry-merge-mine` | 535 B / 621 B | 5.2 kB / 6.7 kB |
-| `@solana-programs/quarry-mine` | 582 B / 678 B | 6.2 kB / 8.1 kB |
-| `@solana-programs/quarry-mint-wrapper` | 442 B / 525 B | 3.3 kB / 4.1 kB |
+| `@solana-programs/orca-whirlpools` | 553 B / 664 B | 12.8 kB / 18.0 kB |
+| `@solana-programs/quarry` (umbrella) | 575 B / 680 B | 15.8 kB / 23.0 kB |
+| `@solana-programs/quarry-merge-mine` | 536 B / 627 B | 5.3 kB / 6.8 kB |
+| `@solana-programs/quarry-mine` | 575 B / 680 B | 6.3 kB / 8.1 kB |
+| `@solana-programs/quarry-mint-wrapper` | 456 B / 529 B | 3.3 kB / 4.1 kB |
 | `@solana-programs/quarry-operator` | 318 B / 390 B | 3.3 kB / 4.0 kB |
-| `@solana-programs/quarry-redeemer` | 478 B / 566 B | 2.2 kB / 2.6 kB |
+| `@solana-programs/quarry-redeemer` | 492 B / 563 B | 2.2 kB / 2.6 kB |
 | `@solana-programs/quarry-registry` | 299 B / 376 B | 1.6 kB / 1.9 kB |
-| `@solana-programs/spl-governance` | 632 B / 714 B | 12.2 kB / 16.3 kB |
-| `@solana-programs/spl-stake-pool` | 602 B / 691 B | 8.0 kB / 10.6 kB |
-| `@solana-programs/token-metadata` | 969 B / 1.1 kB | 16.7 kB / 23.2 kB |
+| `@solana-programs/spl-governance` | 632 B / 714 B | 12.2 kB / 16.4 kB |
+| `@solana-programs/spl-stake-pool` | 592 B / 687 B | 8.1 kB / 10.7 kB |
+| `@solana-programs/token-metadata` | 969 B / 1.1 kB | 16.9 kB / 23.3 kB |
 | `@solana-programs/tribeca` (umbrella) | 394 B / 474 B | 8.9 kB / 11.8 kB |
 | `@solana-programs/tribeca-govern` | 497 B / 578 B | 4.3 kB / 5.4 kB |
-| `@solana-programs/tribeca-locked-voter` | 394 B / 474 B | 4.6 kB / 5.7 kB |
-| `@solana-programs/voter-stake-registry` | 467 B / 545 B | 5.8 kB / 7.4 kB |
+| `@solana-programs/tribeca-locked-voter` | 394 B / 474 B | 4.6 kB / 5.8 kB |
+| `@solana-programs/voter-stake-registry` | 465 B / 546 B | 5.8 kB / 7.4 kB |
 
 Umbrella packages contain no code of their own: they re-export several single-program packages, so importing one instruction from them costs the same as importing it from the program's package.
 
-The gap between the columns is the point. `@solana-programs/kamino-lending` covers 48 instructions and weighs 18.5 kB if you take all of it — but a dApp that borrows against an obligation imports one instruction builder and pays 602 bytes.
+The gap between the columns is the point. `@solana-programs/kamino-lending` covers 48 instructions and weighs 18.7 kB if you take all of it — but a dApp that borrows against an obligation imports one instruction builder and pays 601 bytes.
 
 This is also why a headline "bundle size" badge is misleading for these packages. A single number can only report the `export *` ceiling, which is the one import pattern nobody uses.
 

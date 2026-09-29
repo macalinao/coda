@@ -8,6 +8,8 @@
   "devDependencies": {
     "@macalinao/coda": "workspace:^",
     "@macalinao/megagraph": "workspace:^",
-    "@macalinao/tsconfig": "catalog:"
+    "@macalinao/tsconfig": "catalog:",
+    "@types/bun": "catalog:",
+    "@types/node": "catalog:"
   }
 }

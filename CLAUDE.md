@@ -53,6 +53,7 @@ bun run build:watch:packages # Watch mode for packages only
 bun run graph               # Build graph/ (the megagraph) from programs/
 bun run codegen             # graph/, then the clients/ workspace, then `bun install` in it
 bun run clients build       # Build/typecheck/test/lint the generated clients (skips if absent)
+bun run megagraph <command> # graph, generate, clients, export, release, publish, peers, compat
 coda generate               # Generate client with Coda CLI
 coda init                  # Initialize coda.config.ts
 
@@ -89,12 +90,9 @@ coda/
 ├── graph/                  # Generated, gitignored: codama.json, packages.json
 ├── clients/                # Generated, gitignored: standalone Bun workspace
 │   └── packages/quarry/mine/  # @solana-programs/quarry-mine (umbrella at packages/quarry/)
-├── scripts/megagraph.ts    # Driver: programs/ -> graph/ -> clients/, release plan/apply
-├── scripts/clients.ts      # Runs install/build/typecheck/test/lint inside clients/
-├── scripts/export-solana-programs.ts  # Assembles the toolboxdao/solana-programs mirror
-├── scripts/publish-clients.ts          # Publishes mirror packages missing from npm
 ├── apps/docs/              # Documentation site (Fumadocs + Next.js)
-├── scripts/               # Build and CI scripts
+├── scripts/               # Shell scripts only (publishing, CI checks)
+├── tsconfig.json           # Type-checks the shared tsdown.config.ts (nothing else)
 └── vendor/                 # Vendored dependencies for reference
     └── fumadocs/          # Fumadocs source for configuration reference
 ```
@@ -274,7 +272,7 @@ Tasks are defined in turbo.json:
 
 - `build`: Depends on upstream builds, outputs to `./dist/**`
 - `test`: Depends on build, no caching
-- `codegen`: No package defines it anymore; the root `graph`/`codegen` scripts build `@macalinao/megagraph` with turbo and then run `scripts/megagraph.ts`
+- `codegen`: No package defines it anymore; the root `graph`/`codegen` scripts build `@macalinao/megagraph` with turbo and then run its `megagraph` CLI
 - Tasks run in topological order respecting dependencies
 
 ## Program Megagraph
@@ -313,6 +311,29 @@ dependencies and must stay acyclic. oxlint bans the raw `pdaLinkNode`,
 `accountLinkNode`, `definedTypeLinkNode` and `programLinkNode` in
 `programs/**`.
 
+**External programs** (e.g. `programs/solana/token/`) are programs whose
+client is published by someone else. Their `idl.json` is a vendored Codama IDL
+(record the source repository, tag and commit in the config) and their
+`program.config.ts` uses `defineExternalProgram({ external: { package,
+peerRange, source, handles } })`. They are in the graph for link resolution
+and validation but never rendered, never packaged and never released. The
+graph build asserts that every handle the config exports (program handles,
+`definePdas` PDAs) matches the IDL exactly. Addresses and the associated
+token account PDA that configs write as inline values
+(`TOKEN_PROGRAM_VALUE_NODE`, `associatedTokenAccountValueNode`, and the
+default account rules) become links to the external programs
+(`linkKnownProgramsVisitor`, enabled by the megagraph only). A package whose
+rendered code imports an external package gets it as a peer dependency (and a
+`catalog:` devDependency); umbrellas take the union of their members' peers.
+
+**Peer ranges** live in `programs/peer-ranges.ts`: the `@solana/kit` range of
+every client and each external package's range. `programs/peer-ranges.test.ts`
+checks them against the `npm-peers.json` snapshot next to each external IDL
+(every external version in range accepts a supported kit, every kit major is
+covered); CI runs `bun run megagraph peers --verify` to check the snapshot
+against npm (`--refresh` rewrites it) and type-checks sample clients against
+the oldest and newest kit of each major (`megagraph compat`).
+
 `bun run graph` runs every config on a root whose main program is that program
 (so bare selectors like `updateAccountsVisitor({ miner })` only match it),
 merges the results into one root, validates it (every link resolves, reported
@@ -330,7 +351,7 @@ Fresh clone: `bun install && bun run codegen && bun run build`.
 **Releases** of `@solana-programs/*` do not use changesets. The
 `release-clients.yml` workflow plans versions against the release state in
 github.com/toolboxdao/solana-programs (the mirror: previous graph, versions and
-changelogs) with `scripts/megagraph.ts release plan`, applies them with
+changelogs) with `megagraph release plan`, applies them with
 `release apply`, verifies everything builds (in coda and in the exported
 mirror standalone), commits and tags the release in the mirror, then
 publishes the versions npm does not have. A package's `version` in its config
@@ -353,6 +374,21 @@ releases breaking changes as minor and everything else as patch.
 Keep everything program-specific in `programs/` (inputs) and tooling in
 `packages/*`, so the program data can move to its own repository.
 
+## Repository Rules
+
+- Every TypeScript file lives in a workspace package with its own
+  `package.json` and `tsconfig.json`, so oxlint's type-aware pass
+  type-checks it (`scripts/check-ts-in-packages.sh` enforces this; the root
+  `tsconfig.json` only covers the shared `tsdown.config.ts`). Repository
+  tooling is a command of a package (e.g. the `megagraph` CLI), not a loose
+  script; `scripts/` holds shell scripts only.
+- Use Bun everywhere: `#!/usr/bin/env bun` shebangs, `bun` in scripts and
+  docs, `jq` or `bun -e` to read JSON in shell. Node is only used where it is
+  genuinely required, with a comment saying why: `npm publish` over OIDC
+  trusted publishing (npm CLI >= 11.5.1), and the CI check that the
+  published `@macalinao/coda` / `create-coda` CLIs (`#!/usr/bin/env node`)
+  work under Node, since consumers run them with node.
+
 ## CI/CD
 
 GitHub Actions workflow runs on push/PR to main:
@@ -361,9 +397,16 @@ GitHub Actions workflow runs on push/PR to main:
 - Builds all packages
 - Runs oxlint (lint + type-aware type-checking) and checks formatting with oxfmt
 - Runs tests
-- Generates `graph/` and `clients/` (the graph step under native Node),
-  checks codegen is idempotent, and builds, type-checks and loads every
-  generated client, then checks bundle sizes
+- Checks every tracked TypeScript file belongs to a package with a
+  `tsconfig.json` (`scripts/check-ts-in-packages.sh`), so oxlint type-checks it
+- Runs the published `@macalinao/coda` CLI under Node (consumers run it with
+  node); everything else runs on Bun
+- Checks external peer ranges against npm
+- Generates `graph/` and `clients/`, checks codegen is idempotent, and builds,
+  type-checks and loads every generated client, then checks bundle sizes
+- `client-compat`: type-checks sample clients against each supported
+  `@solana/kit` major (oldest and newest) with a matching
+  `@solana-program/token`
 
 `release-clients.yml` releases the generated clients (see Program Megagraph);
 on pull requests it only posts the release plan to the job summary.
@@ -522,7 +565,7 @@ bun run build   # Build for production
 ls -la ./src/generated/
 
 # Verify config is valid
-node -e "import('./coda.config.ts').then(c => console.log(c.default))"
+bun -e "console.log((await import('./coda.config.ts')).default)"
 
 # Clean and rebuild
 bun run clean && bun run codegen && bun run build

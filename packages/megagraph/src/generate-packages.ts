@@ -51,6 +51,47 @@ async function copyOptional(from: string, to: string): Promise<void> {
   }
 }
 
+/** Scope of the packages that publish Solana program clients. */
+const PROGRAM_CLIENT_SCOPE = /^@solana-program\//;
+
+const IMPORT_SPECIFIER = /from\s+["']([^"']+)["']/g;
+
+/**
+ * Derives a package's peer dependencies on external program packages from
+ * the imports of its rendered code, and fails on an import of a program
+ * client package that is not a declared external (e.g. `@solana-program/system`
+ * would have to be added as one).
+ */
+async function getExternalPeers(
+  generatedDir: string,
+  externals: Megagraph["externals"],
+  packageName: string,
+): Promise<Record<string, string>> {
+  const ranges = new Map(
+    externals.map((external) => [external.packageName, external.peerRange]),
+  );
+  const peers: Record<string, string> = {};
+  const files = (await readdir(generatedDir, { recursive: true })).filter(
+    (file) => file.endsWith(".ts"),
+  );
+  for (const file of files) {
+    const code = await readFile(join(generatedDir, file), "utf-8");
+    for (const [, specifier] of code.matchAll(IMPORT_SPECIFIER)) {
+      if (specifier === undefined || !PROGRAM_CLIENT_SCOPE.test(specifier)) {
+        continue;
+      }
+      const range = ranges.get(specifier);
+      if (range === undefined) {
+        throw new Error(
+          `${packageName}: generated code imports ${specifier}, which is not a declared external program`,
+        );
+      }
+      peers[specifier] = range;
+    }
+  }
+  return peers;
+}
+
 /** The kebab-case file name the markdown renderer uses for a program. */
 function getDocsFileName(program: ProgramNode): string {
   const kebab = program.name
@@ -62,6 +103,8 @@ function getDocsFileName(program: ProgramNode): string {
 
 export interface GeneratePackagesInput {
   megagraph: Megagraph;
+  /** Peer dependencies every generated package declares (e.g. `@solana/kit`). */
+  peerDependencies: Record<string, string>;
   programs: ProgramSource[];
   protocols: ProtocolSource[];
   /** Directory holding `programs/`; used for source paths in manifests. */
@@ -105,6 +148,11 @@ export async function generatePackages(
     );
   }
 
+  const externalsByProgram = new Map(
+    megagraph.externals.map((entry) => [entry.program, entry]),
+  );
+  const peersByPackage = new Map<string, Record<string, string>>();
+
   const packagesDir = join(input.outDir, "packages");
   await rm(packagesDir, { recursive: true, force: true });
 
@@ -119,15 +167,19 @@ export async function generatePackages(
       (candidate) => candidate.protocol === source.protocol,
     );
 
-    const dependencies: PackageDependency[] = entry.dependencies.map((name) => {
-      const dependency = packagesByProgram.get(name);
-      if (dependency === undefined) {
-        throw new Error(
-          `Program "${entry.program}" links to unknown program "${name}"`,
-        );
-      }
-      return { program: name, packageName: dependency.packageName };
-    });
+    // Links into external programs become peer dependencies, derived from
+    // the rendered imports below; the rest are workspace dependencies.
+    const dependencies: PackageDependency[] = entry.dependencies
+      .filter((name) => !externalsByProgram.has(name))
+      .map((name) => {
+        const dependency = packagesByProgram.get(name);
+        if (dependency === undefined) {
+          throw new Error(
+            `Program "${entry.program}" links to unknown program "${name}"`,
+          );
+        }
+        return { program: name, packageName: dependency.packageName };
+      });
 
     // The renderer needs every program reachable through links, since a
     // linked node's own links must resolve too (e.g. to size a linked type).
@@ -143,7 +195,9 @@ export async function generatePackages(
     const externalModules = Object.fromEntries(
       closure.map((name) => [
         name,
-        packagesByProgram.get(name)?.packageName ?? name,
+        packagesByProgram.get(name)?.packageName ??
+          externalsByProgram.get(name)?.packageName ??
+          name,
       ]),
     );
 
@@ -158,6 +212,7 @@ export async function generatePackages(
       ],
       source: relative(input.repoRoot, source.dir),
       dependencies,
+      peerDependencies: input.peerDependencies,
     };
 
     await mkdir(join(packageDir, "src"), { recursive: true });
@@ -179,6 +234,16 @@ export async function generatePackages(
         await rm(join(docsDir, file));
       }
     }
+
+    templateInput.peerDependencies = {
+      ...input.peerDependencies,
+      ...(await getExternalPeers(
+        join(packageDir, "src", "generated"),
+        megagraph.externals,
+        entry.packageName,
+      )),
+    };
+    peersByPackage.set(entry.packageName, templateInput.peerDependencies);
 
     const readmeBody = await readOptional(join(source.dir, "README.md"));
     await writeFile(
@@ -219,7 +284,13 @@ export async function generatePackages(
       );
     }
     generated.push(
-      await generateUmbrella(umbrella, protocol, input, packagesByProgram),
+      await generateUmbrella(
+        umbrella,
+        protocol,
+        input,
+        packagesByProgram,
+        peersByPackage,
+      ),
     );
   }
   return generated;
@@ -235,6 +306,7 @@ async function generateUmbrella(
   protocol: ProtocolSource,
   input: GeneratePackagesInput,
   packagesByProgram: Map<string, Megagraph["packages"][number]>,
+  peersByPackage: Map<string, Record<string, string>>,
 ): Promise<string> {
   const config = protocol.config.umbrella;
   if (config === undefined) {
@@ -272,6 +344,13 @@ async function generateUmbrella(
       program,
       packageName,
     })),
+    // An umbrella re-exports its members, so it takes the union of their
+    // peers.
+    peerDependencies: Object.assign(
+      {},
+      input.peerDependencies,
+      ...members.map((member) => peersByPackage.get(member.packageName) ?? {}),
+    ) as Record<string, string>,
   };
 
   await mkdir(join(packageDir, "src"), { recursive: true });

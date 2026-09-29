@@ -1,7 +1,13 @@
 import type { ProgramNode, RootNode } from "codama";
-import type { ProgramSource, ProtocolSource } from "./load-programs.ts";
+import type {
+  ExternalProgramSource,
+  ProgramSource,
+  ProtocolSource,
+} from "./load-programs.ts";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { processConfig } from "@macalinao/coda";
-import { programNode, rootNode } from "codama";
+import { createFromJson, programNode, rootNode } from "codama";
 import { IDL_FILE } from "./load-programs.ts";
 import {
   findCycles,
@@ -61,6 +67,22 @@ export interface UmbrellaPackage {
 }
 
 /**
+ * A program whose client is published elsewhere, as recorded in
+ * `graph/packages.json`. Links into it import from `packageName`.
+ */
+export interface ExternalProgramEntry {
+  /** Codama program name. */
+  program: string;
+  protocol: string;
+  /** `<protocol>/<program>` directory under `programs/` holding the IDL. */
+  slug: string;
+  /** npm package exporting the program's client. */
+  packageName: string;
+  /** Peer dependency range of that package. */
+  peerRange: string;
+}
+
+/**
  * The merged program graph.
  */
 export interface Megagraph {
@@ -72,6 +94,8 @@ export interface Megagraph {
   packages: ProgramPackage[];
   /** One entry per umbrella package, sorted by protocol. */
   umbrellas: UmbrellaPackage[];
+  /** One entry per external program, sorted by program name. */
+  externals: ExternalProgramEntry[];
 }
 
 /**
@@ -85,6 +109,7 @@ export interface Megagraph {
 async function processProgram(
   source: ProgramSource,
   contextPrograms: ProgramNode[],
+  linkPrograms: string[],
 ): Promise<ProgramNode> {
   const { codama } = await processConfig(
     {
@@ -95,7 +120,7 @@ async function processProgram(
       }),
       ...(source.config.visitors && { visitors: source.config.visitors }),
     },
-    { baseDir: source.dir, contextPrograms, quiet: true },
+    { baseDir: source.dir, contextPrograms, linkPrograms, quiet: true },
   );
   return codama.getRoot().program;
 }
@@ -119,13 +144,53 @@ function toContextProgram(program: ProgramNode): ProgramNode {
   });
 }
 
+/**
+ * Loads an external program's vendored Codama IDL and asserts that the
+ * handles its config declares match the IDL exactly.
+ */
+async function loadExternalPrograms(
+  source: ExternalProgramSource,
+): Promise<ProgramNode[]> {
+  const json = await readFile(join(source.dir, IDL_FILE), "utf-8");
+  const root = createFromJson(json).getRoot();
+  const programs: ProgramNode[] = [
+    root.program,
+    ...(root.additionalPrograms ?? []),
+  ];
+  const where = `programs/${source.slug}`;
+  for (const handle of source.external.handles.programs ?? []) {
+    if (!programs.some((program) => program.name === handle.name)) {
+      throw new Error(
+        `${where}: program handle "${handle.name}" does not match any program of the IDL (${programs.map((program) => program.name).join(", ")})`,
+      );
+    }
+  }
+  for (const handle of source.external.handles.pdas ?? []) {
+    const program = programs.find(
+      (candidate) => candidate.name === handle.program,
+    );
+    const pda = (program?.pdas ?? []).find(
+      (candidate) => candidate.name === handle.name,
+    );
+    if (pda === undefined) {
+      throw new Error(
+        `${where}: PDA handle ${handle.program}.${handle.name} does not match any PDA of the IDL`,
+      );
+    }
+    if (JSON.stringify(pda) !== JSON.stringify(handle.node)) {
+      throw new Error(
+        `${where}: PDA handle ${handle.program}.${handle.name} drifted from the IDL.\n  handle: ${JSON.stringify(handle.node)}\n  IDL:    ${JSON.stringify(pda)}`,
+      );
+    }
+  }
+  return programs;
+}
+
 function assertUniqueProgramNames(
-  sources: ProgramSource[],
-  programs: ProgramNode[],
+  entries: { slug: string; program: ProgramNode }[],
 ): void {
   const owners = new Map<string, string>();
-  for (const [index, program] of programs.entries()) {
-    const slug = sources[index]?.slug ?? "?";
+  for (const { slug, program } of entries) {
     const owner = owners.get(program.name);
     if (owner !== undefined) {
       throw new Error(
@@ -230,24 +295,53 @@ function resolveUmbrellas(
 export async function buildMegagraph(input: {
   protocols: ProtocolSource[];
   programs: ProgramSource[];
+  externals?: ExternalProgramSource[];
 }): Promise<Megagraph> {
   const { protocols, programs: sources } = input;
+  const externalSources = input.externals ?? [];
+  const externalEntries = (
+    await Promise.all(
+      externalSources.map(async (source) =>
+        (await loadExternalPrograms(source)).map((program) => ({
+          source,
+          program,
+        })),
+      ),
+    )
+  ).flat();
+  const externalPrograms = externalEntries.map((entry) => entry.program);
+  const linkPrograms = externalPrograms.map(
+    (program) => program.name as string,
+  );
   if (sources.length === 0) {
     throw new Error("No programs found under programs/");
   }
   assertUniquePackageNames(sources, protocols);
 
+  const externalContext = externalPrograms.map(toContextProgram);
   const firstPass = await Promise.all(
-    sources.map((source) => processProgram(source, [])),
+    sources.map((source) =>
+      processProgram(source, externalContext, linkPrograms),
+    ),
   );
-  assertUniqueProgramNames(sources, firstPass);
+  assertUniqueProgramNames([
+    ...sources.map((source, index) => ({
+      slug: source.slug,
+      program: firstPass[index] ?? programNode({ name: "?", publicKey: "?" }),
+    })),
+    ...externalEntries.map((entry) => ({
+      slug: entry.source.slug,
+      program: entry.program,
+    })),
+  ]);
 
   const context = firstPass.map(toContextProgram);
   const programs = await Promise.all(
     sources.map((source, index) =>
       processProgram(
         source,
-        context.filter((_, other) => other !== index),
+        [...context.filter((_, other) => other !== index), ...externalContext],
+        linkPrograms,
       ),
     ),
   );
@@ -260,18 +354,25 @@ export async function buildMegagraph(input: {
     )
     .toSorted((a, b) => a.program.name.localeCompare(b.program.name));
 
-  const [first, ...rest] = sorted.map((entry) => entry.program);
+  const [first, ...rest] = [
+    ...sorted.map((entry) => entry.program),
+    ...externalPrograms,
+  ].toSorted((a, b) => a.name.localeCompare(b.name));
   if (first === undefined) {
     throw new Error("No programs were produced");
   }
   const root = rootNode(first, rest);
 
-  const packageNames = new Map(
-    sorted.map(({ source, program }) => [
-      program.name as string,
-      source.packageName,
-    ]),
-  );
+  const packageNames = new Map([
+    ...sorted.map(
+      ({ source, program }) =>
+        [program.name as string, source.packageName] as const,
+    ),
+    ...externalEntries.map(
+      ({ source, program }) =>
+        [program.name as string, source.external.package] as const,
+    ),
+  ]);
   const unresolved = findUnresolvedLinks(root);
   if (unresolved.length > 0) {
     const lines = unresolved.map((link) => {
@@ -309,9 +410,10 @@ export async function buildMegagraph(input: {
       ...(config.repository !== undefined && {
         repository: config.repository,
       }),
-      programs: sorted
+      programs: [...sorted, ...externalEntries]
         .filter((entry) => entry.source.protocol === protocol)
-        .map((entry) => entry.program.name as string),
+        .map((entry) => entry.program.name as string)
+        .toSorted(),
     })),
     packages: sorted.map(({ source, program }) => ({
       program: program.name,
@@ -325,5 +427,14 @@ export async function buildMegagraph(input: {
       }),
     })),
     umbrellas: resolveUmbrellas(protocols, sorted),
+    externals: externalEntries
+      .map(({ source, program }) => ({
+        program: program.name as string,
+        protocol: source.protocol,
+        slug: source.slug,
+        packageName: source.external.package,
+        peerRange: source.external.peerRange,
+      }))
+      .toSorted((a, b) => a.program.localeCompare(b.program)),
   };
 }

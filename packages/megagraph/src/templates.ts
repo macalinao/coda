@@ -3,9 +3,6 @@ import type { ProgramNode } from "codama";
 /** Keywords every generated package carries. */
 const BASE_KEYWORDS = ["coda", "solana", "client", "esm", "typescript"];
 
-/** Range of `@solana/kit` versions the generated clients support. */
-const KIT_PEER_RANGE = "^6.10.0 || ^7.0.0 || ^8.0.0";
-
 /** A package this package depends on because it links into its program. */
 export interface PackageDependency {
   program: string;
@@ -21,6 +18,17 @@ export interface PackageTemplateInput {
   /** Directory the package is generated from, e.g. `programs/quarry/mine`. */
   source: string;
   dependencies: PackageDependency[];
+  /**
+   * Peer dependencies: the repository-wide ones plus the external packages
+   * the generated code imports.
+   */
+  peerDependencies: Record<string, string>;
+}
+
+function sortKeys(record: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(record).toSorted(([a], [b]) => a.localeCompare(b)),
+  );
 }
 
 /**
@@ -60,17 +68,17 @@ export function renderPackageJson(input: PackageTemplateInput): string {
           .map((name) => [name, "workspace:^"]),
       ),
     }),
-    peerDependencies: {
-      "@solana/kit": KIT_PEER_RANGE,
-      "@solana/program-client-core": KIT_PEER_RANGE,
-    },
-    devDependencies: {
+    peerDependencies: sortKeys(input.peerDependencies),
+    // Every peer is also a devDependency, from the workspace catalog, so the
+    // package builds and type-checks in the workspace.
+    devDependencies: sortKeys({
       "@macalinao/tsconfig": "catalog:",
-      "@solana/kit": "catalog:",
-      "@solana/program-client-core": "catalog:",
       tsdown: "catalog:",
       typescript: "catalog:",
-    },
+      ...Object.fromEntries(
+        Object.keys(input.peerDependencies).map((name) => [name, "catalog:"]),
+      ),
+    }),
     publishConfig: {
       access: "public",
     },

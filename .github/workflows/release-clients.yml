@@ -14,7 +14,7 @@ name: Release clients
 #   SOLANA_PROGRAMS_TOKEN       fine-grained PAT, contents: read and write
 # Without either, the release runs as a dry run: nothing is pushed or
 # published. npm publishing uses trusted publishing (OIDC) from this
-# workflow; see scripts/publish-clients.ts.
+# workflow; see `megagraph publish` in packages/megagraph.
 #
 # Pull requests only plan the release (read-only, no credentials) and post
 # the plan to the job summary.
@@ -67,7 +67,7 @@ jobs:
         run: git clone --depth 1 "https://github.com/${MIRROR_REPOSITORY}.git" mirror
 
       - name: Plan the release
-        run: bun scripts/megagraph.ts release plan --mirror mirror
+        run: bun run megagraph release plan --mirror mirror
 
   release:
     name: Release
@@ -88,6 +88,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # Node only for the npm CLI: publishing over npm trusted publishing
+      # (OIDC) with provenance needs npm >= 11.5.1.
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
@@ -147,24 +149,24 @@ jobs:
           fi
 
       - name: Plan the release
-        run: bun scripts/megagraph.ts release plan --mirror mirror
+        run: bun run megagraph release plan --mirror mirror
 
       - name: Apply the release to clients/
-        run: bun scripts/megagraph.ts release apply --mirror mirror --commit "$GITHUB_SHA"
+        run: bun run megagraph release apply --mirror mirror --commit "$GITHUB_SHA"
 
       # Nothing is pushed or published unless all of this passes.
       - name: Build, typecheck and test
         run: |
           bun run build:ci
           bun test
-          bun scripts/clients.ts build
-          bun scripts/clients.ts typecheck
-          bun scripts/clients.ts test
+          bun run megagraph clients build
+          bun run megagraph clients typecheck
+          bun run megagraph clients test
 
       - name: Export into the mirror
         run: |
           find mirror -mindepth 1 -maxdepth 1 ! -name .git ! -name bun.lock -exec rm -rf {} +
-          bun scripts/export-solana-programs.ts mirror --source-commit "$GITHUB_SHA"
+          bun run megagraph export mirror --source-commit "$GITHUB_SHA"
 
       - name: Verify the mirror builds standalone
         working-directory: mirror
@@ -213,8 +215,8 @@ jobs:
       # npm.
       - name: Publish to npm
         if: steps.mirror.outputs.publish == 'true'
-        run: bun scripts/publish-clients.ts mirror
+        run: bun run megagraph publish mirror
 
       - name: Show what would be published
         if: steps.mirror.outputs.publish != 'true'
-        run: bun scripts/publish-clients.ts mirror --dry-run
+        run: bun run megagraph publish mirror --dry-run

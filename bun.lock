@@ -181,6 +181,9 @@
     "packages/megagraph": {
       "name": "@macalinao/megagraph",
       "version": "0.0.0",
+      "bin": {
+        "megagraph": "./dist/bin/cli.js",
+      },
       "dependencies": {
         "@macalinao/coda": "workspace:^",
         "@macalinao/codama-renderers-js-esm": "workspace:^",
@@ -205,6 +208,8 @@
         "@macalinao/coda": "workspace:^",
         "@macalinao/megagraph": "workspace:^",
         "@macalinao/tsconfig": "catalog:",
+        "@types/bun": "catalog:",
+        "@types/node": "catalog:",
       },
     },
   },
@@ -226,9 +231,11 @@
     "@codama/renderers-core": "^1.4.1",
     "@codama/visitors-core": "^1.11.0",
     "@macalinao/tsconfig": "^4.0.0",
+    "@solana-program/token": "^0.17.0",
     "@solana/kit": "^8.3.0",
     "@solana/program-client-core": "^8.3.0",
     "@types/bun": "~1.4.2",
+    "@types/node": "^26.6.2",
     "codama": "^1.11.0",
     "tsdown": "^0.23.0",
     "typescript": "^7.0.2",

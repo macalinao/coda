@@ -50,12 +50,9 @@ trap 'rm -rf "$STUB_DIR"' EXIT
 bootstrap_dir() {
   local dir="$1"
   local workflow="$2"
-  local name abs
+  local name
 
-  # node's require() needs an absolute path -- a bare relative one resolves
-  # against the module paths, not the cwd.
-  abs="$(cd "$dir" && pwd)"
-  name="$(node -p "require('$abs/package.json').name")"
+  name="$(jq -r .name "$dir/package.json")"
 
   if npm view "$name" version --json >/dev/null 2>&1; then
     echo "ok    $name -- already on the registry, nothing to bootstrap"
@@ -72,18 +69,15 @@ bootstrap_dir() {
   local out="$STUB_DIR/$(basename "$dir")"
   mkdir -p "$out"
 
-  node -e "
-    const fs = require('node:fs');
-    const pkg = require('$abs/package.json');
-    fs.writeFileSync('$out/package.json', JSON.stringify({
-      name: pkg.name,
-      version: '$STUB_VERSION',
-      description: 'Placeholder to bootstrap npm trusted publishing. See ' + (pkg.homepage ?? 'https://github.com/$REPO'),
-      license: pkg.license,
-      repository: pkg.repository,
-    }, null, 2) + '\n');
-  "
+  jq --arg version "$STUB_VERSION" --arg repo "https://github.com/$REPO" '{
+    name,
+    version: $version,
+    description: ("Placeholder to bootstrap npm trusted publishing. See " + (.homepage // $repo)),
+    license,
+    repository,
+  }' "$dir/package.json" > "$out/package.json"
 
+  # npm, not bun: `npm trust` below only exists in the npm CLI.
   # No --provenance here: this publish is token-authenticated, not OIDC.
   # --tag keeps the `latest` tag free for the first real release.
   npm publish "$out" --access public --tag "$STUB_TAG"

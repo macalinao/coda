@@ -11,22 +11,24 @@
       "programs"
     ],
     "catalog": {
-      "typescript": "^7.0.2",
-      "@macalinao/tsconfig": "^4.0.0",
-      "@solana/kit": "^8.3.0",
-      "@solana/program-client-core": "^8.3.0",
-      "@types/bun": "~1.4.2",
-      "codama": "^1.11.0",
       "@codama/nodes": "^1.11.0",
       "@codama/nodes-from-anchor": "^1.5.6",
       "@codama/renderers-core": "^1.4.1",
       "@codama/visitors-core": "^1.11.0",
-      "ws": "^8.21.3",
-      "tsdown": "^0.23.0"
+      "@macalinao/tsconfig": "^4.0.0",
+      "@solana-program/token": "^0.17.0",
+      "@solana/kit": "^8.3.0",
+      "@solana/program-client-core": "^8.3.0",
+      "@types/bun": "~1.4.2",
+      "@types/node": "^26.6.2",
+      "codama": "^1.11.0",
+      "tsdown": "^0.23.0",
+      "typescript": "^7.0.2",
+      "ws": "^8.21.3"
     }
   },
   "scripts": {
-    "build": "turbo build && bun run build:clients",
+    "build": "turbo build && megagraph clients build",
     "build:packages": "turbo build --filter='./packages/**'",
     "build:watch": "turbo watch build",
     "build:watch:packages": "turbo watch build --filter='./packages/**'",
@@ -41,17 +43,16 @@
     "ci:version": "changeset version && bun update",
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
-    "graph": "turbo run build --filter=@macalinao/megagraph... && bun scripts/megagraph.ts graph",
-    "codegen": "turbo run build --filter=@macalinao/megagraph... && bun scripts/megagraph.ts graph && bun scripts/megagraph.ts generate && bun scripts/clients.ts install",
-    "typecheck": "tsc -p tsconfig.configs.json",
+    "graph": "turbo run build --filter=@macalinao/megagraph... && megagraph graph",
+    "codegen": "turbo run build --filter=@macalinao/megagraph... && megagraph graph && megagraph generate && megagraph clients install",
     "size": "size-limit",
     "docs:dev": "turbo dev --filter=coda-docs",
     "docs:build": "turbo build --filter=coda-docs",
     "format": "oxfmt",
-    "export:solana-programs": "bun scripts/export-solana-programs.ts",
     "build:clients": "bun scripts/clients.ts build",
     "build:ci": "turbo build --filter='./packages/**'",
-    "clients": "bun scripts/clients.ts"
+    "clients": "megagraph clients",
+    "megagraph": "megagraph"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",

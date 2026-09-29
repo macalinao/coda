@@ -30,13 +30,10 @@ SKIPPED=()
 
 publish_dir() {
   local dir="$1"
-  local name version abs
+  local name version
 
-  # node's require() needs an absolute path -- a bare relative one resolves
-  # against the module paths, not the cwd.
-  abs="$(cd "$dir" && pwd)"
-  name="$(node -p "require('$abs/package.json').name")"
-  version="$(node -p "require('$abs/package.json').version")"
+  name="$(jq -r .name "$dir/package.json")"
+  version="$(jq -r .version "$dir/package.json")"
 
   # Every release run walks all packages, not just the ones changesets bumped,
   # so an unchanged package is expected to be already on the registry. That is
@@ -61,6 +58,7 @@ publish_dir() {
 
   echo "Publishing $name@$version..."
   local log="$out/publish.log"
+  # npm, not bun: OIDC trusted publishing needs the npm CLI >= 11.5.1.
   if npm publish "$tarball" --access public 2>&1 | tee "$log"; then
     PUBLISHED+=("$name@$version")
   elif grep -q "cannot publish over the previously published versions" "$log"; then

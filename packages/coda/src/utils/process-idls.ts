@@ -7,6 +7,7 @@ import {
   BPF_UPGRADEABLE_LOADER_PROGRAM_VALUE_NODE,
   eventsToDefinedTypesVisitor,
   fixDocsVisitor,
+  linkKnownProgramsVisitor,
   MEMO_PROGRAM_VALUE_NODE,
   SYSVAR_INSTRUCTIONS_VALUE_NODE,
   TOKEN_2022_PROGRAM_VALUE_NODE,
@@ -47,6 +48,13 @@ export interface ProcessConfigOptions {
    * expected to pick their own programs back out of the result.
    */
   contextPrograms?: ProgramNode[];
+  /**
+   * Programs whose addresses and associated token account PDA should become
+   * links when they are present in the root (typically among
+   * `contextPrograms`), instead of inline values. See
+   * `linkKnownProgramsVisitor`.
+   */
+  linkPrograms?: string[];
   /** Suppress progress logging. */
   quiet?: boolean;
 }
@@ -142,6 +150,10 @@ export async function processConfig(
 
   // Apply custom visitors
   applyCustomVisitors(codama, config, idls, { quiet });
+
+  if (options.linkPrograms !== undefined && options.linkPrograms.length > 0) {
+    codama.update(linkKnownProgramsVisitor(options.linkPrograms));
+  }
 
   return { codama, idls };
 }

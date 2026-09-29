@@ -7,8 +7,16 @@
     "incremental": false,
     "declaration": false,
     "declarationMap": false,
-    "isolatedDeclarations": false
+    "isolatedDeclarations": false,
+    "types": [
+      "bun",
+      "node"
+    ]
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

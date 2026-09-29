@@ -130,6 +130,7 @@ function graph(programs: ProgramNode[]): Megagraph {
         dependencies: [],
       },
     ],
+    externals: [],
     umbrellas: [
       {
         protocol: "q",

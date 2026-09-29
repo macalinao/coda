@@ -29,6 +29,7 @@ export async function writeMegagraph(
     protocols: megagraph.protocols,
     packages: megagraph.packages,
     umbrellas: megagraph.umbrellas,
+    externals: megagraph.externals,
   };
   await writeFile(
     join(graphDir, PACKAGES_JSON),
@@ -51,5 +52,6 @@ export async function readMegagraph(graphDir: string): Promise<Megagraph> {
     protocols: packagesFile.protocols ?? [],
     packages: packagesFile.packages ?? [],
     umbrellas: packagesFile.umbrellas ?? [],
+    externals: packagesFile.externals ?? [],
   };
 }

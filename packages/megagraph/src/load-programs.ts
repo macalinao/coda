@@ -1,4 +1,10 @@
-import type { ProgramConfig, ProtocolConfig } from "./define-program.ts";
+import type {
+  ExternalProgramConfig,
+  ExternalProgramDefinition,
+  MegagraphConfig,
+  ProgramConfig,
+  ProtocolConfig,
+} from "./define-program.ts";
 import { dirname, join, relative, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { glob } from "glob";
@@ -12,6 +18,9 @@ export const PROGRAM_CONFIG_FILE = "program.config.ts";
 /** File name of a protocol's config inside its directory. */
 export const PROTOCOL_CONFIG_FILE = "protocol.config.ts";
 
+/** File name of the repository-wide config inside the programs directory. */
+export const MEGAGRAPH_CONFIG_FILE = "megagraph.config.ts";
+
 /** Default npm scope of generated packages. */
 export const PACKAGE_SCOPE = "@solana-programs";
 
@@ -24,6 +33,18 @@ export interface ProtocolSource {
   /** Absolute path of the protocol directory. */
   dir: string;
   config: ProtocolConfig;
+}
+
+/**
+ * An external program directory: a vendored Codama IDL for a program whose
+ * client is published elsewhere.
+ */
+export interface ExternalProgramSource {
+  protocol: string;
+  program: string;
+  slug: string;
+  dir: string;
+  external: ExternalProgramConfig;
 }
 
 /**
@@ -59,6 +80,7 @@ async function importDefault<T>(path: string): Promise<T> {
 export async function loadPrograms(programsDir: string): Promise<{
   protocols: ProtocolSource[];
   programs: ProgramSource[];
+  externals: ExternalProgramSource[];
 }> {
   const protocolPaths = (
     await glob(`*/${PROTOCOL_CONFIG_FILE}`, {
@@ -85,6 +107,7 @@ export async function loadPrograms(programsDir: string): Promise<{
     })
   ).toSorted();
   const programs: ProgramSource[] = [];
+  const externals: ExternalProgramSource[] = [];
   for (const path of programPaths) {
     const dir = dirname(path);
     const segments = relative(programsDir, dir).split(sep);
@@ -103,7 +126,19 @@ export async function loadPrograms(programsDir: string): Promise<{
         `programs/${protocol}/${program}: missing programs/${protocol}/${PROTOCOL_CONFIG_FILE}`,
       );
     }
-    const config = await importDefault<ProgramConfig>(path);
+    const config = await importDefault<
+      ProgramConfig | ExternalProgramDefinition
+    >(path);
+    if ("external" in config) {
+      externals.push({
+        protocol,
+        program,
+        slug: `${protocol}/${program}`,
+        dir,
+        external: config.external,
+      });
+      continue;
+    }
     programs.push({
       protocol,
       program,
@@ -114,7 +149,7 @@ export async function loadPrograms(programsDir: string): Promise<{
         config.package.name ?? `${PACKAGE_SCOPE}/${protocol}-${program}`,
     });
   }
-  return { protocols, programs };
+  return { protocols, programs, externals };
 }
 
 /** Path of a program's generated package relative to the generated tree. */
@@ -125,4 +160,15 @@ export function getProgramPackagePath(source: { slug: string }): string {
 /** Path of a protocol's umbrella package relative to the generated tree. */
 export function getUmbrellaPackagePath(protocol: string): string {
   return join("packages", protocol);
+}
+
+/**
+ * Loads `<programsDir>/megagraph.config.ts`.
+ */
+export async function loadMegagraphConfig(
+  programsDir: string,
+): Promise<MegagraphConfig> {
+  return importDefault<MegagraphConfig>(
+    join(programsDir, MEGAGRAPH_CONFIG_FILE),
+  );
 }
