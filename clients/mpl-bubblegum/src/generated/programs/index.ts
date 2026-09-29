@@ -7,4 +7,3 @@
  */
 
 export * from "./bubblegum.ts";
-export * from "./mplTokenMetadata.ts";

@@ -7,6 +7,10 @@
  */
 
 import {
+  findMasterEditionPda,
+  findMetadataPda,
+} from "@solana-programs/token-metadata";
+import {
   address,
   combineCodec,
   fixDecoderSize,
@@ -40,11 +44,7 @@ import {
   getAddressFromResolvedInstructionAccount,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import {
-  findMasterEditionPda,
-  findMetadataPda,
-  findMintAuthorityPda,
-} from "../pdas/index.ts";
+import { findMintAuthorityPda } from "../pdas/index.ts";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
   getMetadataArgsDecoder,

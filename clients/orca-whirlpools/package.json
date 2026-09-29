@@ -10,12 +10,13 @@
   "keywords": [
     "coda",
     "solana",
+    "client",
+    "esm",
+    "typescript",
     "orca",
     "whirlpools",
     "dex",
-    "amm",
-    "client",
-    "typescript"
+    "amm"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,20 +32,18 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
-    "codegen": "rm -fr src/generated/ && coda generate"
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
     "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
     "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0"
   },
   "devDependencies": {
-    "@macalinao/coda": "workspace:^",
     "@macalinao/tsconfig": "catalog:",
     "@solana/kit": "catalog:",
     "@solana/program-client-core": "catalog:",
-    "typescript": "catalog:",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
   },
   "publishConfig": {
     "access": "public"

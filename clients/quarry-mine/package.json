@@ -1,0 +1,59 @@
+{
+  "name": "@solana-programs/quarry-mine",
+  "version": "0.8.1",
+  "description": "TypeScript client for the Quarry Mine program, the core liquidity mining program of the Quarry protocol",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://coda.ianm.com",
+  "license": "Apache-2.0",
+  "keywords": [
+    "coda",
+    "solana",
+    "client",
+    "esm",
+    "typescript",
+    "quarry",
+    "mining",
+    "staking",
+    "ian-macalinao"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@solana-programs/quarry-mint-wrapper": "workspace:*"
+  },
+  "peerDependencies": {
+    "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+    "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0"
+  },
+  "devDependencies": {
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "catalog:",
+    "@solana/program-client-core": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "clients/quarry-mine"
+  }
+}

@@ -6,6 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import { FARMS_PROGRAM_ADDRESS } from "@solana-programs/kamino-farms";
 import {
   combineCodec,
   fixDecoderSize,
@@ -40,10 +41,7 @@ import {
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.ts";
-import {
-  FARMS_PROGRAM_ADDRESS,
-  KAMINO_LENDING_PROGRAM_ADDRESS,
-} from "../programs/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const INIT_OBLIGATION_FARMS_FOR_RESERVE_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([136, 63, 15, 186, 211, 152, 168, 164]);

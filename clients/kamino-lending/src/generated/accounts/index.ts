@@ -6,13 +6,9 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./farmsGlobalConfig.ts";
-export * from "./farmState.ts";
-export * from "./farmsUserState.ts";
 export * from "./lendingGlobalConfig.ts";
 export * from "./lendingMarket.ts";
 export * from "./obligation.ts";
-export * from "./oraclePrices.ts";
 export * from "./referrerState.ts";
 export * from "./referrerTokenState.ts";
 export * from "./reserve.ts";

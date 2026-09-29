@@ -1,6 +1,9 @@
 # Whirlpool Program
 
+[![npm version](https://badge.fury.io/js/%40solana-programs%2Forca-whirlpools.svg)](https://www.npmjs.com/package/%40solana-programs%2Forca-whirlpools)
+
 - Program ID: `whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc`
+- TypeScript Client: [`@solana-programs/orca-whirlpools`](https://www.npmjs.com/package/@solana-programs/orca-whirlpools)
 
 ## Table of Contents
 
@@ -76,6 +79,10 @@
   - [accountsType](#accountsType)
   - [remainingAccountsInfo](#remainingAccountsInfo)
   - [remainingAccountsSlice](#remainingAccountsSlice)
+  - [liquidityDecreased](#liquidityDecreased)
+  - [liquidityIncreased](#liquidityIncreased)
+  - [poolInitialized](#poolInitialized)
+  - [traded](#traded)
 - [Errors](#errors)
 
 ## Accounts
@@ -86,11 +93,11 @@
 
 | Field                           | Type        | Description |
 | ------------------------------- | ----------- | ----------- |
-| `discriminator`                 | `unknown`   |             |
-| `feeAuthority`                  | `PublicKey` |             |
-| `collectProtocolFeesAuthority`  | `PublicKey` |             |
-| `rewardEmissionsSuperAuthority` | `PublicKey` |             |
-| `defaultProtocolFeeRate`        | `u16`       |             |
+| `discriminator`                 | `unknown`   | -           |
+| `feeAuthority`                  | `PublicKey` | -           |
+| `collectProtocolFeesAuthority`  | `PublicKey` | -           |
+| `rewardEmissionsSuperAuthority` | `PublicKey` | -           |
+| `defaultProtocolFeeRate`        | `u16`       | -           |
 
 ### whirlpoolsConfigExtension
 
@@ -98,10 +105,10 @@
 
 | Field                      | Type        | Description |
 | -------------------------- | ----------- | ----------- |
-| `discriminator`            | `unknown`   |             |
-| `whirlpoolsConfig`         | `PublicKey` |             |
-| `configExtensionAuthority` | `PublicKey` |             |
-| `tokenBadgeAuthority`      | `PublicKey` |             |
+| `discriminator`            | `unknown`   | -           |
+| `whirlpoolsConfig`         | `PublicKey` | -           |
+| `configExtensionAuthority` | `PublicKey` | -           |
+| `tokenBadgeAuthority`      | `PublicKey` | -           |
 
 ### feeTier
 
@@ -109,10 +116,10 @@
 
 | Field              | Type        | Description |
 | ------------------ | ----------- | ----------- |
-| `discriminator`    | `unknown`   |             |
-| `whirlpoolsConfig` | `PublicKey` |             |
-| `tickSpacing`      | `u16`       |             |
-| `defaultFeeRate`   | `u16`       |             |
+| `discriminator`    | `unknown`   | -           |
+| `whirlpoolsConfig` | `PublicKey` | -           |
+| `tickSpacing`      | `u16`       | -           |
+| `defaultFeeRate`   | `u16`       | -           |
 
 ### lockConfig
 
@@ -120,12 +127,12 @@
 
 | Field             | Type                              | Description |
 | ----------------- | --------------------------------- | ----------- |
-| `discriminator`   | `unknown`                         |             |
-| `position`        | `PublicKey`                       |             |
-| `positionOwner`   | `PublicKey`                       |             |
-| `whirlpool`       | `PublicKey`                       |             |
-| `lockedTimestamp` | `u64`                             |             |
-| `lockType`        | [lockTypeLabel](#lockTypeLabel-3) |             |
+| `discriminator`   | `unknown`                         | -           |
+| `position`        | `PublicKey`                       | -           |
+| `positionOwner`   | `PublicKey`                       | -           |
+| `whirlpool`       | `PublicKey`                       | -           |
+| `lockedTimestamp` | `u64`                             | -           |
+| `lockType`        | [lockTypeLabel](#lockTypeLabel-3) | -           |
 
 ### position
 
@@ -133,17 +140,17 @@
 
 | Field                  | Type                                           | Description |
 | ---------------------- | ---------------------------------------------- | ----------- |
-| `discriminator`        | `unknown`                                      |             |
-| `whirlpool`            | `PublicKey`                                    |             |
-| `positionMint`         | `PublicKey`                                    |             |
-| `liquidity`            | `u128`                                         |             |
-| `tickLowerIndex`       | `i32`                                          |             |
-| `tickUpperIndex`       | `i32`                                          |             |
-| `feeGrowthCheckpointA` | `u128`                                         |             |
-| `feeOwedA`             | `u64`                                          |             |
-| `feeGrowthCheckpointB` | `u128`                                         |             |
-| `feeOwedB`             | `u64`                                          |             |
-| `rewardInfos`          | [positionRewardInfo](#positionRewardInfo-3)[3] |             |
+| `discriminator`        | `unknown`                                      | -           |
+| `whirlpool`            | `PublicKey`                                    | -           |
+| `positionMint`         | `PublicKey`                                    | -           |
+| `liquidity`            | `u128`                                         | -           |
+| `tickLowerIndex`       | `i32`                                          | -           |
+| `tickUpperIndex`       | `i32`                                          | -           |
+| `feeGrowthCheckpointA` | `u128`                                         | -           |
+| `feeOwedA`             | `u64`                                          | -           |
+| `feeGrowthCheckpointB` | `u128`                                         | -           |
+| `feeOwedB`             | `u64`                                          | -           |
+| `rewardInfos`          | [positionRewardInfo](#positionRewardInfo-3)[3] | -           |
 
 ### positionBundle
 
@@ -151,9 +158,9 @@
 
 | Field                | Type        | Description |
 | -------------------- | ----------- | ----------- |
-| `discriminator`      | `unknown`   |             |
-| `positionBundleMint` | `PublicKey` |             |
-| `positionBitmap`     | `u8`[32]    |             |
+| `discriminator`      | `unknown`   | -           |
+| `positionBundleMint` | `PublicKey` | -           |
+| `positionBitmap`     | `u8`[32]    | -           |
 
 ### tickArray
 
@@ -161,10 +168,10 @@
 
 | Field            | Type                | Description |
 | ---------------- | ------------------- | ----------- |
-| `discriminator`  | `unknown`           |             |
-| `startTickIndex` | `i32`               |             |
-| `ticks`          | [tick](#tick-3)[88] |             |
-| `whirlpool`      | `PublicKey`         |             |
+| `discriminator`  | `unknown`           | -           |
+| `startTickIndex` | `i32`               | -           |
+| `ticks`          | [tick](#tick-3)[88] | -           |
+| `whirlpool`      | `PublicKey`         | -           |
 
 ### tokenBadge
 
@@ -172,9 +179,9 @@
 
 | Field              | Type        | Description |
 | ------------------ | ----------- | ----------- |
-| `discriminator`    | `unknown`   |             |
-| `whirlpoolsConfig` | `PublicKey` |             |
-| `tokenMint`        | `PublicKey` |             |
+| `discriminator`    | `unknown`   | -           |
+| `whirlpoolsConfig` | `PublicKey` | -           |
+| `tokenMint`        | `PublicKey` | -           |
 
 ### whirlpool
 
@@ -182,26 +189,26 @@
 
 | Field                        | Type                                             | Description |
 | ---------------------------- | ------------------------------------------------ | ----------- |
-| `discriminator`              | `unknown`                                        |             |
-| `whirlpoolsConfig`           | `PublicKey`                                      |             |
-| `whirlpoolBump`              | `u8`[1]                                          |             |
-| `tickSpacing`                | `u16`                                            |             |
-| `tickSpacingSeed`            | `u8`[2]                                          |             |
-| `feeRate`                    | `u16`                                            |             |
-| `protocolFeeRate`            | `u16`                                            |             |
-| `liquidity`                  | `u128`                                           |             |
-| `sqrtPrice`                  | `u128`                                           |             |
-| `tickCurrentIndex`           | `i32`                                            |             |
-| `protocolFeeOwedA`           | `u64`                                            |             |
-| `protocolFeeOwedB`           | `u64`                                            |             |
-| `tokenMintA`                 | `PublicKey`                                      |             |
-| `tokenVaultA`                | `PublicKey`                                      |             |
-| `feeGrowthGlobalA`           | `u128`                                           |             |
-| `tokenMintB`                 | `PublicKey`                                      |             |
-| `tokenVaultB`                | `PublicKey`                                      |             |
-| `feeGrowthGlobalB`           | `u128`                                           |             |
-| `rewardLastUpdatedTimestamp` | `u64`                                            |             |
-| `rewardInfos`                | [whirlpoolRewardInfo](#whirlpoolRewardInfo-3)[3] |             |
+| `discriminator`              | `unknown`                                        | -           |
+| `whirlpoolsConfig`           | `PublicKey`                                      | -           |
+| `whirlpoolBump`              | `u8`[1]                                          | -           |
+| `tickSpacing`                | `u16`                                            | -           |
+| `tickSpacingSeed`            | `u8`[2]                                          | -           |
+| `feeRate`                    | `u16`                                            | -           |
+| `protocolFeeRate`            | `u16`                                            | -           |
+| `liquidity`                  | `u128`                                           | -           |
+| `sqrtPrice`                  | `u128`                                           | -           |
+| `tickCurrentIndex`           | `i32`                                            | -           |
+| `protocolFeeOwedA`           | `u64`                                            | -           |
+| `protocolFeeOwedB`           | `u64`                                            | -           |
+| `tokenMintA`                 | `PublicKey`                                      | -           |
+| `tokenVaultA`                | `PublicKey`                                      | -           |
+| `feeGrowthGlobalA`           | `u128`                                           | -           |
+| `tokenMintB`                 | `PublicKey`                                      | -           |
+| `tokenVaultB`                | `PublicKey`                                      | -           |
+| `feeGrowthGlobalB`           | `u128`                                           | -           |
+| `rewardLastUpdatedTimestamp` | `u64`                                            | -           |
+| `rewardInfos`                | [whirlpoolRewardInfo](#whirlpoolRewardInfo-3)[3] | -           |
 
 ## Instructions
 
@@ -211,19 +218,19 @@
 
 | Account         | Type             | Description |
 | --------------- | ---------------- | ----------- |
-| `config`        | signer, writable |             |
-| `funder`        | signer, writable |             |
-| `systemProgram` | readonly         |             |
+| `config`        | signer, writable | -           |
+| `funder`        | signer, writable | -           |
+| `systemProgram` | readonly         | -           |
 
 **Arguments:**
 
 | Argument                        | Type        | Description |
 | ------------------------------- | ----------- | ----------- |
-| `discriminator`                 | `unknown`   |             |
-| `feeAuthority`                  | `PublicKey` |             |
-| `collectProtocolFeesAuthority`  | `PublicKey` |             |
-| `rewardEmissionsSuperAuthority` | `PublicKey` |             |
-| `defaultProtocolFeeRate`        | `u16`       |             |
+| `discriminator`                 | `unknown`   | -           |
+| `feeAuthority`                  | `PublicKey` | -           |
+| `collectProtocolFeesAuthority`  | `PublicKey` | -           |
+| `rewardEmissionsSuperAuthority` | `PublicKey` | -           |
+| `defaultProtocolFeeRate`        | `u16`       | -           |
 
 ### initializePool
 
@@ -231,26 +238,26 @@
 
 | Account            | Type             | Description |
 | ------------------ | ---------------- | ----------- |
-| `whirlpoolsConfig` | readonly         |             |
-| `tokenMintA`       | readonly         |             |
-| `tokenMintB`       | readonly         |             |
-| `funder`           | signer, writable |             |
-| `whirlpool`        | writable         |             |
-| `tokenVaultA`      | signer, writable |             |
-| `tokenVaultB`      | signer, writable |             |
-| `feeTier`          | readonly         |             |
-| `tokenProgram`     | readonly         |             |
-| `systemProgram`    | readonly         |             |
-| `rent`             | readonly         |             |
+| `whirlpoolsConfig` | readonly         | -           |
+| `tokenMintA`       | readonly         | -           |
+| `tokenMintB`       | readonly         | -           |
+| `funder`           | signer, writable | -           |
+| `whirlpool`        | writable         | -           |
+| `tokenVaultA`      | signer, writable | -           |
+| `tokenVaultB`      | signer, writable | -           |
+| `feeTier`          | readonly         | -           |
+| `tokenProgram`     | readonly         | -           |
+| `systemProgram`    | readonly         | -           |
+| `rent`             | readonly         | -           |
 
 **Arguments:**
 
 | Argument           | Type                                | Description |
 | ------------------ | ----------------------------------- | ----------- |
-| `discriminator`    | `unknown`                           |             |
-| `bumps`            | [whirlpoolBumps](#whirlpoolBumps-3) |             |
-| `tickSpacing`      | `u16`                               |             |
-| `initialSqrtPrice` | `u128`                              |             |
+| `discriminator`    | `unknown`                           | -           |
+| `bumps`            | [whirlpoolBumps](#whirlpoolBumps-3) | -           |
+| `tickSpacing`      | `u16`                               | -           |
+| `initialSqrtPrice` | `u128`                              | -           |
 
 ### initializeTickArray
 
@@ -258,17 +265,17 @@
 
 | Account         | Type             | Description |
 | --------------- | ---------------- | ----------- |
-| `whirlpool`     | readonly         |             |
-| `funder`        | signer, writable |             |
-| `tickArray`     | writable         |             |
-| `systemProgram` | readonly         |             |
+| `whirlpool`     | readonly         | -           |
+| `funder`        | signer, writable | -           |
+| `tickArray`     | writable         | -           |
+| `systemProgram` | readonly         | -           |
 
 **Arguments:**
 
 | Argument         | Type      | Description |
 | ---------------- | --------- | ----------- |
-| `discriminator`  | `unknown` |             |
-| `startTickIndex` | `i32`     |             |
+| `discriminator`  | `unknown` | -           |
+| `startTickIndex` | `i32`     | -           |
 
 ### initializeFeeTier
 
@@ -276,19 +283,19 @@
 
 | Account         | Type             | Description |
 | --------------- | ---------------- | ----------- |
-| `config`        | readonly         |             |
-| `feeTier`       | writable         |             |
-| `funder`        | signer, writable |             |
-| `feeAuthority`  | signer           |             |
-| `systemProgram` | readonly         |             |
+| `config`        | readonly         | -           |
+| `feeTier`       | writable         | -           |
+| `funder`        | signer, writable | -           |
+| `feeAuthority`  | signer           | -           |
+| `systemProgram` | readonly         | -           |
 
 **Arguments:**
 
 | Argument         | Type      | Description |
 | ---------------- | --------- | ----------- |
-| `discriminator`  | `unknown` |             |
-| `tickSpacing`    | `u16`     |             |
-| `defaultFeeRate` | `u16`     |             |
+| `discriminator`  | `unknown` | -           |
+| `tickSpacing`    | `u16`     | -           |
+| `defaultFeeRate` | `u16`     | -           |
 
 ### initializeReward
 
@@ -296,21 +303,21 @@
 
 | Account           | Type             | Description |
 | ----------------- | ---------------- | ----------- |
-| `rewardAuthority` | signer           |             |
-| `funder`          | signer, writable |             |
-| `whirlpool`       | writable         |             |
-| `rewardMint`      | readonly         |             |
-| `rewardVault`     | signer, writable |             |
-| `tokenProgram`    | readonly         |             |
-| `systemProgram`   | readonly         |             |
-| `rent`            | readonly         |             |
+| `rewardAuthority` | signer           | -           |
+| `funder`          | signer, writable | -           |
+| `whirlpool`       | writable         | -           |
+| `rewardMint`      | readonly         | -           |
+| `rewardVault`     | signer, writable | -           |
+| `tokenProgram`    | readonly         | -           |
+| `systemProgram`   | readonly         | -           |
+| `rent`            | readonly         | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
-| `rewardIndex`   | `u8`      |             |
+| `discriminator` | `unknown` | -           |
+| `rewardIndex`   | `u8`      | -           |
 
 ### setRewardEmissions
 
@@ -318,17 +325,17 @@
 
 | Account           | Type     | Description |
 | ----------------- | -------- | ----------- |
-| `whirlpool`       | writable |             |
-| `rewardAuthority` | signer   |             |
-| `rewardVault`     | readonly |             |
+| `whirlpool`       | writable | -           |
+| `rewardAuthority` | signer   | -           |
+| `rewardVault`     | readonly | -           |
 
 **Arguments:**
 
 | Argument                | Type      | Description |
 | ----------------------- | --------- | ----------- |
-| `discriminator`         | `unknown` |             |
-| `rewardIndex`           | `u8`      |             |
-| `emissionsPerSecondX64` | `u128`    |             |
+| `discriminator`         | `unknown` | -           |
+| `rewardIndex`           | `u8`      | -           |
+| `emissionsPerSecondX64` | `u128`    | -           |
 
 ### openPosition
 
@@ -336,25 +343,25 @@
 
 | Account                  | Type             | Description |
 | ------------------------ | ---------------- | ----------- |
-| `funder`                 | signer, writable |             |
-| `owner`                  | readonly         |             |
-| `position`               | writable         |             |
-| `positionMint`           | signer, writable |             |
-| `positionTokenAccount`   | writable         |             |
-| `whirlpool`              | readonly         |             |
-| `tokenProgram`           | readonly         |             |
-| `systemProgram`          | readonly         |             |
-| `rent`                   | readonly         |             |
-| `associatedTokenProgram` | readonly         |             |
+| `funder`                 | signer, writable | -           |
+| `owner`                  | readonly         | -           |
+| `position`               | writable         | -           |
+| `positionMint`           | signer, writable | -           |
+| `positionTokenAccount`   | writable         | -           |
+| `whirlpool`              | readonly         | -           |
+| `tokenProgram`           | readonly         | -           |
+| `systemProgram`          | readonly         | -           |
+| `rent`                   | readonly         | -           |
+| `associatedTokenProgram` | readonly         | -           |
 
 **Arguments:**
 
 | Argument         | Type                                      | Description |
 | ---------------- | ----------------------------------------- | ----------- |
-| `discriminator`  | `unknown`                                 |             |
-| `bumps`          | [openPositionBumps](#openPositionBumps-3) |             |
-| `tickLowerIndex` | `i32`                                     |             |
-| `tickUpperIndex` | `i32`                                     |             |
+| `discriminator`  | `unknown`                                 | -           |
+| `bumps`          | [openPositionBumps](#openPositionBumps-3) | -           |
+| `tickLowerIndex` | `i32`                                     | -           |
+| `tickUpperIndex` | `i32`                                     | -           |
 
 ### openPositionWithMetadata
 
@@ -362,28 +369,28 @@
 
 | Account                   | Type             | Description |
 | ------------------------- | ---------------- | ----------- |
-| `funder`                  | signer, writable |             |
-| `owner`                   | readonly         |             |
-| `position`                | writable         |             |
-| `positionMint`            | signer, writable |             |
-| `positionMetadataAccount` | writable         |             |
-| `positionTokenAccount`    | writable         |             |
-| `whirlpool`               | readonly         |             |
-| `tokenProgram`            | readonly         |             |
-| `systemProgram`           | readonly         |             |
-| `rent`                    | readonly         |             |
-| `associatedTokenProgram`  | readonly         |             |
-| `metadataProgram`         | readonly         |             |
-| `metadataUpdateAuth`      | readonly         |             |
+| `funder`                  | signer, writable | -           |
+| `owner`                   | readonly         | -           |
+| `position`                | writable         | -           |
+| `positionMint`            | signer, writable | -           |
+| `positionMetadataAccount` | writable         | -           |
+| `positionTokenAccount`    | writable         | -           |
+| `whirlpool`               | readonly         | -           |
+| `tokenProgram`            | readonly         | -           |
+| `systemProgram`           | readonly         | -           |
+| `rent`                    | readonly         | -           |
+| `associatedTokenProgram`  | readonly         | -           |
+| `metadataProgram`         | readonly         | -           |
+| `metadataUpdateAuth`      | readonly         | -           |
 
 **Arguments:**
 
 | Argument         | Type                                                              | Description |
 | ---------------- | ----------------------------------------------------------------- | ----------- |
-| `discriminator`  | `unknown`                                                         |             |
-| `bumps`          | [openPositionWithMetadataBumps](#openPositionWithMetadataBumps-3) |             |
-| `tickLowerIndex` | `i32`                                                             |             |
-| `tickUpperIndex` | `i32`                                                             |             |
+| `discriminator`  | `unknown`                                                         | -           |
+| `bumps`          | [openPositionWithMetadataBumps](#openPositionWithMetadataBumps-3) | -           |
+| `tickLowerIndex` | `i32`                                                             | -           |
+| `tickUpperIndex` | `i32`                                                             | -           |
 
 ### increaseLiquidity
 
@@ -391,26 +398,26 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | writable |             |
-| `tokenProgram`         | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `tokenOwnerAccountA`   | writable |             |
-| `tokenOwnerAccountB`   | writable |             |
-| `tokenVaultA`          | writable |             |
-| `tokenVaultB`          | writable |             |
-| `tickArrayLower`       | writable |             |
-| `tickArrayUpper`       | writable |             |
+| `whirlpool`            | writable | -           |
+| `tokenProgram`         | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `tokenOwnerAccountA`   | writable | -           |
+| `tokenOwnerAccountB`   | writable | -           |
+| `tokenVaultA`          | writable | -           |
+| `tokenVaultB`          | writable | -           |
+| `tickArrayLower`       | writable | -           |
+| `tickArrayUpper`       | writable | -           |
 
 **Arguments:**
 
 | Argument          | Type      | Description |
 | ----------------- | --------- | ----------- |
-| `discriminator`   | `unknown` |             |
-| `liquidityAmount` | `u128`    |             |
-| `tokenMaxA`       | `u64`     |             |
-| `tokenMaxB`       | `u64`     |             |
+| `discriminator`   | `unknown` | -           |
+| `liquidityAmount` | `u128`    | -           |
+| `tokenMaxA`       | `u64`     | -           |
+| `tokenMaxB`       | `u64`     | -           |
 
 ### decreaseLiquidity
 
@@ -418,26 +425,26 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | writable |             |
-| `tokenProgram`         | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `tokenOwnerAccountA`   | writable |             |
-| `tokenOwnerAccountB`   | writable |             |
-| `tokenVaultA`          | writable |             |
-| `tokenVaultB`          | writable |             |
-| `tickArrayLower`       | writable |             |
-| `tickArrayUpper`       | writable |             |
+| `whirlpool`            | writable | -           |
+| `tokenProgram`         | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `tokenOwnerAccountA`   | writable | -           |
+| `tokenOwnerAccountB`   | writable | -           |
+| `tokenVaultA`          | writable | -           |
+| `tokenVaultB`          | writable | -           |
+| `tickArrayLower`       | writable | -           |
+| `tickArrayUpper`       | writable | -           |
 
 **Arguments:**
 
 | Argument          | Type      | Description |
 | ----------------- | --------- | ----------- |
-| `discriminator`   | `unknown` |             |
-| `liquidityAmount` | `u128`    |             |
-| `tokenMinA`       | `u64`     |             |
-| `tokenMinB`       | `u64`     |             |
+| `discriminator`   | `unknown` | -           |
+| `liquidityAmount` | `u128`    | -           |
+| `tokenMinA`       | `u64`     | -           |
+| `tokenMinB`       | `u64`     | -           |
 
 ### updateFeesAndRewards
 
@@ -445,16 +452,16 @@
 
 | Account          | Type     | Description |
 | ---------------- | -------- | ----------- |
-| `whirlpool`      | writable |             |
-| `position`       | writable |             |
-| `tickArrayLower` | readonly |             |
-| `tickArrayUpper` | readonly |             |
+| `whirlpool`      | writable | -           |
+| `position`       | writable | -           |
+| `tickArrayLower` | readonly | -           |
+| `tickArrayUpper` | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### collectFees
 
@@ -462,21 +469,21 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `tokenOwnerAccountA`   | writable |             |
-| `tokenVaultA`          | writable |             |
-| `tokenOwnerAccountB`   | writable |             |
-| `tokenVaultB`          | writable |             |
-| `tokenProgram`         | readonly |             |
+| `whirlpool`            | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `tokenOwnerAccountA`   | writable | -           |
+| `tokenVaultA`          | writable | -           |
+| `tokenOwnerAccountB`   | writable | -           |
+| `tokenVaultB`          | writable | -           |
+| `tokenProgram`         | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### collectReward
 
@@ -484,20 +491,20 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `rewardOwnerAccount`   | writable |             |
-| `rewardVault`          | writable |             |
-| `tokenProgram`         | readonly |             |
+| `whirlpool`            | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `rewardOwnerAccount`   | writable | -           |
+| `rewardVault`          | writable | -           |
+| `tokenProgram`         | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
-| `rewardIndex`   | `u8`      |             |
+| `discriminator` | `unknown` | -           |
+| `rewardIndex`   | `u8`      | -           |
 
 ### collectProtocolFees
 
@@ -505,20 +512,20 @@
 
 | Account                        | Type     | Description |
 | ------------------------------ | -------- | ----------- |
-| `whirlpoolsConfig`             | readonly |             |
-| `whirlpool`                    | writable |             |
-| `collectProtocolFeesAuthority` | signer   |             |
-| `tokenVaultA`                  | writable |             |
-| `tokenVaultB`                  | writable |             |
-| `tokenDestinationA`            | writable |             |
-| `tokenDestinationB`            | writable |             |
-| `tokenProgram`                 | readonly |             |
+| `whirlpoolsConfig`             | readonly | -           |
+| `whirlpool`                    | writable | -           |
+| `collectProtocolFeesAuthority` | signer   | -           |
+| `tokenVaultA`                  | writable | -           |
+| `tokenVaultB`                  | writable | -           |
+| `tokenDestinationA`            | writable | -           |
+| `tokenDestinationB`            | writable | -           |
+| `tokenProgram`                 | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### swap
 
@@ -526,28 +533,28 @@
 
 | Account              | Type     | Description |
 | -------------------- | -------- | ----------- |
-| `tokenProgram`       | readonly |             |
-| `tokenAuthority`     | signer   |             |
-| `whirlpool`          | writable |             |
-| `tokenOwnerAccountA` | writable |             |
-| `tokenVaultA`        | writable |             |
-| `tokenOwnerAccountB` | writable |             |
-| `tokenVaultB`        | writable |             |
-| `tickArray0`         | writable |             |
-| `tickArray1`         | writable |             |
-| `tickArray2`         | writable |             |
-| `oracle`             | readonly |             |
+| `tokenProgram`       | readonly | -           |
+| `tokenAuthority`     | signer   | -           |
+| `whirlpool`          | writable | -           |
+| `tokenOwnerAccountA` | writable | -           |
+| `tokenVaultA`        | writable | -           |
+| `tokenOwnerAccountB` | writable | -           |
+| `tokenVaultB`        | writable | -           |
+| `tickArray0`         | writable | -           |
+| `tickArray1`         | writable | -           |
+| `tickArray2`         | writable | -           |
+| `oracle`             | readonly | -           |
 
 **Arguments:**
 
 | Argument                 | Type      | Description |
 | ------------------------ | --------- | ----------- |
-| `discriminator`          | `unknown` |             |
-| `amount`                 | `u64`     |             |
-| `otherAmountThreshold`   | `u64`     |             |
-| `sqrtPriceLimit`         | `u128`    |             |
-| `amountSpecifiedIsInput` | `boolean` |             |
-| `aToB`                   | `boolean` |             |
+| `discriminator`          | `unknown` | -           |
+| `amount`                 | `u64`     | -           |
+| `otherAmountThreshold`   | `u64`     | -           |
+| `sqrtPriceLimit`         | `u128`    | -           |
+| `amountSpecifiedIsInput` | `boolean` | -           |
+| `aToB`                   | `boolean` | -           |
 
 ### closePosition
 
@@ -555,18 +562,18 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `positionAuthority`    | signer   |             |
-| `receiver`             | writable |             |
-| `position`             | writable |             |
-| `positionMint`         | writable |             |
-| `positionTokenAccount` | writable |             |
-| `tokenProgram`         | readonly |             |
+| `positionAuthority`    | signer   | -           |
+| `receiver`             | writable | -           |
+| `position`             | writable | -           |
+| `positionMint`         | writable | -           |
+| `positionTokenAccount` | writable | -           |
+| `tokenProgram`         | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### setDefaultFeeRate
 
@@ -574,16 +581,16 @@
 
 | Account            | Type     | Description |
 | ------------------ | -------- | ----------- |
-| `whirlpoolsConfig` | readonly |             |
-| `feeTier`          | writable |             |
-| `feeAuthority`     | signer   |             |
+| `whirlpoolsConfig` | readonly | -           |
+| `feeTier`          | writable | -           |
+| `feeAuthority`     | signer   | -           |
 
 **Arguments:**
 
 | Argument         | Type      | Description |
 | ---------------- | --------- | ----------- |
-| `discriminator`  | `unknown` |             |
-| `defaultFeeRate` | `u16`     |             |
+| `discriminator`  | `unknown` | -           |
+| `defaultFeeRate` | `u16`     | -           |
 
 ### setDefaultProtocolFeeRate
 
@@ -591,15 +598,15 @@
 
 | Account            | Type     | Description |
 | ------------------ | -------- | ----------- |
-| `whirlpoolsConfig` | writable |             |
-| `feeAuthority`     | signer   |             |
+| `whirlpoolsConfig` | writable | -           |
+| `feeAuthority`     | signer   | -           |
 
 **Arguments:**
 
 | Argument                 | Type      | Description |
 | ------------------------ | --------- | ----------- |
-| `discriminator`          | `unknown` |             |
-| `defaultProtocolFeeRate` | `u16`     |             |
+| `discriminator`          | `unknown` | -           |
+| `defaultProtocolFeeRate` | `u16`     | -           |
 
 ### setFeeRate
 
@@ -607,16 +614,16 @@
 
 | Account            | Type     | Description |
 | ------------------ | -------- | ----------- |
-| `whirlpoolsConfig` | readonly |             |
-| `whirlpool`        | writable |             |
-| `feeAuthority`     | signer   |             |
+| `whirlpoolsConfig` | readonly | -           |
+| `whirlpool`        | writable | -           |
+| `feeAuthority`     | signer   | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
-| `feeRate`       | `u16`     |             |
+| `discriminator` | `unknown` | -           |
+| `feeRate`       | `u16`     | -           |
 
 ### setProtocolFeeRate
 
@@ -624,16 +631,16 @@
 
 | Account            | Type     | Description |
 | ------------------ | -------- | ----------- |
-| `whirlpoolsConfig` | readonly |             |
-| `whirlpool`        | writable |             |
-| `feeAuthority`     | signer   |             |
+| `whirlpoolsConfig` | readonly | -           |
+| `whirlpool`        | writable | -           |
+| `feeAuthority`     | signer   | -           |
 
 **Arguments:**
 
 | Argument          | Type      | Description |
 | ----------------- | --------- | ----------- |
-| `discriminator`   | `unknown` |             |
-| `protocolFeeRate` | `u16`     |             |
+| `discriminator`   | `unknown` | -           |
+| `protocolFeeRate` | `u16`     | -           |
 
 ### setFeeAuthority
 
@@ -641,15 +648,15 @@
 
 | Account            | Type     | Description |
 | ------------------ | -------- | ----------- |
-| `whirlpoolsConfig` | writable |             |
-| `feeAuthority`     | signer   |             |
-| `newFeeAuthority`  | readonly |             |
+| `whirlpoolsConfig` | writable | -           |
+| `feeAuthority`     | signer   | -           |
+| `newFeeAuthority`  | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### setCollectProtocolFeesAuthority
 
@@ -657,15 +664,15 @@
 
 | Account                           | Type     | Description |
 | --------------------------------- | -------- | ----------- |
-| `whirlpoolsConfig`                | writable |             |
-| `collectProtocolFeesAuthority`    | signer   |             |
-| `newCollectProtocolFeesAuthority` | readonly |             |
+| `whirlpoolsConfig`                | writable | -           |
+| `collectProtocolFeesAuthority`    | signer   | -           |
+| `newCollectProtocolFeesAuthority` | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### setRewardAuthority
 
@@ -673,16 +680,16 @@
 
 | Account              | Type     | Description |
 | -------------------- | -------- | ----------- |
-| `whirlpool`          | writable |             |
-| `rewardAuthority`    | signer   |             |
-| `newRewardAuthority` | readonly |             |
+| `whirlpool`          | writable | -           |
+| `rewardAuthority`    | signer   | -           |
+| `newRewardAuthority` | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
-| `rewardIndex`   | `u8`      |             |
+| `discriminator` | `unknown` | -           |
+| `rewardIndex`   | `u8`      | -           |
 
 ### setRewardAuthorityBySuperAuthority
 
@@ -690,17 +697,17 @@
 
 | Account                         | Type     | Description |
 | ------------------------------- | -------- | ----------- |
-| `whirlpoolsConfig`              | readonly |             |
-| `whirlpool`                     | writable |             |
-| `rewardEmissionsSuperAuthority` | signer   |             |
-| `newRewardAuthority`            | readonly |             |
+| `whirlpoolsConfig`              | readonly | -           |
+| `whirlpool`                     | writable | -           |
+| `rewardEmissionsSuperAuthority` | signer   | -           |
+| `newRewardAuthority`            | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
-| `rewardIndex`   | `u8`      |             |
+| `discriminator` | `unknown` | -           |
+| `rewardIndex`   | `u8`      | -           |
 
 ### setRewardEmissionsSuperAuthority
 
@@ -708,15 +715,15 @@
 
 | Account                            | Type     | Description |
 | ---------------------------------- | -------- | ----------- |
-| `whirlpoolsConfig`                 | writable |             |
-| `rewardEmissionsSuperAuthority`    | signer   |             |
-| `newRewardEmissionsSuperAuthority` | readonly |             |
+| `whirlpoolsConfig`                 | writable | -           |
+| `rewardEmissionsSuperAuthority`    | signer   | -           |
+| `newRewardEmissionsSuperAuthority` | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### twoHopSwap
 
@@ -724,39 +731,39 @@
 
 | Account                 | Type     | Description |
 | ----------------------- | -------- | ----------- |
-| `tokenProgram`          | readonly |             |
-| `tokenAuthority`        | signer   |             |
-| `whirlpoolOne`          | writable |             |
-| `whirlpoolTwo`          | writable |             |
-| `tokenOwnerAccountOneA` | writable |             |
-| `tokenVaultOneA`        | writable |             |
-| `tokenOwnerAccountOneB` | writable |             |
-| `tokenVaultOneB`        | writable |             |
-| `tokenOwnerAccountTwoA` | writable |             |
-| `tokenVaultTwoA`        | writable |             |
-| `tokenOwnerAccountTwoB` | writable |             |
-| `tokenVaultTwoB`        | writable |             |
-| `tickArrayOne0`         | writable |             |
-| `tickArrayOne1`         | writable |             |
-| `tickArrayOne2`         | writable |             |
-| `tickArrayTwo0`         | writable |             |
-| `tickArrayTwo1`         | writable |             |
-| `tickArrayTwo2`         | writable |             |
-| `oracleOne`             | readonly |             |
-| `oracleTwo`             | readonly |             |
+| `tokenProgram`          | readonly | -           |
+| `tokenAuthority`        | signer   | -           |
+| `whirlpoolOne`          | writable | -           |
+| `whirlpoolTwo`          | writable | -           |
+| `tokenOwnerAccountOneA` | writable | -           |
+| `tokenVaultOneA`        | writable | -           |
+| `tokenOwnerAccountOneB` | writable | -           |
+| `tokenVaultOneB`        | writable | -           |
+| `tokenOwnerAccountTwoA` | writable | -           |
+| `tokenVaultTwoA`        | writable | -           |
+| `tokenOwnerAccountTwoB` | writable | -           |
+| `tokenVaultTwoB`        | writable | -           |
+| `tickArrayOne0`         | writable | -           |
+| `tickArrayOne1`         | writable | -           |
+| `tickArrayOne2`         | writable | -           |
+| `tickArrayTwo0`         | writable | -           |
+| `tickArrayTwo1`         | writable | -           |
+| `tickArrayTwo2`         | writable | -           |
+| `oracleOne`             | readonly | -           |
+| `oracleTwo`             | readonly | -           |
 
 **Arguments:**
 
 | Argument                 | Type      | Description |
 | ------------------------ | --------- | ----------- |
-| `discriminator`          | `unknown` |             |
-| `amount`                 | `u64`     |             |
-| `otherAmountThreshold`   | `u64`     |             |
-| `amountSpecifiedIsInput` | `boolean` |             |
-| `aToBOne`                | `boolean` |             |
-| `aToBTwo`                | `boolean` |             |
-| `sqrtPriceLimitOne`      | `u128`    |             |
-| `sqrtPriceLimitTwo`      | `u128`    |             |
+| `discriminator`          | `unknown` | -           |
+| `amount`                 | `u64`     | -           |
+| `otherAmountThreshold`   | `u64`     | -           |
+| `amountSpecifiedIsInput` | `boolean` | -           |
+| `aToBOne`                | `boolean` | -           |
+| `aToBTwo`                | `boolean` | -           |
+| `sqrtPriceLimitOne`      | `u128`    | -           |
+| `sqrtPriceLimitTwo`      | `u128`    | -           |
 
 ### initializePositionBundle
 
@@ -764,21 +771,21 @@
 
 | Account                      | Type             | Description |
 | ---------------------------- | ---------------- | ----------- |
-| `positionBundle`             | writable         |             |
-| `positionBundleMint`         | signer, writable |             |
-| `positionBundleTokenAccount` | writable         |             |
-| `positionBundleOwner`        | readonly         |             |
-| `funder`                     | signer, writable |             |
-| `tokenProgram`               | readonly         |             |
-| `systemProgram`              | readonly         |             |
-| `rent`                       | readonly         |             |
-| `associatedTokenProgram`     | readonly         |             |
+| `positionBundle`             | writable         | -           |
+| `positionBundleMint`         | signer, writable | -           |
+| `positionBundleTokenAccount` | writable         | -           |
+| `positionBundleOwner`        | readonly         | -           |
+| `funder`                     | signer, writable | -           |
+| `tokenProgram`               | readonly         | -           |
+| `systemProgram`              | readonly         | -           |
+| `rent`                       | readonly         | -           |
+| `associatedTokenProgram`     | readonly         | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### initializePositionBundleWithMetadata
 
@@ -786,24 +793,24 @@
 
 | Account                      | Type             | Description |
 | ---------------------------- | ---------------- | ----------- |
-| `positionBundle`             | writable         |             |
-| `positionBundleMint`         | signer, writable |             |
-| `positionBundleMetadata`     | writable         |             |
-| `positionBundleTokenAccount` | writable         |             |
-| `positionBundleOwner`        | readonly         |             |
-| `funder`                     | signer, writable |             |
-| `metadataUpdateAuth`         | readonly         |             |
-| `tokenProgram`               | readonly         |             |
-| `systemProgram`              | readonly         |             |
-| `rent`                       | readonly         |             |
-| `associatedTokenProgram`     | readonly         |             |
-| `metadataProgram`            | readonly         |             |
+| `positionBundle`             | writable         | -           |
+| `positionBundleMint`         | signer, writable | -           |
+| `positionBundleMetadata`     | writable         | -           |
+| `positionBundleTokenAccount` | writable         | -           |
+| `positionBundleOwner`        | readonly         | -           |
+| `funder`                     | signer, writable | -           |
+| `metadataUpdateAuth`         | readonly         | -           |
+| `tokenProgram`               | readonly         | -           |
+| `systemProgram`              | readonly         | -           |
+| `rent`                       | readonly         | -           |
+| `associatedTokenProgram`     | readonly         | -           |
+| `metadataProgram`            | readonly         | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### deletePositionBundle
 
@@ -811,18 +818,18 @@
 
 | Account                      | Type     | Description |
 | ---------------------------- | -------- | ----------- |
-| `positionBundle`             | writable |             |
-| `positionBundleMint`         | writable |             |
-| `positionBundleTokenAccount` | writable |             |
-| `positionBundleOwner`        | signer   |             |
-| `receiver`                   | writable |             |
-| `tokenProgram`               | readonly |             |
+| `positionBundle`             | writable | -           |
+| `positionBundleMint`         | writable | -           |
+| `positionBundleTokenAccount` | writable | -           |
+| `positionBundleOwner`        | signer   | -           |
+| `receiver`                   | writable | -           |
+| `tokenProgram`               | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### openBundledPosition
 
@@ -830,23 +837,23 @@
 
 | Account                      | Type             | Description |
 | ---------------------------- | ---------------- | ----------- |
-| `bundledPosition`            | writable         |             |
-| `positionBundle`             | writable         |             |
-| `positionBundleTokenAccount` | readonly         |             |
-| `positionBundleAuthority`    | signer           |             |
-| `whirlpool`                  | readonly         |             |
-| `funder`                     | signer, writable |             |
-| `systemProgram`              | readonly         |             |
-| `rent`                       | readonly         |             |
+| `bundledPosition`            | writable         | -           |
+| `positionBundle`             | writable         | -           |
+| `positionBundleTokenAccount` | readonly         | -           |
+| `positionBundleAuthority`    | signer           | -           |
+| `whirlpool`                  | readonly         | -           |
+| `funder`                     | signer, writable | -           |
+| `systemProgram`              | readonly         | -           |
+| `rent`                       | readonly         | -           |
 
 **Arguments:**
 
 | Argument         | Type      | Description |
 | ---------------- | --------- | ----------- |
-| `discriminator`  | `unknown` |             |
-| `bundleIndex`    | `u16`     |             |
-| `tickLowerIndex` | `i32`     |             |
-| `tickUpperIndex` | `i32`     |             |
+| `discriminator`  | `unknown` | -           |
+| `bundleIndex`    | `u16`     | -           |
+| `tickLowerIndex` | `i32`     | -           |
+| `tickUpperIndex` | `i32`     | -           |
 
 ### closeBundledPosition
 
@@ -854,18 +861,18 @@
 
 | Account                      | Type     | Description |
 | ---------------------------- | -------- | ----------- |
-| `bundledPosition`            | writable |             |
-| `positionBundle`             | writable |             |
-| `positionBundleTokenAccount` | readonly |             |
-| `positionBundleAuthority`    | signer   |             |
-| `receiver`                   | writable |             |
+| `bundledPosition`            | writable | -           |
+| `positionBundle`             | writable | -           |
+| `positionBundleTokenAccount` | readonly | -           |
+| `positionBundleAuthority`    | signer   | -           |
+| `receiver`                   | writable | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
-| `bundleIndex`   | `u16`     |             |
+| `discriminator` | `unknown` | -           |
+| `bundleIndex`   | `u16`     | -           |
 
 ### openPositionWithTokenExtensions
 
@@ -873,25 +880,25 @@
 
 | Account                  | Type             | Description |
 | ------------------------ | ---------------- | ----------- |
-| `funder`                 | signer, writable |             |
-| `owner`                  | readonly         |             |
-| `position`               | writable         |             |
-| `positionMint`           | signer, writable |             |
-| `positionTokenAccount`   | writable         |             |
-| `whirlpool`              | readonly         |             |
-| `token2022Program`       | readonly         |             |
-| `systemProgram`          | readonly         |             |
-| `associatedTokenProgram` | readonly         |             |
-| `metadataUpdateAuth`     | readonly         |             |
+| `funder`                 | signer, writable | -           |
+| `owner`                  | readonly         | -           |
+| `position`               | writable         | -           |
+| `positionMint`           | signer, writable | -           |
+| `positionTokenAccount`   | writable         | -           |
+| `whirlpool`              | readonly         | -           |
+| `token2022Program`       | readonly         | -           |
+| `systemProgram`          | readonly         | -           |
+| `associatedTokenProgram` | readonly         | -           |
+| `metadataUpdateAuth`     | readonly         | -           |
 
 **Arguments:**
 
 | Argument                     | Type      | Description |
 | ---------------------------- | --------- | ----------- |
-| `discriminator`              | `unknown` |             |
-| `tickLowerIndex`             | `i32`     |             |
-| `tickUpperIndex`             | `i32`     |             |
-| `withTokenMetadataExtension` | `boolean` |             |
+| `discriminator`              | `unknown` | -           |
+| `tickLowerIndex`             | `i32`     | -           |
+| `tickUpperIndex`             | `i32`     | -           |
+| `withTokenMetadataExtension` | `boolean` | -           |
 
 ### closePositionWithTokenExtensions
 
@@ -899,18 +906,18 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `positionAuthority`    | signer   |             |
-| `receiver`             | writable |             |
-| `position`             | writable |             |
-| `positionMint`         | writable |             |
-| `positionTokenAccount` | writable |             |
-| `token2022Program`     | readonly |             |
+| `positionAuthority`    | signer   | -           |
+| `receiver`             | writable | -           |
+| `position`             | writable | -           |
+| `positionMint`         | writable | -           |
+| `positionTokenAccount` | writable | -           |
+| `token2022Program`     | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### lockPosition
 
@@ -918,22 +925,22 @@
 
 | Account                | Type             | Description |
 | ---------------------- | ---------------- | ----------- |
-| `funder`               | signer, writable |             |
-| `positionAuthority`    | signer           |             |
-| `position`             | readonly         |             |
-| `positionMint`         | readonly         |             |
-| `positionTokenAccount` | writable         |             |
-| `lockConfig`           | writable         |             |
-| `whirlpool`            | readonly         |             |
-| `token2022Program`     | readonly         |             |
-| `systemProgram`        | readonly         |             |
+| `funder`               | signer, writable | -           |
+| `positionAuthority`    | signer           | -           |
+| `position`             | readonly         | -           |
+| `positionMint`         | readonly         | -           |
+| `positionTokenAccount` | writable         | -           |
+| `lockConfig`           | writable         | -           |
+| `whirlpool`            | readonly         | -           |
+| `token2022Program`     | readonly         | -           |
+| `systemProgram`        | readonly         | -           |
 
 **Arguments:**
 
 | Argument        | Type                    | Description |
 | --------------- | ----------------------- | ----------- |
-| `discriminator` | `unknown`               |             |
-| `lockType`      | [lockType](#lockType-3) |             |
+| `discriminator` | `unknown`               | -           |
+| `lockType`      | [lockType](#lockType-3) | -           |
 
 ### collectFeesV2
 
@@ -941,26 +948,26 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `tokenMintA`           | readonly |             |
-| `tokenMintB`           | readonly |             |
-| `tokenOwnerAccountA`   | writable |             |
-| `tokenVaultA`          | writable |             |
-| `tokenOwnerAccountB`   | writable |             |
-| `tokenVaultB`          | writable |             |
-| `tokenProgramA`        | readonly |             |
-| `tokenProgramB`        | readonly |             |
-| `memoProgram`          | readonly |             |
+| `whirlpool`            | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `tokenMintA`           | readonly | -           |
+| `tokenMintB`           | readonly | -           |
+| `tokenOwnerAccountA`   | writable | -           |
+| `tokenVaultA`          | writable | -           |
+| `tokenOwnerAccountB`   | writable | -           |
+| `tokenVaultB`          | writable | -           |
+| `tokenProgramA`        | readonly | -           |
+| `tokenProgramB`        | readonly | -           |
+| `memoProgram`          | readonly | -           |
 
 **Arguments:**
 
 | Argument                | Type                                              | Description |
-| ----------------------- | ------------------------------------------------- | ----------- | --- |
-| `discriminator`         | `unknown`                                         |             |
-| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        |     |
+| ----------------------- | ------------------------------------------------- | ----------- |
+| `discriminator`         | `unknown`                                         | -           |
+| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        | -   |
 
 ### collectProtocolFeesV2
 
@@ -968,25 +975,25 @@
 
 | Account                        | Type     | Description |
 | ------------------------------ | -------- | ----------- |
-| `whirlpoolsConfig`             | readonly |             |
-| `whirlpool`                    | writable |             |
-| `collectProtocolFeesAuthority` | signer   |             |
-| `tokenMintA`                   | readonly |             |
-| `tokenMintB`                   | readonly |             |
-| `tokenVaultA`                  | writable |             |
-| `tokenVaultB`                  | writable |             |
-| `tokenDestinationA`            | writable |             |
-| `tokenDestinationB`            | writable |             |
-| `tokenProgramA`                | readonly |             |
-| `tokenProgramB`                | readonly |             |
-| `memoProgram`                  | readonly |             |
+| `whirlpoolsConfig`             | readonly | -           |
+| `whirlpool`                    | writable | -           |
+| `collectProtocolFeesAuthority` | signer   | -           |
+| `tokenMintA`                   | readonly | -           |
+| `tokenMintB`                   | readonly | -           |
+| `tokenVaultA`                  | writable | -           |
+| `tokenVaultB`                  | writable | -           |
+| `tokenDestinationA`            | writable | -           |
+| `tokenDestinationB`            | writable | -           |
+| `tokenProgramA`                | readonly | -           |
+| `tokenProgramB`                | readonly | -           |
+| `memoProgram`                  | readonly | -           |
 
 **Arguments:**
 
 | Argument                | Type                                              | Description |
-| ----------------------- | ------------------------------------------------- | ----------- | --- |
-| `discriminator`         | `unknown`                                         |             |
-| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        |     |
+| ----------------------- | ------------------------------------------------- | ----------- |
+| `discriminator`         | `unknown`                                         | -           |
+| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        | -   |
 
 ### collectRewardV2
 
@@ -994,23 +1001,23 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `rewardOwnerAccount`   | writable |             |
-| `rewardMint`           | readonly |             |
-| `rewardVault`          | writable |             |
-| `rewardTokenProgram`   | readonly |             |
-| `memoProgram`          | readonly |             |
+| `whirlpool`            | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `rewardOwnerAccount`   | writable | -           |
+| `rewardMint`           | readonly | -           |
+| `rewardVault`          | writable | -           |
+| `rewardTokenProgram`   | readonly | -           |
+| `memoProgram`          | readonly | -           |
 
 **Arguments:**
 
 | Argument                | Type                                              | Description |
-| ----------------------- | ------------------------------------------------- | ----------- | --- |
-| `discriminator`         | `unknown`                                         |             |
-| `rewardIndex`           | `u8`                                              |             |
-| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        |     |
+| ----------------------- | ------------------------------------------------- | ----------- |
+| `discriminator`         | `unknown`                                         | -           |
+| `rewardIndex`           | `u8`                                              | -           |
+| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        | -   |
 
 ### decreaseLiquidityV2
 
@@ -1018,31 +1025,31 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | writable |             |
-| `tokenProgramA`        | readonly |             |
-| `tokenProgramB`        | readonly |             |
-| `memoProgram`          | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `tokenMintA`           | readonly |             |
-| `tokenMintB`           | readonly |             |
-| `tokenOwnerAccountA`   | writable |             |
-| `tokenOwnerAccountB`   | writable |             |
-| `tokenVaultA`          | writable |             |
-| `tokenVaultB`          | writable |             |
-| `tickArrayLower`       | writable |             |
-| `tickArrayUpper`       | writable |             |
+| `whirlpool`            | writable | -           |
+| `tokenProgramA`        | readonly | -           |
+| `tokenProgramB`        | readonly | -           |
+| `memoProgram`          | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `tokenMintA`           | readonly | -           |
+| `tokenMintB`           | readonly | -           |
+| `tokenOwnerAccountA`   | writable | -           |
+| `tokenOwnerAccountB`   | writable | -           |
+| `tokenVaultA`          | writable | -           |
+| `tokenVaultB`          | writable | -           |
+| `tickArrayLower`       | writable | -           |
+| `tickArrayUpper`       | writable | -           |
 
 **Arguments:**
 
 | Argument                | Type                                              | Description |
-| ----------------------- | ------------------------------------------------- | ----------- | --- |
-| `discriminator`         | `unknown`                                         |             |
-| `liquidityAmount`       | `u128`                                            |             |
-| `tokenMinA`             | `u64`                                             |             |
-| `tokenMinB`             | `u64`                                             |             |
-| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        |     |
+| ----------------------- | ------------------------------------------------- | ----------- |
+| `discriminator`         | `unknown`                                         | -           |
+| `liquidityAmount`       | `u128`                                            | -           |
+| `tokenMinA`             | `u64`                                             | -           |
+| `tokenMinB`             | `u64`                                             | -           |
+| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        | -   |
 
 ### increaseLiquidityV2
 
@@ -1050,31 +1057,31 @@
 
 | Account                | Type     | Description |
 | ---------------------- | -------- | ----------- |
-| `whirlpool`            | writable |             |
-| `tokenProgramA`        | readonly |             |
-| `tokenProgramB`        | readonly |             |
-| `memoProgram`          | readonly |             |
-| `positionAuthority`    | signer   |             |
-| `position`             | writable |             |
-| `positionTokenAccount` | readonly |             |
-| `tokenMintA`           | readonly |             |
-| `tokenMintB`           | readonly |             |
-| `tokenOwnerAccountA`   | writable |             |
-| `tokenOwnerAccountB`   | writable |             |
-| `tokenVaultA`          | writable |             |
-| `tokenVaultB`          | writable |             |
-| `tickArrayLower`       | writable |             |
-| `tickArrayUpper`       | writable |             |
+| `whirlpool`            | writable | -           |
+| `tokenProgramA`        | readonly | -           |
+| `tokenProgramB`        | readonly | -           |
+| `memoProgram`          | readonly | -           |
+| `positionAuthority`    | signer   | -           |
+| `position`             | writable | -           |
+| `positionTokenAccount` | readonly | -           |
+| `tokenMintA`           | readonly | -           |
+| `tokenMintB`           | readonly | -           |
+| `tokenOwnerAccountA`   | writable | -           |
+| `tokenOwnerAccountB`   | writable | -           |
+| `tokenVaultA`          | writable | -           |
+| `tokenVaultB`          | writable | -           |
+| `tickArrayLower`       | writable | -           |
+| `tickArrayUpper`       | writable | -           |
 
 **Arguments:**
 
 | Argument                | Type                                              | Description |
-| ----------------------- | ------------------------------------------------- | ----------- | --- |
-| `discriminator`         | `unknown`                                         |             |
-| `liquidityAmount`       | `u128`                                            |             |
-| `tokenMaxA`             | `u64`                                             |             |
-| `tokenMaxB`             | `u64`                                             |             |
-| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        |     |
+| ----------------------- | ------------------------------------------------- | ----------- |
+| `discriminator`         | `unknown`                                         | -           |
+| `liquidityAmount`       | `u128`                                            | -           |
+| `tokenMaxA`             | `u64`                                             | -           |
+| `tokenMaxB`             | `u64`                                             | -           |
+| `remainingAccountsInfo` | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        | -   |
 
 ### initializePoolV2
 
@@ -1082,28 +1089,28 @@
 
 | Account            | Type             | Description |
 | ------------------ | ---------------- | ----------- |
-| `whirlpoolsConfig` | readonly         |             |
-| `tokenMintA`       | readonly         |             |
-| `tokenMintB`       | readonly         |             |
-| `tokenBadgeA`      | readonly         |             |
-| `tokenBadgeB`      | readonly         |             |
-| `funder`           | signer, writable |             |
-| `whirlpool`        | writable         |             |
-| `tokenVaultA`      | signer, writable |             |
-| `tokenVaultB`      | signer, writable |             |
-| `feeTier`          | readonly         |             |
-| `tokenProgramA`    | readonly         |             |
-| `tokenProgramB`    | readonly         |             |
-| `systemProgram`    | readonly         |             |
-| `rent`             | readonly         |             |
+| `whirlpoolsConfig` | readonly         | -           |
+| `tokenMintA`       | readonly         | -           |
+| `tokenMintB`       | readonly         | -           |
+| `tokenBadgeA`      | readonly         | -           |
+| `tokenBadgeB`      | readonly         | -           |
+| `funder`           | signer, writable | -           |
+| `whirlpool`        | writable         | -           |
+| `tokenVaultA`      | signer, writable | -           |
+| `tokenVaultB`      | signer, writable | -           |
+| `feeTier`          | readonly         | -           |
+| `tokenProgramA`    | readonly         | -           |
+| `tokenProgramB`    | readonly         | -           |
+| `systemProgram`    | readonly         | -           |
+| `rent`             | readonly         | -           |
 
 **Arguments:**
 
 | Argument           | Type      | Description |
 | ------------------ | --------- | ----------- |
-| `discriminator`    | `unknown` |             |
-| `tickSpacing`      | `u16`     |             |
-| `initialSqrtPrice` | `u128`    |             |
+| `discriminator`    | `unknown` | -           |
+| `tickSpacing`      | `u16`     | -           |
+| `initialSqrtPrice` | `u128`    | -           |
 
 ### initializeRewardV2
 
@@ -1111,22 +1118,22 @@
 
 | Account              | Type             | Description |
 | -------------------- | ---------------- | ----------- |
-| `rewardAuthority`    | signer           |             |
-| `funder`             | signer, writable |             |
-| `whirlpool`          | writable         |             |
-| `rewardMint`         | readonly         |             |
-| `rewardTokenBadge`   | readonly         |             |
-| `rewardVault`        | signer, writable |             |
-| `rewardTokenProgram` | readonly         |             |
-| `systemProgram`      | readonly         |             |
-| `rent`               | readonly         |             |
+| `rewardAuthority`    | signer           | -           |
+| `funder`             | signer, writable | -           |
+| `whirlpool`          | writable         | -           |
+| `rewardMint`         | readonly         | -           |
+| `rewardTokenBadge`   | readonly         | -           |
+| `rewardVault`        | signer, writable | -           |
+| `rewardTokenProgram` | readonly         | -           |
+| `systemProgram`      | readonly         | -           |
+| `rent`               | readonly         | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
-| `rewardIndex`   | `u8`      |             |
+| `discriminator` | `unknown` | -           |
+| `rewardIndex`   | `u8`      | -           |
 
 ### setRewardEmissionsV2
 
@@ -1134,17 +1141,17 @@
 
 | Account           | Type     | Description |
 | ----------------- | -------- | ----------- |
-| `whirlpool`       | writable |             |
-| `rewardAuthority` | signer   |             |
-| `rewardVault`     | readonly |             |
+| `whirlpool`       | writable | -           |
+| `rewardAuthority` | signer   | -           |
+| `rewardVault`     | readonly | -           |
 
 **Arguments:**
 
 | Argument                | Type      | Description |
 | ----------------------- | --------- | ----------- |
-| `discriminator`         | `unknown` |             |
-| `rewardIndex`           | `u8`      |             |
-| `emissionsPerSecondX64` | `u128`    |             |
+| `discriminator`         | `unknown` | -           |
+| `rewardIndex`           | `u8`      | -           |
+| `emissionsPerSecondX64` | `u128`    | -           |
 
 ### swapV2
 
@@ -1152,33 +1159,33 @@
 
 | Account              | Type     | Description |
 | -------------------- | -------- | ----------- |
-| `tokenProgramA`      | readonly |             |
-| `tokenProgramB`      | readonly |             |
-| `memoProgram`        | readonly |             |
-| `tokenAuthority`     | signer   |             |
-| `whirlpool`          | writable |             |
-| `tokenMintA`         | readonly |             |
-| `tokenMintB`         | readonly |             |
-| `tokenOwnerAccountA` | writable |             |
-| `tokenVaultA`        | writable |             |
-| `tokenOwnerAccountB` | writable |             |
-| `tokenVaultB`        | writable |             |
-| `tickArray0`         | writable |             |
-| `tickArray1`         | writable |             |
-| `tickArray2`         | writable |             |
-| `oracle`             | writable |             |
+| `tokenProgramA`      | readonly | -           |
+| `tokenProgramB`      | readonly | -           |
+| `memoProgram`        | readonly | -           |
+| `tokenAuthority`     | signer   | -           |
+| `whirlpool`          | writable | -           |
+| `tokenMintA`         | readonly | -           |
+| `tokenMintB`         | readonly | -           |
+| `tokenOwnerAccountA` | writable | -           |
+| `tokenVaultA`        | writable | -           |
+| `tokenOwnerAccountB` | writable | -           |
+| `tokenVaultB`        | writable | -           |
+| `tickArray0`         | writable | -           |
+| `tickArray1`         | writable | -           |
+| `tickArray2`         | writable | -           |
+| `oracle`             | writable | -           |
 
 **Arguments:**
 
 | Argument                 | Type                                              | Description |
-| ------------------------ | ------------------------------------------------- | ----------- | --- |
-| `discriminator`          | `unknown`                                         |             |
-| `amount`                 | `u64`                                             |             |
-| `otherAmountThreshold`   | `u64`                                             |             |
-| `sqrtPriceLimit`         | `u128`                                            |             |
-| `amountSpecifiedIsInput` | `boolean`                                         |             |
-| `aToB`                   | `boolean`                                         |             |
-| `remainingAccountsInfo`  | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        |     |
+| ------------------------ | ------------------------------------------------- | ----------- |
+| `discriminator`          | `unknown`                                         | -           |
+| `amount`                 | `u64`                                             | -           |
+| `otherAmountThreshold`   | `u64`                                             | -           |
+| `sqrtPriceLimit`         | `u128`                                            | -           |
+| `amountSpecifiedIsInput` | `boolean`                                         | -           |
+| `aToB`                   | `boolean`                                         | -           |
+| `remainingAccountsInfo`  | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        | -   |
 
 ### twoHopSwapV2
 
@@ -1186,44 +1193,44 @@
 
 | Account                     | Type     | Description |
 | --------------------------- | -------- | ----------- |
-| `whirlpoolOne`              | writable |             |
-| `whirlpoolTwo`              | writable |             |
-| `tokenMintInput`            | readonly |             |
-| `tokenMintIntermediate`     | readonly |             |
-| `tokenMintOutput`           | readonly |             |
-| `tokenProgramInput`         | readonly |             |
-| `tokenProgramIntermediate`  | readonly |             |
-| `tokenProgramOutput`        | readonly |             |
-| `tokenOwnerAccountInput`    | writable |             |
-| `tokenVaultOneInput`        | writable |             |
-| `tokenVaultOneIntermediate` | writable |             |
-| `tokenVaultTwoIntermediate` | writable |             |
-| `tokenVaultTwoOutput`       | writable |             |
-| `tokenOwnerAccountOutput`   | writable |             |
-| `tokenAuthority`            | signer   |             |
-| `tickArrayOne0`             | writable |             |
-| `tickArrayOne1`             | writable |             |
-| `tickArrayOne2`             | writable |             |
-| `tickArrayTwo0`             | writable |             |
-| `tickArrayTwo1`             | writable |             |
-| `tickArrayTwo2`             | writable |             |
-| `oracleOne`                 | writable |             |
-| `oracleTwo`                 | writable |             |
-| `memoProgram`               | readonly |             |
+| `whirlpoolOne`              | writable | -           |
+| `whirlpoolTwo`              | writable | -           |
+| `tokenMintInput`            | readonly | -           |
+| `tokenMintIntermediate`     | readonly | -           |
+| `tokenMintOutput`           | readonly | -           |
+| `tokenProgramInput`         | readonly | -           |
+| `tokenProgramIntermediate`  | readonly | -           |
+| `tokenProgramOutput`        | readonly | -           |
+| `tokenOwnerAccountInput`    | writable | -           |
+| `tokenVaultOneInput`        | writable | -           |
+| `tokenVaultOneIntermediate` | writable | -           |
+| `tokenVaultTwoIntermediate` | writable | -           |
+| `tokenVaultTwoOutput`       | writable | -           |
+| `tokenOwnerAccountOutput`   | writable | -           |
+| `tokenAuthority`            | signer   | -           |
+| `tickArrayOne0`             | writable | -           |
+| `tickArrayOne1`             | writable | -           |
+| `tickArrayOne2`             | writable | -           |
+| `tickArrayTwo0`             | writable | -           |
+| `tickArrayTwo1`             | writable | -           |
+| `tickArrayTwo2`             | writable | -           |
+| `oracleOne`                 | writable | -           |
+| `oracleTwo`                 | writable | -           |
+| `memoProgram`               | readonly | -           |
 
 **Arguments:**
 
 | Argument                 | Type                                              | Description |
-| ------------------------ | ------------------------------------------------- | ----------- | --- |
-| `discriminator`          | `unknown`                                         |             |
-| `amount`                 | `u64`                                             |             |
-| `otherAmountThreshold`   | `u64`                                             |             |
-| `amountSpecifiedIsInput` | `boolean`                                         |             |
-| `aToBOne`                | `boolean`                                         |             |
-| `aToBTwo`                | `boolean`                                         |             |
-| `sqrtPriceLimitOne`      | `u128`                                            |             |
-| `sqrtPriceLimitTwo`      | `u128`                                            |             |
-| `remainingAccountsInfo`  | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        |     |
+| ------------------------ | ------------------------------------------------- | ----------- |
+| `discriminator`          | `unknown`                                         | -           |
+| `amount`                 | `u64`                                             | -           |
+| `otherAmountThreshold`   | `u64`                                             | -           |
+| `amountSpecifiedIsInput` | `boolean`                                         | -           |
+| `aToBOne`                | `boolean`                                         | -           |
+| `aToBTwo`                | `boolean`                                         | -           |
+| `sqrtPriceLimitOne`      | `u128`                                            | -           |
+| `sqrtPriceLimitTwo`      | `u128`                                            | -           |
+| `remainingAccountsInfo`  | [remainingAccountsInfo](#remainingAccountsInfo-3) | null        | -   |
 
 ### initializeConfigExtension
 
@@ -1231,17 +1238,17 @@
 
 | Account           | Type             | Description |
 | ----------------- | ---------------- | ----------- |
-| `config`          | readonly         |             |
-| `configExtension` | writable         |             |
-| `funder`          | signer, writable |             |
-| `feeAuthority`    | signer           |             |
-| `systemProgram`   | readonly         |             |
+| `config`          | readonly         | -           |
+| `configExtension` | writable         | -           |
+| `funder`          | signer, writable | -           |
+| `feeAuthority`    | signer           | -           |
+| `systemProgram`   | readonly         | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### setConfigExtensionAuthority
 
@@ -1249,16 +1256,16 @@
 
 | Account                       | Type     | Description |
 | ----------------------------- | -------- | ----------- |
-| `whirlpoolsConfig`            | readonly |             |
-| `whirlpoolsConfigExtension`   | writable |             |
-| `configExtensionAuthority`    | signer   |             |
-| `newConfigExtensionAuthority` | readonly |             |
+| `whirlpoolsConfig`            | readonly | -           |
+| `whirlpoolsConfigExtension`   | writable | -           |
+| `configExtensionAuthority`    | signer   | -           |
+| `newConfigExtensionAuthority` | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### setTokenBadgeAuthority
 
@@ -1266,16 +1273,16 @@
 
 | Account                     | Type     | Description |
 | --------------------------- | -------- | ----------- |
-| `whirlpoolsConfig`          | readonly |             |
-| `whirlpoolsConfigExtension` | writable |             |
-| `configExtensionAuthority`  | signer   |             |
-| `newTokenBadgeAuthority`    | readonly |             |
+| `whirlpoolsConfig`          | readonly | -           |
+| `whirlpoolsConfigExtension` | writable | -           |
+| `configExtensionAuthority`  | signer   | -           |
+| `newTokenBadgeAuthority`    | readonly | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### initializeTokenBadge
 
@@ -1283,19 +1290,19 @@
 
 | Account                     | Type             | Description |
 | --------------------------- | ---------------- | ----------- |
-| `whirlpoolsConfig`          | readonly         |             |
-| `whirlpoolsConfigExtension` | readonly         |             |
-| `tokenBadgeAuthority`       | signer           |             |
-| `tokenMint`                 | readonly         |             |
-| `tokenBadge`                | writable         |             |
-| `funder`                    | signer, writable |             |
-| `systemProgram`             | readonly         |             |
+| `whirlpoolsConfig`          | readonly         | -           |
+| `whirlpoolsConfigExtension` | readonly         | -           |
+| `tokenBadgeAuthority`       | signer           | -           |
+| `tokenMint`                 | readonly         | -           |
+| `tokenBadge`                | writable         | -           |
+| `funder`                    | signer, writable | -           |
+| `systemProgram`             | readonly         | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ### deleteTokenBadge
 
@@ -1303,18 +1310,18 @@
 
 | Account                     | Type     | Description |
 | --------------------------- | -------- | ----------- |
-| `whirlpoolsConfig`          | readonly |             |
-| `whirlpoolsConfigExtension` | readonly |             |
-| `tokenBadgeAuthority`       | signer   |             |
-| `tokenMint`                 | readonly |             |
-| `tokenBadge`                | writable |             |
-| `receiver`                  | writable |             |
+| `whirlpoolsConfig`          | readonly | -           |
+| `whirlpoolsConfigExtension` | readonly | -           |
+| `tokenBadgeAuthority`       | signer   | -           |
+| `tokenMint`                 | readonly | -           |
+| `tokenBadge`                | writable | -           |
+| `receiver`                  | writable | -           |
 
 **Arguments:**
 
 | Argument        | Type      | Description |
 | --------------- | --------- | ----------- |
-| `discriminator` | `unknown` |             |
+| `discriminator` | `unknown` | -           |
 
 ## Types
 
@@ -1442,6 +1449,80 @@
 }
 ```
 
+### liquidityDecreased
+
+**Definition:**
+
+```typescript
+{
+  whirlpool: PublicKey;
+  position: PublicKey;
+  tickLowerIndex: bigint;
+  tickUpperIndex: bigint;
+  liquidity: bigint;
+  tokenAAmount: bigint;
+  tokenBAmount: bigint;
+  tokenATransferFee: bigint;
+  tokenBTransferFee: bigint;
+}
+```
+
+### liquidityIncreased
+
+**Definition:**
+
+```typescript
+{
+  whirlpool: PublicKey;
+  position: PublicKey;
+  tickLowerIndex: bigint;
+  tickUpperIndex: bigint;
+  liquidity: bigint;
+  tokenAAmount: bigint;
+  tokenBAmount: bigint;
+  tokenATransferFee: bigint;
+  tokenBTransferFee: bigint;
+}
+```
+
+### poolInitialized
+
+**Definition:**
+
+```typescript
+{
+  whirlpool: PublicKey;
+  whirlpoolsConfig: PublicKey;
+  tokenMintA: PublicKey;
+  tokenMintB: PublicKey;
+  tickSpacing: bigint;
+  tokenProgramA: PublicKey;
+  tokenProgramB: PublicKey;
+  decimalsA: bigint;
+  decimalsB: bigint;
+  initialSqrtPrice: bigint;
+}
+```
+
+### traded
+
+**Definition:**
+
+```typescript
+{
+  whirlpool: PublicKey;
+  aToB: boolean;
+  preSqrtPrice: bigint;
+  postSqrtPrice: bigint;
+  inputAmount: bigint;
+  outputAmount: bigint;
+  inputTransferFee: bigint;
+  outputTransferFee: bigint;
+  lpFee: bigint;
+  protocolFee: bigint;
+}
+```
+
 ## Errors
 
 - **6000 - InvalidEnum**: Enum value could not be converted _(Hex: `0x1770`)_
@@ -1476,7 +1557,7 @@
 - **6029 - ProtocolFeeRateMaxExceeded**: Exceeded max protocol fee rate _(Hex: `0x178d`)_
 - **6030 - MultiplicationShiftRightOverflow**: Multiplication with shift right overflow _(Hex: `0x178e`)_
 - **6031 - MulDivOverflow**: Muldiv overflow _(Hex: `0x178f`)_
-- **6032 - MulDivInvalidInput**: Invalid div*u256 input *(Hex: `0x1790`)\_
+- **6032 - MulDivInvalidInput**: Invalid div_u256 input _(Hex: `0x1790`)_
 - **6033 - MultiplicationOverflow**: Multiplication overflow _(Hex: `0x1791`)_
 - **6034 - InvalidSqrtPriceLimitDirection**: Provided SqrtPriceLimit not in the same direction as the swap. _(Hex: `0x1792`)_
 - **6035 - ZeroTradableAmount**: There are no tradable amount to swap. _(Hex: `0x1793`)_

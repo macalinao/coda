@@ -6,6 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import { FARMS_PROGRAM_ADDRESS } from "@solana-programs/kamino-farms";
 import {
   combineCodec,
   fixDecoderSize,
@@ -44,10 +45,7 @@ import {
   findReserveCollateralMintPda,
   findReserveLiquiditySupplyPda,
 } from "../pdas/index.ts";
-import {
-  FARMS_PROGRAM_ADDRESS,
-  KAMINO_LENDING_PROGRAM_ADDRESS,
-} from "../programs/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const DEPOSIT_RESERVE_LIQUIDITY_AND_OBLIGATION_COLLATERAL_V2_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([216, 224, 191, 27, 204, 151, 102, 175]);

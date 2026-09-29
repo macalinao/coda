@@ -83,6 +83,8 @@
   - [closeAccounts](#closeAccounts)
 - [PDAs](#pdas)
   - [metadata](#metadata)
+  - [masterEdition](#masterEdition)
+  - [tokenRecord](#tokenRecord)
 - [Types](#types)
   - [setCollectionSizeArgs](#setCollectionSizeArgs)
   - [createMasterEditionArgs](#createMasterEditionArgs)
@@ -144,10 +146,10 @@
 **Fields:**
 
 | Field             | Type          | Description |
-| ----------------- | ------------- | ----------- | --- |
-| `key`             | [key](#key-3) |             |
-| `bump`            | `u8`          |             |
-| `updateAuthority` | `PublicKey`   | null        |     |
+| ----------------- | ------------- | ----------- |
+| `key`             | [key](#key-3) | -           |
+| `bump`            | `u8`          | -           |
+| `updateAuthority` | `PublicKey`   | null        | -   |
 
 ### metadataDelegateRecord
 
@@ -155,11 +157,11 @@
 
 | Field             | Type          | Description |
 | ----------------- | ------------- | ----------- |
-| `key`             | [key](#key-3) |             |
-| `bump`            | `u8`          |             |
-| `mint`            | `PublicKey`   |             |
-| `delegate`        | `PublicKey`   |             |
-| `updateAuthority` | `PublicKey`   |             |
+| `key`             | [key](#key-3) | -           |
+| `bump`            | `u8`          | -           |
+| `mint`            | `PublicKey`   | -           |
+| `delegate`        | `PublicKey`   | -           |
+| `updateAuthority` | `PublicKey`   | -           |
 
 ### holderDelegateRecord
 
@@ -167,11 +169,11 @@
 
 | Field             | Type          | Description |
 | ----------------- | ------------- | ----------- |
-| `key`             | [key](#key-3) |             |
-| `bump`            | `u8`          |             |
-| `mint`            | `PublicKey`   |             |
-| `delegate`        | `PublicKey`   |             |
-| `updateAuthority` | `PublicKey`   |             |
+| `key`             | [key](#key-3) | -           |
+| `bump`            | `u8`          | -           |
+| `mint`            | `PublicKey`   | -           |
+| `delegate`        | `PublicKey`   | -           |
+| `updateAuthority` | `PublicKey`   | -           |
 
 ### edition
 
@@ -179,9 +181,9 @@
 
 | Field     | Type          | Description |
 | --------- | ------------- | ----------- |
-| `key`     | [key](#key-3) |             |
-| `parent`  | `PublicKey`   |             |
-| `edition` | `u64`         |             |
+| `key`     | [key](#key-3) | -           |
+| `parent`  | `PublicKey`   | -           |
+| `edition` | `u64`         | -           |
 
 ### editionMarker
 
@@ -189,8 +191,8 @@
 
 | Field    | Type          | Description |
 | -------- | ------------- | ----------- |
-| `key`    | [key](#key-3) |             |
-| `ledger` | `u8`[31]      |             |
+| `key`    | [key](#key-3) | -           |
+| `ledger` | `u8`[31]      | -           |
 
 ### editionMarkerV2
 
@@ -198,8 +200,8 @@
 
 | Field    | Type          | Description |
 | -------- | ------------- | ----------- |
-| `key`    | [key](#key-3) |             |
-| `ledger` | `unknown`     |             |
+| `key`    | [key](#key-3) | -           |
+| `ledger` | `unknown`     | -           |
 
 ### tokenOwnedEscrow
 
@@ -207,89 +209,89 @@
 
 | Field       | Type                                  | Description |
 | ----------- | ------------------------------------- | ----------- |
-| `key`       | [key](#key-3)                         |             |
-| `baseToken` | `PublicKey`                           |             |
-| `authority` | [escrowAuthority](#escrowAuthority-3) |             |
-| `bump`      | `u8`                                  |             |
+| `key`       | [key](#key-3)                         | -           |
+| `baseToken` | `PublicKey`                           | -           |
+| `authority` | [escrowAuthority](#escrowAuthority-3) | -           |
+| `bump`      | `u8`                                  | -           |
 
 ### masterEditionV2
 
 **Fields:**
 
 | Field       | Type          | Description |
-| ----------- | ------------- | ----------- | --- |
-| `key`       | [key](#key-3) |             |
-| `supply`    | `u64`         |             |
-| `maxSupply` | `u64`         | null        |     |
+| ----------- | ------------- | ----------- |
+| `key`       | [key](#key-3) | -           |
+| `supply`    | `u64`         | -           |
+| `maxSupply` | `u64`         | null        | -   |
 
 ### masterEditionV1
 
 **Fields:**
 
 | Field                              | Type          | Description |
-| ---------------------------------- | ------------- | ----------- | --- |
-| `key`                              | [key](#key-3) |             |
-| `supply`                           | `u64`         |             |
-| `maxSupply`                        | `u64`         | null        |     |
-| `printingMint`                     | `PublicKey`   |             |
-| `oneTimePrintingAuthorizationMint` | `PublicKey`   |             |
+| ---------------------------------- | ------------- | ----------- |
+| `key`                              | [key](#key-3) | -           |
+| `supply`                           | `u64`         | -           |
+| `maxSupply`                        | `u64`         | null        | -   |
+| `printingMint`                     | `PublicKey`   | -           |
+| `oneTimePrintingAuthorizationMint` | `PublicKey`   | -           |
 
 ### metadata
 
 **Fields:**
 
 | Field                 | Type                                        | Description |
-| --------------------- | ------------------------------------------- | ----------- | --- |
-| `key`                 | [key](#key-3)                               |             |
-| `updateAuthority`     | `PublicKey`                                 |             |
-| `mint`                | `PublicKey`                                 |             |
-| `data`                | [data](#data-3)                             |             |
-| `primarySaleHappened` | `boolean`                                   |             |
-| `isMutable`           | `boolean`                                   |             |
-| `editionNonce`        | `u8`                                        | null        |     |
-| `tokenStandard`       | [tokenStandard](#tokenStandard-3)           | null        |     |
-| `collection`          | [collection](#collection-3)                 | null        |     |
-| `uses`                | [uses](#uses-3)                             | null        |     |
-| `collectionDetails`   | [collectionDetails](#collectionDetails-3)   | null        |     |
-| `programmableConfig`  | [programmableConfig](#programmableConfig-3) | null        |     |
+| --------------------- | ------------------------------------------- | ----------- |
+| `key`                 | [key](#key-3)                               | -           |
+| `updateAuthority`     | `PublicKey`                                 | -           |
+| `mint`                | `PublicKey`                                 | -           |
+| `data`                | [data](#data-3)                             | -           |
+| `primarySaleHappened` | `boolean`                                   | -           |
+| `isMutable`           | `boolean`                                   | -           |
+| `editionNonce`        | `u8`                                        | null        | -   |
+| `tokenStandard`       | [tokenStandard](#tokenStandard-3)           | null        | -   |
+| `collection`          | [collection](#collection-3)                 | null        | -   |
+| `uses`                | [uses](#uses-3)                             | null        | -   |
+| `collectionDetails`   | [collectionDetails](#collectionDetails-3)   | null        | -   |
+| `programmableConfig`  | [programmableConfig](#programmableConfig-3) | null        | -   |
 
 ### tokenRecord
 
 **Fields:**
 
 | Field             | Type                                      | Description |
-| ----------------- | ----------------------------------------- | ----------- | --- |
-| `key`             | [key](#key-3)                             |             |
-| `bump`            | `u8`                                      |             |
-| `state`           | [tokenState](#tokenState-3)               |             |
-| `ruleSetRevision` | `u64`                                     | null        |     |
-| `delegate`        | `PublicKey`                               | null        |     |
-| `delegateRole`    | [tokenDelegateRole](#tokenDelegateRole-3) | null        |     |
-| `lockedTransfer`  | `PublicKey`                               | null        |     |
+| ----------------- | ----------------------------------------- | ----------- |
+| `key`             | [key](#key-3)                             | -           |
+| `bump`            | `u8`                                      | -           |
+| `state`           | [tokenState](#tokenState-3)               | -           |
+| `ruleSetRevision` | `u64`                                     | null        | -   |
+| `delegate`        | `PublicKey`                               | null        | -   |
+| `delegateRole`    | [tokenDelegateRole](#tokenDelegateRole-3) | null        | -   |
+| `lockedTransfer`  | `PublicKey`                               | null        | -   |
 
 ### reservationListV2
 
 **Fields:**
 
 | Field                     | Type                            | Description |
-| ------------------------- | ------------------------------- | ----------- | --- |
-| `key`                     | [key](#key-3)                   |             |
-| `masterEdition`           | `PublicKey`                     |             |
-| `supplySnapshot`          | `u64`                           | null        |     |
-| `reservations`            | [reservation](#reservation-3)[] |             |
-| `totalReservationSpots`   | `u64`                           |             |
-| `currentReservationSpots` | `u64`                           |             |
+| ------------------------- | ------------------------------- | ----------- |
+| `key`                     | [key](#key-3)                   | -           |
+| `masterEdition`           | `PublicKey`                     | -           |
+| `supplySnapshot`          | `u64`                           | null        | -   |
+| `reservations`            | [reservation](#reservation-3)[] | -           |
+| `totalReservationSpots`   | `u64`                           | -           |
+| `currentReservationSpots` | `u64`                           | -           |
 
 ### reservationListV1
 
 **Fields:**
 
 | Field            | Type                                | Description |
-| ---------------- | ----------------------------------- | ----------- | --- |
-| `key`            | [key](#key-3)                       |             |
-| `masterEdition`  | `PublicKey`                         |             |
-| `supplySnapshot` | `u64`                               | null        |     |
-| `reservations`   | [reservationV1](#reservationV1-3)[] |             |
+| ---------------- | ----------------------------------- | ----------- |
+| `key`            | [key](#key-3)                       | -           |
+| `masterEdition`  | `PublicKey`                         | -           |
+| `supplySnapshot` | `u64`                               | null        | -   |
+| `reservations`   | [reservationV1](#reservationV1-3)[] | -           |
 
 ### useAuthorityRecord
 
@@ -297,9 +299,9 @@
 
 | Field         | Type          | Description |
 | ------------- | ------------- | ----------- |
-| `key`         | [key](#key-3) |             |
-| `allowedUses` | `u64`         |             |
-| `bump`        | `u8`          |             |
+| `key`         | [key](#key-3) | -           |
+| `allowedUses` | `u64`         | -           |
+| `bump`        | `u8`          | -           |
 
 ## Instructions
 
@@ -321,7 +323,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### updateMetadataAccount
 
@@ -336,7 +338,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### deprecatedCreateMasterEdition
 
@@ -362,7 +364,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### deprecatedMintNewEditionFromMasterEditionViaPrintingToken
 
@@ -391,7 +393,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### updatePrimarySaleHappenedViaToken
 
@@ -407,7 +409,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### deprecatedSetReservationList
 
@@ -423,7 +425,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### deprecatedCreateReservationList
 
@@ -444,7 +446,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### signMetadata
 
@@ -459,7 +461,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### deprecatedMintPrintingTokensViaToken
 
@@ -481,7 +483,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### deprecatedMintPrintingTokens
 
@@ -501,7 +503,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### createMasterEdition
 
@@ -523,7 +525,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### mintNewEditionFromMasterEditionViaToken
 
@@ -550,8 +552,8 @@
 
 | Argument                                      | Type                                                                                          | Description |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------- |
-| `discriminator`                               | `u8`                                                                                          |             |
-| `mintNewEditionFromMasterEditionViaTokenArgs` | [mintNewEditionFromMasterEditionViaTokenArgs](#mintNewEditionFromMasterEditionViaTokenArgs-3) |             |
+| `discriminator`                               | `u8`                                                                                          | -           |
+| `mintNewEditionFromMasterEditionViaTokenArgs` | [mintNewEditionFromMasterEditionViaTokenArgs](#mintNewEditionFromMasterEditionViaTokenArgs-3) | -           |
 
 ### convertMasterEditionV1ToV2
 
@@ -567,7 +569,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### mintNewEditionFromMasterEditionViaVaultProxy
 
@@ -597,8 +599,8 @@
 
 | Argument                                      | Type                                                                                          | Description |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------- |
-| `discriminator`                               | `u8`                                                                                          |             |
-| `mintNewEditionFromMasterEditionViaTokenArgs` | [mintNewEditionFromMasterEditionViaTokenArgs](#mintNewEditionFromMasterEditionViaTokenArgs-3) |             |
+| `discriminator`                               | `u8`                                                                                          | -           |
+| `mintNewEditionFromMasterEditionViaTokenArgs` | [mintNewEditionFromMasterEditionViaTokenArgs](#mintNewEditionFromMasterEditionViaTokenArgs-3) | -           |
 
 ### puffMetadata
 
@@ -612,7 +614,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### updateMetadataAccountV2
 
@@ -627,8 +629,8 @@
 
 | Argument                      | Type                                                          | Description |
 | ----------------------------- | ------------------------------------------------------------- | ----------- |
-| `discriminator`               | `u8`                                                          |             |
-| `updateMetadataAccountArgsV2` | [updateMetadataAccountArgsV2](#updateMetadataAccountArgsV2-3) |             |
+| `discriminator`               | `u8`                                                          | -           |
+| `updateMetadataAccountArgsV2` | [updateMetadataAccountArgsV2](#updateMetadataAccountArgsV2-3) | -           |
 
 ### createMetadataAccountV2
 
@@ -648,7 +650,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### createMasterEditionV3
 
@@ -670,8 +672,8 @@
 
 | Argument                  | Type                                                  | Description |
 | ------------------------- | ----------------------------------------------------- | ----------- |
-| `discriminator`           | `u8`                                                  |             |
-| `createMasterEditionArgs` | [createMasterEditionArgs](#createMasterEditionArgs-3) |             |
+| `discriminator`           | `u8`                                                  | -           |
+| `createMasterEditionArgs` | [createMasterEditionArgs](#createMasterEditionArgs-3) | -           |
 
 ### verifyCollection
 
@@ -691,7 +693,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### utilize
 
@@ -715,8 +717,8 @@
 
 | Argument        | Type                          | Description |
 | --------------- | ----------------------------- | ----------- |
-| `discriminator` | `u8`                          |             |
-| `utilizeArgs`   | [utilizeArgs](#utilizeArgs-3) |             |
+| `discriminator` | `u8`                          | -           |
+| `utilizeArgs`   | [utilizeArgs](#utilizeArgs-3) | -           |
 
 ### approveUseAuthority
 
@@ -740,8 +742,8 @@
 
 | Argument                  | Type                                                  | Description |
 | ------------------------- | ----------------------------------------------------- | ----------- |
-| `discriminator`           | `u8`                                                  |             |
-| `approveUseAuthorityArgs` | [approveUseAuthorityArgs](#approveUseAuthorityArgs-3) |             |
+| `discriminator`           | `u8`                                                  | -           |
+| `approveUseAuthorityArgs` | [approveUseAuthorityArgs](#approveUseAuthorityArgs-3) | -           |
 
 ### revokeUseAuthority
 
@@ -763,7 +765,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### unverifyCollection
 
@@ -782,7 +784,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### approveCollectionAuthority
 
@@ -803,7 +805,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### revokeCollectionAuthority
 
@@ -821,7 +823,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### setAndVerifyCollection
 
@@ -842,7 +844,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### freezeDelegatedAccount
 
@@ -860,7 +862,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### thawDelegatedAccount
 
@@ -878,7 +880,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### removeCreatorVerification
 
@@ -893,7 +895,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### burnNft
 
@@ -913,7 +915,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### verifySizedCollectionItem
 
@@ -933,7 +935,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### unverifySizedCollectionItem
 
@@ -953,7 +955,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### setAndVerifySizedCollectionItem
 
@@ -974,7 +976,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### createMetadataAccountV3
 
@@ -994,8 +996,8 @@
 
 | Argument                      | Type                                                          | Description |
 | ----------------------------- | ------------------------------------------------------------- | ----------- |
-| `discriminator`               | `u8`                                                          |             |
-| `createMetadataAccountArgsV3` | [createMetadataAccountArgsV3](#createMetadataAccountArgsV3-3) |             |
+| `discriminator`               | `u8`                                                          | -           |
+| `createMetadataAccountArgsV3` | [createMetadataAccountArgsV3](#createMetadataAccountArgsV3-3) | -           |
 
 ### setCollectionSize
 
@@ -1012,8 +1014,8 @@
 
 | Argument                | Type                                              | Description |
 | ----------------------- | ------------------------------------------------- | ----------- |
-| `discriminator`         | `u8`                                              |             |
-| `setCollectionSizeArgs` | [setCollectionSizeArgs](#setCollectionSizeArgs-3) |             |
+| `discriminator`         | `u8`                                              | -           |
+| `setCollectionSizeArgs` | [setCollectionSizeArgs](#setCollectionSizeArgs-3) | -           |
 
 ### setTokenStandard
 
@@ -1030,7 +1032,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### bubblegumSetCollectionSize
 
@@ -1048,8 +1050,8 @@
 
 | Argument                | Type                                              | Description |
 | ----------------------- | ------------------------------------------------- | ----------- |
-| `discriminator`         | `u8`                                              |             |
-| `setCollectionSizeArgs` | [setCollectionSizeArgs](#setCollectionSizeArgs-3) |             |
+| `discriminator`         | `u8`                                              | -           |
+| `setCollectionSizeArgs` | [setCollectionSizeArgs](#setCollectionSizeArgs-3) | -           |
 
 ### burnEditionNft
 
@@ -1072,7 +1074,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### createEscrowAccount
 
@@ -1094,7 +1096,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### closeEscrowAccount
 
@@ -1115,7 +1117,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### transferOutOfEscrow
 
@@ -1141,8 +1143,8 @@
 
 | Argument                  | Type                                                  | Description |
 | ------------------------- | ----------------------------------------------------- | ----------- |
-| `discriminator`           | `u8`                                                  |             |
-| `transferOutOfEscrowArgs` | [transferOutOfEscrowArgs](#transferOutOfEscrowArgs-3) |             |
+| `discriminator`           | `u8`                                                  | -           |
+| `transferOutOfEscrowArgs` | [transferOutOfEscrowArgs](#transferOutOfEscrowArgs-3) | -           |
 
 ### burn
 
@@ -1169,8 +1171,8 @@
 
 | Argument        | Type                    | Description |
 | --------------- | ----------------------- | ----------- |
-| `discriminator` | `u8`                    |             |
-| `burnArgs`      | [burnArgs](#burnArgs-3) |             |
+| `discriminator` | `u8`                    | -           |
+| `burnArgs`      | [burnArgs](#burnArgs-3) | -           |
 
 ### create
 
@@ -1192,8 +1194,8 @@
 
 | Argument        | Type                        | Description |
 | --------------- | --------------------------- | ----------- |
-| `discriminator` | `u8`                        |             |
-| `createArgs`    | [createArgs](#createArgs-3) |             |
+| `discriminator` | `u8`                        | -           |
+| `createArgs`    | [createArgs](#createArgs-3) | -           |
 
 ### mint
 
@@ -1221,8 +1223,8 @@
 
 | Argument        | Type                    | Description |
 | --------------- | ----------------------- | ----------- |
-| `discriminator` | `u8`                    |             |
-| `mintArgs`      | [mintArgs](#mintArgs-3) |             |
+| `discriminator` | `u8`                    | -           |
+| `mintArgs`      | [mintArgs](#mintArgs-3) | -           |
 
 ### delegate
 
@@ -1249,8 +1251,8 @@
 
 | Argument        | Type                            | Description |
 | --------------- | ------------------------------- | ----------- |
-| `discriminator` | `u8`                            |             |
-| `delegateArgs`  | [delegateArgs](#delegateArgs-3) |             |
+| `discriminator` | `u8`                            | -           |
+| `delegateArgs`  | [delegateArgs](#delegateArgs-3) | -           |
 
 ### revoke
 
@@ -1277,8 +1279,8 @@
 
 | Argument        | Type                        | Description |
 | --------------- | --------------------------- | ----------- |
-| `discriminator` | `u8`                        |             |
-| `revokeArgs`    | [revokeArgs](#revokeArgs-3) |             |
+| `discriminator` | `u8`                        | -           |
+| `revokeArgs`    | [revokeArgs](#revokeArgs-3) | -           |
 
 ### lock
 
@@ -1304,8 +1306,8 @@
 
 | Argument        | Type                    | Description |
 | --------------- | ----------------------- | ----------- |
-| `discriminator` | `u8`                    |             |
-| `lockArgs`      | [lockArgs](#lockArgs-3) |             |
+| `discriminator` | `u8`                    | -           |
+| `lockArgs`      | [lockArgs](#lockArgs-3) | -           |
 
 ### unlock
 
@@ -1331,8 +1333,8 @@
 
 | Argument        | Type                        | Description |
 | --------------- | --------------------------- | ----------- |
-| `discriminator` | `u8`                        |             |
-| `unlockArgs`    | [unlockArgs](#unlockArgs-3) |             |
+| `discriminator` | `u8`                        | -           |
+| `unlockArgs`    | [unlockArgs](#unlockArgs-3) | -           |
 
 ### migrate
 
@@ -1360,7 +1362,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### transfer
 
@@ -1390,8 +1392,8 @@
 
 | Argument        | Type                            | Description |
 | --------------- | ------------------------------- | ----------- |
-| `discriminator` | `u8`                            |             |
-| `transferArgs`  | [transferArgs](#transferArgs-3) |             |
+| `discriminator` | `u8`                            | -           |
+| `transferArgs`  | [transferArgs](#transferArgs-3) | -           |
 
 ### update
 
@@ -1415,8 +1417,8 @@
 
 | Argument        | Type                        | Description |
 | --------------- | --------------------------- | ----------- |
-| `discriminator` | `u8`                        |             |
-| `updateArgs`    | [updateArgs](#updateArgs-3) |             |
+| `discriminator` | `u8`                        | -           |
+| `updateArgs`    | [updateArgs](#updateArgs-3) | -           |
 
 ### use
 
@@ -1441,8 +1443,8 @@
 
 | Argument        | Type                  | Description |
 | --------------- | --------------------- | ----------- |
-| `discriminator` | `u8`                  |             |
-| `useArgs`       | [useArgs](#useArgs-3) |             |
+| `discriminator` | `u8`                  | -           |
+| `useArgs`       | [useArgs](#useArgs-3) | -           |
 
 ### verify
 
@@ -1463,8 +1465,8 @@
 
 | Argument           | Type                                    | Description |
 | ------------------ | --------------------------------------- | ----------- |
-| `discriminator`    | `u8`                                    |             |
-| `verificationArgs` | [verificationArgs](#verificationArgs-3) |             |
+| `discriminator`    | `u8`                                    | -           |
+| `verificationArgs` | [verificationArgs](#verificationArgs-3) | -           |
 
 ### unverify
 
@@ -1484,8 +1486,8 @@
 
 | Argument           | Type                                    | Description |
 | ------------------ | --------------------------------------- | ----------- |
-| `discriminator`    | `u8`                                    |             |
-| `verificationArgs` | [verificationArgs](#verificationArgs-3) |             |
+| `discriminator`    | `u8`                                    | -           |
+| `verificationArgs` | [verificationArgs](#verificationArgs-3) | -           |
 
 ### collect
 
@@ -1500,7 +1502,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### print
 
@@ -1531,8 +1533,8 @@
 
 | Argument        | Type                      | Description |
 | --------------- | ------------------------- | ----------- |
-| `discriminator` | `u8`                      |             |
-| `printArgs`     | [printArgs](#printArgs-3) |             |
+| `discriminator` | `u8`                      | -           |
+| `printArgs`     | [printArgs](#printArgs-3) | -           |
 
 ### resize
 
@@ -1552,7 +1554,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ### closeAccounts
 
@@ -1570,7 +1572,7 @@
 
 | Argument        | Type | Description |
 | --------------- | ---- | ----------- |
-| `discriminator` | `u8` |             |
+| `discriminator` | `u8` | -           |
 
 ## PDAs
 
@@ -1583,6 +1585,29 @@
 | `constant`  | bytes (constant) | -                               |
 | `programId` | `PublicKey`      | The address of the program      |
 | `mint`      | `PublicKey`      | The address of the mint account |
+
+### masterEdition
+
+**Seeds:**
+
+| Seed        | Type             | Description                     |
+| ----------- | ---------------- | ------------------------------- |
+| `constant`  | bytes (constant) | -                               |
+| `programId` | `PublicKey`      | The address of the program      |
+| `mint`      | `PublicKey`      | The address of the mint account |
+| `constant`  | bytes (constant) | -                               |
+
+### tokenRecord
+
+**Seeds:**
+
+| Seed        | Type             | Description                      |
+| ----------- | ---------------- | -------------------------------- |
+| `constant`  | bytes (constant) | -                                |
+| `programId` | `PublicKey`      | The address of the program       |
+| `mint`      | `PublicKey`      | The address of the mint account  |
+| `constant`  | bytes (constant) | -                                |
+| `token`     | `PublicKey`      | The address of the token account |
 
 ## Types
 

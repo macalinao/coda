@@ -6,5 +6,4 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./farms.ts";
 export * from "./kaminoLending.ts";

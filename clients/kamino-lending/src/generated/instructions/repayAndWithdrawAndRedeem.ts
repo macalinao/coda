@@ -6,6 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import { FARMS_PROGRAM_ADDRESS } from "@solana-programs/kamino-farms";
 import {
   combineCodec,
   fixDecoderSize,
@@ -39,10 +40,7 @@ import {
   getAccountMetaFactory,
   type ResolvedInstructionAccount,
 } from "@solana/program-client-core";
-import {
-  FARMS_PROGRAM_ADDRESS,
-  KAMINO_LENDING_PROGRAM_ADDRESS,
-} from "../programs/index.ts";
+import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
 export const REPAY_AND_WITHDRAW_AND_REDEEM_DISCRIMINATOR: ReadonlyUint8Array =
   new Uint8Array([2, 54, 152, 3, 148, 96, 109, 218]);

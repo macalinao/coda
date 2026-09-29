@@ -1,0 +1,78 @@
+# Quarry Registry Program
+
+[![npm version](https://badge.fury.io/js/%40solana-programs%2Fquarry-registry.svg)](https://www.npmjs.com/package/%40solana-programs%2Fquarry-registry)
+
+- Program ID: `QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc`
+- TypeScript Client: [`@solana-programs/quarry-registry`](https://www.npmjs.com/package/@solana-programs/quarry-registry)
+
+## Table of Contents
+
+- [Accounts](#accounts)
+  - [registry](#registry)
+- [Instructions](#instructions)
+  - [newRegistry](#newRegistry)
+  - [syncQuarry](#syncQuarry)
+- [PDAs](#pdas)
+  - [registry](#registry)
+
+## Accounts
+
+### registry
+
+**Fields:**
+
+| Field           | Type          | Description |
+| --------------- | ------------- | ----------- |
+| `discriminator` | `unknown`     | -           |
+| `bump`          | `u8`          | -           |
+| `rewarder`      | `PublicKey`   | -           |
+| `tokens`        | `PublicKey`[] | -           |
+
+## Instructions
+
+### newRegistry
+
+**Accounts:**
+
+| Account         | Type             | Description |
+| --------------- | ---------------- | ----------- |
+| `rewarder`      | readonly         | -           |
+| `registry`      | writable         | -           |
+| `payer`         | signer, writable | -           |
+| `systemProgram` | readonly         | -           |
+
+**Arguments:**
+
+| Argument        | Type      | Description |
+| --------------- | --------- | ----------- |
+| `discriminator` | `unknown` | -           |
+| `maxQuarries`   | `u16`     | -           |
+| `bump`          | `u8`      | -           |
+
+### syncQuarry
+
+**Accounts:**
+
+| Account    | Type     | Description |
+| ---------- | -------- | ----------- |
+| `quarry`   | readonly | -           |
+| `registry` | writable | -           |
+
+**Arguments:**
+
+| Argument        | Type      | Description |
+| --------------- | --------- | ----------- |
+| `discriminator` | `unknown` | -           |
+
+## PDAs
+
+### registry
+
+Registry tracking all quarries for a rewarder
+
+**Seeds:**
+
+| Seed       | Type             | Description |
+| ---------- | ---------------- | ----------- |
+| `constant` | bytes (constant) | -           |
+| `rewarder` | `PublicKey`      | -           |

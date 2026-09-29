@@ -10,12 +10,12 @@
   "keywords": [
     "coda",
     "solana",
-    "kamino",
-    "lending",
-    "defi",
     "client",
     "esm",
     "typescript",
+    "kamino",
+    "lending",
+    "defi",
     "ian-macalinao"
   ],
   "main": "dist/index.js",
@@ -30,6 +30,24 @@
     "dist/",
     "src/"
   ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@solana-programs/kamino-farms": "workspace:*"
+  },
+  "peerDependencies": {
+    "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
+    "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0"
+  },
+  "devDependencies": {
+    "@macalinao/tsconfig": "catalog:",
+    "@solana/kit": "catalog:",
+    "@solana/program-client-core": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -37,23 +55,5 @@
     "type": "git",
     "url": "git+https://github.com/macalinao/coda.git",
     "directory": "clients/kamino-lending"
-  },
-  "scripts": {
-    "build": "tsdown",
-    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
-    "test": "echo 'No tests yet'",
-    "codegen": "coda generate"
-  },
-  "peerDependencies": {
-    "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-    "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0"
-  },
-  "devDependencies": {
-    "@macalinao/coda": "workspace:^",
-    "@macalinao/tsconfig": "catalog:",
-    "@solana/kit": "catalog:",
-    "@solana/program-client-core": "catalog:",
-    "typescript": "catalog:",
-    "tsdown": "catalog:"
   }
 }

@@ -1,0 +1,141 @@
+{
+  "packages": [
+    {
+      "program": "bubblegum",
+      "slug": "mpl-bubblegum",
+      "packageName": "@solana-programs/mpl-bubblegum",
+      "dependencies": [
+        "tokenMetadata"
+      ]
+    },
+    {
+      "program": "cpAmm",
+      "slug": "meteora-damm-v2",
+      "packageName": "@solana-programs/meteora-damm-v2",
+      "dependencies": []
+    },
+    {
+      "program": "farms",
+      "slug": "kamino-farms",
+      "packageName": "@solana-programs/kamino-farms",
+      "dependencies": []
+    },
+    {
+      "program": "govern",
+      "slug": "tribeca-govern",
+      "packageName": "@solana-programs/tribeca-govern",
+      "dependencies": []
+    },
+    {
+      "program": "kaminoLending",
+      "slug": "kamino-lending",
+      "packageName": "@solana-programs/kamino-lending",
+      "dependencies": [
+        "farms"
+      ]
+    },
+    {
+      "program": "lockedVoter",
+      "slug": "tribeca-locked-voter",
+      "packageName": "@solana-programs/tribeca-locked-voter",
+      "dependencies": []
+    },
+    {
+      "program": "mplCoreProgram",
+      "slug": "mpl-core",
+      "packageName": "@solana-programs/mpl-core",
+      "dependencies": []
+    },
+    {
+      "program": "mplTokenAuthRules",
+      "slug": "mpl-token-auth-rules",
+      "packageName": "@solana-programs/mpl-token-auth-rules",
+      "dependencies": []
+    },
+    {
+      "program": "quarryMergeMine",
+      "slug": "quarry-merge-mine",
+      "packageName": "@solana-programs/quarry-merge-mine",
+      "dependencies": [
+        "quarryMine",
+        "quarryMintWrapper"
+      ]
+    },
+    {
+      "program": "quarryMine",
+      "slug": "quarry-mine",
+      "packageName": "@solana-programs/quarry-mine",
+      "dependencies": [
+        "quarryMintWrapper"
+      ]
+    },
+    {
+      "program": "quarryMintWrapper",
+      "slug": "quarry-mint-wrapper",
+      "packageName": "@solana-programs/quarry-mint-wrapper",
+      "dependencies": []
+    },
+    {
+      "program": "quarryOperator",
+      "slug": "quarry-operator",
+      "packageName": "@solana-programs/quarry-operator",
+      "dependencies": [
+        "quarryMine"
+      ]
+    },
+    {
+      "program": "quarryRedeemer",
+      "slug": "quarry-redeemer",
+      "packageName": "@solana-programs/quarry-redeemer",
+      "dependencies": []
+    },
+    {
+      "program": "quarryRegistry",
+      "slug": "quarry-registry",
+      "packageName": "@solana-programs/quarry-registry",
+      "dependencies": []
+    },
+    {
+      "program": "smartWallet",
+      "slug": "goki-smart-wallet",
+      "packageName": "@solana-programs/goki-smart-wallet",
+      "dependencies": []
+    },
+    {
+      "program": "splGovernance",
+      "slug": "spl-governance",
+      "packageName": "@solana-programs/spl-governance",
+      "dependencies": []
+    },
+    {
+      "program": "splStakePool",
+      "slug": "spl-stake-pool",
+      "packageName": "@solana-programs/spl-stake-pool",
+      "dependencies": []
+    },
+    {
+      "program": "tokenMetadata",
+      "slug": "token-metadata",
+      "packageName": "@solana-programs/token-metadata",
+      "dependencies": []
+    },
+    {
+      "program": "tokenSigner",
+      "slug": "goki-token-signer",
+      "packageName": "@solana-programs/goki-token-signer",
+      "dependencies": []
+    },
+    {
+      "program": "voterStakeRegistry",
+      "slug": "voter-stake-registry",
+      "packageName": "@solana-programs/voter-stake-registry",
+      "dependencies": []
+    },
+    {
+      "program": "whirlpool",
+      "slug": "orca-whirlpools",
+      "packageName": "@solana-programs/orca-whirlpools",
+      "dependencies": []
+    }
+  ]
+}

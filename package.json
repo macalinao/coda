@@ -8,6 +8,7 @@
     "packages": [
       "apps/*",
       "packages/*",
+      "tools/*",
       "clients/*"
     ],
     "catalog": {
@@ -42,6 +43,7 @@
     "ci:version": "changeset version && bun update",
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
+    "graph": "turbo run graph",
     "codegen": "turbo run codegen",
     "typecheck": "tsc -p tsconfig.configs.json",
     "size": "size-limit",
@@ -51,6 +53,8 @@
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
+    "@macalinao/coda": "workspace:*",
+    "@macalinao/megagraph": "workspace:*",
     "@size-limit/preset-small-lib": "13.1.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",

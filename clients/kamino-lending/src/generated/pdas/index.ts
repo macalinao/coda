@@ -6,9 +6,6 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./farmsUserState.ts";
-export * from "./farmVault.ts";
-export * from "./farmVaultsAuthority.ts";
 export * from "./lendingGlobalConfigState.ts";
 export * from "./lendingMarketAuth.ts";
 export * from "./obligation.ts";
@@ -18,8 +15,5 @@ export * from "./reserveCollateralMint.ts";
 export * from "./reserveCollateralSupply.ts";
 export * from "./reserveFeeVault.ts";
 export * from "./reserveLiquiditySupply.ts";
-export * from "./rewardTreasuryVault.ts";
-export * from "./rewardVault.ts";
 export * from "./shortUrl.ts";
-export * from "./treasuryVaultsAuthority.ts";
 export * from "./userMetadata.ts";
