@@ -126,7 +126,7 @@ export function renderBundleIndex(
     lines.push(
       "",
       "// Names exported by more than one bundled program resolve to the program",
-      "// listed first in programs/bundles.ts.",
+      "// with the highest precedence in the umbrella config.",
     );
     for (const member of members) {
       const won = [...plan.conflicts].filter(

@@ -49,9 +49,10 @@ bun run build                # Build all packages
 bun run build:watch          # Watch mode for all packages
 bun run build:watch:packages # Watch mode for packages only
 
-# Code Generation
-bun run graph               # Rebuild graph/ (the megagraph) from programs/
-bun run codegen             # Rebuild graph/, then regenerate every package under clients/
+# Code Generation (graph/ and clients/ are generated, never committed)
+bun run graph               # Build graph/ (the megagraph) from programs/
+bun run codegen             # graph/, then the clients/ workspace, then `bun install` in it
+bun run clients build       # Build/typecheck/test/lint the generated clients (skips if absent)
 coda generate               # Generate client with Coda CLI
 coda init                  # Initialize coda.config.ts
 
@@ -81,13 +82,17 @@ coda/
 │   ├── coda/               # Main CLI tool (@macalinao/coda)
 │   ├── codama-instruction-accounts-dedupe-visitor/  # Flattens nested accounts
 │   └── codama-renderers-js-esm/                    # ESM-native renderer
-├── programs/               # Source of truth for every client: one dir per program
-│   └── token-metadata/     # idl.json, program.config.ts, optional README.md
-├── graph/                  # Generated: codama.json (merged megagraph), packages.json
-├── clients/                # Generated client packages (do not edit by hand)
-│   └── token-metadata/     # @solana-programs/token-metadata
-├── scripts/megagraph.ts    # Driver: programs/ -> graph/ -> clients/
+│   └── megagraph/          # Graph builder, generator and release planner (@macalinao/megagraph)
+├── programs/               # Source of truth for every client (private workspace package)
+│   └── quarry/             # protocol.config.ts (+ optional umbrella), CHANGELOG seed
+│       └── mine/           # idl.json, program.config.ts, optional README.md / CHANGELOG seed
+├── graph/                  # Generated, gitignored: codama.json, packages.json
+├── clients/                # Generated, gitignored: standalone Bun workspace
+│   └── packages/quarry/mine/  # @solana-programs/quarry-mine (umbrella at packages/quarry/)
+├── scripts/megagraph.ts    # Driver: programs/ -> graph/ -> clients/, release plan/apply
+├── scripts/clients.ts      # Runs install/build/typecheck/test/lint inside clients/
 ├── scripts/export-solana-programs.ts  # Assembles the toolboxdao/solana-programs mirror
+├── scripts/publish-clients.ts          # Publishes mirror packages missing from npm
 ├── apps/docs/              # Documentation site (Fumadocs + Next.js)
 ├── scripts/               # Build and CI scripts
 └── vendor/                 # Vendored dependencies for reference
@@ -118,7 +123,13 @@ coda/
 - Ensures compatibility with `"type": "module"`
 - Emits only erasable syntax (no `enum`, no angle-bracket assertions), so generated clients compile under `erasableSyntaxOnly`
 
-### 4. **@solana-programs/token-metadata**
+### 4. **@macalinao/megagraph**
+
+- Builds and validates the program megagraph from `programs/`
+- Generates one package per program (plus umbrellas) into `clients/`
+- Plans and applies releases of the generated packages
+
+### 5. **@solana-programs/token-metadata**
 
 - Pre-generated client for Metaplex Token Metadata program
 - Includes custom PDAs and type definitions
@@ -244,8 +255,9 @@ Linting is configured in the root `.oxlintrc.json` and runs as a single
 pass over the whole repo via `oxlint --disable-nested-config`. It enables
 the `correctness`, `suspicious`, and `perf` categories plus a curated set
 of high-value type-aware rules, with `typeAware` and `typeCheck` on (so
-oxlint also reports TypeScript compiler errors). Overrides relax generated
-code (`clients/*/src/generated/**`), CLI console output, and tests.
+oxlint also reports TypeScript compiler errors). `graph/`, `clients/` and
+`mirror/` are generated and ignored. Overrides relax CLI console output and
+tests, and ban raw link constructors in `programs/**`.
 
 - No floating promises (must be handled)
 - No explicit `any`
@@ -267,60 +279,79 @@ Tasks are defined in turbo.json:
 
 ## Program Megagraph
 
-`programs/` is the single source of truth for every client. Each
-`programs/<slug>/` holds:
+`programs/` is the single source of truth for every `@solana-programs/*`
+client, grouped by protocol:
 
-- `idl.json` - the program's Anchor IDL
-- `program.config.ts` - `defineProgram({ package, instructionAccountDefaultValues, visitors })`
-  from `@macalinao/megagraph`; `package` is the npm metadata (name, description,
-  keywords, `initialVersion`)
+- `programs/<protocol>/protocol.config.ts` - `defineProtocol({ displayName,
+  description, homepage?, repository?, keywords?, umbrella? })`. `umbrella`
+  (`{ name, description, version, precedence? }`) generates a package that
+  re-exports every program of the protocol.
+- `programs/<protocol>/<program>/idl.json` - the program's Anchor IDL
+- `programs/<protocol>/<program>/program.config.ts` -
+  `defineProgram({ package: { name?, description, keywords?, version,
+  releaseNotes? }, instructionAccountDefaultValues, visitors })`. The package
+  name defaults to `@solana-programs/<protocol>-<program>`; existing
+  published names are set explicitly.
 - `README.md` (optional) - hand-written body inserted into the generated README
+- `CHANGELOG.md` (optional) - seed changelog for a package's first release
 
-`programs/bundles.ts` (`defineBundles`) declares umbrella packages such as
-`@solana-programs/quarry`: a bundle lists program slugs and generates a
-package with no code of its own that depends on those packages and
-`export *`s them. Names exported by several bundled programs are re-exported
-explicitly from the program listed first, and each program that lost a name
-is also exported as a namespace named after the program (e.g. `farms`).
+`programs/` is one private workspace package (`@solana-programs/programs`)
+with its own `tsconfig.json`, so the repo-wide `bun run lint` type-checks
+every config. That needs the tooling built first (`@macalinao/coda` and
+`@macalinao/megagraph` resolve to their `dist/` types), which CI's build step
+guarantees.
+
+**Links are typed and always program-qualified.** Each config exports
+`program = programHandle("<codama name>")` and, for PDAs it declares,
+`pdas = definePdas(program, { ... })` (with `constant()`/`variable()` seeds).
+Use `pdas.<name>.value({ <seed>: ... })` for PDA default values,
+`pdas.<name>.link` / `program.link` / `program.pda|account|definedType(name)`
+for links, and `pdas.visitor` to add the PDAs. Another program's handles are
+imported from its config (`import * as quarryMine from
+"../mine/program.config.ts"`); the import graph mirrors the package
+dependencies and must stay acyclic. oxlint bans the raw `pdaLinkNode`,
+`accountLinkNode`, `definedTypeLinkNode` and `programLinkNode` in
+`programs/**`.
 
 `bun run graph` runs every config on a root whose main program is that program
-(so bare selectors like `pdaLinkNode("miner")` refer to it), merges the results
-into one root, validates it (every link resolves, program and package names
-are unique, no package cycles) and writes `graph/codama.json` and
-`graph/packages.json`. `bun run codegen` then regenerates every
-`clients/<slug>/` from `graph/`: `package.json`, `tsconfig.json`, `README.md`,
-`docs/`, `src/index.ts` and `src/generated/`. Only `CHANGELOG.md` (owned by
-changesets) and the `version` in `package.json` survive regeneration.
+(so bare selectors like `updateAccountsVisitor({ miner })` only match it),
+merges the results into one root, validates it (every link resolves, reported
+as `<package>: unresolved pdaLink <program>.<name>`; unique program and
+package names; no package cycles) and writes `graph/codama.json` and
+`graph/packages.json` (protocols, packages, umbrellas). `bun run codegen`
+then generates `clients/`, a standalone Bun workspace (not part of this
+repository's workspaces, so a fresh clone installs without it):
+`packages/<protocol>/<program>/` per program, `packages/<protocol>/` per
+umbrella. Each link into another program becomes a `workspace:^` dependency
+and an import from that package instead of re-emitted code.
 
-**Cross-program references** are written only as program-qualified links in
-the referencing program's config, e.g.
-`pdaValueNode(pdaLinkNode("metadata", "tokenMetadata"), [...])` or
-`programLinkNode("farms")`. The generator turns each link into a
-`"<owning package>": "workspace:^"` dependency and makes the generated code
-import the linked helpers from that package instead of re-emitting them.
-`linkOverrides` in `@codama/renderers-js` are keyed by name only, so the
-renderer refuses to import a linked name that the local program also declares;
-rename one side if that happens.
+Fresh clone: `bun install && bun run codegen && bun run build`.
+
+**Releases** of `@solana-programs/*` do not use changesets. The
+`release-clients.yml` workflow plans versions against the release state in
+github.com/toolboxdao/solana-programs (the mirror: previous graph, versions and
+changelogs) with `scripts/megagraph.ts release plan`, applies them with
+`release apply`, verifies everything builds (in coda and in the exported
+mirror standalone), commits and tags the release in the mirror, then
+publishes the versions npm does not have. A package's `version` in its config
+is only used for its first release. Classification: removed/renamed/changed/
+reordered interface nodes are breaking, additions features, docs-only changes
+and regenerated-code-only changes fixes, unknown changes breaking; 0.x
+releases breaking changes as minor and everything else as patch.
 
 ## Adding a New Client
 
-1. Create `programs/<slug>/idl.json` and `programs/<slug>/program.config.ts`
-   (copy an existing one; `<slug>` becomes `clients/<slug>/`)
-2. Optionally add `programs/<slug>/README.md`
-3. Run `bun run codegen`, then `bun install` (to link the new workspace
-   package) and `bun run build`
+1. Create `programs/<protocol>/<program>/idl.json` and `program.config.ts`
+   (copy an existing one), and `programs/<protocol>/protocol.config.ts` for a
+   new protocol
+2. Optionally add a `README.md`
+3. Run `bun run codegen` and `bun run build`
 4. Add size budgets for the package to `.size-limit.json`
-5. Add a changeset; a brand new npm name also needs a bootstrap publish and a
-   trusted publisher (see `scripts/bootstrap-publish.sh`)
+5. A brand new npm name needs a bootstrap publish and a trusted publisher for
+   `release-clients.yml` (see `scripts/bootstrap-publish.sh`)
 
-Never edit files under `clients/` by hand: CI regenerates them and fails on
-any difference.
-
-Keep everything program-specific in `programs/`, `graph/` and `clients/`, and
-tooling in `packages/*` (the graph builder is `@macalinao/megagraph`), so the
-program data can be lifted into its own repository. The
-`sync-solana-programs` workflow already mirrors it, output only, to
-github.com/toolboxdao/solana-programs via `scripts/export-solana-programs.ts`.
+Keep everything program-specific in `programs/` (inputs) and tooling in
+`packages/*`, so the program data can move to its own repository.
 
 ## CI/CD
 
@@ -330,13 +361,13 @@ GitHub Actions workflow runs on push/PR to main:
 - Builds all packages
 - Runs oxlint (lint + type-aware type-checking) and checks formatting with oxfmt
 - Runs tests
-- Type-checks the program.config.ts files
-- Regenerates `graph/` and `clients/` (the graph step under native Node) and fails on any diff
+- Generates `graph/` and `clients/` (the graph step under native Node),
+  checks codegen is idempotent, and builds, type-checks and loads every
+  generated client, then checks bundle sizes
 
-`sync-solana-programs.yml` runs on push to master: it checks the generated
-output is up to date, exports it with `scripts/export-solana-programs.ts`,
-verifies the export builds standalone and pushes it to `main` of
-toolboxdao/solana-programs (SSH deploy key in `SOLANA_PROGRAMS_DEPLOY_KEY`).
+`release-clients.yml` releases the generated clients (see Program Megagraph);
+on pull requests it only posts the release plan to the job summary.
+`release.yml` (changesets) releases only the tooling packages.
 
 ## Publishing Workflow
 
@@ -347,9 +378,11 @@ toolboxdao/solana-programs (SSH deploy key in `SOLANA_PROGRAMS_DEPLOY_KEY`).
 
 ### Changesets on Every PR
 
-**Every new PR must include a changeset.** Releases are cut from the
-changesets on master, so a PR without one ships its changes with no version
-bump and no changelog entry.
+**Every new PR must include a changeset.** Releases of the tooling packages
+are cut from the changesets on master, so a PR without one ships its changes
+with no version bump and no changelog entry. The generated `@solana-programs/*`
+clients are not workspace packages and are versioned by
+`release-clients.yml` instead; changes to `programs/` need no changeset.
 
 1. Run `bun run changeset`
 2. Select the package(s) the PR affects

@@ -12,7 +12,7 @@ Learn from real-world implementations of Coda in production projects. These exam
 [![npm version](https://img.shields.io/npm/v/@solana-programs/token-metadata.svg?style=flat-square)](https://www.npmjs.com/package/@solana-programs/token-metadata)
 [![npm downloads](https://img.shields.io/npm/dm/@solana-programs/token-metadata.svg?style=flat-square)](https://www.npmjs.com/package/@solana-programs/token-metadata)
 
-[View on GitHub →](https://github.com/macalinao/coda/tree/master/programs/token-metadata)
+[View on GitHub →](https://github.com/macalinao/coda/tree/master/programs/metaplex/token-metadata)
 
 The Token Metadata client showcases Coda's capabilities for a **single program** setup:
 
@@ -27,11 +27,11 @@ Perfect for projects that need to interact with a single Solana program or want 
 
 [![npm version](https://img.shields.io/npm/v/@solana-programs/quarry-mine.svg?style=flat-square)](https://www.npmjs.com/package/@solana-programs/quarry-mine)
 
-[View on GitHub →](https://github.com/macalinao/coda/tree/master/programs)
+[View on GitHub →](https://github.com/macalinao/coda/tree/master/programs/quarry)
 
-The six Quarry programs demonstrate Coda's **multi-program** capabilities. Each program is defined once under `programs/` and published as its own package (`@solana-programs/quarry-mine`, `quarry-merge-mine`, `quarry-mint-wrapper`, `quarry-operator`, `quarry-redeemer`, `quarry-registry`), and the `@solana-programs/quarry` umbrella package re-exports all six:
+The six Quarry programs demonstrate Coda's **multi-program** capabilities. Each program is defined once under `programs/quarry/` and published as its own package (`@solana-programs/quarry-mine`, `quarry-merge-mine`, `quarry-mint-wrapper`, `quarry-operator`, `quarry-redeemer`, `quarry-registry`), and the `@solana-programs/quarry` umbrella package re-exports all six:
 
-- **Program-qualified links** - Merge Mine and Operator derive Quarry Mine PDAs with `pdaLinkNode("miner", "quarryMine")`
+- **Typed cross-program links** - Merge Mine and Operator import Quarry Mine's PDA handles and derive them with `quarryMine.pdas.miner.value({ ... })`
 - **Derived package dependencies** - Each link becomes a dependency on the owning package, whose helpers are imported rather than duplicated
 - **Name conflict handling** - Merge Mine instructions renamed with `renameVisitor` keep their `MM` suffix
 
@@ -42,7 +42,7 @@ Ideal for protocol developers managing multiple interconnected programs or anyon
 [![npm version](https://img.shields.io/npm/v/@solana-programs/kamino-lending.svg?style=flat-square)](https://www.npmjs.com/package/@solana-programs/kamino-lending)
 [![npm downloads](https://img.shields.io/npm/dm/@solana-programs/kamino-lending.svg?style=flat-square)](https://www.npmjs.com/package/@solana-programs/kamino-lending)
 
-[View on GitHub →](https://github.com/macalinao/coda/tree/master/programs/kamino-klend)
+[View on GitHub →](https://github.com/macalinao/coda/tree/master/programs/kamino/lending)
 
 The Kamino Lending client demonstrates Coda's ability to handle **complex IDLs with overlapping account names**:
 

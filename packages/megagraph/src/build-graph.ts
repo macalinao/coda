@@ -1,6 +1,5 @@
 import type { ProgramNode, RootNode } from "codama";
-import type { BundleConfig } from "./define-program.ts";
-import type { ProgramSource } from "./load-programs.ts";
+import type { ProgramSource, ProtocolSource } from "./load-programs.ts";
 import { processConfig } from "@macalinao/coda";
 import { programNode, rootNode } from "codama";
 import { IDL_FILE } from "./load-programs.ts";
@@ -16,25 +15,49 @@ import {
 export interface ProgramPackage {
   /** Codama program name. */
   program: string;
-  /** Directory name under `programs/` and `clients/`. */
+  /** Protocol directory name, e.g. `quarry`. */
+  protocol: string;
+  /** `<protocol>/<program>` directory under `programs/`. */
   slug: string;
   /** npm package name. */
   packageName: string;
+  /** Version of the package's first release (from its config). */
+  version: string;
   /** Names of the programs this program links into. */
   dependencies: string[];
+  /** Changelog lines for the package's first release. */
+  releaseNotes?: string[];
+}
+
+/**
+ * Metadata of one protocol, as recorded in `graph/packages.json`.
+ */
+export interface ProtocolEntry {
+  /** Directory name under `programs/`. */
+  protocol: string;
+  displayName: string;
+  description: string;
+  homepage?: string;
+  repository?: string;
+  /** Codama names of the protocol's programs, sorted. */
+  programs: string[];
 }
 
 /**
  * Package metadata of one umbrella package, as recorded in
  * `graph/packages.json`.
  */
-export interface BundlePackage {
-  /** Directory name under `clients/`. */
-  slug: string;
+export interface UmbrellaPackage {
+  /** Protocol directory name; the umbrella is generated at packages/<protocol>/. */
+  protocol: string;
   /** npm package name. */
   packageName: string;
-  /** Codama names of the bundled programs, in priority order. */
+  /** Version of the package's first release (from its config). */
+  version: string;
+  /** Codama names of the member programs, in precedence order. */
   programs: string[];
+  /** Changelog lines for the package's first release. */
+  releaseNotes?: string[];
 }
 
 /**
@@ -43,10 +66,12 @@ export interface BundlePackage {
 export interface Megagraph {
   /** Every program, sorted by name, merged into one root. */
   root: RootNode;
+  /** One entry per protocol, sorted by directory name. */
+  protocols: ProtocolEntry[];
   /** One entry per program, sorted by program name. */
   packages: ProgramPackage[];
-  /** One entry per umbrella package, sorted by slug. */
-  bundles: BundlePackage[];
+  /** One entry per umbrella package, sorted by protocol. */
+  umbrellas: UmbrellaPackage[];
 }
 
 /**
@@ -112,19 +137,25 @@ function assertUniqueProgramNames(
 }
 
 function assertUniquePackageNames(
-  sources: ProgramSource[],
-  bundles: BundleConfig[],
+  programs: ProgramSource[],
+  protocols: ProtocolSource[],
 ): void {
   const owners = new Map<string, string>();
   const entries = [
-    ...sources.map((source) => ({
-      name: source.config.package.name,
+    ...programs.map((source) => ({
+      name: source.packageName,
       owner: `programs/${source.slug}`,
     })),
-    ...bundles.map((bundle) => ({
-      name: bundle.package.name,
-      owner: `bundle "${bundle.slug}"`,
-    })),
+    ...protocols.flatMap((source) =>
+      source.config.umbrella === undefined
+        ? []
+        : [
+            {
+              name: source.config.umbrella.name,
+              owner: `the umbrella of programs/${source.protocol}`,
+            },
+          ],
+    ),
   ];
   for (const { name, owner } of entries) {
     const existing = owners.get(name);
@@ -138,46 +169,49 @@ function assertUniquePackageNames(
 }
 
 /**
- * Checks that bundles have unique slugs that do not clash with a program's
- * package directory, and that they only bundle registered programs.
+ * Resolves each protocol's umbrella members to program names, ordered by the
+ * umbrella's `precedence` and then alphabetically.
  */
-function resolveBundles(
-  bundles: BundleConfig[],
-  sources: ProgramSource[],
-  programs: ProgramNode[],
-): BundlePackage[] {
-  const programNameBySlug = new Map(
-    sources.map((source, index) => [source.slug, programs[index]?.name]),
-  );
-  const slugs = new Set<string>();
-  const resolved = bundles.map((bundle) => {
-    if (programNameBySlug.has(bundle.slug) || slugs.has(bundle.slug)) {
-      throw new Error(
-        `Bundle slug "${bundle.slug}" clashes with another package directory under clients/`,
-      );
+function resolveUmbrellas(
+  protocols: ProtocolSource[],
+  entries: { source: ProgramSource; program: ProgramNode }[],
+): UmbrellaPackage[] {
+  return protocols.flatMap(({ protocol, config }) => {
+    const umbrella = config.umbrella;
+    if (umbrella === undefined) {
+      return [];
     }
-    slugs.add(bundle.slug);
-    if (bundle.programs.length === 0) {
-      throw new Error(`Bundle "${bundle.slug}" does not bundle any program`);
+    const members = entries
+      .filter((entry) => entry.source.protocol === protocol)
+      .toSorted((a, b) => a.source.program.localeCompare(b.source.program));
+    if (members.length === 0) {
+      throw new Error(`programs/${protocol}: the umbrella has no programs`);
     }
-    if (new Set(bundle.programs).size !== bundle.programs.length) {
-      throw new Error(`Bundle "${bundle.slug}" lists a program twice`);
+    const precedence = umbrella.precedence ?? [];
+    for (const program of precedence) {
+      if (!members.some((member) => member.source.program === program)) {
+        throw new Error(
+          `programs/${protocol}: umbrella precedence lists "${program}", which is not a program of the protocol`,
+        );
+      }
     }
-    return {
-      slug: bundle.slug,
-      packageName: bundle.package.name,
-      programs: bundle.programs.map((slug) => {
-        const name = programNameBySlug.get(slug);
-        if (name === undefined) {
-          throw new Error(
-            `Bundle "${bundle.slug}" references unknown program "${slug}" (expected a directory under programs/)`,
-          );
-        }
-        return name;
-      }),
+    const rank = (program: string) => {
+      const index = precedence.indexOf(program);
+      return index === -1 ? precedence.length : index;
     };
+    const ordered = members.toSorted(
+      (a, b) => rank(a.source.program) - rank(b.source.program),
+    );
+    return [
+      {
+        protocol,
+        packageName: umbrella.name,
+        version: umbrella.version,
+        programs: ordered.map((member) => member.program.name),
+        ...(umbrella.releaseNotes && { releaseNotes: umbrella.releaseNotes }),
+      },
+    ];
   });
-  return resolved.toSorted((a, b) => a.slug.localeCompare(b.slug));
 }
 
 /**
@@ -193,20 +227,20 @@ function resolveBundles(
  * config only links to PDAs another config declares, not to nodes another
  * config derives from links of its own.
  */
-export async function buildMegagraph(
-  sources: ProgramSource[],
-  bundleConfigs: BundleConfig[] = [],
-): Promise<Megagraph> {
+export async function buildMegagraph(input: {
+  protocols: ProtocolSource[];
+  programs: ProgramSource[];
+}): Promise<Megagraph> {
+  const { protocols, programs: sources } = input;
   if (sources.length === 0) {
     throw new Error("No programs found under programs/");
   }
-  assertUniquePackageNames(sources, bundleConfigs);
+  assertUniquePackageNames(sources, protocols);
 
   const firstPass = await Promise.all(
     sources.map((source) => processProgram(source, [])),
   );
   assertUniqueProgramNames(sources, firstPass);
-  const bundles = resolveBundles(bundleConfigs, sources, firstPass);
 
   const context = firstPass.map(toContextProgram);
   const programs = await Promise.all(
@@ -232,12 +266,26 @@ export async function buildMegagraph(
   }
   const root = rootNode(first, rest);
 
+  const packageNames = new Map(
+    sorted.map(({ source, program }) => [
+      program.name as string,
+      source.packageName,
+    ]),
+  );
   const unresolved = findUnresolvedLinks(root);
   if (unresolved.length > 0) {
-    const lines = unresolved.map(
-      (link) =>
-        `  - ${link.kind} "${link.name}"${link.program === undefined ? "" : ` (program "${link.program}")`} at ${link.path}`,
-    );
+    const lines = unresolved.map((link) => {
+      const owner =
+        (link.owner === undefined ? undefined : packageNames.get(link.owner)) ??
+        link.owner ??
+        "?";
+      const target =
+        link.kind === "programLinkNode"
+          ? link.name
+          : `${link.program ?? "(unqualified)"}.${link.name}`;
+      const where = link.location === "" ? "" : ` (at ${link.location})`;
+      return `  - ${owner}: unresolved ${link.kind.replace(/Node$/, "")} ${target}${where}`;
+    });
     throw new Error(
       `${unresolved.length.toString()} link(s) do not resolve:\n${lines.join("\n")}`,
     );
@@ -253,12 +301,29 @@ export async function buildMegagraph(
 
   return {
     root,
+    protocols: protocols.map(({ protocol, config }) => ({
+      protocol,
+      displayName: config.displayName,
+      description: config.description,
+      ...(config.homepage !== undefined && { homepage: config.homepage }),
+      ...(config.repository !== undefined && {
+        repository: config.repository,
+      }),
+      programs: sorted
+        .filter((entry) => entry.source.protocol === protocol)
+        .map((entry) => entry.program.name as string),
+    })),
     packages: sorted.map(({ source, program }) => ({
       program: program.name,
+      protocol: source.protocol,
       slug: source.slug,
-      packageName: source.config.package.name,
+      packageName: source.packageName,
+      version: source.config.package.version,
       dependencies: dependencies.get(program.name) ?? [],
+      ...(source.config.package.releaseNotes && {
+        releaseNotes: source.config.package.releaseNotes,
+      }),
     })),
-    bundles,
+    umbrellas: resolveUmbrellas(protocols, sorted),
   };
 }

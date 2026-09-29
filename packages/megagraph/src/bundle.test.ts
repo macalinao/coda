@@ -87,7 +87,7 @@ describe("planBundleExports", () => {
         'export * from "@solana-programs/kamino-farms";',
         "",
         "// Names exported by more than one bundled program resolve to the program",
-        "// listed first in programs/bundles.ts.",
+        "// with the highest precedence in the umbrella config.",
         'export { getUpdateGlobalConfigInstruction } from "@solana-programs/kamino-klend";',
         'export type { UpdateGlobalConfigInput } from "@solana-programs/kamino-klend";',
         "",

@@ -94,8 +94,9 @@ publish_all() {
   done
 }
 
+# The generated @solana-programs/* clients are released by
+# release-clients.yml, not by changesets.
 publish_all packages
-publish_all clients
 
 echo
 echo "Published: ${#PUBLISHED[@]}  Skipped: ${#SKIPPED[@]}  Failed: ${#FAILED[@]}"

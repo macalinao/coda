@@ -54,3 +54,11 @@ result
 result-*
 
 /docs
+
+# Program megagraph output (bun run codegen); published to
+# github.com/toolboxdao/solana-programs by the release-clients workflow
+/graph/
+/clients/
+/mirror/
+/release-plan.json
+/release-plan.md

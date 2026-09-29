@@ -10,6 +10,22 @@ export {
 export * from "codama";
 export { defineConfig } from "./config.ts";
 export type {
+  NamedVariablePdaSeedNode,
+  PdaDefinition,
+  PdaHandle,
+  PdaHandles,
+  PdaSeedNames,
+  PdaSeeds,
+  PdaSeedValues,
+  ProgramHandle,
+} from "./program-handles.ts";
+export {
+  constant,
+  definePdas,
+  programHandle,
+  variable,
+} from "./program-handles.ts";
+export type {
   ProcessConfigOptions,
   ResolveIdlPathsOptions,
 } from "./utils/index.ts";

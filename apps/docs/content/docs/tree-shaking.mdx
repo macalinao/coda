@@ -15,8 +15,8 @@ These are the pre-generated clients in the Coda repository, measured with esbuil
 | `@solana-programs/goki-smart-wallet` | 321 B / 398 B | 4.2 kB / 5.3 kB |
 | `@solana-programs/goki-token-signer` | 345 B / 424 B | 1.1 kB / 1.2 kB |
 | `@solana-programs/kamino-farms` | 476 B / 562 B | 8.5 kB / 11.2 kB |
-| `@solana-programs/kamino-klend` | 602 B / 726 B | 18.5 kB / 26.6 kB |
-| `@solana-programs/kamino-lending` (umbrella) | 602 B / 726 B | 27.6 kB / 39.5 kB |
+| `@solana-programs/kamino-lending` | 602 B / 726 B | 18.5 kB / 26.6 kB |
+| `@solana-programs/kamino` (umbrella) | 602 B / 726 B | 27.6 kB / 39.5 kB |
 | `@solana-programs/meteora-damm-v2` | 618 B / 714 B | 12.9 kB / 18.6 kB |
 | `@solana-programs/mpl-bubblegum` | 572 B / 662 B | 11.0 kB / 16.1 kB |
 | `@solana-programs/mpl-core` | 1.1 kB / 1.4 kB | 12.0 kB / 16.6 kB |
@@ -39,7 +39,7 @@ These are the pre-generated clients in the Coda repository, measured with esbuil
 
 Umbrella packages contain no code of their own: they re-export several single-program packages, so importing one instruction from them costs the same as importing it from the program's package.
 
-The gap between the columns is the point. `@solana-programs/kamino-klend` covers 48 instructions and weighs 18.5 kB if you take all of it — but a dApp that borrows against an obligation imports one instruction builder and pays 602 bytes.
+The gap between the columns is the point. `@solana-programs/kamino-lending` covers 48 instructions and weighs 18.5 kB if you take all of it — but a dApp that borrows against an obligation imports one instruction builder and pays 602 bytes.
 
 This is also why a headline "bundle size" badge is misleading for these packages. A single number can only report the `export *` ceiling, which is the one import pattern nobody uses.
 

@@ -1,7 +1,8 @@
 export type {
-  BundlePackage,
   Megagraph,
   ProgramPackage,
+  ProtocolEntry,
+  UmbrellaPackage,
 } from "./build-graph.ts";
 export { buildMegagraph } from "./build-graph.ts";
 export type { BundleExportPlan, BundleMember, ExportKind } from "./bundle.ts";
@@ -11,11 +12,12 @@ export {
   renderBundleIndex,
 } from "./bundle.ts";
 export type {
-  BundleConfig,
   ProgramConfig,
   ProgramPackageConfig,
+  ProtocolConfig,
+  UmbrellaConfig,
 } from "./define-program.ts";
-export { defineBundles, defineProgram } from "./define-program.ts";
+export { defineProgram, defineProtocol } from "./define-program.ts";
 export type { GeneratePackagesInput } from "./generate-packages.ts";
 export { generatePackages } from "./generate-packages.ts";
 export {
@@ -24,12 +26,15 @@ export {
   readMegagraph,
   writeMegagraph,
 } from "./graph-files.ts";
-export type { ProgramSource } from "./load-programs.ts";
+export type { ProgramSource, ProtocolSource } from "./load-programs.ts";
 export {
-  BUNDLES_FILE,
+  getProgramPackagePath,
+  getUmbrellaPackagePath,
   IDL_FILE,
-  loadBundles,
   loadPrograms,
+  PACKAGE_SCOPE,
+  PROGRAM_CONFIG_FILE,
+  PROTOCOL_CONFIG_FILE,
 } from "./load-programs.ts";
 export type { UnresolvedLink } from "./package-graph.ts";
 export {
@@ -39,3 +44,21 @@ export {
   getProgramDependencies,
   getTransitiveDependencies,
 } from "./package-graph.ts";
+export type { WorkspaceScaffoldOptions } from "./scaffold.ts";
+export { writeWorkspaceScaffold } from "./scaffold.ts";
+export {
+  applyRelease,
+  prependChangelogEntry,
+  renderChangelogEntry,
+} from "./release/apply.ts";
+export type { Change, ChangeLevel } from "./release/classify.ts";
+export { diffProgram, maxLevel } from "./release/classify.ts";
+export type { Manifest } from "./release/manifest.ts";
+export { diffManifest } from "./release/manifest.ts";
+export type { Bump, PackageRelease, ReleasePlan } from "./release/plan.ts";
+export {
+  bumpVersion,
+  getReleasedPackages,
+  planRelease,
+  renderPlanMarkdown,
+} from "./release/plan.ts";

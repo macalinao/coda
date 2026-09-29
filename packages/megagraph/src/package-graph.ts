@@ -90,8 +90,12 @@ export function getProgramDependencies(
 export interface UnresolvedLink {
   kind: string;
   name: string;
+  /** The program the link points into, or `undefined` if unqualified. */
   program: string | undefined;
-  path: string;
+  /** The program whose nodes contain the link. */
+  owner: string | undefined;
+  /** The named nodes leading to the link inside its owner, e.g. `instruction claimRewards > account miner`. */
+  location: string;
 }
 
 /**
@@ -124,11 +128,20 @@ export function findUnresolvedLinks(root: RootNode): UnresolvedLink[] {
                 node.kind === "programLinkNode"
                   ? link.name
                   : link.program?.name,
-              path: path
-                .map((pathNode) =>
-                  "name" in pathNode && typeof pathNode.name === "string"
-                    ? `${pathNode.kind}(${pathNode.name})`
-                    : pathNode.kind,
+              owner: path.find((pathNode) => pathNode.kind === "programNode")
+                ?.name,
+              location: path
+                .filter(
+                  (pathNode) =>
+                    pathNode.kind !== "rootNode" &&
+                    pathNode.kind !== "programNode" &&
+                    pathNode !== node &&
+                    "name" in pathNode &&
+                    typeof pathNode.name === "string",
+                )
+                .map(
+                  (pathNode) =>
+                    `${pathNode.kind.replace(/Node$/, "")} ${(pathNode as { name: string }).name}`,
                 )
                 .join(" > "),
             });

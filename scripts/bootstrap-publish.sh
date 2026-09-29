@@ -17,6 +17,11 @@ set -euo pipefail
 # exactly what happened to @solana-programs/goki@0.2.0 on 2026-08-15.
 # The stub also leaves `latest` unset until the first real release claims it.
 #
+# Tooling packages (packages/*) are released by release.yml. The generated
+# @solana-programs/* clients are released by release-clients.yml from the
+# generated clients/ workspace, so run `bun run codegen` first to bootstrap
+# new client names.
+#
 # Run this locally, once, whenever a new package is added to the repo:
 #
 #   npm login                       # or export NPM_TOKEN
@@ -26,7 +31,6 @@ set -euo pipefail
 # Requires npm >= 11.10.0 for `npm trust`.
 
 REPO="macalinao/coda"
-WORKFLOW="release.yml"
 STUB_VERSION="0.0.0-bootstrap"
 STUB_TAG="bootstrap"
 
@@ -45,6 +49,7 @@ trap 'rm -rf "$STUB_DIR"' EXIT
 
 bootstrap_dir() {
   local dir="$1"
+  local workflow="$2"
   local name abs
 
   # node's require() needs an absolute path -- a bare relative one resolves
@@ -58,7 +63,7 @@ bootstrap_dir() {
   fi
 
   if [ "$EXECUTE" = false ]; then
-    echo "would $name@$STUB_VERSION -- publish stub with token, then configure trusted publisher"
+    echo "would $name@$STUB_VERSION -- publish stub with token, then trust $workflow"
     return
   fi
 
@@ -85,7 +90,7 @@ bootstrap_dir() {
 
   npm trust github "$name" \
     --repo "$REPO" \
-    --file "$WORKFLOW" \
+    --file "$workflow" \
     --allow-publish \
     --yes
 
@@ -93,18 +98,24 @@ bootstrap_dir() {
 }
 
 bootstrap_all() {
-  local parent="$1"
-  for dir in "$parent"/*; do
+  local workflow="$1"
+  shift
+  for dir in "$@"; do
     if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
       if ! grep -q '"private": true' "$dir/package.json"; then
-        bootstrap_dir "$dir"
+        bootstrap_dir "$dir" "$workflow"
       fi
     fi
   done
 }
 
-bootstrap_all packages
-bootstrap_all clients
+bootstrap_all release.yml packages/*
+# Umbrellas at clients/packages/<protocol>/, programs one level below.
+if [ -d clients/packages ]; then
+  bootstrap_all release-clients.yml clients/packages/* clients/packages/*/*
+else
+  echo "clients/ has not been generated; run \`bun run codegen\` to bootstrap client packages."
+fi
 
 echo
 if [ "$EXECUTE" = false ]; then

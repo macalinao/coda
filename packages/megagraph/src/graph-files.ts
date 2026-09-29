@@ -6,7 +6,7 @@ import { join } from "node:path";
 /** File holding the merged Codama root. */
 export const CODAMA_JSON = "codama.json";
 
-/** File holding the package summary (programs, bundles and dependencies). */
+/** File holding the package summary (protocols, programs, umbrellas and dependencies). */
 export const PACKAGES_JSON = "packages.json";
 
 type PackagesFile = Omit<Megagraph, "root">;
@@ -26,8 +26,9 @@ export async function writeMegagraph(
     `${JSON.stringify(megagraph.root, null, 2)}\n`,
   );
   const packagesFile: PackagesFile = {
+    protocols: megagraph.protocols,
     packages: megagraph.packages,
-    bundles: megagraph.bundles,
+    umbrellas: megagraph.umbrellas,
   };
   await writeFile(
     join(graphDir, PACKAGES_JSON),
@@ -47,7 +48,8 @@ export async function readMegagraph(graphDir: string): Promise<Megagraph> {
   ) as Partial<PackagesFile>;
   return {
     root,
+    protocols: packagesFile.protocols ?? [],
     packages: packagesFile.packages ?? [],
-    bundles: packagesFile.bundles ?? [],
+    umbrellas: packagesFile.umbrellas ?? [],
   };
 }

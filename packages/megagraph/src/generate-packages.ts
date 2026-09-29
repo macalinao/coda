@@ -1,11 +1,17 @@
-import type { ProgramNode, RootNode } from "codama";
-import type { BundlePackage, ProgramPackage } from "./build-graph.ts";
+import type { ProgramNode } from "codama";
+import type { Megagraph, UmbrellaPackage } from "./build-graph.ts";
 import type { BundleMember } from "./bundle.ts";
-import type { BundleConfig } from "./define-program.ts";
-import type { ProgramSource } from "./load-programs.ts";
-import type { PackageDependency } from "./templates.ts";
-import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import type { ProgramSource, ProtocolSource } from "./load-programs.ts";
+import type { PackageDependency, PackageTemplateInput } from "./templates.ts";
+import {
+  copyFile,
+  mkdir,
+  readdir,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
+import { join, relative } from "node:path";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
 import { renderMarkdownVisitor } from "@macalinao/codama-renderers-markdown";
 import { getAllPrograms, rootNode, visit } from "codama";
@@ -14,23 +20,22 @@ import {
   planBundleExports,
   renderBundleIndex,
 } from "./bundle.ts";
+import {
+  getProgramPackagePath,
+  getUmbrellaPackagePath,
+} from "./load-programs.ts";
 import { getTransitiveDependencies } from "./package-graph.ts";
 import {
-  renderBundleReadme,
   renderEntryBarrel,
   renderEntryHeader,
   renderPackageJson,
   renderReadme,
   renderTsconfig,
+  renderUmbrellaReadme,
 } from "./templates.ts";
 
-/** Files and directories in a client package that are not generated. */
-const PRESERVED_ENTRIES = new Set([
-  "CHANGELOG.md",
-  "dist",
-  "node_modules",
-  ".turbo",
-]);
+/** Seed changelog a program or protocol directory may carry. */
+const CHANGELOG_FILE = "CHANGELOG.md";
 
 async function readOptional(path: string): Promise<string | null> {
   try {
@@ -40,26 +45,9 @@ async function readOptional(path: string): Promise<string | null> {
   }
 }
 
-async function readExistingVersion(
-  packageDir: string,
-): Promise<string | undefined> {
-  const packageJson = await readOptional(join(packageDir, "package.json"));
-  if (packageJson === null) {
-    return undefined;
-  }
-  return (JSON.parse(packageJson) as { version?: string }).version;
-}
-
-/**
- * Deletes everything in a package directory but the preserved entries, so
- * files that are no longer generated (and stale dependencies) disappear.
- */
-async function resetPackageDir(packageDir: string): Promise<void> {
-  await mkdir(packageDir, { recursive: true });
-  for (const existing of await readdir(packageDir)) {
-    if (!PRESERVED_ENTRIES.has(existing)) {
-      await rm(join(packageDir, existing), { recursive: true, force: true });
-    }
+async function copyOptional(from: string, to: string): Promise<void> {
+  if ((await readOptional(from)) !== null) {
+    await copyFile(from, to);
   }
 }
 
@@ -73,74 +61,63 @@ function getDocsFileName(program: ProgramNode): string {
 }
 
 export interface GeneratePackagesInput {
-  root: RootNode;
-  packages: ProgramPackage[];
-  bundles: BundlePackage[];
-  sources: ProgramSource[];
-  bundleConfigs: BundleConfig[];
-  clientsDir: string;
+  megagraph: Megagraph;
+  programs: ProgramSource[];
+  protocols: ProtocolSource[];
+  /** Directory holding `programs/`; used for source paths in manifests. */
+  repoRoot: string;
+  /**
+   * Root of the generated workspace. Packages are written to
+   * `<outDir>/packages/<protocol>/<program>/` and umbrellas to
+   * `<outDir>/packages/<protocol>/`; `<outDir>/packages/` is replaced.
+   */
+  outDir: string;
 }
 
 /**
- * Generates every client package from the megagraph, and deletes client
- * directories that no longer correspond to a program.
+ * Generates every package of the megagraph into a fresh
+ * `<outDir>/packages/` directory.
  *
  * @returns The absolute paths of the generated package directories.
  */
 export async function generatePackages(
   input: GeneratePackagesInput,
 ): Promise<string[]> {
+  const { megagraph } = input;
   const programsByName = new Map<string, ProgramNode>(
-    getAllPrograms(input.root).map((program) => [program.name, program]),
+    getAllPrograms(megagraph.root).map((program) => [program.name, program]),
   );
   const packagesByProgram = new Map(
-    input.packages.map((entry) => [entry.program, entry]),
+    megagraph.packages.map((entry) => [entry.program, entry]),
   );
   const sourcesBySlug = new Map(
-    input.sources.map((source) => [source.slug, source]),
+    input.programs.map((source) => [source.slug, source]),
   );
   const dependencyGraph = new Map(
-    input.packages.map((entry) => [entry.program, entry.dependencies]),
+    megagraph.packages.map((entry) => [entry.program, entry.dependencies]),
   );
-
-  const expectedSlugs = new Set([
-    ...input.packages.map((entry) => entry.slug),
-    ...input.bundles.map((entry) => entry.slug),
-  ]);
-  const sourceSlugs = new Set([
-    ...sourcesBySlug.keys(),
-    ...input.bundleConfigs.map((bundle) => bundle.slug),
-  ]);
   if (
-    expectedSlugs.size !== sourceSlugs.size ||
-    [...expectedSlugs].some((slug) => !sourceSlugs.has(slug))
+    megagraph.packages.length !== input.programs.length ||
+    megagraph.packages.some((entry) => !sourcesBySlug.has(entry.slug))
   ) {
     throw new Error(
       "graph/packages.json is out of date with programs/. Run `bun run graph` first.",
     );
   }
 
-  // Remove client packages whose program no longer exists.
-  await mkdir(input.clientsDir, { recursive: true });
-  for (const entry of await readdir(input.clientsDir, {
-    withFileTypes: true,
-  })) {
-    if (entry.isDirectory() && !expectedSlugs.has(entry.name)) {
-      console.log(`Removing stale package clients/${entry.name}`);
-      await rm(join(input.clientsDir, entry.name), {
-        recursive: true,
-        force: true,
-      });
-    }
-  }
+  const packagesDir = join(input.outDir, "packages");
+  await rm(packagesDir, { recursive: true, force: true });
 
   const generated: string[] = [];
-  for (const entry of input.packages) {
+  for (const entry of megagraph.packages) {
     const program = programsByName.get(entry.program);
     const source = sourcesBySlug.get(entry.slug);
     if (program === undefined || source === undefined) {
       throw new Error(`Program "${entry.program}" is missing from the graph`);
     }
+    const protocol = input.protocols.find(
+      (candidate) => candidate.protocol === source.protocol,
+    );
 
     const dependencies: PackageDependency[] = entry.dependencies.map((name) => {
       const dependency = packagesByProgram.get(name);
@@ -170,20 +147,20 @@ export async function generatePackages(
       ]),
     );
 
-    const packageDir = join(input.clientsDir, entry.slug);
-    const version =
-      (await readExistingVersion(packageDir)) ??
-      source.config.package.initialVersion ??
-      "0.0.0";
-    const templateInput = {
-      slug: entry.slug,
-      version,
-      package: source.config.package,
+    const packageDir = join(input.outDir, getProgramPackagePath(entry));
+    const templateInput: PackageTemplateInput = {
+      name: entry.packageName,
+      version: entry.version,
+      description: source.config.package.description,
+      keywords: [
+        ...(protocol?.config.keywords ?? []),
+        ...(source.config.package.keywords ?? []),
+      ],
+      source: relative(input.repoRoot, source.dir),
       dependencies,
     };
 
-    await resetPackageDir(packageDir);
-
+    await mkdir(join(packageDir, "src"), { recursive: true });
     visit(
       renderRoot,
       renderESMTypeScriptVisitor(join(packageDir, "src", "generated"), {
@@ -217,9 +194,13 @@ export async function generatePackages(
       join(packageDir, "README.md"),
       renderReadme(templateInput, program, `docs/${docsFile}`, readmeBody),
     );
+    await copyOptional(
+      join(source.dir, CHANGELOG_FILE),
+      join(packageDir, CHANGELOG_FILE),
+    );
 
     console.log(
-      `Generated ${entry.packageName} (clients/${entry.slug})${
+      `Generated ${entry.packageName}@${entry.version} (packages/${entry.slug})${
         dependencies.length > 0
           ? ` -> ${dependencies.map((d) => d.packageName).join(", ")}`
           : ""
@@ -228,63 +209,71 @@ export async function generatePackages(
     generated.push(packageDir);
   }
 
-  for (const entry of input.bundles) {
-    const config = input.bundleConfigs.find(
-      (bundle) => bundle.slug === entry.slug,
+  for (const umbrella of megagraph.umbrellas) {
+    const protocol = input.protocols.find(
+      (candidate) => candidate.protocol === umbrella.protocol,
     );
-    if (config === undefined) {
-      throw new Error(`Bundle "${entry.slug}" is missing from programs/`);
+    if (protocol?.config.umbrella === undefined) {
+      throw new Error(
+        `programs/${umbrella.protocol}: the umbrella is missing from protocol.config.ts`,
+      );
     }
     generated.push(
-      await generateBundle(entry, config, packagesByProgram, input.clientsDir),
+      await generateUmbrella(umbrella, protocol, input, packagesByProgram),
     );
   }
   return generated;
 }
 
 /**
- * Generates an umbrella package that re-exports its bundled program packages.
- * Must run after the bundled packages are generated, since it scans their
- * exports for conflicts.
+ * Generates an umbrella package that re-exports its member program packages.
+ * Must run after the members are generated, since it scans their exports for
+ * conflicts.
  */
-async function generateBundle(
-  entry: BundlePackage,
-  config: BundleConfig,
-  packagesByProgram: Map<string, ProgramPackage>,
-  clientsDir: string,
+async function generateUmbrella(
+  umbrella: UmbrellaPackage,
+  protocol: ProtocolSource,
+  input: GeneratePackagesInput,
+  packagesByProgram: Map<string, Megagraph["packages"][number]>,
 ): Promise<string> {
+  const config = protocol.config.umbrella;
+  if (config === undefined) {
+    throw new Error(`programs/${protocol.protocol} has no umbrella`);
+  }
   const members: BundleMember[] = [];
-  for (const program of entry.programs) {
+  for (const program of umbrella.programs) {
     const member = packagesByProgram.get(program);
     if (member === undefined) {
       throw new Error(
-        `Bundle "${entry.slug}" references unknown program "${program}"`,
+        `The ${umbrella.packageName} umbrella references unknown program "${program}"`,
       );
     }
     members.push({
       program,
       packageName: member.packageName,
-      exports: await collectGeneratedExports(join(clientsDir, member.slug)),
+      exports: await collectGeneratedExports(
+        join(input.outDir, getProgramPackagePath(member)),
+      ),
     });
   }
   const plan = planBundleExports(members);
 
-  const packageDir = join(clientsDir, entry.slug);
-  const version =
-    (await readExistingVersion(packageDir)) ??
-    config.package.initialVersion ??
-    "0.0.0";
-  const templateInput = {
-    slug: entry.slug,
-    version,
-    package: config.package,
+  const packageDir = join(
+    input.outDir,
+    getUmbrellaPackagePath(umbrella.protocol),
+  );
+  const templateInput: PackageTemplateInput = {
+    name: umbrella.packageName,
+    version: umbrella.version,
+    description: config.description,
+    keywords: [...(protocol.config.keywords ?? []), ...(config.keywords ?? [])],
+    source: relative(input.repoRoot, protocol.dir),
     dependencies: members.map(({ program, packageName }) => ({
       program,
       packageName,
     })),
   };
 
-  await resetPackageDir(packageDir);
   await mkdir(join(packageDir, "src"), { recursive: true });
   await writeFile(
     join(packageDir, "package.json"),
@@ -294,14 +283,17 @@ async function generateBundle(
   await writeFile(
     join(packageDir, "src", "index.ts"),
     renderBundleIndex(
-      renderEntryHeader(templateInput, "programs/bundles.ts"),
+      renderEntryHeader(
+        templateInput,
+        `${templateInput.source}/protocol.config.ts`,
+      ),
       members,
       plan,
     ),
   );
   await writeFile(
     join(packageDir, "README.md"),
-    renderBundleReadme(
+    renderUmbrellaReadme(
       templateInput,
       [...plan.conflicts.keys()],
       plan.namespaced.map(({ program, packageName }) => ({
@@ -310,9 +302,13 @@ async function generateBundle(
       })),
     ),
   );
+  await copyOptional(
+    join(protocol.dir, CHANGELOG_FILE),
+    join(packageDir, CHANGELOG_FILE),
+  );
 
   console.log(
-    `Generated bundle ${entry.packageName} (clients/${entry.slug}) = ${members
+    `Generated umbrella ${umbrella.packageName}@${umbrella.version} (packages/${umbrella.protocol}) = ${members
       .map((member) => member.packageName)
       .join(" + ")}${
       plan.conflicts.size > 0

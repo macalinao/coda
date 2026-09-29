@@ -8,7 +8,7 @@
     "packages": [
       "apps/*",
       "packages/*",
-      "clients/*"
+      "programs"
     ],
     "catalog": {
       "typescript": "^7.0.2",
@@ -26,8 +26,7 @@
     }
   },
   "scripts": {
-    "build": "turbo build",
-    "build:ci": "turbo build --filter='./{packages,clients}/**'",
+    "build": "turbo build && bun run build:clients",
     "build:packages": "turbo build --filter='./packages/**'",
     "build:watch": "turbo watch build",
     "build:watch:packages": "turbo watch build --filter='./packages/**'",
@@ -43,17 +42,19 @@
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
     "graph": "turbo run build --filter=@macalinao/megagraph... && bun scripts/megagraph.ts graph",
-    "codegen": "turbo run build --filter=@macalinao/megagraph... && bun scripts/megagraph.ts graph && bun scripts/megagraph.ts generate",
+    "codegen": "turbo run build --filter=@macalinao/megagraph... && bun scripts/megagraph.ts graph && bun scripts/megagraph.ts generate && bun scripts/clients.ts install",
     "typecheck": "tsc -p tsconfig.configs.json",
     "size": "size-limit",
     "docs:dev": "turbo dev --filter=coda-docs",
     "docs:build": "turbo build --filter=coda-docs",
     "format": "oxfmt",
-    "export:solana-programs": "bun scripts/export-solana-programs.ts"
+    "export:solana-programs": "bun scripts/export-solana-programs.ts",
+    "build:clients": "bun scripts/clients.ts build",
+    "build:ci": "turbo build --filter='./packages/**'",
+    "clients": "bun scripts/clients.ts"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
-    "@macalinao/coda": "workspace:*",
     "@macalinao/megagraph": "workspace:*",
     "@size-limit/preset-small-lib": "13.1.1",
     "husky": "^9.1.7",

@@ -6,7 +6,6 @@
       "name": "@macalinao/coda-monorepo",
       "devDependencies": {
         "@changesets/cli": "^3.0.3",
-        "@macalinao/coda": "workspace:*",
         "@macalinao/megagraph": "workspace:*",
         "@size-limit/preset-small-lib": "13.1.1",
         "husky": "^9.1.7",
@@ -45,417 +44,6 @@
         "postcss": "^8.5.28",
         "tailwindcss": "^4.3.3",
         "typescript": "^7.0.2",
-      },
-    },
-    "clients/goki": {
-      "name": "@solana-programs/goki",
-      "version": "0.4.1",
-      "dependencies": {
-        "@solana-programs/goki-smart-wallet": "workspace:^",
-        "@solana-programs/goki-token-signer": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/goki-smart-wallet": {
-      "name": "@solana-programs/goki-smart-wallet",
-      "version": "0.4.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/goki-token-signer": {
-      "name": "@solana-programs/goki-token-signer",
-      "version": "0.4.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/kamino-farms": {
-      "name": "@solana-programs/kamino-farms",
-      "version": "0.9.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/kamino-klend": {
-      "name": "@solana-programs/kamino-klend",
-      "version": "0.9.1",
-      "dependencies": {
-        "@solana-programs/kamino-farms": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/kamino-lending": {
-      "name": "@solana-programs/kamino-lending",
-      "version": "0.9.1",
-      "dependencies": {
-        "@solana-programs/kamino-farms": "workspace:^",
-        "@solana-programs/kamino-klend": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/meteora-damm-v2": {
-      "name": "@solana-programs/meteora-damm-v2",
-      "version": "0.5.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/mpl-bubblegum": {
-      "name": "@solana-programs/mpl-bubblegum",
-      "version": "0.0.0",
-      "dependencies": {
-        "@solana-programs/token-metadata": "workspace:*",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/mpl-core": {
-      "name": "@solana-programs/mpl-core",
-      "version": "0.6.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/mpl-token-auth-rules": {
-      "name": "@solana-programs/mpl-token-auth-rules",
-      "version": "0.6.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/orca-whirlpools": {
-      "name": "@solana-programs/orca-whirlpools",
-      "version": "0.8.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/quarry": {
-      "name": "@solana-programs/quarry",
-      "version": "0.8.1",
-      "dependencies": {
-        "@solana-programs/quarry-merge-mine": "workspace:^",
-        "@solana-programs/quarry-mine": "workspace:^",
-        "@solana-programs/quarry-mint-wrapper": "workspace:^",
-        "@solana-programs/quarry-operator": "workspace:^",
-        "@solana-programs/quarry-redeemer": "workspace:^",
-        "@solana-programs/quarry-registry": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/quarry-merge-mine": {
-      "name": "@solana-programs/quarry-merge-mine",
-      "version": "0.8.1",
-      "dependencies": {
-        "@solana-programs/quarry-mine": "workspace:^",
-        "@solana-programs/quarry-mint-wrapper": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/quarry-mine": {
-      "name": "@solana-programs/quarry-mine",
-      "version": "0.8.1",
-      "dependencies": {
-        "@solana-programs/quarry-mint-wrapper": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/quarry-mint-wrapper": {
-      "name": "@solana-programs/quarry-mint-wrapper",
-      "version": "0.8.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/quarry-operator": {
-      "name": "@solana-programs/quarry-operator",
-      "version": "0.8.1",
-      "dependencies": {
-        "@solana-programs/quarry-mine": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/quarry-redeemer": {
-      "name": "@solana-programs/quarry-redeemer",
-      "version": "0.8.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/quarry-registry": {
-      "name": "@solana-programs/quarry-registry",
-      "version": "0.8.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/spl-governance": {
-      "name": "@solana-programs/spl-governance",
-      "version": "0.6.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/spl-stake-pool": {
-      "name": "@solana-programs/spl-stake-pool",
-      "version": "0.5.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/token-metadata": {
-      "name": "@solana-programs/token-metadata",
-      "version": "0.9.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/tribeca": {
-      "name": "@solana-programs/tribeca",
-      "version": "0.5.1",
-      "dependencies": {
-        "@solana-programs/tribeca-govern": "workspace:^",
-        "@solana-programs/tribeca-locked-voter": "workspace:^",
-      },
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/tribeca-govern": {
-      "name": "@solana-programs/tribeca-govern",
-      "version": "0.5.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/tribeca-locked-voter": {
-      "name": "@solana-programs/tribeca-locked-voter",
-      "version": "0.5.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
-      },
-    },
-    "clients/voter-stake-registry": {
-      "name": "@solana-programs/voter-stake-registry",
-      "version": "0.6.1",
-      "devDependencies": {
-        "@macalinao/tsconfig": "catalog:",
-        "@solana/kit": "catalog:",
-        "@solana/program-client-core": "catalog:",
-        "tsdown": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-        "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0",
       },
     },
     "packages/coda": {
@@ -599,13 +187,24 @@
         "@macalinao/codama-renderers-markdown": "workspace:^",
         "codama": "catalog:",
         "glob": "^13.0.6",
+        "semver": "^7.8.5",
       },
       "devDependencies": {
         "@macalinao/tsconfig": "catalog:",
         "@types/bun": "catalog:",
         "@types/node": "^26.6.2",
+        "@types/semver": "^7.7.1",
         "tsdown": "catalog:",
         "typescript": "catalog:",
+      },
+    },
+    "programs": {
+      "name": "@solana-programs/programs",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@macalinao/coda": "workspace:^",
+        "@macalinao/megagraph": "workspace:^",
+        "@macalinao/tsconfig": "catalog:",
       },
     },
   },
@@ -1134,55 +733,7 @@
 
     "@solana-program/zk-elgamal-proof": ["@solana-program/zk-elgamal-proof@0.4.0", "", { "dependencies": { "@solana-program/system": "^0.14.0" }, "peerDependencies": { "@solana/kit": "^8.0.0" } }, "sha512-bf2Q3f25xcCNaLm/MR4lwoAguJzEW2eeLdrJb6rUjMcA63qcgyJOWl6To7Bn4e+0OyWBa+J7YP2BUhi//VPz3g=="],
 
-    "@solana-programs/goki": ["@solana-programs/goki@workspace:clients/goki"],
-
-    "@solana-programs/goki-smart-wallet": ["@solana-programs/goki-smart-wallet@workspace:clients/goki-smart-wallet"],
-
-    "@solana-programs/goki-token-signer": ["@solana-programs/goki-token-signer@workspace:clients/goki-token-signer"],
-
-    "@solana-programs/kamino-farms": ["@solana-programs/kamino-farms@workspace:clients/kamino-farms"],
-
-    "@solana-programs/kamino-klend": ["@solana-programs/kamino-klend@workspace:clients/kamino-klend"],
-
-    "@solana-programs/kamino-lending": ["@solana-programs/kamino-lending@workspace:clients/kamino-lending"],
-
-    "@solana-programs/meteora-damm-v2": ["@solana-programs/meteora-damm-v2@workspace:clients/meteora-damm-v2"],
-
-    "@solana-programs/mpl-bubblegum": ["@solana-programs/mpl-bubblegum@workspace:clients/mpl-bubblegum"],
-
-    "@solana-programs/mpl-core": ["@solana-programs/mpl-core@workspace:clients/mpl-core"],
-
-    "@solana-programs/mpl-token-auth-rules": ["@solana-programs/mpl-token-auth-rules@workspace:clients/mpl-token-auth-rules"],
-
-    "@solana-programs/orca-whirlpools": ["@solana-programs/orca-whirlpools@workspace:clients/orca-whirlpools"],
-
-    "@solana-programs/quarry": ["@solana-programs/quarry@workspace:clients/quarry"],
-
-    "@solana-programs/quarry-merge-mine": ["@solana-programs/quarry-merge-mine@workspace:clients/quarry-merge-mine"],
-
-    "@solana-programs/quarry-mine": ["@solana-programs/quarry-mine@workspace:clients/quarry-mine"],
-
-    "@solana-programs/quarry-mint-wrapper": ["@solana-programs/quarry-mint-wrapper@workspace:clients/quarry-mint-wrapper"],
-
-    "@solana-programs/quarry-operator": ["@solana-programs/quarry-operator@workspace:clients/quarry-operator"],
-
-    "@solana-programs/quarry-redeemer": ["@solana-programs/quarry-redeemer@workspace:clients/quarry-redeemer"],
-
-    "@solana-programs/quarry-registry": ["@solana-programs/quarry-registry@workspace:clients/quarry-registry"],
-
-    "@solana-programs/spl-governance": ["@solana-programs/spl-governance@workspace:clients/spl-governance"],
-
-    "@solana-programs/spl-stake-pool": ["@solana-programs/spl-stake-pool@workspace:clients/spl-stake-pool"],
-
-    "@solana-programs/token-metadata": ["@solana-programs/token-metadata@workspace:clients/token-metadata"],
-
-    "@solana-programs/tribeca": ["@solana-programs/tribeca@workspace:clients/tribeca"],
-
-    "@solana-programs/tribeca-govern": ["@solana-programs/tribeca-govern@workspace:clients/tribeca-govern"],
-
-    "@solana-programs/tribeca-locked-voter": ["@solana-programs/tribeca-locked-voter@workspace:clients/tribeca-locked-voter"],
-
-    "@solana-programs/voter-stake-registry": ["@solana-programs/voter-stake-registry@workspace:clients/voter-stake-registry"],
+    "@solana-programs/programs": ["@solana-programs/programs@workspace:programs"],
 
     "@solana/accounts": ["@solana/accounts@8.3.0", "", { "dependencies": { "@solana/addresses": "8.3.0", "@solana/codecs-core": "8.3.0", "@solana/codecs-strings": "8.3.0", "@solana/errors": "8.3.0", "@solana/rpc-spec": "8.3.0", "@solana/rpc-types": "8.3.0" }, "peerDependencies": { "typescript": ">=5.4.0" }, "optionalPeers": ["typescript"] }, "sha512-HNVCs4yyE5kTRHVD3ApuKuByuO85GHE6Ns7I/yMB9vXhFgZjGzFhOGi/YCjlWpIk3RqTyX7wGniHyEb49R3ELQ=="],
 
@@ -1339,6 +890,8 @@
     "@types/react": ["@types/react@19.3.0", "", { "dependencies": { "csstype": "^3.2.2" } }, "sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg=="],
 
     "@types/react-dom": ["@types/react-dom@19.3.0", "", { "peerDependencies": { "@types/react": "^19.3.0" } }, "sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q=="],
+
+    "@types/semver": ["@types/semver@7.8.0", "", {}, "sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ=="],
 
     "@types/unist": ["@types/unist@3.0.3", "", {}, "sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q=="],
 
@@ -2123,56 +1676,6 @@
     "@size-limit/esbuild/esbuild": ["esbuild@0.28.2", "", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.28.2", "@esbuild/android-arm": "0.28.2", "@esbuild/android-arm64": "0.28.2", "@esbuild/android-x64": "0.28.2", "@esbuild/darwin-arm64": "0.28.2", "@esbuild/darwin-x64": "0.28.2", "@esbuild/freebsd-arm64": "0.28.2", "@esbuild/freebsd-x64": "0.28.2", "@esbuild/linux-arm": "0.28.2", "@esbuild/linux-arm64": "0.28.2", "@esbuild/linux-ia32": "0.28.2", "@esbuild/linux-loong64": "0.28.2", "@esbuild/linux-mips64el": "0.28.2", "@esbuild/linux-ppc64": "0.28.2", "@esbuild/linux-riscv64": "0.28.2", "@esbuild/linux-s390x": "0.28.2", "@esbuild/linux-x64": "0.28.2", "@esbuild/netbsd-arm64": "0.28.2", "@esbuild/netbsd-x64": "0.28.2", "@esbuild/openbsd-arm64": "0.28.2", "@esbuild/openbsd-x64": "0.28.2", "@esbuild/openharmony-arm64": "0.28.2", "@esbuild/sunos-x64": "0.28.2", "@esbuild/win32-arm64": "0.28.2", "@esbuild/win32-ia32": "0.28.2", "@esbuild/win32-x64": "0.28.2" }, "bin": { "esbuild": "bin/esbuild" } }, "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA=="],
 
     "@size-limit/esbuild/nanoid": ["nanoid@6.0.1", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-3wVS3i51pE2pi1k5FFL/95BGfVS0kSsvDVuGXHOtxox/TywUmtgq+3qiTOTbs9J7KfHaXPiN171k/A6dBnaXFw=="],
-
-    "@solana-programs/goki/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/goki-smart-wallet/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/goki-token-signer/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/kamino-farms/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/kamino-klend/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/kamino-lending/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/meteora-damm-v2/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/mpl-bubblegum/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/mpl-core/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/mpl-token-auth-rules/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/orca-whirlpools/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/quarry/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/quarry-merge-mine/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/quarry-mine/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/quarry-mint-wrapper/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/quarry-operator/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/quarry-redeemer/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/quarry-registry/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/spl-governance/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/spl-stake-pool/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/token-metadata/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/tribeca/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/tribeca-govern/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/tribeca-locked-voter/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
-
-    "@solana-programs/voter-stake-registry/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
 
     "@solana/accounts/@solana/codecs-strings": ["@solana/codecs-strings@8.3.0", "", { "dependencies": { "@solana/codecs-core": "8.3.0", "@solana/codecs-numbers": "8.3.0", "@solana/errors": "8.3.0" }, "peerDependencies": { "fastestsmallesttextencoderdecoder": "^1.0.22", "typescript": ">=5.4.0" }, "optionalPeers": ["fastestsmallesttextencoderdecoder", "typescript"] }, "sha512-S7rZrc1B90AS0QVRlo6+6cX2t+0TGtsadsPWdfA7tXcaDKQfQn4C/6OJxJ7/n8ugw8LMgGC+Xcs81ii4nIp6aQ=="],
 

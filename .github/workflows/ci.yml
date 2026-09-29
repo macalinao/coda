@@ -38,6 +38,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      # Tooling only; the generated clients are built after codegen below.
       - name: Build all packages
         run: bun run build:ci
 
@@ -50,16 +51,18 @@ jobs:
         working-directory: apps/docs
 
       # oxlint runs with typeAware + typeCheck, so this both lints and
-      # type-checks every package/client (replacing the old biome + eslint
-      # pass). The build above produces the .d.ts files tsgolint needs for
-      # cross-package type resolution. oxfmt --check enforces formatting.
+      # type-checks every package and every programs/**/*.ts config (the
+      # `programs` workspace package). The build above produces the .d.ts
+      # files tsgolint needs to resolve @macalinao/coda and
+      # @macalinao/megagraph from the configs. oxfmt --check enforces
+      # formatting.
       - name: Run oxlint (lint + type-check) and check formatting
         run: bun run lint
 
       - name: Run tests
         run: bun test
 
-      - name: Typecheck coda.config.ts files
+      - name: Typecheck the create-coda template config
         run: bun run typecheck
 
       # The Typedoc Docs workflow only runs on push to master, so a dependency
@@ -67,6 +70,37 @@ jobs:
       # would otherwise pass PR CI and only fail after merge.
       - name: Build TypeDoc API docs
         run: bun run typedoc --emit none
+
+      # graph/ and clients/ are not committed: generate them here. The graph
+      # step runs under `node` directly (not bun), so every program config
+      # must also load via native type stripping. The generated clients are
+      # the integration test of the tooling: they must build, type-check and
+      # load.
+      - name: Generate graph/ and clients/
+        run: |
+          node scripts/megagraph.ts graph
+          bun scripts/megagraph.ts generate
+          bun scripts/clients.ts install
+
+      - name: Check codegen is idempotent
+        run: |
+          before="$(bun scripts/clients.ts fingerprint)"
+          bun scripts/megagraph.ts graph
+          bun scripts/megagraph.ts generate
+          bun scripts/clients.ts install
+          after="$(bun scripts/clients.ts fingerprint)"
+          echo "first:  $before"
+          echo "second: $after"
+          test "$before" = "$after"
+
+      - name: Build the generated clients
+        run: bun scripts/clients.ts build
+
+      - name: Typecheck the generated clients
+        run: bun scripts/clients.ts typecheck
+
+      - name: Load every generated client
+        run: bun scripts/clients.ts test
 
       # Enforce the bundle-size budgets in .size-limit.json. The @solana/*
       # peer deps are ignored, so these measure each client's own cost. Two
@@ -76,14 +110,3 @@ jobs:
       # budget long before the full-client one moves.
       - name: Check client bundle sizes
         run: bun run size
-
-      # Rebuild the megagraph and every client package from programs/ and
-      # fail if the checked-in output differs. The graph step runs under
-      # `node` directly (not bun), so every program.config.ts must also load
-      # and apply its visitors via native type stripping.
-      - name: Verify graph/ and clients/ are generated from programs/
-        run: |
-          node scripts/megagraph.ts graph
-          bun scripts/megagraph.ts generate
-          git add --all --intent-to-add graph clients
-          git diff --exit-code -- graph clients

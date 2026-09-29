@@ -4,31 +4,41 @@ import type { CodaConfig } from "@macalinao/coda";
  * npm metadata of the package generated for a program.
  */
 export interface ProgramPackageConfig {
-  /** npm package name, e.g. `@solana-programs/quarry-mine`. */
-  name: string;
+  /**
+   * npm package name.
+   * @default `@solana-programs/<protocol>-<program>`
+   */
+  name?: string;
   /** One-line package description. */
   description: string;
-  /** npm keywords. `coda`, `solana`, `client` and `typescript` are always added. */
+  /**
+   * npm keywords, added to the protocol's keywords. `coda`, `solana`,
+   * `client`, `esm` and `typescript` are always added.
+   */
   keywords?: string[];
   /**
-   * Version written the first time the package is generated. Afterwards the
-   * version in the generated `package.json` is preserved, since changesets owns
-   * it from then on.
-   * @default "0.0.0"
+   * Version of the package's first release, used while the package does not
+   * exist in the release state yet. Afterwards the release pipeline derives
+   * versions from what changed.
    */
-  initialVersion?: string;
+  version: string;
+  /**
+   * Changelog lines for the package's first release (e.g. what changed since
+   * a version published before the megagraph).
+   */
+  releaseNotes?: string[];
 }
 
 /**
- * Configuration of a single program under `programs/<slug>/`.
+ * Configuration of a single program under `programs/<protocol>/<program>/`.
  *
- * The program's IDL is always `programs/<slug>/idl.json` and its package is
- * always generated into `clients/<slug>/`. The visitors run on a root whose
- * main program is this program, so bare selectors and links (e.g.
- * `pdaLinkNode("miner")`) refer to this program. Every other program in the
- * repository is also present in that root (PDAs only), which is what lets a
- * program-qualified link such as `pdaLinkNode("metadata", "tokenMetadata")`
- * resolve; changes the visitors make to those other programs are discarded.
+ * The program's IDL is always `idl.json` next to the config. The visitors
+ * run on a root whose main program is this program, so bare selectors (e.g.
+ * `updateAccountsVisitor({ miner: ... })`) only match this program's nodes.
+ * Links should always be created through program and PDA handles
+ * (`programHandle`, `definePdas` from `@macalinao/coda`), which qualify them
+ * with their program. Every other program's PDAs are also present in that
+ * root, so a PDA default value linking into another program resolves.
  */
 export interface ProgramConfig extends Pick<
   CodaConfig,
@@ -38,34 +48,57 @@ export interface ProgramConfig extends Pick<
 }
 
 /**
- * Define the configuration of a program in `programs/<slug>/program.config.ts`.
+ * Define the configuration of a program in
+ * `programs/<protocol>/<program>/program.config.ts`.
  */
 export function defineProgram(config: ProgramConfig): ProgramConfig {
   return config;
 }
 
 /**
- * An umbrella package that re-exports several program packages, e.g. the
- * historical `@solana-programs/quarry` bundling the six Quarry programs.
- *
- * A bundle contains no rendered code: its generated `package.json` depends
- * on the bundled program packages and its `src/index.ts` re-exports them.
+ * An umbrella package re-exporting every program package of a protocol, e.g.
+ * `@solana-programs/quarry`. It contains no rendered code of its own.
  */
-export interface BundleConfig {
-  /** Package directory under `clients/`. Must not clash with a program slug. */
-  slug: string;
-  package: ProgramPackageConfig;
+export interface UmbrellaConfig {
+  /** npm package name. */
+  name: string;
+  /** One-line package description. */
+  description: string;
+  /** npm keywords, added to the protocol's keywords. */
+  keywords?: string[];
+  /** Version of the package's first release; see {@link ProgramPackageConfig.version}. */
+  version: string;
+  /** Changelog lines for the package's first release. */
+  releaseNotes?: string[];
   /**
-   * Slugs of the bundled programs (directories under `programs/`), in
-   * priority order: when two bundled packages export the same name, the
-   * bundle re-exports the one from the program listed first.
+   * Program directories that take precedence, in order, when several member
+   * packages export the same name. Members not listed follow alphabetically.
    */
-  programs: string[];
+  precedence?: string[];
 }
 
 /**
- * Define the umbrella packages in `programs/bundles.ts`.
+ * Configuration of a protocol, `programs/<protocol>/protocol.config.ts`. A
+ * protocol groups the programs in its directory.
  */
-export function defineBundles(bundles: BundleConfig[]): BundleConfig[] {
-  return bundles;
+export interface ProtocolConfig {
+  /** Human-readable name, e.g. `Quarry`. */
+  displayName: string;
+  /** Short description of the protocol, for docs and directories. */
+  description: string;
+  /** Protocol website. */
+  homepage?: string;
+  /** Source repository of the on-chain programs. */
+  repository?: string;
+  /** npm keywords shared by every package of the protocol. */
+  keywords?: string[];
+  /** Optional umbrella package re-exporting all of the protocol's programs. */
+  umbrella?: UmbrellaConfig;
+}
+
+/**
+ * Define a protocol in `programs/<protocol>/protocol.config.ts`.
+ */
+export function defineProtocol(config: ProtocolConfig): ProtocolConfig {
+  return config;
 }

@@ -1,7 +1,7 @@
 [
   {
     "name": "goki: one instruction",
-    "path": "clients/goki/dist/index.js",
+    "path": "clients/packages/goki/dist/index.js",
     "import": "{ getApproveInstruction }",
     "ignore": [
       "@solana/kit",
@@ -11,7 +11,7 @@
   },
   {
     "name": "goki: entire client",
-    "path": "clients/goki/dist/index.js",
+    "path": "clients/packages/goki/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -20,7 +20,7 @@
   },
   {
     "name": "goki-smart-wallet: one instruction",
-    "path": "clients/goki-smart-wallet/dist/index.js",
+    "path": "clients/packages/goki/smart-wallet/dist/index.js",
     "import": "{ getApproveInstruction }",
     "ignore": [
       "@solana/kit",
@@ -30,7 +30,7 @@
   },
   {
     "name": "goki-smart-wallet: entire client",
-    "path": "clients/goki-smart-wallet/dist/index.js",
+    "path": "clients/packages/goki/smart-wallet/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -39,7 +39,7 @@
   },
   {
     "name": "goki-token-signer: one instruction",
-    "path": "clients/goki-token-signer/dist/index.js",
+    "path": "clients/packages/goki/token-signer/dist/index.js",
     "import": "{ getInvokeSignedInstructionInstruction }",
     "ignore": [
       "@solana/kit",
@@ -49,7 +49,7 @@
   },
   {
     "name": "goki-token-signer: entire client",
-    "path": "clients/goki-token-signer/dist/index.js",
+    "path": "clients/packages/goki/token-signer/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -57,8 +57,27 @@
     "limit": "1.5 KB"
   },
   {
+    "name": "kamino: one instruction",
+    "path": "clients/packages/kamino/dist/index.js",
+    "import": "{ getBorrowObligationLiquidityInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "750 B"
+  },
+  {
+    "name": "kamino: entire client",
+    "path": "clients/packages/kamino/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "29.5 KB"
+  },
+  {
     "name": "kamino-farms: one instruction",
-    "path": "clients/kamino-farms/dist/index.js",
+    "path": "clients/packages/kamino/farms/dist/index.js",
     "import": "{ getStakeInstruction }",
     "ignore": [
       "@solana/kit",
@@ -68,7 +87,7 @@
   },
   {
     "name": "kamino-farms: entire client",
-    "path": "clients/kamino-farms/dist/index.js",
+    "path": "clients/packages/kamino/farms/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -76,27 +95,8 @@
     "limit": "10 KB"
   },
   {
-    "name": "kamino-klend: one instruction",
-    "path": "clients/kamino-klend/dist/index.js",
-    "import": "{ getBorrowObligationLiquidityInstruction }",
-    "ignore": [
-      "@solana/kit",
-      "@solana/program-client-core"
-    ],
-    "limit": "750 B"
-  },
-  {
-    "name": "kamino-klend: entire client",
-    "path": "clients/kamino-klend/dist/index.js",
-    "ignore": [
-      "@solana/kit",
-      "@solana/program-client-core"
-    ],
-    "limit": "22 KB"
-  },
-  {
     "name": "kamino-lending: one instruction",
-    "path": "clients/kamino-lending/dist/index.js",
+    "path": "clients/packages/kamino/lending/dist/index.js",
     "import": "{ getBorrowObligationLiquidityInstruction }",
     "ignore": [
       "@solana/kit",
@@ -106,16 +106,16 @@
   },
   {
     "name": "kamino-lending: entire client",
-    "path": "clients/kamino-lending/dist/index.js",
+    "path": "clients/packages/kamino/lending/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "29.5 KB"
+    "limit": "22 KB"
   },
   {
     "name": "meteora-damm-v2: one instruction",
-    "path": "clients/meteora-damm-v2/dist/index.js",
+    "path": "clients/packages/meteora/damm-v2/dist/index.js",
     "import": "{ getSwapInstruction }",
     "ignore": [
       "@solana/kit",
@@ -125,7 +125,7 @@
   },
   {
     "name": "meteora-damm-v2: entire client",
-    "path": "clients/meteora-damm-v2/dist/index.js",
+    "path": "clients/packages/meteora/damm-v2/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -134,7 +134,7 @@
   },
   {
     "name": "mpl-bubblegum: one instruction",
-    "path": "clients/mpl-bubblegum/dist/index.js",
+    "path": "clients/packages/metaplex/bubblegum/dist/index.js",
     "import": "{ getCreateTreeInstruction }",
     "ignore": [
       "@solana/kit",
@@ -144,7 +144,7 @@
   },
   {
     "name": "mpl-bubblegum: entire client",
-    "path": "clients/mpl-bubblegum/dist/index.js",
+    "path": "clients/packages/metaplex/bubblegum/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -153,7 +153,7 @@
   },
   {
     "name": "mpl-core: one instruction",
-    "path": "clients/mpl-core/dist/index.js",
+    "path": "clients/packages/metaplex/core/dist/index.js",
     "import": "{ getBurnV1Instruction }",
     "ignore": [
       "@solana/kit",
@@ -163,7 +163,7 @@
   },
   {
     "name": "mpl-core: entire client",
-    "path": "clients/mpl-core/dist/index.js",
+    "path": "clients/packages/metaplex/core/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -172,7 +172,7 @@
   },
   {
     "name": "mpl-token-auth-rules: one instruction",
-    "path": "clients/mpl-token-auth-rules/dist/index.js",
+    "path": "clients/packages/metaplex/token-auth-rules/dist/index.js",
     "import": "{ getValidateInstruction }",
     "ignore": [
       "@solana/kit",
@@ -182,7 +182,7 @@
   },
   {
     "name": "mpl-token-auth-rules: entire client",
-    "path": "clients/mpl-token-auth-rules/dist/index.js",
+    "path": "clients/packages/metaplex/token-auth-rules/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -191,7 +191,7 @@
   },
   {
     "name": "orca-whirlpools: one instruction",
-    "path": "clients/orca-whirlpools/dist/index.js",
+    "path": "clients/packages/orca/whirlpools/dist/index.js",
     "import": "{ getSwapInstruction }",
     "ignore": [
       "@solana/kit",
@@ -201,7 +201,7 @@
   },
   {
     "name": "orca-whirlpools: entire client",
-    "path": "clients/orca-whirlpools/dist/index.js",
+    "path": "clients/packages/orca/whirlpools/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -210,7 +210,7 @@
   },
   {
     "name": "quarry: one instruction",
-    "path": "clients/quarry/dist/index.js",
+    "path": "clients/packages/quarry/dist/index.js",
     "import": "{ getClaimRewardsInstruction }",
     "ignore": [
       "@solana/kit",
@@ -220,7 +220,7 @@
   },
   {
     "name": "quarry: entire client",
-    "path": "clients/quarry/dist/index.js",
+    "path": "clients/packages/quarry/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -229,7 +229,7 @@
   },
   {
     "name": "quarry-merge-mine: one instruction",
-    "path": "clients/quarry-merge-mine/dist/index.js",
+    "path": "clients/packages/quarry/merge-mine/dist/index.js",
     "import": "{ getStakePrimaryMinerInstruction }",
     "ignore": [
       "@solana/kit",
@@ -239,7 +239,7 @@
   },
   {
     "name": "quarry-merge-mine: entire client",
-    "path": "clients/quarry-merge-mine/dist/index.js",
+    "path": "clients/packages/quarry/merge-mine/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -248,7 +248,7 @@
   },
   {
     "name": "quarry-mine: one instruction",
-    "path": "clients/quarry-mine/dist/index.js",
+    "path": "clients/packages/quarry/mine/dist/index.js",
     "import": "{ getClaimRewardsInstruction }",
     "ignore": [
       "@solana/kit",
@@ -258,7 +258,7 @@
   },
   {
     "name": "quarry-mine: entire client",
-    "path": "clients/quarry-mine/dist/index.js",
+    "path": "clients/packages/quarry/mine/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -267,7 +267,7 @@
   },
   {
     "name": "quarry-mint-wrapper: one instruction",
-    "path": "clients/quarry-mint-wrapper/dist/index.js",
+    "path": "clients/packages/quarry/mint-wrapper/dist/index.js",
     "import": "{ getPerformMintInstruction }",
     "ignore": [
       "@solana/kit",
@@ -277,7 +277,7 @@
   },
   {
     "name": "quarry-mint-wrapper: entire client",
-    "path": "clients/quarry-mint-wrapper/dist/index.js",
+    "path": "clients/packages/quarry/mint-wrapper/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -286,7 +286,7 @@
   },
   {
     "name": "quarry-operator: one instruction",
-    "path": "clients/quarry-operator/dist/index.js",
+    "path": "clients/packages/quarry/operator/dist/index.js",
     "import": "{ getSetAdminInstruction }",
     "ignore": [
       "@solana/kit",
@@ -296,7 +296,7 @@
   },
   {
     "name": "quarry-operator: entire client",
-    "path": "clients/quarry-operator/dist/index.js",
+    "path": "clients/packages/quarry/operator/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -305,7 +305,7 @@
   },
   {
     "name": "quarry-redeemer: one instruction",
-    "path": "clients/quarry-redeemer/dist/index.js",
+    "path": "clients/packages/quarry/redeemer/dist/index.js",
     "import": "{ getRedeemTokensInstruction }",
     "ignore": [
       "@solana/kit",
@@ -315,7 +315,7 @@
   },
   {
     "name": "quarry-redeemer: entire client",
-    "path": "clients/quarry-redeemer/dist/index.js",
+    "path": "clients/packages/quarry/redeemer/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -324,7 +324,7 @@
   },
   {
     "name": "quarry-registry: one instruction",
-    "path": "clients/quarry-registry/dist/index.js",
+    "path": "clients/packages/quarry/registry/dist/index.js",
     "import": "{ getSyncQuarryInstruction }",
     "ignore": [
       "@solana/kit",
@@ -334,7 +334,7 @@
   },
   {
     "name": "quarry-registry: entire client",
-    "path": "clients/quarry-registry/dist/index.js",
+    "path": "clients/packages/quarry/registry/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -343,7 +343,7 @@
   },
   {
     "name": "spl-governance: one instruction",
-    "path": "clients/spl-governance/dist/index.js",
+    "path": "clients/packages/spl/governance/dist/index.js",
     "import": "{ getCastVoteInstruction }",
     "ignore": [
       "@solana/kit",
@@ -353,7 +353,7 @@
   },
   {
     "name": "spl-governance: entire client",
-    "path": "clients/spl-governance/dist/index.js",
+    "path": "clients/packages/spl/governance/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -362,7 +362,7 @@
   },
   {
     "name": "spl-stake-pool: one instruction",
-    "path": "clients/spl-stake-pool/dist/index.js",
+    "path": "clients/packages/spl/stake-pool/dist/index.js",
     "import": "{ getDepositStakeInstruction }",
     "ignore": [
       "@solana/kit",
@@ -372,7 +372,7 @@
   },
   {
     "name": "spl-stake-pool: entire client",
-    "path": "clients/spl-stake-pool/dist/index.js",
+    "path": "clients/packages/spl/stake-pool/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -381,7 +381,7 @@
   },
   {
     "name": "token-metadata: one instruction",
-    "path": "clients/token-metadata/dist/index.js",
+    "path": "clients/packages/metaplex/token-metadata/dist/index.js",
     "import": "{ getCreateInstruction }",
     "ignore": [
       "@solana/kit",
@@ -391,7 +391,7 @@
   },
   {
     "name": "token-metadata: entire client",
-    "path": "clients/token-metadata/dist/index.js",
+    "path": "clients/packages/metaplex/token-metadata/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -400,7 +400,7 @@
   },
   {
     "name": "tribeca: one instruction",
-    "path": "clients/tribeca/dist/index.js",
+    "path": "clients/packages/tribeca/dist/index.js",
     "import": "{ getCastVoteInstruction }",
     "ignore": [
       "@solana/kit",
@@ -410,7 +410,7 @@
   },
   {
     "name": "tribeca: entire client",
-    "path": "clients/tribeca/dist/index.js",
+    "path": "clients/packages/tribeca/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -419,7 +419,7 @@
   },
   {
     "name": "tribeca-govern: one instruction",
-    "path": "clients/tribeca-govern/dist/index.js",
+    "path": "clients/packages/tribeca/govern/dist/index.js",
     "import": "{ getCreateProposalInstruction }",
     "ignore": [
       "@solana/kit",
@@ -429,7 +429,7 @@
   },
   {
     "name": "tribeca-govern: entire client",
-    "path": "clients/tribeca-govern/dist/index.js",
+    "path": "clients/packages/tribeca/govern/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -438,7 +438,7 @@
   },
   {
     "name": "tribeca-locked-voter: one instruction",
-    "path": "clients/tribeca-locked-voter/dist/index.js",
+    "path": "clients/packages/tribeca/locked-voter/dist/index.js",
     "import": "{ getCastVoteInstruction }",
     "ignore": [
       "@solana/kit",
@@ -448,7 +448,7 @@
   },
   {
     "name": "tribeca-locked-voter: entire client",
-    "path": "clients/tribeca-locked-voter/dist/index.js",
+    "path": "clients/packages/tribeca/locked-voter/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
@@ -457,7 +457,7 @@
   },
   {
     "name": "voter-stake-registry: one instruction",
-    "path": "clients/voter-stake-registry/dist/index.js",
+    "path": "clients/packages/spl/voter-stake-registry/dist/index.js",
     "import": "{ getDepositInstruction }",
     "ignore": [
       "@solana/kit",
@@ -467,7 +467,7 @@
   },
   {
     "name": "voter-stake-registry: entire client",
-    "path": "clients/voter-stake-registry/dist/index.js",
+    "path": "clients/packages/spl/voter-stake-registry/dist/index.js",
     "ignore": [
       "@solana/kit",
       "@solana/program-client-core"
