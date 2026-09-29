@@ -1,0 +1,14 @@
+# Gitleaks findings reviewed and accepted. Format: <commit>:<file>:<rule>:<line>
+#
+# 14a502c ("wip: docs site", 2025-08-18) accidentally committed a local
+# `next build` output directory (docs/.next/); it was removed in the following
+# commit and `.next/` is gitignored. The flagged values are Next.js's
+# auto-generated, per-build preview-mode and server-actions encryption keys
+# (expired 2025-09-01). They are not credentials for any external service and
+# never protected a deployment, so they are allowlisted here rather than
+# rewriting history.
+14a502c4823e8b0026cdffab3aa64ee8a13d5c6c:docs/.next/cache/.previewinfo:generic-api-key:1
+14a502c4823e8b0026cdffab3aa64ee8a13d5c6c:docs/.next/cache/.rscinfo:generic-api-key:1
+14a502c4823e8b0026cdffab3aa64ee8a13d5c6c:docs/.next/prerender-manifest.json:generic-api-key:15
+14a502c4823e8b0026cdffab3aa64ee8a13d5c6c:docs/.next/prerender-manifest.json:generic-api-key:16
+14a502c4823e8b0026cdffab3aa64ee8a13d5c6c:docs/.next/server/server-reference-manifest.json:generic-api-key:4
