@@ -86,7 +86,8 @@ coda/
 ├── graph/                  # Generated: codama.json (merged megagraph), packages.json
 ├── clients/                # Generated client packages (do not edit by hand)
 │   └── token-metadata/     # @solana-programs/token-metadata
-├── tools/megagraph/        # Private tool that builds graph/ and clients/
+├── scripts/megagraph.ts    # Driver: programs/ -> graph/ -> clients/
+├── scripts/export-solana-programs.ts  # Assembles the toolboxdao/solana-programs mirror
 ├── apps/docs/              # Documentation site (Fumadocs + Next.js)
 ├── scripts/               # Build and CI scripts
 └── vendor/                 # Vendored dependencies for reference
@@ -261,7 +262,7 @@ Tasks are defined in turbo.json:
 
 - `build`: Depends on upstream builds, outputs to `./dist/**`
 - `test`: Depends on build, no caching
-- `graph` / `codegen`: Only defined by `tools/megagraph`; depend on upstream builds, no caching
+- `codegen`: No package defines it anymore; the root `graph`/`codegen` scripts build `@macalinao/megagraph` with turbo and then run `scripts/megagraph.ts`
 - Tasks run in topological order respecting dependencies
 
 ## Program Megagraph
@@ -274,6 +275,13 @@ Tasks are defined in turbo.json:
   from `@macalinao/megagraph`; `package` is the npm metadata (name, description,
   keywords, `initialVersion`)
 - `README.md` (optional) - hand-written body inserted into the generated README
+
+`programs/bundles.ts` (`defineBundles`) declares umbrella packages such as
+`@solana-programs/quarry`: a bundle lists program slugs and generates a
+package with no code of its own that depends on those packages and
+`export *`s them. Names exported by several bundled programs are re-exported
+explicitly from the program listed first, and each program that lost a name
+is also exported as a namespace named after the program (e.g. `farms`).
 
 `bun run graph` runs every config on a root whose main program is that program
 (so bare selectors like `pdaLinkNode("miner")` refer to it), merges the results
@@ -288,7 +296,7 @@ changesets) and the `version` in `package.json` survive regeneration.
 the referencing program's config, e.g.
 `pdaValueNode(pdaLinkNode("metadata", "tokenMetadata"), [...])` or
 `programLinkNode("farms")`. The generator turns each link into a
-`"<owning package>": "workspace:*"` dependency and makes the generated code
+`"<owning package>": "workspace:^"` dependency and makes the generated code
 import the linked helpers from that package instead of re-emitting them.
 `linkOverrides` in `@codama/renderers-js` are keyed by name only, so the
 renderer refuses to import a linked name that the local program also declares;
@@ -308,6 +316,12 @@ rename one side if that happens.
 Never edit files under `clients/` by hand: CI regenerates them and fails on
 any difference.
 
+Keep everything program-specific in `programs/`, `graph/` and `clients/`, and
+tooling in `packages/*` (the graph builder is `@macalinao/megagraph`), so the
+program data can be lifted into its own repository. The
+`sync-solana-programs` workflow already mirrors it, output only, to
+github.com/toolboxdao/solana-programs via `scripts/export-solana-programs.ts`.
+
 ## CI/CD
 
 GitHub Actions workflow runs on push/PR to main:
@@ -318,6 +332,11 @@ GitHub Actions workflow runs on push/PR to main:
 - Runs tests
 - Type-checks the program.config.ts files
 - Regenerates `graph/` and `clients/` (the graph step under native Node) and fails on any diff
+
+`sync-solana-programs.yml` runs on push to master: it checks the generated
+output is up to date, exports it with `scripts/export-solana-programs.ts`,
+verifies the export builds standalone and pushes it to `main` of
+toolboxdao/solana-programs (SSH deploy key in `SOLANA_PROGRAMS_DEPLOY_KEY`).
 
 ## Publishing Workflow
 

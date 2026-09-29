@@ -1,0 +1,117 @@
+name: Sync solana-programs
+
+# Publishes the generated program packages to
+# github.com/toolboxdao/solana-programs, an output-only mirror assembled by
+# scripts/export-solana-programs.ts.
+#
+# Requires the SOLANA_PROGRAMS_DEPLOY_KEY secret: the private half of an SSH
+# deploy key added with write access to toolboxdao/solana-programs.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Syncs must land in order and none may be dropped halfway through a push.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync solana-programs
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'macalinao'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Regenerate graph/ and clients/
+        run: bun run codegen
+
+      # The mirror must only ever receive output that is committed here.
+      - name: Fail if the generated output is out of date
+        run: |
+          git add --all --intent-to-add
+          git diff --exit-code
+
+      - name: Build all packages
+        run: bun run build
+
+      # An empty repository has no branch to check out; fall back to a fresh
+      # clone below in that case.
+      - name: Checkout toolboxdao/solana-programs
+        id: checkout-target
+        continue-on-error: true
+        uses: actions/checkout@v7
+        with:
+          repository: toolboxdao/solana-programs
+          ref: main
+          path: solana-programs
+          ssh-key: ${{ secrets.SOLANA_PROGRAMS_DEPLOY_KEY }}
+
+      - name: Initialize toolboxdao/solana-programs (empty repository)
+        if: steps.checkout-target.outcome == 'failure'
+        env:
+          DEPLOY_KEY: ${{ secrets.SOLANA_PROGRAMS_DEPLOY_KEY }}
+        run: |
+          rm -rf solana-programs
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/solana_programs_deploy_key
+          chmod 600 ~/.ssh/solana_programs_deploy_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          git init --initial-branch=main solana-programs
+          cd solana-programs
+          git config core.sshCommand "ssh -i ~/.ssh/solana_programs_deploy_key -o IdentitiesOnly=yes"
+          git remote add origin git@github.com:toolboxdao/solana-programs.git
+
+      # Keep bun.lock so `bun install` only re-resolves what changed.
+      - name: Export generated output
+        run: |
+          find solana-programs -mindepth 1 -maxdepth 1 ! -name .git ! -name bun.lock -exec rm -rf {} +
+          bun scripts/export-solana-programs.ts solana-programs --source-commit "$GITHUB_SHA"
+
+      - name: Verify the export builds standalone
+        working-directory: solana-programs
+        run: |
+          bun install
+          bun run build
+          bun run lint
+
+      - name: Commit and push
+        working-directory: solana-programs
+        run: |
+          git add --all
+          # The README always names the source commit; only sync when
+          # something else changed.
+          if git diff --cached --quiet -- . ':(exclude)README.md'; then
+            echo "No changes to sync."
+            exit 0
+          fi
+          short_sha="${GITHUB_SHA::7}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit \
+            -m "sync: macalinao/coda@${short_sha}" \
+            -m "Generated from ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          git push origin HEAD:main
