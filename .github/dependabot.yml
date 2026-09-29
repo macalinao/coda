@@ -1,7 +1,9 @@
 version: 2
 updates:
-  # Enable version updates for npm/bun dependencies
-  - package-ecosystem: "npm"
+  # Enable version updates for bun dependencies. This must be "bun", not
+  # "npm": the repo is locked with bun.lock, which the npm_and_yarn updater
+  # refuses to touch -- every run failed with "Bun is misconfigured".
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -28,7 +30,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday" 
+      day: "monday"
       time: "03:00"
     labels:
       - "dependencies"

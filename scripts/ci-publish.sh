@@ -17,6 +17,10 @@ set -euo pipefail
 
 echo "Publishing packages via npm OIDC trusted publishing..."
 
+# The trusted publisher every package must be configured with on npmjs.com.
+GITHUB_REPO_SLUG="macalinao/coda"
+RELEASE_WORKFLOW="release.yml"
+
 PACK_DIR="$(mktemp -d)"
 trap 'rm -rf "$PACK_DIR"' EXIT
 
@@ -66,6 +70,13 @@ publish_dir() {
     # source of truth, and it says the version is present. Same benign case.
     echo "Skipping $name@$version (already published -- registry raced the check)"
     SKIPPED+=("$name@$version")
+  elif grep -q "E404" "$log" && npm view "$name" version --json >/dev/null 2>&1; then
+    # An OIDC publish to a name that already exists comes back as a bare 404
+    # when the package has no trusted publisher for this repo/workflow -- npm
+    # does not say so explicitly. @solana-programs/kamino-lending failed this
+    # way on every release from 0.8.0 to 0.9.1. Only a maintainer can fix it.
+    echo "::error::Failed to publish $name@$version: npm returned 404 for an existing package, so it has no trusted publisher for $GITHUB_REPO_SLUG/$RELEASE_WORKFLOW. Fix with: npm trust github $name --repo $GITHUB_REPO_SLUG --file $RELEASE_WORKFLOW --allow-publish"
+    FAILED+=("$name@$version")
   else
     echo "::error::Failed to publish $name@$version"
     FAILED+=("$name@$version")
@@ -94,6 +105,8 @@ if [ ${#FAILED[@]} -gt 0 ]; then
   printf '  %s\n' "${FAILED[@]}"
   echo "If these are new package names, they need a bootstrap publish and a"
   echo "trusted publisher configured before OIDC publishing works."
+  echo "If they already exist on npm, they are missing a trusted publisher:"
+  echo "  npm trust github <name> --repo $GITHUB_REPO_SLUG --file $RELEASE_WORKFLOW --allow-publish"
   exit 1
 fi
 

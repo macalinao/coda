@@ -62,6 +62,12 @@ jobs:
       - name: Typecheck coda.config.ts files
         run: bun run typecheck
 
+      # The Typedoc Docs workflow only runs on push to master, so a dependency
+      # bump that breaks TypeDoc (e.g. a TypeScript major it does not support)
+      # would otherwise pass PR CI and only fail after merge.
+      - name: Build TypeDoc API docs
+        run: bun run typedoc --emit none
+
       # Enforce the bundle-size budgets in .size-limit.json. The @solana/*
       # peer deps are ignored, so these measure each client's own cost. Two
       # entries per client: a single instruction (the tree-shaken path almost
