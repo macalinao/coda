@@ -1,5 +1,7 @@
 import type { ProgramNode, RootNode } from "codama";
-import type { ProgramPackage } from "./build-graph.ts";
+import type { BundlePackage, ProgramPackage } from "./build-graph.ts";
+import type { BundleMember } from "./bundle.ts";
+import type { BundleConfig } from "./define-program.ts";
 import type { ProgramSource } from "./load-programs.ts";
 import type { PackageDependency } from "./templates.ts";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -7,9 +9,16 @@ import { join } from "node:path";
 import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
 import { renderMarkdownVisitor } from "@macalinao/codama-renderers-markdown";
 import { getAllPrograms, rootNode, visit } from "codama";
+import {
+  collectGeneratedExports,
+  planBundleExports,
+  renderBundleIndex,
+} from "./bundle.ts";
 import { getTransitiveDependencies } from "./package-graph.ts";
 import {
+  renderBundleReadme,
   renderEntryBarrel,
+  renderEntryHeader,
   renderPackageJson,
   renderReadme,
   renderTsconfig,
@@ -41,6 +50,19 @@ async function readExistingVersion(
   return (JSON.parse(packageJson) as { version?: string }).version;
 }
 
+/**
+ * Deletes everything in a package directory but the preserved entries, so
+ * files that are no longer generated (and stale dependencies) disappear.
+ */
+async function resetPackageDir(packageDir: string): Promise<void> {
+  await mkdir(packageDir, { recursive: true });
+  for (const existing of await readdir(packageDir)) {
+    if (!PRESERVED_ENTRIES.has(existing)) {
+      await rm(join(packageDir, existing), { recursive: true, force: true });
+    }
+  }
+}
+
 /** The kebab-case file name the markdown renderer uses for a program. */
 function getDocsFileName(program: ProgramNode): string {
   const kebab = program.name
@@ -53,7 +75,9 @@ function getDocsFileName(program: ProgramNode): string {
 export interface GeneratePackagesInput {
   root: RootNode;
   packages: ProgramPackage[];
+  bundles: BundlePackage[];
   sources: ProgramSource[];
+  bundleConfigs: BundleConfig[];
   clientsDir: string;
 }
 
@@ -79,8 +103,14 @@ export async function generatePackages(
     input.packages.map((entry) => [entry.program, entry.dependencies]),
   );
 
-  const expectedSlugs = new Set(input.packages.map((entry) => entry.slug));
-  const sourceSlugs = new Set(sourcesBySlug.keys());
+  const expectedSlugs = new Set([
+    ...input.packages.map((entry) => entry.slug),
+    ...input.bundles.map((entry) => entry.slug),
+  ]);
+  const sourceSlugs = new Set([
+    ...sourcesBySlug.keys(),
+    ...input.bundleConfigs.map((bundle) => bundle.slug),
+  ]);
   if (
     expectedSlugs.size !== sourceSlugs.size ||
     [...expectedSlugs].some((slug) => !sourceSlugs.has(slug))
@@ -152,14 +182,7 @@ export async function generatePackages(
       dependencies,
     };
 
-    // Everything but the preserved entries is regenerated from scratch, so
-    // files that are no longer generated (and stale dependencies) disappear.
-    await mkdir(packageDir, { recursive: true });
-    for (const existing of await readdir(packageDir)) {
-      if (!PRESERVED_ENTRIES.has(existing)) {
-        await rm(join(packageDir, existing), { recursive: true, force: true });
-      }
-    }
+    await resetPackageDir(packageDir);
 
     visit(
       renderRoot,
@@ -204,5 +227,98 @@ export async function generatePackages(
     );
     generated.push(packageDir);
   }
+
+  for (const entry of input.bundles) {
+    const config = input.bundleConfigs.find(
+      (bundle) => bundle.slug === entry.slug,
+    );
+    if (config === undefined) {
+      throw new Error(`Bundle "${entry.slug}" is missing from programs/`);
+    }
+    generated.push(
+      await generateBundle(entry, config, packagesByProgram, input.clientsDir),
+    );
+  }
   return generated;
+}
+
+/**
+ * Generates an umbrella package that re-exports its bundled program packages.
+ * Must run after the bundled packages are generated, since it scans their
+ * exports for conflicts.
+ */
+async function generateBundle(
+  entry: BundlePackage,
+  config: BundleConfig,
+  packagesByProgram: Map<string, ProgramPackage>,
+  clientsDir: string,
+): Promise<string> {
+  const members: BundleMember[] = [];
+  for (const program of entry.programs) {
+    const member = packagesByProgram.get(program);
+    if (member === undefined) {
+      throw new Error(
+        `Bundle "${entry.slug}" references unknown program "${program}"`,
+      );
+    }
+    members.push({
+      program,
+      packageName: member.packageName,
+      exports: await collectGeneratedExports(join(clientsDir, member.slug)),
+    });
+  }
+  const plan = planBundleExports(members);
+
+  const packageDir = join(clientsDir, entry.slug);
+  const version =
+    (await readExistingVersion(packageDir)) ??
+    config.package.initialVersion ??
+    "0.0.0";
+  const templateInput = {
+    slug: entry.slug,
+    version,
+    package: config.package,
+    dependencies: members.map(({ program, packageName }) => ({
+      program,
+      packageName,
+    })),
+  };
+
+  await resetPackageDir(packageDir);
+  await mkdir(join(packageDir, "src"), { recursive: true });
+  await writeFile(
+    join(packageDir, "package.json"),
+    renderPackageJson(templateInput),
+  );
+  await writeFile(join(packageDir, "tsconfig.json"), renderTsconfig());
+  await writeFile(
+    join(packageDir, "src", "index.ts"),
+    renderBundleIndex(
+      renderEntryHeader(templateInput, "programs/bundles.ts"),
+      members,
+      plan,
+    ),
+  );
+  await writeFile(
+    join(packageDir, "README.md"),
+    renderBundleReadme(
+      templateInput,
+      [...plan.conflicts.keys()],
+      plan.namespaced.map(({ program, packageName }) => ({
+        program,
+        packageName,
+      })),
+    ),
+  );
+
+  console.log(
+    `Generated bundle ${entry.packageName} (clients/${entry.slug}) = ${members
+      .map((member) => member.packageName)
+      .join(" + ")}${
+      plan.conflicts.size > 0
+        ? ` (${plan.conflicts.size.toString()} conflicting name(s))`
+        : ""
+    }`,
+  );
+  return packageDir;
 }

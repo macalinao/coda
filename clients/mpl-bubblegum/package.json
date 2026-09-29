@@ -37,7 +37,7 @@
     "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@solana-programs/token-metadata": "workspace:*"
+    "@solana-programs/token-metadata": "workspace:^"
   },
   "peerDependencies": {
     "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",

@@ -110,7 +110,7 @@
       "files": [
         "packages/coda/**",
         "packages/create-coda/**",
-        "tools/megagraph/**"
+        "packages/megagraph/**"
       ],
       "rules": {
         "no-console": "off"

@@ -83,7 +83,7 @@ jobs:
       # and apply its visitors via native type stripping.
       - name: Verify graph/ and clients/ are generated from programs/
         run: |
-          node tools/megagraph/src/cli.ts graph
-          bun tools/megagraph/src/cli.ts generate
+          node scripts/megagraph.ts graph
+          bun scripts/megagraph.ts generate
           git add --all --intent-to-add graph clients
           git diff --exit-code -- graph clients

@@ -8,7 +8,6 @@
     "packages": [
       "apps/*",
       "packages/*",
-      "tools/*",
       "clients/*"
     ],
     "catalog": {
@@ -43,13 +42,14 @@
     "ci:version": "changeset version && bun update",
     "ci:publish": "./scripts/ci-publish.sh",
     "prepare": "husky",
-    "graph": "turbo run graph",
-    "codegen": "turbo run codegen",
+    "graph": "turbo run build --filter=@macalinao/megagraph... && bun scripts/megagraph.ts graph",
+    "codegen": "turbo run build --filter=@macalinao/megagraph... && bun scripts/megagraph.ts graph && bun scripts/megagraph.ts generate",
     "typecheck": "tsc -p tsconfig.configs.json",
     "size": "size-limit",
     "docs:dev": "turbo dev --filter=coda-docs",
     "docs:build": "turbo build --filter=coda-docs",
-    "format": "oxfmt"
+    "format": "oxfmt",
+    "export:solana-programs": "bun scripts/export-solana-programs.ts"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",

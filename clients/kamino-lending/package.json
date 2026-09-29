@@ -1,7 +1,7 @@
 {
   "name": "@solana-programs/kamino-lending",
   "version": "0.9.1",
-  "description": "TypeScript client for the Kamino Lending program",
+  "description": "TypeScript client for the Kamino Lending and Kamino Farms programs",
   "type": "module",
   "sideEffects": false,
   "author": "Ian Macalinao <me@ianm.com>",
@@ -15,6 +15,7 @@
     "typescript",
     "kamino",
     "lending",
+    "farms",
     "defi",
     "ian-macalinao"
   ],
@@ -35,7 +36,8 @@
     "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@solana-programs/kamino-farms": "workspace:*"
+    "@solana-programs/kamino-farms": "workspace:^",
+    "@solana-programs/kamino-klend": "workspace:^"
   },
   "peerDependencies": {
     "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",

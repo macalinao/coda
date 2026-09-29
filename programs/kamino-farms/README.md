@@ -19,4 +19,4 @@ const instruction = await getStakeInstructionAsync({
 });
 ```
 
-Accounts and instructions that clash with Kamino Lending's names keep the `farms` prefix they had in the combined `@solana-programs/kamino-lending` client (`FarmsUserState`, `FarmsGlobalConfig`, `farmsIdlMissingTypes`).
+Accounts and instructions that clash with Kamino Lending's names keep the `farms` prefix they had when both programs were rendered into one package (`FarmsUserState`, `FarmsGlobalConfig`, `farmsIdlMissingTypes`). [`@solana-programs/kamino-lending`](https://www.npmjs.com/package/@solana-programs/kamino-lending) still bundles both programs.

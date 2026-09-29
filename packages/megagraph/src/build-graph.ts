@@ -1,4 +1,5 @@
 import type { ProgramNode, RootNode } from "codama";
+import type { BundleConfig } from "./define-program.ts";
 import type { ProgramSource } from "./load-programs.ts";
 import { processConfig } from "@macalinao/coda";
 import { programNode, rootNode } from "codama";
@@ -24,6 +25,19 @@ export interface ProgramPackage {
 }
 
 /**
+ * Package metadata of one umbrella package, as recorded in
+ * `graph/packages.json`.
+ */
+export interface BundlePackage {
+  /** Directory name under `clients/`. */
+  slug: string;
+  /** npm package name. */
+  packageName: string;
+  /** Codama names of the bundled programs, in priority order. */
+  programs: string[];
+}
+
+/**
  * The merged program graph.
  */
 export interface Megagraph {
@@ -31,6 +45,8 @@ export interface Megagraph {
   root: RootNode;
   /** One entry per program, sorted by program name. */
   packages: ProgramPackage[];
+  /** One entry per umbrella package, sorted by slug. */
+  bundles: BundlePackage[];
 }
 
 /**
@@ -95,17 +111,73 @@ function assertUniqueProgramNames(
   }
 }
 
-function assertUniquePackageNames(sources: ProgramSource[]): void {
+function assertUniquePackageNames(
+  sources: ProgramSource[],
+  bundles: BundleConfig[],
+): void {
   const owners = new Map<string, string>();
-  for (const source of sources) {
-    const owner = owners.get(source.config.package.name);
-    if (owner !== undefined) {
+  const entries = [
+    ...sources.map((source) => ({
+      name: source.config.package.name,
+      owner: `programs/${source.slug}`,
+    })),
+    ...bundles.map((bundle) => ({
+      name: bundle.package.name,
+      owner: `bundle "${bundle.slug}"`,
+    })),
+  ];
+  for (const { name, owner } of entries) {
+    const existing = owners.get(name);
+    if (existing !== undefined) {
       throw new Error(
-        `Package name "${source.config.package.name}" is used by both programs/${owner} and programs/${source.slug}`,
+        `Package name "${name}" is used by both ${existing} and ${owner}`,
       );
     }
-    owners.set(source.config.package.name, source.slug);
+    owners.set(name, owner);
   }
+}
+
+/**
+ * Checks that bundles have unique slugs that do not clash with a program's
+ * package directory, and that they only bundle registered programs.
+ */
+function resolveBundles(
+  bundles: BundleConfig[],
+  sources: ProgramSource[],
+  programs: ProgramNode[],
+): BundlePackage[] {
+  const programNameBySlug = new Map(
+    sources.map((source, index) => [source.slug, programs[index]?.name]),
+  );
+  const slugs = new Set<string>();
+  const resolved = bundles.map((bundle) => {
+    if (programNameBySlug.has(bundle.slug) || slugs.has(bundle.slug)) {
+      throw new Error(
+        `Bundle slug "${bundle.slug}" clashes with another package directory under clients/`,
+      );
+    }
+    slugs.add(bundle.slug);
+    if (bundle.programs.length === 0) {
+      throw new Error(`Bundle "${bundle.slug}" does not bundle any program`);
+    }
+    if (new Set(bundle.programs).size !== bundle.programs.length) {
+      throw new Error(`Bundle "${bundle.slug}" lists a program twice`);
+    }
+    return {
+      slug: bundle.slug,
+      packageName: bundle.package.name,
+      programs: bundle.programs.map((slug) => {
+        const name = programNameBySlug.get(slug);
+        if (name === undefined) {
+          throw new Error(
+            `Bundle "${bundle.slug}" references unknown program "${slug}" (expected a directory under programs/)`,
+          );
+        }
+        return name;
+      }),
+    };
+  });
+  return resolved.toSorted((a, b) => a.slug.localeCompare(b.slug));
 }
 
 /**
@@ -123,16 +195,18 @@ function assertUniquePackageNames(sources: ProgramSource[]): void {
  */
 export async function buildMegagraph(
   sources: ProgramSource[],
+  bundleConfigs: BundleConfig[] = [],
 ): Promise<Megagraph> {
   if (sources.length === 0) {
     throw new Error("No programs found under programs/");
   }
-  assertUniquePackageNames(sources);
+  assertUniquePackageNames(sources, bundleConfigs);
 
   const firstPass = await Promise.all(
     sources.map((source) => processProgram(source, [])),
   );
   assertUniqueProgramNames(sources, firstPass);
+  const bundles = resolveBundles(bundleConfigs, sources, firstPass);
 
   const context = firstPass.map(toContextProgram);
   const programs = await Promise.all(
@@ -185,5 +259,6 @@ export async function buildMegagraph(
       packageName: source.config.package.name,
       dependencies: dependencies.get(program.name) ?? [],
     })),
+    bundles,
   };
 }

@@ -2,7 +2,7 @@
 
 Quarry Mine is the core liquidity mining program of the Quarry protocol: a rewarder distributes rewards across quarries (one per staked token mint), and miners stake into them.
 
-This package was previously part of `@solana-programs/quarry`, which bundled all six Quarry programs.
+[`@solana-programs/quarry`](https://www.npmjs.com/package/@solana-programs/quarry) bundles all six Quarry programs in one package.
 
 ## Usage
 

@@ -18,9 +18,11 @@ import { defineProgram } from "@macalinao/megagraph";
 
 export default defineProgram({
   package: {
-    name: "@solana-programs/kamino-lending",
-    description: "TypeScript client for the Kamino Lending program",
-    keywords: ["kamino", "lending", "defi", "ian-macalinao"],
+    name: "@solana-programs/kamino-klend",
+    description:
+      "TypeScript client for the Kamino Lending (klend) program on its own, without Kamino Farms",
+    keywords: ["kamino", "klend", "lending", "defi", "ian-macalinao"],
+    initialVersion: "0.9.1",
   },
   instructionAccountDefaultValues: [
     {

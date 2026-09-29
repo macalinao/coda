@@ -2,7 +2,7 @@
 
 Quarry Mint Wrapper owns the mint authority of a rewards token and hands out rate-limited minters; Quarry rewarders claim rewards through it.
 
-This package was previously part of `@solana-programs/quarry`, which bundled all six Quarry programs.
+[`@solana-programs/quarry`](https://www.npmjs.com/package/@solana-programs/quarry) bundles all six Quarry programs in one package.
 
 ## Usage
 

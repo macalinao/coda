@@ -35,7 +35,7 @@
     "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@solana-programs/quarry-mine": "workspace:*"
+    "@solana-programs/quarry-mine": "workspace:^"
   },
   "peerDependencies": {
     "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",

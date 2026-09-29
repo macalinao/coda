@@ -1,37 +1,23 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalEnv": [
-    "NODE_AUTH_TOKEN"
-  ],
+  "globalEnv": ["NODE_AUTH_TOKEN"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "./dist/**",
-        "./.next/**"
-      ],
-      "env": [
-        "NODE_ENV"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["./dist/**", "./.next/**"],
+      "env": ["NODE_ENV"]
     },
     "test": {
-      "dependsOn": [
-        "build"
-      ],
+      "dependsOn": ["build"],
       "cache": false
     },
     "test:run": {
-      "dependsOn": [
-        "build"
-      ],
+      "dependsOn": ["build"],
       "cache": false
     },
     "codegen": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["./src/generated/**"],
       "cache": false
     },
     "dev": {
@@ -39,12 +25,6 @@
       "cache": false
     },
     "clean": {
-      "cache": false
-    },
-    "graph": {
-      "dependsOn": [
-        "^build"
-      ],
       "cache": false
     }
   }

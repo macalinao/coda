@@ -1,9 +1,9 @@
 # Kamino Lending Program
 
-[![npm version](https://badge.fury.io/js/%40solana-programs%2Fkamino-lending.svg)](https://www.npmjs.com/package/%40solana-programs%2Fkamino-lending)
+[![npm version](https://badge.fury.io/js/%40solana-programs%2Fkamino-klend.svg)](https://www.npmjs.com/package/%40solana-programs%2Fkamino-klend)
 
 - Program ID: `KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD`
-- TypeScript Client: [`@solana-programs/kamino-lending`](https://www.npmjs.com/package/@solana-programs/kamino-lending)
+- TypeScript Client: [`@solana-programs/kamino-klend`](https://www.npmjs.com/package/@solana-programs/kamino-klend)
 
 ## Table of Contents
 

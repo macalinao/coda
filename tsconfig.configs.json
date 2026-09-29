@@ -16,6 +16,7 @@
   },
   "include": [
     "programs/*/program.config.ts",
+    "programs/bundles.ts",
     "packages/create-coda/template/coda.config.ts"
   ]
 }

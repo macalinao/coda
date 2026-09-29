@@ -1,19 +1,8 @@
-import type { ProgramConfig } from "./define-program.ts";
-import { basename, dirname, join, resolve } from "node:path";
+import type { BundleConfig, ProgramConfig } from "./define-program.ts";
+import { access } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { glob } from "glob";
-
-/** Root of the monorepo. */
-export const REPO_ROOT: string = resolve(import.meta.dirname, "../../..");
-
-/** Directory holding one sub-directory per program. */
-export const PROGRAMS_DIR: string = join(REPO_ROOT, "programs");
-
-/** Directory the megagraph and its package summary are written to. */
-export const GRAPH_DIR: string = join(REPO_ROOT, "graph");
-
-/** Directory every client package is generated into. */
-export const CLIENTS_DIR: string = join(REPO_ROOT, "clients");
 
 /** File name of a program's IDL inside its directory. */
 export const IDL_FILE = "idl.json";
@@ -33,7 +22,7 @@ export interface ProgramSource {
  * Loads every `programs/<slug>/program.config.ts`, sorted by slug.
  */
 export async function loadPrograms(
-  programsDir: string = PROGRAMS_DIR,
+  programsDir: string,
 ): Promise<ProgramSource[]> {
   const configPaths = (
     await glob("*/program.config.ts", { cwd: programsDir, absolute: true })
@@ -48,4 +37,26 @@ export async function loadPrograms(
     programs.push({ slug: basename(dir), dir, config: configModule.default });
   }
   return programs;
+}
+
+/** File under the programs directory that declares the umbrella packages. */
+export const BUNDLES_FILE = "bundles.ts";
+
+/**
+ * Loads the umbrella packages declared in `<programsDir>/bundles.ts`, or an
+ * empty list when the file does not exist.
+ */
+export async function loadBundles(
+  programsDir: string,
+): Promise<BundleConfig[]> {
+  const bundlesPath = join(programsDir, BUNDLES_FILE);
+  try {
+    await access(bundlesPath);
+  } catch {
+    return [];
+  }
+  const bundlesModule = (await import(pathToFileURL(bundlesPath).href)) as {
+    default: BundleConfig[];
+  };
+  return bundlesModule.default;
 }

@@ -16,7 +16,7 @@ bun add @solana-programs/quarry-redeemer @solana/kit
 
 Quarry Redeemer exchanges IOU tokens for their underlying redemption tokens.
 
-This package was previously part of `@solana-programs/quarry`, which bundled all six Quarry programs.
+[`@solana-programs/quarry`](https://www.npmjs.com/package/@solana-programs/quarry) bundles all six Quarry programs in one package.
 
 ## Usage
 

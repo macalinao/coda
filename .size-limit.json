@@ -1,5 +1,24 @@
 [
   {
+    "name": "goki: one instruction",
+    "path": "clients/goki/dist/index.js",
+    "import": "{ getApproveInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "400 B"
+  },
+  {
+    "name": "goki: entire client",
+    "path": "clients/goki/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "5.5 KB"
+  },
+  {
     "name": "goki-smart-wallet: one instruction",
     "path": "clients/goki-smart-wallet/dist/index.js",
     "import": "{ getApproveInstruction }",
@@ -55,6 +74,25 @@
       "@solana/program-client-core"
     ],
     "limit": "10 KB"
+  },
+  {
+    "name": "kamino-klend: one instruction",
+    "path": "clients/kamino-klend/dist/index.js",
+    "import": "{ getBorrowObligationLiquidityInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "750 B"
+  },
+  {
+    "name": "kamino-klend: entire client",
+    "path": "clients/kamino-klend/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "22 KB"
   },
   {
     "name": "kamino-lending: one instruction",
@@ -169,6 +207,25 @@
       "@solana/program-client-core"
     ],
     "limit": "15 KB"
+  },
+  {
+    "name": "quarry: one instruction",
+    "path": "clients/quarry/dist/index.js",
+    "import": "{ getClaimRewardsInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "750 B"
+  },
+  {
+    "name": "quarry: entire client",
+    "path": "clients/quarry/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "18 KB"
   },
   {
     "name": "quarry-merge-mine: one instruction",
@@ -340,6 +397,25 @@
       "@solana/program-client-core"
     ],
     "limit": "19 KB"
+  },
+  {
+    "name": "tribeca: one instruction",
+    "path": "clients/tribeca/dist/index.js",
+    "import": "{ getCastVoteInstruction }",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "500 B"
+  },
+  {
+    "name": "tribeca: entire client",
+    "path": "clients/tribeca/dist/index.js",
+    "ignore": [
+      "@solana/kit",
+      "@solana/program-client-core"
+    ],
+    "limit": "10.5 KB"
   },
   {
     "name": "tribeca-govern: one instruction",

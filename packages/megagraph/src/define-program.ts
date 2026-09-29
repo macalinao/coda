@@ -26,7 +26,7 @@ export interface ProgramPackageConfig {
  * always generated into `clients/<slug>/`. The visitors run on a root whose
  * main program is this program, so bare selectors and links (e.g.
  * `pdaLinkNode("miner")`) refer to this program. Every other program in the
- * repository is also present in that root, which is what lets a
+ * repository is also present in that root (PDAs only), which is what lets a
  * program-qualified link such as `pdaLinkNode("metadata", "tokenMetadata")`
  * resolve; changes the visitors make to those other programs are discarded.
  */
@@ -42,4 +42,30 @@ export interface ProgramConfig extends Pick<
  */
 export function defineProgram(config: ProgramConfig): ProgramConfig {
   return config;
+}
+
+/**
+ * An umbrella package that re-exports several program packages, e.g. the
+ * historical `@solana-programs/quarry` bundling the six Quarry programs.
+ *
+ * A bundle contains no rendered code: its generated `package.json` depends
+ * on the bundled program packages and its `src/index.ts` re-exports them.
+ */
+export interface BundleConfig {
+  /** Package directory under `clients/`. Must not clash with a program slug. */
+  slug: string;
+  package: ProgramPackageConfig;
+  /**
+   * Slugs of the bundled programs (directories under `programs/`), in
+   * priority order: when two bundled packages export the same name, the
+   * bundle re-exports the one from the program listed first.
+   */
+  programs: string[];
+}
+
+/**
+ * Define the umbrella packages in `programs/bundles.ts`.
+ */
+export function defineBundles(bundles: BundleConfig[]): BundleConfig[] {
+  return bundles;
 }

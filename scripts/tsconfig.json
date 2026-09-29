@@ -1,0 +1,14 @@
+{
+  "extends": "@macalinao/tsconfig/tsconfig.node.json",
+  "compilerOptions": {
+    "types": ["node", "bun"],
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "declaration": false,
+    "declarationMap": false,
+    "isolatedDeclarations": false
+  },
+  "include": ["./*.ts"]
+}

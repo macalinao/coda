@@ -16,7 +16,7 @@ bun add @solana-programs/quarry-registry @solana/kit
 
 Quarry Registry keeps an on-chain list of the quarries of a rewarder.
 
-This package was previously part of `@solana-programs/quarry`, which bundled all six Quarry programs.
+[`@solana-programs/quarry`](https://www.npmjs.com/package/@solana-programs/quarry) bundles all six Quarry programs in one package.
 
 ## Usage
 

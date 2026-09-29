@@ -28,8 +28,8 @@
     },
     {
       "program": "kaminoLending",
-      "slug": "kamino-lending",
-      "packageName": "@solana-programs/kamino-lending",
+      "slug": "kamino-klend",
+      "packageName": "@solana-programs/kamino-klend",
       "dependencies": [
         "farms"
       ]
@@ -136,6 +136,44 @@
       "slug": "orca-whirlpools",
       "packageName": "@solana-programs/orca-whirlpools",
       "dependencies": []
+    }
+  ],
+  "bundles": [
+    {
+      "slug": "goki",
+      "packageName": "@solana-programs/goki",
+      "programs": [
+        "smartWallet",
+        "tokenSigner"
+      ]
+    },
+    {
+      "slug": "kamino-lending",
+      "packageName": "@solana-programs/kamino-lending",
+      "programs": [
+        "kaminoLending",
+        "farms"
+      ]
+    },
+    {
+      "slug": "quarry",
+      "packageName": "@solana-programs/quarry",
+      "programs": [
+        "quarryMine",
+        "quarryMergeMine",
+        "quarryMintWrapper",
+        "quarryOperator",
+        "quarryRedeemer",
+        "quarryRegistry"
+      ]
+    },
+    {
+      "slug": "tribeca",
+      "packageName": "@solana-programs/tribeca",
+      "programs": [
+        "lockedVoter",
+        "govern"
+      ]
     }
   ]
 }
