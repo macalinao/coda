@@ -82,3 +82,31 @@ export function checkPeerRanges(input: {
   }
   return problems;
 }
+
+/**
+ * Checks an external package's range against every shared peer it also
+ * declares (e.g. the generated clients' `@solana/kit` range). Returns the
+ * problems found and the shared peers that were checked.
+ */
+export function checkExternalPeerRanges(input: {
+  matrix: PeerMatrix;
+  externalRange: string;
+  peerDependencies: Record<string, string>;
+}): { problems: string[]; checked: [string, string][] } {
+  const checked = Object.entries(input.peerDependencies).filter(([name]) =>
+    Object.values(input.matrix.versions).some(
+      (version) => version.peerDependencies?.[name] !== undefined,
+    ),
+  );
+  return {
+    checked,
+    problems: checked.flatMap(([sharedPeer, sharedRange]) =>
+      checkPeerRanges({
+        matrix: input.matrix,
+        externalRange: input.externalRange,
+        sharedPeer,
+        sharedRange,
+      }),
+    ),
+  };
+}

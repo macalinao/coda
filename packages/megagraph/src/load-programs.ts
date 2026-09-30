@@ -1,6 +1,5 @@
 import type {
   ExternalProgramConfig,
-  ExternalProgramDefinition,
   MegagraphConfig,
   ProgramConfig,
   ProtocolConfig,
@@ -126,16 +125,16 @@ export async function loadPrograms(programsDir: string): Promise<{
         `programs/${protocol}/${program}: missing programs/${protocol}/${PROTOCOL_CONFIG_FILE}`,
       );
     }
-    const config = await importDefault<
-      ProgramConfig | ExternalProgramDefinition
-    >(path);
-    if ("external" in config) {
+    const config = await importDefault<ProgramConfig | ExternalProgramConfig>(
+      path,
+    );
+    if ("npm" in config) {
       externals.push({
         protocol,
         program,
         slug: `${protocol}/${program}`,
         dir,
-        external: config.external,
+        external: config,
       });
       continue;
     }

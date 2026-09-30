@@ -7,6 +7,79 @@ const BASE_KEYWORDS = ["coda", "solana", "client", "esm", "typescript"];
 export interface PackageDependency {
   program: string;
   packageName: string;
+  /** Directory of the package in the mirror, e.g. `packages/quarry/mine`. */
+  path: string;
+}
+
+/** Where the generated packages are published as source. */
+export interface MirrorLocation {
+  /** GitHub repository, e.g. `toolboxdao/solana-programs`. */
+  repository: string;
+  defaultBranch: string;
+}
+
+/** URL of a directory of the mirror at a ref (branch or tag). */
+export function mirrorTreeUrl(
+  mirror: MirrorLocation,
+  ref: string,
+  path: string,
+): string {
+  return `https://github.com/${mirror.repository}/tree/${encodeURIComponent(ref)}/${path}`;
+}
+
+/** Delimits the README section `release apply` rewrites for each version. */
+export const SOURCE_SECTION_START = "<!-- megagraph:source -->";
+export const SOURCE_SECTION_END = "<!-- /megagraph:source -->";
+
+/**
+ * Renders the README section linking a package to its source in the mirror:
+ * its directory at the release tag (`<name>@<version>`, created by the
+ * release that publishes this version), on the default branch, and the
+ * inputs it is generated from.
+ */
+export function renderSourceSection(input: {
+  name: string;
+  version: string;
+  /** Directory of the package in the mirror. */
+  path: string;
+  /** Directory of the package's inputs, e.g. `programs/quarry/mine`. */
+  source: string;
+  mirror: MirrorLocation;
+}): string {
+  const { name, version, path, source, mirror } = input;
+  const tag = `${name}@${version}`;
+  return [
+    SOURCE_SECTION_START,
+    "## Source",
+    "",
+    `This package is generated; its source is published in [\`${mirror.repository}\`](https://github.com/${mirror.repository}):`,
+    "",
+    `- This release (\`${tag}\`): [\`${path}\`](${mirrorTreeUrl(mirror, tag, path)})`,
+    `- Latest (\`${mirror.defaultBranch}\`): [\`${path}\`](${mirrorTreeUrl(mirror, mirror.defaultBranch, path)})`,
+    `- Generator inputs: [\`${source}\`](${mirrorTreeUrl(mirror, mirror.defaultBranch, source)})`,
+    SOURCE_SECTION_END,
+  ].join("\n");
+}
+
+/**
+ * Replaces the source section of a README (see {@link renderSourceSection}).
+ * Returns the README unchanged when it has none.
+ */
+export function replaceSourceSection(readme: string, section: string): string {
+  const start = readme.indexOf(SOURCE_SECTION_START);
+  const end = readme.indexOf(SOURCE_SECTION_END);
+  if (start === -1 || end === -1 || end < start) {
+    return readme;
+  }
+  return (
+    readme.slice(0, start) +
+    section +
+    readme.slice(end + SOURCE_SECTION_END.length)
+  );
+}
+
+function mirrorLink(mirror: MirrorLocation, dependency: PackageDependency) {
+  return `[\`${dependency.packageName}\`](https://www.npmjs.com/package/${dependency.packageName}) ([source](${mirrorTreeUrl(mirror, mirror.defaultBranch, dependency.path)}))`;
 }
 
 export interface PackageTemplateInput {
@@ -17,6 +90,9 @@ export interface PackageTemplateInput {
   keywords: string[];
   /** Directory the package is generated from, e.g. `programs/quarry/mine`. */
   source: string;
+  /** Directory of the package in the generated workspace and the mirror. */
+  path: string;
+  mirror: MirrorLocation;
   dependencies: PackageDependency[];
   /**
    * Peer dependencies: the repository-wide ones plus the external packages
@@ -43,7 +119,13 @@ export function renderPackageJson(input: PackageTemplateInput): string {
     type: "module",
     sideEffects: false,
     author: "Ian Macalinao <me@ianm.com>",
-    homepage: "https://coda.ianm.com",
+    // The package's source in the mirror. npm provenance only checks
+    // `repository`, which has to stay the publishing repository (coda).
+    homepage: mirrorTreeUrl(
+      input.mirror,
+      input.mirror.defaultBranch,
+      input.path,
+    ),
     license: "Apache-2.0",
     keywords,
     main: "dist/index.js",
@@ -183,12 +265,13 @@ export function renderReadme(
         "",
         ...input.dependencies.map(
           (dependency) =>
-            `- \`${dependency.program}\`: [\`${dependency.packageName}\`](https://www.npmjs.com/package/${dependency.packageName})`,
+            `- \`${dependency.program}\`: ${mirrorLink(input.mirror, dependency)}`,
         ),
       ].join("\n"),
     );
   }
   sections.push(
+    renderSourceSection(input),
     [
       "## License",
       "",
@@ -228,7 +311,7 @@ export function renderUmbrellaReadme(
       "",
       ...input.dependencies.map(
         (dependency) =>
-          `- \`${dependency.program}\`: [\`${dependency.packageName}\`](https://www.npmjs.com/package/${dependency.packageName})`,
+          `- \`${dependency.program}\`: ${mirrorLink(input.mirror, dependency)}`,
       ),
     ].join("\n"),
   ];
@@ -247,6 +330,7 @@ export function renderUmbrellaReadme(
     );
   }
   sections.push(
+    renderSourceSection(input),
     [
       "## License",
       "",

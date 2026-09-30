@@ -123,14 +123,21 @@ jobs:
 
   # Type-checks a sample of generated clients (including ones that link to
   # @solana-program/token) against the oldest and newest @solana/kit of each
-  # major we support, with a @solana-program/token that accepts it, to prove
-  # the published peer ranges.
+  # major we support, and against every @solana-program/token minor in the
+  # external range (each with a @solana/kit it accepts), to prove the
+  # published peer ranges.
   client-compat:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
+          - kit: 6.10.0
+            token: 0.11.0
+          - kit: 6.10.0
+            token: 0.12.0
+          - kit: 6.10.0
+            token: 0.13.0
           - kit: 6.10.0
             token: 0.14.0
           - kit: 7.0.0

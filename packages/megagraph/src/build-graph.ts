@@ -370,7 +370,7 @@ export async function buildMegagraph(input: {
     ),
     ...externalEntries.map(
       ({ source, program }) =>
-        [program.name as string, source.external.package] as const,
+        [program.name as string, source.external.npm.package] as const,
     ),
   ]);
   const unresolved = findUnresolvedLinks(root);
@@ -432,8 +432,8 @@ export async function buildMegagraph(input: {
         program: program.name as string,
         protocol: source.protocol,
         slug: source.slug,
-        packageName: source.external.package,
-        peerRange: source.external.peerRange,
+        packageName: source.external.npm.package,
+        peerRange: source.external.npm.range,
       }))
       .toSorted((a, b) => a.program.localeCompare(b.program)),
   };

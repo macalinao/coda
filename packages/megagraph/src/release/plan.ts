@@ -11,6 +11,7 @@ import {
   getUmbrellaPackagePath,
 } from "../load-programs.ts";
 import { diffProgram, maxLevel } from "./classify.ts";
+import { replaceSourceSection, SOURCE_SECTION_START } from "../templates.ts";
 import { diffManifest } from "./manifest.ts";
 
 /** How a package's version moves in a release. */
@@ -83,7 +84,15 @@ async function readPackageFiles(
         files.set(file, content);
       }
     } else {
-      files.set(relative(root, path), await readFile(path, "utf-8"));
+      const content = await readFile(path, "utf-8");
+      // The README's source links name the released version, so they differ
+      // between a fresh generation and the release state by design.
+      files.set(
+        relative(root, path),
+        entry.name === "README.md"
+          ? replaceSourceSection(content, SOURCE_SECTION_START)
+          : content,
+      );
     }
   }
   return files;

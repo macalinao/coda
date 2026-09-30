@@ -2,7 +2,11 @@ import type { ProgramNode } from "codama";
 import type { Megagraph, UmbrellaPackage } from "./build-graph.ts";
 import type { BundleMember } from "./bundle.ts";
 import type { ProgramSource, ProtocolSource } from "./load-programs.ts";
-import type { PackageDependency, PackageTemplateInput } from "./templates.ts";
+import type {
+  MirrorLocation,
+  PackageDependency,
+  PackageTemplateInput,
+} from "./templates.ts";
 import {
   copyFile,
   mkdir,
@@ -105,6 +109,8 @@ export interface GeneratePackagesInput {
   megagraph: Megagraph;
   /** Peer dependencies every generated package declares (e.g. `@solana/kit`). */
   peerDependencies: Record<string, string>;
+  /** Where the generated packages are published as source (READMEs link to it). */
+  mirror: MirrorLocation;
   programs: ProgramSource[];
   protocols: ProtocolSource[];
   /** Directory holding `programs/`; used for source paths in manifests. */
@@ -178,7 +184,11 @@ export async function generatePackages(
             `Program "${entry.program}" links to unknown program "${name}"`,
           );
         }
-        return { program: name, packageName: dependency.packageName };
+        return {
+          program: name,
+          packageName: dependency.packageName,
+          path: getProgramPackagePath(dependency),
+        };
       });
 
     // The renderer needs every program reachable through links, since a
@@ -211,6 +221,8 @@ export async function generatePackages(
         ...(source.config.package.keywords ?? []),
       ],
       source: relative(input.repoRoot, source.dir),
+      path: getProgramPackagePath(entry),
+      mirror: input.mirror,
       dependencies,
       peerDependencies: input.peerDependencies,
     };
@@ -334,15 +346,22 @@ async function generateUmbrella(
     input.outDir,
     getUmbrellaPackagePath(umbrella.protocol),
   );
+  const memberPath = (program: string): string => {
+    const member = packagesByProgram.get(program);
+    return member === undefined ? "" : getProgramPackagePath(member);
+  };
   const templateInput: PackageTemplateInput = {
     name: umbrella.packageName,
     version: umbrella.version,
     description: config.description,
     keywords: [...(protocol.config.keywords ?? []), ...(config.keywords ?? [])],
     source: relative(input.repoRoot, protocol.dir),
+    path: getUmbrellaPackagePath(umbrella.protocol),
+    mirror: input.mirror,
     dependencies: members.map(({ program, packageName }) => ({
       program,
       packageName,
+      path: memberPath(program),
     })),
     // An umbrella re-exports its members, so it takes the union of their
     // peers.
@@ -378,6 +397,7 @@ async function generateUmbrella(
       plan.namespaced.map(({ program, packageName }) => ({
         program,
         packageName,
+        path: memberPath(program),
       })),
     ),
   );

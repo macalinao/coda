@@ -63,8 +63,8 @@ export {
   renderPlanMarkdown,
 } from "./release/plan.ts";
 export type {
+  ExternalNpmPackage,
   ExternalProgramConfig,
-  ExternalProgramDefinition,
   MegagraphConfig,
 } from "./define-program.ts";
 export { defineExternalProgram, defineMegagraph } from "./define-program.ts";
@@ -72,4 +72,12 @@ export type { ExternalProgramEntry } from "./build-graph.ts";
 export type { ExternalProgramSource } from "./load-programs.ts";
 export { loadMegagraphConfig, MEGAGRAPH_CONFIG_FILE } from "./load-programs.ts";
 export type { PeerMatrix } from "./peers.ts";
-export { checkPeerRanges } from "./peers.ts";
+export { checkExternalPeerRanges, checkPeerRanges } from "./peers.ts";
+export type { MirrorLocation } from "./templates.ts";
+export {
+  mirrorTreeUrl,
+  renderSourceSection,
+  replaceSourceSection,
+  SOURCE_SECTION_END,
+  SOURCE_SECTION_START,
+} from "./templates.ts";

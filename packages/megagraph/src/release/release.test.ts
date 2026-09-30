@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pdaNode, programNode, rootNode } from "codama";
 import { writeMegagraph } from "../graph-files.ts";
+import { renderSourceSection } from "../templates.ts";
 import { applyRelease, prependChangelogEntry } from "./apply.ts";
 import { diffManifest } from "./manifest.ts";
 import { bumpVersion, planRelease } from "./plan.ts";
@@ -174,6 +175,7 @@ describe("planRelease and applyRelease", () => {
         {
           name: "@s/q-mine",
           dependencies: { "@s/q-mint-wrapper": "workspace:^" },
+          repository: { directory: "programs/q/mine" },
         },
       ],
       ["packages/q/registry", { name: "@s/q-registry" }],
@@ -196,6 +198,23 @@ describe("planRelease and applyRelease", () => {
     await writeFile(
       join(mirror, "packages/q/mine/CHANGELOG.md"),
       "# @s/q-mine\n\n## 1.2.0\n\n- Before\n",
+    );
+    const mirrorLocation = { repository: "org/mirror", defaultBranch: "main" };
+    const sourceSection = (version: string) =>
+      renderSourceSection({
+        name: "@s/q-mine",
+        version,
+        path: "packages/q/mine",
+        source: "programs/q/mine",
+        mirror: mirrorLocation,
+      });
+    await writeFile(
+      join(clients, "packages/q/mine/README.md"),
+      `# @s/q-mine\n\n${sourceSection("0.1.0")}\n`,
+    );
+    await writeFile(
+      join(mirror, "packages/q/mine/README.md"),
+      `# @s/q-mine\n\n${sourceSection("1.2.0")}\n`,
     );
 
     const plan = await planRelease({
@@ -232,7 +251,14 @@ describe("planRelease and applyRelease", () => {
       clientsDir: clients,
       mirrorDir: mirror,
       source: { repository: "macalinao/coda", commit: "0123456789abcdef" },
+      mirror: mirrorLocation,
     });
+    expect(
+      await readFile(join(clients, "packages/q/mine/README.md"), "utf-8"),
+    ).toBe(`# @s/q-mine\n\n${sourceSection("1.2.1")}\n`);
+    expect(sourceSection("1.2.1")).toContain(
+      "https://github.com/org/mirror/tree/%40s%2Fq-mine%401.2.1/packages/q/mine",
+    );
     const mineManifest = JSON.parse(
       await readFile(join(clients, "packages/q/mine/package.json"), "utf-8"),
     ) as { version: string };

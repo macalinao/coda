@@ -3,7 +3,7 @@ import type { CliContext } from "./context.ts";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { loadPrograms } from "../load-programs.ts";
-import { checkPeerRanges } from "../peers.ts";
+import { checkExternalPeerRanges } from "../peers.ts";
 
 /** Snapshot of an external package's peers, next to its vendored IDL. */
 const SNAPSHOT_FILE = "npm-peers.json";
@@ -60,7 +60,7 @@ export async function peersCommand(
   const problems: string[] = [];
   for (const external of externals) {
     const snapshotPath = join(external.dir, SNAPSHOT_FILE);
-    const packageName = external.external.package;
+    const packageName = external.external.npm.package;
     if (mode !== "check") {
       const fresh = serialize(await fetchMatrix(packageName));
       if (mode === "refresh") {
@@ -75,24 +75,14 @@ export async function peersCommand(
     const matrix = JSON.parse(
       await readFile(snapshotPath, "utf-8"),
     ) as PeerMatrix;
-    const shared = Object.entries(context.config.peerDependencies).filter(
-      ([name]) =>
-        Object.values(matrix.versions).some(
-          (version) => version.peerDependencies?.[name] !== undefined,
-        ),
-    );
-    for (const [sharedPeer, sharedRange] of shared) {
-      problems.push(
-        ...checkPeerRanges({
-          matrix,
-          externalRange: external.external.peerRange,
-          sharedPeer,
-          sharedRange,
-        }),
-      );
-    }
+    const { problems: found, checked: shared } = checkExternalPeerRanges({
+      matrix,
+      externalRange: external.external.npm.range,
+      peerDependencies: context.config.peerDependencies,
+    });
+    problems.push(...found);
     console.log(
-      `${packageName} ${external.external.peerRange}: checked against ${shared.map(([name, range]) => `${name} ${range}`).join(", ")}`,
+      `${packageName} ${external.external.npm.range}: checked against ${shared.map(([name, range]) => `${name} ${range}`).join(", ")}`,
     );
   }
   if (problems.length > 0) {

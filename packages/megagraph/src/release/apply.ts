@@ -1,6 +1,8 @@
+import type { MirrorLocation } from "../templates.ts";
 import type { PackageRelease, ReleasePlan } from "./plan.ts";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { renderSourceSection, replaceSourceSection } from "../templates.ts";
 
 async function readOptional(path: string): Promise<string | null> {
   try {
@@ -71,15 +73,38 @@ export async function applyRelease(input: {
   clientsDir: string;
   mirrorDir: string;
   source: { repository: string; commit: string };
+  /** When given, README source links are pointed at the release's tag. */
+  mirror?: MirrorLocation;
 }): Promise<void> {
   for (const release of input.plan.packages) {
     const packageDir = join(input.clientsDir, release.path);
     const manifestPath = join(packageDir, "package.json");
     const manifest = JSON.parse(await readFile(manifestPath, "utf-8")) as {
       version: string;
+      repository?: { directory?: string };
     };
     manifest.version = release.version;
     await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+    // The README links to the mirror at the tag of this release.
+    const readmePath = join(packageDir, "README.md");
+    const readme = await readOptional(readmePath);
+    const source = manifest.repository?.directory;
+    if (input.mirror !== undefined && readme !== null && source !== undefined) {
+      await writeFile(
+        readmePath,
+        replaceSourceSection(
+          readme,
+          renderSourceSection({
+            name: release.name,
+            version: release.version,
+            path: release.path,
+            source,
+            mirror: input.mirror,
+          }),
+        ),
+      );
+    }
 
     const changelogPath = join(packageDir, "CHANGELOG.md");
     const previous =

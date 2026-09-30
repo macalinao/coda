@@ -95,6 +95,10 @@ export async function generateCommand(context: CliContext): Promise<void> {
   await generatePackages({
     megagraph: await readMegagraph(context.graphDir),
     peerDependencies: config.peerDependencies,
+    mirror: {
+      repository: config.workspace.repository,
+      defaultBranch: config.workspace.defaultBranch,
+    },
     programs: sources.programs,
     protocols: sources.protocols,
     repoRoot: context.root,
@@ -219,6 +223,10 @@ export async function releaseApplyCommand(
     clientsDir: context.clientsDir,
     mirrorDir: resolve(mirrorDir),
     source: { repository: context.config.sourceRepository, commit },
+    mirror: {
+      repository: context.config.workspace.repository,
+      defaultBranch: context.config.workspace.defaultBranch,
+    },
   });
   const released = getReleasedPackages(plan);
   console.log(

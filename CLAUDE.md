@@ -314,8 +314,8 @@ dependencies and must stay acyclic. oxlint bans the raw `pdaLinkNode`,
 **External programs** (e.g. `programs/solana/token/`) are programs whose
 client is published by someone else. Their `idl.json` is a vendored Codama IDL
 (record the source repository, tag and commit in the config) and their
-`program.config.ts` uses `defineExternalProgram({ external: { package,
-peerRange, source, handles } })`. They are in the graph for link resolution
+`program.config.ts` uses `defineExternalProgram({ npm: { package, range },
+source, handles })`. They are in the graph for link resolution
 and validation but never rendered, never packaged and never released. The
 graph build asserts that every handle the config exports (program handles,
 `definePdas` PDAs) matches the IDL exactly. Addresses and the associated
@@ -326,13 +326,17 @@ default account rules) become links to the external programs
 rendered code imports an external package gets it as a peer dependency (and a
 `catalog:` devDependency); umbrellas take the union of their members' peers.
 
-**Peer ranges** live in `programs/peer-ranges.ts`: the `@solana/kit` range of
-every client and each external package's range. `programs/peer-ranges.test.ts`
-checks them against the `npm-peers.json` snapshot next to each external IDL
-(every external version in range accepts a supported kit, every kit major is
-covered); CI runs `bun run megagraph peers --verify` to check the snapshot
-against npm (`--refresh` rewrites it) and type-checks sample clients against
-the oldest and newest kit of each major (`megagraph compat`).
+**Peer ranges**: the `@solana/kit` / `@solana/program-client-core` range of
+every client is `peerDependencies` in `programs/megagraph.config.ts`; each
+external program declares its own supported versions in its config
+(`defineExternalProgram({ npm: { package, range }, ... })`), which become the
+peer range of every package whose code imports it.
+`programs/peers.test.ts` checks every external range against the kit range
+using the `npm-peers.json` snapshot next to each external IDL (every version
+in range accepts a supported kit, every kit major is covered); CI runs
+`bun run megagraph peers --verify` to check the snapshot against npm
+(`--refresh` rewrites it) and type-checks sample clients against the oldest
+and newest kit of each major and every external minor (`megagraph compat`).
 
 `bun run graph` runs every config on a root whose main program is that program
 (so bare selectors like `updateAccountsVisitor({ miner })` only match it),
@@ -345,6 +349,13 @@ repository's workspaces, so a fresh clone installs without it):
 `packages/<protocol>/<program>/` per program, `packages/<protocol>/` per
 umbrella. Each link into another program becomes a `workspace:^` dependency
 and an import from that package instead of re-emitted code.
+
+Generated READMEs link to each package's directory in the mirror
+(`workspace.repository` and `workspace.defaultBranch` in
+`programs/megagraph.config.ts`), both at the release tag `<pkg>@<version>`
+(rewritten by `release apply`) and on the default branch; umbrella READMEs
+link their members. `homepage` points at the mirror directory, while
+`repository` stays coda, as npm provenance requires.
 
 Fresh clone: `bun install && bun run codegen && bun run build`.
 

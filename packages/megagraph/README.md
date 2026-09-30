@@ -21,7 +21,7 @@ megagraph peers [--refresh|--verify]
 megagraph compat --kit <version> [--with <pkg>@<version>]... --clients <a,b>
 ```
 
-External programs (clients published elsewhere, e.g. `@solana-program/token`) are declared with `defineExternalProgram` next to a vendored Codama IDL: they are linked to and validated, never generated, and become peer dependencies of the packages whose code imports them.
+External programs (clients published elsewhere, e.g. `@solana-program/token`) are declared with `defineExternalProgram({ npm: { package, range }, source, handles })` next to a vendored Codama IDL: they are linked to and validated, never generated, and become peer dependencies of the packages whose code imports them.
 
 ## License
 
