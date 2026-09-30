@@ -204,19 +204,38 @@ Creates a visitor that renders ESM-compatible TypeScript:
 ```typescript
 function renderESMTypeScriptVisitor(
   outputDir: string,
-  options?: RenderOptions,
+  options?: RenderESMTypeScriptOptions,
 ): Visitor;
 
-interface RenderOptions {
-  // Inherits all options from @codama/renderers-js
-  // Additional ESM-specific options may be added
+interface RenderESMTypeScriptOptions {
+  // Programs in the root owned by other packages: program name -> module.
+  externalPrograms?: Record<string, string>;
+  // Extra `linkOverrides` passed through to @codama/renderers-js.
+  linkOverrides?: LinkOverrides;
 }
 ```
 
 **Parameters:**
 
 - `outputDir`: Directory where files will be generated
-- `options`: Optional configuration for the renderer
+- `options.externalPrograms`: Programs that must be in the root so that links into them resolve (a PDA default value needs the PDA's seeds), but whose code lives in another package. Every link from a local program into one of them is imported from the given module, none of their files are written, and the barrels only export the local programs.
+- `options.linkOverrides`: Passed through to `@codama/renderers-js`, taking precedence over the overrides derived from `externalPrograms`
+
+```typescript
+import { renderESMTypeScriptVisitor } from "@macalinao/codama-renderers-js-esm";
+import { rootNode, visit } from "codama";
+
+// bubblegum links to pdaLinkNode("metadata", "tokenMetadata")
+visit(
+  rootNode(bubblegumProgram, [tokenMetadataProgram]),
+  renderESMTypeScriptVisitor("./src/generated", {
+    externalPrograms: { tokenMetadata: "@solana-programs/token-metadata" },
+  }),
+);
+// => import { findMetadataPda } from "@solana-programs/token-metadata";
+```
+
+`linkOverrides` are keyed by node name only, so the renderer throws if a linked external name is also declared by a local node of the same kind (or by two external programs owned by different modules). A local node that merely shares a name with an unlinked external node is fine: the local file always wins.
 
 ## How It Works
 

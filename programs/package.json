@@ -1,0 +1,15 @@
+{
+  "name": "@solana-programs/programs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Inputs of the program megagraph: one directory per protocol and program (IDL, config, README)",
+  "type": "module",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@macalinao/coda": "workspace:^",
+    "@macalinao/megagraph": "workspace:^",
+    "@macalinao/tsconfig": "catalog:",
+    "@types/bun": "catalog:",
+    "@types/node": "catalog:"
+  }
+}

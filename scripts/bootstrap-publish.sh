@@ -17,6 +17,11 @@ set -euo pipefail
 # exactly what happened to @solana-programs/goki@0.2.0 on 2026-08-15.
 # The stub also leaves `latest` unset until the first real release claims it.
 #
+# Tooling packages (packages/*) are released by release.yml. The generated
+# @solana-programs/* clients are released by release-clients.yml from the
+# generated clients/ workspace, so run `bun run codegen` first to bootstrap
+# new client names.
+#
 # Run this locally, once, whenever a new package is added to the repo:
 #
 #   npm login                       # or export NPM_TOKEN
@@ -26,7 +31,6 @@ set -euo pipefail
 # Requires npm >= 11.10.0 for `npm trust`.
 
 REPO="macalinao/coda"
-WORKFLOW="release.yml"
 STUB_VERSION="0.0.0-bootstrap"
 STUB_TAG="bootstrap"
 
@@ -45,12 +49,10 @@ trap 'rm -rf "$STUB_DIR"' EXIT
 
 bootstrap_dir() {
   local dir="$1"
-  local name abs
+  local workflow="$2"
+  local name
 
-  # node's require() needs an absolute path -- a bare relative one resolves
-  # against the module paths, not the cwd.
-  abs="$(cd "$dir" && pwd)"
-  name="$(node -p "require('$abs/package.json').name")"
+  name="$(jq -r .name "$dir/package.json")"
 
   if npm view "$name" version --json >/dev/null 2>&1; then
     echo "ok    $name -- already on the registry, nothing to bootstrap"
@@ -58,7 +60,7 @@ bootstrap_dir() {
   fi
 
   if [ "$EXECUTE" = false ]; then
-    echo "would $name@$STUB_VERSION -- publish stub with token, then configure trusted publisher"
+    echo "would $name@$STUB_VERSION -- publish stub with token, then trust $workflow"
     return
   fi
 
@@ -67,25 +69,22 @@ bootstrap_dir() {
   local out="$STUB_DIR/$(basename "$dir")"
   mkdir -p "$out"
 
-  node -e "
-    const fs = require('node:fs');
-    const pkg = require('$abs/package.json');
-    fs.writeFileSync('$out/package.json', JSON.stringify({
-      name: pkg.name,
-      version: '$STUB_VERSION',
-      description: 'Placeholder to bootstrap npm trusted publishing. See ' + (pkg.homepage ?? 'https://github.com/$REPO'),
-      license: pkg.license,
-      repository: pkg.repository,
-    }, null, 2) + '\n');
-  "
+  jq --arg version "$STUB_VERSION" --arg repo "https://github.com/$REPO" '{
+    name,
+    version: $version,
+    description: ("Placeholder to bootstrap npm trusted publishing. See " + (.homepage // $repo)),
+    license,
+    repository,
+  }' "$dir/package.json" > "$out/package.json"
 
+  # npm, not bun: `npm trust` below only exists in the npm CLI.
   # No --provenance here: this publish is token-authenticated, not OIDC.
   # --tag keeps the `latest` tag free for the first real release.
   npm publish "$out" --access public --tag "$STUB_TAG"
 
   npm trust github "$name" \
     --repo "$REPO" \
-    --file "$WORKFLOW" \
+    --file "$workflow" \
     --allow-publish \
     --yes
 
@@ -93,18 +92,24 @@ bootstrap_dir() {
 }
 
 bootstrap_all() {
-  local parent="$1"
-  for dir in "$parent"/*; do
+  local workflow="$1"
+  shift
+  for dir in "$@"; do
     if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
       if ! grep -q '"private": true' "$dir/package.json"; then
-        bootstrap_dir "$dir"
+        bootstrap_dir "$dir" "$workflow"
       fi
     fi
   done
 }
 
-bootstrap_all packages
-bootstrap_all clients
+bootstrap_all release.yml packages/*
+# Umbrellas at clients/packages/<protocol>/, programs one level below.
+if [ -d clients/packages ]; then
+  bootstrap_all release-clients.yml clients/packages/* clients/packages/*/*
+else
+  echo "clients/ has not been generated; run \`bun run codegen\` to bootstrap client packages."
+fi
 
 echo
 if [ "$EXECUTE" = false ]; then

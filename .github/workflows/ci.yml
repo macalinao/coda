@@ -19,9 +19,9 @@ jobs:
         with:
           bun-version: latest
 
-      # Coda loads coda.config.ts via native Node.js type stripping, which
-      # requires Node >= 22.18 / 24. Pin a supported version for the native
-      # config-load verification step below.
+      # Node only for the check below that the published @macalinao/coda CLI
+      # works under Node, since consumers run it with node. Loading
+      # coda.config.ts via native type stripping needs Node >= 22.18 / 24.
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
@@ -38,6 +38,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      # Tooling only; the generated clients are built after codegen below.
       - name: Build all packages
         run: bun run build:ci
 
@@ -49,24 +50,67 @@ jobs:
         run: bun run typegen
         working-directory: apps/docs
 
+      # oxlint only type-checks files that belong to a package with a
+      # tsconfig.json, so every tracked TypeScript file must.
+      - name: Check every TypeScript file belongs to a package
+        run: ./scripts/check-ts-in-packages.sh
+
       # oxlint runs with typeAware + typeCheck, so this both lints and
-      # type-checks every package/client (replacing the old biome + eslint
-      # pass). The build above produces the .d.ts files tsgolint needs for
-      # cross-package type resolution. oxfmt --check enforces formatting.
+      # type-checks every package, the megagraph CLI and every
+      # programs/**/*.ts config (the `programs` workspace package). The build
+      # above produces the .d.ts files tsgolint needs to resolve
+      # @macalinao/coda and @macalinao/megagraph from the configs. oxfmt
+      # --check enforces formatting.
       - name: Run oxlint (lint + type-check) and check formatting
         run: bun run lint
 
       - name: Run tests
         run: bun test
 
-      - name: Typecheck coda.config.ts files
-        run: bun run typecheck
+      # Consumers run the published coda CLI with node, loading their
+      # coda.config.ts via native type stripping: exercise exactly that on the
+      # create-coda template. `idl` only prints the Codama IDL.
+      - name: Check the coda CLI works under Node
+        working-directory: packages/create-coda/template
+        run: node ../../coda/dist/bin/cli.js idl > /dev/null
 
       # The Typedoc Docs workflow only runs on push to master, so a dependency
       # bump that breaks TypeDoc (e.g. a TypeScript major it does not support)
       # would otherwise pass PR CI and only fail after merge.
       - name: Build TypeDoc API docs
         run: bun run typedoc --emit none
+
+      # External programs peer on packages (e.g. @solana-program/token) whose
+      # own @solana/kit peer must line up with ours; check the committed
+      # npm-peers.json snapshots against npm and the ranges against them.
+      - name: Check external peer ranges
+        run: bun run megagraph peers --verify
+
+      # graph/ and clients/ are not committed: generate them here. The
+      # generated clients are the integration test of the tooling: they must
+      # build, type-check and load.
+      - name: Generate graph/ and clients/
+        run: bun run codegen
+
+      - name: Check codegen is idempotent
+        run: |
+          before="$(bun run megagraph clients fingerprint)"
+          bun run megagraph graph
+          bun run megagraph generate
+          bun run megagraph clients install
+          after="$(bun run megagraph clients fingerprint)"
+          echo "first:  $before"
+          echo "second: $after"
+          test "$before" = "$after"
+
+      - name: Build the generated clients
+        run: bun run megagraph clients build
+
+      - name: Typecheck the generated clients
+        run: bun run megagraph clients typecheck
+
+      - name: Load every generated client
+        run: bun run megagraph clients test
 
       # Enforce the bundle-size budgets in .size-limit.json. The @solana/*
       # peer deps are ignored, so these measure each client's own cost. Two
@@ -77,13 +121,60 @@ jobs:
       - name: Check client bundle sizes
         run: bun run size
 
-      # Gate the native Node.js config-load path: run the compiled CLI with
-      # `node` directly (not bun) against every client so each coda.config.ts
-      # must load and apply its visitors via native type stripping. `idl` is
-      # non-destructive (prints to stdout, writes no files).
-      - name: Verify coda.config.ts loads under native Node
-        run: |
-          for dir in clients/*/; do
-            echo "== ${dir} =="
-            ( cd "${dir}" && node "${GITHUB_WORKSPACE}/packages/coda/dist/bin/cli.js" idl > /dev/null )
-          done
+  # Type-checks a sample of generated clients (including ones that link to
+  # @solana-program/token) against the oldest and newest @solana/kit of each
+  # major we support, and against every @solana-program/token minor in the
+  # external range (each with a @solana/kit it accepts), to prove the
+  # published peer ranges.
+  client-compat:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - kit: 6.10.0
+            token: 0.11.0
+          - kit: 6.10.0
+            token: 0.12.0
+          - kit: 6.10.0
+            token: 0.13.0
+          - kit: 6.10.0
+            token: 0.14.0
+          - kit: 7.0.0
+            token: 0.15.0
+          - kit: 7.1.1
+            token: 0.15.0
+          - kit: 8.0.0
+            token: 0.16.0
+          - kit: 8.4.0
+            token: 0.17.0
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate graph/ and clients/
+        run: bun run codegen
+
+      - name: Type-check against @solana/kit ${{ matrix.kit }} and @solana-program/token ${{ matrix.token }}
+        run: >-
+          bun run megagraph compat
+          --kit ${{ matrix.kit }}
+          --with @solana-program/token@${{ matrix.token }}
+          --clients @solana-programs/quarry-merge-mine,@solana-programs/kamino-lending,@solana-programs/mpl-bubblegum,@solana-programs/orca-whirlpools

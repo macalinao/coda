@@ -1,0 +1,222 @@
+name: Release clients
+
+# Releases the generated @solana-programs/* packages.
+#
+# github.com/toolboxdao/solana-programs is a code-only mirror (no workflows)
+# and the release state: its graph/codama.json, package versions and
+# changelogs are what each release is planned against. This workflow
+# regenerates every client from programs/, plans version bumps from the
+# difference, verifies everything builds, commits and tags the release in the
+# mirror, and then publishes whatever the mirror has that npm does not.
+#
+# Push credential for the mirror, whichever secret is set:
+#   SOLANA_PROGRAMS_DEPLOY_KEY  private SSH deploy key with write access
+#   SOLANA_PROGRAMS_TOKEN       fine-grained PAT, contents: read and write
+# Without either, the release runs as a dry run: nothing is pushed or
+# published. npm publishing uses trusted publishing (OIDC) from this
+# workflow; see `megagraph publish` in packages/megagraph.
+#
+# Pull requests only plan the release (read-only, no credentials) and post
+# the plan to the job summary.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  MIRROR_REPOSITORY: toolboxdao/solana-programs
+
+jobs:
+  plan:
+    name: Plan release (dry run)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate graph/ and clients/
+        run: bun run codegen
+
+      # The mirror is public, so the release state can be read without
+      # credentials. An empty mirror clones to an empty directory, which
+      # makes every package new.
+      - name: Check out the release state
+        run: git clone --depth 1 "https://github.com/${MIRROR_REPOSITORY}.git" mirror
+
+      - name: Plan the release
+        run: bun run megagraph release plan --mirror mirror
+
+  release:
+    name: Release
+    if: github.event_name != 'pull_request' && github.repository_owner == 'macalinao'
+    runs-on: ubuntu-latest
+    # Reviewers can be required on this environment to gate releases.
+    environment: solana-programs-release
+    concurrency:
+      group: release-clients
+      cancel-in-progress: false
+
+    permissions:
+      contents: read
+      # Required for npm OIDC trusted publishing (provenance attestations)
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Node only for the npm CLI: publishing over npm trusted publishing
+      # (OIDC) with provenance needs npm >= 11.5.1.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      # npm OIDC trusted publishing requires npm >= 11.5.1; Node 22 ships an
+      # older npm, so upgrade it explicitly.
+      - name: Upgrade npm for OIDC trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate graph/ and clients/
+        run: bun run codegen
+
+      - name: Check out the release state
+        id: mirror
+        env:
+          DEPLOY_KEY: ${{ secrets.SOLANA_PROGRAMS_DEPLOY_KEY }}
+          TOKEN: ${{ secrets.SOLANA_PROGRAMS_TOKEN }}
+        run: |
+          if [ -n "$DEPLOY_KEY" ]; then
+            install -m 700 -d ~/.ssh
+            printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/solana_programs
+            chmod 600 ~/.ssh/solana_programs
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/solana_programs -o IdentitiesOnly=yes"
+            git clone --depth 1 "git@github.com:${MIRROR_REPOSITORY}.git" mirror
+            git -C mirror config core.sshCommand "$GIT_SSH_COMMAND"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          elif [ -n "$TOKEN" ]; then
+            git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/${MIRROR_REPOSITORY}.git" mirror
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Neither SOLANA_PROGRAMS_DEPLOY_KEY nor SOLANA_PROGRAMS_TOKEN is set: running as a dry run, nothing will be pushed or published."
+            git clone --depth 1 "https://github.com/${MIRROR_REPOSITORY}.git" mirror
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          fi
+          # An empty mirror has no branch yet; commit to main.
+          if ! git -C mirror rev-parse --verify HEAD > /dev/null 2>&1; then
+            git -C mirror symbolic-ref HEAD refs/heads/main
+          fi
+
+      - name: Plan the release
+        run: bun run megagraph release plan --mirror mirror
+
+      - name: Apply the release to clients/
+        run: bun run megagraph release apply --mirror mirror --commit "$GITHUB_SHA"
+
+      # Nothing is pushed or published unless all of this passes.
+      - name: Build, typecheck and test
+        run: |
+          bun run build:ci
+          bun test
+          bun run megagraph clients build
+          bun run megagraph clients typecheck
+          bun run megagraph clients test
+
+      - name: Export into the mirror
+        run: |
+          find mirror -mindepth 1 -maxdepth 1 ! -name .git ! -name bun.lock -exec rm -rf {} +
+          bun run megagraph export mirror --source-commit "$GITHUB_SHA"
+
+      - name: Verify the mirror builds standalone
+        working-directory: mirror
+        run: |
+          bun install
+          bun run build
+          bun run typecheck
+          bun run test
+          bun run lint
+
+      - name: Commit, tag and push the release
+        if: steps.mirror.outputs.publish == 'true'
+        working-directory: mirror
+        run: |
+          git add --all
+          # The README always names the source commit; only commit when
+          # something else changed.
+          if git diff --cached --quiet -- . ':(exclude)README.md'; then
+            echo "No changes to release."
+            exit 0
+          fi
+          short_sha="${GITHUB_SHA::7}"
+          releases="$(jq -r '.packages[] | select(.bump != null) | "\(.name)@\(.version)"' ../release-plan.json)"
+          if [ -n "$releases" ]; then
+            subject="release: macalinao/coda@${short_sha}"
+          else
+            subject="sync: macalinao/coda@${short_sha}"
+          fi
+          body="Generated from ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          if [ -n "$releases" ]; then
+            body="${body}"$'\n\n'"$(printf '%s\n' "$releases" | sed 's/^/- /')"
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "$subject" -m "$body"
+          tags=()
+          while IFS= read -r release; do
+            [ -n "$release" ] || continue
+            git tag -a "$release" -m "$release"
+            tags+=("$release")
+          done <<< "$releases"
+          git push --atomic origin HEAD:main "${tags[@]}"
+
+      # Runs even when there was nothing to commit, so a publish that failed
+      # in an earlier run is retried: its version is in the mirror but not on
+      # npm.
+      - name: Publish to npm
+        if: steps.mirror.outputs.publish == 'true'
+        run: bun run megagraph publish mirror
+
+      - name: Show what would be published
+        if: steps.mirror.outputs.publish != 'true'
+        run: bun run megagraph publish mirror --dry-run

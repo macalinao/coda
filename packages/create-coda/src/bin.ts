@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// node, not bun: this is the published CLI, and consumers run it with Node.
 
 import { existsSync } from "node:fs";
 import { cp, mkdir, readdir } from "node:fs/promises";

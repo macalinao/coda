@@ -17,6 +17,8 @@ github:
 # single-level wildcards, and enumerate nested dist dirs explicitly.
 ignore:
   - clients/*/src/generated/
+  - clients/*/docs/
+  - graph/
   - vendor/
   - packages/*/dist/
   - clients/*/dist/
