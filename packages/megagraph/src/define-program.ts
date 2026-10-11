@@ -77,9 +77,13 @@ export interface ProgramMetadataConfig {
   idlSource?: GitFileSource;
   /**
    * Program addresses per cluster. `mainnet` defaults to the IDL's address
-   * and, when given, must equal it.
+   * and, when given, must equal it; `null` records that the program is not
+   * deployed on mainnet.
    */
-  addresses?: Partial<Record<ProgramCluster, string>>;
+  addresses?: {
+    mainnet?: string | null;
+    devnet?: string;
+  };
   /** Documentation of the program. */
   docs?: string;
   /** Published security audits. */

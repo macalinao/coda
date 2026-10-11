@@ -69,6 +69,13 @@ describe("resolveProgramMetadata", () => {
     expect(JSON.stringify(metadata)).not.toContain("null");
   });
 
+  test("a null mainnet address records that the program is not on mainnet", () => {
+    expect(resolve({ addresses: { mainnet: null, devnet: MAINNET } })).toEqual({
+      addresses: { devnet: MAINNET },
+      status: "active",
+    });
+  });
+
   test("rejects a mainnet address that differs from the IDL's", () => {
     expect(() => resolve({ addresses: { mainnet: DEVNET } })).toThrow(
       "programs/quarry/mine: program.addresses.mainnet (11111111111111111111111111111111) does not match the IDL's address",
@@ -199,6 +206,17 @@ describe("renderProgramSection", () => {
         "- Reference: [docs/quarry-mine.md](./docs/quarry-mine.md)",
       ].join("\n"),
     );
+  });
+
+  test("flags a program that is not deployed on mainnet", () => {
+    expect(
+      renderProgramSection({
+        program,
+        metadata: resolve({ addresses: { mainnet: null } }),
+        docsFile: "docs/quarry-mine.md",
+        mirror,
+      }),
+    ).toContain(`- Address: \`${MAINNET}\` (not deployed on mainnet)`);
   });
 
   test("renders addresses, sources, audits and the successor", () => {

@@ -16,14 +16,15 @@ export const PROGRAM_CLUSTERS: readonly ProgramCluster[] = [
 /**
  * The resolved metadata of an on-chain program, as recorded in
  * `graph/packages.json`. Optional fields are only present when configured;
- * `addresses.mainnet` and `status` are always resolved.
+ * `status` is always resolved, and `addresses.mainnet` unless the config
+ * declares the program is not deployed on mainnet.
  */
 export interface ProgramMetadata {
   displayName?: string;
   description?: string;
   repository?: string;
   idlSource?: GitFileSource;
-  addresses: Partial<Record<ProgramCluster, string>> & { mainnet: string };
+  addresses: Partial<Record<ProgramCluster, string>>;
   docs?: string;
   audits?: ProgramAudit[];
   status: ProgramStatus;
@@ -81,7 +82,8 @@ function resolveGitFileSource(
  * Validates a program's metadata config and resolves it for
  * `graph/packages.json`, with fields in a fixed order.
  *
- * - `addresses.mainnet` defaults to the IDL's address and must equal it.
+ * - `addresses.mainnet` defaults to the IDL's address and must equal it;
+ *   `null` records that the program is not deployed on mainnet.
  * - Addresses must be base58 public keys; URLs must be https.
  * - `supersededBy` requires `status: "deprecated"` and must name another
  *   program of the graph.
@@ -120,14 +122,23 @@ export function resolveProgramMetadata(input: {
       );
     }
   }
-  if (configured.mainnet !== undefined && configured.mainnet !== publicKey) {
+  if (
+    configured.mainnet !== undefined &&
+    configured.mainnet !== null &&
+    configured.mainnet !== publicKey
+  ) {
     throw new Error(
       `${where}: program.addresses.mainnet (${configured.mainnet}) does not match the IDL's address (${publicKey})`,
     );
   }
-  const addresses: ProgramMetadata["addresses"] = { mainnet: publicKey };
+  const addresses: ProgramMetadata["addresses"] = {};
   for (const cluster of PROGRAM_CLUSTERS) {
-    const address = cluster === "mainnet" ? publicKey : configured[cluster];
+    const address =
+      cluster === "mainnet"
+        ? configured.mainnet === null
+          ? undefined
+          : publicKey
+        : (configured[cluster] ?? undefined);
     if (address === undefined) {
       continue;
     }

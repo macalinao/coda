@@ -288,7 +288,11 @@ export function renderProgramSection(input: {
       }`,
     );
   }
-  lines.push(`- Address: \`${metadata.addresses.mainnet}\``);
+  lines.push(
+    metadata.addresses.mainnet === undefined
+      ? `- Address: \`${program.publicKey}\` (not deployed on mainnet)`
+      : `- Address: \`${metadata.addresses.mainnet}\``,
+  );
   if (metadata.addresses.devnet !== undefined) {
     lines.push(`- Devnet address: \`${metadata.addresses.devnet}\``);
   }
