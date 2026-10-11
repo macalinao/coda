@@ -12,8 +12,13 @@ export {
   renderBundleIndex,
 } from "./bundle.ts";
 export type {
+  GitFileSource,
+  ProgramAudit,
+  ProgramCluster,
   ProgramConfig,
+  ProgramMetadataConfig,
   ProgramPackageConfig,
+  ProgramStatus,
   ProtocolConfig,
   UmbrellaConfig,
 } from "./define-program.ts";
@@ -44,6 +49,13 @@ export {
   getProgramDependencies,
   getTransitiveDependencies,
 } from "./package-graph.ts";
+export type { ProgramMetadata } from "./program-metadata.ts";
+export {
+  diffProgramMetadata,
+  gitFileUrl,
+  PROGRAM_CLUSTERS,
+  resolveProgramMetadata,
+} from "./program-metadata.ts";
 export type { WorkspaceScaffoldOptions } from "./scaffold.ts";
 export { writeWorkspaceScaffold } from "./scaffold.ts";
 export {
@@ -73,9 +85,11 @@ export type { ExternalProgramSource } from "./load-programs.ts";
 export { loadMegagraphConfig, MEGAGRAPH_CONFIG_FILE } from "./load-programs.ts";
 export type { PeerMatrix } from "./peers.ts";
 export { checkExternalPeerRanges, checkPeerRanges } from "./peers.ts";
-export type { MirrorLocation } from "./templates.ts";
+export type { MirrorLocation, ProgramSuccessor } from "./templates.ts";
 export {
   mirrorTreeUrl,
+  renderDeprecationNotice,
+  renderProgramSection,
   renderSourceSection,
   replaceSourceSection,
   SOURCE_SECTION_END,

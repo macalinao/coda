@@ -30,6 +30,70 @@ export interface ProgramPackageConfig {
 }
 
 /**
+ * A file in a git repository at a release, e.g. where an IDL was taken from.
+ */
+export interface GitFileSource {
+  /** Repository URL, e.g. `https://github.com/QuarryProtocol/quarry`. */
+  repository: string;
+  /** Git tag of the release the file was taken from. */
+  tag?: string;
+  /** Full (40-character) commit hash the file was taken from. */
+  commit?: string;
+  /** Path of the file in the repository. */
+  path: string;
+}
+
+/** Clusters a program can be deployed to. */
+export type ProgramCluster = "mainnet" | "devnet";
+
+/** Lifecycle of an on-chain program. */
+export type ProgramStatus = "active" | "deprecated";
+
+/** A published security audit of a program. */
+export interface ProgramAudit {
+  /** Firm or person that performed the audit. */
+  auditor: string;
+  /** Link to the report. */
+  url: string;
+  /** Date of the report, `YYYY-MM` or `YYYY-MM-DD`. */
+  date?: string;
+}
+
+/**
+ * Descriptive metadata of the on-chain program a package is generated for.
+ * Every field is optional; the graph build validates what it can check.
+ */
+export interface ProgramMetadataConfig {
+  /** Human-readable name, e.g. `Quarry Mine`. */
+  displayName?: string;
+  /**
+   * What the on-chain program does. Distinct from
+   * {@link ProgramPackageConfig.description}, which describes the npm package.
+   */
+  description?: string;
+  /** Source repository of the on-chain program. */
+  repository?: string;
+  /** Where `idl.json` comes from. */
+  idlSource?: GitFileSource;
+  /**
+   * Program addresses per cluster. `mainnet` defaults to the IDL's address
+   * and, when given, must equal it.
+   */
+  addresses?: Partial<Record<ProgramCluster, string>>;
+  /** Documentation of the program. */
+  docs?: string;
+  /** Published security audits. */
+  audits?: ProgramAudit[];
+  /** @default "active" */
+  status?: ProgramStatus;
+  /**
+   * Codama name of the program that replaces this one (e.g.
+   * `whirlpool`). Only valid when `status` is `"deprecated"`.
+   */
+  supersededBy?: string;
+}
+
+/**
  * Configuration of a single program under `programs/<protocol>/<program>/`.
  *
  * The program's IDL is always `idl.json` next to the config. The visitors
@@ -44,7 +108,10 @@ export interface ProgramConfig extends Pick<
   CodaConfig,
   "instructionAccountDefaultValues" | "visitors"
 > {
+  /** The npm package generated for the program. */
   package: ProgramPackageConfig;
+  /** The on-chain program itself: addresses, sources, status. */
+  program?: ProgramMetadataConfig;
 }
 
 /**
@@ -130,13 +197,7 @@ export interface ExternalNpmPackage {
 export interface ExternalProgramConfig {
   npm: ExternalNpmPackage;
   /** Where the vendored Codama IDL (`idl.json`) comes from. */
-  source: {
-    repository: string;
-    /** Git tag of the release the IDL was taken from. */
-    tag: string;
-    commit: string;
-    path: string;
-  };
+  source: GitFileSource & { tag: string; commit: string };
   /**
    * Typed handles the config exports for other configs to link against. The
    * graph build asserts each one matches the IDL exactly (name, seeds and

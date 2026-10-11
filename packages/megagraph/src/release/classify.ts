@@ -11,7 +11,8 @@
  *   appended at the end; an instruction account that became optional or
  *   gained a default value.
  * - fix: documentation-only changes, and program metadata (`version`,
- *   `origin`).
+ *   `origin`). The descriptive metadata of `graph/packages.json` (addresses,
+ *   sources, status) is diffed by `diffProgramMetadata`, also as fixes.
  */
 
 /** How much a change affects consumers of the generated package. */

@@ -1,4 +1,5 @@
 import type { ProgramNode, RootNode } from "codama";
+import type { ProgramMetadata } from "./program-metadata.ts";
 import type {
   ExternalProgramSource,
   ProgramSource,
@@ -14,6 +15,7 @@ import {
   findUnresolvedLinks,
   getProgramDependencies,
 } from "./package-graph.ts";
+import { resolveProgramMetadata } from "./program-metadata.ts";
 
 /**
  * Package metadata of one program, as recorded in `graph/packages.json`.
@@ -33,6 +35,8 @@ export interface ProgramPackage {
   dependencies: string[];
   /** Changelog lines for the package's first release. */
   releaseNotes?: string[];
+  /** The on-chain program: addresses, sources and status. */
+  metadata: ProgramMetadata;
 }
 
 /**
@@ -400,6 +404,8 @@ export async function buildMegagraph(input: {
     );
   }
 
+  const knownPrograms = new Set(packageNames.keys());
+
   return {
     root,
     protocols: protocols.map(({ protocol, config }) => ({
@@ -424,6 +430,13 @@ export async function buildMegagraph(input: {
       dependencies: dependencies.get(program.name) ?? [],
       ...(source.config.package.releaseNotes && {
         releaseNotes: source.config.package.releaseNotes,
+      }),
+      metadata: resolveProgramMetadata({
+        config: source.config.program,
+        program: program.name,
+        publicKey: program.publicKey,
+        knownPrograms,
+        where: `programs/${source.slug}`,
       }),
     })),
     umbrellas: resolveUmbrellas(protocols, sorted),

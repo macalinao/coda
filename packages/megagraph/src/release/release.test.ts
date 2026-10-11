@@ -1,4 +1,5 @@
 import type { Megagraph } from "../build-graph.ts";
+import type { ProgramMetadata } from "../program-metadata.ts";
 import type { ProgramNode } from "codama";
 import { describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
@@ -99,7 +100,17 @@ async function writeManifest(
   await writeFile(join(root, path, "package.json"), JSON.stringify(manifest));
 }
 
-function graph(programs: ProgramNode[]): Megagraph {
+function metadata(
+  publicKey: string,
+  extra: Partial<ProgramMetadata> = {},
+): ProgramMetadata {
+  return { addresses: { mainnet: publicKey }, status: "active", ...extra };
+}
+
+function graph(
+  programs: ProgramNode[],
+  registryMetadata: Partial<ProgramMetadata> = {},
+): Megagraph {
   const [first, ...rest] = programs;
   if (first === undefined) throw new Error("fixture");
   return {
@@ -113,6 +124,7 @@ function graph(programs: ProgramNode[]): Megagraph {
         packageName: "@s/q-mint-wrapper",
         version: "0.1.0",
         dependencies: [],
+        metadata: metadata("QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV"),
       },
       {
         program: "mine",
@@ -121,6 +133,7 @@ function graph(programs: ProgramNode[]): Megagraph {
         packageName: "@s/q-mine",
         version: "0.1.0",
         dependencies: ["mintWrapper"],
+        metadata: metadata("QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"),
       },
       {
         program: "registry",
@@ -129,6 +142,10 @@ function graph(programs: ProgramNode[]): Megagraph {
         packageName: "@s/q-registry",
         version: "0.1.0",
         dependencies: [],
+        metadata: metadata(
+          "QREGBnEj9Sa5uR91AV8u3FxThgP5ZCvdZUW2bHAkfNc",
+          registryMetadata,
+        ),
       },
     ],
     externals: [],
@@ -289,6 +306,52 @@ describe("planRelease and applyRelease", () => {
         "",
       ].join("\n"),
     );
+  });
+
+  test("a metadata-only change releases the package as a fix", async () => {
+    const root = await mkdtemp(join(tmpdir(), "megagraph-release-"));
+    const clients = join(root, "clients");
+    const mirror = join(root, "mirror");
+    const programs = [
+      programNode({ name: "mintWrapper", publicKey: "x" }),
+      programNode({ name: "mine", publicKey: "y" }),
+      programNode({ name: "registry", publicKey: "z" }),
+    ];
+    await writeMegagraph(join(mirror, "graph"), graph(programs));
+    for (const [path, name] of [
+      ["packages/q/mint-wrapper", "@s/q-mint-wrapper"],
+      ["packages/q/mine", "@s/q-mine"],
+      ["packages/q/registry", "@s/q-registry"],
+      ["packages/q", "@s/q"],
+    ] as const) {
+      await writeManifest(mirror, path, { name, version: "1.0.0" });
+      await writeManifest(clients, path, { name, version: "1.0.0" });
+    }
+    const plan = await planRelease({
+      megagraph: graph(programs, {
+        status: "deprecated",
+        docs: "https://docs.example.com",
+      }),
+      clientsDir: clients,
+      mirrorDir: mirror,
+    });
+    const registry = plan.packages.find(
+      (release) => release.name === "@s/q-registry",
+    );
+    expect(registry).toMatchObject({
+      version: "1.0.1",
+      bump: "patch",
+      level: "fix",
+      changes: [
+        { level: "fix", message: "Updated program metadata `docs`" },
+        { level: "fix", message: "Updated program metadata `status`" },
+      ],
+    });
+    expect(
+      plan.packages
+        .filter((release) => release.bump !== null)
+        .map((release) => release.name),
+    ).toEqual(["@s/q-registry"]);
   });
 
   test("an empty release state makes every package new", async () => {

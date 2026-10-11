@@ -10,6 +10,7 @@ import {
   getProgramPackagePath,
   getUmbrellaPackagePath,
 } from "../load-programs.ts";
+import { diffProgramMetadata } from "../program-metadata.ts";
 import { diffProgram, maxLevel } from "./classify.ts";
 import { replaceSourceSection, SOURCE_SECTION_START } from "../templates.ts";
 import { diffManifest } from "./manifest.ts";
@@ -163,6 +164,9 @@ export async function planRelease(input: {
     previousGraph = null;
   }
   const previousPrograms = new Map<string, unknown>();
+  const previousEntries = new Map(
+    (previousGraph?.packages ?? []).map((entry) => [entry.packageName, entry]),
+  );
   if (previousGraph !== null) {
     const nodes = new Map(
       allPrograms(previousGraph.root).map((program) => [
@@ -275,7 +279,14 @@ export async function planRelease(input: {
                   },
                 ];
           }
-          return diffProgram(before, newPrograms.get(entry.program));
+          return [
+            ...diffProgram(before, newPrograms.get(entry.program)),
+            // Descriptive only (addresses, sources, status): always a fix.
+            ...diffProgramMetadata(
+              previousEntries.get(entry.packageName)?.metadata,
+              entry.metadata,
+            ),
+          ];
         },
         entry.releaseNotes,
       ),

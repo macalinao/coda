@@ -6,6 +6,7 @@ import type {
   MirrorLocation,
   PackageDependency,
   PackageTemplateInput,
+  ProgramSuccessor,
 } from "./templates.ts";
 import {
   copyFile,
@@ -103,6 +104,30 @@ function getDocsFileName(program: ProgramNode): string {
     .toLowerCase()
     .replace(/^-/, "");
   return `${kebab}.md`;
+}
+
+/** Where the program that supersedes a deprecated program is published. */
+function getSuccessor(
+  program: string | undefined,
+  packagesByProgram: Map<string, Megagraph["packages"][number]>,
+  externalsByProgram: Map<string, Megagraph["externals"][number]>,
+): ProgramSuccessor | undefined {
+  if (program === undefined) {
+    return undefined;
+  }
+  const own = packagesByProgram.get(program);
+  if (own !== undefined) {
+    return {
+      program,
+      packageName: own.packageName,
+      path: getProgramPackagePath(own),
+    };
+  }
+  const external = externalsByProgram.get(program);
+  if (external !== undefined) {
+    return { program, packageName: external.packageName };
+  }
+  throw new Error(`Program "${program}" is missing from the graph`);
 }
 
 export interface GeneratePackagesInput {
@@ -258,6 +283,11 @@ export async function generatePackages(
     peersByPackage.set(entry.packageName, templateInput.peerDependencies);
 
     const readmeBody = await readOptional(join(source.dir, "README.md"));
+    const successor = getSuccessor(
+      entry.metadata.supersededBy,
+      packagesByProgram,
+      externalsByProgram,
+    );
     await writeFile(
       join(packageDir, "package.json"),
       renderPackageJson(templateInput),
@@ -269,7 +299,10 @@ export async function generatePackages(
     );
     await writeFile(
       join(packageDir, "README.md"),
-      renderReadme(templateInput, program, `docs/${docsFile}`, readmeBody),
+      renderReadme(templateInput, program, `docs/${docsFile}`, readmeBody, {
+        metadata: entry.metadata,
+        ...(successor !== undefined && { successor }),
+      }),
     );
     await copyOptional(
       join(source.dir, CHANGELOG_FILE),
