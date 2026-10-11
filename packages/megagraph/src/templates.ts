@@ -1,6 +1,7 @@
+import type { ProgramCluster } from "./define-program.ts";
 import type { ProgramMetadata } from "./program-metadata.ts";
 import type { ProgramNode } from "codama";
-import { gitFileUrl } from "./program-metadata.ts";
+import { gitFileUrl, PROGRAM_CLUSTERS } from "./program-metadata.ts";
 
 /** Keywords every generated package carries. */
 const BASE_KEYWORDS = ["coda", "solana", "client", "esm", "typescript"];
@@ -256,6 +257,37 @@ export function renderDeprecationNotice(
   ].join("\n");
 }
 
+const CLUSTER_LABELS: Record<ProgramCluster, string> = {
+  mainnet: "Mainnet",
+  devnet: "Devnet",
+};
+
+/**
+ * Renders the address lines of the Program section: the IDL's address with
+ * the clusters it is deployed to, then any cluster deployed elsewhere.
+ */
+function renderAddresses(
+  publicKey: string,
+  addresses: ProgramMetadata["addresses"],
+): string[] {
+  const shared = PROGRAM_CLUSTERS.filter(
+    (cluster) => addresses[cluster] === publicKey,
+  );
+  const notes = [
+    ...(shared.length === 1 && shared[0] === "mainnet" ? [] : shared),
+    ...(addresses.mainnet === undefined ? ["not deployed on mainnet"] : []),
+  ];
+  return [
+    `- Address: \`${publicKey}\`${notes.length > 0 ? ` (${notes.join(", ")})` : ""}`,
+    ...PROGRAM_CLUSTERS.flatMap((cluster) => {
+      const address = addresses[cluster];
+      return address === undefined || address === publicKey
+        ? []
+        : [`- ${CLUSTER_LABELS[cluster]} address: \`${address}\``];
+    }),
+  ];
+}
+
 /**
  * Renders the `## Program` section of a program package's README: what the
  * program is, its addresses, where its source and IDL come from, and its
@@ -288,14 +320,7 @@ export function renderProgramSection(input: {
       }`,
     );
   }
-  lines.push(
-    metadata.addresses.mainnet === undefined
-      ? `- Address: \`${program.publicKey}\` (not deployed on mainnet)`
-      : `- Address: \`${metadata.addresses.mainnet}\``,
-  );
-  if (metadata.addresses.devnet !== undefined) {
-    lines.push(`- Devnet address: \`${metadata.addresses.devnet}\``);
-  }
+  lines.push(...renderAddresses(program.publicKey, metadata.addresses));
   if (metadata.repository !== undefined) {
     lines.push(`- Source: ${metadata.repository}`);
   }

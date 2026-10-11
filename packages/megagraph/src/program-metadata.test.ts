@@ -208,15 +208,31 @@ describe("renderProgramSection", () => {
     );
   });
 
-  test("flags a program that is not deployed on mainnet", () => {
-    expect(
+  test("lists the clusters deployed at the IDL's address on one line", () => {
+    const addressLines = (config: ProgramMetadataConfig) =>
       renderProgramSection({
         program,
-        metadata: resolve({ addresses: { mainnet: null } }),
+        metadata: resolve(config),
         docsFile: "docs/quarry-mine.md",
         mirror,
-      }),
-    ).toContain(`- Address: \`${MAINNET}\` (not deployed on mainnet)`);
+      })
+        .split("\n")
+        .filter((line) => line.includes("ddress:"));
+    expect(addressLines({ addresses: { devnet: MAINNET } })).toEqual([
+      `- Address: \`${MAINNET}\` (mainnet, devnet)`,
+    ]);
+    expect(addressLines({ addresses: { mainnet: null } })).toEqual([
+      `- Address: \`${MAINNET}\` (not deployed on mainnet)`,
+    ]);
+    expect(
+      addressLines({ addresses: { mainnet: null, devnet: MAINNET } }),
+    ).toEqual([`- Address: \`${MAINNET}\` (devnet, not deployed on mainnet)`]);
+    expect(
+      addressLines({ addresses: { mainnet: null, devnet: DEVNET } }),
+    ).toEqual([
+      `- Address: \`${MAINNET}\` (not deployed on mainnet)`,
+      `- Devnet address: \`${DEVNET}\``,
+    ]);
   });
 
   test("renders addresses, sources, audits and the successor", () => {
