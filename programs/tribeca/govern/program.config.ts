@@ -50,6 +50,18 @@ export default defineProgram({
       "Split out of `@solana-programs/tribeca`, which now re-exports this package.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Tribeca Govern",
+    description:
+      "Core program of Tribeca governance: creates governors and proposals, and records votes.",
+    repository: "https://github.com/TribecaHQ/tribeca",
+    addresses: {
+      devnet: "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw",
+    },
+    docs: "https://docs.rs/govern",
+  },
 
   visitors: [
     pdas.visitor,

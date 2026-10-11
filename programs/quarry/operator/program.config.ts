@@ -31,6 +31,18 @@ export default defineProgram({
       "Imports `findQuarryPda` from `@solana-programs/quarry-mine` instead of duplicating it.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Quarry Operator",
+    description:
+      "Delegates the administration of a Quarry Mine rewarder (setting rates, creating quarries, allocating shares) to separate roles.",
+    repository: "https://github.com/QuarryProtocol/quarry",
+    addresses: {
+      devnet: "QoP6NfrQbaGnccXQrMLUkog2tQZ4C1RFgJcwDnT8Kmz",
+    },
+    docs: "https://docs.rs/quarry-operator",
+  },
 
   visitors: [
     updateAccountsVisitor({

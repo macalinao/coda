@@ -244,6 +244,24 @@ export default defineProgram({
       "**Breaking:** removed the duplicated Token Metadata helpers (`findMetadataPda`, `findMasterEditionPda`, `MPL_TOKEN_METADATA_PROGRAM_ADDRESS` and the rest of the `mplTokenMetadata` program module). The collection instructions now derive those PDAs with the helpers from `@solana-programs/token-metadata`, which this package depends on.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Metaplex Bubblegum",
+    description: "Creates and manages compressed NFTs.",
+    repository: "https://github.com/metaplex-foundation/mpl-bubblegum",
+    // idl.json parses to the same JSON as this file.
+    idlSource: {
+      repository: "https://github.com/metaplex-foundation/mpl-bubblegum",
+      tag: "release/bubblegum@1.3.0",
+      commit: "575f7292e64cdc2e6402bf5c5a52d4e05775494b",
+      path: "idls/bubblegum.json",
+    },
+    addresses: {
+      devnet: "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY",
+    },
+    docs: "https://www.metaplex.com/docs/smart-contracts/bubblegum",
+  },
 
   visitors: [
     pdas.visitor,

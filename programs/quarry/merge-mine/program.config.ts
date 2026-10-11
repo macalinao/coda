@@ -49,6 +49,25 @@ export default defineProgram({
       "Imports `findMinerPda` and `findQuarryPda` from `@solana-programs/quarry-mine` and `findMinterPda` from `@solana-programs/quarry-mint-wrapper` instead of duplicating them.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Quarry Merge Mine",
+    description:
+      "Stakes a single deposit into multiple quarries at once by minting replica tokens for a merge pool.",
+    repository: "https://github.com/QuarryProtocol/quarry",
+    addresses: {
+      devnet: "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto",
+    },
+    docs: "https://docs.rs/quarry-merge-mine",
+    audits: [
+      {
+        auditor: "Quantstamp",
+        url: "https://github.com/QuarryProtocol/quarry/blob/master/audit/quantstamp.pdf",
+        date: "2021-12-08",
+      },
+    ],
+  },
 
   visitors: [
     updateAccountsVisitor({

@@ -57,6 +57,24 @@ export default defineProgram({
       "Generated from the program megagraph in macalinao/coda. The generated code is unchanged; the README, reference docs and package metadata are regenerated.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Metaplex Token Authorization Rules",
+    description:
+      "Creates and executes rules that restrict common token operations such as transferring and selling.",
+    repository: "https://github.com/metaplex-foundation/mpl-token-auth-rules",
+    // idl.json parses to the same JSON as this file.
+    idlSource: {
+      repository: "https://github.com/metaplex-foundation/mpl-token-auth-rules",
+      commit: "5b8b8973543a1e1e139912d0c210d902af77a6b5",
+      path: "idls/mpl_token_auth_rules.json",
+    },
+    addresses: {
+      devnet: "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg",
+    },
+    docs: "https://www.metaplex.com/docs/smart-contracts/token-auth-rules",
+  },
 
   visitors: [
     pdas.visitor,

@@ -80,6 +80,16 @@ export default defineProgram({
       "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Voter Stake Registry",
+    description: "Voter weight addin for SPL Governance.",
+    repository: "https://github.com/Grape-Labs/voter-stake-registry",
+    addresses: {
+      devnet: "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ",
+    },
+  },
   visitors: [
     pdas.visitor,
     addNodesVisitor({

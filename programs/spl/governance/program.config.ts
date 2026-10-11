@@ -153,6 +153,17 @@ export default defineProgram({
       "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "SPL Governance",
+    description: "Core building blocks and primitives for creating DAOs.",
+    repository: "https://github.com/Mythic-Project/solana-program-library",
+    addresses: {
+      devnet: "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    },
+    docs: "https://docs.realms.today",
+  },
   visitors: [
     updateAccountsVisitor({
       // Realm accounts

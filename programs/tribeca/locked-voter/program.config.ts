@@ -53,6 +53,18 @@ export default defineProgram({
       "Split out of `@solana-programs/tribeca`, which now re-exports this package.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Tribeca Locked Voter",
+    description:
+      "Vote escrow program: token holders lock tokens for a period of time in exchange for voting power in a Tribeca Govern governor.",
+    repository: "https://github.com/TribecaHQ/tribeca",
+    addresses: {
+      devnet: "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw",
+    },
+    docs: "https://docs.rs/locked-voter",
+  },
 
   visitors: [
     pdas.visitor,

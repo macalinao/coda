@@ -65,6 +65,24 @@ export default defineProgram({
       "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "SPL Stake Pool",
+    description: "Pools stake accounts, managed by another entity.",
+    repository: "https://github.com/solana-program/stake-pool",
+    addresses: {
+      devnet: "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy",
+    },
+    docs: "https://www.solana-program.com/docs/stake-pool",
+    audits: [
+      {
+        auditor: "Halborn",
+        url: "https://github.com/anza-xyz/security-audits/blob/master/spl/HalbornStakePoolAudit-2023-12-31.pdf",
+        date: "2023-12-31",
+      },
+    ],
+  },
   visitors: [
     setAccountDiscriminatorFromFieldVisitor({
       // Realm accounts

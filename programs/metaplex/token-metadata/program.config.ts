@@ -165,6 +165,25 @@ export default defineProgram({
       "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Metaplex Token Metadata",
+    description:
+      "Attaches additional data to fungible and non-fungible tokens through PDAs derived from their mint addresses.",
+    repository: "https://github.com/metaplex-foundation/mpl-token-metadata",
+    // idl.json parses to the same JSON as this file.
+    idlSource: {
+      repository: "https://github.com/metaplex-foundation/mpl-token-metadata",
+      tag: "mpl-token-metadata@v5.1.1",
+      commit: "a7ee5e17ed60feaafeaa5582a4f46d9317c1b412",
+      path: "idls/token_metadata.json",
+    },
+    addresses: {
+      devnet: "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+    },
+    docs: "https://www.metaplex.com/docs/smart-contracts/token-metadata",
+  },
   instructionAccountDefaultValues: [
     // Metadata PDA of the mint.
     ...METADATA_INSTRUCTIONS.map((instruction) => ({

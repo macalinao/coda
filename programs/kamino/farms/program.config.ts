@@ -66,6 +66,17 @@ export default defineProgram({
       "Split out of `@solana-programs/kamino-lending`. Also ships the Farms `updateGlobalConfig` and `updateGlobalConfigAdmin` instructions, which the combined client overwrote with Kamino Lending's.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Kamino Farms",
+    description:
+      "Lets users deposit or lock tokens in pools in exchange for rewards.",
+    repository: "https://github.com/Kamino-Finance/kfarms",
+    addresses: {
+      devnet: "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+    },
+  },
   instructionAccountDefaultValues: [
     ...["initializeFarm", "stake"].map((instruction) => ({
       instruction,

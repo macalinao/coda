@@ -48,6 +48,25 @@ export default defineProgram({
       "Imports `findMinterPda` from `@solana-programs/quarry-mint-wrapper` instead of duplicating it.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Quarry Mine",
+    description:
+      "Core liquidity mining program of Quarry: a rewarder distributes rewards across quarries (one per staked token mint), and miners stake into them.",
+    repository: "https://github.com/QuarryProtocol/quarry",
+    addresses: {
+      devnet: "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB",
+    },
+    docs: "https://docs.rs/quarry-mine",
+    audits: [
+      {
+        auditor: "Quantstamp",
+        url: "https://github.com/QuarryProtocol/quarry/blob/master/audit/quantstamp.pdf",
+        date: "2021-12-08",
+      },
+    ],
+  },
 
   visitors: [
     updateAccountsVisitor({

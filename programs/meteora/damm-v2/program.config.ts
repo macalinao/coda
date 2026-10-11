@@ -187,6 +187,16 @@ export default defineProgram({
       "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Meteora DAMM v2",
+    description: "Meteora's constant product AMM (CP-AMM).",
+    repository: "https://github.com/MeteoraAg/damm-v2",
+    addresses: {
+      devnet: "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+    },
+  },
   instructionAccountDefaultValues: [
     // Set pool_authority for all instructions that use it
     ...instructionsWithPoolAuthority.map((instruction) => ({

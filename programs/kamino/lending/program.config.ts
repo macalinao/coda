@@ -92,6 +92,16 @@ export default defineProgram({
       "**Breaking:** the Kamino Farms program is no longer part of this package. It is published as `@solana-programs/kamino-farms`, which this package depends on for `FARMS_PROGRAM_ADDRESS`; `@solana-programs/kamino` bundles both programs.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Kamino Lending",
+    description: "Kamino's lending protocol program.",
+    repository: "https://github.com/Kamino-Finance/klend",
+    addresses: {
+      devnet: "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+    },
+  },
   instructionAccountDefaultValues: [
     {
       account: /collateralTokenProgram|liquidityTokenProgram/,

@@ -37,6 +37,25 @@ export default defineProgram({
       "Split out of `@solana-programs/quarry`, which now re-exports this package.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Quarry Mint Wrapper",
+    description:
+      "Owns the mint authority of a rewards token and hands out rate-limited minters.",
+    repository: "https://github.com/QuarryProtocol/quarry",
+    addresses: {
+      devnet: "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
+    },
+    docs: "https://docs.rs/quarry-mint-wrapper",
+    audits: [
+      {
+        auditor: "Quantstamp",
+        url: "https://github.com/QuarryProtocol/quarry/blob/master/audit/quantstamp.pdf",
+        date: "2021-12-08",
+      },
+    ],
+  },
 
   visitors: [
     updateAccountsVisitor({

@@ -26,6 +26,20 @@ export default defineProgram({
       "Split out of `@solana-programs/goki`, which now re-exports this package.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Goki Token Signer",
+    description:
+      "Lets the holder of an NFT sign instructions on behalf of a PDA derived from the NFT's mint.",
+    repository: "https://github.com/GokiProtocol/goki",
+    addresses: {
+      // Not deployed on mainnet-beta at the IDL's address.
+      mainnet: null,
+      devnet: "NFTUJzSHuUCsMMqMRJpB7PmbsaU7Wm51acdPk2FXMLn",
+    },
+    docs: "https://docs.rs/token-signer",
+  },
 
   // The Goki IDLs are legacy Anchor 0.x IDLs: they declare their PDA seeds
   // inline on instruction accounts, which the Anchor-to-Codama parser drops.

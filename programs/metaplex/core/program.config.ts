@@ -39,6 +39,16 @@ export default defineProgram({
       "Generated from the program megagraph in macalinao/coda. The generated code is unchanged; the README, reference docs and package metadata are regenerated.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Metaplex Core",
+    repository: "https://github.com/metaplex-foundation/mpl-core",
+    addresses: {
+      devnet: "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
+    },
+    docs: "https://www.metaplex.com/docs/smart-contracts/core",
+  },
 
   // mpl-core assets and collections are keypair-generated accounts rather than
   // PDAs, so the only PDA the program derives is the per-asset signing PDA used

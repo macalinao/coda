@@ -34,6 +34,17 @@ export default defineProgram({
       "Split out of `@solana-programs/quarry`, which now re-exports this package.",
     ],
   },
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  program: {
+    displayName: "Quarry Redeemer",
+    description: "Exchanges IOU tokens for their underlying redemption tokens.",
+    repository: "https://github.com/QuarryProtocol/quarry",
+    addresses: {
+      devnet: "QRDxhMw1P2NEfiw5mYXG79bwfgHTdasY2xNP76XSea9",
+    },
+    docs: "https://docs.rs/quarry-redeemer",
+  },
 
   visitors: [
     updateAccountsVisitor({
