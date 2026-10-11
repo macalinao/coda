@@ -9,8 +9,10 @@ import { checkExternalPeerRanges } from "../peers.ts";
 const SNAPSHOT_FILE = "npm-peers.json";
 
 async function fetchMatrix(packageName: string): Promise<PeerMatrix> {
+  // Encodes the whole name: the registry accepts `%40scope%2Fname` for scoped
+  // packages, and unscoped names pass through unchanged.
   const response = await fetch(
-    `https://registry.npmjs.org/${packageName.replace("/", "%2F")}`,
+    `https://registry.npmjs.org/${encodeURIComponent(packageName)}`,
   );
   if (!response.ok) {
     throw new Error(
