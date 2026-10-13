@@ -9,7 +9,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { processConfig } from "@macalinao/coda";
 import { createFromJson, programNode, rootNode } from "codama";
-import { IDL_FILE } from "./load-programs.ts";
+import { IDL_FILE, PROGRAMS_DIR } from "./load-programs.ts";
 import {
   findCycles,
   findUnresolvedLinks,
@@ -25,7 +25,7 @@ export interface ProgramPackage {
   program: string;
   /** Protocol directory name, e.g. `quarry`. */
   protocol: string;
-  /** `<protocol>/<program>` directory under `programs/`. */
+  /** `<protocol>/<program>` directory under `programs/src/`. */
   slug: string;
   /** npm package name. */
   packageName: string;
@@ -43,7 +43,7 @@ export interface ProgramPackage {
  * Metadata of one protocol, as recorded in `graph/packages.json`.
  */
 export interface ProtocolEntry {
-  /** Directory name under `programs/`. */
+  /** Directory name under `programs/src/`. */
   protocol: string;
   displayName: string;
   description: string;
@@ -78,7 +78,7 @@ export interface ExternalProgramEntry {
   /** Codama program name. */
   program: string;
   protocol: string;
-  /** `<protocol>/<program>` directory under `programs/` holding the IDL. */
+  /** `<protocol>/<program>` directory under `programs/src/` holding the IDL. */
   slug: string;
   /** npm package exporting the program's client. */
   packageName: string;
@@ -161,7 +161,7 @@ async function loadExternalPrograms(
     root.program,
     ...(root.additionalPrograms ?? []),
   ];
-  const where = `programs/${source.slug}`;
+  const where = `${PROGRAMS_DIR}/${source.slug}`;
   for (const handle of source.external.handles.programs ?? []) {
     if (!programs.some((program) => program.name === handle.name)) {
       throw new Error(
@@ -198,7 +198,7 @@ function assertUniqueProgramNames(
     const owner = owners.get(program.name);
     if (owner !== undefined) {
       throw new Error(
-        `Program name "${program.name}" is declared by both programs/${owner} and programs/${slug}`,
+        `Program name "${program.name}" is declared by both ${PROGRAMS_DIR}/${owner} and ${PROGRAMS_DIR}/${slug}`,
       );
     }
     owners.set(program.name, slug);
@@ -213,7 +213,7 @@ function assertUniquePackageNames(
   const entries = [
     ...programs.map((source) => ({
       name: source.packageName,
-      owner: `programs/${source.slug}`,
+      owner: `${PROGRAMS_DIR}/${source.slug}`,
     })),
     ...protocols.flatMap((source) =>
       source.config.umbrella === undefined
@@ -221,7 +221,7 @@ function assertUniquePackageNames(
         : [
             {
               name: source.config.umbrella.name,
-              owner: `the umbrella of programs/${source.protocol}`,
+              owner: `the umbrella of ${PROGRAMS_DIR}/${source.protocol}`,
             },
           ],
     ),
@@ -254,13 +254,15 @@ function resolveUmbrellas(
       .filter((entry) => entry.source.protocol === protocol)
       .toSorted((a, b) => a.source.program.localeCompare(b.source.program));
     if (members.length === 0) {
-      throw new Error(`programs/${protocol}: the umbrella has no programs`);
+      throw new Error(
+        `${PROGRAMS_DIR}/${protocol}: the umbrella has no programs`,
+      );
     }
     const precedence = umbrella.precedence ?? [];
     for (const program of precedence) {
       if (!members.some((member) => member.source.program === program)) {
         throw new Error(
-          `programs/${protocol}: umbrella precedence lists "${program}", which is not a program of the protocol`,
+          `${PROGRAMS_DIR}/${protocol}: umbrella precedence lists "${program}", which is not a program of the protocol`,
         );
       }
     }
@@ -318,7 +320,7 @@ export async function buildMegagraph(input: {
     (program) => program.name as string,
   );
   if (sources.length === 0) {
-    throw new Error("No programs found under programs/");
+    throw new Error(`No programs found under ${PROGRAMS_DIR}/`);
   }
   assertUniquePackageNames(sources, protocols);
 
@@ -436,7 +438,7 @@ export async function buildMegagraph(input: {
         program: program.name,
         publicKey: program.publicKey,
         knownPrograms,
-        where: `programs/${source.slug}`,
+        where: `${PROGRAMS_DIR}/${source.slug}`,
       }),
     })),
     umbrellas: resolveUmbrellas(protocols, sorted),

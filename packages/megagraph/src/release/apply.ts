@@ -66,7 +66,7 @@ export function prependChangelogEntry(
  * Applies a release plan to the generated packages in `clientsDir`: writes
  * each package's release version into its manifest and brings its changelog
  * up to date, starting from the release state's changelog in `mirrorDir`
- * (or, for a new package, the seed changelog generated from programs/).
+ * (or, for a new package, the seed changelog generated from programs/src/).
  */
 export async function applyRelease(input: {
   plan: ReleasePlan;

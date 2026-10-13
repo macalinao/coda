@@ -28,6 +28,7 @@ import {
 import {
   getProgramPackagePath,
   getUmbrellaPackagePath,
+  PROGRAMS_DIR,
 } from "./load-programs.ts";
 import { getTransitiveDependencies } from "./package-graph.ts";
 import {
@@ -138,7 +139,7 @@ export interface GeneratePackagesInput {
   mirror: MirrorLocation;
   programs: ProgramSource[];
   protocols: ProtocolSource[];
-  /** Directory holding `programs/`; used for source paths in manifests. */
+  /** Repository root, holding `programs/src/`; used for source paths in manifests. */
   repoRoot: string;
   /**
    * Root of the generated workspace. Packages are written to
@@ -175,7 +176,7 @@ export async function generatePackages(
     megagraph.packages.some((entry) => !sourcesBySlug.has(entry.slug))
   ) {
     throw new Error(
-      "graph/packages.json is out of date with programs/. Run `bun run graph` first.",
+      "graph/packages.json is out of date with programs/src/. Run `bun run graph` first.",
     );
   }
 
@@ -325,7 +326,7 @@ export async function generatePackages(
     );
     if (protocol?.config.umbrella === undefined) {
       throw new Error(
-        `programs/${umbrella.protocol}: the umbrella is missing from protocol.config.ts`,
+        `${PROGRAMS_DIR}/${umbrella.protocol}: the umbrella is missing from protocol.config.ts`,
       );
     }
     generated.push(
@@ -355,7 +356,7 @@ async function generateUmbrella(
 ): Promise<string> {
   const config = protocol.config.umbrella;
   if (config === undefined) {
-    throw new Error(`programs/${protocol.protocol} has no umbrella`);
+    throw new Error(`${PROGRAMS_DIR}/${protocol.protocol} has no umbrella`);
   }
   const members: BundleMember[] = [];
   for (const program of umbrella.programs) {

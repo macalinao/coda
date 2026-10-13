@@ -96,7 +96,7 @@ export function resolveProgramMetadata(input: {
   publicKey: string;
   /** Codama names of every program of the graph, externals included. */
   knownPrograms: ReadonlySet<string>;
-  /** Prefix of error messages, e.g. `programs/quarry/mine`. */
+  /** Prefix of error messages, e.g. `programs/src/quarry/mine`. */
   where: string;
 }): ProgramMetadata {
   const { config = {}, program, publicKey, knownPrograms, where } = input;

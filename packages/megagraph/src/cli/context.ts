@@ -5,12 +5,16 @@ import { dirname, join, resolve } from "node:path";
 import {
   loadMegagraphConfig,
   MEGAGRAPH_CONFIG_FILE,
+  PROGRAMS_DIR,
 } from "../load-programs.ts";
 
 /** Directories and settings of the repository the CLI runs in. */
 export interface CliContext {
   /** Repository root: the directory holding `programs/`. */
   root: string;
+  /** `programs/`: the workspace package holding the program inputs. */
+  programsPackageDir: string;
+  /** `programs/src/`: the program inputs (configs, IDLs, READMEs). */
   programsDir: string;
   /** `graph/`: the merged graph (generated). */
   graphDir: string;
@@ -30,18 +34,18 @@ export interface RootManifest {
 
 /**
  * Finds the repository root: the closest directory, from `start` upwards,
- * with a `programs/megagraph.config.ts`.
+ * with a `programs/src/megagraph.config.ts`.
  */
 export function findRoot(start: string): string {
   let dir = resolve(start);
   for (;;) {
-    if (existsSync(join(dir, "programs", MEGAGRAPH_CONFIG_FILE))) {
+    if (existsSync(join(dir, PROGRAMS_DIR, MEGAGRAPH_CONFIG_FILE))) {
       return dir;
     }
     const parent = dirname(dir);
     if (parent === dir) {
       throw new Error(
-        `No programs/${MEGAGRAPH_CONFIG_FILE} found from ${start} upwards; pass --root`,
+        `No ${PROGRAMS_DIR}/${MEGAGRAPH_CONFIG_FILE} found from ${start} upwards; pass --root`,
       );
     }
     dir = parent;
@@ -49,9 +53,10 @@ export function findRoot(start: string): string {
 }
 
 export async function loadContext(root: string): Promise<CliContext> {
-  const programsDir = join(root, "programs");
+  const programsDir = join(root, PROGRAMS_DIR);
   return {
     root,
+    programsPackageDir: dirname(programsDir),
     programsDir,
     graphDir: join(root, "graph"),
     clientsDir: join(root, "clients"),

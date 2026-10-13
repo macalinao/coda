@@ -2,7 +2,7 @@ import type { PeerMatrix } from "../peers.ts";
 import type { CliContext } from "./context.ts";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { loadPrograms } from "../load-programs.ts";
+import { loadPrograms, PROGRAMS_DIR } from "../load-programs.ts";
 import { checkExternalPeerRanges } from "../peers.ts";
 
 /** Snapshot of an external package's peers, next to its vendored IDL. */
@@ -67,10 +67,10 @@ export async function peersCommand(
       const fresh = serialize(await fetchMatrix(packageName));
       if (mode === "refresh") {
         await writeFile(snapshotPath, fresh);
-        console.log(`Wrote programs/${external.slug}/${SNAPSHOT_FILE}`);
+        console.log(`Wrote ${PROGRAMS_DIR}/${external.slug}/${SNAPSHOT_FILE}`);
       } else if ((await readFile(snapshotPath, "utf-8")) !== fresh) {
         problems.push(
-          `programs/${external.slug}/${SNAPSHOT_FILE} is out of date with npm; run \`bun run megagraph peers --refresh\``,
+          `${PROGRAMS_DIR}/${external.slug}/${SNAPSHOT_FILE} is out of date with npm; run \`bun run megagraph peers --refresh\``,
         );
       }
     }

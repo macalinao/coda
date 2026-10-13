@@ -98,7 +98,7 @@ export interface ProgramMetadataConfig {
 }
 
 /**
- * Configuration of a single program under `programs/<protocol>/<program>/`.
+ * Configuration of a single program under `programs/src/<protocol>/<program>/`.
  *
  * The program's IDL is always `idl.json` next to the config. The visitors
  * run on a root whose main program is this program, so bare selectors (e.g.
@@ -120,7 +120,7 @@ export interface ProgramConfig extends Pick<
 
 /**
  * Define the configuration of a program in
- * `programs/<protocol>/<program>/program.config.ts`.
+ * `programs/src/<protocol>/<program>/program.config.ts`.
  */
 export function defineProgram(config: ProgramConfig): ProgramConfig {
   return config;
@@ -149,7 +149,7 @@ export interface UmbrellaConfig {
 }
 
 /**
- * Configuration of a protocol, `programs/<protocol>/protocol.config.ts`. A
+ * Configuration of a protocol, `programs/src/<protocol>/protocol.config.ts`. A
  * protocol groups the programs in its directory.
  */
 export interface ProtocolConfig {
@@ -168,7 +168,7 @@ export interface ProtocolConfig {
 }
 
 /**
- * Define a protocol in `programs/<protocol>/protocol.config.ts`.
+ * Define a protocol in `programs/src/<protocol>/protocol.config.ts`.
  */
 export function defineProtocol(config: ProtocolConfig): ProtocolConfig {
   return config;
@@ -191,7 +191,7 @@ export interface ExternalNpmPackage {
 
 /**
  * Configuration of an external program under
- * `programs/<protocol>/<program>/program.config.ts`: a program whose client
+ * `programs/src/<protocol>/<program>/program.config.ts`: a program whose client
  * is published by someone else (e.g. `@solana-program/token`). Its `idl.json`
  * is a vendored Codama IDL (not an Anchor IDL) and may contain several
  * programs. It is part of the graph so links into it resolve and are
@@ -214,7 +214,7 @@ export interface ExternalProgramConfig {
 }
 
 /**
- * Define an external program in `programs/<protocol>/<program>/program.config.ts`.
+ * Define an external program in `programs/src/<protocol>/<program>/program.config.ts`.
  */
 export function defineExternalProgram(
   config: ExternalProgramConfig,
@@ -223,7 +223,7 @@ export function defineExternalProgram(
 }
 
 /**
- * Repository-wide settings of the megagraph, `programs/megagraph.config.ts`.
+ * Repository-wide settings of the megagraph, `programs/src/megagraph.config.ts`.
  */
 export interface MegagraphConfig {
   /** Peer dependencies every generated package declares. */
@@ -254,7 +254,7 @@ export interface MegagraphConfig {
 }
 
 /**
- * Define the repository-wide settings in `programs/megagraph.config.ts`.
+ * Define the repository-wide settings in `programs/src/megagraph.config.ts`.
  */
 export function defineMegagraph(config: MegagraphConfig): MegagraphConfig {
   return config;

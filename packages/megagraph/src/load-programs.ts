@@ -8,6 +8,13 @@ import { dirname, join, relative, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { glob } from "glob";
 
+/**
+ * Directory of the program inputs relative to the repository root: the
+ * `src/` of the `programs` workspace package. Holds `megagraph.config.ts`,
+ * one directory per protocol and, in it, one per program.
+ */
+export const PROGRAMS_DIR = "programs/src";
+
 /** File name of a program's IDL inside its directory. */
 export const IDL_FILE = "idl.json";
 
@@ -24,7 +31,7 @@ export const MEGAGRAPH_CONFIG_FILE = "megagraph.config.ts";
 export const PACKAGE_SCOPE = "@solana-programs";
 
 /**
- * A protocol directory, `programs/<protocol>/`, with its loaded config.
+ * A protocol directory, `programs/src/<protocol>/`, with its loaded config.
  */
 export interface ProtocolSource {
   /** Directory name, e.g. `quarry`. */
@@ -47,7 +54,7 @@ export interface ExternalProgramSource {
 }
 
 /**
- * A program directory, `programs/<protocol>/<program>/`, with its loaded
+ * A program directory, `programs/src/<protocol>/<program>/`, with its loaded
  * config.
  */
 export interface ProgramSource {
@@ -117,12 +124,12 @@ export async function loadPrograms(programsDir: string): Promise<{
       program === undefined
     ) {
       throw new Error(
-        `${relative(programsDir, path)}: programs must live in programs/<protocol>/<program>/`,
+        `${relative(programsDir, path)}: programs must live in ${PROGRAMS_DIR}/<protocol>/<program>/`,
       );
     }
     if (!protocolNames.has(protocol)) {
       throw new Error(
-        `programs/${protocol}/${program}: missing programs/${protocol}/${PROTOCOL_CONFIG_FILE}`,
+        `${PROGRAMS_DIR}/${protocol}/${program}: missing ${PROGRAMS_DIR}/${protocol}/${PROTOCOL_CONFIG_FILE}`,
       );
     }
     const config = await importDefault<ProgramConfig | ExternalProgramConfig>(

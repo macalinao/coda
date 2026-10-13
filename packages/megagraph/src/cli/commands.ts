@@ -39,7 +39,7 @@ function run(command: string, args: string[], cwd: string): void {
   }
 }
 
-/** `graph`: builds the megagraph from programs/ into graph/. */
+/** `graph`: builds the megagraph from programs/src/ into graph/. */
 export async function graphCommand(context: CliContext): Promise<void> {
   const sources = await loadPrograms(context.programsDir);
   console.log(
@@ -65,7 +65,7 @@ export async function graphCommand(context: CliContext): Promise<void> {
   console.log("Wrote graph/codama.json and graph/packages.json");
 }
 
-/** `generate`: generates the clients/ workspace from graph/ and programs/. */
+/** `generate`: generates the clients/ workspace from graph/ and programs/src/. */
 export async function generateCommand(context: CliContext): Promise<void> {
   const { config } = context;
   await writeWorkspaceScaffold(context.clientsDir, {
@@ -267,13 +267,13 @@ function renderMirrorReadme(
 TypeScript clients for Solana programs, one npm package per program, plus umbrella packages that re-export a protocol's programs.
 
 > [!IMPORTANT]
-> This repository is **generated** from [${source}](https://github.com/${source}) at [\`${sourceCommit.slice(0, 7)}\`](${commitUrl}). Do not edit it by hand: change \`programs/\` in ${source} instead. Releases are cut and published from ${source}; the versions, changelogs and \`graph/\` here are the release state it diffs against.
+> This repository is **generated** from [${source}](https://github.com/${source}) at [\`${sourceCommit.slice(0, 7)}\`](${commitUrl}). Do not edit it by hand: change \`programs/src/\` in ${source} instead. Releases are cut and published from ${source}; the versions, changelogs and \`graph/\` here are the release state it diffs against.
 
 ## Layout
 
 - \`packages/<protocol>/<program>/\`: one package per program. \`packages/<protocol>/\`: the protocol's umbrella package, if it has one.
 - \`graph/codama.json\`: every program merged into one Codama graph, including external programs (e.g. SPL Token) whose clients are published elsewhere. \`graph/packages.json\` lists each program's protocol, package and on-chain metadata (addresses, sources, status), the programs it links to, the umbrellas and the external programs.
-- \`programs/<protocol>/<program>/\`: the generator's inputs (IDL, \`program.config.ts\`), for reference. They need the coda tooling to run. External programs only have a vendored IDL here, no package.
+- \`programs/src/<protocol>/<program>/\`: the generator's inputs (IDL, \`program.config.ts\`), for reference; the same files are published as the \`@solana-programs/programs\` npm package. They need the coda tooling to run. External programs only have a vendored IDL here, no package.
 
 ## Development
 
@@ -328,7 +328,7 @@ export async function exportCommand(
 
   await copyTree(context.clientsDir, outDir);
   await copyTree(context.graphDir, join(outDir, "graph"));
-  await copyTree(context.programsDir, join(outDir, "programs"));
+  await copyTree(context.programsPackageDir, join(outDir, "programs"));
 
   const packages = await findWorkspacePackages(outDir);
   await writeFile(

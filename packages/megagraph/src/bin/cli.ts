@@ -2,10 +2,10 @@
 /**
  * megagraph: builds the program graph, generates the client workspace, and
  * plans, applies and publishes releases. Run from the repository root (the
- * directory holding `programs/megagraph.config.ts`) or pass `--root <dir>`.
+ * directory holding `programs/src/megagraph.config.ts`) or pass `--root <dir>`.
  *
- *   megagraph graph                       programs/ -> graph/
- *   megagraph generate                    graph/ + programs/ -> clients/
+ *   megagraph graph                       programs/src/ -> graph/
+ *   megagraph generate                    graph/ + programs/src/ -> clients/
  *   megagraph clients <install|build|typecheck|test|lint|fingerprint>
  *   megagraph export <out-dir> [--source-commit <sha>]
  *   megagraph release plan --mirror <dir>

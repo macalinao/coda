@@ -45,7 +45,7 @@ export function renderSourceSection(input: {
   version: string;
   /** Directory of the package in the mirror. */
   path: string;
-  /** Directory of the package's inputs, e.g. `programs/quarry/mine`. */
+  /** Directory of the package's inputs, e.g. `programs/src/quarry/mine`. */
   source: string;
   mirror: MirrorLocation;
 }): string {
@@ -91,7 +91,7 @@ export interface PackageTemplateInput {
   version: string;
   description: string;
   keywords: string[];
-  /** Directory the package is generated from, e.g. `programs/quarry/mine`. */
+  /** Directory the package is generated from, e.g. `programs/src/quarry/mine`. */
   source: string;
   /** Directory of the package in the generated workspace and the mirror. */
   path: string;
@@ -358,7 +358,7 @@ export function renderProgramSection(input: {
 
 /**
  * Renders the generated `README.md`. `body` is the optional hand-written
- * `programs/<slug>/README.md`, inserted after the installation section.
+ * `programs/src/<slug>/README.md`, inserted after the installation section.
  */
 export function renderReadme(
   input: PackageTemplateInput,
