@@ -49,7 +49,7 @@
     "docs:dev": "turbo dev --filter=coda-docs",
     "docs:build": "turbo build --filter=coda-docs",
     "format": "oxfmt",
-    "build:ci": "turbo build --filter='./packages/**'",
+    "build:ci": "turbo build --filter='./packages/**' --filter=./programs",
     "clients": "bun run megagraph clients",
     "megagraph": "bun packages/megagraph/src/bin/cli.ts"
   },

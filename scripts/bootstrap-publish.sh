@@ -17,7 +17,8 @@ set -euo pipefail
 # exactly what happened to @solana-programs/goki@0.2.0 on 2026-08-15.
 # The stub also leaves `latest` unset until the first real release claims it.
 #
-# Tooling packages (packages/*) are released by release.yml. The generated
+# Tooling packages (packages/*) and the program inputs (programs/,
+# @solana-programs/programs) are released by release.yml. The generated
 # @solana-programs/* clients are released by release-clients.yml from the
 # generated clients/ workspace, so run `bun run codegen` first to bootstrap
 # new client names.
@@ -103,7 +104,7 @@ bootstrap_all() {
   done
 }
 
-bootstrap_all release.yml packages/*
+bootstrap_all release.yml packages/* programs
 # Umbrellas at clients/packages/<protocol>/, programs one level below.
 if [ -d clients/packages ]; then
   bootstrap_all release-clients.yml clients/packages/* clients/packages/*/*
