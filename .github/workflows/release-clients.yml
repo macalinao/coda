@@ -5,7 +5,7 @@ name: Release clients
 # github.com/toolboxdao/solana-programs is a code-only mirror (no workflows)
 # and the release state: its graph/codama.json, package versions and
 # changelogs are what each release is planned against. This workflow
-# regenerates every client from programs/, plans version bumps from the
+# regenerates every client from programs/src/, plans version bumps from the
 # difference, verifies everything builds, commits and tags the release in the
 # mirror, and then publishes whatever the mirror has that npm does not.
 #

@@ -57,7 +57,7 @@ jobs:
 
       # oxlint runs with typeAware + typeCheck, so this both lints and
       # type-checks every package, the megagraph CLI and every
-      # programs/**/*.ts config (the `programs` workspace package). The build
+      # programs/src/**/*.ts config (the `programs` workspace package). The build
       # above produces the .d.ts files tsgolint needs to resolve
       # @macalinao/coda and @macalinao/megagraph from the configs. oxfmt
       # --check enforces formatting.
