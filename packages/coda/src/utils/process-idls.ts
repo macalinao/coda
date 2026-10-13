@@ -55,21 +55,23 @@ export interface ProcessConfigOptions {
    * `linkKnownProgramsVisitor`.
    */
   linkPrograms?: string[];
+  /**
+   * Parsed IDLs to process instead of loading `config.idlPath`, e.g. an IDL
+   * imported as a JSON module. Each is cloned first, so the caller's objects
+   * are never mutated.
+   */
+  idls?: AnchorIdl[];
   /** Suppress progress logging. */
   quiet?: boolean;
 }
 
 /**
- * Parse the IDLs a config points at and apply the default account rules and
- * the config's custom visitors.
+ * Loads the IDLs `config.idlPath` points at (default `./idls/*.json`).
  */
-export async function processConfig(
+async function loadIdlsFromConfig(
   config: CodaConfig,
-  options: ProcessConfigOptions = {},
-): Promise<{ codama: Codama; idls: AnchorIdl[] }> {
-  const { quiet = false } = options;
-
-  // Determine IDL paths - use config if provided, otherwise use command line option
+  options: ProcessConfigOptions,
+): Promise<AnchorIdl[]> {
   const idlPathInput = config.idlPath ?? "./idls/*.json";
   const resolveOptions =
     options.baseDir === undefined ? {} : { baseDir: options.baseDir };
@@ -78,9 +80,26 @@ export async function processConfig(
   if (resolvedPaths.length === 0) {
     throw new Error("No IDL files found matching the specified pattern(s)");
   }
+  return loadIdls(resolvedPaths, { quiet: options.quiet ?? false });
+}
 
-  // Load all IDLs
-  const idls = await loadIdls(resolvedPaths, { quiet });
+/**
+ * Parse the IDLs a config points at (or `options.idls`) and apply the
+ * default account rules and the config's custom visitors.
+ */
+export async function processConfig(
+  config: CodaConfig,
+  options: ProcessConfigOptions = {},
+): Promise<{ codama: Codama; idls: AnchorIdl[] }> {
+  const { quiet = false } = options;
+
+  const idls =
+    options.idls === undefined
+      ? await loadIdlsFromConfig(config, options)
+      : options.idls.map((idl) => structuredClone(idl));
+  if (idls.length === 0) {
+    throw new Error("No IDLs to process");
+  }
 
   // Create Codama instance
   const codama = createCodamaFromIdls(idls, { quiet });
