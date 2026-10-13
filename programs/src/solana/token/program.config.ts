@@ -1,3 +1,4 @@
+import type { RootNode } from "@macalinao/coda";
 import {
   definePdas,
   programHandle,
@@ -5,6 +6,13 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineExternalProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+// JSON imports widen string literals, so the node kinds do not type-check as
+// literals; the IDL is a valid rootNode (megagraph validates it on every build).
+/** The program's Codama IDL (a `rootNode`), vendored from its npm package. */
+export const idl: RootNode = idlJson as unknown as RootNode;
 
 /** The SPL Token program. */
 export const program = programHandle("token");
@@ -35,6 +43,9 @@ export const associatedTokenPdas = definePdas(associatedTokenProgram, {
 });
 
 export default defineExternalProgram({
+  protocol,
+  name: "token",
+  idl,
   npm: {
     package: "@solana-program/token",
     // One caret per 0.x minor (`^0.x` only matches that minor). Every version

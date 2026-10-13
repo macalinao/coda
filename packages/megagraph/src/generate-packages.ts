@@ -29,6 +29,7 @@ import {
   getProgramPackagePath,
   getUmbrellaPackagePath,
   PROGRAMS_DIR,
+  PROTOCOL_CONFIG_FILE,
 } from "./load-programs.ts";
 import { getTransitiveDependencies } from "./package-graph.ts";
 import {
@@ -241,10 +242,10 @@ export async function generatePackages(
     const templateInput: PackageTemplateInput = {
       name: entry.packageName,
       version: entry.version,
-      description: source.config.package.description,
+      description: source.package.description,
       keywords: [
-        ...(protocol?.config.keywords ?? []),
-        ...(source.config.package.keywords ?? []),
+        ...(protocol?.release?.keywords ?? []),
+        ...(source.package.keywords ?? []),
       ],
       source: relative(input.repoRoot, source.dir),
       path: getProgramPackagePath(entry),
@@ -324,9 +325,9 @@ export async function generatePackages(
     const protocol = input.protocols.find(
       (candidate) => candidate.protocol === umbrella.protocol,
     );
-    if (protocol?.config.umbrella === undefined) {
+    if (protocol?.release?.umbrella === undefined) {
       throw new Error(
-        `${PROGRAMS_DIR}/${umbrella.protocol}: the umbrella is missing from protocol.config.ts`,
+        `${PROGRAMS_DIR}/${umbrella.protocol}: the umbrella is missing from the protocol's release`,
       );
     }
     generated.push(
@@ -354,7 +355,7 @@ async function generateUmbrella(
   packagesByProgram: Map<string, Megagraph["packages"][number]>,
   peersByPackage: Map<string, Record<string, string>>,
 ): Promise<string> {
-  const config = protocol.config.umbrella;
+  const config = protocol.release?.umbrella;
   if (config === undefined) {
     throw new Error(`${PROGRAMS_DIR}/${protocol.protocol} has no umbrella`);
   }
@@ -388,7 +389,10 @@ async function generateUmbrella(
     name: umbrella.packageName,
     version: umbrella.version,
     description: config.description,
-    keywords: [...(protocol.config.keywords ?? []), ...(config.keywords ?? [])],
+    keywords: [
+      ...(protocol.release?.keywords ?? []),
+      ...(config.keywords ?? []),
+    ],
     source: relative(input.repoRoot, protocol.dir),
     path: getUmbrellaPackagePath(umbrella.protocol),
     mirror: input.mirror,
@@ -417,7 +421,7 @@ async function generateUmbrella(
     renderBundleIndex(
       renderEntryHeader(
         templateInput,
-        `${templateInput.source}/protocol.config.ts`,
+        `${templateInput.source}/${PROTOCOL_CONFIG_FILE}`,
       ),
       members,
       plan,

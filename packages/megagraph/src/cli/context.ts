@@ -1,4 +1,4 @@
-import type { MegagraphConfig } from "../define-program.ts";
+import type { MegagraphConfig } from "../define-release.ts";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";

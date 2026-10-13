@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   constant,
   definePdas,
@@ -6,6 +7,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("tokenSigner");
 
@@ -17,18 +23,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description:
-      "TypeScript client for the Goki Token Signer program, which lets an NFT holder sign for a PDA derived from the NFT's mint",
-    keywords: ["goki", "token-signer", "nft"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/goki`, which now re-exports this package.",
-    ],
-  },
+  protocol,
+  name: "token-signer",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Goki Token Signer",
     description:
       "Lets the holder of an NFT sign instructions on behalf of a PDA derived from the NFT's mint.",

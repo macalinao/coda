@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   associatedTokenAccountValueNode,
@@ -10,6 +11,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("quarryRedeemer");
 
@@ -25,18 +31,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description:
-      "TypeScript client for the Quarry Redeemer program, which redeems IOU tokens for their underlying tokens",
-    keywords: ["quarry", "redeemer", "ian-macalinao"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/quarry`, which now re-exports this package.",
-    ],
-  },
+  protocol,
+  name: "redeemer",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Quarry Redeemer",
     description: "Exchanges IOU tokens for their underlying redemption tokens.",
     repository: "https://github.com/QuarryProtocol/quarry",

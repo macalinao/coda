@@ -46,6 +46,7 @@
     "test": "bun test src/"
   },
   "dependencies": {
+    "@codama/nodes-from-anchor": "catalog:",
     "@macalinao/coda": "workspace:^",
     "@macalinao/codama-renderers-js-esm": "workspace:^",
     "@macalinao/codama-renderers-markdown": "workspace:^",

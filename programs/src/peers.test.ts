@@ -13,13 +13,13 @@ describe("external peer ranges", () => {
   });
 
   for (const external of externals) {
-    test(`${external.external.npm.package} is aligned with the shared peers`, async () => {
+    test(`${external.definition.npm.package} is aligned with the shared peers`, async () => {
       const matrix = JSON.parse(
         await readFile(join(external.dir, "npm-peers.json"), "utf-8"),
       ) as PeerMatrix;
       const { problems } = checkExternalPeerRanges({
         matrix,
-        externalRange: external.external.npm.range,
+        externalRange: external.definition.npm.range,
         peerDependencies: megagraph.peerDependencies,
       });
       expect(problems).toEqual([]);

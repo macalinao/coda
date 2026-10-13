@@ -1,8 +1,11 @@
 /**
- * Every program of the Coda program megagraph, one namespace per protocol:
- * its `protocol.config.ts` as `protocol` and, per program, the exports of its
- * `program.config.ts` (`config` is the default export) and its IDL as `idl`.
- * Each protocol and program is also importable from its own subpath, e.g.
+ * The definition of every program of the Coda program megagraph, one
+ * namespace per protocol: its `protocol.config.ts` (`defineProtocol`) as
+ * `protocol` and, per program, the exports of its `program.config.ts`: the
+ * `defineProgram` definition as `definition`, its IDL as `idl`, and its
+ * handles (`program`, `pdas`, ...). Release metadata (package names,
+ * versions, changelogs) is not part of this package. Each protocol and
+ * program is also importable from its own subpath, e.g.
  * `@solana-programs/definitions/quarry/mine`.
  */
 

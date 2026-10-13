@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   constant,
@@ -12,6 +13,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("mplCoreProgram");
 
@@ -30,18 +36,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    name: "@solana-programs/mpl-core",
-    description: "TypeScript client for the Metaplex Core program",
-    keywords: ["metaplex", "mpl-core", "core", "nft", "ian-macalinao"],
-    version: "0.6.2",
-    releaseNotes: [
-      "Generated from the program megagraph in macalinao/coda. The generated code is unchanged; the README, reference docs and package metadata are regenerated.",
-    ],
-  },
+  protocol,
+  name: "core",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Metaplex Core",
     repository: "https://github.com/metaplex-foundation/mpl-core",
     addresses: {

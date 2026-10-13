@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   constant,
   definePdas,
@@ -8,6 +9,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("smartWallet");
 
@@ -54,18 +60,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description:
-      "TypeScript client for the Goki Smart Wallet (multisig) program",
-    keywords: ["goki", "smart-wallet", "multisig"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/goki`, which now re-exports this package.",
-    ],
-  },
+  protocol,
+  name: "smart-wallet",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Goki Smart Wallet",
     description:
       "Owner-threshold multisig that proposes, approves and executes arbitrary instructions, optionally behind a timelock.",

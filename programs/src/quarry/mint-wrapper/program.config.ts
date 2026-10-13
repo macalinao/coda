@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   constant,
@@ -9,6 +10,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("quarryMintWrapper");
 
@@ -28,18 +34,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description:
-      "TypeScript client for the Quarry Mint Wrapper program, which mints Quarry rewards through rate-limited minters",
-    keywords: ["quarry", "mining", "mint-wrapper", "ian-macalinao"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/quarry`, which now re-exports this package.",
-    ],
-  },
+  protocol,
+  name: "mint-wrapper",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Quarry Mint Wrapper",
     description:
       "Owns the mint authority of a rewards token and hands out rate-limited minters.",

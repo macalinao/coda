@@ -5,11 +5,9 @@ import type {
   ProgramSource,
   ProtocolSource,
 } from "./load-programs.ts";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { processConfig } from "@macalinao/coda";
 import { createFromJson, programNode, rootNode } from "codama";
-import { IDL_FILE, PROGRAMS_DIR } from "./load-programs.ts";
+import { PROGRAMS_DIR } from "./load-programs.ts";
 import {
   findCycles,
   findUnresolvedLinks,
@@ -29,7 +27,7 @@ export interface ProgramPackage {
   slug: string;
   /** npm package name. */
   packageName: string;
-  /** Version of the package's first release (from its config). */
+  /** Version of the package's first release (from its release config). */
   version: string;
   /** Names of the programs this program links into. */
   dependencies: string[];
@@ -62,7 +60,7 @@ export interface UmbrellaPackage {
   protocol: string;
   /** npm package name. */
   packageName: string;
-  /** Version of the package's first release (from its config). */
+  /** Version of the package's first release (from its release config). */
   version: string;
   /** Codama names of the member programs, in precedence order. */
   programs: string[];
@@ -103,9 +101,9 @@ export interface Megagraph {
 }
 
 /**
- * Parses a program's IDL and runs its config.
+ * Parses a program's IDL and runs its definition's visitors.
  *
- * The program is processed on its own root, so the config's bare selectors
+ * The program is processed on its own root, so the definition's bare selectors
  * cannot touch another program's nodes. `contextPrograms` are added to that
  * root only so that program-qualified links resolve while the visitors run;
  * only the program itself is kept.
@@ -115,28 +113,34 @@ async function processProgram(
   contextPrograms: ProgramNode[],
   linkPrograms: string[],
 ): Promise<ProgramNode> {
+  const { definition } = source;
   const { codama } = await processConfig(
     {
-      idlPath: `./${IDL_FILE}`,
-      ...(source.config.instructionAccountDefaultValues && {
+      ...(definition.instructionAccountDefaultValues && {
         instructionAccountDefaultValues:
-          source.config.instructionAccountDefaultValues,
+          definition.instructionAccountDefaultValues,
       }),
-      ...(source.config.visitors && { visitors: source.config.visitors }),
+      ...(definition.visitors && { visitors: definition.visitors }),
     },
-    { baseDir: source.dir, contextPrograms, linkPrograms, quiet: true },
+    { idls: [definition.idl], contextPrograms, linkPrograms, quiet: true },
   );
-  return codama.getRoot().program;
+  const program = codama.getRoot().program;
+  if (program.name !== definition.program.name) {
+    throw new Error(
+      `${PROGRAMS_DIR}/${source.slug}: the program handle is named "${definition.program.name}", but the IDL's program is "${program.name}"`,
+    );
+  }
+  return program;
 }
 
 /**
  * Strips a program down to its identity and PDAs for use as context.
  *
- * Configs select nodes by bare name (`updateInstructionsVisitor({ burn: ... })`),
- * and those selectors match nodes of every program in the root. A same-named
- * instruction of a context program can make such a visitor throw, so context
- * programs only carry what config-time link resolution actually needs: the
- * PDAs whose seeds a PDA default value is filled from. Every other link kind
+ * Definitions select nodes by bare name
+ * (`updateInstructionsVisitor({ burn: ... })`), and those selectors match
+ * nodes of every program in the root. A same-named instruction of a context
+ * program can make such a visitor throw, so context programs only carry what
+ * link resolution while the visitors run actually needs: the PDAs whose seeds a PDA default value is filled from. Every other link kind
  * is resolved later, when the merged graph is validated and rendered.
  */
 function toContextProgram(program: ProgramNode): ProgramNode {
@@ -150,26 +154,23 @@ function toContextProgram(program: ProgramNode): ProgramNode {
 
 /**
  * Loads an external program's vendored Codama IDL and asserts that the
- * handles its config declares match the IDL exactly.
+ * handles its definition declares match the IDL exactly.
  */
-async function loadExternalPrograms(
-  source: ExternalProgramSource,
-): Promise<ProgramNode[]> {
-  const json = await readFile(join(source.dir, IDL_FILE), "utf-8");
-  const root = createFromJson(json).getRoot();
+function loadExternalPrograms(source: ExternalProgramSource): ProgramNode[] {
+  const root = createFromJson(JSON.stringify(source.definition.idl)).getRoot();
   const programs: ProgramNode[] = [
     root.program,
     ...(root.additionalPrograms ?? []),
   ];
   const where = `${PROGRAMS_DIR}/${source.slug}`;
-  for (const handle of source.external.handles.programs ?? []) {
+  for (const handle of source.definition.handles.programs ?? []) {
     if (!programs.some((program) => program.name === handle.name)) {
       throw new Error(
         `${where}: program handle "${handle.name}" does not match any program of the IDL (${programs.map((program) => program.name).join(", ")})`,
       );
     }
   }
-  for (const handle of source.external.handles.pdas ?? []) {
+  for (const handle of source.definition.handles.pdas ?? []) {
     const program = programs.find(
       (candidate) => candidate.name === handle.program,
     );
@@ -216,11 +217,11 @@ function assertUniquePackageNames(
       owner: `${PROGRAMS_DIR}/${source.slug}`,
     })),
     ...protocols.flatMap((source) =>
-      source.config.umbrella === undefined
+      source.release?.umbrella === undefined
         ? []
         : [
             {
-              name: source.config.umbrella.name,
+              name: source.release.umbrella.name,
               owner: `the umbrella of ${PROGRAMS_DIR}/${source.protocol}`,
             },
           ],
@@ -245,8 +246,8 @@ function resolveUmbrellas(
   protocols: ProtocolSource[],
   entries: { source: ProgramSource; program: ProgramNode }[],
 ): UmbrellaPackage[] {
-  return protocols.flatMap(({ protocol, config }) => {
-    const umbrella = config.umbrella;
+  return protocols.flatMap(({ protocol, release }) => {
+    const umbrella = release?.umbrella;
     if (umbrella === undefined) {
       return [];
     }
@@ -260,19 +261,17 @@ function resolveUmbrellas(
     }
     const precedence = umbrella.precedence ?? [];
     for (const program of precedence) {
-      if (!members.some((member) => member.source.program === program)) {
+      if (!members.some((member) => member.source.definition === program)) {
         throw new Error(
-          `${PROGRAMS_DIR}/${protocol}: umbrella precedence lists "${program}", which is not a program of the protocol`,
+          `${PROGRAMS_DIR}/${protocol}: umbrella precedence lists "${program.protocol.name}/${program.name}", which is not a program of the protocol`,
         );
       }
     }
-    const rank = (program: string) => {
-      const index = precedence.indexOf(program);
+    const rank = (program: ProgramSource) => {
+      const index = precedence.indexOf(program.definition);
       return index === -1 ? precedence.length : index;
     };
-    const ordered = members.toSorted(
-      (a, b) => rank(a.source.program) - rank(b.source.program),
-    );
+    const ordered = members.toSorted((a, b) => rank(a.source) - rank(b.source));
     return [
       {
         protocol,
@@ -288,15 +287,15 @@ function resolveUmbrellas(
 /**
  * Builds and validates the megagraph from every program source.
  *
- * Programs are processed twice. The first pass runs each config on its own
- * program, which yields every program's own nodes (e.g. the PDAs its config
- * adds). The second pass runs each config again with every other program's
- * first-pass PDAs as context, so a PDA default value linking into another
- * program resolves while the visitors run —
+ * Programs are processed twice. The first pass runs each definition's
+ * visitors on its own program, which yields every program's own nodes (e.g.
+ * the PDAs its definition adds). The second pass runs them again with every
+ * other program's first-pass PDAs as context, so a PDA default value linking
+ * into another program resolves while the visitors run —
  * `setInstructionAccountDefaultValuesVisitor`, for one, silently drops a PDA
  * default whose seeds it cannot look up. Two passes suffice as long as a
- * config only links to PDAs another config declares, not to nodes another
- * config derives from links of its own.
+ * definition only links to PDAs another definition declares, not to nodes
+ * another definition derives from links of its own.
  */
 export async function buildMegagraph(input: {
   protocols: ProtocolSource[];
@@ -305,16 +304,9 @@ export async function buildMegagraph(input: {
 }): Promise<Megagraph> {
   const { protocols, programs: sources } = input;
   const externalSources = input.externals ?? [];
-  const externalEntries = (
-    await Promise.all(
-      externalSources.map(async (source) =>
-        (await loadExternalPrograms(source)).map((program) => ({
-          source,
-          program,
-        })),
-      ),
-    )
-  ).flat();
+  const externalEntries = externalSources.flatMap((source) =>
+    loadExternalPrograms(source).map((program) => ({ source, program })),
+  );
   const externalPrograms = externalEntries.map((entry) => entry.program);
   const linkPrograms = externalPrograms.map(
     (program) => program.name as string,
@@ -376,7 +368,7 @@ export async function buildMegagraph(input: {
     ),
     ...externalEntries.map(
       ({ source, program }) =>
-        [program.name as string, source.external.npm.package] as const,
+        [program.name as string, source.definition.npm.package] as const,
     ),
   ]);
   const unresolved = findUnresolvedLinks(root);
@@ -410,13 +402,15 @@ export async function buildMegagraph(input: {
 
   return {
     root,
-    protocols: protocols.map(({ protocol, config }) => ({
+    protocols: protocols.map(({ protocol, definition }) => ({
       protocol,
-      displayName: config.displayName,
-      description: config.description,
-      ...(config.homepage !== undefined && { homepage: config.homepage }),
-      ...(config.repository !== undefined && {
-        repository: config.repository,
+      displayName: definition.displayName,
+      description: definition.description,
+      ...(definition.homepage !== undefined && {
+        homepage: definition.homepage,
+      }),
+      ...(definition.repository !== undefined && {
+        repository: definition.repository,
       }),
       programs: [...sorted, ...externalEntries]
         .filter((entry) => entry.source.protocol === protocol)
@@ -428,13 +422,13 @@ export async function buildMegagraph(input: {
       protocol: source.protocol,
       slug: source.slug,
       packageName: source.packageName,
-      version: source.config.package.version,
+      version: source.package.version,
       dependencies: dependencies.get(program.name) ?? [],
-      ...(source.config.package.releaseNotes && {
-        releaseNotes: source.config.package.releaseNotes,
+      ...(source.package.releaseNotes && {
+        releaseNotes: source.package.releaseNotes,
       }),
       metadata: resolveProgramMetadata({
-        config: source.config.program,
+        config: source.definition.metadata,
         program: program.name,
         publicKey: program.publicKey,
         knownPrograms,
@@ -447,8 +441,8 @@ export async function buildMegagraph(input: {
         program: program.name as string,
         protocol: source.protocol,
         slug: source.slug,
-        packageName: source.external.npm.package,
-        peerRange: source.external.npm.range,
+        packageName: source.definition.npm.package,
+        peerRange: source.definition.npm.range,
       }))
       .toSorted((a, b) => a.program.localeCompare(b.program)),
   };

@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   associatedTokenAccountValueNode,
@@ -10,6 +11,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("tokenMetadata");
 
@@ -155,19 +161,14 @@ const ataOf = (mintAccount: string, ownerAccount: string) =>
   });
 
 export default defineProgram({
-  package: {
-    name: "@solana-programs/token-metadata",
-    description: "TypeScript client for the Metaplex Token Metadata program",
-    keywords: ["metaplex", "token-metadata", "nft", "ian-macalinao"],
-    version: "0.10.0",
-    releaseNotes: [
-      "**Breaking:** now has a peer dependency on `@solana-program/token` (`^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0`): the generated code imports the token program addresses (`TOKEN_PROGRAM_ADDRESS`, `ASSOCIATED_TOKEN_PROGRAM_ADDRESS`) and `findAssociatedTokenPda` from it instead of inlining them.",
-      "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
-    ],
-  },
+  protocol,
+  name: "token-metadata",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Metaplex Token Metadata",
     description:
       "Attaches additional data to fungible and non-fungible tokens through PDAs derived from their mint addresses.",

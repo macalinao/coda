@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   constant,
   definePdas,
@@ -8,6 +9,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("govern");
 
@@ -42,17 +48,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description: "TypeScript client for the Tribeca Govern program",
-    keywords: ["tribeca", "governance", "voting", "dao"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/tribeca`, which now re-exports this package.",
-    ],
-  },
+  protocol,
+  name: "govern",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Tribeca Govern",
     description:
       "Core program of Tribeca governance: creates governors and proposals, and records votes.",

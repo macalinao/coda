@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   constant,
   constantValueNode,
@@ -10,6 +11,11 @@ import {
   zeroableOptionTypeNode,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("lockedVoter");
 
@@ -44,18 +50,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description:
-      "TypeScript client for the Tribeca Locked Voter (vote escrow) program",
-    keywords: ["tribeca", "governance", "voting", "vote-escrow", "dao"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/tribeca`, which now re-exports this package.",
-    ],
-  },
+  protocol,
+  name: "locked-voter",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Tribeca Locked Voter",
     description:
       "Vote escrow program: token holders lock tokens for a period of time in exchange for voting power in a Tribeca Govern governor.",

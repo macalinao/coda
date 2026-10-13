@@ -2,7 +2,7 @@ import type { PeerMatrix } from "../peers.ts";
 import type { CliContext } from "./context.ts";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { loadPrograms, PROGRAMS_DIR } from "../load-programs.ts";
+import { PROGRAMS_DIR, resolvePrograms } from "../load-programs.ts";
 import { checkExternalPeerRanges } from "../peers.ts";
 
 /** Snapshot of an external package's peers, next to its vendored IDL. */
@@ -58,11 +58,11 @@ export async function peersCommand(
   context: CliContext,
   mode: "check" | "refresh" | "verify",
 ): Promise<void> {
-  const { externals } = await loadPrograms(context.programsDir);
+  const { externals } = resolvePrograms(context.config, context.programsDir);
   const problems: string[] = [];
   for (const external of externals) {
     const snapshotPath = join(external.dir, SNAPSHOT_FILE);
-    const packageName = external.external.npm.package;
+    const packageName = external.definition.npm.package;
     if (mode !== "check") {
       const fresh = serialize(await fetchMatrix(packageName));
       if (mode === "refresh") {
@@ -79,12 +79,12 @@ export async function peersCommand(
     ) as PeerMatrix;
     const { problems: found, checked: shared } = checkExternalPeerRanges({
       matrix,
-      externalRange: external.external.npm.range,
+      externalRange: external.definition.npm.range,
       peerDependencies: context.config.peerDependencies,
     });
     problems.push(...found);
     console.log(
-      `${packageName} ${external.external.npm.range}: checked against ${shared.map(([name, range]) => `${name} ${range}`).join(", ")}`,
+      `${packageName} ${external.definition.npm.range}: checked against ${shared.map(([name, range]) => `${name} ${range}`).join(", ")}`,
     );
   }
   if (problems.length > 0) {

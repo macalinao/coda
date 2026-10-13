@@ -2,6 +2,7 @@ import type { ProgramMetadataConfig } from "./define-program.ts";
 import type { ProgramMetadata } from "./program-metadata.ts";
 import { describe, expect, test } from "bun:test";
 import { programNode } from "codama";
+import { programHandle } from "@macalinao/coda";
 import {
   diffProgramMetadata,
   gitFileUrl,
@@ -78,7 +79,7 @@ describe("resolveProgramMetadata", () => {
 
   test("rejects a mainnet address that differs from the IDL's", () => {
     expect(() => resolve({ addresses: { mainnet: DEVNET } })).toThrow(
-      "programs/quarry/mine: program.addresses.mainnet (11111111111111111111111111111111) does not match the IDL's address",
+      "programs/quarry/mine: metadata.addresses.mainnet (11111111111111111111111111111111) does not match the IDL's address",
     );
   });
 
@@ -88,12 +89,12 @@ describe("resolveProgramMetadata", () => {
     );
     expect(() =>
       resolve({ addresses: { testnet: DEVNET } as Record<string, string> }),
-    ).toThrow("program.addresses.testnet is not a known cluster");
+    ).toThrow("metadata.addresses.testnet is not a known cluster");
     expect(() => resolve({ repository: "github.com/x/y" })).toThrow(
-      "program.repository is not a URL",
+      "metadata.repository is not a URL",
     );
     expect(() => resolve({ docs: "http://example.com" })).toThrow(
-      "program.docs must be an https URL",
+      "metadata.docs must be an https URL",
     );
     expect(() =>
       resolve({
@@ -110,15 +111,15 @@ describe("resolveProgramMetadata", () => {
           { auditor: "Firm", url: "https://example.com", date: "June 2021" },
         ],
       }),
-    ).toThrow("program.audits[0].date must be YYYY-MM or YYYY-MM-DD");
+    ).toThrow("metadata.audits[0].date must be YYYY-MM or YYYY-MM-DD");
     expect(() => resolve({ displayName: " " })).toThrow(
-      "program.displayName must not be empty",
+      "metadata.displayName must not be empty",
     );
   });
 
   test("supersededBy requires a deprecated status and a known, other program", () => {
     expect(() => resolve({ supersededBy: "quarryMineV2" })).toThrow(
-      'requires program.status "deprecated"',
+      'requires metadata.status "deprecated"',
     );
     expect(() =>
       resolve({ status: "deprecated", supersededBy: "quarryMine" }),
@@ -129,6 +130,12 @@ describe("resolveProgramMetadata", () => {
     expect(
       resolve({ status: "deprecated", supersededBy: "quarryMineV2" })
         .supersededBy,
+    ).toBe("quarryMineV2");
+    expect(
+      resolve({
+        status: "deprecated",
+        supersededBy: programHandle("quarryMineV2"),
+      }).supersededBy,
     ).toBe("quarryMineV2");
   });
 });

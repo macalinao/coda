@@ -12,17 +12,33 @@ export {
   renderBundleIndex,
 } from "./bundle.ts";
 export type {
+  ExternalNpmPackage,
+  ExternalProgramDefinition,
   GitFileSource,
   ProgramAudit,
   ProgramCluster,
-  ProgramConfig,
+  ProgramDefinition,
   ProgramMetadataConfig,
-  ProgramPackageConfig,
   ProgramStatus,
-  ProtocolConfig,
-  UmbrellaConfig,
+  ProtocolDefinition,
 } from "./define-program.ts";
-export { defineProgram, defineProtocol } from "./define-program.ts";
+export {
+  defineExternalProgram,
+  defineProgram,
+  defineProtocol,
+} from "./define-program.ts";
+export type {
+  MegagraphConfig,
+  ProgramPackageConfig,
+  ProgramRelease,
+  ProtocolRelease,
+  UmbrellaConfig,
+} from "./define-release.ts";
+export {
+  defineMegagraph,
+  defineProgramRelease,
+  defineProtocolRelease,
+} from "./define-release.ts";
 export type { GeneratePackagesInput } from "./generate-packages.ts";
 export { generatePackages } from "./generate-packages.ts";
 export {
@@ -31,15 +47,25 @@ export {
   readMegagraph,
   writeMegagraph,
 } from "./graph-files.ts";
-export type { ProgramSource, ProtocolSource } from "./load-programs.ts";
+export type {
+  ExternalProgramSource,
+  MegagraphSources,
+  ProgramSource,
+  ProtocolSource,
+} from "./load-programs.ts";
 export {
   getProgramPackagePath,
   getUmbrellaPackagePath,
   IDL_FILE,
+  loadMegagraphConfig,
   loadPrograms,
+  MEGAGRAPH_CONFIG_FILE,
   PACKAGE_SCOPE,
   PROGRAM_CONFIG_FILE,
+  PROGRAMS_DIR,
   PROTOCOL_CONFIG_FILE,
+  RELEASE_CONFIG_FILE,
+  resolvePrograms,
 } from "./load-programs.ts";
 export type { UnresolvedLink } from "./package-graph.ts";
 export {
@@ -74,15 +100,7 @@ export {
   planRelease,
   renderPlanMarkdown,
 } from "./release/plan.ts";
-export type {
-  ExternalNpmPackage,
-  ExternalProgramConfig,
-  MegagraphConfig,
-} from "./define-program.ts";
-export { defineExternalProgram, defineMegagraph } from "./define-program.ts";
 export type { ExternalProgramEntry } from "./build-graph.ts";
-export type { ExternalProgramSource } from "./load-programs.ts";
-export { loadMegagraphConfig, MEGAGRAPH_CONFIG_FILE } from "./load-programs.ts";
 export type { PeerMatrix } from "./peers.ts";
 export { checkExternalPeerRanges, checkPeerRanges } from "./peers.ts";
 export type { MirrorLocation, ProgramSuccessor } from "./templates.ts";

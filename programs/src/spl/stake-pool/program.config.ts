@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   argumentValueNode,
@@ -14,6 +15,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("splStakePool");
 
@@ -49,25 +55,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description: "TypeScript client for the SPL Stake Pool program",
-    keywords: [
-      "spl",
-      "stake-pool",
-      "staking",
-      "delegation",
-      "validator",
-      "ian-macalinao",
-    ],
-    version: "0.6.0",
-    releaseNotes: [
-      "**Breaking:** now has a peer dependency on `@solana-program/token` (`^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0`): the generated code imports the token program addresses (`TOKEN_PROGRAM_ADDRESS`, `ASSOCIATED_TOKEN_PROGRAM_ADDRESS`) and `findAssociatedTokenPda` from it instead of inlining them.",
-      "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
-    ],
-  },
+  protocol,
+  name: "stake-pool",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "SPL Stake Pool",
     description: "Pools stake accounts, managed by another entity.",
     repository: "https://github.com/solana-program/stake-pool",

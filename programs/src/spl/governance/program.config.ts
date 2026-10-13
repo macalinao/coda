@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   constant,
@@ -14,6 +15,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("splGovernance");
 
@@ -144,18 +150,14 @@ export const pdas = definePdas(program, {
 // https://raw.githubusercontent.com/Mythic-Project/governance-sdk/refs/heads/main/src/pda.ts
 
 export default defineProgram({
-  package: {
-    description: "TypeScript client for the SPL Governance program",
-    keywords: ["spl", "governance", "dao", "voting", "realm", "ian-macalinao"],
-    version: "0.7.0",
-    releaseNotes: [
-      "**Breaking:** now has a peer dependency on `@solana-program/token` (`^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0`): the generated code imports the token program addresses (`TOKEN_PROGRAM_ADDRESS`, `ASSOCIATED_TOKEN_PROGRAM_ADDRESS`) and `findAssociatedTokenPda` from it instead of inlining them.",
-      "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
-    ],
-  },
+  protocol,
+  name: "governance",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "SPL Governance",
     description: "Core building blocks and primitives for creating DAOs.",
     repository: "https://github.com/Mythic-Project/solana-program-library",

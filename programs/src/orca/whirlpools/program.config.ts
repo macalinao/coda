@@ -1,21 +1,22 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import { programHandle } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("whirlpool");
 
 export default defineProgram({
-  package: {
-    description: "TypeScript client for Orca Whirlpools program",
-    keywords: ["orca", "whirlpools", "dex", "amm"],
-    version: "0.9.0",
-    releaseNotes: [
-      "**Breaking:** now has a peer dependency on `@solana-program/token` (`^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0`): the generated code imports the token program addresses (`TOKEN_PROGRAM_ADDRESS`, `ASSOCIATED_TOKEN_PROGRAM_ADDRESS`) and `findAssociatedTokenPda` from it instead of inlining them.",
-      "Generated from the program megagraph in macalinao/coda; the README, reference docs and package metadata are regenerated.",
-    ],
-  },
+  protocol,
+  name: "whirlpools",
+  program,
+  idl,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Orca Whirlpools",
     description:
       "Concentrated liquidity AMM (CLMM): liquidity providers concentrate their capital within custom price ranges.",

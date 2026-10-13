@@ -17,7 +17,7 @@ import { basename, join, relative, resolve } from "node:path";
 import { buildMegagraph } from "../build-graph.ts";
 import { generatePackages } from "../generate-packages.ts";
 import { readMegagraph, writeMegagraph } from "../graph-files.ts";
-import { loadPrograms } from "../load-programs.ts";
+import { resolvePrograms } from "../load-programs.ts";
 import { applyRelease } from "../release/apply.ts";
 import {
   getReleasedPackages,
@@ -41,7 +41,7 @@ function run(command: string, args: string[], cwd: string): void {
 
 /** `graph`: builds the megagraph from programs/src/ into graph/. */
 export async function graphCommand(context: CliContext): Promise<void> {
-  const sources = await loadPrograms(context.programsDir);
+  const sources = resolvePrograms(context.config, context.programsDir);
   console.log(
     `Building the megagraph from ${sources.programs.length.toString()} programs and ${sources.externals.length.toString()} external IDL(s)...`,
   );
@@ -91,7 +91,7 @@ export async function generateCommand(context: CliContext): Promise<void> {
     })),
   });
 
-  const sources = await loadPrograms(context.programsDir);
+  const sources = resolvePrograms(context.config, context.programsDir);
   await generatePackages({
     megagraph: await readMegagraph(context.graphDir),
     peerDependencies: config.peerDependencies,
@@ -273,7 +273,7 @@ TypeScript clients for Solana programs, one npm package per program, plus umbrel
 
 - \`packages/<protocol>/<program>/\`: one package per program. \`packages/<protocol>/\`: the protocol's umbrella package, if it has one.
 - \`graph/codama.json\`: every program merged into one Codama graph, including external programs (e.g. SPL Token) whose clients are published elsewhere. \`graph/packages.json\` lists each program's protocol, package and on-chain metadata (addresses, sources, status), the programs it links to, the umbrellas and the external programs.
-- \`programs/src/<protocol>/<program>/\`: the generator's inputs (IDL, \`program.config.ts\`), for reference; the same files are published as the \`@solana-programs/definitions\` npm package. They need the coda tooling to run. External programs only have a vendored IDL here, no package.
+- \`programs/src/\`: the generator's inputs, for reference. \`megagraph.config.ts\` lists every program; each \`<protocol>/<program>/\` holds the program's definition (\`program.config.ts\`: IDL, PDAs, visitors, on-chain metadata), published as the \`@solana-programs/definitions\` npm package, and its release metadata (\`release.config.ts\`: package description, first version, release notes), which is not. They need the coda tooling to run. External programs have a definition and a vendored IDL here, no package.
 
 ## Development
 

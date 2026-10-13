@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   associatedTokenAccountValueNode,
@@ -11,6 +12,11 @@ import {
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
 import * as quarryMintWrapper from "../mint-wrapper/program.config.ts";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("quarryMine");
 
@@ -38,19 +44,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description:
-      "TypeScript client for the Quarry Mine program, the core liquidity mining program of the Quarry protocol",
-    keywords: ["quarry", "mining", "staking", "ian-macalinao"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/quarry`, which now re-exports this package.",
-      "Imports `findMinterPda` from `@solana-programs/quarry-mint-wrapper` instead of duplicating it.",
-    ],
-  },
+  protocol,
+  name: "mine",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Quarry Mine",
     description:
       "Core liquidity mining program of Quarry: a rewarder distributes rewards across quarries (one per staked token mint), and miners stake into them.",

@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   constant,
@@ -13,6 +14,11 @@ import {
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
 import * as farms from "../farms/program.config.ts";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("kaminoLending");
 
@@ -83,18 +89,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description: "TypeScript client for the Kamino Lending program",
-    keywords: ["kamino", "lending", "defi", "ian-macalinao"],
-    version: "0.10.0",
-    releaseNotes: [
-      "**Breaking:** now has a peer dependency on `@solana-program/token` (`^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0`): the generated code imports the token program addresses (`TOKEN_PROGRAM_ADDRESS`, `ASSOCIATED_TOKEN_PROGRAM_ADDRESS`) and `findAssociatedTokenPda` from it instead of inlining them.",
-      "**Breaking:** the Kamino Farms program is no longer part of this package. It is published as `@solana-programs/kamino-farms`, which this package depends on for `FARMS_PROGRAM_ADDRESS`; `@solana-programs/kamino` bundles both programs.",
-    ],
-  },
+  protocol,
+  name: "lending",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Kamino Lending",
     description: "Kamino's lending protocol program.",
     repository: "https://github.com/Kamino-Finance/klend",

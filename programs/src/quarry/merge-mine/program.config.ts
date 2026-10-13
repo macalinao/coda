@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   associatedTokenAccountValueNode,
@@ -13,6 +14,11 @@ import {
 import { defineProgram } from "@macalinao/megagraph";
 import * as quarryMine from "../mine/program.config.ts";
 import * as quarryMintWrapper from "../mint-wrapper/program.config.ts";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("quarryMergeMine");
 
@@ -39,19 +45,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description:
-      "TypeScript client for the Quarry Merge Mine program, which stakes one deposit across multiple quarries",
-    keywords: ["quarry", "mining", "staking", "merge-mine", "ian-macalinao"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/quarry`, which now re-exports this package.",
-      "Imports `findMinerPda` and `findQuarryPda` from `@solana-programs/quarry-mine` and `findMinterPda` from `@solana-programs/quarry-mint-wrapper` instead of duplicating them.",
-    ],
-  },
+  protocol,
+  name: "merge-mine",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Quarry Merge Mine",
     description:
       "Stakes a single deposit into multiple quarries at once by minting replica tokens for a merge pool.",

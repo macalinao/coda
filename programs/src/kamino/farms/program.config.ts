@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   associatedTokenAccountValueNode,
@@ -10,6 +11,11 @@ import {
   variable,
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("farms");
 
@@ -58,17 +64,14 @@ export const pdas = definePdas(program, {
 });
 
 export default defineProgram({
-  package: {
-    description: "TypeScript client for the Kamino Farms program",
-    keywords: ["kamino", "farms", "staking", "defi", "ian-macalinao"],
-    version: "0.1.0",
-    releaseNotes: [
-      "Split out of `@solana-programs/kamino-lending`. Also ships the Farms `updateGlobalConfig` and `updateGlobalConfigAdmin` instructions, which the combined client overwrote with Kamino Lending's.",
-    ],
-  },
+  protocol,
+  name: "farms",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Kamino Farms",
     description:
       "Lets users deposit or lock tokens in pools in exchange for rewards.",

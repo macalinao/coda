@@ -38,7 +38,7 @@ const STATUSES = new Set<string>(["active", "deprecated"]);
 
 function assertText(where: string, field: string, value: string): void {
   if (value.trim().length === 0) {
-    throw new Error(`${where}: program.${field} must not be empty`);
+    throw new Error(`${where}: metadata.${field} must not be empty`);
   }
 }
 
@@ -47,11 +47,11 @@ function assertUrl(where: string, field: string, value: string): void {
   try {
     url = new URL(value);
   } catch {
-    throw new Error(`${where}: program.${field} is not a URL: ${value}`);
+    throw new Error(`${where}: metadata.${field} is not a URL: ${value}`);
   }
   if (url.protocol !== "https:") {
     throw new Error(
-      `${where}: program.${field} must be an https URL: ${value}`,
+      `${where}: metadata.${field} must be an https URL: ${value}`,
     );
   }
 }
@@ -67,7 +67,7 @@ function resolveGitFileSource(
   }
   if (source.commit !== undefined && !COMMIT_HASH.test(source.commit)) {
     throw new Error(
-      `${where}: program.idlSource.commit must be a full 40-character commit hash: ${source.commit}`,
+      `${where}: metadata.idlSource.commit must be a full 40-character commit hash: ${source.commit}`,
     );
   }
   return {
@@ -118,7 +118,7 @@ export function resolveProgramMetadata(input: {
   for (const cluster of Object.keys(configured)) {
     if (!(PROGRAM_CLUSTERS as readonly string[]).includes(cluster)) {
       throw new Error(
-        `${where}: program.addresses.${cluster} is not a known cluster (${PROGRAM_CLUSTERS.join(", ")})`,
+        `${where}: metadata.addresses.${cluster} is not a known cluster (${PROGRAM_CLUSTERS.join(", ")})`,
       );
     }
   }
@@ -128,7 +128,7 @@ export function resolveProgramMetadata(input: {
     configured.mainnet !== publicKey
   ) {
     throw new Error(
-      `${where}: program.addresses.mainnet (${configured.mainnet}) does not match the IDL's address (${publicKey})`,
+      `${where}: metadata.addresses.mainnet (${configured.mainnet}) does not match the IDL's address (${publicKey})`,
     );
   }
   const addresses: ProgramMetadata["addresses"] = {};
@@ -144,7 +144,7 @@ export function resolveProgramMetadata(input: {
     }
     if (!BASE58_ADDRESS.test(address)) {
       throw new Error(
-        `${where}: program.addresses.${cluster} is not a base58 address: ${address}`,
+        `${where}: metadata.addresses.${cluster} is not a base58 address: ${address}`,
       );
     }
     addresses[cluster] = address;
@@ -155,7 +155,7 @@ export function resolveProgramMetadata(input: {
     assertUrl(where, `audits[${index.toString()}].url`, audit.url);
     if (audit.date !== undefined && !AUDIT_DATE.test(audit.date)) {
       throw new Error(
-        `${where}: program.audits[${index.toString()}].date must be YYYY-MM or YYYY-MM-DD: ${audit.date}`,
+        `${where}: metadata.audits[${index.toString()}].date must be YYYY-MM or YYYY-MM-DD: ${audit.date}`,
       );
     }
     return {
@@ -168,23 +168,27 @@ export function resolveProgramMetadata(input: {
   const status = config.status ?? "active";
   if (!STATUSES.has(status)) {
     throw new Error(
-      `${where}: program.status must be "active" or "deprecated", got "${status}"`,
+      `${where}: metadata.status must be "active" or "deprecated", got "${status}"`,
     );
   }
-  if (config.supersededBy !== undefined) {
+  const supersededBy =
+    typeof config.supersededBy === "object"
+      ? config.supersededBy.name
+      : config.supersededBy;
+  if (supersededBy !== undefined) {
     if (status !== "deprecated") {
       throw new Error(
-        `${where}: program.supersededBy requires program.status "deprecated"`,
+        `${where}: metadata.supersededBy requires metadata.status "deprecated"`,
       );
     }
-    if (config.supersededBy === program) {
+    if (supersededBy === program) {
       throw new Error(
-        `${where}: program.supersededBy names the program itself`,
+        `${where}: metadata.supersededBy names the program itself`,
       );
     }
-    if (!knownPrograms.has(config.supersededBy)) {
+    if (!knownPrograms.has(supersededBy)) {
       throw new Error(
-        `${where}: program.supersededBy names "${config.supersededBy}", which is not a program of the graph`,
+        `${where}: metadata.supersededBy names "${supersededBy}", which is not a program of the graph`,
       );
     }
   }
@@ -204,8 +208,8 @@ export function resolveProgramMetadata(input: {
     ...(config.docs !== undefined && { docs: config.docs }),
     ...(audits !== undefined && audits.length > 0 && { audits }),
     status,
-    ...(config.supersededBy !== undefined && {
-      supersededBy: config.supersededBy,
+    ...(supersededBy !== undefined && {
+      supersededBy,
     }),
   };
 }

@@ -1,3 +1,4 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
 import {
   accountValueNode,
   associatedTokenAccountValueNode,
@@ -19,6 +20,11 @@ import {
 } from "@macalinao/coda";
 import { defineProgram } from "@macalinao/megagraph";
 import * as tokenMetadata from "../token-metadata/program.config.ts";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
 
 export const program = programHandle("bubblegum");
 
@@ -227,26 +233,14 @@ const masterEditionPdaOf = (mintAccount: string) =>
   });
 
 export default defineProgram({
-  package: {
-    name: "@solana-programs/mpl-bubblegum",
-    description: "TypeScript client for the Metaplex Bubblegum program",
-    keywords: [
-      "metaplex",
-      "bubblegum",
-      "compression",
-      "cnft",
-      "nft",
-      "ian-macalinao",
-    ],
-    version: "0.7.0",
-    releaseNotes: [
-      "**Breaking:** now has a peer dependency on `@solana-program/token` (`^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0`): the generated code imports the token program addresses (`TOKEN_PROGRAM_ADDRESS`, `ASSOCIATED_TOKEN_PROGRAM_ADDRESS`) and `findAssociatedTokenPda` from it instead of inlining them.",
-      "**Breaking:** removed the duplicated Token Metadata helpers (`findMetadataPda`, `findMasterEditionPda`, `MPL_TOKEN_METADATA_PROGRAM_ADDRESS` and the rest of the `mplTokenMetadata` program module). The collection instructions now derive those PDAs with the helpers from `@solana-programs/token-metadata`, which this package depends on.",
-    ],
-  },
+  protocol,
+  name: "bubblegum",
+  program,
+  idl,
+  pdas,
   // The on-chain program. Addresses were checked with getAccountInfo on
   // mainnet-beta and devnet (2026-10).
-  program: {
+  metadata: {
     displayName: "Metaplex Bubblegum",
     description: "Creates and manages compressed NFTs.",
     repository: "https://github.com/metaplex-foundation/mpl-bubblegum",

@@ -1,33 +1,5 @@
-import type { CodaConfig } from "@macalinao/coda";
-
-/**
- * npm metadata of the package generated for a program.
- */
-export interface ProgramPackageConfig {
-  /**
-   * npm package name.
-   * @default `@solana-programs/<protocol>-<program>`
-   */
-  name?: string;
-  /** One-line package description. */
-  description: string;
-  /**
-   * npm keywords, added to the protocol's keywords. `coda`, `solana`,
-   * `client`, `esm` and `typescript` are always added.
-   */
-  keywords?: string[];
-  /**
-   * Version of the package's first release, used while the package does not
-   * exist in the release state yet. Afterwards the release pipeline derives
-   * versions from what changed.
-   */
-  version: string;
-  /**
-   * Changelog lines for the package's first release (e.g. what changed since
-   * a version published before the megagraph).
-   */
-  releaseNotes?: string[];
-}
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
+import type { CodaConfig, ProgramHandle, RootNode } from "@macalinao/coda";
 
 /**
  * A file in a git repository at a release, e.g. where an IDL was taken from.
@@ -60,20 +32,20 @@ export interface ProgramAudit {
 }
 
 /**
- * Descriptive metadata of the on-chain program a package is generated for.
- * Every field is optional; the graph build validates what it can check.
+ * Descriptive metadata of an on-chain program. Every field is optional; the
+ * graph build validates what it can check.
  */
 export interface ProgramMetadataConfig {
   /** Human-readable name, e.g. `Quarry Mine`. */
   displayName?: string;
   /**
-   * What the on-chain program does. Distinct from
-   * {@link ProgramPackageConfig.description}, which describes the npm package.
+   * What the on-chain program does. Distinct from the description of the npm
+   * package generated for it, which is release metadata.
    */
   description?: string;
   /** Source repository of the on-chain program. */
   repository?: string;
-  /** Where `idl.json` comes from. */
+  /** Where the program's IDL comes from. */
   idlSource?: GitFileSource;
   /**
    * Program addresses per cluster. `mainnet` defaults to the IDL's address
@@ -91,68 +63,22 @@ export interface ProgramMetadataConfig {
   /** @default "active" */
   status?: ProgramStatus;
   /**
-   * Codama name of the program that replaces this one (e.g.
-   * `whirlpool`). Only valid when `status` is `"deprecated"`.
+   * The program that replaces this one: its handle (preferred, imported from
+   * its definition) or its Codama name (e.g. `whirlpool`). Only valid when
+   * `status` is `"deprecated"`.
    */
-  supersededBy?: string;
+  supersededBy?: string | Pick<ProgramHandle, "name">;
 }
 
 /**
- * Configuration of a single program under `programs/src/<protocol>/<program>/`.
- *
- * The program's IDL is always `idl.json` next to the config. The visitors
- * run on a root whose main program is this program, so bare selectors (e.g.
- * `updateAccountsVisitor({ miner: ... })`) only match this program's nodes.
- * Links should always be created through program and PDA handles
- * (`programHandle`, `definePdas` from `@macalinao/coda`), which qualify them
- * with their program. Every other program's PDAs are also present in that
- * root, so a PDA default value linking into another program resolves.
+ * A protocol: a group of programs maintained together, e.g. Quarry.
  */
-export interface ProgramConfig extends Pick<
-  CodaConfig,
-  "instructionAccountDefaultValues" | "visitors"
-> {
-  /** The npm package generated for the program. */
-  package: ProgramPackageConfig;
-  /** The on-chain program itself: addresses, sources, status. */
-  program?: ProgramMetadataConfig;
-}
-
-/**
- * Define the configuration of a program in
- * `programs/src/<protocol>/<program>/program.config.ts`.
- */
-export function defineProgram(config: ProgramConfig): ProgramConfig {
-  return config;
-}
-
-/**
- * An umbrella package re-exporting every program package of a protocol, e.g.
- * `@solana-programs/quarry`. It contains no rendered code of its own.
- */
-export interface UmbrellaConfig {
-  /** npm package name. */
-  name: string;
-  /** One-line package description. */
-  description: string;
-  /** npm keywords, added to the protocol's keywords. */
-  keywords?: string[];
-  /** Version of the package's first release; see {@link ProgramPackageConfig.version}. */
-  version: string;
-  /** Changelog lines for the package's first release. */
-  releaseNotes?: string[];
+export interface ProtocolDefinition {
   /**
-   * Program directories that take precedence, in order, when several member
-   * packages export the same name. Members not listed follow alphabetically.
+   * Kebab-case identifier, e.g. `quarry`. Also the protocol's directory under
+   * `programs/src/` and the prefix of its programs' default package names.
    */
-  precedence?: string[];
-}
-
-/**
- * Configuration of a protocol, `programs/src/<protocol>/protocol.config.ts`. A
- * protocol groups the programs in its directory.
- */
-export interface ProtocolConfig {
+  name: string;
   /** Human-readable name, e.g. `Quarry`. */
   displayName: string;
   /** Short description of the protocol, for docs and directories. */
@@ -161,17 +87,59 @@ export interface ProtocolConfig {
   homepage?: string;
   /** Source repository of the on-chain programs. */
   repository?: string;
-  /** npm keywords shared by every package of the protocol. */
-  keywords?: string[];
-  /** Optional umbrella package re-exporting all of the protocol's programs. */
-  umbrella?: UmbrellaConfig;
 }
 
 /**
- * Define a protocol in `programs/src/<protocol>/protocol.config.ts`.
+ * Defines a protocol, conventionally in
+ * `programs/src/<protocol>/protocol.config.ts`.
  */
-export function defineProtocol(config: ProtocolConfig): ProtocolConfig {
-  return config;
+export function defineProtocol<T extends ProtocolDefinition>(definition: T): T {
+  return definition;
+}
+
+/**
+ * What a Solana program is, independent of how its client is released: its
+ * IDL, typed handles to it and its PDAs, the Coda visitors that complete the
+ * IDL, and descriptive metadata of the on-chain program.
+ *
+ * The visitors run on a root whose main program is this program, so bare
+ * selectors (e.g. `updateAccountsVisitor({ miner: ... })`) only match this
+ * program's nodes. Links should always be created through program and PDA
+ * handles (`programHandle`, `definePdas` from `@macalinao/coda`), which
+ * qualify them with their program; to link into another program, import its
+ * definition's handles. Every other program's PDAs are also present in that
+ * root, so a PDA default value linking into another program resolves.
+ */
+export interface ProgramDefinition extends Pick<
+  CodaConfig,
+  "instructionAccountDefaultValues" | "visitors"
+> {
+  /** The protocol the program belongs to. */
+  protocol: ProtocolDefinition;
+  /**
+   * Kebab-case identifier within the protocol, e.g. `merge-mine`. Also the
+   * program's directory under `programs/src/<protocol>/`.
+   */
+  name: string;
+  /** Handle to the program; its name must be the IDL's program name. */
+  program: ProgramHandle;
+  /** The program's Anchor IDL. */
+  idl: AnchorIdl;
+  /**
+   * Typed handles to the PDAs the definition declares (`definePdas`), for
+   * other definitions and clients to link against.
+   */
+  pdas?: object;
+  /** Descriptive metadata of the on-chain program. */
+  metadata?: ProgramMetadataConfig;
+}
+
+/**
+ * Defines a program, conventionally in
+ * `programs/src/<protocol>/<program>/program.config.ts`.
+ */
+export function defineProgram<T extends ProgramDefinition>(definition: T): T {
+  return definition;
 }
 
 /**
@@ -190,72 +158,41 @@ export interface ExternalNpmPackage {
 }
 
 /**
- * Configuration of an external program under
- * `programs/src/<protocol>/<program>/program.config.ts`: a program whose client
- * is published by someone else (e.g. `@solana-program/token`). Its `idl.json`
- * is a vendored Codama IDL (not an Anchor IDL) and may contain several
- * programs. It is part of the graph so links into it resolve and are
- * validated, but it is never rendered and gets no package; links into it are
- * imported from `npm.package`, which the linking packages peer-depend on.
+ * A program whose client is published by someone else (e.g.
+ * `@solana-program/token`). Its IDL is a vendored Codama IDL (not an Anchor
+ * IDL) and may contain several programs. It is part of the graph so links
+ * into it resolve and are validated, but it is never rendered and gets no
+ * package; links into it are imported from `npm.package`, which the linking
+ * packages peer-depend on.
  */
-export interface ExternalProgramConfig {
+export interface ExternalProgramDefinition {
+  /** The protocol the program belongs to. */
+  protocol: ProtocolDefinition;
+  /** Kebab-case identifier within the protocol, e.g. `token`. */
+  name: string;
+  /** The vendored Codama IDL. */
+  idl: RootNode;
   npm: ExternalNpmPackage;
-  /** Where the vendored Codama IDL (`idl.json`) comes from. */
+  /** Where the vendored Codama IDL comes from. */
   source: GitFileSource & { tag: string; commit: string };
   /**
-   * Typed handles the config exports for other configs to link against. The
-   * graph build asserts each one matches the IDL exactly (name, seeds and
-   * program), so a vendored IDL update cannot silently drift from them.
+   * Typed handles the definition exports for other definitions to link
+   * against. The graph build asserts each one matches the IDL exactly (name,
+   * seeds and program), so a vendored IDL update cannot silently drift from
+   * them.
    */
   handles: {
-    programs?: { name: string }[];
+    programs?: Pick<ProgramHandle, "name">[];
     pdas?: { program: string; name: string; node: unknown }[];
   };
 }
 
 /**
- * Define an external program in `programs/src/<protocol>/<program>/program.config.ts`.
+ * Defines an external program, conventionally in
+ * `programs/src/<protocol>/<program>/program.config.ts`.
  */
-export function defineExternalProgram(
-  config: ExternalProgramConfig,
-): ExternalProgramConfig {
-  return config;
-}
-
-/**
- * Repository-wide settings of the megagraph, `programs/src/megagraph.config.ts`.
- */
-export interface MegagraphConfig {
-  /** Peer dependencies every generated package declares. */
-  peerDependencies: Record<string, string>;
-  /** The generated workspace (`clients/`), also the published mirror. */
-  workspace: {
-    /** Root package name. */
-    name: string;
-    /** GitHub repository the workspace is published to, e.g. `org/repo`. */
-    repository: string;
-    /** Default branch of that repository; READMEs link to it. */
-    defaultBranch: string;
-    /**
-     * Catalog entries the generated manifests use (`catalog:`); versions are
-     * read from the repository's root package.json catalog.
-     */
-    catalog: string[];
-    /**
-     * Root devDependencies of the workspace; versions are read from the
-     * repository's root package.json (devDependencies, then catalog).
-     */
-    devDependencies: string[];
-    /** Files copied from the repository root into the workspace root. */
-    copyFiles: string[];
-  };
-  /** GitHub repository the packages are generated and published from. */
-  sourceRepository: string;
-}
-
-/**
- * Define the repository-wide settings in `programs/src/megagraph.config.ts`.
- */
-export function defineMegagraph(config: MegagraphConfig): MegagraphConfig {
-  return config;
+export function defineExternalProgram<T extends ExternalProgramDefinition>(
+  definition: T,
+): T {
+  return definition;
 }
