@@ -94,7 +94,7 @@ publish_all() {
 
 # The generated @solana-programs/* clients are released by
 # release-clients.yml, not by changesets. programs/ is the package of their
-# inputs (@solana-programs/programs), released here with the tooling.
+# inputs (@solana-programs/definitions), released here with the tooling.
 publish_all packages
 publish_dir programs
 

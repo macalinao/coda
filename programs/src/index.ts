@@ -3,7 +3,7 @@
  * its `protocol.config.ts` as `protocol` and, per program, the exports of its
  * `program.config.ts` (`config` is the default export) and its IDL as `idl`.
  * Each protocol and program is also importable from its own subpath, e.g.
- * `@solana-programs/programs/quarry/mine`.
+ * `@solana-programs/definitions/quarry/mine`.
  */
 
 export * as goki from "./goki/index.ts";

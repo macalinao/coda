@@ -273,7 +273,7 @@ TypeScript clients for Solana programs, one npm package per program, plus umbrel
 
 - \`packages/<protocol>/<program>/\`: one package per program. \`packages/<protocol>/\`: the protocol's umbrella package, if it has one.
 - \`graph/codama.json\`: every program merged into one Codama graph, including external programs (e.g. SPL Token) whose clients are published elsewhere. \`graph/packages.json\` lists each program's protocol, package and on-chain metadata (addresses, sources, status), the programs it links to, the umbrellas and the external programs.
-- \`programs/src/<protocol>/<program>/\`: the generator's inputs (IDL, \`program.config.ts\`), for reference; the same files are published as the \`@solana-programs/programs\` npm package. They need the coda tooling to run. External programs only have a vendored IDL here, no package.
+- \`programs/src/<protocol>/<program>/\`: the generator's inputs (IDL, \`program.config.ts\`), for reference; the same files are published as the \`@solana-programs/definitions\` npm package. They need the coda tooling to run. External programs only have a vendored IDL here, no package.
 
 ## Development
 

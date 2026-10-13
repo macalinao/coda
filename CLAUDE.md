@@ -84,7 +84,7 @@ coda/
 │   ├── codama-instruction-accounts-dedupe-visitor/  # Flattens nested accounts
 │   └── codama-renderers-js-esm/                    # ESM-native renderer
 │   └── megagraph/          # Graph builder, generator and release planner (@macalinao/megagraph)
-├── programs/               # Source of truth for every client (@solana-programs/programs)
+├── programs/               # Source of truth for every client (@solana-programs/definitions)
 │   └── src/                # megagraph.config.ts, index.ts (barrel), peers/index tests
 │       └── quarry/         # protocol.config.ts (+ optional umbrella), index.ts, CHANGELOG seed
 │           └── mine/       # idl.json, program.config.ts, index.ts, optional README.md / CHANGELOG seed
@@ -299,7 +299,7 @@ client, grouped by protocol:
   `programs/src/index.ts` exports one namespace per protocol; add the new
   program or protocol to them (`programs/src/index.test.ts` fails otherwise)
 
-`programs/` is a published workspace package (`@solana-programs/programs`,
+`programs/` is a published workspace package (`@solana-programs/definitions`,
 released with changesets like `packages/*`) so others can generate their own
 clients from the same IDLs and configs. It builds with tsdown (its own
 `tsdown.config.ts`: one entry per protocol and per program, exported as
@@ -449,7 +449,7 @@ are cut from the changesets on master, so a PR without one ships its changes
 with no version bump and no changelog entry. The generated `@solana-programs/*`
 clients are not workspace packages and are versioned by
 `release-clients.yml` instead. Changes to `programs/` still need a changeset
-for `@solana-programs/programs`, the published package of their inputs.
+for `@solana-programs/definitions`, the published package of their inputs.
 
 1. Run `bun run changeset`
 2. Select the package(s) the PR affects

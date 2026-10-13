@@ -1,5 +1,5 @@
 {
-  "name": "@solana-programs/programs",
+  "name": "@solana-programs/definitions",
   "version": "0.0.0",
   "description": "IDLs and Coda configs of every program in the Coda program megagraph, to generate your own Solana clients from",
   "type": "module",

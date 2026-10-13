@@ -9,7 +9,7 @@ Each program lives in `programs/src/<protocol>/<program>/` (`idl.json`, `program
 - `buildMegagraph(programs, bundles)` runs each program's config, merges every program into one root and validates it: every link resolves, program and package names are unique, and there are no package cycles.
 - `generatePackages(...)` renders each program into its own package. Program-qualified links (`pdaLinkNode("metadata", "tokenMetadata")`) become dependencies on the owning package, whose helpers are imported instead of duplicated. Bundles re-export their programs.
 
-The `megagraph` CLI (Bun) drives it from a repository root holding `programs/src/megagraph.config.ts` (`defineMegagraph`). `programs/` is a workspace package whose `src/` holds the inputs, so they can be built and published too (as in coda, where it is `@solana-programs/programs`):
+The `megagraph` CLI (Bun) drives it from a repository root holding `programs/src/megagraph.config.ts` (`defineMegagraph`). `programs/` is a workspace package whose `src/` holds the inputs, so they can be built and published too (as in coda, where it is `@solana-programs/definitions`):
 
 ```bash
 megagraph graph                       # programs/src/ -> graph/

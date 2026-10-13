@@ -1,9 +1,9 @@
-# @solana-programs/programs
+# @solana-programs/definitions
 
 The inputs of every `@solana-programs/*` client: each program's IDL and its [Coda](https://coda.ianm.com) config (PDAs, visitors, on-chain metadata), grouped by protocol. Use it to generate your own clients for these programs, or to read their IDLs, without vendoring them.
 
 ```bash
-bun add @solana-programs/programs
+bun add @solana-programs/definitions
 ```
 
 ## Usage
@@ -12,7 +12,7 @@ Each program's entry exports its IDL as `idl`, its `program.config.ts` default e
 
 ```typescript
 import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
-import { config, idl, pdas } from "@solana-programs/programs/quarry/mine";
+import { config, idl, pdas } from "@solana-programs/definitions/quarry/mine";
 
 const root = rootNodeFromAnchor(idl);
 console.log(config.program?.displayName, Object.keys(pdas));
@@ -21,7 +21,7 @@ console.log(config.program?.displayName, Object.keys(pdas));
 The package root exports one namespace per protocol, holding its `protocol.config.ts` as `protocol` and one namespace per program:
 
 ```typescript
-import { kamino, quarry } from "@solana-programs/programs";
+import { kamino, quarry } from "@solana-programs/definitions";
 
 quarry.protocol.displayName; // "Quarry"
 kamino.lending.idl;
@@ -30,7 +30,7 @@ kamino.lending.idl;
 The raw IDL files are also exported:
 
 ```typescript
-import idl from "@solana-programs/programs/quarry/mine/idl.json" with { type: "json" };
+import idl from "@solana-programs/definitions/quarry/mine/idl.json" with { type: "json" };
 ```
 
 External programs (e.g. `solana/token`, whose client is `@solana-program/token`) export a Codama `rootNode` as `idl` instead of an Anchor IDL.

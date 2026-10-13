@@ -18,7 +18,7 @@ set -euo pipefail
 # The stub also leaves `latest` unset until the first real release claims it.
 #
 # Tooling packages (packages/*) and the program inputs (programs/,
-# @solana-programs/programs) are released by release.yml. The generated
+# @solana-programs/definitions) are released by release.yml. The generated
 # @solana-programs/* clients are released by release-clients.yml from the
 # generated clients/ workspace, so run `bun run codegen` first to bootstrap
 # new client names.
