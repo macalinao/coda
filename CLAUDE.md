@@ -85,9 +85,9 @@ coda/
 │   └── codama-renderers-js-esm/                    # ESM-native renderer
 │   └── megagraph/          # Graph builder, generator and release planner (@macalinao/megagraph)
 ├── programs/               # Source of truth for every client (@solana-programs/definitions)
-│   └── src/                # megagraph.config.ts, index.ts (barrel), peers/index tests
-│       └── quarry/         # protocol.config.ts (+ optional umbrella), index.ts, CHANGELOG seed
-│           └── mine/       # idl.json, program.config.ts, index.ts, optional README.md / CHANGELOG seed
+│   └── src/                # megagraph.config.ts (the registry), index.ts (barrel), peers/index tests
+│       └── quarry/         # protocol.config.ts, release.config.ts (keywords, umbrella), index.ts, CHANGELOG seed
+│           └── mine/       # idl.json, program.config.ts (definition), release.config.ts, index.ts, optional README.md / CHANGELOG seed
 ├── graph/                  # Generated, gitignored: codama.json, packages.json
 ├── clients/                # Generated, gitignored: standalone Bun workspace
 │   └── packages/quarry/mine/  # @solana-programs/quarry-mine (umbrella at packages/quarry/)
@@ -279,43 +279,67 @@ Tasks are defined in turbo.json:
 ## Program Megagraph
 
 `programs/src/` is the single source of truth for every `@solana-programs/*`
-client, grouped by protocol:
+client, grouped by protocol. Each program and protocol has a **definition**
+(what it is; published in `@solana-programs/definitions` for anyone building
+their own clients) and **release metadata** (how its package is released;
+repository-internal, never exported or published):
 
-- `programs/src/<protocol>/protocol.config.ts` - `defineProtocol({ displayName,
-  description, homepage?, repository?, keywords?, umbrella? })`. `umbrella`
-  (`{ name, description, version, precedence? }`) generates a package that
+- `programs/src/<protocol>/protocol.config.ts` - definition:
+  `defineProtocol({ name, displayName, description, homepage?, repository? })`.
+  `name` is the kebab-case protocol directory.
+- `programs/src/<protocol>/release.config.ts` - release metadata (optional):
+  `defineProtocolRelease({ protocol, keywords?, umbrella? })`. `umbrella`
+  (`{ name, description, keywords?, version, releaseNotes?, precedence? }`,
+  `precedence` being imported program definitions) generates a package that
   re-exports every program of the protocol.
 - `programs/src/<protocol>/<program>/idl.json` - the program's Anchor IDL
-- `programs/src/<protocol>/<program>/program.config.ts` -
-  `defineProgram({ package: { name?, description, keywords?, version,
-  releaseNotes? }, instructionAccountDefaultValues, visitors })`. The package
-  name defaults to `@solana-programs/<protocol>-<program>`; existing
-  published names are set explicitly.
+- `programs/src/<protocol>/<program>/program.config.ts` - definition:
+  `defineProgram({ protocol, name, program, idl, pdas?, metadata?,
+  instructionAccountDefaultValues?, visitors? })`. `protocol` is the imported
+  protocol definition, `name` the kebab-case program directory, `program` the
+  `programHandle`, `idl` the imported `idl.json`, `metadata` the on-chain
+  program (`displayName`, `description`, `repository`, `idlSource`,
+  `addresses`, `docs`, `audits`, `status`, `supersededBy`). It also exports
+  `idl`, `program` and `pdas` as named exports.
+- `programs/src/<protocol>/<program>/release.config.ts` - release metadata:
+  `defineProgramRelease({ program: definition, package: { name?, description,
+  keywords?, version, releaseNotes? } })`. The package name defaults to
+  `@solana-programs/<protocol>-<program>`; existing published names are set
+  explicitly.
 - `README.md` (optional) - hand-written body inserted into the generated README
 - `CHANGELOG.md` (optional) - seed changelog for a package's first release
-
-- `index.ts` - re-exports the program's config (`config`, plus its named
-  exports) and its IDL (`idl`). Each protocol has an `index.ts` too, and
+- `index.ts` - the public module: re-exports `program.config.ts` (the default
+  export as `definition`, plus `idl`, `program`, `pdas`, ...). Never re-export
+  a `release.config.ts`. Each protocol has an `index.ts` too, and
   `programs/src/index.ts` exports one namespace per protocol; add the new
   program or protocol to them (`programs/src/index.test.ts` fails otherwise)
+- `programs/src/megagraph.config.ts` - the registry: `defineMegagraph({
+  programs, externals, protocols, peerDependencies, workspace, ... })` lists
+  every program release, external definition and protocol release by import.
+  Megagraph does not glob; a program that is not listed is not built
+  (`programs/src/index.test.ts` checks that every `program.config.ts` and
+  `release.config.ts` on disk is listed). Directories are derived from the
+  protocol and program `name`s and must exist (README/CHANGELOG seeds and the
+  generated READMEs' source links live there).
 
 `programs/` is a published workspace package (`@solana-programs/definitions`,
 released with changesets like `packages/*`) so others can generate their own
-clients from the same IDLs and configs. It builds with tsdown (its own
+clients from the same definitions. It builds with tsdown (its own
 `tsdown.config.ts`: one entry per protocol and per program, exported as
 `./<protocol>` and `./<protocol>/<program>`; raw IDLs as
-`./<protocol>/<program>/idl.json`). Its `tsconfig.json` lets the repo-wide
-`bun run lint` type-check every config. That needs the tooling built first
-(`@macalinao/coda` and `@macalinao/megagraph` resolve to their `dist/`
-types), which CI's build step guarantees.
+`./<protocol>/<program>/idl.json`); `release.config.ts` files and
+`megagraph.config.ts` are excluded from its `files`. Its `tsconfig.json` lets
+the repo-wide `bun run lint` type-check every definition. That needs the
+tooling built first (`@macalinao/coda` and `@macalinao/megagraph` resolve to
+their `dist/` types), which CI's build step guarantees.
 
-**Links are typed and always program-qualified.** Each config exports
+**Links are typed and always program-qualified.** Each definition exports
 `program = programHandle("<codama name>")` and, for PDAs it declares,
 `pdas = definePdas(program, { ... })` (with `constant()`/`variable()` seeds).
 Use `pdas.<name>.value({ <seed>: ... })` for PDA default values,
 `pdas.<name>.link` / `program.link` / `program.pda|account|definedType(name)`
 for links, and `pdas.visitor` to add the PDAs. Another program's handles are
-imported from its config (`import * as quarryMine from
+imported from its definition (`import * as quarryMine from
 "../mine/program.config.ts"`); the import graph mirrors the package
 dependencies and must stay acyclic. oxlint bans the raw `pdaLinkNode`,
 `accountLinkNode`, `definedTypeLinkNode` and `programLinkNode` in
@@ -323,11 +347,12 @@ dependencies and must stay acyclic. oxlint bans the raw `pdaLinkNode`,
 
 **External programs** (e.g. `programs/src/solana/token/`) are programs whose
 client is published by someone else. Their `idl.json` is a vendored Codama IDL
-(record the source repository, tag and commit in the config) and their
-`program.config.ts` uses `defineExternalProgram({ npm: { package, range },
-source, handles })`. They are in the graph for link resolution
+(record the source repository, tag and commit in the definition), their
+`program.config.ts` uses `defineExternalProgram({ protocol, name, idl, npm: {
+package, range }, source, handles })` and they have no `release.config.ts`;
+`megagraph.config.ts` lists them under `externals`. They are in the graph for link resolution
 and validation but never rendered, never packaged and never released. The
-graph build asserts that every handle the config exports (program handles,
+graph build asserts that every handle the definition exports (program handles,
 `definePdas` PDAs) matches the IDL exactly. Addresses and the associated
 token account PDA that configs write as inline values
 (`TOKEN_PROGRAM_VALUE_NODE`, `associatedTokenAccountValueNode`, and the
@@ -338,7 +363,7 @@ rendered code imports an external package gets it as a peer dependency (and a
 
 **Peer ranges**: the `@solana/kit` / `@solana/program-client-core` range of
 every client is `peerDependencies` in `programs/src/megagraph.config.ts`; each
-external program declares its own supported versions in its config
+external program declares its own supported versions in its definition
 (`defineExternalProgram({ npm: { package, range }, ... })`), which become the
 peer range of every package whose code imports it.
 `programs/src/peers.test.ts` checks every external range against the kit range
@@ -348,7 +373,7 @@ in range accepts a supported kit, every kit major is covered); CI runs
 (`--refresh` rewrites it) and type-checks sample clients against the oldest
 and newest kit of each major and every external minor (`megagraph compat`).
 
-`bun run graph` runs every config on a root whose main program is that program
+`bun run graph` runs every definition's visitors on a root whose main program is that program
 (so bare selectors like `updateAccountsVisitor({ miner })` only match it),
 merges the results into one root, validates it (every link resolves, reported
 as `<package>: unresolved pdaLink <program>.<name>`; unique program and
@@ -375,8 +400,8 @@ github.com/toolboxdao/solana-programs (the mirror: previous graph, versions and
 changelogs) with `megagraph release plan`, applies them with
 `release apply`, verifies everything builds (in coda and in the exported
 mirror standalone), commits and tags the release in the mirror, then
-publishes the versions npm does not have. A package's `version` in its config
-is only used for its first release. Classification: removed/renamed/changed/
+publishes the versions npm does not have. A package's `version` in its
+`release.config.ts` is only used for its first release. Classification: removed/renamed/changed/
 reordered interface nodes are breaking, additions features, docs-only changes
 and regenerated-code-only changes fixes, unknown changes breaking; 0.x
 releases breaking changes as minor and everything else as patch.
@@ -384,14 +409,17 @@ releases breaking changes as minor and everything else as patch.
 ## Adding a New Client
 
 1. Create `programs/src/<protocol>/<program>/idl.json`, `program.config.ts`
-   and `index.ts` (copy an existing one), and
-   `programs/src/<protocol>/protocol.config.ts` and `index.ts` for a new
-   protocol; export it from the protocol's (and for a new protocol, the root)
-   `index.ts`
-2. Optionally add a `README.md`
-3. Run `bun run codegen` and `bun run build`
-4. Add size budgets for the package to `.size-limit.json`
-5. A brand new npm name needs a bootstrap publish and a trusted publisher for
+   (the definition), `release.config.ts` (the package) and `index.ts` (copy
+   an existing one), and `programs/src/<protocol>/protocol.config.ts`,
+   `release.config.ts` (if it needs keywords or an umbrella) and `index.ts`
+   for a new protocol
+2. Export it from the protocol's (and for a new protocol, the root)
+   `index.ts`, and list its release (and a new protocol's release) in
+   `programs/src/megagraph.config.ts`
+3. Optionally add a `README.md`
+4. Run `bun run codegen` and `bun run build`
+5. Add size budgets for the package to `.size-limit.json`
+6. A brand new npm name needs a bootstrap publish and a trusted publisher for
    `release-clients.yml` (see `scripts/bootstrap-publish.sh`)
 
 Keep everything program-specific in `programs/` (inputs) and tooling in
@@ -448,8 +476,9 @@ on pull requests it only posts the release plan to the job summary.
 are cut from the changesets on master, so a PR without one ships its changes
 with no version bump and no changelog entry. The generated `@solana-programs/*`
 clients are not workspace packages and are versioned by
-`release-clients.yml` instead. Changes to `programs/` still need a changeset
-for `@solana-programs/definitions`, the published package of their inputs.
+`release-clients.yml` instead. Changes to program definitions still need a
+changeset for `@solana-programs/definitions`, the package that publishes them;
+release-only changes (`release.config.ts`) do not change what it publishes.
 
 1. Run `bun run changeset`
 2. Select the package(s) the PR affects

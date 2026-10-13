@@ -2,7 +2,7 @@
 "@macalinao/megagraph": minor
 ---
 
-`defineProgram` takes an optional `program` block describing the on-chain program, separate from the npm `package` block: `displayName`, `description`, `repository`, `idlSource` (`{ repository, tag?, commit?, path }`, the same shape as an external program's `source`), `addresses` per cluster, `docs`, `audits` (`{ auditor, url, date? }[]`) and `status` (`"active"` or `"deprecated"`, with an optional `supersededBy` program). Every field is optional.
+`defineProgram` takes an optional `metadata` block describing the on-chain program (the npm package is release metadata, in `defineProgramRelease`): `displayName`, `description`, `repository`, `idlSource` (`{ repository, tag?, commit?, path }`, the same shape as an external program's `source`), `addresses` per cluster, `docs`, `audits` (`{ auditor, url, date? }[]`) and `status` (`"active"` or `"deprecated"`, with an optional `supersededBy` program handle or name). Every field is optional.
 
 `addresses.mainnet` defaults to the IDL's address. When given it must equal that address, and `null` records that the program is not deployed on mainnet. The graph build also rejects non-https URLs, malformed addresses, commit hashes and audit dates, and a `supersededBy` that is not another program in the graph or is set on a program not marked deprecated.
 
