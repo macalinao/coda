@@ -1,0 +1,18 @@
+// Type-checks the repository root's own TypeScript: the shared
+// tsdown.config.ts, which tsdown finds by walking up from each package. Every
+// other TypeScript file belongs to a workspace package with its own
+// tsconfig.json (see scripts/check-ts-in-packages.sh).
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "@macalinao/tsconfig/tsconfig.node.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "declaration": false,
+    "declarationMap": false,
+    "isolatedDeclarations": false
+  },
+  "files": ["tsdown.config.ts"]
+}

@@ -18,6 +18,8 @@ reviews:
   path_filters:
     # Skip generated Codama output and vendored code — no signal there.
     - "!clients/*/src/generated/**"
+    - "!clients/*/docs/**"
+    - "!graph/**"
     - "!vendor/**"
     - "!**/dist/**"
   tools:

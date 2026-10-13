@@ -4,5 +4,7 @@ export { ensureEntryBarrel } from "./ensure-entry-barrel.ts";
 export { fileExists } from "./file-exists.ts";
 export { loadConfig } from "./load-config.ts";
 export { loadIdls } from "./load-idls.ts";
-export { processIdls } from "./process-idls.ts";
+export type { ProcessConfigOptions } from "./process-idls.ts";
+export { processConfig, processIdls } from "./process-idls.ts";
+export type { ResolveIdlPathsOptions } from "./resolve-idl-paths.ts";
 export { resolveIdlPaths } from "./resolve-idl-paths.ts";

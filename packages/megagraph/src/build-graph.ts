@@ -1,0 +1,449 @@
+import type { ProgramNode, RootNode } from "codama";
+import type { ProgramMetadata } from "./program-metadata.ts";
+import type {
+  ExternalProgramSource,
+  ProgramSource,
+  ProtocolSource,
+} from "./load-programs.ts";
+import { processConfig } from "@macalinao/coda";
+import { createFromJson, programNode, rootNode } from "codama";
+import { PROGRAMS_DIR } from "./load-programs.ts";
+import {
+  findCycles,
+  findUnresolvedLinks,
+  getProgramDependencies,
+} from "./package-graph.ts";
+import { resolveProgramMetadata } from "./program-metadata.ts";
+
+/**
+ * Package metadata of one program, as recorded in `graph/packages.json`.
+ */
+export interface ProgramPackage {
+  /** Codama program name. */
+  program: string;
+  /** Protocol directory name, e.g. `quarry`. */
+  protocol: string;
+  /** `<protocol>/<program>` directory under `programs/src/`. */
+  slug: string;
+  /** npm package name. */
+  packageName: string;
+  /** Version of the package's first release (from its release config). */
+  version: string;
+  /** Names of the programs this program links into. */
+  dependencies: string[];
+  /** Changelog lines for the package's first release. */
+  releaseNotes?: string[];
+  /** The on-chain program: addresses, sources and status. */
+  metadata: ProgramMetadata;
+}
+
+/**
+ * Metadata of one protocol, as recorded in `graph/packages.json`.
+ */
+export interface ProtocolEntry {
+  /** Directory name under `programs/src/`. */
+  protocol: string;
+  displayName: string;
+  description: string;
+  homepage?: string;
+  repository?: string;
+  /** Codama names of the protocol's programs, sorted. */
+  programs: string[];
+}
+
+/**
+ * Package metadata of one umbrella package, as recorded in
+ * `graph/packages.json`.
+ */
+export interface UmbrellaPackage {
+  /** Protocol directory name; the umbrella is generated at packages/<protocol>/. */
+  protocol: string;
+  /** npm package name. */
+  packageName: string;
+  /** Version of the package's first release (from its release config). */
+  version: string;
+  /** Codama names of the member programs, in precedence order. */
+  programs: string[];
+  /** Changelog lines for the package's first release. */
+  releaseNotes?: string[];
+}
+
+/**
+ * A program whose client is published elsewhere, as recorded in
+ * `graph/packages.json`. Links into it import from `packageName`.
+ */
+export interface ExternalProgramEntry {
+  /** Codama program name. */
+  program: string;
+  protocol: string;
+  /** `<protocol>/<program>` directory under `programs/src/` holding the IDL. */
+  slug: string;
+  /** npm package exporting the program's client. */
+  packageName: string;
+  /** Peer dependency range of that package. */
+  peerRange: string;
+}
+
+/**
+ * The merged program graph.
+ */
+export interface Megagraph {
+  /** Every program, sorted by name, merged into one root. */
+  root: RootNode;
+  /** One entry per protocol, sorted by directory name. */
+  protocols: ProtocolEntry[];
+  /** One entry per program, sorted by program name. */
+  packages: ProgramPackage[];
+  /** One entry per umbrella package, sorted by protocol. */
+  umbrellas: UmbrellaPackage[];
+  /** One entry per external program, sorted by program name. */
+  externals: ExternalProgramEntry[];
+}
+
+/**
+ * Parses a program's IDL and runs its definition's visitors.
+ *
+ * The program is processed on its own root, so the definition's bare selectors
+ * cannot touch another program's nodes. `contextPrograms` are added to that
+ * root only so that program-qualified links resolve while the visitors run;
+ * only the program itself is kept.
+ */
+async function processProgram(
+  source: ProgramSource,
+  contextPrograms: ProgramNode[],
+  linkPrograms: string[],
+): Promise<ProgramNode> {
+  const { definition } = source;
+  const { codama } = await processConfig(
+    {
+      ...(definition.instructionAccountDefaultValues && {
+        instructionAccountDefaultValues:
+          definition.instructionAccountDefaultValues,
+      }),
+      ...(definition.visitors && { visitors: definition.visitors }),
+    },
+    { idls: [definition.idl], contextPrograms, linkPrograms, quiet: true },
+  );
+  const program = codama.getRoot().program;
+  if (program.name !== definition.program.name) {
+    throw new Error(
+      `${PROGRAMS_DIR}/${source.slug}: the program handle is named "${definition.program.name}", but the IDL's program is "${program.name}"`,
+    );
+  }
+  return program;
+}
+
+/**
+ * Strips a program down to its identity and PDAs for use as context.
+ *
+ * Definitions select nodes by bare name
+ * (`updateInstructionsVisitor({ burn: ... })`), and those selectors match
+ * nodes of every program in the root. A same-named instruction of a context
+ * program can make such a visitor throw, so context programs only carry what
+ * link resolution while the visitors run actually needs: the PDAs whose seeds a PDA default value is filled from. Every other link kind
+ * is resolved later, when the merged graph is validated and rendered.
+ */
+function toContextProgram(program: ProgramNode): ProgramNode {
+  return programNode({
+    name: program.name,
+    publicKey: program.publicKey,
+    version: program.version,
+    pdas: program.pdas,
+  });
+}
+
+/**
+ * Loads an external program's vendored Codama IDL and asserts that the
+ * handles its definition declares match the IDL exactly.
+ */
+function loadExternalPrograms(source: ExternalProgramSource): ProgramNode[] {
+  const root = createFromJson(JSON.stringify(source.definition.idl)).getRoot();
+  const programs: ProgramNode[] = [
+    root.program,
+    ...(root.additionalPrograms ?? []),
+  ];
+  const where = `${PROGRAMS_DIR}/${source.slug}`;
+  for (const handle of source.definition.handles.programs ?? []) {
+    if (!programs.some((program) => program.name === handle.name)) {
+      throw new Error(
+        `${where}: program handle "${handle.name}" does not match any program of the IDL (${programs.map((program) => program.name).join(", ")})`,
+      );
+    }
+  }
+  for (const handle of source.definition.handles.pdas ?? []) {
+    const program = programs.find(
+      (candidate) => candidate.name === handle.program,
+    );
+    const pda = (program?.pdas ?? []).find(
+      (candidate) => candidate.name === handle.name,
+    );
+    if (pda === undefined) {
+      throw new Error(
+        `${where}: PDA handle ${handle.program}.${handle.name} does not match any PDA of the IDL`,
+      );
+    }
+    if (JSON.stringify(pda) !== JSON.stringify(handle.node)) {
+      throw new Error(
+        `${where}: PDA handle ${handle.program}.${handle.name} drifted from the IDL.\n  handle: ${JSON.stringify(handle.node)}\n  IDL:    ${JSON.stringify(pda)}`,
+      );
+    }
+  }
+  return programs;
+}
+
+function assertUniqueProgramNames(
+  entries: { slug: string; program: ProgramNode }[],
+): void {
+  const owners = new Map<string, string>();
+  for (const { slug, program } of entries) {
+    const owner = owners.get(program.name);
+    if (owner !== undefined) {
+      throw new Error(
+        `Program name "${program.name}" is declared by both ${PROGRAMS_DIR}/${owner} and ${PROGRAMS_DIR}/${slug}`,
+      );
+    }
+    owners.set(program.name, slug);
+  }
+}
+
+function assertUniquePackageNames(
+  programs: ProgramSource[],
+  protocols: ProtocolSource[],
+): void {
+  const owners = new Map<string, string>();
+  const entries = [
+    ...programs.map((source) => ({
+      name: source.packageName,
+      owner: `${PROGRAMS_DIR}/${source.slug}`,
+    })),
+    ...protocols.flatMap((source) =>
+      source.release?.umbrella === undefined
+        ? []
+        : [
+            {
+              name: source.release.umbrella.name,
+              owner: `the umbrella of ${PROGRAMS_DIR}/${source.protocol}`,
+            },
+          ],
+    ),
+  ];
+  for (const { name, owner } of entries) {
+    const existing = owners.get(name);
+    if (existing !== undefined) {
+      throw new Error(
+        `Package name "${name}" is used by both ${existing} and ${owner}`,
+      );
+    }
+    owners.set(name, owner);
+  }
+}
+
+/**
+ * Resolves each protocol's umbrella members to program names, ordered by the
+ * umbrella's `precedence` and then alphabetically.
+ */
+function resolveUmbrellas(
+  protocols: ProtocolSource[],
+  entries: { source: ProgramSource; program: ProgramNode }[],
+): UmbrellaPackage[] {
+  return protocols.flatMap(({ protocol, release }) => {
+    const umbrella = release?.umbrella;
+    if (umbrella === undefined) {
+      return [];
+    }
+    const members = entries
+      .filter((entry) => entry.source.protocol === protocol)
+      .toSorted((a, b) => a.source.program.localeCompare(b.source.program));
+    if (members.length === 0) {
+      throw new Error(
+        `${PROGRAMS_DIR}/${protocol}: the umbrella has no programs`,
+      );
+    }
+    const precedence = umbrella.precedence ?? [];
+    for (const program of precedence) {
+      if (!members.some((member) => member.source.definition === program)) {
+        throw new Error(
+          `${PROGRAMS_DIR}/${protocol}: umbrella precedence lists "${program.protocol.name}/${program.name}", which is not a program of the protocol`,
+        );
+      }
+    }
+    const rank = (program: ProgramSource) => {
+      const index = precedence.indexOf(program.definition);
+      return index === -1 ? precedence.length : index;
+    };
+    const ordered = members.toSorted((a, b) => rank(a.source) - rank(b.source));
+    return [
+      {
+        protocol,
+        packageName: umbrella.name,
+        version: umbrella.version,
+        programs: ordered.map((member) => member.program.name),
+        ...(umbrella.releaseNotes && { releaseNotes: umbrella.releaseNotes }),
+      },
+    ];
+  });
+}
+
+/**
+ * Builds and validates the megagraph from every program source.
+ *
+ * Programs are processed twice. The first pass runs each definition's
+ * visitors on its own program, which yields every program's own nodes (e.g.
+ * the PDAs its definition adds). The second pass runs them again with every
+ * other program's first-pass PDAs as context, so a PDA default value linking
+ * into another program resolves while the visitors run —
+ * `setInstructionAccountDefaultValuesVisitor`, for one, silently drops a PDA
+ * default whose seeds it cannot look up. Two passes suffice as long as a
+ * definition only links to PDAs another definition declares, not to nodes
+ * another definition derives from links of its own.
+ */
+export async function buildMegagraph(input: {
+  protocols: ProtocolSource[];
+  programs: ProgramSource[];
+  externals?: ExternalProgramSource[];
+}): Promise<Megagraph> {
+  const { protocols, programs: sources } = input;
+  const externalSources = input.externals ?? [];
+  const externalEntries = externalSources.flatMap((source) =>
+    loadExternalPrograms(source).map((program) => ({ source, program })),
+  );
+  const externalPrograms = externalEntries.map((entry) => entry.program);
+  const linkPrograms = externalPrograms.map(
+    (program) => program.name as string,
+  );
+  if (sources.length === 0) {
+    throw new Error(`No programs found under ${PROGRAMS_DIR}/`);
+  }
+  assertUniquePackageNames(sources, protocols);
+
+  const externalContext = externalPrograms.map(toContextProgram);
+  const firstPass = await Promise.all(
+    sources.map((source) =>
+      processProgram(source, externalContext, linkPrograms),
+    ),
+  );
+  assertUniqueProgramNames([
+    ...sources.map((source, index) => ({
+      slug: source.slug,
+      program: firstPass[index] ?? programNode({ name: "?", publicKey: "?" }),
+    })),
+    ...externalEntries.map((entry) => ({
+      slug: entry.source.slug,
+      program: entry.program,
+    })),
+  ]);
+
+  const context = firstPass.map(toContextProgram);
+  const programs = await Promise.all(
+    sources.map((source, index) =>
+      processProgram(
+        source,
+        [...context.filter((_, other) => other !== index), ...externalContext],
+        linkPrograms,
+      ),
+    ),
+  );
+
+  const sorted = sources
+    .map((source, index) => ({ source, program: programs[index] }))
+    .filter(
+      (entry): entry is { source: ProgramSource; program: ProgramNode } =>
+        entry.program !== undefined,
+    )
+    .toSorted((a, b) => a.program.name.localeCompare(b.program.name));
+
+  const [first, ...rest] = [
+    ...sorted.map((entry) => entry.program),
+    ...externalPrograms,
+  ].toSorted((a, b) => a.name.localeCompare(b.name));
+  if (first === undefined) {
+    throw new Error("No programs were produced");
+  }
+  const root = rootNode(first, rest);
+
+  const packageNames = new Map([
+    ...sorted.map(
+      ({ source, program }) =>
+        [program.name as string, source.packageName] as const,
+    ),
+    ...externalEntries.map(
+      ({ source, program }) =>
+        [program.name as string, source.definition.npm.package] as const,
+    ),
+  ]);
+  const unresolved = findUnresolvedLinks(root);
+  if (unresolved.length > 0) {
+    const lines = unresolved.map((link) => {
+      const owner =
+        (link.owner === undefined ? undefined : packageNames.get(link.owner)) ??
+        link.owner ??
+        "?";
+      const target =
+        link.kind === "programLinkNode"
+          ? link.name
+          : `${link.program ?? "(unqualified)"}.${link.name}`;
+      const where = link.location === "" ? "" : ` (at ${link.location})`;
+      return `  - ${owner}: unresolved ${link.kind.replace(/Node$/, "")} ${target}${where}`;
+    });
+    throw new Error(
+      `${unresolved.length.toString()} link(s) do not resolve:\n${lines.join("\n")}`,
+    );
+  }
+
+  const dependencies = getProgramDependencies(sorted.map((e) => e.program));
+  const cycles = findCycles(dependencies);
+  if (cycles.length > 0) {
+    throw new Error(
+      `Package dependency cycle(s):\n${cycles.map((cycle) => `  - ${cycle.join(" -> ")}`).join("\n")}`,
+    );
+  }
+
+  const knownPrograms = new Set(packageNames.keys());
+
+  return {
+    root,
+    protocols: protocols.map(({ protocol, definition }) => ({
+      protocol,
+      displayName: definition.displayName,
+      description: definition.description,
+      ...(definition.homepage !== undefined && {
+        homepage: definition.homepage,
+      }),
+      ...(definition.repository !== undefined && {
+        repository: definition.repository,
+      }),
+      programs: [...sorted, ...externalEntries]
+        .filter((entry) => entry.source.protocol === protocol)
+        .map((entry) => entry.program.name as string)
+        .toSorted(),
+    })),
+    packages: sorted.map(({ source, program }) => ({
+      program: program.name,
+      protocol: source.protocol,
+      slug: source.slug,
+      packageName: source.packageName,
+      version: source.package.version,
+      dependencies: dependencies.get(program.name) ?? [],
+      ...(source.package.releaseNotes && {
+        releaseNotes: source.package.releaseNotes,
+      }),
+      metadata: resolveProgramMetadata({
+        config: source.definition.metadata,
+        program: program.name,
+        publicKey: program.publicKey,
+        knownPrograms,
+        where: `${PROGRAMS_DIR}/${source.slug}`,
+      }),
+    })),
+    umbrellas: resolveUmbrellas(protocols, sorted),
+    externals: externalEntries
+      .map(({ source, program }) => ({
+        program: program.name as string,
+        protocol: source.protocol,
+        slug: source.slug,
+        packageName: source.definition.npm.package,
+        peerRange: source.definition.npm.range,
+      }))
+      .toSorted((a, b) => a.program.localeCompare(b.program)),
+  };
+}

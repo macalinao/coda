@@ -41,7 +41,8 @@
   },
   "scripts": {
     "build": "tsdown",
-    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo"
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
+    "test": "bun test src/"
   },
   "dependencies": {
     "@solana-program/memo": "^0.13.1",

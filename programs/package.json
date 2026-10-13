@@ -1,0 +1,65 @@
+{
+  "name": "@solana-programs/definitions",
+  "version": "0.0.0",
+  "description": "Definitions of every program in the Coda program megagraph (IDL, PDAs, Coda visitors, on-chain metadata), to generate your own Solana clients from",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Ian Macalinao <me@ianm.com>",
+  "homepage": "https://coda.ianm.com",
+  "license": "Apache-2.0",
+  "keywords": [
+    "coda",
+    "codama",
+    "solana",
+    "idl",
+    "anchor",
+    "code-generation",
+    "ian-macalinao"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./*/idl.json": "./src/*/idl.json",
+    "./*": {
+      "types": "./dist/*/index.d.ts",
+      "import": "./dist/*/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "!src/**/*.test.ts",
+    "!src/**/release.config.ts",
+    "!src/megagraph.config.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macalinao/coda.git",
+    "directory": "programs"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -fr dist/ node_modules/ tsconfig.tsbuildinfo",
+    "test": "bun test src/"
+  },
+  "dependencies": {
+    "@codama/nodes-from-anchor": "catalog:",
+    "@macalinao/coda": "workspace:^",
+    "@macalinao/megagraph": "workspace:^"
+  },
+  "devDependencies": {
+    "@macalinao/tsconfig": "catalog:",
+    "@types/bun": "catalog:",
+    "@types/node": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
+}

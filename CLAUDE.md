@@ -10,7 +10,8 @@ The monorepo contains:
 
 - **Coda CLI** - The main tool for generating TypeScript clients from Anchor IDLs
 - **Codama utilities** - Custom visitors and renderers for enhanced code generation
-- **Generated clients** - Pre-built clients for popular Solana programs
+- **Program megagraph** - Every program's IDL and config under `programs/`, merged into one Codama graph (`graph/codama.json`)
+- **Generated clients** - Pre-built clients for popular Solana programs, one package per program, generated entirely from `programs/`
 
 ## Technology Stack
 
@@ -48,8 +49,11 @@ bun run build                # Build all packages
 bun run build:watch          # Watch mode for all packages
 bun run build:watch:packages # Watch mode for packages only
 
-# Code Generation
-bun run codegen             # Run code generation for all clients
+# Code Generation (graph/ and clients/ are generated, never committed)
+bun run graph               # Build graph/ (the megagraph) from programs/src/
+bun run codegen             # graph/, then the clients/ workspace, then `bun install` in it
+bun run clients build       # Build/typecheck/test/lint the generated clients (skips if absent)
+bun run megagraph <command> # graph, generate, clients, export, release, publish, peers, compat
 coda generate               # Generate client with Coda CLI
 coda init                  # Initialize coda.config.ts
 
@@ -79,10 +83,17 @@ coda/
 │   ├── coda/               # Main CLI tool (@macalinao/coda)
 │   ├── codama-instruction-accounts-dedupe-visitor/  # Flattens nested accounts
 │   └── codama-renderers-js-esm/                    # ESM-native renderer
-├── clients/                # Generated client libraries
-│   └── token-metadata/     # Metaplex Token Metadata client
-├── docs/                   # Documentation site (Fumadocs + Next.js)
-├── scripts/               # Build and CI scripts
+│   └── megagraph/          # Graph builder, generator and release planner (@macalinao/megagraph)
+├── programs/               # Source of truth for every client (@solana-programs/definitions)
+│   └── src/                # megagraph.config.ts (the registry), index.ts (barrel), peers/index tests
+│       └── quarry/         # protocol.config.ts, release.config.ts (keywords, umbrella), index.ts, CHANGELOG seed
+│           └── mine/       # idl.json, program.config.ts (definition), release.config.ts, index.ts, optional README.md / CHANGELOG seed
+├── graph/                  # Generated, gitignored: codama.json, packages.json
+├── clients/                # Generated, gitignored: standalone Bun workspace
+│   └── packages/quarry/mine/  # @solana-programs/quarry-mine (umbrella at packages/quarry/)
+├── apps/docs/              # Documentation site (Fumadocs + Next.js)
+├── scripts/               # Shell scripts only (publishing, CI checks)
+├── tsconfig.json           # Type-checks the shared tsdown.config.ts (nothing else)
 └── vendor/                 # Vendored dependencies for reference
     └── fumadocs/          # Fumadocs source for configuration reference
 ```
@@ -111,7 +122,13 @@ coda/
 - Ensures compatibility with `"type": "module"`
 - Emits only erasable syntax (no `enum`, no angle-bracket assertions), so generated clients compile under `erasableSyntaxOnly`
 
-### 4. **@solana-programs/token-metadata**
+### 4. **@macalinao/megagraph**
+
+- Builds and validates the program megagraph from `programs/`
+- Generates one package per program (plus umbrellas) into `clients/`
+- Plans and applies releases of the generated packages
+
+### 5. **@solana-programs/token-metadata**
 
 - Pre-generated client for Metaplex Token Metadata program
 - Includes custom PDAs and type definitions
@@ -137,7 +154,7 @@ Coda automatically discovers IDLs without any configuration:
 
 ### Single IDL Configuration
 
-For projects with a single program (like [token-metadata](https://github.com/macalinao/coda/tree/master/clients/token-metadata)):
+For projects with a single program:
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
@@ -159,7 +176,7 @@ export default defineConfig({
 
 ### Multiple IDL Configuration with Glob Pattern
 
-For projects with multiple programs (like [quarry](https://github.com/macalinao/coda/tree/master/clients/quarry)):
+For projects with multiple programs:
 
 ```javascript
 import { defineConfig } from "@macalinao/coda";
@@ -237,8 +254,9 @@ Linting is configured in the root `.oxlintrc.json` and runs as a single
 pass over the whole repo via `oxlint --disable-nested-config`. It enables
 the `correctness`, `suspicious`, and `perf` categories plus a curated set
 of high-value type-aware rules, with `typeAware` and `typeCheck` on (so
-oxlint also reports TypeScript compiler errors). Overrides relax generated
-code (`clients/*/src/generated/**`), CLI console output, and tests.
+oxlint also reports TypeScript compiler errors). `graph/`, `clients/` and
+`mirror/` are generated and ignored. Overrides relax CLI console output and
+tests, and ban raw link constructors in `programs/**`.
 
 - No floating promises (must be handled)
 - No explicit `any`
@@ -255,31 +273,172 @@ Tasks are defined in turbo.json:
 
 - `build`: Depends on upstream builds, outputs to `./dist/**`
 - `test`: Depends on build, no caching
-- `codegen`: Outputs to `./src/generated/**`, no caching
+- `codegen`: No package defines it anymore; the root `graph`/`codegen` scripts build `@macalinao/megagraph` with turbo and then run its `megagraph` CLI
 - Tasks run in topological order respecting dependencies
+
+## Program Megagraph
+
+`programs/src/` is the single source of truth for every `@solana-programs/*`
+client, grouped by protocol. Each program and protocol has a **definition**
+(what it is; published in `@solana-programs/definitions` for anyone building
+their own clients) and **release metadata** (how its package is released;
+repository-internal, never exported or published):
+
+- `programs/src/<protocol>/protocol.config.ts` - definition:
+  `defineProtocol({ name, displayName, description, homepage?, repository? })`.
+  `name` is the kebab-case protocol directory.
+- `programs/src/<protocol>/release.config.ts` - release metadata (optional):
+  `defineProtocolRelease({ protocol, keywords?, umbrella? })`. `umbrella`
+  (`{ name, description, keywords?, version, releaseNotes?, precedence? }`,
+  `precedence` being imported program definitions) generates a package that
+  re-exports every program of the protocol.
+- `programs/src/<protocol>/<program>/idl.json` - the program's Anchor IDL
+- `programs/src/<protocol>/<program>/program.config.ts` - definition:
+  `defineProgram({ protocol, name, program, idl, pdas?, metadata?,
+  instructionAccountDefaultValues?, visitors? })`. `protocol` is the imported
+  protocol definition, `name` the kebab-case program directory, `program` the
+  `programHandle`, `idl` the imported `idl.json`, `metadata` the on-chain
+  program (`displayName`, `description`, `repository`, `idlSource`,
+  `addresses`, `docs`, `audits`, `status`, `supersededBy`). It also exports
+  `idl`, `program` and `pdas` as named exports.
+- `programs/src/<protocol>/<program>/release.config.ts` - release metadata:
+  `defineProgramRelease({ program: definition, package: { name?, description,
+  keywords?, version, releaseNotes? } })`. The package name defaults to
+  `@solana-programs/<protocol>-<program>`; existing published names are set
+  explicitly.
+- `README.md` (optional) - hand-written body inserted into the generated README
+- `CHANGELOG.md` (optional) - seed changelog for a package's first release
+- `index.ts` - the public module: re-exports `program.config.ts` (the default
+  export as `definition`, plus `idl`, `program`, `pdas`, ...). Never re-export
+  a `release.config.ts`. Each protocol has an `index.ts` too, and
+  `programs/src/index.ts` exports one namespace per protocol; add the new
+  program or protocol to them (`programs/src/index.test.ts` fails otherwise)
+- `programs/src/megagraph.config.ts` - the registry: `defineMegagraph({
+  programs, externals, protocols, peerDependencies, workspace, ... })` lists
+  every program release, external definition and protocol release by import.
+  Megagraph does not glob; a program that is not listed is not built
+  (`programs/src/index.test.ts` checks that every `program.config.ts` and
+  `release.config.ts` on disk is listed). Directories are derived from the
+  protocol and program `name`s and must exist (README/CHANGELOG seeds and the
+  generated READMEs' source links live there).
+
+`programs/` is a published workspace package (`@solana-programs/definitions`,
+released with changesets like `packages/*`) so others can generate their own
+clients from the same definitions. It builds with tsdown (its own
+`tsdown.config.ts`: one entry per protocol and per program, exported as
+`./<protocol>` and `./<protocol>/<program>`; raw IDLs as
+`./<protocol>/<program>/idl.json`); `release.config.ts` files and
+`megagraph.config.ts` are excluded from its `files`. Its `tsconfig.json` lets
+the repo-wide `bun run lint` type-check every definition. That needs the
+tooling built first (`@macalinao/coda` and `@macalinao/megagraph` resolve to
+their `dist/` types), which CI's build step guarantees.
+
+**Links are typed and always program-qualified.** Each definition exports
+`program = programHandle("<codama name>")` and, for PDAs it declares,
+`pdas = definePdas(program, { ... })` (with `constant()`/`variable()` seeds).
+Use `pdas.<name>.value({ <seed>: ... })` for PDA default values,
+`pdas.<name>.link` / `program.link` / `program.pda|account|definedType(name)`
+for links, and `pdas.visitor` to add the PDAs. Another program's handles are
+imported from its definition (`import * as quarryMine from
+"../mine/program.config.ts"`); the import graph mirrors the package
+dependencies and must stay acyclic. oxlint bans the raw `pdaLinkNode`,
+`accountLinkNode`, `definedTypeLinkNode` and `programLinkNode` in
+`programs/**`.
+
+**External programs** (e.g. `programs/src/solana/token/`) are programs whose
+client is published by someone else. Their `idl.json` is a vendored Codama IDL
+(record the source repository, tag and commit in the definition), their
+`program.config.ts` uses `defineExternalProgram({ protocol, name, idl, npm: {
+package, range }, source, handles })` and they have no `release.config.ts`;
+`megagraph.config.ts` lists them under `externals`. They are in the graph for link resolution
+and validation but never rendered, never packaged and never released. The
+graph build asserts that every handle the definition exports (program handles,
+`definePdas` PDAs) matches the IDL exactly. Addresses and the associated
+token account PDA that configs write as inline values
+(`TOKEN_PROGRAM_VALUE_NODE`, `associatedTokenAccountValueNode`, and the
+default account rules) become links to the external programs
+(`linkKnownProgramsVisitor`, enabled by the megagraph only). A package whose
+rendered code imports an external package gets it as a peer dependency (and a
+`catalog:` devDependency); umbrellas take the union of their members' peers.
+
+**Peer ranges**: the `@solana/kit` / `@solana/program-client-core` range of
+every client is `peerDependencies` in `programs/src/megagraph.config.ts`; each
+external program declares its own supported versions in its definition
+(`defineExternalProgram({ npm: { package, range }, ... })`), which become the
+peer range of every package whose code imports it.
+`programs/src/peers.test.ts` checks every external range against the kit range
+using the `npm-peers.json` snapshot next to each external IDL (every version
+in range accepts a supported kit, every kit major is covered); CI runs
+`bun run megagraph peers --verify` to check the snapshot against npm
+(`--refresh` rewrites it) and type-checks sample clients against the oldest
+and newest kit of each major and every external minor (`megagraph compat`).
+
+`bun run graph` runs every definition's visitors on a root whose main program is that program
+(so bare selectors like `updateAccountsVisitor({ miner })` only match it),
+merges the results into one root, validates it (every link resolves, reported
+as `<package>: unresolved pdaLink <program>.<name>`; unique program and
+package names; no package cycles) and writes `graph/codama.json` and
+`graph/packages.json` (protocols, packages, umbrellas). `bun run codegen`
+then generates `clients/`, a standalone Bun workspace (not part of this
+repository's workspaces, so a fresh clone installs without it):
+`packages/<protocol>/<program>/` per program, `packages/<protocol>/` per
+umbrella. Each link into another program becomes a `workspace:^` dependency
+and an import from that package instead of re-emitted code.
+
+Generated READMEs link to each package's directory in the mirror
+(`workspace.repository` and `workspace.defaultBranch` in
+`programs/src/megagraph.config.ts`), both at the release tag `<pkg>@<version>`
+(rewritten by `release apply`) and on the default branch; umbrella READMEs
+link their members. `homepage` points at the mirror directory, while
+`repository` stays coda, as npm provenance requires.
+
+Fresh clone: `bun install && bun run codegen && bun run build`.
+
+**Releases** of `@solana-programs/*` do not use changesets. The
+`release-clients.yml` workflow plans versions against the release state in
+github.com/toolboxdao/solana-programs (the mirror: previous graph, versions and
+changelogs) with `megagraph release plan`, applies them with
+`release apply`, verifies everything builds (in coda and in the exported
+mirror standalone), commits and tags the release in the mirror, then
+publishes the versions npm does not have. A package's `version` in its
+`release.config.ts` is only used for its first release. Classification: removed/renamed/changed/
+reordered interface nodes are breaking, additions features, docs-only changes
+and regenerated-code-only changes fixes, unknown changes breaking; 0.x
+releases breaking changes as minor and everything else as patch.
 
 ## Adding a New Client
 
-1. **Add IDL file**: Place in `clients/[program-name]/idls/`
-2. **Create config**: Add `coda.config.ts` with any custom visitors
-3. **Add package.json**: Include build (`"build": "tsdown"`) and codegen scripts
-4. **Generate client**: Run `bun run codegen`
-5. **Build**: Run `bun run build`
+1. Create `programs/src/<protocol>/<program>/idl.json`, `program.config.ts`
+   (the definition), `release.config.ts` (the package) and `index.ts` (copy
+   an existing one), and `programs/src/<protocol>/protocol.config.ts`,
+   `release.config.ts` (if it needs keywords or an umbrella) and `index.ts`
+   for a new protocol
+2. Export it from the protocol's (and for a new protocol, the root)
+   `index.ts`, and list its release (and a new protocol's release) in
+   `programs/src/megagraph.config.ts`
+3. Optionally add a `README.md`
+4. Run `bun run codegen` and `bun run build`
+5. Add size budgets for the package to `.size-limit.json`
+6. A brand new npm name needs a bootstrap publish and a trusted publisher for
+   `release-clients.yml` (see `scripts/bootstrap-publish.sh`)
 
-No per-package `tsdown.config.ts` is needed — tsdown walks up to the shared root `tsdown.config.ts`.
+Keep everything program-specific in `programs/` (inputs) and tooling in
+`packages/*`, so the program data can move to its own repository.
 
-Example package.json for a client:
+## Repository Rules
 
-```json
-{
-  "name": "@solana-programs/[program-name]",
-  "scripts": {
-    "build": "tsdown",
-    "codegen": "coda generate",
-    "clean": "rm -fr dist/"
-  }
-}
-```
+- Every TypeScript file lives in a workspace package with its own
+  `package.json` and `tsconfig.json`, so oxlint's type-aware pass
+  type-checks it (`scripts/check-ts-in-packages.sh` enforces this; the root
+  `tsconfig.json` only covers the shared `tsdown.config.ts`). Repository
+  tooling is a command of a package (e.g. the `megagraph` CLI), not a loose
+  script; `scripts/` holds shell scripts only.
+- Use Bun everywhere: `#!/usr/bin/env bun` shebangs, `bun` in scripts and
+  docs, `jq` or `bun -e` to read JSON in shell. Node is only used where it is
+  genuinely required, with a comment saying why: `npm publish` over OIDC
+  trusted publishing (npm CLI >= 11.5.1), and the CI check that the
+  published `@macalinao/coda` / `create-coda` CLIs (`#!/usr/bin/env node`)
+  work under Node, since consumers run them with node.
 
 ## CI/CD
 
@@ -289,7 +448,20 @@ GitHub Actions workflow runs on push/PR to main:
 - Builds all packages
 - Runs oxlint (lint + type-aware type-checking) and checks formatting with oxfmt
 - Runs tests
-- Type-checks the coda.config.ts files
+- Checks every tracked TypeScript file belongs to a package with a
+  `tsconfig.json` (`scripts/check-ts-in-packages.sh`), so oxlint type-checks it
+- Runs the published `@macalinao/coda` CLI under Node (consumers run it with
+  node); everything else runs on Bun
+- Checks external peer ranges against npm
+- Generates `graph/` and `clients/`, checks codegen is idempotent, and builds,
+  type-checks and loads every generated client, then checks bundle sizes
+- `client-compat`: type-checks sample clients against each supported
+  `@solana/kit` major (oldest and newest) with a matching
+  `@solana-program/token`
+
+`release-clients.yml` releases the generated clients (see Program Megagraph);
+on pull requests it only posts the release plan to the job summary.
+`release.yml` (changesets) releases only the tooling packages.
 
 ## Publishing Workflow
 
@@ -300,9 +472,13 @@ GitHub Actions workflow runs on push/PR to main:
 
 ### Changesets on Every PR
 
-**Every new PR must include a changeset.** Releases are cut from the
-changesets on master, so a PR without one ships its changes with no version
-bump and no changelog entry.
+**Every new PR must include a changeset.** Releases of the tooling packages
+are cut from the changesets on master, so a PR without one ships its changes
+with no version bump and no changelog entry. The generated `@solana-programs/*`
+clients are not workspace packages and are versioned by
+`release-clients.yml` instead. Changes to program definitions still need a
+changeset for `@solana-programs/definitions`, the package that publishes them;
+release-only changes (`release.config.ts`) do not change what it publishes.
 
 1. Run `bun run changeset`
 2. Select the package(s) the PR affects
@@ -380,7 +556,7 @@ When writing documentation for Coda or generated clients:
    - Keep examples concise but complete
 
 5. **Links and References**:
-   - Link to example repositories (e.g., token-metadata for single IDL, quarry for multiple IDLs)
+   - Link to example programs (e.g., `programs/src/metaplex/token-metadata` for a single program, the `programs/src/quarry/*` suite for linked programs)
    - Reference the official Codama documentation where appropriate
    - Include links to Anchor documentation for IDL-related topics
 
@@ -442,7 +618,7 @@ bun run build   # Build for production
 ls -la ./src/generated/
 
 # Verify config is valid
-node -e "import('./coda.config.ts').then(c => console.log(c.default))"
+bun -e "console.log((await import('./coda.config.ts')).default)"
 
 # Clean and rebuild
 bun run clean && bun run codegen && bun run build

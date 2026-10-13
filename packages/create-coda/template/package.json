@@ -24,10 +24,11 @@
     "src/"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "clean": "rm -fr dist/ tsconfig.tsbuildinfo",
     "codegen": "rm -fr src/generated/ && coda generate",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "typecheck": "tsc"
   },
   "peerDependencies": {
     "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
@@ -38,7 +39,7 @@
     "@macalinao/tsconfig": "^4.0.0",
     "@solana/kit": "*",
     "@solana/program-client-core": "*",
-    "@types/bun": "catalog:",
+    "@types/bun": "~1.4.2",
     "oxlint": "1.82.0",
     "oxlint-tsgolint": "7.0.2001",
     "typescript": "^7.0.2"

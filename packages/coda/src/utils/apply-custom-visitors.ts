@@ -9,6 +9,7 @@ export function applyCustomVisitors(
   codama: Codama,
   config: CodaConfig,
   idls: AnchorIdl[],
+  options: { quiet?: boolean } = {},
 ): void {
   if (config.visitors) {
     // Resolve visitors - either array or function
@@ -17,13 +18,13 @@ export function applyCustomVisitors(
         ? config.visitors({ idls })
         : config.visitors;
 
-    if (visitors.length > 0) {
+    if (visitors.length > 0 && !options.quiet) {
       console.log(
         `Applying ${visitors.length.toLocaleString()} custom visitor(s)...`,
       );
-      for (const visitor of visitors) {
-        codama.update(visitor);
-      }
+    }
+    for (const visitor of visitors) {
+      codama.update(visitor);
     }
   }
 }

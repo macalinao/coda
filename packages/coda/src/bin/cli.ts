@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// node, not bun: this is the published CLI, and consumers run it with Node.
 import { rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { renderVisitor as renderRustVisitor } from "@codama/renderers-rust";

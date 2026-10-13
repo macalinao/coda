@@ -1,0 +1,105 @@
+import type { AnchorIdl } from "@codama/nodes-from-anchor";
+import {
+  accountValueNode,
+  constant,
+  definePdas,
+  programHandle,
+  publicKeyTypeNode,
+  setInstructionAccountDefaultValuesVisitor,
+  updateAccountsVisitor,
+  variable,
+} from "@macalinao/coda";
+import { defineProgram } from "@macalinao/megagraph";
+import idlJson from "./idl.json" with { type: "json" };
+import protocol from "../protocol.config.ts";
+
+/** The program's Anchor IDL. */
+export const idl: AnchorIdl = idlJson as AnchorIdl;
+
+export const program = programHandle("quarryMintWrapper");
+
+export const pdas = definePdas(program, {
+  mintWrapper: {
+    docs: ["Mint wrapper that controls minting of wrapped tokens"],
+    seeds: [constant("MintWrapper"), variable("base", publicKeyTypeNode())],
+  },
+  minter: {
+    docs: ["Minter authority for a specific mint wrapper"],
+    seeds: [
+      constant("MintWrapperMinter"),
+      variable("wrapper", publicKeyTypeNode()),
+      variable("authority", publicKeyTypeNode()),
+    ],
+  },
+});
+
+export default defineProgram({
+  protocol,
+  name: "mint-wrapper",
+  program,
+  idl,
+  pdas,
+  // The on-chain program. Addresses were checked with getAccountInfo on
+  // mainnet-beta and devnet (2026-10).
+  metadata: {
+    displayName: "Quarry Mint Wrapper",
+    description:
+      "Owns the mint authority of a rewards token and hands out rate-limited minters.",
+    repository: "https://github.com/QuarryProtocol/quarry",
+    addresses: {
+      devnet: "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV",
+    },
+    docs: "https://docs.rs/quarry-mint-wrapper",
+    audits: [
+      {
+        auditor: "Quantstamp",
+        url: "https://github.com/QuarryProtocol/quarry/blob/master/audit/quantstamp.pdf",
+        date: "2021-12-08",
+      },
+    ],
+  },
+
+  visitors: [
+    updateAccountsVisitor({
+      mintWrapper: {
+        pda: pdas.mintWrapper.link,
+      },
+      minter: {
+        pda: pdas.minter.link,
+      },
+    }),
+    pdas.visitor,
+    setInstructionAccountDefaultValuesVisitor([
+      ...["newWrapper", "newWrapperV2"].flatMap((instruction) => [
+        {
+          account: "mintWrapper",
+          instruction,
+          defaultValue: pdas.mintWrapper.value({
+            base: accountValueNode("base"),
+          }),
+        },
+        {
+          account: "admin",
+          instruction,
+          defaultValue: accountValueNode("payer"),
+        },
+      ]),
+
+      ...["newMinter", "newMinterV2"].flatMap((instruction) => [
+        {
+          account: "minter",
+          instruction,
+          defaultValue: pdas.minter.value({
+            wrapper: accountValueNode("mintWrapper"),
+            authority: accountValueNode("newMinterAuthority"),
+          }),
+        },
+        {
+          account: "newMinterAuthority",
+          instruction,
+          defaultValue: accountValueNode("payer"),
+        },
+      ]),
+    ]),
+  ],
+});

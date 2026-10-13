@@ -1,3 +1,15 @@
 {
-  "extends": "@macalinao/tsconfig/tsconfig.base.json"
+  "extends": "@macalinao/tsconfig/tsconfig.base.json",
+  // Type-checks the whole project, coda.config.ts included (tsc --noEmit,
+  // and editors). The build uses tsconfig.build.json, which emits src/ only.
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "declaration": false,
+    "declarationMap": false,
+    "isolatedDeclarations": false
+  },
+  "include": ["src/**/*", "coda.config.ts"]
 }

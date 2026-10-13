@@ -5,7 +5,10 @@ import { fileExists } from "./file-exists.ts";
 /**
  * Load IDL files from the specified paths
  */
-export async function loadIdls(idlPaths: string[]): Promise<AnchorIdl[]> {
+export async function loadIdls(
+  idlPaths: string[],
+  options: { quiet?: boolean } = {},
+): Promise<AnchorIdl[]> {
   const idls: AnchorIdl[] = [];
 
   for (const idlPath of idlPaths) {
@@ -16,7 +19,9 @@ export async function loadIdls(idlPaths: string[]): Promise<AnchorIdl[]> {
     }
 
     // Load the IDL
-    console.log(`Loading IDL from ${idlPath}...`);
+    if (!options.quiet) {
+      console.log(`Loading IDL from ${idlPath}...`);
+    }
     const idlContent = await readFile(idlPath, "utf-8");
     const idl = JSON.parse(idlContent) as AnchorIdl;
     idls.push(idl);

@@ -35,6 +35,7 @@ TypeScript client for Solana program generated with [Coda](https://github.com/ma
 
 - `bun run codegen` - Generate TypeScript client from IDL
 - `bun run build` - Build the TypeScript project
+- `bun run typecheck` - Type-check the project, `coda.config.ts` included
 - `bun run clean` - Clean build artifacts
 - `bun run lint` - Run oxlint
 - `bun test` - Run tests
