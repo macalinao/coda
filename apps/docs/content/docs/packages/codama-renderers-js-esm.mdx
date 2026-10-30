@@ -150,6 +150,10 @@ The object keeps the exact runtime shape a numeric `enum` compiles to, reverse m
 
 The program plugin's angle-bracket type assertion — also non-erasable, since it is ambiguous with JSX — becomes an equivalent `as` assertion.
 
+### 6. Exact Optional Property Types
+
+Generated program plugins forward `programAddress: instructionConfig?.programAddress ?? config.programAddress` to every instruction builder, which is `undefined` when neither config sets it. This renderer declares the builders' `programAddress` override as `... | undefined` (as `find*Pda` already is), so generated clients type-check under `exactOptionalPropertyTypes`.
+
 ## Comparison with Standard Renderer
 
 | Feature           | @codama/renderers-js | @macalinao/codama-renderers-js-esm |
@@ -160,6 +164,7 @@ The program plugin's angle-bracket type assertion — also non-erasable, since i
 | Runtime Checks    | Node.js-specific     | Universal                          |
 | Null Checks       | Loose (`==`)         | Strict (`===`)                     |
 | Enums             | `enum` declarations  | Erasable `const` objects           |
+| `exactOptionalPropertyTypes` | Fails (TS2379) | Passes                       |
 | Tree Shaking      | Good                 | Excellent                          |
 
 ## Configuration
