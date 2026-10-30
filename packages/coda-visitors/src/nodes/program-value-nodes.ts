@@ -2,7 +2,7 @@ import {
   SYSVAR_INSTRUCTIONS_ADDRESS,
   SYSVAR_RENT_ADDRESS,
 } from "@solana/sysvars";
-import { MEMO_PROGRAM_ADDRESS } from "@solana-program/memo";
+import { LEGACY_MEMO_PROGRAM_ADDRESS_V3 } from "@solana-program/memo";
 import { SYSTEM_PROGRAM_ADDRESS } from "@solana-program/system";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ADDRESS,
@@ -41,8 +41,11 @@ export const SYSVAR_INSTRUCTIONS_VALUE_NODE = publicKeyValueNode(
   "instructionsSysvar",
 );
 
+// SPL Memo v3 (MemoSq4g...). @solana-program/memo >= 0.14 exports the v4
+// program as MEMO_PROGRAM_ADDRESS, but existing on-chain programs (e.g. Orca
+// Whirlpools' *V2 instructions) check for the v3 program ID.
 export const MEMO_PROGRAM_VALUE_NODE = publicKeyValueNode(
-  MEMO_PROGRAM_ADDRESS,
+  LEGACY_MEMO_PROGRAM_ADDRESS_V3,
   "memoProgram",
 );
 
