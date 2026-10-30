@@ -21,9 +21,19 @@
  * Should be upstreamed to `@codama/renderers-js`, after which this pass becomes
  * a no-op and can be removed.
  */
-const BUILDER_PROGRAM_ADDRESS_CONFIG =
-  /(config\?:\s*\{\s*programAddress\?:\s*TProgramAddress\s*\|\s*\{\s*readonly address:\s*TProgramAddress;?\s*\})(\s*;?\s*\})/g;
+const PROGRAM_ADDRESS_OVERRIDE =
+  "programAddress?: TProgramAddress | { readonly address: TProgramAddress }";
+
+/**
+ * Matched as a literal, not a pattern. The pass runs on the raw renderer
+ * output, before any formatting, where the upstream template always emits this
+ * exact text, and a fixed search cannot backtrack.
+ */
+const BUILDER_PROGRAM_ADDRESS_CONFIG = `config?: { ${PROGRAM_ADDRESS_OVERRIDE} }`;
 
 export function allowUndefinedProgramAddress(code: string): string {
-  return code.replace(BUILDER_PROGRAM_ADDRESS_CONFIG, "$1 | undefined$2");
+  return code.replaceAll(
+    BUILDER_PROGRAM_ADDRESS_CONFIG,
+    `config?: { ${PROGRAM_ADDRESS_OVERRIDE} | undefined }`,
+  );
 }

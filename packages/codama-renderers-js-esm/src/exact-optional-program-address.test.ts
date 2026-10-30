@@ -14,24 +14,6 @@ describe("allowUndefinedProgramAddress", () => {
     );
   });
 
-  test("handles formatted output", () => {
-    expect(
-      allowUndefinedProgramAddress(
-        [
-          "  config?: {",
-          "    programAddress?: TProgramAddress | { readonly address: TProgramAddress };",
-          "  },",
-        ].join("\n"),
-      ),
-    ).toBe(
-      [
-        "  config?: {",
-        "    programAddress?: TProgramAddress | { readonly address: TProgramAddress } | undefined;",
-        "  },",
-      ].join("\n"),
-    );
-  });
-
   test("is idempotent", () => {
     const once = allowUndefinedProgramAddress(
       "config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } }",
