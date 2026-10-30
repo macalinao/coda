@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtPermanentLockPosition = {
@@ -28,8 +29,8 @@ export type EvtPermanentLockPosition = {
 };
 
 export type EvtPermanentLockPositionArgs = {
-  pool: Address;
-  position: Address;
+  pool: Address | HasAddress;
+  position: Address | HasAddress;
   lockLiquidityAmount: number | bigint;
   totalPermanentLockedLiquidity: number | bigint;
 };

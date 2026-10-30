@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type InitMergeMinerEvent = {
@@ -25,7 +26,12 @@ export type InitMergeMinerEvent = {
   owner: Address;
 };
 
-export type InitMergeMinerEventArgs = InitMergeMinerEvent;
+export type InitMergeMinerEventArgs = {
+  pool: Address | HasAddress;
+  mm: Address | HasAddress;
+  primaryMint: Address | HasAddress;
+  owner: Address | HasAddress;
+};
 
 export function getInitMergeMinerEventEncoder(): FixedSizeEncoder<InitMergeMinerEventArgs> {
   return getStructEncoder([

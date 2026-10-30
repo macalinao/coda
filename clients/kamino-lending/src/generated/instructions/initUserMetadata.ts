@@ -25,19 +25,23 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -94,7 +98,9 @@ export type InitUserMetadataInstructionData = {
   userLookupTable: Address;
 };
 
-export type InitUserMetadataInstructionDataArgs = { userLookupTable: Address };
+export type InitUserMetadataInstructionDataArgs = {
+  userLookupTable: Address | HasAddress;
+};
 
 export function getInitUserMetadataInstructionDataEncoder(): FixedSizeEncoder<InitUserMetadataInstructionDataArgs> {
   return transformEncoder(
@@ -124,29 +130,32 @@ export function getInitUserMetadataInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitUserMetadataInput<
-  TAccountOwner extends string = string,
-  TAccountFeePayer extends string = string,
-  TAccountUserMetadata extends string = string,
-  TAccountReferrerUserMetadata extends string = string,
-  TAccountRent extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFeePayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserMetadata extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReferrerUserMetadata extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  feePayer: TransactionSigner<TAccountFeePayer>;
-  userMetadata: Address<TAccountUserMetadata>;
-  referrerUserMetadata?: Address<TAccountReferrerUserMetadata>;
-  rent?: Address<TAccountRent>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  owner: TAccountOwner;
+  feePayer: TAccountFeePayer;
+  userMetadata: TAccountUserMetadata;
+  referrerUserMetadata?: TAccountReferrerUserMetadata;
+  rent?: TAccountRent;
+  systemProgram?: TAccountSystemProgram;
   userLookupTable: InitUserMetadataInstructionDataArgs["userLookupTable"];
 };
 
 export function getInitUserMetadataInstruction<
-  TAccountOwner extends string,
-  TAccountFeePayer extends string,
-  TAccountUserMetadata extends string,
-  TAccountReferrerUserMetadata extends string,
-  TAccountRent extends string,
-  TAccountSystemProgram extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountFeePayer extends InstructionSignerInput,
+  TAccountUserMetadata extends InstructionAccountInput,
+  TAccountReferrerUserMetadata extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: InitUserMetadataInput<
@@ -157,31 +166,74 @@ export function getInitUserMetadataInstruction<
     TAccountRent,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitUserMetadataInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountFeePayer,
-  TAccountUserMetadata,
-  TAccountReferrerUserMetadata,
-  TAccountRent,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeePayer,
+    InstructionAccountInputAddress<TAccountFeePayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserMetadata,
+    InstructionAccountInputAddress<TAccountUserMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferrerUserMetadata,
+    InstructionAccountInputAddress<TAccountReferrerUserMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    feePayer: { value: input.feePayer ?? null, isWritable: true },
-    userMetadata: { value: input.userMetadata ?? null, isWritable: true },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    feePayer: {
+      value: input.feePayer ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    userMetadata: {
+      value: input.userMetadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     referrerUserMetadata: {
       value: input.referrerUserMetadata ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    rent: { value: input.rent ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -201,7 +253,6 @@ export function getInitUserMetadataInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -217,12 +268,30 @@ export function getInitUserMetadataInstruction<
     programAddress,
   } as InitUserMetadataInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountFeePayer,
-    TAccountUserMetadata,
-    TAccountReferrerUserMetadata,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeePayer,
+      InstructionAccountInputAddress<TAccountFeePayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserMetadata,
+      InstructionAccountInputAddress<TAccountUserMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferrerUserMetadata,
+      InstructionAccountInputAddress<TAccountReferrerUserMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

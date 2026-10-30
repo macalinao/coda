@@ -20,6 +20,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getProposalInstructionDecoder,
@@ -36,8 +37,8 @@ export type ProposalCreateEvent = {
 };
 
 export type ProposalCreateEventArgs = {
-  governor: Address;
-  proposal: Address;
+  governor: Address | HasAddress;
+  proposal: Address | HasAddress;
   index: number | bigint;
   instructions: Array<ProposalInstructionArgs>;
 };

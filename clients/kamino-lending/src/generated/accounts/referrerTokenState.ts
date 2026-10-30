@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -71,9 +75,9 @@ export type ReferrerTokenState = {
 
 export type ReferrerTokenStateArgs = {
   /** Pubkey of the referrer/owner */
-  referrer: Address;
+  referrer: Address | HasAddress;
   /** Token mint for the account */
-  mint: Address;
+  mint: Address | HasAddress;
   /** Amount that has been accumulated and not claimed yet -> available to claim (scaled fraction) */
   amountUnclaimedSf: number | bigint;
   /** Amount that has been accumulated in total -> both already claimed and unclaimed (scaled fraction) */
@@ -144,8 +148,10 @@ export function decodeReferrerTokenState<TAddress extends string = string>(
 }
 
 export async function fetchReferrerTokenState<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<ReferrerTokenState, TAddress>> {
   const maybeAccount = await fetchMaybeReferrerTokenState(rpc, address, config);
@@ -156,17 +162,25 @@ export async function fetchReferrerTokenState<TAddress extends string = string>(
 export async function fetchMaybeReferrerTokenState<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<ReferrerTokenState, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeReferrerTokenState(maybeAccount);
 }
 
 export async function fetchAllReferrerTokenState(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ReferrerTokenState>[]> {
   const maybeAccounts = await fetchAllMaybeReferrerTokenState(
@@ -179,20 +193,28 @@ export async function fetchAllReferrerTokenState(
 }
 
 export async function fetchAllMaybeReferrerTokenState(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ReferrerTokenState>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeReferrerTokenState(maybeAccount),
   );
 }
 
 export async function fetchReferrerTokenStateFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ReferrerTokenStateSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<ReferrerTokenState>> {
   const maybeAccount = await fetchMaybeReferrerTokenStateFromSeeds(
     rpc,
@@ -204,9 +226,11 @@ export async function fetchReferrerTokenStateFromSeeds(
 }
 
 export async function fetchMaybeReferrerTokenStateFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ReferrerTokenStateSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<ReferrerTokenState>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findReferrerTokenStatePda(seeds, { programAddress });

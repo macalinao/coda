@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** A single creator entry in a compressed NFT's metadata. */
@@ -36,7 +37,18 @@ export type Creator = {
   share: number;
 };
 
-export type CreatorArgs = Creator;
+export type CreatorArgs = {
+  /** Public key of the creator. */
+  address: Address | HasAddress;
+  /** Whether this creator has signed to verify their share. */
+  verified: boolean;
+  /**
+   * The creator's royalty share of the asset.
+   *
+   * The value is a percentage (0-100), not basis points.
+   */
+  share: number;
+};
 
 export function getCreatorEncoder(): FixedSizeEncoder<CreatorArgs> {
   return getStructEncoder([

@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.ts";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -143,44 +146,49 @@ export function getSplitPositionInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SplitPositionAsyncInput<
-  TAccountPool extends string = string,
-  TAccountFirstPosition extends string = string,
-  TAccountFirstPositionNftAccount extends string = string,
-  TAccountSecondPosition extends string = string,
-  TAccountSecondPositionNftAccount extends string = string,
-  TAccountFirstOwner extends string = string,
-  TAccountSecondOwner extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFirstPosition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFirstPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSecondPosition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSecondPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFirstOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSecondOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
+  pool: TAccountPool;
   /** The first position */
-  firstPosition: Address<TAccountFirstPosition>;
+  firstPosition: TAccountFirstPosition;
   /** The token account for position nft */
-  firstPositionNftAccount: Address<TAccountFirstPositionNftAccount>;
+  firstPositionNftAccount: TAccountFirstPositionNftAccount;
   /** The second position */
-  secondPosition: Address<TAccountSecondPosition>;
+  secondPosition: TAccountSecondPosition;
   /** The token account for position nft */
-  secondPositionNftAccount: Address<TAccountSecondPositionNftAccount>;
+  secondPositionNftAccount: TAccountSecondPositionNftAccount;
   /** Owner of first position */
-  firstOwner: TransactionSigner<TAccountFirstOwner>;
+  firstOwner: TAccountFirstOwner;
   /** Owner of second position */
-  secondOwner: TransactionSigner<TAccountSecondOwner>;
-  eventAuthority?: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  secondOwner: TAccountSecondOwner;
+  eventAuthority?: TAccountEventAuthority;
+  program?: TAccountProgram;
   params: SplitPositionInstructionDataArgs["params"];
 };
 
 export async function getSplitPositionInstructionAsync<
-  TAccountPool extends string,
-  TAccountFirstPosition extends string,
-  TAccountFirstPositionNftAccount extends string,
-  TAccountSecondPosition extends string,
-  TAccountSecondPositionNftAccount extends string,
-  TAccountFirstOwner extends string,
-  TAccountSecondOwner extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountFirstPosition extends InstructionAccountInput,
+  TAccountFirstPositionNftAccount extends InstructionAccountInput,
+  TAccountSecondPosition extends InstructionAccountInput,
+  TAccountSecondPositionNftAccount extends InstructionAccountInput,
+  TAccountFirstOwner extends InstructionSignerInput,
+  TAccountSecondOwner extends InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: SplitPositionAsyncInput<
@@ -194,41 +202,106 @@ export async function getSplitPositionInstructionAsync<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   SplitPositionInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountFirstPosition,
-    TAccountFirstPositionNftAccount,
-    TAccountSecondPosition,
-    TAccountSecondPositionNftAccount,
-    TAccountFirstOwner,
-    TAccountSecondOwner,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstPosition,
+      InstructionAccountInputAddress<TAccountFirstPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstPositionNftAccount,
+      InstructionAccountInputAddress<TAccountFirstPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondPosition,
+      InstructionAccountInputAddress<TAccountSecondPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondPositionNftAccount,
+      InstructionAccountInputAddress<TAccountSecondPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstOwner,
+      InstructionAccountInputAddress<TAccountFirstOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondOwner,
+      InstructionAccountInputAddress<TAccountSecondOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: true },
-    firstPosition: { value: input.firstPosition ?? null, isWritable: true },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    firstPosition: {
+      value: input.firstPosition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     firstPositionNftAccount: {
       value: input.firstPositionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    secondPosition: { value: input.secondPosition ?? null, isWritable: true },
+    secondPosition: {
+      value: input.secondPosition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     secondPositionNftAccount: {
       value: input.secondPositionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    firstOwner: { value: input.firstOwner ?? null, isWritable: false },
-    secondOwner: { value: input.secondOwner ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    firstOwner: {
+      value: input.firstOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    secondOwner: {
+      value: input.secondOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -249,7 +322,6 @@ export async function getSplitPositionInstructionAsync<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -274,57 +346,89 @@ export async function getSplitPositionInstructionAsync<
     programAddress,
   } as SplitPositionInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountFirstPosition,
-    TAccountFirstPositionNftAccount,
-    TAccountSecondPosition,
-    TAccountSecondPositionNftAccount,
-    TAccountFirstOwner,
-    TAccountSecondOwner,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstPosition,
+      InstructionAccountInputAddress<TAccountFirstPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstPositionNftAccount,
+      InstructionAccountInputAddress<TAccountFirstPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondPosition,
+      InstructionAccountInputAddress<TAccountSecondPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondPositionNftAccount,
+      InstructionAccountInputAddress<TAccountSecondPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstOwner,
+      InstructionAccountInputAddress<TAccountFirstOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondOwner,
+      InstructionAccountInputAddress<TAccountSecondOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 
 export type SplitPositionInput<
-  TAccountPool extends string = string,
-  TAccountFirstPosition extends string = string,
-  TAccountFirstPositionNftAccount extends string = string,
-  TAccountSecondPosition extends string = string,
-  TAccountSecondPositionNftAccount extends string = string,
-  TAccountFirstOwner extends string = string,
-  TAccountSecondOwner extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFirstPosition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFirstPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSecondPosition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSecondPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFirstOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSecondOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
+  pool: TAccountPool;
   /** The first position */
-  firstPosition: Address<TAccountFirstPosition>;
+  firstPosition: TAccountFirstPosition;
   /** The token account for position nft */
-  firstPositionNftAccount: Address<TAccountFirstPositionNftAccount>;
+  firstPositionNftAccount: TAccountFirstPositionNftAccount;
   /** The second position */
-  secondPosition: Address<TAccountSecondPosition>;
+  secondPosition: TAccountSecondPosition;
   /** The token account for position nft */
-  secondPositionNftAccount: Address<TAccountSecondPositionNftAccount>;
+  secondPositionNftAccount: TAccountSecondPositionNftAccount;
   /** Owner of first position */
-  firstOwner: TransactionSigner<TAccountFirstOwner>;
+  firstOwner: TAccountFirstOwner;
   /** Owner of second position */
-  secondOwner: TransactionSigner<TAccountSecondOwner>;
-  eventAuthority: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  secondOwner: TAccountSecondOwner;
+  eventAuthority: TAccountEventAuthority;
+  program?: TAccountProgram;
   params: SplitPositionInstructionDataArgs["params"];
 };
 
 export function getSplitPositionInstruction<
-  TAccountPool extends string,
-  TAccountFirstPosition extends string,
-  TAccountFirstPositionNftAccount extends string,
-  TAccountSecondPosition extends string,
-  TAccountSecondPositionNftAccount extends string,
-  TAccountFirstOwner extends string,
-  TAccountSecondOwner extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountFirstPosition extends InstructionAccountInput,
+  TAccountFirstPositionNftAccount extends InstructionAccountInput,
+  TAccountSecondPosition extends InstructionAccountInput,
+  TAccountSecondPositionNftAccount extends InstructionAccountInput,
+  TAccountFirstOwner extends InstructionSignerInput,
+  TAccountSecondOwner extends InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: SplitPositionInput<
@@ -338,39 +442,104 @@ export function getSplitPositionInstruction<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SplitPositionInstruction<
   TProgramAddress,
-  TAccountPool,
-  TAccountFirstPosition,
-  TAccountFirstPositionNftAccount,
-  TAccountSecondPosition,
-  TAccountSecondPositionNftAccount,
-  TAccountFirstOwner,
-  TAccountSecondOwner,
-  TAccountEventAuthority,
-  TAccountProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFirstPosition,
+    InstructionAccountInputAddress<TAccountFirstPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFirstPositionNftAccount,
+    InstructionAccountInputAddress<TAccountFirstPositionNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSecondPosition,
+    InstructionAccountInputAddress<TAccountSecondPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSecondPositionNftAccount,
+    InstructionAccountInputAddress<TAccountSecondPositionNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFirstOwner,
+    InstructionAccountInputAddress<TAccountFirstOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSecondOwner,
+    InstructionAccountInputAddress<TAccountSecondOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEventAuthority,
+    InstructionAccountInputAddress<TAccountEventAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: true },
-    firstPosition: { value: input.firstPosition ?? null, isWritable: true },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    firstPosition: {
+      value: input.firstPosition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     firstPositionNftAccount: {
       value: input.firstPositionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    secondPosition: { value: input.secondPosition ?? null, isWritable: true },
+    secondPosition: {
+      value: input.secondPosition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     secondPositionNftAccount: {
       value: input.secondPositionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    firstOwner: { value: input.firstOwner ?? null, isWritable: false },
-    secondOwner: { value: input.secondOwner ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    firstOwner: {
+      value: input.firstOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    secondOwner: {
+      value: input.secondOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -386,7 +555,6 @@ export function getSplitPositionInstruction<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -411,15 +579,42 @@ export function getSplitPositionInstruction<
     programAddress,
   } as SplitPositionInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountFirstPosition,
-    TAccountFirstPositionNftAccount,
-    TAccountSecondPosition,
-    TAccountSecondPositionNftAccount,
-    TAccountFirstOwner,
-    TAccountSecondOwner,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstPosition,
+      InstructionAccountInputAddress<TAccountFirstPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstPositionNftAccount,
+      InstructionAccountInputAddress<TAccountFirstPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondPosition,
+      InstructionAccountInputAddress<TAccountSecondPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondPositionNftAccount,
+      InstructionAccountInputAddress<TAccountSecondPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFirstOwner,
+      InstructionAccountInputAddress<TAccountFirstOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSecondOwner,
+      InstructionAccountInputAddress<TAccountSecondOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 

@@ -31,14 +31,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getNonNullResolvedInstructionInput,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -156,48 +159,53 @@ export function getClaimRewardInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ClaimRewardAsyncInput<
-  TAccountPoolAuthority extends string = string,
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountRewardVault extends string = string,
-  TAccountRewardMint extends string = string,
-  TAccountUserTokenAccount extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPoolAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUserTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  poolAuthority?: Address<TAccountPoolAuthority>;
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
+  poolAuthority?: TAccountPoolAuthority;
+  pool: TAccountPool;
+  position: TAccountPosition;
   /** The vault token account for reward token */
-  rewardVault?: Address<TAccountRewardVault>;
-  rewardMint: Address<TAccountRewardMint>;
-  userTokenAccount: Address<TAccountUserTokenAccount>;
+  rewardVault?: TAccountRewardVault;
+  rewardMint: TAccountRewardMint;
+  userTokenAccount: TAccountUserTokenAccount;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
+  positionNftAccount: TAccountPositionNftAccount;
   /** owner of position */
-  owner: TransactionSigner<TAccountOwner>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  eventAuthority?: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  owner: TAccountOwner;
+  tokenProgram?: TAccountTokenProgram;
+  eventAuthority?: TAccountEventAuthority;
+  program?: TAccountProgram;
   rewardIndex: ClaimRewardInstructionDataArgs["rewardIndex"];
   skipReward: ClaimRewardInstructionDataArgs["skipReward"];
 };
 
 export async function getClaimRewardInstructionAsync<
-  TAccountPoolAuthority extends string,
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountRewardVault extends string,
-  TAccountRewardMint extends string,
-  TAccountUserTokenAccount extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountOwner extends string,
-  TAccountTokenProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPoolAuthority extends InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput,
+  TAccountUserTokenAccount extends InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: ClaimRewardAsyncInput<
@@ -213,45 +221,120 @@ export async function getClaimRewardInstructionAsync<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   ClaimRewardInstruction<
     TProgramAddress,
-    TAccountPoolAuthority,
-    TAccountPool,
-    TAccountPosition,
-    TAccountRewardVault,
-    TAccountRewardMint,
-    TAccountUserTokenAccount,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserTokenAccount,
+      InstructionAccountInputAddress<TAccountUserTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    poolAuthority: { value: input.poolAuthority ?? null, isWritable: false },
-    pool: { value: input.pool ?? null, isWritable: true },
-    position: { value: input.position ?? null, isWritable: true },
-    rewardVault: { value: input.rewardVault ?? null, isWritable: true },
-    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
+    poolAuthority: {
+      value: input.poolAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    rewardVault: {
+      value: input.rewardVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    rewardMint: {
+      value: input.rewardMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     userTokenAccount: {
       value: input.userTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     positionNftAccount: {
       value: input.positionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -296,7 +379,6 @@ export async function getClaimRewardInstructionAsync<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("poolAuthority", accounts.poolAuthority),
@@ -317,63 +399,101 @@ export async function getClaimRewardInstructionAsync<
     programAddress,
   } as ClaimRewardInstruction<
     TProgramAddress,
-    TAccountPoolAuthority,
-    TAccountPool,
-    TAccountPosition,
-    TAccountRewardVault,
-    TAccountRewardMint,
-    TAccountUserTokenAccount,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserTokenAccount,
+      InstructionAccountInputAddress<TAccountUserTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 
 export type ClaimRewardInput<
-  TAccountPoolAuthority extends string = string,
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountRewardVault extends string = string,
-  TAccountRewardMint extends string = string,
-  TAccountUserTokenAccount extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPoolAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUserTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  poolAuthority: Address<TAccountPoolAuthority>;
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
+  poolAuthority: TAccountPoolAuthority;
+  pool: TAccountPool;
+  position: TAccountPosition;
   /** The vault token account for reward token */
-  rewardVault: Address<TAccountRewardVault>;
-  rewardMint: Address<TAccountRewardMint>;
-  userTokenAccount: Address<TAccountUserTokenAccount>;
+  rewardVault: TAccountRewardVault;
+  rewardMint: TAccountRewardMint;
+  userTokenAccount: TAccountUserTokenAccount;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
+  positionNftAccount: TAccountPositionNftAccount;
   /** owner of position */
-  owner: TransactionSigner<TAccountOwner>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  eventAuthority: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  owner: TAccountOwner;
+  tokenProgram?: TAccountTokenProgram;
+  eventAuthority: TAccountEventAuthority;
+  program?: TAccountProgram;
   rewardIndex: ClaimRewardInstructionDataArgs["rewardIndex"];
   skipReward: ClaimRewardInstructionDataArgs["skipReward"];
 };
 
 export function getClaimRewardInstruction<
-  TAccountPoolAuthority extends string,
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountRewardVault extends string,
-  TAccountRewardMint extends string,
-  TAccountUserTokenAccount extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountOwner extends string,
-  TAccountTokenProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPoolAuthority extends InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput,
+  TAccountUserTokenAccount extends InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: ClaimRewardInput<
@@ -389,43 +509,118 @@ export function getClaimRewardInstruction<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ClaimRewardInstruction<
   TProgramAddress,
-  TAccountPoolAuthority,
-  TAccountPool,
-  TAccountPosition,
-  TAccountRewardVault,
-  TAccountRewardMint,
-  TAccountUserTokenAccount,
-  TAccountPositionNftAccount,
-  TAccountOwner,
-  TAccountTokenProgram,
-  TAccountEventAuthority,
-  TAccountProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPoolAuthority,
+    InstructionAccountInputAddress<TAccountPoolAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardVault,
+    InstructionAccountInputAddress<TAccountRewardVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardMint,
+    InstructionAccountInputAddress<TAccountRewardMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserTokenAccount,
+    InstructionAccountInputAddress<TAccountUserTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionNftAccount,
+    InstructionAccountInputAddress<TAccountPositionNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEventAuthority,
+    InstructionAccountInputAddress<TAccountEventAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    poolAuthority: { value: input.poolAuthority ?? null, isWritable: false },
-    pool: { value: input.pool ?? null, isWritable: true },
-    position: { value: input.position ?? null, isWritable: true },
-    rewardVault: { value: input.rewardVault ?? null, isWritable: true },
-    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
+    poolAuthority: {
+      value: input.poolAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    rewardVault: {
+      value: input.rewardVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    rewardMint: {
+      value: input.rewardMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     userTokenAccount: {
       value: input.userTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     positionNftAccount: {
       value: input.positionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -445,7 +640,6 @@ export function getClaimRewardInstruction<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("poolAuthority", accounts.poolAuthority),
@@ -466,17 +660,50 @@ export function getClaimRewardInstruction<
     programAddress,
   } as ClaimRewardInstruction<
     TProgramAddress,
-    TAccountPoolAuthority,
-    TAccountPool,
-    TAccountPosition,
-    TAccountRewardVault,
-    TAccountRewardMint,
-    TAccountUserTokenAccount,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserTokenAccount,
+      InstructionAccountInputAddress<TAccountUserTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 

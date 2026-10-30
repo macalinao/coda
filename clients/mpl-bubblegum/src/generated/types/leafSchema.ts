@@ -26,6 +26,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 
 /**
@@ -79,11 +80,11 @@ export type LeafSchemaArgs =
   | {
       __kind: "V1";
       /** Asset id of the leaf, derived from the tree address and `nonce`. */
-      id: Address;
+      id: Address | HasAddress;
       /** Current owner of the leaf. */
-      owner: Address;
+      owner: Address | HasAddress;
       /** Current delegate of the leaf (equal to `owner` when unset). */
-      delegate: Address;
+      delegate: Address | HasAddress;
       /** Tree-scoped nonce assigned to the leaf when it was minted; part of the asset id derivation. */
       nonce: number | bigint;
       /** Keccak256 hash of the leaf's metadata (`MetadataArgs`/`MetadataArgsV2`). */
@@ -94,11 +95,11 @@ export type LeafSchemaArgs =
   | {
       __kind: "V2";
       /** Asset id of the leaf, derived from the tree address and `nonce`. */
-      id: Address;
+      id: Address | HasAddress;
       /** Current owner of the leaf. */
-      owner: Address;
+      owner: Address | HasAddress;
       /** Current delegate of the leaf (equal to `owner` when unset). */
-      delegate: Address;
+      delegate: Address | HasAddress;
       /** Tree-scoped nonce assigned to the leaf when it was minted; part of the asset id derivation. */
       nonce: number | bigint;
       /** Keccak256 hash of the leaf's metadata (`MetadataArgs`/`MetadataArgsV2`). */

@@ -24,6 +24,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type ReadonlyUint8Array,
 } from "@solana/kit";
 import {
@@ -40,7 +41,7 @@ export type TXInstruction = {
 };
 
 export type TXInstructionArgs = {
-  programId: Address;
+  programId: Address | HasAddress;
   keys: Array<TXAccountMetaArgs>;
   data: ReadonlyUint8Array;
 };

@@ -19,6 +19,7 @@ import {
   type ClientWithTransactionPlanning,
   type ClientWithTransactionSending,
   type ExtendedClient,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -111,6 +112,7 @@ export type TokenSignerPlugin = {
 export type TokenSignerPluginInstructions = {
   invokeSignedInstruction: (
     input: InvokeSignedInstructionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInvokeSignedInstructionInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -120,20 +122,31 @@ export type TokenSignerPluginPdas = { nftSigner: typeof findNftSignerPda };
 export type TokenSignerPluginRequirements = ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function tokenSignerProgram() {
+export function tokenSignerProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends TokenSignerPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { tokenSigner: TokenSignerPlugin }> => {
     return extendClient(client, {
       tokenSigner: {
         instructions: {
-          invokeSignedInstruction: (input) =>
+          invokeSignedInstruction: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInvokeSignedInstructionInstruction(input),
+              getInvokeSignedInstructionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
-        pdas: { nftSigner: findNftSignerPda },
+        pdas: {
+          nftSigner: (seeds, pdaConfig) =>
+            findNftSignerPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+        },
         identifyInstruction: identifyTokenSignerInstruction,
         parseInstruction: parseTokenSignerInstruction,
       } as TokenSignerPlugin,

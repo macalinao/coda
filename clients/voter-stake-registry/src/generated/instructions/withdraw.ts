@@ -33,12 +33,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -136,36 +139,40 @@ export function getWithdrawInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type WithdrawInput<
-  TAccountRegistrar extends string = string,
-  TAccountVoter extends string = string,
-  TAccountVoterAuthority extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountVoterWeightRecord extends string = string,
-  TAccountVault extends string = string,
-  TAccountDestination extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  voter: Address<TAccountVoter>;
-  voterAuthority: TransactionSigner<TAccountVoterAuthority>;
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
-  voterWeightRecord: Address<TAccountVoterWeightRecord>;
-  vault: Address<TAccountVault>;
-  destination: Address<TAccountDestination>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  registrar: TAccountRegistrar;
+  voter: TAccountVoter;
+  voterAuthority: TAccountVoterAuthority;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
+  voterWeightRecord: TAccountVoterWeightRecord;
+  vault: TAccountVault;
+  destination: TAccountDestination;
+  tokenProgram?: TAccountTokenProgram;
   depositEntryIndex: WithdrawInstructionDataArgs["depositEntryIndex"];
   amount: WithdrawInstructionDataArgs["amount"];
 };
 
 export function getWithdrawInstruction<
-  TAccountRegistrar extends string,
-  TAccountVoter extends string,
-  TAccountVoterAuthority extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountVoterWeightRecord extends string,
-  TAccountVault extends string,
-  TAccountDestination extends string,
-  TAccountTokenProgram extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput,
+  TAccountDestination extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: WithdrawInput<
@@ -178,38 +185,92 @@ export function getWithdrawInstruction<
     TAccountDestination,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): WithdrawInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountVoter,
-  TAccountVoterAuthority,
-  TAccountTokenOwnerRecord,
-  TAccountVoterWeightRecord,
-  TAccountVault,
-  TAccountDestination,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterAuthority,
+    InstructionAccountInputAddress<TAccountVoterAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterWeightRecord,
+    InstructionAccountInputAddress<TAccountVoterWeightRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVault,
+    InstructionAccountInputAddress<TAccountVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDestination,
+    InstructionAccountInputAddress<TAccountDestination>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: true },
-    voterAuthority: { value: input.voterAuthority ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: true },
+    voterAuthority: {
+      value: input.voterAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
     voterWeightRecord: {
       value: input.voterWeightRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    vault: { value: input.vault ?? null, isWritable: true },
-    destination: { value: input.destination ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    vault: { value: input.vault ?? null, isSigner: false, isWritable: true },
+    destination: {
+      value: input.destination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -225,7 +286,6 @@ export function getWithdrawInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -243,14 +303,38 @@ export function getWithdrawInstruction<
     programAddress,
   } as WithdrawInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVoterAuthority,
-    TAccountTokenOwnerRecord,
-    TAccountVoterWeightRecord,
-    TAccountVault,
-    TAccountDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterAuthority,
+      InstructionAccountInputAddress<TAccountVoterAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterWeightRecord,
+      InstructionAccountInputAddress<TAccountVoterWeightRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVault,
+      InstructionAccountInputAddress<TAccountVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestination,
+      InstructionAccountInputAddress<TAccountDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

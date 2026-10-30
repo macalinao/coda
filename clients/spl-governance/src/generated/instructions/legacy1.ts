@@ -68,11 +68,18 @@ export type Legacy1Input = {};
 export function getLegacy1Instruction<
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(config?: {
-  programAddress?: TProgramAddress;
+  programAddress?:
+    | TProgramAddress
+    | { readonly address: TProgramAddress }
+    | undefined;
 }): Legacy1Instruction<TProgramAddress> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   return Object.freeze({
     data: getLegacy1InstructionDataEncoder().encode({}),

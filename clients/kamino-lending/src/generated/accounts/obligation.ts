@@ -32,12 +32,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -140,9 +144,9 @@ export type ObligationArgs = {
   /** Last update to collateral, liquidity, or their market values */
   lastUpdate: LastUpdateArgs;
   /** Lending market address */
-  lendingMarket: Address;
+  lendingMarket: Address | HasAddress;
   /** Owner authority which can borrow liquidity */
-  owner: Address;
+  owner: Address | HasAddress;
   /** Deposited collateral for the obligation, unique by deposit reserve address */
   deposits: Array<ObligationCollateralArgs>;
   /** Worst LTV for the collaterals backing the loan, represented as a percentage */
@@ -170,7 +174,7 @@ export type ObligationArgs = {
   /** Marked = 1 if borrows array is not empty, 0 = borrows empty */
   hasDebt: number;
   /** Wallet address of the referrer */
-  referrer: Address;
+  referrer: Address | HasAddress;
   /** Marked = 1 if borrowing disabled, 0 = borrowing enabled */
   borrowingDisabled: number;
   /**
@@ -301,8 +305,10 @@ export function decodeObligation<TAddress extends string = string>(
 }
 
 export async function fetchObligation<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Obligation, TAddress>> {
   const maybeAccount = await fetchMaybeObligation(rpc, address, config);
@@ -311,17 +317,25 @@ export async function fetchObligation<TAddress extends string = string>(
 }
 
 export async function fetchMaybeObligation<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Obligation, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeObligation(maybeAccount);
 }
 
 export async function fetchAllObligation(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Obligation>[]> {
   const maybeAccounts = await fetchAllMaybeObligation(rpc, addresses, config);
@@ -330,18 +344,26 @@ export async function fetchAllObligation(
 }
 
 export async function fetchAllMaybeObligation(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Obligation>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeObligation(maybeAccount));
 }
 
 export async function fetchObligationFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ObligationSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Obligation>> {
   const maybeAccount = await fetchMaybeObligationFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -349,9 +371,11 @@ export async function fetchObligationFromSeeds(
 }
 
 export async function fetchMaybeObligationFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ObligationSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Obligation>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findObligationPda(seeds, { programAddress });

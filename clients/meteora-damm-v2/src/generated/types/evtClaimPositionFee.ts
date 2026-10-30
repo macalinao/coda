@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtClaimPositionFee = {
@@ -29,9 +30,9 @@ export type EvtClaimPositionFee = {
 };
 
 export type EvtClaimPositionFeeArgs = {
-  pool: Address;
-  position: Address;
-  owner: Address;
+  pool: Address | HasAddress;
+  position: Address | HasAddress;
+  owner: Address | HasAddress;
   feeAClaimed: number | bigint;
   feeBClaimed: number | bigint;
 };

@@ -27,13 +27,16 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.ts";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -102,30 +105,30 @@ export function getCloseAccountsInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CloseAccountsAsyncInput<
-  TAccountMetadata extends string = string,
-  TAccountEdition extends string = string,
-  TAccountMint extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountDestination extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
-  metadata?: Address<TAccountMetadata>;
+  metadata?: TAccountMetadata;
   /** Edition of the asset */
-  edition: Address<TAccountEdition>;
+  edition: TAccountEdition;
   /** Mint of token asset */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** Authority to close ownerless accounts */
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: TAccountAuthority;
   /** The destination account that will receive the rent. */
-  destination: Address<TAccountDestination>;
+  destination: TAccountDestination;
 };
 
 export async function getCloseAccountsInstructionAsync<
-  TAccountMetadata extends string,
-  TAccountEdition extends string,
-  TAccountMint extends string,
-  TAccountAuthority extends string,
-  TAccountDestination extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountDestination extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: CloseAccountsAsyncInput<
@@ -135,28 +138,71 @@ export async function getCloseAccountsInstructionAsync<
     TAccountAuthority,
     TAccountDestination
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   CloseAccountsInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountEdition,
-    TAccountMint,
-    TAccountAuthority,
-    TAccountDestination
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEdition,
+      InstructionAccountInputAddress<TAccountEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestination,
+      InstructionAccountInputAddress<TAccountDestination>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    edition: { value: input.edition ?? null, isWritable: true },
-    mint: { value: input.mint ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    destination: { value: input.destination ?? null, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    edition: {
+      value: input.edition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    destination: {
+      value: input.destination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -177,7 +223,6 @@ export async function getCloseAccountsInstructionAsync<
     );
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -190,39 +235,54 @@ export async function getCloseAccountsInstructionAsync<
     programAddress,
   } as CloseAccountsInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountEdition,
-    TAccountMint,
-    TAccountAuthority,
-    TAccountDestination
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEdition,
+      InstructionAccountInputAddress<TAccountEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestination,
+      InstructionAccountInputAddress<TAccountDestination>
+    >
   >);
 }
 
 export type CloseAccountsInput<
-  TAccountMetadata extends string = string,
-  TAccountEdition extends string = string,
-  TAccountMint extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountDestination extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Edition of the asset */
-  edition: Address<TAccountEdition>;
+  edition: TAccountEdition;
   /** Mint of token asset */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** Authority to close ownerless accounts */
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: TAccountAuthority;
   /** The destination account that will receive the rent. */
-  destination: Address<TAccountDestination>;
+  destination: TAccountDestination;
 };
 
 export function getCloseAccountsInstruction<
-  TAccountMetadata extends string,
-  TAccountEdition extends string,
-  TAccountMint extends string,
-  TAccountAuthority extends string,
-  TAccountDestination extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountDestination extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: CloseAccountsInput<
@@ -232,33 +292,75 @@ export function getCloseAccountsInstruction<
     TAccountAuthority,
     TAccountDestination
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CloseAccountsInstruction<
   TProgramAddress,
-  TAccountMetadata,
-  TAccountEdition,
-  TAccountMint,
-  TAccountAuthority,
-  TAccountDestination
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEdition,
+    InstructionAccountInputAddress<TAccountEdition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMint,
+    InstructionAccountInputAddress<TAccountMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDestination,
+    InstructionAccountInputAddress<TAccountDestination>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    edition: { value: input.edition ?? null, isWritable: true },
-    mint: { value: input.mint ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    destination: { value: input.destination ?? null, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    edition: {
+      value: input.edition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    destination: {
+      value: input.destination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -271,11 +373,26 @@ export function getCloseAccountsInstruction<
     programAddress,
   } as CloseAccountsInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountEdition,
-    TAccountMint,
-    TAccountAuthority,
-    TAccountDestination
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEdition,
+      InstructionAccountInputAddress<TAccountEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestination,
+      InstructionAccountInputAddress<TAccountDestination>
+    >
   >);
 }
 

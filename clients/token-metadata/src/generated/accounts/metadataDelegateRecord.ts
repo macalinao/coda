@@ -21,12 +21,16 @@ import {
   getU8Encoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
 } from "@solana/kit";
@@ -48,9 +52,9 @@ export type MetadataDelegateRecord = {
 export type MetadataDelegateRecordArgs = {
   key: KeyArgs;
   bump: number;
-  mint: Address;
-  delegate: Address;
-  updateAuthority: Address;
+  mint: Address | HasAddress;
+  delegate: Address | HasAddress;
+  updateAuthority: Address | HasAddress;
 };
 
 /** Gets the encoder for {@link MetadataDelegateRecordArgs} account data. */
@@ -106,8 +110,10 @@ export function decodeMetadataDelegateRecord<TAddress extends string = string>(
 export async function fetchMetadataDelegateRecord<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<MetadataDelegateRecord, TAddress>> {
   const maybeAccount = await fetchMaybeMetadataDelegateRecord(
@@ -122,17 +128,25 @@ export async function fetchMetadataDelegateRecord<
 export async function fetchMaybeMetadataDelegateRecord<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<MetadataDelegateRecord, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeMetadataDelegateRecord(maybeAccount);
 }
 
 export async function fetchAllMetadataDelegateRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MetadataDelegateRecord>[]> {
   const maybeAccounts = await fetchAllMaybeMetadataDelegateRecord(
@@ -145,11 +159,17 @@ export async function fetchAllMetadataDelegateRecord(
 }
 
 export async function fetchAllMaybeMetadataDelegateRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MetadataDelegateRecord>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeMetadataDelegateRecord(maybeAccount),
   );

@@ -25,6 +25,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
@@ -32,12 +33,15 @@ import {
   type OptionOrNullable,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -73,7 +77,7 @@ export type SetGovernanceDelegateInstructionData = {
 };
 
 export type SetGovernanceDelegateInstructionDataArgs = {
-  newGovernanceDelegate: OptionOrNullable<Address>;
+  newGovernanceDelegate: OptionOrNullable<Address | HasAddress>;
 };
 
 export function getSetGovernanceDelegateInstructionDataEncoder(): Encoder<SetGovernanceDelegateInstructionDataArgs> {
@@ -107,42 +111,64 @@ export function getSetGovernanceDelegateInstructionDataCodec(): Codec<
 }
 
 export type SetGovernanceDelegateInput<
-  TAccountCurrentDelegateOrOwner extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
+  TAccountCurrentDelegateOrOwner extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Current governance delegate or governing token owner */
-  currentDelegateOrOwner: TransactionSigner<TAccountCurrentDelegateOrOwner>;
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
+  currentDelegateOrOwner: TAccountCurrentDelegateOrOwner;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
   newGovernanceDelegate: SetGovernanceDelegateInstructionDataArgs["newGovernanceDelegate"];
 };
 
 export function getSetGovernanceDelegateInstruction<
-  TAccountCurrentDelegateOrOwner extends string,
-  TAccountTokenOwnerRecord extends string,
+  TAccountCurrentDelegateOrOwner extends InstructionSignerInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: SetGovernanceDelegateInput<
     TAccountCurrentDelegateOrOwner,
     TAccountTokenOwnerRecord
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetGovernanceDelegateInstruction<
   TProgramAddress,
-  TAccountCurrentDelegateOrOwner,
-  TAccountTokenOwnerRecord
+  ResolvedInstructionAccountMeta<
+    TAccountCurrentDelegateOrOwner,
+    InstructionAccountInputAddress<TAccountCurrentDelegateOrOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     currentDelegateOrOwner: {
       value: input.currentDelegateOrOwner ?? null,
+      isSigner: true,
       isWritable: false,
     },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
   };
@@ -154,7 +180,6 @@ export function getSetGovernanceDelegateInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("currentDelegateOrOwner", accounts.currentDelegateOrOwner),
@@ -166,8 +191,14 @@ export function getSetGovernanceDelegateInstruction<
     programAddress,
   } as SetGovernanceDelegateInstruction<
     TProgramAddress,
-    TAccountCurrentDelegateOrOwner,
-    TAccountTokenOwnerRecord
+    ResolvedInstructionAccountMeta<
+      TAccountCurrentDelegateOrOwner,
+      InstructionAccountInputAddress<TAccountCurrentDelegateOrOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >
   >);
 }
 

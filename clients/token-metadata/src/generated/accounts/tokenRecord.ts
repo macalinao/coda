@@ -25,12 +25,16 @@ import {
   getU8Encoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -66,9 +70,9 @@ export type TokenRecordArgs = {
   bump: number;
   state: TokenStateArgs;
   ruleSetRevision: OptionOrNullable<number | bigint>;
-  delegate: OptionOrNullable<Address>;
+  delegate: OptionOrNullable<Address | HasAddress>;
   delegateRole: OptionOrNullable<TokenDelegateRoleArgs>;
-  lockedTransfer: OptionOrNullable<Address>;
+  lockedTransfer: OptionOrNullable<Address | HasAddress>;
 };
 
 /** Gets the encoder for {@link TokenRecordArgs} account data. */
@@ -118,8 +122,10 @@ export function decodeTokenRecord<TAddress extends string = string>(
 }
 
 export async function fetchTokenRecord<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<TokenRecord, TAddress>> {
   const maybeAccount = await fetchMaybeTokenRecord(rpc, address, config);
@@ -128,17 +134,25 @@ export async function fetchTokenRecord<TAddress extends string = string>(
 }
 
 export async function fetchMaybeTokenRecord<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<TokenRecord, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeTokenRecord(maybeAccount);
 }
 
 export async function fetchAllTokenRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TokenRecord>[]> {
   const maybeAccounts = await fetchAllMaybeTokenRecord(rpc, addresses, config);
@@ -147,10 +161,16 @@ export async function fetchAllTokenRecord(
 }
 
 export async function fetchAllMaybeTokenRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TokenRecord>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeTokenRecord(maybeAccount));
 }

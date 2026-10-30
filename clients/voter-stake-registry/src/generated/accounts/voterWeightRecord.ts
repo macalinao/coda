@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -68,13 +72,13 @@ export type VoterWeightRecord = {
 };
 
 export type VoterWeightRecordArgs = {
-  realm: Address;
-  governingTokenMint: Address;
-  governingTokenOwner: Address;
+  realm: Address | HasAddress;
+  governingTokenMint: Address | HasAddress;
+  governingTokenOwner: Address | HasAddress;
   voterWeight: number | bigint;
   voterWeightExpiry: OptionOrNullable<number | bigint>;
   weightAction: OptionOrNullable<number>;
-  weightActionTarget: OptionOrNullable<Address>;
+  weightActionTarget: OptionOrNullable<Address | HasAddress>;
 };
 
 /** Gets the encoder for {@link VoterWeightRecordArgs} account data. */
@@ -137,8 +141,10 @@ export function decodeVoterWeightRecord<TAddress extends string = string>(
 }
 
 export async function fetchVoterWeightRecord<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<VoterWeightRecord, TAddress>> {
   const maybeAccount = await fetchMaybeVoterWeightRecord(rpc, address, config);
@@ -149,17 +155,25 @@ export async function fetchVoterWeightRecord<TAddress extends string = string>(
 export async function fetchMaybeVoterWeightRecord<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<VoterWeightRecord, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeVoterWeightRecord(maybeAccount);
 }
 
 export async function fetchAllVoterWeightRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<VoterWeightRecord>[]> {
   const maybeAccounts = await fetchAllMaybeVoterWeightRecord(
@@ -172,20 +186,28 @@ export async function fetchAllVoterWeightRecord(
 }
 
 export async function fetchAllMaybeVoterWeightRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<VoterWeightRecord>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeVoterWeightRecord(maybeAccount),
   );
 }
 
 export async function fetchVoterWeightRecordFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: VoterWeightRecordSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<VoterWeightRecord>> {
   const maybeAccount = await fetchMaybeVoterWeightRecordFromSeeds(
     rpc,
@@ -197,9 +219,11 @@ export async function fetchVoterWeightRecordFromSeeds(
 }
 
 export async function fetchMaybeVoterWeightRecordFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: VoterWeightRecordSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<VoterWeightRecord>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findVoterWeightRecordPda(seeds, { programAddress });

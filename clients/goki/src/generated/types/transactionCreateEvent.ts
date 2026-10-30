@@ -20,6 +20,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getTXInstructionDecoder,
@@ -38,9 +39,9 @@ export type TransactionCreateEvent = {
 };
 
 export type TransactionCreateEventArgs = {
-  smartWallet: Address;
-  transaction: Address;
-  proposer: Address;
+  smartWallet: Address | HasAddress;
+  transaction: Address | HasAddress;
+  proposer: Address | HasAddress;
   instructions: Array<TXInstructionArgs>;
   eta: number | bigint;
   timestamp: number | bigint;

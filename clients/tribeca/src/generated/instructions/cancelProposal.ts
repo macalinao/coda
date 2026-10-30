@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -102,19 +105,19 @@ export function getCancelProposalInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CancelProposalInput<
-  TAccountGovernor extends string = string,
-  TAccountProposal extends string = string,
-  TAccountProposer extends string = string,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProposer extends InstructionSignerInput = InstructionSignerInput,
 > = {
-  governor: Address<TAccountGovernor>;
-  proposal: Address<TAccountProposal>;
-  proposer: TransactionSigner<TAccountProposer>;
+  governor: TAccountGovernor;
+  proposal: TAccountProposal;
+  proposer: TAccountProposer;
 };
 
 export function getCancelProposalInstruction<
-  TAccountGovernor extends string,
-  TAccountProposal extends string,
-  TAccountProposer extends string,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput,
+  TAccountProposer extends InstructionSignerInput,
   TProgramAddress extends Address = typeof GOVERN_PROGRAM_ADDRESS,
 >(
   input: CancelProposalInput<
@@ -122,28 +125,60 @@ export function getCancelProposalInstruction<
     TAccountProposal,
     TAccountProposer
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CancelProposalInstruction<
   TProgramAddress,
-  TAccountGovernor,
-  TAccountProposal,
-  TAccountProposer
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposal,
+    InstructionAccountInputAddress<TAccountProposal>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposer,
+    InstructionAccountInputAddress<TAccountProposer>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    governor: { value: input.governor ?? null, isWritable: false },
-    proposal: { value: input.proposal ?? null, isWritable: true },
-    proposer: { value: input.proposer ?? null, isWritable: false },
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    proposal: {
+      value: input.proposal ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    proposer: {
+      value: input.proposer ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("governor", accounts.governor),
@@ -154,9 +189,18 @@ export function getCancelProposalInstruction<
     programAddress,
   } as CancelProposalInstruction<
     TProgramAddress,
-    TAccountGovernor,
-    TAccountProposal,
-    TAccountProposer
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposal,
+      InstructionAccountInputAddress<TAccountProposal>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposer,
+      InstructionAccountInputAddress<TAccountProposer>
+    >
   >);
 }
 

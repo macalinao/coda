@@ -16,11 +16,14 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type DynamicConfigParameters = { poolCreatorAuthority: Address };
 
-export type DynamicConfigParametersArgs = DynamicConfigParameters;
+export type DynamicConfigParametersArgs = {
+  poolCreatorAuthority: Address | HasAddress;
+};
 
 export function getDynamicConfigParametersEncoder(): FixedSizeEncoder<DynamicConfigParametersArgs> {
   return getStructEncoder([["poolCreatorAuthority", getAddressEncoder()]]);

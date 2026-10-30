@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type WalletCreateEvent = {
@@ -33,8 +34,8 @@ export type WalletCreateEvent = {
 };
 
 export type WalletCreateEventArgs = {
-  smartWallet: Address;
-  owners: Array<Address>;
+  smartWallet: Address | HasAddress;
+  owners: Array<Address | HasAddress>;
   threshold: number | bigint;
   minimumDelay: number | bigint;
   timestamp: number | bigint;

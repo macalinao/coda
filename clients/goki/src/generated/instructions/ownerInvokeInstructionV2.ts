@@ -33,17 +33,21 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -87,7 +91,7 @@ export type OwnerInvokeInstructionV2InstructionData = {
 export type OwnerInvokeInstructionV2InstructionDataArgs = {
   index: number | bigint;
   bump: number;
-  invoker: Address;
+  invoker: Address | HasAddress;
   data: ReadonlyUint8Array;
 };
 
@@ -128,11 +132,11 @@ export function getOwnerInvokeInstructionV2InstructionDataCodec(): Codec<
 }
 
 export type OwnerInvokeInstructionV2Input<
-  TAccountSmartWallet extends string = string,
-  TAccountOwner extends string = string,
+  TAccountSmartWallet extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
 > = {
-  smartWallet: Address<TAccountSmartWallet>;
-  owner: TransactionSigner<TAccountOwner>;
+  smartWallet: TAccountSmartWallet;
+  owner: TAccountOwner;
   index: OwnerInvokeInstructionV2InstructionDataArgs["index"];
   bump: OwnerInvokeInstructionV2InstructionDataArgs["bump"];
   invoker: OwnerInvokeInstructionV2InstructionDataArgs["invoker"];
@@ -140,24 +144,47 @@ export type OwnerInvokeInstructionV2Input<
 };
 
 export function getOwnerInvokeInstructionV2Instruction<
-  TAccountSmartWallet extends string,
-  TAccountOwner extends string,
+  TAccountSmartWallet extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
   TProgramAddress extends Address = typeof SMART_WALLET_PROGRAM_ADDRESS,
 >(
   input: OwnerInvokeInstructionV2Input<TAccountSmartWallet, TAccountOwner>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): OwnerInvokeInstructionV2Instruction<
   TProgramAddress,
-  TAccountSmartWallet,
-  TAccountOwner
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    smartWallet: { value: input.smartWallet ?? null, isWritable: false },
-    owner: { value: input.owner ?? null, isWritable: false },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -167,7 +194,6 @@ export function getOwnerInvokeInstructionV2Instruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("smartWallet", accounts.smartWallet),
@@ -179,8 +205,14 @@ export function getOwnerInvokeInstructionV2Instruction<
     programAddress,
   } as OwnerInvokeInstructionV2Instruction<
     TProgramAddress,
-    TAccountSmartWallet,
-    TAccountOwner
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >
   >);
 }
 

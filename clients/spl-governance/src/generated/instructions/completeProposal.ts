@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -93,21 +96,24 @@ export function getCompleteProposalInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CompleteProposalInput<
-  TAccountProposalAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountCompleteProposalAuthority extends string = string,
+  TAccountProposalAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCompleteProposalAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
 > = {
-  proposalAccount: Address<TAccountProposalAccount>;
+  proposalAccount: TAccountProposalAccount;
   /** TokenOwnerRecord account of the Proposal owner */
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
   /** Token Owner or Delegate */
-  completeProposalAuthority: TransactionSigner<TAccountCompleteProposalAuthority>;
+  completeProposalAuthority: TAccountCompleteProposalAuthority;
 };
 
 export function getCompleteProposalInstruction<
-  TAccountProposalAccount extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountCompleteProposalAuthority extends string,
+  TAccountProposalAccount extends InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountCompleteProposalAuthority extends InstructionSignerInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: CompleteProposalInput<
@@ -115,26 +121,53 @@ export function getCompleteProposalInstruction<
     TAccountTokenOwnerRecord,
     TAccountCompleteProposalAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CompleteProposalInstruction<
   TProgramAddress,
-  TAccountProposalAccount,
-  TAccountTokenOwnerRecord,
-  TAccountCompleteProposalAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountProposalAccount,
+    InstructionAccountInputAddress<TAccountProposalAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCompleteProposalAuthority,
+    InstructionAccountInputAddress<TAccountCompleteProposalAuthority>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    proposalAccount: { value: input.proposalAccount ?? null, isWritable: true },
+    proposalAccount: {
+      value: input.proposalAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
     completeProposalAuthority: {
       value: input.completeProposalAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
   };
@@ -143,7 +176,6 @@ export function getCompleteProposalInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("proposalAccount", accounts.proposalAccount),
@@ -157,9 +189,18 @@ export function getCompleteProposalInstruction<
     programAddress,
   } as CompleteProposalInstruction<
     TProgramAddress,
-    TAccountProposalAccount,
-    TAccountTokenOwnerRecord,
-    TAccountCompleteProposalAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountProposalAccount,
+      InstructionAccountInputAddress<TAccountProposalAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCompleteProposalAuthority,
+      InstructionAccountInputAddress<TAccountCompleteProposalAuthority>
+    >
   >);
 }
 

@@ -34,12 +34,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -70,14 +74,14 @@ export type SmartWallet = {
 };
 
 export type SmartWalletArgs = {
-  base: Address;
+  base: Address | HasAddress;
   bump: number;
   threshold: number | bigint;
   minimumDelay: number | bigint;
   gracePeriod: number | bigint;
   ownerSetSeqno: number;
   numTransactions: number | bigint;
-  owners: Array<Address>;
+  owners: Array<Address | HasAddress>;
   reserved: Array<number | bigint>;
 };
 
@@ -137,8 +141,10 @@ export function decodeSmartWallet<TAddress extends string = string>(
 }
 
 export async function fetchSmartWallet<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<SmartWallet, TAddress>> {
   const maybeAccount = await fetchMaybeSmartWallet(rpc, address, config);
@@ -147,17 +153,25 @@ export async function fetchSmartWallet<TAddress extends string = string>(
 }
 
 export async function fetchMaybeSmartWallet<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<SmartWallet, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeSmartWallet(maybeAccount);
 }
 
 export async function fetchAllSmartWallet(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<SmartWallet>[]> {
   const maybeAccounts = await fetchAllMaybeSmartWallet(rpc, addresses, config);
@@ -166,18 +180,26 @@ export async function fetchAllSmartWallet(
 }
 
 export async function fetchAllMaybeSmartWallet(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<SmartWallet>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeSmartWallet(maybeAccount));
 }
 
 export async function fetchSmartWalletFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: SmartWalletSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<SmartWallet>> {
   const maybeAccount = await fetchMaybeSmartWalletFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -185,9 +207,11 @@ export async function fetchSmartWalletFromSeeds(
 }
 
 export async function fetchMaybeSmartWalletFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: SmartWalletSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<SmartWallet>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findSmartWalletPda(seeds, { programAddress });

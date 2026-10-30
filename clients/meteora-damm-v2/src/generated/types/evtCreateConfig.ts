@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getPoolFeeParametersDecoder,
@@ -44,14 +45,14 @@ export type EvtCreateConfig = {
 
 export type EvtCreateConfigArgs = {
   poolFees: PoolFeeParametersArgs;
-  vaultConfigKey: Address;
-  poolCreatorAuthority: Address;
+  vaultConfigKey: Address | HasAddress;
+  poolCreatorAuthority: Address | HasAddress;
   activationType: number;
   sqrtMinPrice: number | bigint;
   sqrtMaxPrice: number | bigint;
   collectFeeMode: number;
   index: number | bigint;
-  config: Address;
+  config: Address | HasAddress;
 };
 
 export function getEvtCreateConfigEncoder(): Encoder<EvtCreateConfigArgs> {

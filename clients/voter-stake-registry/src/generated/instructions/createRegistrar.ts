@@ -31,13 +31,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -133,35 +136,39 @@ export function getCreateRegistrarInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CreateRegistrarInput<
-  TAccountRegistrar extends string = string,
-  TAccountRealm extends string = string,
-  TAccountGovernanceProgramId extends string = string,
-  TAccountRealmGoverningTokenMint extends string = string,
-  TAccountRealmAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRealm extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGovernanceProgramId extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRealmGoverningTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  realm: Address<TAccountRealm>;
-  governanceProgramId?: Address<TAccountGovernanceProgramId>;
-  realmGoverningTokenMint: Address<TAccountRealmGoverningTokenMint>;
-  realmAuthority: TransactionSigner<TAccountRealmAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  registrar: TAccountRegistrar;
+  realm: TAccountRealm;
+  governanceProgramId?: TAccountGovernanceProgramId;
+  realmGoverningTokenMint: TAccountRealmGoverningTokenMint;
+  realmAuthority: TAccountRealmAuthority;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
   registrarBump: CreateRegistrarInstructionDataArgs["registrarBump"];
 };
 
 export function getCreateRegistrarInstruction<
-  TAccountRegistrar extends string,
-  TAccountRealm extends string,
-  TAccountGovernanceProgramId extends string,
-  TAccountRealmGoverningTokenMint extends string,
-  TAccountRealmAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountRealm extends InstructionAccountInput,
+  TAccountGovernanceProgramId extends InstructionAccountInput,
+  TAccountRealmGoverningTokenMint extends InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: CreateRegistrarInput<
@@ -174,38 +181,88 @@ export function getCreateRegistrarInstruction<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateRegistrarInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountRealm,
-  TAccountGovernanceProgramId,
-  TAccountRealmGoverningTokenMint,
-  TAccountRealmAuthority,
-  TAccountPayer,
-  TAccountSystemProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealm,
+    InstructionAccountInputAddress<TAccountRealm>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceProgramId,
+    InstructionAccountInputAddress<TAccountGovernanceProgramId>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmGoverningTokenMint,
+    InstructionAccountInputAddress<TAccountRealmGoverningTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAuthority,
+    InstructionAccountInputAddress<TAccountRealmAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: true },
-    realm: { value: input.realm ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    realm: { value: input.realm ?? null, isSigner: false, isWritable: false },
     governanceProgramId: {
       value: input.governanceProgramId ?? null,
+      isSigner: false,
       isWritable: false,
     },
     realmGoverningTokenMint: {
       value: input.realmGoverningTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    realmAuthority: { value: input.realmAuthority ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    realmAuthority: {
+      value: input.realmAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -229,7 +286,6 @@ export function getCreateRegistrarInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -250,14 +306,38 @@ export function getCreateRegistrarInstruction<
     programAddress,
   } as CreateRegistrarInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountRealm,
-    TAccountGovernanceProgramId,
-    TAccountRealmGoverningTokenMint,
-    TAccountRealmAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealm,
+      InstructionAccountInputAddress<TAccountRealm>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceProgramId,
+      InstructionAccountInputAddress<TAccountGovernanceProgramId>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmGoverningTokenMint,
+      InstructionAccountInputAddress<TAccountRealmGoverningTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAuthority,
+      InstructionAccountInputAddress<TAccountRealmAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

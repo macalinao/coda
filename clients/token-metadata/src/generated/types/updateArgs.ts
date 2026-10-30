@@ -24,6 +24,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -126,7 +127,7 @@ export type UpdateArgs =
 export type UpdateArgsArgs =
   | {
       __kind: "V1";
-      newUpdateAuthority: OptionOrNullable<Address>;
+      newUpdateAuthority: OptionOrNullable<Address | HasAddress>;
       data: OptionOrNullable<DataArgs>;
       primarySaleHappened: OptionOrNullable<boolean>;
       isMutable: OptionOrNullable<boolean>;
@@ -138,7 +139,7 @@ export type UpdateArgsArgs =
     }
   | {
       __kind: "AsUpdateAuthorityV2";
-      newUpdateAuthority: OptionOrNullable<Address>;
+      newUpdateAuthority: OptionOrNullable<Address | HasAddress>;
       data: OptionOrNullable<DataArgs>;
       primarySaleHappened: OptionOrNullable<boolean>;
       isMutable: OptionOrNullable<boolean>;
@@ -151,7 +152,7 @@ export type UpdateArgsArgs =
     }
   | {
       __kind: "AsAuthorityItemDelegateV2";
-      newUpdateAuthority: OptionOrNullable<Address>;
+      newUpdateAuthority: OptionOrNullable<Address | HasAddress>;
       primarySaleHappened: OptionOrNullable<boolean>;
       isMutable: OptionOrNullable<boolean>;
       tokenStandard: OptionOrNullable<TokenStandardArgs>;

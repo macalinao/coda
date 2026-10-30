@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ReservationV1 = {
@@ -26,7 +27,11 @@ export type ReservationV1 = {
   totalSpots: number;
 };
 
-export type ReservationV1Args = ReservationV1;
+export type ReservationV1Args = {
+  address: Address | HasAddress;
+  spotsRemaining: number;
+  totalSpots: number;
+};
 
 export function getReservationV1Encoder(): FixedSizeEncoder<ReservationV1Args> {
   return getStructEncoder([

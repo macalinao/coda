@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type MintWrapperAdminProposeEvent = {
@@ -24,7 +25,11 @@ export type MintWrapperAdminProposeEvent = {
   pendingAdmin: Address;
 };
 
-export type MintWrapperAdminProposeEventArgs = MintWrapperAdminProposeEvent;
+export type MintWrapperAdminProposeEventArgs = {
+  mintWrapper: Address | HasAddress;
+  currentAdmin: Address | HasAddress;
+  pendingAdmin: Address | HasAddress;
+};
 
 export function getMintWrapperAdminProposeEventEncoder(): FixedSizeEncoder<MintWrapperAdminProposeEventArgs> {
   return getStructEncoder([

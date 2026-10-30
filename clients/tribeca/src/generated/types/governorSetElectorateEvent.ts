@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type GovernorSetElectorateEvent = {
@@ -24,7 +25,11 @@ export type GovernorSetElectorateEvent = {
   newElectorate: Address;
 };
 
-export type GovernorSetElectorateEventArgs = GovernorSetElectorateEvent;
+export type GovernorSetElectorateEventArgs = {
+  governor: Address | HasAddress;
+  prevElectorate: Address | HasAddress;
+  newElectorate: Address | HasAddress;
+};
 
 export function getGovernorSetElectorateEventEncoder(): FixedSizeEncoder<GovernorSetElectorateEventArgs> {
   return getStructEncoder([

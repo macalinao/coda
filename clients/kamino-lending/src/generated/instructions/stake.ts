@@ -31,13 +31,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findFarmsUserStatePda, findFarmVaultPda } from "../pdas/index.ts";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -130,35 +133,36 @@ export function getStakeInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type StakeAsyncInput<
-  TAccountOwner extends string = string,
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountFarmVault extends string = string,
-  TAccountUserAta extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountScopePrices extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUserAta extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  userState?: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
-  farmVault?: Address<TAccountFarmVault>;
-  userAta: Address<TAccountUserAta>;
-  tokenMint: Address<TAccountTokenMint>;
-  scopePrices?: Address<TAccountScopePrices>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  owner: TAccountOwner;
+  userState?: TAccountUserState;
+  farmState: TAccountFarmState;
+  farmVault?: TAccountFarmVault;
+  userAta: TAccountUserAta;
+  tokenMint: TAccountTokenMint;
+  scopePrices?: TAccountScopePrices;
+  tokenProgram?: TAccountTokenProgram;
   amount: StakeInstructionDataArgs["amount"];
 };
 
 export async function getStakeInstructionAsync<
-  TAccountOwner extends string,
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
-  TAccountFarmVault extends string,
-  TAccountUserAta extends string,
-  TAccountTokenMint extends string,
-  TAccountScopePrices extends string,
-  TAccountTokenProgram extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput,
+  TAccountUserAta extends InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: StakeAsyncInput<
@@ -171,33 +175,97 @@ export async function getStakeInstructionAsync<
     TAccountScopePrices,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   StakeInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountFarmVault,
-    TAccountUserAta,
-    TAccountTokenMint,
-    TAccountScopePrices,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVault,
+      InstructionAccountInputAddress<TAccountFarmVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserAta,
+      InstructionAccountInputAddress<TAccountUserAta>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    farmVault: { value: input.farmVault ?? null, isWritable: true },
-    userAta: { value: input.userAta ?? null, isWritable: true },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmVault: {
+      value: input.farmVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    userAta: {
+      value: input.userAta ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -243,7 +311,6 @@ export async function getStakeInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -261,47 +328,72 @@ export async function getStakeInstructionAsync<
     programAddress,
   } as StakeInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountFarmVault,
-    TAccountUserAta,
-    TAccountTokenMint,
-    TAccountScopePrices,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVault,
+      InstructionAccountInputAddress<TAccountFarmVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserAta,
+      InstructionAccountInputAddress<TAccountUserAta>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 
 export type StakeInput<
-  TAccountOwner extends string = string,
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountFarmVault extends string = string,
-  TAccountUserAta extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountScopePrices extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUserAta extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  userState: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
-  farmVault: Address<TAccountFarmVault>;
-  userAta: Address<TAccountUserAta>;
-  tokenMint: Address<TAccountTokenMint>;
-  scopePrices?: Address<TAccountScopePrices>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  owner: TAccountOwner;
+  userState: TAccountUserState;
+  farmState: TAccountFarmState;
+  farmVault: TAccountFarmVault;
+  userAta: TAccountUserAta;
+  tokenMint: TAccountTokenMint;
+  scopePrices?: TAccountScopePrices;
+  tokenProgram?: TAccountTokenProgram;
   amount: StakeInstructionDataArgs["amount"];
 };
 
 export function getStakeInstruction<
-  TAccountOwner extends string,
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
-  TAccountFarmVault extends string,
-  TAccountUserAta extends string,
-  TAccountTokenMint extends string,
-  TAccountScopePrices extends string,
-  TAccountTokenProgram extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput,
+  TAccountUserAta extends InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: StakeInput<
@@ -314,31 +406,95 @@ export function getStakeInstruction<
     TAccountScopePrices,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): StakeInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountUserState,
-  TAccountFarmState,
-  TAccountFarmVault,
-  TAccountUserAta,
-  TAccountTokenMint,
-  TAccountScopePrices,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserState,
+    InstructionAccountInputAddress<TAccountUserState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmVault,
+    InstructionAccountInputAddress<TAccountFarmVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserAta,
+    InstructionAccountInputAddress<TAccountUserAta>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenMint,
+    InstructionAccountInputAddress<TAccountTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountScopePrices,
+    InstructionAccountInputAddress<TAccountScopePrices>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    farmVault: { value: input.farmVault ?? null, isWritable: true },
-    userAta: { value: input.userAta ?? null, isWritable: true },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmVault: {
+      value: input.farmVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    userAta: {
+      value: input.userAta ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -354,7 +510,6 @@ export function getStakeInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -372,14 +527,38 @@ export function getStakeInstruction<
     programAddress,
   } as StakeInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountFarmVault,
-    TAccountUserAta,
-    TAccountTokenMint,
-    TAccountScopePrices,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVault,
+      InstructionAccountInputAddress<TAccountFarmVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserAta,
+      InstructionAccountInputAddress<TAccountUserAta>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

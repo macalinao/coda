@@ -33,12 +33,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -119,21 +122,22 @@ export function getSetRewardEmissionsInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetRewardEmissionsInput<
-  TAccountWhirlpool extends string = string,
-  TAccountRewardAuthority extends string = string,
-  TAccountRewardVault extends string = string,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountRewardVault extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  whirlpool: Address<TAccountWhirlpool>;
-  rewardAuthority: TransactionSigner<TAccountRewardAuthority>;
-  rewardVault: Address<TAccountRewardVault>;
+  whirlpool: TAccountWhirlpool;
+  rewardAuthority: TAccountRewardAuthority;
+  rewardVault: TAccountRewardVault;
   rewardIndex: SetRewardEmissionsInstructionDataArgs["rewardIndex"];
   emissionsPerSecondX64: SetRewardEmissionsInstructionDataArgs["emissionsPerSecondX64"];
 };
 
 export function getSetRewardEmissionsInstruction<
-  TAccountWhirlpool extends string,
-  TAccountRewardAuthority extends string,
-  TAccountRewardVault extends string,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountRewardAuthority extends InstructionSignerInput,
+  TAccountRewardVault extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: SetRewardEmissionsInput<
@@ -141,24 +145,55 @@ export function getSetRewardEmissionsInstruction<
     TAccountRewardAuthority,
     TAccountRewardVault
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetRewardEmissionsInstruction<
   TProgramAddress,
-  TAccountWhirlpool,
-  TAccountRewardAuthority,
-  TAccountRewardVault
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardAuthority,
+    InstructionAccountInputAddress<TAccountRewardAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardVault,
+    InstructionAccountInputAddress<TAccountRewardVault>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    whirlpool: { value: input.whirlpool ?? null, isWritable: true },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     rewardAuthority: {
       value: input.rewardAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    rewardVault: { value: input.rewardVault ?? null, isWritable: false },
+    rewardVault: {
+      value: input.rewardVault ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -168,7 +203,6 @@ export function getSetRewardEmissionsInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpool", accounts.whirlpool),
@@ -181,9 +215,18 @@ export function getSetRewardEmissionsInstruction<
     programAddress,
   } as SetRewardEmissionsInstruction<
     TProgramAddress,
-    TAccountWhirlpool,
-    TAccountRewardAuthority,
-    TAccountRewardVault
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardAuthority,
+      InstructionAccountInputAddress<TAccountRewardAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >
   >);
 }
 

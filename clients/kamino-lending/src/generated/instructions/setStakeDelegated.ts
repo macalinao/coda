@@ -30,12 +30,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -109,20 +112,21 @@ export function getSetStakeDelegatedInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetStakeDelegatedInput<
-  TAccountDelegateAuthority extends string = string,
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
+  TAccountDelegateAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  delegateAuthority: TransactionSigner<TAccountDelegateAuthority>;
-  userState: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
+  delegateAuthority: TAccountDelegateAuthority;
+  userState: TAccountUserState;
+  farmState: TAccountFarmState;
   newAmount: SetStakeDelegatedInstructionDataArgs["newAmount"];
 };
 
 export function getSetStakeDelegatedInstruction<
-  TAccountDelegateAuthority extends string,
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
+  TAccountDelegateAuthority extends InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: SetStakeDelegatedInput<
@@ -130,24 +134,54 @@ export function getSetStakeDelegatedInstruction<
     TAccountUserState,
     TAccountFarmState
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetStakeDelegatedInstruction<
   TProgramAddress,
-  TAccountDelegateAuthority,
-  TAccountUserState,
-  TAccountFarmState
+  ResolvedInstructionAccountMeta<
+    TAccountDelegateAuthority,
+    InstructionAccountInputAddress<TAccountDelegateAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserState,
+    InstructionAccountInputAddress<TAccountUserState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     delegateAuthority: {
       value: input.delegateAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -157,7 +191,6 @@ export function getSetStakeDelegatedInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("delegateAuthority", accounts.delegateAuthority),
@@ -170,9 +203,18 @@ export function getSetStakeDelegatedInstruction<
     programAddress,
   } as SetStakeDelegatedInstruction<
     TProgramAddress,
-    TAccountDelegateAuthority,
-    TAccountUserState,
-    TAccountFarmState
+    ResolvedInstructionAccountMeta<
+      TAccountDelegateAuthority,
+      InstructionAccountInputAddress<TAccountDelegateAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >
   >);
 }
 

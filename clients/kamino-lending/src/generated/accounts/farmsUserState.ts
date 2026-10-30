@@ -32,12 +32,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -104,8 +108,8 @@ export type FarmsUserState = {
 
 export type FarmsUserStateArgs = {
   userId: number | bigint;
-  farmState: Address;
-  owner: Address;
+  farmState: Address | HasAddress;
+  owner: Address | HasAddress;
   /** Indicate if this user state is part of a delegated farm */
   isFarmDelegated: number;
   padding0: Array<number>;
@@ -142,7 +146,7 @@ export type FarmsUserStateArgs = {
   /** User bump used for account address validation */
   bump: number | bigint;
   /** Delegatee used for initialisation - useful to check against */
-  delegatee: Address;
+  delegatee: Address | HasAddress;
   lastStakeTs: number | bigint;
   padding1: Array<number | bigint>;
 };
@@ -225,8 +229,10 @@ export function decodeFarmsUserState<TAddress extends string = string>(
 }
 
 export async function fetchFarmsUserState<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<FarmsUserState, TAddress>> {
   const maybeAccount = await fetchMaybeFarmsUserState(rpc, address, config);
@@ -237,17 +243,25 @@ export async function fetchFarmsUserState<TAddress extends string = string>(
 export async function fetchMaybeFarmsUserState<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<FarmsUserState, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeFarmsUserState(maybeAccount);
 }
 
 export async function fetchAllFarmsUserState(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FarmsUserState>[]> {
   const maybeAccounts = await fetchAllMaybeFarmsUserState(
@@ -260,20 +274,28 @@ export async function fetchAllFarmsUserState(
 }
 
 export async function fetchAllMaybeFarmsUserState(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FarmsUserState>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeFarmsUserState(maybeAccount),
   );
 }
 
 export async function fetchFarmsUserStateFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: FarmsUserStateSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<FarmsUserState>> {
   const maybeAccount = await fetchMaybeFarmsUserStateFromSeeds(
     rpc,
@@ -285,9 +307,11 @@ export async function fetchFarmsUserStateFromSeeds(
 }
 
 export async function fetchMaybeFarmsUserStateFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: FarmsUserStateSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<FarmsUserState>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findFarmsUserStatePda(seeds, { programAddress });

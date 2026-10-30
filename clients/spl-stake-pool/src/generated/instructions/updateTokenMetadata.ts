@@ -33,13 +33,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.ts";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -131,17 +134,20 @@ export function getUpdateTokenMetadataInstructionDataCodec(): Codec<
 }
 
 export type UpdateTokenMetadataAsyncInput<
-  TAccountStakePool extends string = string,
-  TAccountManager extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountMetadataAccount extends string = string,
-  TAccountMetadataProgram extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput = InstructionSignerInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadataAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  stakePool: Address<TAccountStakePool>;
-  manager: TransactionSigner<TAccountManager>;
-  withdrawAuthority?: Address<TAccountWithdrawAuthority>;
-  metadataAccount: Address<TAccountMetadataAccount>;
-  metadataProgram?: Address<TAccountMetadataProgram>;
+  stakePool: TAccountStakePool;
+  manager: TAccountManager;
+  withdrawAuthority?: TAccountWithdrawAuthority;
+  metadataAccount: TAccountMetadataAccount;
+  metadataProgram?: TAccountMetadataProgram;
   name: UpdateTokenMetadataInstructionDataArgs["name"];
   symbol: UpdateTokenMetadataInstructionDataArgs["symbol"];
   uri: UpdateTokenMetadataInstructionDataArgs["uri"];
@@ -157,11 +163,11 @@ export type UpdateTokenMetadataAsyncInput<
  * 4. `[]` Metadata program id
  */
 export async function getUpdateTokenMetadataInstructionAsync<
-  TAccountStakePool extends string,
-  TAccountManager extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountMetadataAccount extends string,
-  TAccountMetadataProgram extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountMetadataAccount extends InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: UpdateTokenMetadataAsyncInput<
@@ -171,32 +177,73 @@ export async function getUpdateTokenMetadataInstructionAsync<
     TAccountMetadataAccount,
     TAccountMetadataProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   UpdateTokenMetadataInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountManager,
-    TAccountWithdrawAuthority,
-    TAccountMetadataAccount,
-    TAccountMetadataProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountManager,
+      InstructionAccountInputAddress<TAccountManager>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataAccount,
+      InstructionAccountInputAddress<TAccountMetadataAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataProgram,
+      InstructionAccountInputAddress<TAccountMetadataProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: false },
-    manager: { value: input.manager ?? null, isWritable: false },
-    withdrawAuthority: {
-      value: input.withdrawAuthority ?? null,
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    metadataAccount: { value: input.metadataAccount ?? null, isWritable: true },
+    manager: {
+      value: input.manager ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    withdrawAuthority: {
+      value: input.withdrawAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    metadataAccount: {
+      value: input.metadataAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     metadataProgram: {
       value: input.metadataProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -225,7 +272,6 @@ export async function getUpdateTokenMetadataInstructionAsync<
       "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -240,26 +286,44 @@ export async function getUpdateTokenMetadataInstructionAsync<
     programAddress,
   } as UpdateTokenMetadataInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountManager,
-    TAccountWithdrawAuthority,
-    TAccountMetadataAccount,
-    TAccountMetadataProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountManager,
+      InstructionAccountInputAddress<TAccountManager>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataAccount,
+      InstructionAccountInputAddress<TAccountMetadataAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataProgram,
+      InstructionAccountInputAddress<TAccountMetadataProgram>
+    >
   >);
 }
 
 export type UpdateTokenMetadataInput<
-  TAccountStakePool extends string = string,
-  TAccountManager extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountMetadataAccount extends string = string,
-  TAccountMetadataProgram extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput = InstructionSignerInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadataAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  stakePool: Address<TAccountStakePool>;
-  manager: TransactionSigner<TAccountManager>;
-  withdrawAuthority: Address<TAccountWithdrawAuthority>;
-  metadataAccount: Address<TAccountMetadataAccount>;
-  metadataProgram?: Address<TAccountMetadataProgram>;
+  stakePool: TAccountStakePool;
+  manager: TAccountManager;
+  withdrawAuthority: TAccountWithdrawAuthority;
+  metadataAccount: TAccountMetadataAccount;
+  metadataProgram?: TAccountMetadataProgram;
   name: UpdateTokenMetadataInstructionDataArgs["name"];
   symbol: UpdateTokenMetadataInstructionDataArgs["symbol"];
   uri: UpdateTokenMetadataInstructionDataArgs["uri"];
@@ -275,11 +339,11 @@ export type UpdateTokenMetadataInput<
  * 4. `[]` Metadata program id
  */
 export function getUpdateTokenMetadataInstruction<
-  TAccountStakePool extends string,
-  TAccountManager extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountMetadataAccount extends string,
-  TAccountMetadataProgram extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountMetadataAccount extends InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: UpdateTokenMetadataInput<
@@ -289,30 +353,71 @@ export function getUpdateTokenMetadataInstruction<
     TAccountMetadataAccount,
     TAccountMetadataProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateTokenMetadataInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountManager,
-  TAccountWithdrawAuthority,
-  TAccountMetadataAccount,
-  TAccountMetadataProgram
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountManager,
+    InstructionAccountInputAddress<TAccountManager>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWithdrawAuthority,
+    InstructionAccountInputAddress<TAccountWithdrawAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadataAccount,
+    InstructionAccountInputAddress<TAccountMetadataAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadataProgram,
+    InstructionAccountInputAddress<TAccountMetadataProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: false },
-    manager: { value: input.manager ?? null, isWritable: false },
-    withdrawAuthority: {
-      value: input.withdrawAuthority ?? null,
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    metadataAccount: { value: input.metadataAccount ?? null, isWritable: true },
+    manager: {
+      value: input.manager ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    withdrawAuthority: {
+      value: input.withdrawAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    metadataAccount: {
+      value: input.metadataAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     metadataProgram: {
       value: input.metadataProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -330,7 +435,6 @@ export function getUpdateTokenMetadataInstruction<
       "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -345,11 +449,26 @@ export function getUpdateTokenMetadataInstruction<
     programAddress,
   } as UpdateTokenMetadataInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountManager,
-    TAccountWithdrawAuthority,
-    TAccountMetadataAccount,
-    TAccountMetadataProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountManager,
+      InstructionAccountInputAddress<TAccountManager>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataAccount,
+      InstructionAccountInputAddress<TAccountMetadataAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataProgram,
+      InstructionAccountInputAddress<TAccountMetadataProgram>
+    >
   >);
 }
 

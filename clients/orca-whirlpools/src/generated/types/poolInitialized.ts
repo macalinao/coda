@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type PoolInitialized = {
@@ -38,13 +39,13 @@ export type PoolInitialized = {
 };
 
 export type PoolInitializedArgs = {
-  whirlpool: Address;
-  whirlpoolsConfig: Address;
-  tokenMintA: Address;
-  tokenMintB: Address;
+  whirlpool: Address | HasAddress;
+  whirlpoolsConfig: Address | HasAddress;
+  tokenMintA: Address | HasAddress;
+  tokenMintB: Address | HasAddress;
   tickSpacing: number;
-  tokenProgramA: Address;
-  tokenProgramB: Address;
+  tokenProgramA: Address | HasAddress;
+  tokenProgramB: Address | HasAddress;
   decimalsA: number;
   decimalsB: number;
   initialSqrtPrice: number | bigint;

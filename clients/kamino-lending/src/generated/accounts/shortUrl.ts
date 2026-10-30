@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -56,7 +60,7 @@ export type ShortUrl = {
   shortUrl: string;
 };
 
-export type ShortUrlArgs = { referrer: Address; shortUrl: string };
+export type ShortUrlArgs = { referrer: Address | HasAddress; shortUrl: string };
 
 /** Gets the encoder for {@link ShortUrlArgs} account data. */
 export function getShortUrlEncoder(): Encoder<ShortUrlArgs> {
@@ -100,8 +104,10 @@ export function decodeShortUrl<TAddress extends string = string>(
 }
 
 export async function fetchShortUrl<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<ShortUrl, TAddress>> {
   const maybeAccount = await fetchMaybeShortUrl(rpc, address, config);
@@ -110,17 +116,25 @@ export async function fetchShortUrl<TAddress extends string = string>(
 }
 
 export async function fetchMaybeShortUrl<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<ShortUrl, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeShortUrl(maybeAccount);
 }
 
 export async function fetchAllShortUrl(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ShortUrl>[]> {
   const maybeAccounts = await fetchAllMaybeShortUrl(rpc, addresses, config);
@@ -129,18 +143,26 @@ export async function fetchAllShortUrl(
 }
 
 export async function fetchAllMaybeShortUrl(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ShortUrl>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeShortUrl(maybeAccount));
 }
 
 export async function fetchShortUrlFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ShortUrlSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<ShortUrl>> {
   const maybeAccount = await fetchMaybeShortUrlFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -148,9 +170,11 @@ export async function fetchShortUrlFromSeeds(
 }
 
 export async function fetchMaybeShortUrlFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ShortUrlSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<ShortUrl>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findShortUrlPda(seeds, { programAddress });

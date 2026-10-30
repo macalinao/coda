@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -101,19 +104,21 @@ export function getSetFeeAuthorityInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetFeeAuthorityInput<
-  TAccountWhirlpoolsConfig extends string = string,
-  TAccountFeeAuthority extends string = string,
-  TAccountNewFeeAuthority extends string = string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewFeeAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
-  feeAuthority: TransactionSigner<TAccountFeeAuthority>;
-  newFeeAuthority: Address<TAccountNewFeeAuthority>;
+  whirlpoolsConfig: TAccountWhirlpoolsConfig;
+  feeAuthority: TAccountFeeAuthority;
+  newFeeAuthority: TAccountNewFeeAuthority;
 };
 
 export function getSetFeeAuthorityInstruction<
-  TAccountWhirlpoolsConfig extends string,
-  TAccountFeeAuthority extends string,
-  TAccountNewFeeAuthority extends string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput,
+  TAccountFeeAuthority extends InstructionSignerInput,
+  TAccountNewFeeAuthority extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: SetFeeAuthorityInput<
@@ -121,25 +126,53 @@ export function getSetFeeAuthorityInstruction<
     TAccountFeeAuthority,
     TAccountNewFeeAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetFeeAuthorityInstruction<
   TProgramAddress,
-  TAccountWhirlpoolsConfig,
-  TAccountFeeAuthority,
-  TAccountNewFeeAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolsConfig,
+    InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeAuthority,
+    InstructionAccountInputAddress<TAccountFeeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewFeeAuthority,
+    InstructionAccountInputAddress<TAccountNewFeeAuthority>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     whirlpoolsConfig: {
       value: input.whirlpoolsConfig ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    feeAuthority: { value: input.feeAuthority ?? null, isWritable: false },
+    feeAuthority: {
+      value: input.feeAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     newFeeAuthority: {
       value: input.newFeeAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -148,7 +181,6 @@ export function getSetFeeAuthorityInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
@@ -159,9 +191,18 @@ export function getSetFeeAuthorityInstruction<
     programAddress,
   } as SetFeeAuthorityInstruction<
     TProgramAddress,
-    TAccountWhirlpoolsConfig,
-    TAccountFeeAuthority,
-    TAccountNewFeeAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolsConfig,
+      InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAuthority,
+      InstructionAccountInputAddress<TAccountFeeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewFeeAuthority,
+      InstructionAccountInputAddress<TAccountNewFeeAuthority>
+    >
   >);
 }
 

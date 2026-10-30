@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.ts";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -114,25 +117,28 @@ export function getCloseClaimFeeOperatorInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CloseClaimFeeOperatorAsyncInput<
-  TAccountClaimFeeOperator extends string = string,
-  TAccountRentReceiver extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountClaimFeeOperator extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  claimFeeOperator: Address<TAccountClaimFeeOperator>;
-  rentReceiver: Address<TAccountRentReceiver>;
-  admin: TransactionSigner<TAccountAdmin>;
-  eventAuthority?: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  claimFeeOperator: TAccountClaimFeeOperator;
+  rentReceiver: TAccountRentReceiver;
+  admin: TAccountAdmin;
+  eventAuthority?: TAccountEventAuthority;
+  program?: TAccountProgram;
 };
 
 export async function getCloseClaimFeeOperatorInstructionAsync<
-  TAccountClaimFeeOperator extends string,
-  TAccountRentReceiver extends string,
-  TAccountAdmin extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountClaimFeeOperator extends InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: CloseClaimFeeOperatorAsyncInput<
@@ -142,30 +148,70 @@ export async function getCloseClaimFeeOperatorInstructionAsync<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   CloseClaimFeeOperatorInstruction<
     TProgramAddress,
-    TAccountClaimFeeOperator,
-    TAccountRentReceiver,
-    TAccountAdmin,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountClaimFeeOperator,
+      InstructionAccountInputAddress<TAccountClaimFeeOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentReceiver,
+      InstructionAccountInputAddress<TAccountRentReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     claimFeeOperator: {
       value: input.claimFeeOperator ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    rentReceiver: { value: input.rentReceiver ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    rentReceiver: {
+      value: input.rentReceiver ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    admin: { value: input.admin ?? null, isSigner: true, isWritable: false },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -183,7 +229,6 @@ export async function getCloseClaimFeeOperatorInstructionAsync<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("claimFeeOperator", accounts.claimFeeOperator),
@@ -196,34 +241,52 @@ export async function getCloseClaimFeeOperatorInstructionAsync<
     programAddress,
   } as CloseClaimFeeOperatorInstruction<
     TProgramAddress,
-    TAccountClaimFeeOperator,
-    TAccountRentReceiver,
-    TAccountAdmin,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountClaimFeeOperator,
+      InstructionAccountInputAddress<TAccountClaimFeeOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentReceiver,
+      InstructionAccountInputAddress<TAccountRentReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 
 export type CloseClaimFeeOperatorInput<
-  TAccountClaimFeeOperator extends string = string,
-  TAccountRentReceiver extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountClaimFeeOperator extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  claimFeeOperator: Address<TAccountClaimFeeOperator>;
-  rentReceiver: Address<TAccountRentReceiver>;
-  admin: TransactionSigner<TAccountAdmin>;
-  eventAuthority: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  claimFeeOperator: TAccountClaimFeeOperator;
+  rentReceiver: TAccountRentReceiver;
+  admin: TAccountAdmin;
+  eventAuthority: TAccountEventAuthority;
+  program?: TAccountProgram;
 };
 
 export function getCloseClaimFeeOperatorInstruction<
-  TAccountClaimFeeOperator extends string,
-  TAccountRentReceiver extends string,
-  TAccountAdmin extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountClaimFeeOperator extends InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: CloseClaimFeeOperatorInput<
@@ -233,28 +296,68 @@ export function getCloseClaimFeeOperatorInstruction<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CloseClaimFeeOperatorInstruction<
   TProgramAddress,
-  TAccountClaimFeeOperator,
-  TAccountRentReceiver,
-  TAccountAdmin,
-  TAccountEventAuthority,
-  TAccountProgram
+  ResolvedInstructionAccountMeta<
+    TAccountClaimFeeOperator,
+    InstructionAccountInputAddress<TAccountClaimFeeOperator>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRentReceiver,
+    InstructionAccountInputAddress<TAccountRentReceiver>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAdmin,
+    InstructionAccountInputAddress<TAccountAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEventAuthority,
+    InstructionAccountInputAddress<TAccountEventAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     claimFeeOperator: {
       value: input.claimFeeOperator ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    rentReceiver: { value: input.rentReceiver ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    rentReceiver: {
+      value: input.rentReceiver ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    admin: { value: input.admin ?? null, isSigner: true, isWritable: false },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -267,7 +370,6 @@ export function getCloseClaimFeeOperatorInstruction<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("claimFeeOperator", accounts.claimFeeOperator),
@@ -280,11 +382,26 @@ export function getCloseClaimFeeOperatorInstruction<
     programAddress,
   } as CloseClaimFeeOperatorInstruction<
     TProgramAddress,
-    TAccountClaimFeeOperator,
-    TAccountRentReceiver,
-    TAccountAdmin,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountClaimFeeOperator,
+      InstructionAccountInputAddress<TAccountClaimFeeOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentReceiver,
+      InstructionAccountInputAddress<TAccountRentReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 

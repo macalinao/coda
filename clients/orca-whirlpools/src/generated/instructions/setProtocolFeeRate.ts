@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -111,20 +114,21 @@ export function getSetProtocolFeeRateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetProtocolFeeRateInput<
-  TAccountWhirlpoolsConfig extends string = string,
-  TAccountWhirlpool extends string = string,
-  TAccountFeeAuthority extends string = string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFeeAuthority extends InstructionSignerInput = InstructionSignerInput,
 > = {
-  whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
-  whirlpool: Address<TAccountWhirlpool>;
-  feeAuthority: TransactionSigner<TAccountFeeAuthority>;
+  whirlpoolsConfig: TAccountWhirlpoolsConfig;
+  whirlpool: TAccountWhirlpool;
+  feeAuthority: TAccountFeeAuthority;
   protocolFeeRate: SetProtocolFeeRateInstructionDataArgs["protocolFeeRate"];
 };
 
 export function getSetProtocolFeeRateInstruction<
-  TAccountWhirlpoolsConfig extends string,
-  TAccountWhirlpool extends string,
-  TAccountFeeAuthority extends string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountFeeAuthority extends InstructionSignerInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: SetProtocolFeeRateInput<
@@ -132,24 +136,55 @@ export function getSetProtocolFeeRateInstruction<
     TAccountWhirlpool,
     TAccountFeeAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetProtocolFeeRateInstruction<
   TProgramAddress,
-  TAccountWhirlpoolsConfig,
-  TAccountWhirlpool,
-  TAccountFeeAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolsConfig,
+    InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeAuthority,
+    InstructionAccountInputAddress<TAccountFeeAuthority>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     whirlpoolsConfig: {
       value: input.whirlpoolsConfig ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    whirlpool: { value: input.whirlpool ?? null, isWritable: true },
-    feeAuthority: { value: input.feeAuthority ?? null, isWritable: false },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    feeAuthority: {
+      value: input.feeAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -159,7 +194,6 @@ export function getSetProtocolFeeRateInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
@@ -172,9 +206,18 @@ export function getSetProtocolFeeRateInstruction<
     programAddress,
   } as SetProtocolFeeRateInstruction<
     TProgramAddress,
-    TAccountWhirlpoolsConfig,
-    TAccountWhirlpool,
-    TAccountFeeAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolsConfig,
+      InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAuthority,
+      InstructionAccountInputAddress<TAccountFeeAuthority>
+    >
   >);
 }
 

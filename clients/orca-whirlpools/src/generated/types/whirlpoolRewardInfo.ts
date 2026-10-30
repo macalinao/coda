@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type WhirlpoolRewardInfo = {
@@ -29,9 +30,9 @@ export type WhirlpoolRewardInfo = {
 };
 
 export type WhirlpoolRewardInfoArgs = {
-  mint: Address;
-  vault: Address;
-  authority: Address;
+  mint: Address | HasAddress;
+  vault: Address | HasAddress;
+  authority: Address | HasAddress;
   emissionsPerSecondX64: number | bigint;
   growthGlobalX64: number | bigint;
 };

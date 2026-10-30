@@ -24,6 +24,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -110,7 +111,7 @@ export type DelegateArgsArgs =
   | {
       __kind: "LockedTransferV1";
       amount: number | bigint;
-      lockedAddress: Address;
+      lockedAddress: Address | HasAddress;
       authorizationData: OptionOrNullable<AuthorizationDataArgs>;
     }
   | {

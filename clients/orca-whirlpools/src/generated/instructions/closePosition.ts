@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -115,28 +118,32 @@ export function getClosePositionInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ClosePositionInput<
-  TAccountPositionAuthority extends string = string,
-  TAccountReceiver extends string = string,
-  TAccountPosition extends string = string,
-  TAccountPositionMint extends string = string,
-  TAccountPositionTokenAccount extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountPositionAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountReceiver extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  positionAuthority: TransactionSigner<TAccountPositionAuthority>;
-  receiver: Address<TAccountReceiver>;
-  position: Address<TAccountPosition>;
-  positionMint: Address<TAccountPositionMint>;
-  positionTokenAccount: Address<TAccountPositionTokenAccount>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  positionAuthority: TAccountPositionAuthority;
+  receiver: TAccountReceiver;
+  position: TAccountPosition;
+  positionMint: TAccountPositionMint;
+  positionTokenAccount: TAccountPositionTokenAccount;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getClosePositionInstruction<
-  TAccountPositionAuthority extends string,
-  TAccountReceiver extends string,
-  TAccountPosition extends string,
-  TAccountPositionMint extends string,
-  TAccountPositionTokenAccount extends string,
-  TAccountTokenProgram extends string,
+  TAccountPositionAuthority extends InstructionSignerInput,
+  TAccountReceiver extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountPositionMint extends InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: ClosePositionInput<
@@ -147,33 +154,82 @@ export function getClosePositionInstruction<
     TAccountPositionTokenAccount,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ClosePositionInstruction<
   TProgramAddress,
-  TAccountPositionAuthority,
-  TAccountReceiver,
-  TAccountPosition,
-  TAccountPositionMint,
-  TAccountPositionTokenAccount,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPositionAuthority,
+    InstructionAccountInputAddress<TAccountPositionAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReceiver,
+    InstructionAccountInputAddress<TAccountReceiver>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionMint,
+    InstructionAccountInputAddress<TAccountPositionMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionTokenAccount,
+    InstructionAccountInputAddress<TAccountPositionTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     positionAuthority: {
       value: input.positionAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    receiver: { value: input.receiver ?? null, isWritable: true },
-    position: { value: input.position ?? null, isWritable: true },
-    positionMint: { value: input.positionMint ?? null, isWritable: true },
-    positionTokenAccount: {
-      value: input.positionTokenAccount ?? null,
+    receiver: {
+      value: input.receiver ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    positionMint: {
+      value: input.positionMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    positionTokenAccount: {
+      value: input.positionTokenAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -186,7 +242,6 @@ export function getClosePositionInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("positionAuthority", accounts.positionAuthority),
@@ -200,12 +255,30 @@ export function getClosePositionInstruction<
     programAddress,
   } as ClosePositionInstruction<
     TProgramAddress,
-    TAccountPositionAuthority,
-    TAccountReceiver,
-    TAccountPosition,
-    TAccountPositionMint,
-    TAccountPositionTokenAccount,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPositionAuthority,
+      InstructionAccountInputAddress<TAccountPositionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReceiver,
+      InstructionAccountInputAddress<TAccountReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionMint,
+      InstructionAccountInputAddress<TAccountPositionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionTokenAccount,
+      InstructionAccountInputAddress<TAccountPositionTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

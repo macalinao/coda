@@ -29,12 +29,14 @@ import {
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -97,25 +99,49 @@ export function getChangeThresholdInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type ChangeThresholdInput<TAccountSmartWallet extends string = string> =
-  {
-    smartWallet: TransactionSigner<TAccountSmartWallet>;
-    threshold: ChangeThresholdInstructionDataArgs["threshold"];
-  };
+export type ChangeThresholdInput<
+  TAccountSmartWallet extends InstructionSignerInput = InstructionSignerInput,
+> = {
+  smartWallet: TAccountSmartWallet;
+  threshold: ChangeThresholdInstructionDataArgs["threshold"];
+};
 
 export function getChangeThresholdInstruction<
-  TAccountSmartWallet extends string,
+  TAccountSmartWallet extends InstructionSignerInput,
   TProgramAddress extends Address = typeof SMART_WALLET_PROGRAM_ADDRESS,
 >(
   input: ChangeThresholdInput<TAccountSmartWallet>,
-  config?: { programAddress?: TProgramAddress },
-): ChangeThresholdInstruction<TProgramAddress, TAccountSmartWallet> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): ChangeThresholdInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >
+> {
   // Program address.
-  const programAddress = config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    smartWallet: { value: input.smartWallet ?? null, isWritable: true },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -125,14 +151,19 @@ export function getChangeThresholdInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [getAccountMeta("smartWallet", accounts.smartWallet)],
     data: getChangeThresholdInstructionDataEncoder().encode(
       args as ChangeThresholdInstructionDataArgs,
     ),
     programAddress,
-  } as ChangeThresholdInstruction<TProgramAddress, TAccountSmartWallet>);
+  } as ChangeThresholdInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >
+  >);
 }
 
 export type ParsedChangeThresholdInstruction<

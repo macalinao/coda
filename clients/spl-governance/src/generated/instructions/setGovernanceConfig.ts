@@ -25,12 +25,14 @@ import {
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -102,28 +104,48 @@ export function getSetGovernanceConfigInstructionDataCodec(): Codec<
 }
 
 export type SetGovernanceConfigInput<
-  TAccountGovernanceAccount extends string = string,
+  TAccountGovernanceAccount extends InstructionSignerInput =
+    InstructionSignerInput,
 > = {
   /** The governance account the config is for */
-  governanceAccount: TransactionSigner<TAccountGovernanceAccount>;
+  governanceAccount: TAccountGovernanceAccount;
   config: SetGovernanceConfigInstructionDataArgs["config"];
 };
 
 export function getSetGovernanceConfigInstruction<
-  TAccountGovernanceAccount extends string,
+  TAccountGovernanceAccount extends InstructionSignerInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: SetGovernanceConfigInput<TAccountGovernanceAccount>,
-  config?: { programAddress?: TProgramAddress },
-): SetGovernanceConfigInstruction<TProgramAddress, TAccountGovernanceAccount> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): SetGovernanceConfigInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAccount,
+    InstructionAccountInputAddress<TAccountGovernanceAccount>
+  >
+> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     governanceAccount: {
       value: input.governanceAccount ?? null,
+      isSigner: true,
       isWritable: true,
     },
   };
@@ -135,7 +157,6 @@ export function getSetGovernanceConfigInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [getAccountMeta("governanceAccount", accounts.governanceAccount)],
     data: getSetGovernanceConfigInstructionDataEncoder().encode(
@@ -144,7 +165,10 @@ export function getSetGovernanceConfigInstruction<
     programAddress,
   } as SetGovernanceConfigInstruction<
     TProgramAddress,
-    TAccountGovernanceAccount
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAccount,
+      InstructionAccountInputAddress<TAccountGovernanceAccount>
+    >
   >);
 }
 

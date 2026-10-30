@@ -24,6 +24,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 
 export type RuleSetToggle =
@@ -31,7 +32,10 @@ export type RuleSetToggle =
   | { __kind: "Clear" }
   | { __kind: "Set"; fields: readonly [Address] };
 
-export type RuleSetToggleArgs = RuleSetToggle;
+export type RuleSetToggleArgs =
+  | { __kind: "None" }
+  | { __kind: "Clear" }
+  | { __kind: "Set"; fields: readonly [Address | HasAddress] };
 
 export function getRuleSetToggleEncoder(): Encoder<RuleSetToggleArgs> {
   return getDiscriminatedUnionEncoder([

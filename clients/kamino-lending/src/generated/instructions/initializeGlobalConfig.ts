@@ -28,14 +28,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findTreasuryVaultsAuthorityPda } from "../pdas/index.ts";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -111,22 +114,25 @@ export function getInitializeGlobalConfigInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitializeGlobalConfigAsyncInput<
-  TAccountGlobalAdmin extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountTreasuryVaultsAuthority extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountGlobalAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  treasuryVaultsAuthority?: Address<TAccountTreasuryVaultsAuthority>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  globalAdmin: TAccountGlobalAdmin;
+  globalConfig: TAccountGlobalConfig;
+  treasuryVaultsAuthority?: TAccountTreasuryVaultsAuthority;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export async function getInitializeGlobalConfigInstructionAsync<
-  TAccountGlobalAdmin extends string,
-  TAccountGlobalConfig extends string,
-  TAccountTreasuryVaultsAuthority extends string,
-  TAccountSystemProgram extends string,
+  TAccountGlobalAdmin extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: InitializeGlobalConfigAsyncInput<
@@ -135,28 +141,65 @@ export async function getInitializeGlobalConfigInstructionAsync<
     TAccountTreasuryVaultsAuthority,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   InitializeGlobalConfigInstruction<
     TProgramAddress,
-    TAccountGlobalAdmin,
-    TAccountGlobalConfig,
-    TAccountTreasuryVaultsAuthority,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalAdmin,
+      InstructionAccountInputAddress<TAccountGlobalAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultsAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    globalAdmin: { value: input.globalAdmin ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: true },
+    globalAdmin: {
+      value: input.globalAdmin ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     treasuryVaultsAuthority: {
       value: input.treasuryVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -181,7 +224,6 @@ export async function getInitializeGlobalConfigInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("globalAdmin", accounts.globalAdmin),
@@ -196,30 +238,45 @@ export async function getInitializeGlobalConfigInstructionAsync<
     programAddress,
   } as InitializeGlobalConfigInstruction<
     TProgramAddress,
-    TAccountGlobalAdmin,
-    TAccountGlobalConfig,
-    TAccountTreasuryVaultsAuthority,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalAdmin,
+      InstructionAccountInputAddress<TAccountGlobalAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultsAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type InitializeGlobalConfigInput<
-  TAccountGlobalAdmin extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountTreasuryVaultsAuthority extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountGlobalAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  treasuryVaultsAuthority: Address<TAccountTreasuryVaultsAuthority>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  globalAdmin: TAccountGlobalAdmin;
+  globalConfig: TAccountGlobalConfig;
+  treasuryVaultsAuthority: TAccountTreasuryVaultsAuthority;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export function getInitializeGlobalConfigInstruction<
-  TAccountGlobalAdmin extends string,
-  TAccountGlobalConfig extends string,
-  TAccountTreasuryVaultsAuthority extends string,
-  TAccountSystemProgram extends string,
+  TAccountGlobalAdmin extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: InitializeGlobalConfigInput<
@@ -228,26 +285,63 @@ export function getInitializeGlobalConfigInstruction<
     TAccountTreasuryVaultsAuthority,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitializeGlobalConfigInstruction<
   TProgramAddress,
-  TAccountGlobalAdmin,
-  TAccountGlobalConfig,
-  TAccountTreasuryVaultsAuthority,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalAdmin,
+    InstructionAccountInputAddress<TAccountGlobalAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTreasuryVaultsAuthority,
+    InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    globalAdmin: { value: input.globalAdmin ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: true },
+    globalAdmin: {
+      value: input.globalAdmin ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     treasuryVaultsAuthority: {
       value: input.treasuryVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -260,7 +354,6 @@ export function getInitializeGlobalConfigInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("globalAdmin", accounts.globalAdmin),
@@ -275,10 +368,22 @@ export function getInitializeGlobalConfigInstruction<
     programAddress,
   } as InitializeGlobalConfigInstruction<
     TProgramAddress,
-    TAccountGlobalAdmin,
-    TAccountGlobalConfig,
-    TAccountTreasuryVaultsAuthority,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalAdmin,
+      InstructionAccountInputAddress<TAccountGlobalAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultsAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

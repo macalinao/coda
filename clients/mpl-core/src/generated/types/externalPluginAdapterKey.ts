@@ -24,6 +24,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
@@ -51,10 +52,10 @@ export type ExternalPluginAdapterKey =
   | { __kind: "AgentIdentity" };
 
 export type ExternalPluginAdapterKeyArgs =
-  | { __kind: "LifecycleHook"; fields: readonly [Address] }
-  | { __kind: "Oracle"; fields: readonly [Address] }
+  | { __kind: "LifecycleHook"; fields: readonly [Address | HasAddress] }
+  | { __kind: "Oracle"; fields: readonly [Address | HasAddress] }
   | { __kind: "AppData"; fields: readonly [AuthorityArgs] }
-  | { __kind: "LinkedLifecycleHook"; fields: readonly [Address] }
+  | { __kind: "LinkedLifecycleHook"; fields: readonly [Address | HasAddress] }
   | { __kind: "LinkedAppData"; fields: readonly [AuthorityArgs] }
   | { __kind: "DataSection"; fields: readonly [LinkedDataKeyArgs] }
   | { __kind: "AgentIdentity" };

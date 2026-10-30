@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -63,10 +67,10 @@ export type Miner = {
 };
 
 export type MinerArgs = {
-  quarry: Address;
-  authority: Address;
+  quarry: Address | HasAddress;
+  authority: Address | HasAddress;
   bump: number;
-  tokenVaultKey: Address;
+  tokenVaultKey: Address | HasAddress;
   rewardsEarned: number | bigint;
   rewardsPerTokenPaid: number | bigint;
   balance: number | bigint;
@@ -127,8 +131,10 @@ export function decodeMiner<TAddress extends string = string>(
 }
 
 export async function fetchMiner<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Miner, TAddress>> {
   const maybeAccount = await fetchMaybeMiner(rpc, address, config);
@@ -137,17 +143,25 @@ export async function fetchMiner<TAddress extends string = string>(
 }
 
 export async function fetchMaybeMiner<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Miner, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeMiner(maybeAccount);
 }
 
 export async function fetchAllMiner(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Miner>[]> {
   const maybeAccounts = await fetchAllMaybeMiner(rpc, addresses, config);
@@ -156,18 +170,26 @@ export async function fetchAllMiner(
 }
 
 export async function fetchAllMaybeMiner(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Miner>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeMiner(maybeAccount));
 }
 
 export async function fetchMinerFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: MinerSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Miner>> {
   const maybeAccount = await fetchMaybeMinerFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -175,9 +197,11 @@ export async function fetchMinerFromSeeds(
 }
 
 export async function fetchMaybeMinerFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: MinerSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Miner>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findMinerPda(seeds, { programAddress });

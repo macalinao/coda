@@ -26,14 +26,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findRuleSetBufferPda } from "../pdas/index.ts";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -118,19 +121,20 @@ export function getCreateOrUpdateInstructionDataCodec(): Codec<
 }
 
 export type CreateOrUpdateAsyncInput<
-  TAccountPayer extends string = string,
-  TAccountRuleSetPda extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountBufferPda extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRuleSetPda extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountBufferPda extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Payer and creator of the RuleSet */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The PDA account where the RuleSet is stored */
-  ruleSetPda: Address<TAccountRuleSetPda>;
+  ruleSetPda: TAccountRuleSetPda;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The buffer to copy a complete ruleset from */
-  bufferPda?: Address<TAccountBufferPda>;
+  bufferPda?: TAccountBufferPda;
   createOrUpdateArgs: CreateOrUpdateInstructionDataArgs["createOrUpdateArgs"];
 };
 
@@ -144,10 +148,10 @@ export type CreateOrUpdateAsyncInput<
  * auth-rules Rust/JS SDK.
  */
 export async function getCreateOrUpdateInstructionAsync<
-  TAccountPayer extends string,
-  TAccountRuleSetPda extends string,
-  TAccountSystemProgram extends string,
-  TAccountBufferPda extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountRuleSetPda extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountBufferPda extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
 >(
   input: CreateOrUpdateAsyncInput<
@@ -156,26 +160,62 @@ export async function getCreateOrUpdateInstructionAsync<
     TAccountSystemProgram,
     TAccountBufferPda
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   CreateOrUpdateInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountRuleSetPda,
-    TAccountSystemProgram,
-    TAccountBufferPda
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRuleSetPda,
+      InstructionAccountInputAddress<TAccountRuleSetPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBufferPda,
+      InstructionAccountInputAddress<TAccountBufferPda>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    ruleSetPda: { value: input.ruleSetPda ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    bufferPda: { value: input.bufferPda ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    ruleSetPda: {
+      value: input.ruleSetPda ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    bufferPda: {
+      value: input.bufferPda ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -202,7 +242,6 @@ export async function getCreateOrUpdateInstructionAsync<
     );
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -216,27 +255,40 @@ export async function getCreateOrUpdateInstructionAsync<
     programAddress,
   } as CreateOrUpdateInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountRuleSetPda,
-    TAccountSystemProgram,
-    TAccountBufferPda
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRuleSetPda,
+      InstructionAccountInputAddress<TAccountRuleSetPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBufferPda,
+      InstructionAccountInputAddress<TAccountBufferPda>
+    >
   >);
 }
 
 export type CreateOrUpdateInput<
-  TAccountPayer extends string = string,
-  TAccountRuleSetPda extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountBufferPda extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRuleSetPda extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountBufferPda extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Payer and creator of the RuleSet */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The PDA account where the RuleSet is stored */
-  ruleSetPda: Address<TAccountRuleSetPda>;
+  ruleSetPda: TAccountRuleSetPda;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The buffer to copy a complete ruleset from */
-  bufferPda?: Address<TAccountBufferPda>;
+  bufferPda?: TAccountBufferPda;
   createOrUpdateArgs: CreateOrUpdateInstructionDataArgs["createOrUpdateArgs"];
 };
 
@@ -250,10 +302,10 @@ export type CreateOrUpdateInput<
  * auth-rules Rust/JS SDK.
  */
 export function getCreateOrUpdateInstruction<
-  TAccountPayer extends string,
-  TAccountRuleSetPda extends string,
-  TAccountSystemProgram extends string,
-  TAccountBufferPda extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountRuleSetPda extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountBufferPda extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
 >(
   input: CreateOrUpdateInput<
@@ -262,24 +314,60 @@ export function getCreateOrUpdateInstruction<
     TAccountSystemProgram,
     TAccountBufferPda
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateOrUpdateInstruction<
   TProgramAddress,
-  TAccountPayer,
-  TAccountRuleSetPda,
-  TAccountSystemProgram,
-  TAccountBufferPda
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRuleSetPda,
+    InstructionAccountInputAddress<TAccountRuleSetPda>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBufferPda,
+    InstructionAccountInputAddress<TAccountBufferPda>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    ruleSetPda: { value: input.ruleSetPda ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    bufferPda: { value: input.bufferPda ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    ruleSetPda: {
+      value: input.ruleSetPda ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    bufferPda: {
+      value: input.bufferPda ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -295,7 +383,6 @@ export function getCreateOrUpdateInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -309,10 +396,22 @@ export function getCreateOrUpdateInstruction<
     programAddress,
   } as CreateOrUpdateInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountRuleSetPda,
-    TAccountSystemProgram,
-    TAccountBufferPda
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRuleSetPda,
+      InstructionAccountInputAddress<TAccountRuleSetPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBufferPda,
+      InstructionAccountInputAddress<TAccountBufferPda>
+    >
   >);
 }
 

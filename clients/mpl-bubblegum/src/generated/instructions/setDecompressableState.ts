@@ -28,12 +28,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -120,19 +123,20 @@ export function getSetDecompressableStateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetDecompressableStateInput<
-  TAccountTreeAuthority extends string = string,
-  TAccountTreeCreator extends string = string,
+  TAccountTreeAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreeCreator extends InstructionSignerInput = InstructionSignerInput,
 > = {
   /**
    * The tree's `TreeConfig` PDA, which stores its configuration and acts
    * as the tree's authority for CPIs into the compression program.
    */
-  treeAuthority: Address<TAccountTreeAuthority>;
+  treeAuthority: TAccountTreeAuthority;
   /**
    * Creator of the tree, recorded in `TreeConfig` when the tree was
    * created.
    */
-  treeCreator: TransactionSigner<TAccountTreeCreator>;
+  treeCreator: TAccountTreeCreator;
   decompressableState: SetDecompressableStateInstructionDataArgs["decompressableState"];
 };
 
@@ -143,27 +147,54 @@ export type SetDecompressableStateInput<
  * compatibility; prefer `setDecompressibleState` in new code.
  */
 export function getSetDecompressableStateInstruction<
-  TAccountTreeAuthority extends string,
-  TAccountTreeCreator extends string,
+  TAccountTreeAuthority extends InstructionAccountInput,
+  TAccountTreeCreator extends InstructionSignerInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: SetDecompressableStateInput<
     TAccountTreeAuthority,
     TAccountTreeCreator
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetDecompressableStateInstruction<
   TProgramAddress,
-  TAccountTreeAuthority,
-  TAccountTreeCreator
+  ResolvedInstructionAccountMeta<
+    TAccountTreeAuthority,
+    InstructionAccountInputAddress<TAccountTreeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTreeCreator,
+    InstructionAccountInputAddress<TAccountTreeCreator>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
-    treeCreator: { value: input.treeCreator ?? null, isWritable: false },
+    treeAuthority: {
+      value: input.treeAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    treeCreator: {
+      value: input.treeCreator ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -173,7 +204,6 @@ export function getSetDecompressableStateInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("treeAuthority", accounts.treeAuthority),
@@ -185,8 +215,14 @@ export function getSetDecompressableStateInstruction<
     programAddress,
   } as SetDecompressableStateInstruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountTreeCreator
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreeCreator,
+      InstructionAccountInputAddress<TAccountTreeCreator>
+    >
   >);
 }
 

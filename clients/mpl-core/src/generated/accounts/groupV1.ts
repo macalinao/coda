@@ -27,12 +27,16 @@ import {
   getUtf8Encoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
 } from "@solana/kit";
@@ -71,19 +75,19 @@ export type GroupV1Args = {
   /** Account discriminator; always `Key.GroupV1`. */
   key: KeyArgs;
   /** The authority allowed to update the group and manage its membership. */
-  updateAuthority: Address;
+  updateAuthority: Address | HasAddress;
   /** The group's display name. */
   name: string;
   /** The URI pointing to the group's off-chain JSON metadata. */
   uri: string;
   /** The addresses of the collections that are direct members of this group. */
-  collections: Array<Address>;
+  collections: Array<Address | HasAddress>;
   /** The addresses of the child groups nested under this group. */
-  groups: Array<Address>;
+  groups: Array<Address | HasAddress>;
   /** The addresses of the groups that this group is itself a member of. */
-  parentGroups: Array<Address>;
+  parentGroups: Array<Address | HasAddress>;
   /** The addresses of the assets that are direct members of this group. */
-  assets: Array<Address>;
+  assets: Array<Address | HasAddress>;
 };
 
 /** Gets the encoder for {@link GroupV1Args} account data. */
@@ -135,8 +139,10 @@ export function decodeGroupV1<TAddress extends string = string>(
 }
 
 export async function fetchGroupV1<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<GroupV1, TAddress>> {
   const maybeAccount = await fetchMaybeGroupV1(rpc, address, config);
@@ -145,17 +151,25 @@ export async function fetchGroupV1<TAddress extends string = string>(
 }
 
 export async function fetchMaybeGroupV1<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<GroupV1, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeGroupV1(maybeAccount);
 }
 
 export async function fetchAllGroupV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<GroupV1>[]> {
   const maybeAccounts = await fetchAllMaybeGroupV1(rpc, addresses, config);
@@ -164,10 +178,16 @@ export async function fetchAllGroupV1(
 }
 
 export async function fetchAllMaybeGroupV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<GroupV1>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeGroupV1(maybeAccount));
 }

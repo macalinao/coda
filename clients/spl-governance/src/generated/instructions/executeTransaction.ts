@@ -29,7 +29,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -89,19 +92,22 @@ export function getExecuteTransactionInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ExecuteTransactionInput<
-  TAccountGovernanceAccount extends string = string,
-  TAccountProposalAccount extends string = string,
-  TAccountProposalTransactionAccount extends string = string,
+  TAccountGovernanceAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProposalAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProposalTransactionAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  governanceAccount: Address<TAccountGovernanceAccount>;
-  proposalAccount: Address<TAccountProposalAccount>;
-  proposalTransactionAccount: Address<TAccountProposalTransactionAccount>;
+  governanceAccount: TAccountGovernanceAccount;
+  proposalAccount: TAccountProposalAccount;
+  proposalTransactionAccount: TAccountProposalTransactionAccount;
 };
 
 export function getExecuteTransactionInstruction<
-  TAccountGovernanceAccount extends string,
-  TAccountProposalAccount extends string,
-  TAccountProposalTransactionAccount extends string,
+  TAccountGovernanceAccount extends InstructionAccountInput,
+  TAccountProposalAccount extends InstructionAccountInput,
+  TAccountProposalTransactionAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: ExecuteTransactionInput<
@@ -109,26 +115,53 @@ export function getExecuteTransactionInstruction<
     TAccountProposalAccount,
     TAccountProposalTransactionAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ExecuteTransactionInstruction<
   TProgramAddress,
-  TAccountGovernanceAccount,
-  TAccountProposalAccount,
-  TAccountProposalTransactionAccount
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAccount,
+    InstructionAccountInputAddress<TAccountGovernanceAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalAccount,
+    InstructionAccountInputAddress<TAccountProposalAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalTransactionAccount,
+    InstructionAccountInputAddress<TAccountProposalTransactionAccount>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     governanceAccount: {
       value: input.governanceAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    proposalAccount: { value: input.proposalAccount ?? null, isWritable: true },
+    proposalAccount: {
+      value: input.proposalAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     proposalTransactionAccount: {
       value: input.proposalTransactionAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
   };
@@ -137,7 +170,6 @@ export function getExecuteTransactionInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("governanceAccount", accounts.governanceAccount),
@@ -151,9 +183,18 @@ export function getExecuteTransactionInstruction<
     programAddress,
   } as ExecuteTransactionInstruction<
     TProgramAddress,
-    TAccountGovernanceAccount,
-    TAccountProposalAccount,
-    TAccountProposalTransactionAccount
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAccount,
+      InstructionAccountInputAddress<TAccountGovernanceAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalAccount,
+      InstructionAccountInputAddress<TAccountProposalAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalTransactionAccount,
+      InstructionAccountInputAddress<TAccountProposalTransactionAccount>
+    >
   >);
 }
 

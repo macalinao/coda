@@ -27,14 +27,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findAssetSignerPda } from "../pdas/index.ts";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -138,28 +141,31 @@ export function getExecuteV1InstructionDataCodec(): Codec<
 }
 
 export type ExecuteV1AsyncInput<
-  TAccountAsset extends string = string,
-  TAccountCollection extends string = string,
-  TAccountAssetSigner extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountProgramId extends string = string,
+  TAccountAsset extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAssetSigner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionAccountInput | InstructionSignerInput =
+    | InstructionAccountInput
+    | InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgramId extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** The address of the asset */
-  asset: Address<TAccountAsset>;
+  asset: TAccountAsset;
   /** The collection to which the asset belongs */
-  collection?: Address<TAccountCollection>;
+  collection?: TAccountCollection;
   /** The signing PDA for the asset */
-  assetSigner?: Address<TAccountAssetSigner>;
+  assetSigner?: TAccountAssetSigner;
   /** The account paying for the storage fees */
-  payer: Address<TAccountPayer> | TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The owner or delegate of the asset */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   /** The system program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The program id of the instruction */
-  programId?: Address<TAccountProgramId>;
+  programId?: TAccountProgramId;
   executeV1Args: ExecuteV1InstructionDataArgs["executeV1Args"];
 };
 
@@ -174,13 +180,13 @@ export type ExecuteV1AsyncInput<
  * number. Not available for compressed assets.
  */
 export async function getExecuteV1InstructionAsync<
-  TAccountAsset extends string,
-  TAccountCollection extends string,
-  TAccountAssetSigner extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountSystemProgram extends string,
-  TAccountProgramId extends string,
+  TAccountAsset extends InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput,
+  TAccountAssetSigner extends InstructionAccountInput,
+  TAccountPayer extends InstructionAccountInput | InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountProgramId extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: ExecuteV1AsyncInput<
@@ -192,34 +198,87 @@ export async function getExecuteV1InstructionAsync<
     TAccountSystemProgram,
     TAccountProgramId
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   ExecuteV1Instruction<
     TProgramAddress,
-    TAccountAsset,
-    TAccountCollection,
-    TAccountAssetSigner,
-    (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
-      ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
-      : TAccountPayer,
-    TAccountAuthority,
-    TAccountSystemProgram,
-    TAccountProgramId
+    ResolvedInstructionAccountMeta<
+      TAccountAsset,
+      InstructionAccountInputAddress<TAccountAsset>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssetSigner,
+      InstructionAccountInputAddress<TAccountAssetSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>,
+      WritableSignerAccount<InstructionAccountInputAddress<TAccountPayer>> &
+        AccountSignerMeta<InstructionAccountInputAddress<TAccountPayer>>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramId,
+      InstructionAccountInputAddress<TAccountProgramId>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    asset: { value: input.asset ?? null, isWritable: true },
-    collection: { value: input.collection ?? null, isWritable: true },
-    assetSigner: { value: input.assetSigner ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    programId: { value: input.programId ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isSigner: false, isWritable: true },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    assetSigner: {
+      value: input.assetSigner ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: "either", isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    programId: {
+      value: input.programId ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -250,7 +309,6 @@ export async function getExecuteV1InstructionAsync<
     accounts.programId.isWritable = false;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("asset", accounts.asset),
@@ -267,41 +325,65 @@ export async function getExecuteV1InstructionAsync<
     programAddress,
   } as ExecuteV1Instruction<
     TProgramAddress,
-    TAccountAsset,
-    TAccountCollection,
-    TAccountAssetSigner,
-    (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
-      ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
-      : TAccountPayer,
-    TAccountAuthority,
-    TAccountSystemProgram,
-    TAccountProgramId
+    ResolvedInstructionAccountMeta<
+      TAccountAsset,
+      InstructionAccountInputAddress<TAccountAsset>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssetSigner,
+      InstructionAccountInputAddress<TAccountAssetSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>,
+      WritableSignerAccount<InstructionAccountInputAddress<TAccountPayer>> &
+        AccountSignerMeta<InstructionAccountInputAddress<TAccountPayer>>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramId,
+      InstructionAccountInputAddress<TAccountProgramId>
+    >
   >);
 }
 
 export type ExecuteV1Input<
-  TAccountAsset extends string = string,
-  TAccountCollection extends string = string,
-  TAccountAssetSigner extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountProgramId extends string = string,
+  TAccountAsset extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAssetSigner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionAccountInput | InstructionSignerInput =
+    | InstructionAccountInput
+    | InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgramId extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** The address of the asset */
-  asset: Address<TAccountAsset>;
+  asset: TAccountAsset;
   /** The collection to which the asset belongs */
-  collection?: Address<TAccountCollection>;
+  collection?: TAccountCollection;
   /** The signing PDA for the asset */
-  assetSigner: Address<TAccountAssetSigner>;
+  assetSigner: TAccountAssetSigner;
   /** The account paying for the storage fees */
-  payer: Address<TAccountPayer> | TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The owner or delegate of the asset */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   /** The system program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The program id of the instruction */
-  programId?: Address<TAccountProgramId>;
+  programId?: TAccountProgramId;
   executeV1Args: ExecuteV1InstructionDataArgs["executeV1Args"];
 };
 
@@ -316,13 +398,13 @@ export type ExecuteV1Input<
  * number. Not available for compressed assets.
  */
 export function getExecuteV1Instruction<
-  TAccountAsset extends string,
-  TAccountCollection extends string,
-  TAccountAssetSigner extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountSystemProgram extends string,
-  TAccountProgramId extends string,
+  TAccountAsset extends InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput,
+  TAccountAssetSigner extends InstructionAccountInput,
+  TAccountPayer extends InstructionAccountInput | InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountProgramId extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: ExecuteV1Input<
@@ -334,32 +416,85 @@ export function getExecuteV1Instruction<
     TAccountSystemProgram,
     TAccountProgramId
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ExecuteV1Instruction<
   TProgramAddress,
-  TAccountAsset,
-  TAccountCollection,
-  TAccountAssetSigner,
-  (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
-    ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
-    : TAccountPayer,
-  TAccountAuthority,
-  TAccountSystemProgram,
-  TAccountProgramId
+  ResolvedInstructionAccountMeta<
+    TAccountAsset,
+    InstructionAccountInputAddress<TAccountAsset>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollection,
+    InstructionAccountInputAddress<TAccountCollection>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAssetSigner,
+    InstructionAccountInputAddress<TAccountAssetSigner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>,
+    WritableSignerAccount<InstructionAccountInputAddress<TAccountPayer>> &
+      AccountSignerMeta<InstructionAccountInputAddress<TAccountPayer>>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgramId,
+    InstructionAccountInputAddress<TAccountProgramId>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    asset: { value: input.asset ?? null, isWritable: true },
-    collection: { value: input.collection ?? null, isWritable: true },
-    assetSigner: { value: input.assetSigner ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    programId: { value: input.programId ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isSigner: false, isWritable: true },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    assetSigner: {
+      value: input.assetSigner ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: "either", isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    programId: {
+      value: input.programId ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -379,7 +514,6 @@ export function getExecuteV1Instruction<
     accounts.programId.isWritable = false;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("asset", accounts.asset),
@@ -396,15 +530,36 @@ export function getExecuteV1Instruction<
     programAddress,
   } as ExecuteV1Instruction<
     TProgramAddress,
-    TAccountAsset,
-    TAccountCollection,
-    TAccountAssetSigner,
-    (typeof input)["payer"] extends TransactionSigner<TAccountPayer>
-      ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
-      : TAccountPayer,
-    TAccountAuthority,
-    TAccountSystemProgram,
-    TAccountProgramId
+    ResolvedInstructionAccountMeta<
+      TAccountAsset,
+      InstructionAccountInputAddress<TAccountAsset>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssetSigner,
+      InstructionAccountInputAddress<TAccountAssetSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>,
+      WritableSignerAccount<InstructionAccountInputAddress<TAccountPayer>> &
+        AccountSignerMeta<InstructionAccountInputAddress<TAccountPayer>>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramId,
+      InstructionAccountInputAddress<TAccountProgramId>
+    >
   >);
 }
 

@@ -34,13 +34,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_REDEEMER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -130,32 +133,36 @@ export function getRedeemTokensInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RedeemTokensAsyncInput<
-  TAccountRedeemer extends string = string,
-  TAccountSourceAuthority extends string = string,
-  TAccountIouMint extends string = string,
-  TAccountIouSource extends string = string,
-  TAccountRedemptionVault extends string = string,
-  TAccountRedemptionDestination extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountRedeemer extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSourceAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountIouMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountIouSource extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRedemptionVault extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRedemptionDestination extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  redeemer: Address<TAccountRedeemer>;
-  sourceAuthority: TransactionSigner<TAccountSourceAuthority>;
-  iouMint: Address<TAccountIouMint>;
-  iouSource?: Address<TAccountIouSource>;
-  redemptionVault: Address<TAccountRedemptionVault>;
-  redemptionDestination: Address<TAccountRedemptionDestination>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  redeemer: TAccountRedeemer;
+  sourceAuthority: TAccountSourceAuthority;
+  iouMint: TAccountIouMint;
+  iouSource?: TAccountIouSource;
+  redemptionVault: TAccountRedemptionVault;
+  redemptionDestination: TAccountRedemptionDestination;
+  tokenProgram?: TAccountTokenProgram;
   amount: RedeemTokensInstructionDataArgs["amount"];
 };
 
 export async function getRedeemTokensInstructionAsync<
-  TAccountRedeemer extends string,
-  TAccountSourceAuthority extends string,
-  TAccountIouMint extends string,
-  TAccountIouSource extends string,
-  TAccountRedemptionVault extends string,
-  TAccountRedemptionDestination extends string,
-  TAccountTokenProgram extends string,
+  TAccountRedeemer extends InstructionAccountInput,
+  TAccountSourceAuthority extends InstructionSignerInput,
+  TAccountIouMint extends InstructionAccountInput,
+  TAccountIouSource extends InstructionAccountInput,
+  TAccountRedemptionVault extends InstructionAccountInput,
+  TAccountRedemptionDestination extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
 >(
   input: RedeemTokensAsyncInput<
@@ -167,38 +174,93 @@ export async function getRedeemTokensInstructionAsync<
     TAccountRedemptionDestination,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   RedeemTokensInstruction<
     TProgramAddress,
-    TAccountRedeemer,
-    TAccountSourceAuthority,
-    TAccountIouMint,
-    TAccountIouSource,
-    TAccountRedemptionVault,
-    TAccountRedemptionDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRedeemer,
+      InstructionAccountInputAddress<TAccountRedeemer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSourceAuthority,
+      InstructionAccountInputAddress<TAccountSourceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountIouMint,
+      InstructionAccountInputAddress<TAccountIouMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountIouSource,
+      InstructionAccountInputAddress<TAccountIouSource>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRedemptionVault,
+      InstructionAccountInputAddress<TAccountRedemptionVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRedemptionDestination,
+      InstructionAccountInputAddress<TAccountRedemptionDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_REDEEMER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    redeemer: { value: input.redeemer ?? null, isWritable: true },
-    sourceAuthority: {
-      value: input.sourceAuthority ?? null,
-      isWritable: false,
-    },
-    iouMint: { value: input.iouMint ?? null, isWritable: true },
-    iouSource: { value: input.iouSource ?? null, isWritable: true },
-    redemptionVault: { value: input.redemptionVault ?? null, isWritable: true },
-    redemptionDestination: {
-      value: input.redemptionDestination ?? null,
+    redeemer: {
+      value: input.redeemer ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    sourceAuthority: {
+      value: input.sourceAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    iouMint: {
+      value: input.iouMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    iouSource: {
+      value: input.iouSource ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    redemptionVault: {
+      value: input.redemptionVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    redemptionDestination: {
+      value: input.redemptionDestination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -237,7 +299,6 @@ export async function getRedeemTokensInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("redeemer", accounts.redeemer),
@@ -254,43 +315,68 @@ export async function getRedeemTokensInstructionAsync<
     programAddress,
   } as RedeemTokensInstruction<
     TProgramAddress,
-    TAccountRedeemer,
-    TAccountSourceAuthority,
-    TAccountIouMint,
-    TAccountIouSource,
-    TAccountRedemptionVault,
-    TAccountRedemptionDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRedeemer,
+      InstructionAccountInputAddress<TAccountRedeemer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSourceAuthority,
+      InstructionAccountInputAddress<TAccountSourceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountIouMint,
+      InstructionAccountInputAddress<TAccountIouMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountIouSource,
+      InstructionAccountInputAddress<TAccountIouSource>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRedemptionVault,
+      InstructionAccountInputAddress<TAccountRedemptionVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRedemptionDestination,
+      InstructionAccountInputAddress<TAccountRedemptionDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 
 export type RedeemTokensInput<
-  TAccountRedeemer extends string = string,
-  TAccountSourceAuthority extends string = string,
-  TAccountIouMint extends string = string,
-  TAccountIouSource extends string = string,
-  TAccountRedemptionVault extends string = string,
-  TAccountRedemptionDestination extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountRedeemer extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSourceAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountIouMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountIouSource extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRedemptionVault extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRedemptionDestination extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  redeemer: Address<TAccountRedeemer>;
-  sourceAuthority: TransactionSigner<TAccountSourceAuthority>;
-  iouMint: Address<TAccountIouMint>;
-  iouSource: Address<TAccountIouSource>;
-  redemptionVault: Address<TAccountRedemptionVault>;
-  redemptionDestination: Address<TAccountRedemptionDestination>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  redeemer: TAccountRedeemer;
+  sourceAuthority: TAccountSourceAuthority;
+  iouMint: TAccountIouMint;
+  iouSource: TAccountIouSource;
+  redemptionVault: TAccountRedemptionVault;
+  redemptionDestination: TAccountRedemptionDestination;
+  tokenProgram?: TAccountTokenProgram;
   amount: RedeemTokensInstructionDataArgs["amount"];
 };
 
 export function getRedeemTokensInstruction<
-  TAccountRedeemer extends string,
-  TAccountSourceAuthority extends string,
-  TAccountIouMint extends string,
-  TAccountIouSource extends string,
-  TAccountRedemptionVault extends string,
-  TAccountRedemptionDestination extends string,
-  TAccountTokenProgram extends string,
+  TAccountRedeemer extends InstructionAccountInput,
+  TAccountSourceAuthority extends InstructionSignerInput,
+  TAccountIouMint extends InstructionAccountInput,
+  TAccountIouSource extends InstructionAccountInput,
+  TAccountRedemptionVault extends InstructionAccountInput,
+  TAccountRedemptionDestination extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_REDEEMER_PROGRAM_ADDRESS,
 >(
   input: RedeemTokensInput<
@@ -302,36 +388,91 @@ export function getRedeemTokensInstruction<
     TAccountRedemptionDestination,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RedeemTokensInstruction<
   TProgramAddress,
-  TAccountRedeemer,
-  TAccountSourceAuthority,
-  TAccountIouMint,
-  TAccountIouSource,
-  TAccountRedemptionVault,
-  TAccountRedemptionDestination,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRedeemer,
+    InstructionAccountInputAddress<TAccountRedeemer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSourceAuthority,
+    InstructionAccountInputAddress<TAccountSourceAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountIouMint,
+    InstructionAccountInputAddress<TAccountIouMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountIouSource,
+    InstructionAccountInputAddress<TAccountIouSource>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRedemptionVault,
+    InstructionAccountInputAddress<TAccountRedemptionVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRedemptionDestination,
+    InstructionAccountInputAddress<TAccountRedemptionDestination>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_REDEEMER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    redeemer: { value: input.redeemer ?? null, isWritable: true },
-    sourceAuthority: {
-      value: input.sourceAuthority ?? null,
-      isWritable: false,
-    },
-    iouMint: { value: input.iouMint ?? null, isWritable: true },
-    iouSource: { value: input.iouSource ?? null, isWritable: true },
-    redemptionVault: { value: input.redemptionVault ?? null, isWritable: true },
-    redemptionDestination: {
-      value: input.redemptionDestination ?? null,
+    redeemer: {
+      value: input.redeemer ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    sourceAuthority: {
+      value: input.sourceAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    iouMint: {
+      value: input.iouMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    iouSource: {
+      value: input.iouSource ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    redemptionVault: {
+      value: input.redemptionVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    redemptionDestination: {
+      value: input.redemptionDestination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -347,7 +488,6 @@ export function getRedeemTokensInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("redeemer", accounts.redeemer),
@@ -364,13 +504,34 @@ export function getRedeemTokensInstruction<
     programAddress,
   } as RedeemTokensInstruction<
     TProgramAddress,
-    TAccountRedeemer,
-    TAccountSourceAuthority,
-    TAccountIouMint,
-    TAccountIouSource,
-    TAccountRedemptionVault,
-    TAccountRedemptionDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRedeemer,
+      InstructionAccountInputAddress<TAccountRedeemer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSourceAuthority,
+      InstructionAccountInputAddress<TAccountSourceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountIouMint,
+      InstructionAccountInputAddress<TAccountIouMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountIouSource,
+      InstructionAccountInputAddress<TAccountIouSource>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRedemptionVault,
+      InstructionAccountInputAddress<TAccountRedemptionVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRedemptionDestination,
+      InstructionAccountInputAddress<TAccountRedemptionDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

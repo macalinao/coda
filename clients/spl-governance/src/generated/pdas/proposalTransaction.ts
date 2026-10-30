@@ -13,11 +13,12 @@ import {
   getU8Encoder,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type ProposalTransactionSeeds = {
-  proposal: Address;
+  proposal: Address | HasAddress;
   optionIndex: number;
   index: number;
 };
@@ -25,11 +26,16 @@ export type ProposalTransactionSeeds = {
 /** Transaction within a proposal option */
 export async function findProposalTransactionPda(
   seeds: ProposalTransactionSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">,
+    programAddress:
+      programAddressInput = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

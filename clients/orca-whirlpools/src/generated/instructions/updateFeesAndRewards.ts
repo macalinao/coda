@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -104,22 +107,24 @@ export function getUpdateFeesAndRewardsInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateFeesAndRewardsInput<
-  TAccountWhirlpool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountTickArrayLower extends string = string,
-  TAccountTickArrayUpper extends string = string,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTickArrayLower extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTickArrayUpper extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  whirlpool: Address<TAccountWhirlpool>;
-  position: Address<TAccountPosition>;
-  tickArrayLower: Address<TAccountTickArrayLower>;
-  tickArrayUpper: Address<TAccountTickArrayUpper>;
+  whirlpool: TAccountWhirlpool;
+  position: TAccountPosition;
+  tickArrayLower: TAccountTickArrayLower;
+  tickArrayUpper: TAccountTickArrayUpper;
 };
 
 export function getUpdateFeesAndRewardsInstruction<
-  TAccountWhirlpool extends string,
-  TAccountPosition extends string,
-  TAccountTickArrayLower extends string,
-  TAccountTickArrayUpper extends string,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountTickArrayLower extends InstructionAccountInput,
+  TAccountTickArrayUpper extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: UpdateFeesAndRewardsInput<
@@ -128,30 +133,70 @@ export function getUpdateFeesAndRewardsInstruction<
     TAccountTickArrayLower,
     TAccountTickArrayUpper
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateFeesAndRewardsInstruction<
   TProgramAddress,
-  TAccountWhirlpool,
-  TAccountPosition,
-  TAccountTickArrayLower,
-  TAccountTickArrayUpper
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayLower,
+    InstructionAccountInputAddress<TAccountTickArrayLower>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayUpper,
+    InstructionAccountInputAddress<TAccountTickArrayUpper>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    whirlpool: { value: input.whirlpool ?? null, isWritable: true },
-    position: { value: input.position ?? null, isWritable: true },
-    tickArrayLower: { value: input.tickArrayLower ?? null, isWritable: false },
-    tickArrayUpper: { value: input.tickArrayUpper ?? null, isWritable: false },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tickArrayLower: {
+      value: input.tickArrayLower ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tickArrayUpper: {
+      value: input.tickArrayUpper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpool", accounts.whirlpool),
@@ -163,10 +208,22 @@ export function getUpdateFeesAndRewardsInstruction<
     programAddress,
   } as UpdateFeesAndRewardsInstruction<
     TProgramAddress,
-    TAccountWhirlpool,
-    TAccountPosition,
-    TAccountTickArrayLower,
-    TAccountTickArrayUpper
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayLower,
+      InstructionAccountInputAddress<TAccountTickArrayLower>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayUpper,
+      InstructionAccountInputAddress<TAccountTickArrayUpper>
+    >
   >);
 }
 

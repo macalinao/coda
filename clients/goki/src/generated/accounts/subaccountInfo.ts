@@ -26,12 +26,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -65,7 +69,7 @@ export type SubaccountInfo = {
 };
 
 export type SubaccountInfoArgs = {
-  smartWallet: Address;
+  smartWallet: Address | HasAddress;
   subaccountType: SubaccountTypeArgs;
   index: number | bigint;
 };
@@ -117,8 +121,10 @@ export function decodeSubaccountInfo<TAddress extends string = string>(
 }
 
 export async function fetchSubaccountInfo<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<SubaccountInfo, TAddress>> {
   const maybeAccount = await fetchMaybeSubaccountInfo(rpc, address, config);
@@ -129,17 +135,25 @@ export async function fetchSubaccountInfo<TAddress extends string = string>(
 export async function fetchMaybeSubaccountInfo<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<SubaccountInfo, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeSubaccountInfo(maybeAccount);
 }
 
 export async function fetchAllSubaccountInfo(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<SubaccountInfo>[]> {
   const maybeAccounts = await fetchAllMaybeSubaccountInfo(
@@ -152,20 +166,28 @@ export async function fetchAllSubaccountInfo(
 }
 
 export async function fetchAllMaybeSubaccountInfo(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<SubaccountInfo>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeSubaccountInfo(maybeAccount),
   );
 }
 
 export async function fetchSubaccountInfoFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: SubaccountInfoSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<SubaccountInfo>> {
   const maybeAccount = await fetchMaybeSubaccountInfoFromSeeds(
     rpc,
@@ -177,9 +199,11 @@ export async function fetchSubaccountInfoFromSeeds(
 }
 
 export async function fetchMaybeSubaccountInfoFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: SubaccountInfoSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<SubaccountInfo>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findSubaccountInfoPda(seeds, { programAddress });

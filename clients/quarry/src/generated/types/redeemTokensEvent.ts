@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type RedeemTokensEvent = {
@@ -31,9 +32,9 @@ export type RedeemTokensEvent = {
 };
 
 export type RedeemTokensEventArgs = {
-  user: Address;
-  iouMint: Address;
-  redemptionMint: Address;
+  user: Address | HasAddress;
+  iouMint: Address | HasAddress;
+  redemptionMint: Address | HasAddress;
   amount: number | bigint;
   timestamp: number | bigint;
 };

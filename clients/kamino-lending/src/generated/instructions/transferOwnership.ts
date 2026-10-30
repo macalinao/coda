@@ -25,17 +25,21 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -73,7 +77,9 @@ export type TransferOwnershipInstructionData = {
   newOwner: Address;
 };
 
-export type TransferOwnershipInstructionDataArgs = { newOwner: Address };
+export type TransferOwnershipInstructionDataArgs = {
+  newOwner: Address | HasAddress;
+};
 
 export function getTransferOwnershipInstructionDataEncoder(): FixedSizeEncoder<TransferOwnershipInstructionDataArgs> {
   return transformEncoder(
@@ -103,33 +109,55 @@ export function getTransferOwnershipInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type TransferOwnershipInput<
-  TAccountOwner extends string = string,
-  TAccountUserState extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  userState: Address<TAccountUserState>;
+  owner: TAccountOwner;
+  userState: TAccountUserState;
   newOwner: TransferOwnershipInstructionDataArgs["newOwner"];
 };
 
 export function getTransferOwnershipInstruction<
-  TAccountOwner extends string,
-  TAccountUserState extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: TransferOwnershipInput<TAccountOwner, TAccountUserState>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): TransferOwnershipInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountUserState
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserState,
+    InstructionAccountInputAddress<TAccountUserState>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    userState: { value: input.userState ?? null, isWritable: true },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -139,7 +167,6 @@ export function getTransferOwnershipInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -151,8 +178,14 @@ export function getTransferOwnershipInstruction<
     programAddress,
   } as TransferOwnershipInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountUserState
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >
   >);
 }
 

@@ -20,6 +20,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -55,7 +56,7 @@ export type LifecycleHook = {
 
 export type LifecycleHookArgs = {
   /** The program invoked via CPI at the configured lifecycle events. */
-  hookedProgram: Address;
+  hookedProgram: Address | HasAddress;
   /** Additional accounts to forward to the hooked program. */
   extraAccounts: OptionOrNullable<Array<ExtraAccountArgs>>;
   /** The authority allowed to write data returned by the hook, if any. */

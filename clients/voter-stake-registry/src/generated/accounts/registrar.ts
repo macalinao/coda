@@ -32,12 +32,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -73,10 +77,10 @@ export type Registrar = {
 };
 
 export type RegistrarArgs = {
-  governanceProgramId: Address;
-  realm: Address;
-  realmGoverningTokenMint: Address;
-  realmAuthority: Address;
+  governanceProgramId: Address | HasAddress;
+  realm: Address | HasAddress;
+  realmGoverningTokenMint: Address | HasAddress;
+  realmAuthority: Address | HasAddress;
   reserved1: Array<number>;
   votingMints: Array<VotingMintConfigArgs>;
   timeOffset: number | bigint;
@@ -146,8 +150,10 @@ export function decodeRegistrar<TAddress extends string = string>(
 }
 
 export async function fetchRegistrar<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Registrar, TAddress>> {
   const maybeAccount = await fetchMaybeRegistrar(rpc, address, config);
@@ -156,17 +162,25 @@ export async function fetchRegistrar<TAddress extends string = string>(
 }
 
 export async function fetchMaybeRegistrar<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Registrar, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeRegistrar(maybeAccount);
 }
 
 export async function fetchAllRegistrar(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Registrar>[]> {
   const maybeAccounts = await fetchAllMaybeRegistrar(rpc, addresses, config);
@@ -175,18 +189,26 @@ export async function fetchAllRegistrar(
 }
 
 export async function fetchAllMaybeRegistrar(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Registrar>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeRegistrar(maybeAccount));
 }
 
 export async function fetchRegistrarFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RegistrarSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Registrar>> {
   const maybeAccount = await fetchMaybeRegistrarFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -194,9 +216,11 @@ export async function fetchRegistrarFromSeeds(
 }
 
 export async function fetchMaybeRegistrarFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RegistrarSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Registrar>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findRegistrarPda(seeds, { programAddress });

@@ -18,6 +18,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /**
@@ -33,7 +34,13 @@ export type UpdateDelegate = {
   additionalDelegates: Array<Address>;
 };
 
-export type UpdateDelegateArgs = UpdateDelegate;
+export type UpdateDelegateArgs = {
+  /**
+   * Extra addresses, beyond the update authority, allowed to
+   * update the asset.
+   */
+  additionalDelegates: Array<Address | HasAddress>;
+};
 
 export function getUpdateDelegateEncoder(): Encoder<UpdateDelegateArgs> {
   return getStructEncoder([

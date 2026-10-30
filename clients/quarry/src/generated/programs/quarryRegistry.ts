@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -189,10 +190,12 @@ export type QuarryRegistryPluginAccounts = {
 export type QuarryRegistryPluginInstructions = {
   newRegistry: (
     input: MakeOptional<NewRegistryAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewRegistryInstructionAsync> &
     SelfPlanAndSendFunctions;
   syncQuarry: (
     input: SyncQuarryInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSyncQuarryInstruction> & SelfPlanAndSendFunctions;
 };
 
@@ -205,7 +208,9 @@ export type QuarryRegistryPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function quarryRegistryProgram() {
+export function quarryRegistryProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends QuarryRegistryPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { quarryRegistry: QuarryRegistryPlugin }> => {
@@ -215,21 +220,33 @@ export function quarryRegistryProgram() {
           registry: addSelfFetchFunctions(client, getRegistryCodec()),
         },
         instructions: {
-          newRegistry: (input) =>
+          newRegistry: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewRegistryInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getNewRegistryInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          syncQuarry: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSyncQuarryInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          syncQuarry: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSyncQuarryInstruction(input),
-            ),
         },
-        pdas: { registry: findRegistryPda },
+        pdas: {
+          registry: (seeds, pdaConfig) =>
+            findRegistryPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+        },
         identifyAccount: identifyQuarryRegistryAccount,
         identifyInstruction: identifyQuarryRegistryInstruction,
         parseInstruction: parseQuarryRegistryInstruction,

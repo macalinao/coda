@@ -22,6 +22,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 
 /**
@@ -35,7 +36,11 @@ export type Authority =
   | { __kind: "UpdateAuthority" }
   | { __kind: "Address"; address: Address };
 
-export type AuthorityArgs = Authority;
+export type AuthorityArgs =
+  | { __kind: "None" }
+  | { __kind: "Owner" }
+  | { __kind: "UpdateAuthority" }
+  | { __kind: "Address"; address: Address | HasAddress };
 
 export function getAuthorityEncoder(): Encoder<AuthorityArgs> {
   return getDiscriminatedUnionEncoder([

@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -1610,206 +1611,254 @@ export type KaminoLendingPluginAccounts = {
 export type KaminoLendingPluginInstructions = {
   initLendingMarket: (
     input: InitLendingMarketAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitLendingMarketInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateLendingMarket: (
     input: UpdateLendingMarketInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateLendingMarketInstruction> &
     SelfPlanAndSendFunctions;
   updateLendingMarketOwner: (
     input: UpdateLendingMarketOwnerInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateLendingMarketOwnerInstruction> &
     SelfPlanAndSendFunctions;
   initReserve: (
     input: InitReserveAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitReserveInstructionAsync> &
     SelfPlanAndSendFunctions;
   initFarmsForReserve: (
     input: InitFarmsForReserveAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitFarmsForReserveInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateReserveConfig: (
     input: UpdateReserveConfigInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateReserveConfigInstruction> &
     SelfPlanAndSendFunctions;
   redeemFees: (
     input: RedeemFeesAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRedeemFeesInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawProtocolFee: (
     input: WithdrawProtocolFeeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawProtocolFeeInstructionAsync> &
     SelfPlanAndSendFunctions;
   socializeLoss: (
     input: SocializeLossInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSocializeLossInstruction> &
     SelfPlanAndSendFunctions;
   socializeLossV2: (
     input: SocializeLossV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSocializeLossV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   markObligationForDeleveraging: (
     input: MarkObligationForDeleveragingInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getMarkObligationForDeleveragingInstruction> &
     SelfPlanAndSendFunctions;
   refreshReserve: (
     input: RefreshReserveInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefreshReserveInstruction> &
     SelfPlanAndSendFunctions;
   refreshReservesBatch: (
     input: RefreshReservesBatchInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefreshReservesBatchInstruction> &
     SelfPlanAndSendFunctions;
   depositReserveLiquidity: (
     input: DepositReserveLiquidityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositReserveLiquidityInstructionAsync> &
     SelfPlanAndSendFunctions;
   redeemReserveCollateral: (
     input: RedeemReserveCollateralAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRedeemReserveCollateralInstructionAsync> &
     SelfPlanAndSendFunctions;
   initObligation: (
     input: MakeOptional<InitObligationInput, "feePayer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitObligationInstruction> &
     SelfPlanAndSendFunctions;
   initObligationFarmsForReserve: (
     input: MakeOptional<InitObligationFarmsForReserveAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitObligationFarmsForReserveInstructionAsync> &
     SelfPlanAndSendFunctions;
   refreshObligationFarmsForReserve: (
     input: RefreshObligationFarmsForReserveAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefreshObligationFarmsForReserveInstructionAsync> &
     SelfPlanAndSendFunctions;
   refreshObligation: (
     input: RefreshObligationInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefreshObligationInstruction> &
     SelfPlanAndSendFunctions;
   depositObligationCollateral: (
     input: DepositObligationCollateralInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositObligationCollateralInstruction> &
     SelfPlanAndSendFunctions;
   depositObligationCollateralV2: (
     input: DepositObligationCollateralV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositObligationCollateralV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawObligationCollateral: (
     input: WithdrawObligationCollateralAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawObligationCollateralInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawObligationCollateralV2: (
     input: WithdrawObligationCollateralV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawObligationCollateralV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   borrowObligationLiquidity: (
     input: BorrowObligationLiquidityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBorrowObligationLiquidityInstructionAsync> &
     SelfPlanAndSendFunctions;
   borrowObligationLiquidityV2: (
     input: BorrowObligationLiquidityV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBorrowObligationLiquidityV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   repayObligationLiquidity: (
     input: RepayObligationLiquidityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRepayObligationLiquidityInstruction> &
     SelfPlanAndSendFunctions;
   repayObligationLiquidityV2: (
     input: RepayObligationLiquidityV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRepayObligationLiquidityV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   repayAndWithdrawAndRedeem: (
     input: RepayAndWithdrawAndRedeemInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRepayAndWithdrawAndRedeemInstruction> &
     SelfPlanAndSendFunctions;
   depositAndWithdraw: (
     input: DepositAndWithdrawInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositAndWithdrawInstruction> &
     SelfPlanAndSendFunctions;
   depositReserveLiquidityAndObligationCollateral: (
     input: DepositReserveLiquidityAndObligationCollateralAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getDepositReserveLiquidityAndObligationCollateralInstructionAsync
   > &
     SelfPlanAndSendFunctions;
   depositReserveLiquidityAndObligationCollateralV2: (
     input: DepositReserveLiquidityAndObligationCollateralV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getDepositReserveLiquidityAndObligationCollateralV2InstructionAsync
   > &
     SelfPlanAndSendFunctions;
   withdrawObligationCollateralAndRedeemReserveCollateral: (
     input: WithdrawObligationCollateralAndRedeemReserveCollateralAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getWithdrawObligationCollateralAndRedeemReserveCollateralInstructionAsync
   > &
     SelfPlanAndSendFunctions;
   withdrawObligationCollateralAndRedeemReserveCollateralV2: (
     input: WithdrawObligationCollateralAndRedeemReserveCollateralV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getWithdrawObligationCollateralAndRedeemReserveCollateralV2InstructionAsync
   > &
     SelfPlanAndSendFunctions;
   liquidateObligationAndRedeemReserveCollateral: (
     input: LiquidateObligationAndRedeemReserveCollateralAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getLiquidateObligationAndRedeemReserveCollateralInstructionAsync
   > &
     SelfPlanAndSendFunctions;
   liquidateObligationAndRedeemReserveCollateralV2: (
     input: LiquidateObligationAndRedeemReserveCollateralV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getLiquidateObligationAndRedeemReserveCollateralV2Instruction
   > &
     SelfPlanAndSendFunctions;
   flashRepayReserveLiquidity: (
     input: FlashRepayReserveLiquidityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFlashRepayReserveLiquidityInstructionAsync> &
     SelfPlanAndSendFunctions;
   flashBorrowReserveLiquidity: (
     input: FlashBorrowReserveLiquidityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFlashBorrowReserveLiquidityInstructionAsync> &
     SelfPlanAndSendFunctions;
   requestElevationGroup: (
     input: RequestElevationGroupInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRequestElevationGroupInstruction> &
     SelfPlanAndSendFunctions;
   initReferrerTokenState: (
     input: MakeOptional<InitReferrerTokenStateInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitReferrerTokenStateInstruction> &
     SelfPlanAndSendFunctions;
   initUserMetadata: (
     input: MakeOptional<InitUserMetadataInput, "feePayer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitUserMetadataInstruction> &
     SelfPlanAndSendFunctions;
   withdrawReferrerFees: (
     input: WithdrawReferrerFeesAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawReferrerFeesInstructionAsync> &
     SelfPlanAndSendFunctions;
   initReferrerStateAndShortUrl: (
     input: InitReferrerStateAndShortUrlInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitReferrerStateAndShortUrlInstruction> &
     SelfPlanAndSendFunctions;
   deleteReferrerStateAndShortUrl: (
     input: DeleteReferrerStateAndShortUrlInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeleteReferrerStateAndShortUrlInstruction> &
     SelfPlanAndSendFunctions;
   setObligationOrder: (
     input: SetObligationOrderInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetObligationOrderInstruction> &
     SelfPlanAndSendFunctions;
   initGlobalConfig: (
     input: MakeOptional<InitGlobalConfigAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitGlobalConfigInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateGlobalConfig: (
     input: UpdateGlobalConfigInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateGlobalConfigInstruction> &
     SelfPlanAndSendFunctions;
   updateGlobalConfigAdmin: (
     input: UpdateGlobalConfigAdminInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateGlobalConfigAdminInstruction> &
     SelfPlanAndSendFunctions;
   idlMissingTypes: (
     input: IdlMissingTypesInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getIdlMissingTypesInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -1835,7 +1884,9 @@ export type KaminoLendingPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function kaminoLendingProgram() {
+export function kaminoLendingProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends KaminoLendingPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { kaminoLending: KaminoLendingPlugin }> => {
@@ -1859,286 +1910,498 @@ export function kaminoLendingProgram() {
           reserve: addSelfFetchFunctions(client, getReserveCodec()),
         },
         instructions: {
-          initLendingMarket: (input) =>
+          initLendingMarket: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitLendingMarketInstructionAsync(input),
-            ),
-          updateLendingMarket: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateLendingMarketInstruction(input),
-            ),
-          updateLendingMarketOwner: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateLendingMarketOwnerInstruction(input),
-            ),
-          initReserve: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitReserveInstructionAsync(input),
-            ),
-          initFarmsForReserve: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitFarmsForReserveInstructionAsync(input),
-            ),
-          updateReserveConfig: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateReserveConfigInstruction(input),
-            ),
-          redeemFees: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRedeemFeesInstructionAsync(input),
-            ),
-          withdrawProtocolFee: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getWithdrawProtocolFeeInstructionAsync(input),
-            ),
-          socializeLoss: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSocializeLossInstruction(input),
-            ),
-          socializeLossV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSocializeLossV2InstructionAsync(input),
-            ),
-          markObligationForDeleveraging: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getMarkObligationForDeleveragingInstruction(input),
-            ),
-          refreshReserve: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRefreshReserveInstruction(input),
-            ),
-          refreshReservesBatch: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRefreshReservesBatchInstruction(input),
-            ),
-          depositReserveLiquidity: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDepositReserveLiquidityInstructionAsync(input),
-            ),
-          redeemReserveCollateral: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRedeemReserveCollateralInstructionAsync(input),
-            ),
-          initObligation: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitObligationInstruction({
-                ...input,
-                feePayer: input.feePayer ?? client.payer,
+              getInitLendingMarketInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initObligationFarmsForReserve: (input) =>
+          updateLendingMarket: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitObligationFarmsForReserveInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUpdateLendingMarketInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          refreshObligationFarmsForReserve: (input) =>
+          updateLendingMarketOwner: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRefreshObligationFarmsForReserveInstructionAsync(input),
+              getUpdateLendingMarketOwnerInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          refreshObligation: (input) =>
+          initReserve: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRefreshObligationInstruction(input),
+              getInitReserveInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          depositObligationCollateral: (input) =>
+          initFarmsForReserve: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDepositObligationCollateralInstruction(input),
+              getInitFarmsForReserveInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          depositObligationCollateralV2: (input) =>
+          updateReserveConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDepositObligationCollateralV2InstructionAsync(input),
+              getUpdateReserveConfigInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawObligationCollateral: (input) =>
+          redeemFees: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawObligationCollateralInstructionAsync(input),
+              getRedeemFeesInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawObligationCollateralV2: (input) =>
+          withdrawProtocolFee: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawObligationCollateralV2InstructionAsync(input),
+              getWithdrawProtocolFeeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          borrowObligationLiquidity: (input) =>
+          socializeLoss: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getBorrowObligationLiquidityInstructionAsync(input),
+              getSocializeLossInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          borrowObligationLiquidityV2: (input) =>
+          socializeLossV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getBorrowObligationLiquidityV2InstructionAsync(input),
+              getSocializeLossV2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          repayObligationLiquidity: (input) =>
+          markObligationForDeleveraging: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRepayObligationLiquidityInstruction(input),
+              getMarkObligationForDeleveragingInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          repayObligationLiquidityV2: (input) =>
+          refreshReserve: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRepayObligationLiquidityV2InstructionAsync(input),
+              getRefreshReserveInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          repayAndWithdrawAndRedeem: (input) =>
+          refreshReservesBatch: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRepayAndWithdrawAndRedeemInstruction(input),
+              getRefreshReservesBatchInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          depositAndWithdraw: (input) =>
+          depositReserveLiquidity: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDepositAndWithdrawInstruction(input),
+              getDepositReserveLiquidityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          depositReserveLiquidityAndObligationCollateral: (input) =>
+          redeemReserveCollateral: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemReserveCollateralInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          initObligation: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitObligationInstruction(
+                { ...input, feePayer: input.feePayer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initObligationFarmsForReserve: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitObligationFarmsForReserveInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          refreshObligationFarmsForReserve: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshObligationFarmsForReserveInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          refreshObligation: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshObligationInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositObligationCollateral: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositObligationCollateralInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositObligationCollateralV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositObligationCollateralV2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawObligationCollateral: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawObligationCollateralInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawObligationCollateralV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawObligationCollateralV2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          borrowObligationLiquidity: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBorrowObligationLiquidityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          borrowObligationLiquidityV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBorrowObligationLiquidityV2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          repayObligationLiquidity: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRepayObligationLiquidityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          repayObligationLiquidityV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRepayObligationLiquidityV2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          repayAndWithdrawAndRedeem: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRepayAndWithdrawAndRedeemInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositAndWithdraw: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositAndWithdrawInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositReserveLiquidityAndObligationCollateral: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
               getDepositReserveLiquidityAndObligationCollateralInstructionAsync(
                 input,
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
               ),
             ),
-          depositReserveLiquidityAndObligationCollateralV2: (input) =>
+          depositReserveLiquidityAndObligationCollateralV2: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
               getDepositReserveLiquidityAndObligationCollateralV2InstructionAsync(
                 input,
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
               ),
             ),
-          withdrawObligationCollateralAndRedeemReserveCollateral: (input) =>
+          withdrawObligationCollateralAndRedeemReserveCollateral: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
               getWithdrawObligationCollateralAndRedeemReserveCollateralInstructionAsync(
                 input,
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
               ),
             ),
-          withdrawObligationCollateralAndRedeemReserveCollateralV2: (input) =>
+          withdrawObligationCollateralAndRedeemReserveCollateralV2: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
               getWithdrawObligationCollateralAndRedeemReserveCollateralV2InstructionAsync(
                 input,
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
               ),
             ),
-          liquidateObligationAndRedeemReserveCollateral: (input) =>
+          liquidateObligationAndRedeemReserveCollateral: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
               getLiquidateObligationAndRedeemReserveCollateralInstructionAsync(
                 input,
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
               ),
             ),
-          liquidateObligationAndRedeemReserveCollateralV2: (input) =>
+          liquidateObligationAndRedeemReserveCollateralV2: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
               getLiquidateObligationAndRedeemReserveCollateralV2Instruction(
                 input,
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
               ),
             ),
-          flashRepayReserveLiquidity: (input) =>
+          flashRepayReserveLiquidity: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getFlashRepayReserveLiquidityInstructionAsync(input),
-            ),
-          flashBorrowReserveLiquidity: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getFlashBorrowReserveLiquidityInstructionAsync(input),
-            ),
-          requestElevationGroup: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRequestElevationGroupInstruction(input),
-            ),
-          initReferrerTokenState: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitReferrerTokenStateInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getFlashRepayReserveLiquidityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initUserMetadata: (input) =>
+          flashBorrowReserveLiquidity: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitUserMetadataInstruction({
-                ...input,
-                feePayer: input.feePayer ?? client.payer,
+              getFlashBorrowReserveLiquidityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          withdrawReferrerFees: (input) =>
+          requestElevationGroup: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawReferrerFeesInstructionAsync(input),
-            ),
-          initReferrerStateAndShortUrl: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitReferrerStateAndShortUrlInstruction(input),
-            ),
-          deleteReferrerStateAndShortUrl: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDeleteReferrerStateAndShortUrlInstruction(input),
-            ),
-          setObligationOrder: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetObligationOrderInstruction(input),
-            ),
-          initGlobalConfig: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitGlobalConfigInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getRequestElevationGroupInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          updateGlobalConfig: (input) =>
+          initReferrerTokenState: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateGlobalConfigInstruction(input),
+              getInitReferrerTokenStateInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          updateGlobalConfigAdmin: (input) =>
+          initUserMetadata: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateGlobalConfigAdminInstruction(input),
+              getInitUserMetadataInstruction(
+                { ...input, feePayer: input.feePayer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          idlMissingTypes: (input) =>
+          withdrawReferrerFees: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getIdlMissingTypesInstruction(input),
+              getWithdrawReferrerFeesInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          initReferrerStateAndShortUrl: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitReferrerStateAndShortUrlInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          deleteReferrerStateAndShortUrl: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeleteReferrerStateAndShortUrlInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setObligationOrder: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetObligationOrderInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          initGlobalConfig: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitGlobalConfigInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateGlobalConfig: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateGlobalConfigInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          updateGlobalConfigAdmin: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateGlobalConfigAdminInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          idlMissingTypes: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIdlMissingTypesInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          lendingGlobalConfigState: findLendingGlobalConfigStatePda,
-          obligation: findObligationPda,
-          lendingMarketAuth: findLendingMarketAuthPda,
-          reserveLiquiditySupply: findReserveLiquiditySupplyPda,
-          reserveFeeVault: findReserveFeeVaultPda,
-          reserveCollateralMint: findReserveCollateralMintPda,
-          reserveCollateralSupply: findReserveCollateralSupplyPda,
-          userMetadata: findUserMetadataPda,
-          referrerTokenState: findReferrerTokenStatePda,
-          referrerState: findReferrerStatePda,
-          shortUrl: findShortUrlPda,
+          lendingGlobalConfigState: (pdaConfig) =>
+            findLendingGlobalConfigStatePda({
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          obligation: (seeds, pdaConfig) =>
+            findObligationPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          lendingMarketAuth: (seeds, pdaConfig) =>
+            findLendingMarketAuthPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          reserveLiquiditySupply: (seeds, pdaConfig) =>
+            findReserveLiquiditySupplyPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          reserveFeeVault: (seeds, pdaConfig) =>
+            findReserveFeeVaultPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          reserveCollateralMint: (seeds, pdaConfig) =>
+            findReserveCollateralMintPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          reserveCollateralSupply: (seeds, pdaConfig) =>
+            findReserveCollateralSupplyPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          userMetadata: (seeds, pdaConfig) =>
+            findUserMetadataPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          referrerTokenState: (seeds, pdaConfig) =>
+            findReferrerTokenStatePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          referrerState: (seeds, pdaConfig) =>
+            findReferrerStatePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          shortUrl: (seeds, pdaConfig) =>
+            findShortUrlPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyKaminoLendingAccount,
         identifyInstruction: identifyKaminoLendingInstruction,

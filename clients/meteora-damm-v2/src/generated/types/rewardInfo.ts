@@ -24,6 +24,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Stores the state relevant for tracking liquidity mining rewards */
@@ -69,11 +70,11 @@ export type RewardInfoArgs = {
   /** Padding to ensure `reward_rate: u128` is 16-byte aligned */
   padding1: Array<number>;
   /** Reward token mint. */
-  mint: Address;
+  mint: Address | HasAddress;
   /** Reward vault token account. */
-  vault: Address;
+  vault: Address | HasAddress;
   /** Authority account that allows to fund rewards */
-  funder: Address;
+  funder: Address | HasAddress;
   /** reward duration */
   rewardDuration: number | bigint;
   /** reward duration end */

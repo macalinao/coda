@@ -11,23 +11,29 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type TokenOwnerRecordSeeds = {
-  realm: Address;
-  governingTokenMint: Address;
-  governingTokenOwner: Address;
+  realm: Address | HasAddress;
+  governingTokenMint: Address | HasAddress;
+  governingTokenOwner: Address | HasAddress;
 };
 
 /** Token owner's record within a realm */
 export async function findTokenOwnerRecordPda(
   seeds: TokenOwnerRecordSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">,
+    programAddress:
+      programAddressInput = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw" as Address<"GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -1132,139 +1133,175 @@ export type BubblegumPluginAccounts = {
 export type BubblegumPluginInstructions = {
   burn: (
     input: BurnAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBurnInstructionAsync> & SelfPlanAndSendFunctions;
   burnV2: (
     input: MakeOptional<BurnV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBurnV2InstructionAsync> & SelfPlanAndSendFunctions;
   cancelRedeem: (
     input: CancelRedeemAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCancelRedeemInstructionAsync> &
     SelfPlanAndSendFunctions;
   closeTreeV2: (
     input: CloseTreeV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseTreeV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   collectV2: (
     input: CollectV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectV2Instruction> & SelfPlanAndSendFunctions;
   compress: (
     input: MakeOptional<CompressAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCompressInstructionAsync> &
     SelfPlanAndSendFunctions;
   createTree: (
     input: MakeOptional<CreateTreeAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTreeInstructionAsync> &
     SelfPlanAndSendFunctions;
   createTreeV2: (
     input: MakeOptional<CreateTreeV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTreeV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   decompressV1: (
     input: DecompressV1AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDecompressV1InstructionAsync> &
     SelfPlanAndSendFunctions;
   delegate: (
     input: DelegateAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateInstructionAsync> &
     SelfPlanAndSendFunctions;
   delegateAndFreezeV2: (
     input: MakeOptional<DelegateAndFreezeV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateAndFreezeV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   delegateV2: (
     input: MakeOptional<DelegateV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   freezeV2: (
     input: MakeOptional<FreezeV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFreezeV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   mintToCollectionV1: (
     input: MakeOptional<MintToCollectionV1AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getMintToCollectionV1InstructionAsync> &
     SelfPlanAndSendFunctions;
   mintV1: (
     input: MakeOptional<MintV1AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getMintV1InstructionAsync> & SelfPlanAndSendFunctions;
   mintV2: (
     input: MakeOptional<MintV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getMintV2InstructionAsync> & SelfPlanAndSendFunctions;
   redeem: (
     input: RedeemAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRedeemInstructionAsync> & SelfPlanAndSendFunctions;
   setAndVerifyCollection: (
     input: MakeOptional<SetAndVerifyCollectionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetAndVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   setCollectionV2: (
     input: MakeOptional<SetCollectionV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetCollectionV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   setDecompressableState: (
     input: SetDecompressableStateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetDecompressableStateInstruction> &
     SelfPlanAndSendFunctions;
   setDecompressibleState: (
     input: SetDecompressibleStateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetDecompressibleStateInstruction> &
     SelfPlanAndSendFunctions;
   setNonTransferableV2: (
     input: MakeOptional<SetNonTransferableV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetNonTransferableV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   setTreeDelegate: (
     input: SetTreeDelegateAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetTreeDelegateInstructionAsync> &
     SelfPlanAndSendFunctions;
   thawAndRevokeV2: (
     input: MakeOptional<ThawAndRevokeV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getThawAndRevokeV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   thawV2: (
     input: MakeOptional<ThawV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getThawV2InstructionAsync> & SelfPlanAndSendFunctions;
   transfer: (
     input: TransferAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferInstructionAsync> &
     SelfPlanAndSendFunctions;
   transferV2: (
     input: MakeOptional<TransferV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifyCollection: (
     input: MakeOptional<UnverifyCollectionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnverifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifyCreator: (
     input: MakeOptional<UnverifyCreatorAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnverifyCreatorInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifyCreatorV2: (
     input: MakeOptional<UnverifyCreatorV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnverifyCreatorV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   updateAssetDataV2: (
     input: MakeOptional<UpdateAssetDataV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateAssetDataV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   updateMetadata: (
     input: MakeOptional<UpdateMetadataAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateMetadataInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateMetadataV2: (
     input: MakeOptional<UpdateMetadataV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateMetadataV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCollection: (
     input: MakeOptional<VerifyCollectionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCreator: (
     input: MakeOptional<VerifyCreatorAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getVerifyCreatorInstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCreatorV2: (
     input: MakeOptional<VerifyCreatorV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getVerifyCreatorV2InstructionAsync> &
     SelfPlanAndSendFunctions;
 };
@@ -1284,7 +1321,9 @@ export type BubblegumPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function bubblegumProgram() {
+export function bubblegumProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends BubblegumPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { bubblegum: BubblegumPlugin }> => {
@@ -1295,262 +1334,396 @@ export function bubblegumProgram() {
           voucher: addSelfFetchFunctions(client, getVoucherCodec()),
         },
         instructions: {
-          burn: (input) =>
-            addSelfPlanAndSendFunctions(client, getBurnInstructionAsync(input)),
-          burnV2: (input) =>
+          burn: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getBurnV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getBurnInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          cancelRedeem: (input) =>
+          burnV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCancelRedeemInstructionAsync(input),
+              getBurnV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          closeTreeV2: (input) =>
+          cancelRedeem: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseTreeV2InstructionAsync(input),
-            ),
-          collectV2: (input) =>
-            addSelfPlanAndSendFunctions(client, getCollectV2Instruction(input)),
-          compress: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCompressInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCancelRedeemInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createTree: (input) =>
+          closeTreeV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateTreeInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCloseTreeV2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createTreeV2: (input) =>
+          collectV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateTreeV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCollectV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          decompressV1: (input) =>
+          compress: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDecompressV1InstructionAsync(input),
+              getCompressInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          delegate: (input) =>
+          createTree: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateInstructionAsync(input),
+              getCreateTreeInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          delegateAndFreezeV2: (input) =>
+          createTreeV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateAndFreezeV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateTreeV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          decompressV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecompressV1InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          delegateV2: (input) =>
+          delegate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getDelegateInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          freezeV2: (input) =>
+          delegateAndFreezeV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getFreezeV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getDelegateAndFreezeV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          delegateV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          freezeV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFreezeV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          mintToCollectionV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintToCollectionV1InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          mintV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintV1InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          mintV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          redeem: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          mintToCollectionV1: (input) =>
+          setAndVerifyCollection: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintToCollectionV1InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetAndVerifyCollectionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setCollectionV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetCollectionV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setDecompressableState: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetDecompressableStateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          mintV1: (input) =>
+          setDecompressibleState: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintV1InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetDecompressibleStateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          mintV2: (input) =>
+          setNonTransferableV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetNonTransferableV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setTreeDelegate: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetTreeDelegateInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          redeem: (input) =>
+          thawAndRevokeV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRedeemInstructionAsync(input),
+              getThawAndRevokeV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setAndVerifyCollection: (input) =>
+          thawV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetAndVerifyCollectionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getThawV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          transfer: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setCollectionV2: (input) =>
+          transferV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetCollectionV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getTransferV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setDecompressableState: (input) =>
+          unverifyCollection: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetDecompressableStateInstruction(input),
+              getUnverifyCollectionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setDecompressibleState: (input) =>
+          unverifyCreator: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetDecompressibleStateInstruction(input),
+              getUnverifyCreatorInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setNonTransferableV2: (input) =>
+          unverifyCreatorV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetNonTransferableV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getUnverifyCreatorV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setTreeDelegate: (input) =>
+          updateAssetDataV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetTreeDelegateInstructionAsync(input),
+              getUpdateAssetDataV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          thawAndRevokeV2: (input) =>
+          updateMetadata: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getThawAndRevokeV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getUpdateMetadataInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          thawV2: (input) =>
+          updateMetadataV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getThawV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getUpdateMetadataV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          transfer: (input) =>
+          verifyCollection: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTransferInstructionAsync(input),
+              getVerifyCollectionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          transferV2: (input) =>
+          verifyCreator: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTransferV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getVerifyCreatorInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          unverifyCollection: (input) =>
+          verifyCreatorV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifyCollectionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          unverifyCreator: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUnverifyCreatorInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          unverifyCreatorV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUnverifyCreatorV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateAssetDataV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateAssetDataV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateMetadata: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateMetadataInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateMetadataV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateMetadataV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          verifyCollection: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getVerifyCollectionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          verifyCreator: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getVerifyCreatorInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          verifyCreatorV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getVerifyCreatorV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getVerifyCreatorV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
         },
         pdas: {
-          treeConfig: findTreeConfigPda,
-          voucher: findVoucherPda,
-          assetId: findAssetIdPda,
-          bubblegumSigner: findBubblegumSignerPda,
-          mintAuthority: findMintAuthorityPda,
+          treeConfig: (seeds, pdaConfig) =>
+            findTreeConfigPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          voucher: (seeds, pdaConfig) =>
+            findVoucherPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          assetId: (seeds, pdaConfig) =>
+            findAssetIdPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          bubblegumSigner: (pdaConfig) =>
+            findBubblegumSignerPda({
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          mintAuthority: (seeds, pdaConfig) =>
+            findMintAuthorityPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyBubblegumAccount,
         identifyInstruction: identifyBubblegumInstruction,

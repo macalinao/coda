@@ -27,17 +27,21 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -85,9 +89,9 @@ export type InitializeConfigInstructionData = {
 };
 
 export type InitializeConfigInstructionDataArgs = {
-  feeAuthority: Address;
-  collectProtocolFeesAuthority: Address;
-  rewardEmissionsSuperAuthority: Address;
+  feeAuthority: Address | HasAddress;
+  collectProtocolFeesAuthority: Address | HasAddress;
+  rewardEmissionsSuperAuthority: Address | HasAddress;
   defaultProtocolFeeRate: number;
 };
 
@@ -125,13 +129,14 @@ export function getInitializeConfigInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitializeConfigInput<
-  TAccountConfig extends string = string,
-  TAccountFunder extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountConfig extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFunder extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  config: TransactionSigner<TAccountConfig>;
-  funder: TransactionSigner<TAccountFunder>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  config: TAccountConfig;
+  funder: TAccountFunder;
+  systemProgram?: TAccountSystemProgram;
   feeAuthority: InitializeConfigInstructionDataArgs["feeAuthority"];
   collectProtocolFeesAuthority: InitializeConfigInstructionDataArgs["collectProtocolFeesAuthority"];
   rewardEmissionsSuperAuthority: InitializeConfigInstructionDataArgs["rewardEmissionsSuperAuthority"];
@@ -139,9 +144,9 @@ export type InitializeConfigInput<
 };
 
 export function getInitializeConfigInstruction<
-  TAccountConfig extends string,
-  TAccountFunder extends string,
-  TAccountSystemProgram extends string,
+  TAccountConfig extends InstructionSignerInput,
+  TAccountFunder extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: InitializeConfigInput<
@@ -149,21 +154,47 @@ export function getInitializeConfigInstruction<
     TAccountFunder,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitializeConfigInstruction<
   TProgramAddress,
-  TAccountConfig,
-  TAccountFunder,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountConfig,
+    InstructionAccountInputAddress<TAccountConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFunder,
+    InstructionAccountInputAddress<TAccountFunder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    config: { value: input.config ?? null, isWritable: true },
-    funder: { value: input.funder ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    config: { value: input.config ?? null, isSigner: true, isWritable: true },
+    funder: { value: input.funder ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -179,7 +210,6 @@ export function getInitializeConfigInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("config", accounts.config),
@@ -192,9 +222,18 @@ export function getInitializeConfigInstruction<
     programAddress,
   } as InitializeConfigInstruction<
     TProgramAddress,
-    TAccountConfig,
-    TAccountFunder,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountConfig,
+      InstructionAccountInputAddress<TAccountConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFunder,
+      InstructionAccountInputAddress<TAccountFunder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

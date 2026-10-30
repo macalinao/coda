@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -112,41 +115,49 @@ export function getRelinquishVoteInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RelinquishVoteInput<
-  TAccountRealmAccount extends string = string,
-  TAccountGovernanceAccount extends string = string,
-  TAccountProposalAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountProposalVoteRecord extends string = string,
-  TAccountGoverningTokenMint extends string = string,
-  TAccountGovernanceAuthority extends string = string,
-  TAccountBeneficiaryAccount extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernanceAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProposalAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProposalVoteRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountBeneficiaryAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  realmAccount: Address<TAccountRealmAccount>;
-  governanceAccount: Address<TAccountGovernanceAccount>;
-  proposalAccount: Address<TAccountProposalAccount>;
+  realmAccount: TAccountRealmAccount;
+  governanceAccount: TAccountGovernanceAccount;
+  proposalAccount: TAccountProposalAccount;
   /** TokenOwnerRecord account. PDA seeds: ['governance',realm, vote_governing_token_mint, governing_token_owner] */
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
   /** Proposal VoteRecord account. PDA seeds: ['governance',proposal, token_owner_record] */
-  proposalVoteRecord: Address<TAccountProposalVoteRecord>;
+  proposalVoteRecord: TAccountProposalVoteRecord;
   /** The Governing Token Mint which was used to cast the vote (vote_governing_token_mint) */
-  governingTokenMint: Address<TAccountGoverningTokenMint>;
-  governanceAuthority?: TransactionSigner<TAccountGovernanceAuthority>;
+  governingTokenMint: TAccountGoverningTokenMint;
+  governanceAuthority?: TAccountGovernanceAuthority;
   /**
    * Optional Beneficiary account which would receive lamports when VoteRecord Account is disposed.
    *     It's required only when Proposal is still being voted on
    */
-  beneficiaryAccount?: Address<TAccountBeneficiaryAccount>;
+  beneficiaryAccount?: TAccountBeneficiaryAccount;
 };
 
 export function getRelinquishVoteInstruction<
-  TAccountRealmAccount extends string,
-  TAccountGovernanceAccount extends string,
-  TAccountProposalAccount extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountProposalVoteRecord extends string,
-  TAccountGoverningTokenMint extends string,
-  TAccountGovernanceAuthority extends string,
-  TAccountBeneficiaryAccount extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountGovernanceAccount extends InstructionAccountInput,
+  TAccountProposalAccount extends InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountProposalVoteRecord extends InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput,
+  TAccountBeneficiaryAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: RelinquishVoteInput<
@@ -159,48 +170,98 @@ export function getRelinquishVoteInstruction<
     TAccountGovernanceAuthority,
     TAccountBeneficiaryAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RelinquishVoteInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountGovernanceAccount,
-  TAccountProposalAccount,
-  TAccountTokenOwnerRecord,
-  TAccountProposalVoteRecord,
-  TAccountGoverningTokenMint,
-  TAccountGovernanceAuthority,
-  TAccountBeneficiaryAccount
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAccount,
+    InstructionAccountInputAddress<TAccountGovernanceAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalAccount,
+    InstructionAccountInputAddress<TAccountProposalAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalVoteRecord,
+    InstructionAccountInputAddress<TAccountProposalVoteRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenMint,
+    InstructionAccountInputAddress<TAccountGoverningTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAuthority,
+    InstructionAccountInputAddress<TAccountGovernanceAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBeneficiaryAccount,
+    InstructionAccountInputAddress<TAccountBeneficiaryAccount>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: false },
-    governanceAccount: {
-      value: input.governanceAccount ?? null,
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    proposalAccount: { value: input.proposalAccount ?? null, isWritable: true },
+    governanceAccount: {
+      value: input.governanceAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    proposalAccount: {
+      value: input.proposalAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
     proposalVoteRecord: {
       value: input.proposalVoteRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
     governingTokenMint: {
       value: input.governingTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     governanceAuthority: {
       value: input.governanceAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
     beneficiaryAccount: {
       value: input.beneficiaryAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
   };
@@ -209,7 +270,6 @@ export function getRelinquishVoteInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -225,14 +285,38 @@ export function getRelinquishVoteInstruction<
     programAddress,
   } as RelinquishVoteInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountGovernanceAccount,
-    TAccountProposalAccount,
-    TAccountTokenOwnerRecord,
-    TAccountProposalVoteRecord,
-    TAccountGoverningTokenMint,
-    TAccountGovernanceAuthority,
-    TAccountBeneficiaryAccount
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAccount,
+      InstructionAccountInputAddress<TAccountGovernanceAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalAccount,
+      InstructionAccountInputAddress<TAccountProposalAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalVoteRecord,
+      InstructionAccountInputAddress<TAccountProposalVoteRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenMint,
+      InstructionAccountInputAddress<TAccountGoverningTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAuthority,
+      InstructionAccountInputAddress<TAccountGovernanceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBeneficiaryAccount,
+      InstructionAccountInputAddress<TAccountBeneficiaryAccount>
+    >
   >);
 }
 

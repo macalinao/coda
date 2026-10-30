@@ -28,13 +28,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -114,25 +117,27 @@ export function getDeleteReferrerStateAndShortUrlInstructionDataCodec(): FixedSi
 }
 
 export type DeleteReferrerStateAndShortUrlInput<
-  TAccountReferrer extends string = string,
-  TAccountReferrerState extends string = string,
-  TAccountShortUrl extends string = string,
-  TAccountRent extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountReferrer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountReferrerState extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountShortUrl extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  referrer: TransactionSigner<TAccountReferrer>;
-  referrerState: Address<TAccountReferrerState>;
-  shortUrl: Address<TAccountShortUrl>;
-  rent?: Address<TAccountRent>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  referrer: TAccountReferrer;
+  referrerState: TAccountReferrerState;
+  shortUrl: TAccountShortUrl;
+  rent?: TAccountRent;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export function getDeleteReferrerStateAndShortUrlInstruction<
-  TAccountReferrer extends string,
-  TAccountReferrerState extends string,
-  TAccountShortUrl extends string,
-  TAccountRent extends string,
-  TAccountSystemProgram extends string,
+  TAccountReferrer extends InstructionSignerInput,
+  TAccountReferrerState extends InstructionAccountInput,
+  TAccountShortUrl extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: DeleteReferrerStateAndShortUrlInput<
@@ -142,26 +147,69 @@ export function getDeleteReferrerStateAndShortUrlInstruction<
     TAccountRent,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DeleteReferrerStateAndShortUrlInstruction<
   TProgramAddress,
-  TAccountReferrer,
-  TAccountReferrerState,
-  TAccountShortUrl,
-  TAccountRent,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountReferrer,
+    InstructionAccountInputAddress<TAccountReferrer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferrerState,
+    InstructionAccountInputAddress<TAccountReferrerState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountShortUrl,
+    InstructionAccountInputAddress<TAccountShortUrl>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    referrer: { value: input.referrer ?? null, isWritable: true },
-    referrerState: { value: input.referrerState ?? null, isWritable: true },
-    shortUrl: { value: input.shortUrl ?? null, isWritable: true },
-    rent: { value: input.rent ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    referrer: {
+      value: input.referrer ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    referrerState: {
+      value: input.referrerState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    shortUrl: {
+      value: input.shortUrl ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -178,7 +226,6 @@ export function getDeleteReferrerStateAndShortUrlInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("referrer", accounts.referrer),
@@ -191,11 +238,26 @@ export function getDeleteReferrerStateAndShortUrlInstruction<
     programAddress,
   } as DeleteReferrerStateAndShortUrlInstruction<
     TProgramAddress,
-    TAccountReferrer,
-    TAccountReferrerState,
-    TAccountShortUrl,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountReferrer,
+      InstructionAccountInputAddress<TAccountReferrer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferrerState,
+      InstructionAccountInputAddress<TAccountReferrerState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountShortUrl,
+      InstructionAccountInputAddress<TAccountShortUrl>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

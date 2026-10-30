@@ -28,7 +28,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -78,37 +81,66 @@ export function getPuffMetadataInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type PuffMetadataInput<TAccountMetadata extends string = string> = {
+export type PuffMetadataInput<
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+> = {
   /** Metadata account */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
 };
 
 export function getPuffMetadataInstruction<
-  TAccountMetadata extends string,
+  TAccountMetadata extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: PuffMetadataInput<TAccountMetadata>,
-  config?: { programAddress?: TProgramAddress },
-): PuffMetadataInstruction<TProgramAddress, TAccountMetadata> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): PuffMetadataInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >
+> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [getAccountMeta("metadata", accounts.metadata)],
     data: getPuffMetadataInstructionDataEncoder().encode({}),
     programAddress,
-  } as PuffMetadataInstruction<TProgramAddress, TAccountMetadata>);
+  } as PuffMetadataInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >
+  >);
 }
 
 export type ParsedPuffMetadataInstruction<

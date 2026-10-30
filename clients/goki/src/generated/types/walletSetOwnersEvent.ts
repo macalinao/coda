@@ -20,6 +20,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type WalletSetOwnersEvent = {
@@ -29,8 +30,8 @@ export type WalletSetOwnersEvent = {
 };
 
 export type WalletSetOwnersEventArgs = {
-  smartWallet: Address;
-  owners: Array<Address>;
+  smartWallet: Address | HasAddress;
+  owners: Array<Address | HasAddress>;
   timestamp: number | bigint;
 };
 

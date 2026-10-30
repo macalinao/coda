@@ -11,12 +11,13 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type VoterSeeds = {
-  registrar: Address;
-  voterAuthority: Address;
+  registrar: Address | HasAddress;
+  voterAuthority: Address | HasAddress;
 };
 
 /**
@@ -25,11 +26,16 @@ export type VoterSeeds = {
  */
 export async function findVoterPda(
   seeds: VoterSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ" as Address<"vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ">,
+    programAddress:
+      programAddressInput = "vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ" as Address<"vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

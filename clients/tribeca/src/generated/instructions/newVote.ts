@@ -27,18 +27,22 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -85,7 +89,10 @@ export type NewVoteInstructionData = {
   voter: Address;
 };
 
-export type NewVoteInstructionDataArgs = { bump: number; voter: Address };
+export type NewVoteInstructionDataArgs = {
+  bump: number;
+  voter: Address | HasAddress;
+};
 
 export function getNewVoteInstructionDataEncoder(): FixedSizeEncoder<NewVoteInstructionDataArgs> {
   return transformEncoder(
@@ -117,24 +124,25 @@ export function getNewVoteInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type NewVoteInput<
-  TAccountProposal extends string = string,
-  TAccountVote extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountProposal extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVote extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  proposal: Address<TAccountProposal>;
-  vote: Address<TAccountVote>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  proposal: TAccountProposal;
+  vote: TAccountVote;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: NewVoteInstructionDataArgs["bump"];
   voter: NewVoteInstructionDataArgs["voter"];
 };
 
 export function getNewVoteInstruction<
-  TAccountProposal extends string,
-  TAccountVote extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountProposal extends InstructionAccountInput,
+  TAccountVote extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof GOVERN_PROGRAM_ADDRESS,
 >(
   input: NewVoteInput<
@@ -143,23 +151,55 @@ export function getNewVoteInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): NewVoteInstruction<
   TProgramAddress,
-  TAccountProposal,
-  TAccountVote,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountProposal,
+    InstructionAccountInputAddress<TAccountProposal>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVote,
+    InstructionAccountInputAddress<TAccountVote>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    proposal: { value: input.proposal ?? null, isWritable: false },
-    vote: { value: input.vote ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    proposal: {
+      value: input.proposal ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    vote: { value: input.vote ?? null, isSigner: false, isWritable: true },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -175,7 +215,6 @@ export function getNewVoteInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("proposal", accounts.proposal),
@@ -189,10 +228,22 @@ export function getNewVoteInstruction<
     programAddress,
   } as NewVoteInstruction<
     TProgramAddress,
-    TAccountProposal,
-    TAccountVote,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountProposal,
+      InstructionAccountInputAddress<TAccountProposal>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVote,
+      InstructionAccountInputAddress<TAccountVote>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

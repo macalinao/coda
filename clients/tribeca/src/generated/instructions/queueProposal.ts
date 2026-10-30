@@ -30,13 +30,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -126,32 +129,34 @@ export function getQueueProposalInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type QueueProposalInput<
-  TAccountGovernor extends string = string,
-  TAccountProposal extends string = string,
-  TAccountTransaction extends string = string,
-  TAccountSmartWallet extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSmartWalletProgram extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTransaction extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSmartWallet extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSmartWalletProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  governor: Address<TAccountGovernor>;
-  proposal: Address<TAccountProposal>;
-  transaction: Address<TAccountTransaction>;
-  smartWallet: Address<TAccountSmartWallet>;
-  payer: TransactionSigner<TAccountPayer>;
-  smartWalletProgram: Address<TAccountSmartWalletProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  governor: TAccountGovernor;
+  proposal: TAccountProposal;
+  transaction: TAccountTransaction;
+  smartWallet: TAccountSmartWallet;
+  payer: TAccountPayer;
+  smartWalletProgram: TAccountSmartWalletProgram;
+  systemProgram?: TAccountSystemProgram;
   txBump: QueueProposalInstructionDataArgs["txBump"];
 };
 
 export function getQueueProposalInstruction<
-  TAccountGovernor extends string,
-  TAccountProposal extends string,
-  TAccountTransaction extends string,
-  TAccountSmartWallet extends string,
-  TAccountPayer extends string,
-  TAccountSmartWalletProgram extends string,
-  TAccountSystemProgram extends string,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput,
+  TAccountTransaction extends InstructionAccountInput,
+  TAccountSmartWallet extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSmartWalletProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof GOVERN_PROGRAM_ADDRESS,
 >(
   input: QueueProposalInput<
@@ -163,32 +168,86 @@ export function getQueueProposalInstruction<
     TAccountSmartWalletProgram,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): QueueProposalInstruction<
   TProgramAddress,
-  TAccountGovernor,
-  TAccountProposal,
-  TAccountTransaction,
-  TAccountSmartWallet,
-  TAccountPayer,
-  TAccountSmartWalletProgram,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposal,
+    InstructionAccountInputAddress<TAccountProposal>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTransaction,
+    InstructionAccountInputAddress<TAccountTransaction>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWalletProgram,
+    InstructionAccountInputAddress<TAccountSmartWalletProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    governor: { value: input.governor ?? null, isWritable: false },
-    proposal: { value: input.proposal ?? null, isWritable: true },
-    transaction: { value: input.transaction ?? null, isWritable: true },
-    smartWallet: { value: input.smartWallet ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    smartWalletProgram: {
-      value: input.smartWalletProgram ?? null,
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    proposal: {
+      value: input.proposal ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    transaction: {
+      value: input.transaction ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    smartWalletProgram: {
+      value: input.smartWalletProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -204,7 +263,6 @@ export function getQueueProposalInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("governor", accounts.governor),
@@ -221,13 +279,34 @@ export function getQueueProposalInstruction<
     programAddress,
   } as QueueProposalInstruction<
     TProgramAddress,
-    TAccountGovernor,
-    TAccountProposal,
-    TAccountTransaction,
-    TAccountSmartWallet,
-    TAccountPayer,
-    TAccountSmartWalletProgram,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposal,
+      InstructionAccountInputAddress<TAccountProposal>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTransaction,
+      InstructionAccountInputAddress<TAccountTransaction>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWalletProgram,
+      InstructionAccountInputAddress<TAccountSmartWalletProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

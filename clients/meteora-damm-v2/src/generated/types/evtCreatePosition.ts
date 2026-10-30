@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtCreatePosition = {
@@ -25,7 +26,12 @@ export type EvtCreatePosition = {
   positionNftMint: Address;
 };
 
-export type EvtCreatePositionArgs = EvtCreatePosition;
+export type EvtCreatePositionArgs = {
+  pool: Address | HasAddress;
+  owner: Address | HasAddress;
+  position: Address | HasAddress;
+  positionNftMint: Address | HasAddress;
+};
 
 export function getEvtCreatePositionEncoder(): FixedSizeEncoder<EvtCreatePositionArgs> {
   return getStructEncoder([

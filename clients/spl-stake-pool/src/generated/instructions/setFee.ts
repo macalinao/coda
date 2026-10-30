@@ -26,12 +26,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -99,13 +102,13 @@ export function getSetFeeInstructionDataCodec(): Codec<
 }
 
 export type SetFeeInput<
-  TAccountStakePool extends string = string,
-  TAccountManager extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput = InstructionSignerInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Manager */
-  manager: TransactionSigner<TAccountManager>;
+  manager: TAccountManager;
   fee: SetFeeInstructionDataArgs["fee"];
 };
 
@@ -115,21 +118,51 @@ export type SetFeeInput<
  * 1. `[s]` Manager
  */
 export function getSetFeeInstruction<
-  TAccountStakePool extends string,
-  TAccountManager extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: SetFeeInput<TAccountStakePool, TAccountManager>,
-  config?: { programAddress?: TProgramAddress },
-): SetFeeInstruction<TProgramAddress, TAccountStakePool, TAccountManager> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): SetFeeInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountManager,
+    InstructionAccountInputAddress<TAccountManager>
+  >
+> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
-    manager: { value: input.manager ?? null, isWritable: false },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    manager: {
+      value: input.manager ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -139,7 +172,6 @@ export function getSetFeeInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -149,7 +181,17 @@ export function getSetFeeInstruction<
       args as SetFeeInstructionDataArgs,
     ),
     programAddress,
-  } as SetFeeInstruction<TProgramAddress, TAccountStakePool, TAccountManager>);
+  } as SetFeeInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountManager,
+      InstructionAccountInputAddress<TAccountManager>
+    >
+  >);
 }
 
 export type ParsedSetFeeInstruction<

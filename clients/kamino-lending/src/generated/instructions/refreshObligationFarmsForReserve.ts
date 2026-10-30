@@ -31,13 +31,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.ts";
 import {
@@ -149,41 +152,47 @@ export function getRefreshObligationFarmsForReserveInstructionDataCodec(): Fixed
 }
 
 export type RefreshObligationFarmsForReserveAsyncInput<
-  TAccountCrank extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountReserve extends string = string,
-  TAccountReserveFarmState extends string = string,
-  TAccountObligationFarmUserState extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountFarmsProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountCrank extends InstructionSignerInput = InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReserveFarmState extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountObligationFarmUserState extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFarmsProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  crank: TransactionSigner<TAccountCrank>;
-  obligation: Address<TAccountObligation>;
-  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
-  reserve: Address<TAccountReserve>;
-  reserveFarmState: Address<TAccountReserveFarmState>;
-  obligationFarmUserState: Address<TAccountObligationFarmUserState>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  farmsProgram?: Address<TAccountFarmsProgram>;
-  rent?: Address<TAccountRent>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  crank: TAccountCrank;
+  obligation: TAccountObligation;
+  lendingMarketAuthority?: TAccountLendingMarketAuthority;
+  reserve: TAccountReserve;
+  reserveFarmState: TAccountReserveFarmState;
+  obligationFarmUserState: TAccountObligationFarmUserState;
+  lendingMarket: TAccountLendingMarket;
+  farmsProgram?: TAccountFarmsProgram;
+  rent?: TAccountRent;
+  systemProgram?: TAccountSystemProgram;
   mode: RefreshObligationFarmsForReserveInstructionDataArgs["mode"];
 };
 
 export async function getRefreshObligationFarmsForReserveInstructionAsync<
-  TAccountCrank extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountReserve extends string,
-  TAccountReserveFarmState extends string,
-  TAccountObligationFarmUserState extends string,
-  TAccountLendingMarket extends string,
-  TAccountFarmsProgram extends string,
-  TAccountRent extends string,
-  TAccountSystemProgram extends string,
+  TAccountCrank extends InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountReserveFarmState extends InstructionAccountInput,
+  TAccountObligationFarmUserState extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountFarmsProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: RefreshObligationFarmsForReserveAsyncInput<
@@ -198,47 +207,112 @@ export async function getRefreshObligationFarmsForReserveInstructionAsync<
     TAccountRent,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   RefreshObligationFarmsForReserveInstruction<
     TProgramAddress,
-    TAccountCrank,
-    TAccountObligation,
-    TAccountLendingMarketAuthority,
-    TAccountReserve,
-    TAccountReserveFarmState,
-    TAccountObligationFarmUserState,
-    TAccountLendingMarket,
-    TAccountFarmsProgram,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountCrank,
+      InstructionAccountInputAddress<TAccountCrank>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveFarmState,
+      InstructionAccountInputAddress<TAccountReserveFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligationFarmUserState,
+      InstructionAccountInputAddress<TAccountObligationFarmUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmsProgram,
+      InstructionAccountInputAddress<TAccountFarmsProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    crank: { value: input.crank ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: false },
-    lendingMarketAuthority: {
-      value: input.lendingMarketAuthority ?? null,
+    crank: { value: input.crank ?? null, isSigner: true, isWritable: false },
+    obligation: {
+      value: input.obligation ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    reserve: { value: input.reserve ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     reserveFarmState: {
       value: input.reserveFarmState ?? null,
+      isSigner: false,
       isWritable: true,
     },
     obligationFarmUserState: {
       value: input.obligationFarmUserState ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    farmsProgram: {
+      value: input.farmsProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -273,7 +347,6 @@ export async function getRefreshObligationFarmsForReserveInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("crank", accounts.crank),
@@ -296,55 +369,91 @@ export async function getRefreshObligationFarmsForReserveInstructionAsync<
     programAddress,
   } as RefreshObligationFarmsForReserveInstruction<
     TProgramAddress,
-    TAccountCrank,
-    TAccountObligation,
-    TAccountLendingMarketAuthority,
-    TAccountReserve,
-    TAccountReserveFarmState,
-    TAccountObligationFarmUserState,
-    TAccountLendingMarket,
-    TAccountFarmsProgram,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountCrank,
+      InstructionAccountInputAddress<TAccountCrank>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveFarmState,
+      InstructionAccountInputAddress<TAccountReserveFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligationFarmUserState,
+      InstructionAccountInputAddress<TAccountObligationFarmUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmsProgram,
+      InstructionAccountInputAddress<TAccountFarmsProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type RefreshObligationFarmsForReserveInput<
-  TAccountCrank extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountReserve extends string = string,
-  TAccountReserveFarmState extends string = string,
-  TAccountObligationFarmUserState extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountFarmsProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountCrank extends InstructionSignerInput = InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReserveFarmState extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountObligationFarmUserState extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFarmsProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  crank: TransactionSigner<TAccountCrank>;
-  obligation: Address<TAccountObligation>;
-  lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
-  reserve: Address<TAccountReserve>;
-  reserveFarmState: Address<TAccountReserveFarmState>;
-  obligationFarmUserState: Address<TAccountObligationFarmUserState>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  farmsProgram?: Address<TAccountFarmsProgram>;
-  rent?: Address<TAccountRent>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  crank: TAccountCrank;
+  obligation: TAccountObligation;
+  lendingMarketAuthority: TAccountLendingMarketAuthority;
+  reserve: TAccountReserve;
+  reserveFarmState: TAccountReserveFarmState;
+  obligationFarmUserState: TAccountObligationFarmUserState;
+  lendingMarket: TAccountLendingMarket;
+  farmsProgram?: TAccountFarmsProgram;
+  rent?: TAccountRent;
+  systemProgram?: TAccountSystemProgram;
   mode: RefreshObligationFarmsForReserveInstructionDataArgs["mode"];
 };
 
 export function getRefreshObligationFarmsForReserveInstruction<
-  TAccountCrank extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountReserve extends string,
-  TAccountReserveFarmState extends string,
-  TAccountObligationFarmUserState extends string,
-  TAccountLendingMarket extends string,
-  TAccountFarmsProgram extends string,
-  TAccountRent extends string,
-  TAccountSystemProgram extends string,
+  TAccountCrank extends InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountReserveFarmState extends InstructionAccountInput,
+  TAccountObligationFarmUserState extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountFarmsProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: RefreshObligationFarmsForReserveInput<
@@ -359,45 +468,110 @@ export function getRefreshObligationFarmsForReserveInstruction<
     TAccountRent,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RefreshObligationFarmsForReserveInstruction<
   TProgramAddress,
-  TAccountCrank,
-  TAccountObligation,
-  TAccountLendingMarketAuthority,
-  TAccountReserve,
-  TAccountReserveFarmState,
-  TAccountObligationFarmUserState,
-  TAccountLendingMarket,
-  TAccountFarmsProgram,
-  TAccountRent,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountCrank,
+    InstructionAccountInputAddress<TAccountCrank>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountObligation,
+    InstructionAccountInputAddress<TAccountObligation>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarketAuthority,
+    InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserve,
+    InstructionAccountInputAddress<TAccountReserve>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveFarmState,
+    InstructionAccountInputAddress<TAccountReserveFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountObligationFarmUserState,
+    InstructionAccountInputAddress<TAccountObligationFarmUserState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmsProgram,
+    InstructionAccountInputAddress<TAccountFarmsProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    crank: { value: input.crank ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: false },
-    lendingMarketAuthority: {
-      value: input.lendingMarketAuthority ?? null,
+    crank: { value: input.crank ?? null, isSigner: true, isWritable: false },
+    obligation: {
+      value: input.obligation ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    reserve: { value: input.reserve ?? null, isWritable: false },
+    lendingMarketAuthority: {
+      value: input.lendingMarketAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     reserveFarmState: {
       value: input.reserveFarmState ?? null,
+      isSigner: false,
       isWritable: true,
     },
     obligationFarmUserState: {
       value: input.obligationFarmUserState ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    farmsProgram: { value: input.farmsProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    farmsProgram: {
+      value: input.farmsProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -421,7 +595,6 @@ export function getRefreshObligationFarmsForReserveInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("crank", accounts.crank),
@@ -444,16 +617,46 @@ export function getRefreshObligationFarmsForReserveInstruction<
     programAddress,
   } as RefreshObligationFarmsForReserveInstruction<
     TProgramAddress,
-    TAccountCrank,
-    TAccountObligation,
-    TAccountLendingMarketAuthority,
-    TAccountReserve,
-    TAccountReserveFarmState,
-    TAccountObligationFarmUserState,
-    TAccountLendingMarket,
-    TAccountFarmsProgram,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountCrank,
+      InstructionAccountInputAddress<TAccountCrank>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveFarmState,
+      InstructionAccountInputAddress<TAccountReserveFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligationFarmUserState,
+      InstructionAccountInputAddress<TAccountObligationFarmUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmsProgram,
+      InstructionAccountInputAddress<TAccountFarmsProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

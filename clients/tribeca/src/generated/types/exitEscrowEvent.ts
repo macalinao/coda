@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ExitEscrowEvent = {
@@ -31,8 +32,8 @@ export type ExitEscrowEvent = {
 };
 
 export type ExitEscrowEventArgs = {
-  escrowOwner: Address;
-  locker: Address;
+  escrowOwner: Address | HasAddress;
+  locker: Address | HasAddress;
   timestamp: number | bigint;
   lockerSupply: number | bigint;
   releasedAmount: number | bigint;

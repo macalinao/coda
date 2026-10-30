@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -1095,128 +1096,160 @@ export type CpAmmPluginAccounts = {
 export type CpAmmPluginInstructions = {
   addLiquidity: (
     input: AddLiquidityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddLiquidityInstructionAsync> &
     SelfPlanAndSendFunctions;
   claimPartnerFee: (
     input: ClaimPartnerFeeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClaimPartnerFeeInstructionAsync> &
     SelfPlanAndSendFunctions;
   claimPositionFee: (
     input: ClaimPositionFeeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClaimPositionFeeInstructionAsync> &
     SelfPlanAndSendFunctions;
   claimProtocolFee: (
     input: ClaimProtocolFeeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClaimProtocolFeeInstructionAsync> &
     SelfPlanAndSendFunctions;
   claimReward: (
     input: ClaimRewardAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClaimRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
   closeClaimFeeOperator: (
     input: CloseClaimFeeOperatorAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseClaimFeeOperatorInstructionAsync> &
     SelfPlanAndSendFunctions;
   closeConfig: (
     input: CloseConfigAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseConfigInstructionAsync> &
     SelfPlanAndSendFunctions;
   closePosition: (
     input: ClosePositionAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClosePositionInstructionAsync> &
     SelfPlanAndSendFunctions;
   closeTokenBadge: (
     input: CloseTokenBadgeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseTokenBadgeInstructionAsync> &
     SelfPlanAndSendFunctions;
   createClaimFeeOperator: (
     input: CreateClaimFeeOperatorAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateClaimFeeOperatorInstructionAsync> &
     SelfPlanAndSendFunctions;
   createConfig: (
     input: CreateConfigAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateConfigInstructionAsync> &
     SelfPlanAndSendFunctions;
   createDynamicConfig: (
     input: CreateDynamicConfigAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateDynamicConfigInstructionAsync> &
     SelfPlanAndSendFunctions;
   createPosition: (
     input: MakeOptional<CreatePositionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreatePositionInstructionAsync> &
     SelfPlanAndSendFunctions;
   createTokenBadge: (
     input: CreateTokenBadgeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTokenBadgeInstructionAsync> &
     SelfPlanAndSendFunctions;
   fundReward: (
     input: FundRewardAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFundRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializeCustomizablePool: (
     input: MakeOptional<InitializeCustomizablePoolAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeCustomizablePoolInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializePool: (
     input: MakeOptional<InitializePoolAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializePoolInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializePoolWithDynamicConfig: (
     input: MakeOptional<InitializePoolWithDynamicConfigAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializePoolWithDynamicConfigInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializeReward: (
     input: MakeOptional<InitializeRewardAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
   lockPosition: (
     input: MakeOptional<LockPositionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLockPositionInstructionAsync> &
     SelfPlanAndSendFunctions;
   permanentLockPosition: (
     input: PermanentLockPositionAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getPermanentLockPositionInstructionAsync> &
     SelfPlanAndSendFunctions;
   refreshVesting: (
     input: RefreshVestingInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefreshVestingInstruction> &
     SelfPlanAndSendFunctions;
   removeAllLiquidity: (
     input: RemoveAllLiquidityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveAllLiquidityInstructionAsync> &
     SelfPlanAndSendFunctions;
   removeLiquidity: (
     input: RemoveLiquidityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveLiquidityInstructionAsync> &
     SelfPlanAndSendFunctions;
   setPoolStatus: (
     input: SetPoolStatusAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetPoolStatusInstructionAsync> &
     SelfPlanAndSendFunctions;
   splitPosition: (
     input: SplitPositionAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSplitPositionInstructionAsync> &
     SelfPlanAndSendFunctions;
   splitPosition2: (
     input: SplitPosition2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSplitPosition2InstructionAsync> &
     SelfPlanAndSendFunctions;
   swap: (
     input: MakeOptional<SwapAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSwapInstructionAsync> & SelfPlanAndSendFunctions;
   swap2: (
     input: MakeOptional<Swap2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSwap2InstructionAsync> & SelfPlanAndSendFunctions;
   updateRewardDuration: (
     input: UpdateRewardDurationAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateRewardDurationInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateRewardFunder: (
     input: UpdateRewardFunderAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateRewardFunderInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawIneligibleReward: (
     input: WithdrawIneligibleRewardAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawIneligibleRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
 };
@@ -1242,7 +1275,9 @@ export type CpAmmPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function cpAmmProgram() {
+export function cpAmmProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends CpAmmPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { cpAmm: CpAmmPlugin }> => {
@@ -1260,203 +1295,343 @@ export function cpAmmProgram() {
           vesting: addSelfFetchFunctions(client, getVestingCodec()),
         },
         instructions: {
-          addLiquidity: (input) =>
+          addLiquidity: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getAddLiquidityInstructionAsync(input),
-            ),
-          claimPartnerFee: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getClaimPartnerFeeInstructionAsync(input),
-            ),
-          claimPositionFee: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getClaimPositionFeeInstructionAsync(input),
-            ),
-          claimProtocolFee: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getClaimProtocolFeeInstructionAsync(input),
-            ),
-          claimReward: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getClaimRewardInstructionAsync(input),
-            ),
-          closeClaimFeeOperator: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCloseClaimFeeOperatorInstructionAsync(input),
-            ),
-          closeConfig: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCloseConfigInstructionAsync(input),
-            ),
-          closePosition: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getClosePositionInstructionAsync(input),
-            ),
-          closeTokenBadge: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCloseTokenBadgeInstructionAsync(input),
-            ),
-          createClaimFeeOperator: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateClaimFeeOperatorInstructionAsync(input),
-            ),
-          createConfig: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateConfigInstructionAsync(input),
-            ),
-          createDynamicConfig: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateDynamicConfigInstructionAsync(input),
-            ),
-          createPosition: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreatePositionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getAddLiquidityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createTokenBadge: (input) =>
+          claimPartnerFee: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateTokenBadgeInstructionAsync(input),
-            ),
-          fundReward: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getFundRewardInstructionAsync(input),
-            ),
-          initializeCustomizablePool: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitializeCustomizablePoolInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getClaimPartnerFeeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initializePool: (input) =>
+          claimPositionFee: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializePoolInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getClaimPositionFeeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initializePoolWithDynamicConfig: (input) =>
+          claimProtocolFee: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializePoolWithDynamicConfigInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getClaimProtocolFeeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initializeReward: (input) =>
+          claimReward: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeRewardInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getClaimRewardInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          lockPosition: (input) =>
+          closeClaimFeeOperator: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getLockPositionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCloseClaimFeeOperatorInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          permanentLockPosition: (input) =>
+          closeConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getPermanentLockPositionInstructionAsync(input),
-            ),
-          refreshVesting: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRefreshVestingInstruction(input),
-            ),
-          removeAllLiquidity: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveAllLiquidityInstructionAsync(input),
-            ),
-          removeLiquidity: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveLiquidityInstructionAsync(input),
-            ),
-          setPoolStatus: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetPoolStatusInstructionAsync(input),
-            ),
-          splitPosition: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSplitPositionInstructionAsync(input),
-            ),
-          splitPosition2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSplitPosition2InstructionAsync(input),
-            ),
-          swap: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSwapInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCloseConfigInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          swap2: (input) =>
+          closePosition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSwap2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getClosePositionInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          updateRewardDuration: (input) =>
+          closeTokenBadge: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateRewardDurationInstructionAsync(input),
+              getCloseTokenBadgeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateRewardFunder: (input) =>
+          createClaimFeeOperator: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateRewardFunderInstructionAsync(input),
+              getCreateClaimFeeOperatorInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawIneligibleReward: (input) =>
+          createConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawIneligibleRewardInstructionAsync(input),
+              getCreateConfigInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          createDynamicConfig: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateDynamicConfigInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          createPosition: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreatePositionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createTokenBadge: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTokenBadgeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          fundReward: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFundRewardInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          initializeCustomizablePool: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeCustomizablePoolInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initializePool: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePoolInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initializePoolWithDynamicConfig: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializePoolWithDynamicConfigInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initializeReward: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeRewardInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          lockPosition: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockPositionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          permanentLockPosition: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getPermanentLockPositionInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          refreshVesting: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRefreshVestingInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          removeAllLiquidity: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveAllLiquidityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          removeLiquidity: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveLiquidityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setPoolStatus: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetPoolStatusInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          splitPosition: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSplitPositionInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          splitPosition2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSplitPosition2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          swap: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSwapInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          swap2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSwap2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateRewardDuration: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateRewardDurationInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          updateRewardFunder: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateRewardFunderInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawIneligibleReward: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawIneligibleRewardInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          poolAuthority: findPoolAuthorityPda,
-          config: findConfigPda,
-          pool: findPoolPda,
-          position: findPositionPda,
-          tokenVault: findTokenVaultPda,
-          rewardVault: findRewardVaultPda,
-          customizablePool: findCustomizablePoolPda,
-          tokenBadge: findTokenBadgePda,
-          claimFeeOperator: findClaimFeeOperatorPda,
-          positionNftAccount: findPositionNftAccountPda,
-          eventAuthority: findEventAuthorityPda,
+          poolAuthority: (pdaConfig) =>
+            findPoolAuthorityPda({
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          config: (seeds, pdaConfig) =>
+            findConfigPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          pool: (seeds, pdaConfig) =>
+            findPoolPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          position: (seeds, pdaConfig) =>
+            findPositionPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          tokenVault: (seeds, pdaConfig) =>
+            findTokenVaultPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          rewardVault: (seeds, pdaConfig) =>
+            findRewardVaultPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          customizablePool: (seeds, pdaConfig) =>
+            findCustomizablePoolPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          tokenBadge: (seeds, pdaConfig) =>
+            findTokenBadgePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          claimFeeOperator: (seeds, pdaConfig) =>
+            findClaimFeeOperatorPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          positionNftAccount: (seeds, pdaConfig) =>
+            findPositionNftAccountPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          eventAuthority: (pdaConfig) =>
+            findEventAuthorityPda({
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyCpAmmAccount,
         identifyInstruction: identifyCpAmmInstruction,

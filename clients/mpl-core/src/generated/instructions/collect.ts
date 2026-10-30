@@ -28,7 +28,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -83,13 +86,13 @@ export function getCollectInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CollectInput<
-  TAccountRecipient1 extends string = string,
-  TAccountRecipient2 extends string = string,
+  TAccountRecipient1 extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRecipient2 extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** The address of the recipient 1 */
-  recipient1: Address<TAccountRecipient1>;
+  recipient1: TAccountRecipient1;
   /** The address of the recipient 2 */
-  recipient2: Address<TAccountRecipient2>;
+  recipient2: TAccountRecipient2;
 };
 
 /**
@@ -100,28 +103,57 @@ export type CollectInput<
  * required.
  */
 export function getCollectInstruction<
-  TAccountRecipient1 extends string,
-  TAccountRecipient2 extends string,
+  TAccountRecipient1 extends InstructionAccountInput,
+  TAccountRecipient2 extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: CollectInput<TAccountRecipient1, TAccountRecipient2>,
-  config?: { programAddress?: TProgramAddress },
-): CollectInstruction<TProgramAddress, TAccountRecipient1, TAccountRecipient2> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): CollectInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountRecipient1,
+    InstructionAccountInputAddress<TAccountRecipient1>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRecipient2,
+    InstructionAccountInputAddress<TAccountRecipient2>
+  >
+> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    recipient1: { value: input.recipient1 ?? null, isWritable: true },
-    recipient2: { value: input.recipient2 ?? null, isWritable: true },
+    recipient1: {
+      value: input.recipient1 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    recipient2: {
+      value: input.recipient2 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("recipient1", accounts.recipient1),
@@ -131,8 +163,14 @@ export function getCollectInstruction<
     programAddress,
   } as CollectInstruction<
     TProgramAddress,
-    TAccountRecipient1,
-    TAccountRecipient2
+    ResolvedInstructionAccountMeta<
+      TAccountRecipient1,
+      InstructionAccountInputAddress<TAccountRecipient1>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRecipient2,
+      InstructionAccountInputAddress<TAccountRecipient2>
+    >
   >);
 }
 

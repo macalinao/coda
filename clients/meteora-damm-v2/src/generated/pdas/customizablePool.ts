@@ -11,14 +11,15 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type CustomizablePoolSeeds = {
   /** The first token mint (sorted) */
-  tokenAMint: Address;
+  tokenAMint: Address | HasAddress;
   /** The second token mint (sorted) */
-  tokenBMint: Address;
+  tokenBMint: Address | HasAddress;
 };
 
 /**
@@ -28,11 +29,16 @@ export type CustomizablePoolSeeds = {
  */
 export async function findCustomizablePoolPda(
   seeds: CustomizablePoolSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">,
+    programAddress:
+      programAddressInput = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

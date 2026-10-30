@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -120,26 +123,30 @@ export function getCloseBundledPositionInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CloseBundledPositionInput<
-  TAccountBundledPosition extends string = string,
-  TAccountPositionBundle extends string = string,
-  TAccountPositionBundleTokenAccount extends string = string,
-  TAccountPositionBundleAuthority extends string = string,
-  TAccountReceiver extends string = string,
+  TAccountBundledPosition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundle extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountReceiver extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  bundledPosition: Address<TAccountBundledPosition>;
-  positionBundle: Address<TAccountPositionBundle>;
-  positionBundleTokenAccount: Address<TAccountPositionBundleTokenAccount>;
-  positionBundleAuthority: TransactionSigner<TAccountPositionBundleAuthority>;
-  receiver: Address<TAccountReceiver>;
+  bundledPosition: TAccountBundledPosition;
+  positionBundle: TAccountPositionBundle;
+  positionBundleTokenAccount: TAccountPositionBundleTokenAccount;
+  positionBundleAuthority: TAccountPositionBundleAuthority;
+  receiver: TAccountReceiver;
   bundleIndex: CloseBundledPositionInstructionDataArgs["bundleIndex"];
 };
 
 export function getCloseBundledPositionInstruction<
-  TAccountBundledPosition extends string,
-  TAccountPositionBundle extends string,
-  TAccountPositionBundleTokenAccount extends string,
-  TAccountPositionBundleAuthority extends string,
-  TAccountReceiver extends string,
+  TAccountBundledPosition extends InstructionAccountInput,
+  TAccountPositionBundle extends InstructionAccountInput,
+  TAccountPositionBundleTokenAccount extends InstructionAccountInput,
+  TAccountPositionBundleAuthority extends InstructionSignerInput,
+  TAccountReceiver extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: CloseBundledPositionInput<
@@ -149,31 +156,73 @@ export function getCloseBundledPositionInstruction<
     TAccountPositionBundleAuthority,
     TAccountReceiver
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CloseBundledPositionInstruction<
   TProgramAddress,
-  TAccountBundledPosition,
-  TAccountPositionBundle,
-  TAccountPositionBundleTokenAccount,
-  TAccountPositionBundleAuthority,
-  TAccountReceiver
+  ResolvedInstructionAccountMeta<
+    TAccountBundledPosition,
+    InstructionAccountInputAddress<TAccountBundledPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundle,
+    InstructionAccountInputAddress<TAccountPositionBundle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleTokenAccount,
+    InstructionAccountInputAddress<TAccountPositionBundleTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleAuthority,
+    InstructionAccountInputAddress<TAccountPositionBundleAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReceiver,
+    InstructionAccountInputAddress<TAccountReceiver>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    bundledPosition: { value: input.bundledPosition ?? null, isWritable: true },
-    positionBundle: { value: input.positionBundle ?? null, isWritable: true },
+    bundledPosition: {
+      value: input.bundledPosition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    positionBundle: {
+      value: input.positionBundle ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     positionBundleTokenAccount: {
       value: input.positionBundleTokenAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     positionBundleAuthority: {
       value: input.positionBundleAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    receiver: { value: input.receiver ?? null, isWritable: true },
+    receiver: {
+      value: input.receiver ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -183,7 +232,6 @@ export function getCloseBundledPositionInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("bundledPosition", accounts.bundledPosition),
@@ -204,11 +252,26 @@ export function getCloseBundledPositionInstruction<
     programAddress,
   } as CloseBundledPositionInstruction<
     TProgramAddress,
-    TAccountBundledPosition,
-    TAccountPositionBundle,
-    TAccountPositionBundleTokenAccount,
-    TAccountPositionBundleAuthority,
-    TAccountReceiver
+    ResolvedInstructionAccountMeta<
+      TAccountBundledPosition,
+      InstructionAccountInputAddress<TAccountBundledPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundle,
+      InstructionAccountInputAddress<TAccountPositionBundle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleTokenAccount,
+      InstructionAccountInputAddress<TAccountPositionBundleTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleAuthority,
+      InstructionAccountInputAddress<TAccountPositionBundleAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReceiver,
+      InstructionAccountInputAddress<TAccountReceiver>
+    >
   >);
 }
 

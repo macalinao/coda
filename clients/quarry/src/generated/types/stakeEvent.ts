@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type StakeEvent = {
@@ -30,8 +31,8 @@ export type StakeEvent = {
 };
 
 export type StakeEventArgs = {
-  authority: Address;
-  token: Address;
+  authority: Address | HasAddress;
+  token: Address | HasAddress;
   amount: number | bigint;
   timestamp: number | bigint;
 };

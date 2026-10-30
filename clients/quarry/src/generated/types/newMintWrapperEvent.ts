@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type NewMintWrapperEvent = {
@@ -28,10 +29,10 @@ export type NewMintWrapperEvent = {
 };
 
 export type NewMintWrapperEventArgs = {
-  mintWrapper: Address;
+  mintWrapper: Address | HasAddress;
   hardCap: number | bigint;
-  admin: Address;
-  tokenMint: Address;
+  admin: Address | HasAddress;
+  tokenMint: Address | HasAddress;
 };
 
 export function getNewMintWrapperEventEncoder(): FixedSizeEncoder<NewMintWrapperEventArgs> {

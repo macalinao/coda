@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -160,57 +163,66 @@ export function getCreateProgramGovernanceInstructionDataCodec(): Codec<
 }
 
 export type CreateProgramGovernanceInput<
-  TAccountRealmAccount extends string = string,
-  TAccountProgramGovernanceAccount extends string = string,
-  TAccountGovernedProgram extends string = string,
-  TAccountProgramData extends string = string,
-  TAccountCurrentUpgradeAuthority extends string = string,
-  TAccountGoverningTokenOwnerRecord extends string = string,
-  TAccountPayer extends string = string,
-  TAccountBpfUpgradeableLoaderProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountGovernanceAuthority extends string = string,
-  TAccountRealmConfig extends string = string,
-  TAccountVoterWeightRecord extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgramGovernanceAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernedProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCurrentUpgradeAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountGoverningTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountBpfUpgradeableLoaderProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountRealmConfig extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Realm account the created Governance belongs to */
-  realmAccount: Address<TAccountRealmAccount>;
+  realmAccount: TAccountRealmAccount;
   /** Program Governance account. seeds: ['program-governance', realm, governed_program] */
-  programGovernanceAccount: Address<TAccountProgramGovernanceAccount>;
+  programGovernanceAccount: TAccountProgramGovernanceAccount;
   /** Program governed by this Governance account */
-  governedProgram: Address<TAccountGovernedProgram>;
+  governedProgram: TAccountGovernedProgram;
   /** Program Data account of the Program governed by this Governance account */
-  programData: Address<TAccountProgramData>;
+  programData: TAccountProgramData;
   /** Current Upgrade Authority account of the Program governed by this Governance account */
-  currentUpgradeAuthority: TransactionSigner<TAccountCurrentUpgradeAuthority>;
+  currentUpgradeAuthority: TAccountCurrentUpgradeAuthority;
   /** Governing TokenOwnerRecord account (Used only if not signed by RealmAuthority) */
-  governingTokenOwnerRecord: Address<TAccountGoverningTokenOwnerRecord>;
-  payer: TransactionSigner<TAccountPayer>;
+  governingTokenOwnerRecord: TAccountGoverningTokenOwnerRecord;
+  payer: TAccountPayer;
   /** bpf_upgradeable_loader_program program */
-  bpfUpgradeableLoaderProgram?: Address<TAccountBpfUpgradeableLoaderProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
+  bpfUpgradeableLoaderProgram?: TAccountBpfUpgradeableLoaderProgram;
+  systemProgram?: TAccountSystemProgram;
+  governanceAuthority: TAccountGovernanceAuthority;
   /** RealmConfig account. seeds=['realm-config', realm] */
-  realmConfig: Address<TAccountRealmConfig>;
+  realmConfig: TAccountRealmConfig;
   /** Optional Voter Weight Record */
-  voterWeightRecord?: Address<TAccountVoterWeightRecord>;
+  voterWeightRecord?: TAccountVoterWeightRecord;
   config: CreateProgramGovernanceInstructionDataArgs["config"];
   transferUpgradeAuthority: CreateProgramGovernanceInstructionDataArgs["transferUpgradeAuthority"];
 };
 
 export function getCreateProgramGovernanceInstruction<
-  TAccountRealmAccount extends string,
-  TAccountProgramGovernanceAccount extends string,
-  TAccountGovernedProgram extends string,
-  TAccountProgramData extends string,
-  TAccountCurrentUpgradeAuthority extends string,
-  TAccountGoverningTokenOwnerRecord extends string,
-  TAccountPayer extends string,
-  TAccountBpfUpgradeableLoaderProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountGovernanceAuthority extends string,
-  TAccountRealmConfig extends string,
-  TAccountVoterWeightRecord extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountProgramGovernanceAccount extends InstructionAccountInput,
+  TAccountGovernedProgram extends InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput,
+  TAccountCurrentUpgradeAuthority extends InstructionSignerInput,
+  TAccountGoverningTokenOwnerRecord extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountBpfUpgradeableLoaderProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput,
+  TAccountRealmConfig extends InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: CreateProgramGovernanceInput<
@@ -227,59 +239,130 @@ export function getCreateProgramGovernanceInstruction<
     TAccountRealmConfig,
     TAccountVoterWeightRecord
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateProgramGovernanceInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountProgramGovernanceAccount,
-  TAccountGovernedProgram,
-  TAccountProgramData,
-  TAccountCurrentUpgradeAuthority,
-  TAccountGoverningTokenOwnerRecord,
-  TAccountPayer,
-  TAccountBpfUpgradeableLoaderProgram,
-  TAccountSystemProgram,
-  TAccountGovernanceAuthority,
-  TAccountRealmConfig,
-  TAccountVoterWeightRecord
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgramGovernanceAccount,
+    InstructionAccountInputAddress<TAccountProgramGovernanceAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernedProgram,
+    InstructionAccountInputAddress<TAccountGovernedProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgramData,
+    InstructionAccountInputAddress<TAccountProgramData>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCurrentUpgradeAuthority,
+    InstructionAccountInputAddress<TAccountCurrentUpgradeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountGoverningTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBpfUpgradeableLoaderProgram,
+    InstructionAccountInputAddress<TAccountBpfUpgradeableLoaderProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAuthority,
+    InstructionAccountInputAddress<TAccountGovernanceAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmConfig,
+    InstructionAccountInputAddress<TAccountRealmConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterWeightRecord,
+    InstructionAccountInputAddress<TAccountVoterWeightRecord>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: false },
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     programGovernanceAccount: {
       value: input.programGovernanceAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     governedProgram: {
       value: input.governedProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    programData: { value: input.programData ?? null, isWritable: true },
+    programData: {
+      value: input.programData ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     currentUpgradeAuthority: {
       value: input.currentUpgradeAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
     governingTokenOwnerRecord: {
       value: input.governingTokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
     bpfUpgradeableLoaderProgram: {
       value: input.bpfUpgradeableLoaderProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     governanceAuthority: {
       value: input.governanceAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    realmConfig: { value: input.realmConfig ?? null, isWritable: false },
+    realmConfig: {
+      value: input.realmConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     voterWeightRecord: {
       value: input.voterWeightRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -301,7 +384,6 @@ export function getCreateProgramGovernanceInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -335,18 +417,54 @@ export function getCreateProgramGovernanceInstruction<
     programAddress,
   } as CreateProgramGovernanceInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountProgramGovernanceAccount,
-    TAccountGovernedProgram,
-    TAccountProgramData,
-    TAccountCurrentUpgradeAuthority,
-    TAccountGoverningTokenOwnerRecord,
-    TAccountPayer,
-    TAccountBpfUpgradeableLoaderProgram,
-    TAccountSystemProgram,
-    TAccountGovernanceAuthority,
-    TAccountRealmConfig,
-    TAccountVoterWeightRecord
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramGovernanceAccount,
+      InstructionAccountInputAddress<TAccountProgramGovernanceAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernedProgram,
+      InstructionAccountInputAddress<TAccountGovernedProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramData,
+      InstructionAccountInputAddress<TAccountProgramData>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCurrentUpgradeAuthority,
+      InstructionAccountInputAddress<TAccountCurrentUpgradeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountGoverningTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBpfUpgradeableLoaderProgram,
+      InstructionAccountInputAddress<TAccountBpfUpgradeableLoaderProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAuthority,
+      InstructionAccountInputAddress<TAccountGovernanceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmConfig,
+      InstructionAccountInputAddress<TAccountRealmConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterWeightRecord,
+      InstructionAccountInputAddress<TAccountVoterWeightRecord>
+    >
   >);
 }
 

@@ -31,14 +31,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findVoterPda, findVoterWeightRecordPda } from "../pdas/index.ts";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -141,36 +144,40 @@ export function getCreateVoterInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CreateVoterAsyncInput<
-  TAccountRegistrar extends string = string,
-  TAccountVoter extends string = string,
-  TAccountVoterAuthority extends string = string,
-  TAccountVoterWeightRecord extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountInstructions extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountInstructions extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  voter?: Address<TAccountVoter>;
-  voterAuthority: TransactionSigner<TAccountVoterAuthority>;
-  voterWeightRecord?: Address<TAccountVoterWeightRecord>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
-  instructions: Address<TAccountInstructions>;
+  registrar: TAccountRegistrar;
+  voter?: TAccountVoter;
+  voterAuthority: TAccountVoterAuthority;
+  voterWeightRecord?: TAccountVoterWeightRecord;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
+  instructions: TAccountInstructions;
   voterBump: CreateVoterInstructionDataArgs["voterBump"];
   voterWeightRecordBump: CreateVoterInstructionDataArgs["voterWeightRecordBump"];
 };
 
 export async function getCreateVoterInstructionAsync<
-  TAccountRegistrar extends string,
-  TAccountVoter extends string,
-  TAccountVoterAuthority extends string,
-  TAccountVoterWeightRecord extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
-  TAccountInstructions extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountInstructions extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: CreateVoterAsyncInput<
@@ -183,37 +190,90 @@ export async function getCreateVoterInstructionAsync<
     TAccountRent,
     TAccountInstructions
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   CreateVoterInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVoterAuthority,
-    TAccountVoterWeightRecord,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountInstructions
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterAuthority,
+      InstructionAccountInputAddress<TAccountVoterAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterWeightRecord,
+      InstructionAccountInputAddress<TAccountVoterWeightRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInstructions,
+      InstructionAccountInputAddress<TAccountInstructions>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: true },
-    voterAuthority: { value: input.voterAuthority ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: true },
+    voterAuthority: {
+      value: input.voterAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     voterWeightRecord: {
       value: input.voterWeightRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
-    instructions: { value: input.instructions ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    instructions: {
+      value: input.instructions ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -263,7 +323,6 @@ export async function getCreateVoterInstructionAsync<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -281,48 +340,76 @@ export async function getCreateVoterInstructionAsync<
     programAddress,
   } as CreateVoterInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVoterAuthority,
-    TAccountVoterWeightRecord,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountInstructions
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterAuthority,
+      InstructionAccountInputAddress<TAccountVoterAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterWeightRecord,
+      InstructionAccountInputAddress<TAccountVoterWeightRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInstructions,
+      InstructionAccountInputAddress<TAccountInstructions>
+    >
   >);
 }
 
 export type CreateVoterInput<
-  TAccountRegistrar extends string = string,
-  TAccountVoter extends string = string,
-  TAccountVoterAuthority extends string = string,
-  TAccountVoterWeightRecord extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountInstructions extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountInstructions extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  voter: Address<TAccountVoter>;
-  voterAuthority: TransactionSigner<TAccountVoterAuthority>;
-  voterWeightRecord: Address<TAccountVoterWeightRecord>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
-  instructions: Address<TAccountInstructions>;
+  registrar: TAccountRegistrar;
+  voter: TAccountVoter;
+  voterAuthority: TAccountVoterAuthority;
+  voterWeightRecord: TAccountVoterWeightRecord;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
+  instructions: TAccountInstructions;
   voterBump: CreateVoterInstructionDataArgs["voterBump"];
   voterWeightRecordBump: CreateVoterInstructionDataArgs["voterWeightRecordBump"];
 };
 
 export function getCreateVoterInstruction<
-  TAccountRegistrar extends string,
-  TAccountVoter extends string,
-  TAccountVoterAuthority extends string,
-  TAccountVoterWeightRecord extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
-  TAccountInstructions extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountInstructions extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: CreateVoterInput<
@@ -335,35 +422,88 @@ export function getCreateVoterInstruction<
     TAccountRent,
     TAccountInstructions
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateVoterInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountVoter,
-  TAccountVoterAuthority,
-  TAccountVoterWeightRecord,
-  TAccountPayer,
-  TAccountSystemProgram,
-  TAccountRent,
-  TAccountInstructions
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterAuthority,
+    InstructionAccountInputAddress<TAccountVoterAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterWeightRecord,
+    InstructionAccountInputAddress<TAccountVoterWeightRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountInstructions,
+    InstructionAccountInputAddress<TAccountInstructions>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: true },
-    voterAuthority: { value: input.voterAuthority ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: true },
+    voterAuthority: {
+      value: input.voterAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     voterWeightRecord: {
       value: input.voterWeightRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
-    instructions: { value: input.instructions ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    instructions: {
+      value: input.instructions ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -383,7 +523,6 @@ export function getCreateVoterInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -401,14 +540,38 @@ export function getCreateVoterInstruction<
     programAddress,
   } as CreateVoterInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVoterAuthority,
-    TAccountVoterWeightRecord,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountInstructions
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterAuthority,
+      InstructionAccountInputAddress<TAccountVoterAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterWeightRecord,
+      InstructionAccountInputAddress<TAccountVoterWeightRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInstructions,
+      InstructionAccountInputAddress<TAccountInstructions>
+    >
   >);
 }
 

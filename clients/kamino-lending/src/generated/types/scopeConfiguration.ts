@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ScopeConfiguration = {
@@ -31,7 +32,14 @@ export type ScopeConfiguration = {
   twapChain: Array<number>;
 };
 
-export type ScopeConfigurationArgs = ScopeConfiguration;
+export type ScopeConfigurationArgs = {
+  /** Pubkey of the scope price feed (disabled if `null` or `default`) */
+  priceFeed: Address | HasAddress;
+  /** This is the scope_id price chain that results in a price for the token */
+  priceChain: Array<number>;
+  /** This is the scope_id price chain for the twap */
+  twapChain: Array<number>;
+};
 
 export function getScopeConfigurationEncoder(): FixedSizeEncoder<ScopeConfigurationArgs> {
   return getStructEncoder([

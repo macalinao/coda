@@ -28,12 +28,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -64,12 +68,12 @@ export type MintWrapper = {
 };
 
 export type MintWrapperArgs = {
-  base: Address;
+  base: Address | HasAddress;
   bump: number;
   hardCap: number | bigint;
-  admin: Address;
-  pendingAdmin: Address;
-  tokenMint: Address;
+  admin: Address | HasAddress;
+  pendingAdmin: Address | HasAddress;
+  tokenMint: Address | HasAddress;
   numMinters: number | bigint;
   totalAllowance: number | bigint;
   totalMinted: number | bigint;
@@ -134,8 +138,10 @@ export function decodeMintWrapper<TAddress extends string = string>(
 }
 
 export async function fetchMintWrapper<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<MintWrapper, TAddress>> {
   const maybeAccount = await fetchMaybeMintWrapper(rpc, address, config);
@@ -144,17 +150,25 @@ export async function fetchMintWrapper<TAddress extends string = string>(
 }
 
 export async function fetchMaybeMintWrapper<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<MintWrapper, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeMintWrapper(maybeAccount);
 }
 
 export async function fetchAllMintWrapper(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MintWrapper>[]> {
   const maybeAccounts = await fetchAllMaybeMintWrapper(rpc, addresses, config);
@@ -163,18 +177,26 @@ export async function fetchAllMintWrapper(
 }
 
 export async function fetchAllMaybeMintWrapper(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MintWrapper>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeMintWrapper(maybeAccount));
 }
 
 export async function fetchMintWrapperFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: MintWrapperSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<MintWrapper>> {
   const maybeAccount = await fetchMaybeMintWrapperFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -182,9 +204,11 @@ export async function fetchMintWrapperFromSeeds(
 }
 
 export async function fetchMaybeMintWrapperFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: MintWrapperSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<MintWrapper>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findMintWrapperPda(seeds, { programAddress });

@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type LockEvent = {
@@ -35,9 +36,9 @@ export type LockEvent = {
 };
 
 export type LockEventArgs = {
-  locker: Address;
-  escrowOwner: Address;
-  tokenMint: Address;
+  locker: Address | HasAddress;
+  escrowOwner: Address | HasAddress;
+  tokenMint: Address | HasAddress;
   amount: number | bigint;
   lockerSupply: number | bigint;
   duration: number | bigint;

@@ -33,12 +33,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -119,21 +122,21 @@ export function getExecuteTransactionDerivedInstructionDataCodec(): FixedSizeCod
 }
 
 export type ExecuteTransactionDerivedInput<
-  TAccountSmartWallet extends string = string,
-  TAccountTransaction extends string = string,
-  TAccountOwner extends string = string,
+  TAccountSmartWallet extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTransaction extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
 > = {
-  smartWallet: Address<TAccountSmartWallet>;
-  transaction: Address<TAccountTransaction>;
-  owner: TransactionSigner<TAccountOwner>;
+  smartWallet: TAccountSmartWallet;
+  transaction: TAccountTransaction;
+  owner: TAccountOwner;
   index: ExecuteTransactionDerivedInstructionDataArgs["index"];
   bump: ExecuteTransactionDerivedInstructionDataArgs["bump"];
 };
 
 export function getExecuteTransactionDerivedInstruction<
-  TAccountSmartWallet extends string,
-  TAccountTransaction extends string,
-  TAccountOwner extends string,
+  TAccountSmartWallet extends InstructionAccountInput,
+  TAccountTransaction extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
   TProgramAddress extends Address = typeof SMART_WALLET_PROGRAM_ADDRESS,
 >(
   input: ExecuteTransactionDerivedInput<
@@ -141,21 +144,51 @@ export function getExecuteTransactionDerivedInstruction<
     TAccountTransaction,
     TAccountOwner
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ExecuteTransactionDerivedInstruction<
   TProgramAddress,
-  TAccountSmartWallet,
-  TAccountTransaction,
-  TAccountOwner
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTransaction,
+    InstructionAccountInputAddress<TAccountTransaction>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    smartWallet: { value: input.smartWallet ?? null, isWritable: false },
-    transaction: { value: input.transaction ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    transaction: {
+      value: input.transaction ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -165,7 +198,6 @@ export function getExecuteTransactionDerivedInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("smartWallet", accounts.smartWallet),
@@ -178,9 +210,18 @@ export function getExecuteTransactionDerivedInstruction<
     programAddress,
   } as ExecuteTransactionDerivedInstruction<
     TProgramAddress,
-    TAccountSmartWallet,
-    TAccountTransaction,
-    TAccountOwner
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTransaction,
+      InstructionAccountInputAddress<TAccountTransaction>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >
   >);
 }
 

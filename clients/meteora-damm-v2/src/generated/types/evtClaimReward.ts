@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtClaimReward = {
@@ -32,10 +33,10 @@ export type EvtClaimReward = {
 };
 
 export type EvtClaimRewardArgs = {
-  pool: Address;
-  position: Address;
-  owner: Address;
-  mintReward: Address;
+  pool: Address | HasAddress;
+  position: Address | HasAddress;
+  owner: Address | HasAddress;
+  mintReward: Address | HasAddress;
   rewardIndex: number;
   totalReward: number | bigint;
 };

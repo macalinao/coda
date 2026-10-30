@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /**
@@ -34,7 +35,15 @@ export type Creator = {
   percentage: number;
 };
 
-export type CreatorArgs = Creator;
+export type CreatorArgs = {
+  /** The creator's address. */
+  address: Address | HasAddress;
+  /**
+   * The creator's share of royalties, in whole percentage points
+   * (0-100).
+   */
+  percentage: number;
+};
 
 export function getCreatorEncoder(): FixedSizeEncoder<CreatorArgs> {
   return getStructEncoder([

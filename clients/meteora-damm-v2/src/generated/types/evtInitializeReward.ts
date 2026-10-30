@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtInitializeReward = {
@@ -32,10 +33,10 @@ export type EvtInitializeReward = {
 };
 
 export type EvtInitializeRewardArgs = {
-  pool: Address;
-  rewardMint: Address;
-  funder: Address;
-  creator: Address;
+  pool: Address | HasAddress;
+  rewardMint: Address | HasAddress;
+  funder: Address | HasAddress;
+  creator: Address | HasAddress;
   rewardIndex: number;
   rewardDuration: number | bigint;
 };

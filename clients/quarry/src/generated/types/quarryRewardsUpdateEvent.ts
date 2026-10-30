@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type QuarryRewardsUpdateEvent = {
@@ -30,7 +31,7 @@ export type QuarryRewardsUpdateEvent = {
 };
 
 export type QuarryRewardsUpdateEventArgs = {
-  tokenMint: Address;
+  tokenMint: Address | HasAddress;
   annualRewardsRate: number | bigint;
   rewardsShare: number | bigint;
   timestamp: number | bigint;

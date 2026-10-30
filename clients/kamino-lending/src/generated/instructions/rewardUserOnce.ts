@@ -29,13 +29,16 @@ import {
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -113,21 +116,21 @@ export function getRewardUserOnceInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RewardUserOnceInput<
-  TAccountFarmAdmin extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountUserState extends string = string,
+  TAccountFarmAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  farmAdmin: TransactionSigner<TAccountFarmAdmin>;
-  farmState: Address<TAccountFarmState>;
-  userState: Address<TAccountUserState>;
+  farmAdmin: TAccountFarmAdmin;
+  farmState: TAccountFarmState;
+  userState: TAccountUserState;
   rewardIndex: RewardUserOnceInstructionDataArgs["rewardIndex"];
   amount: RewardUserOnceInstructionDataArgs["amount"];
 };
 
 export function getRewardUserOnceInstruction<
-  TAccountFarmAdmin extends string,
-  TAccountFarmState extends string,
-  TAccountUserState extends string,
+  TAccountFarmAdmin extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountUserState extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: RewardUserOnceInput<
@@ -135,21 +138,54 @@ export function getRewardUserOnceInstruction<
     TAccountFarmState,
     TAccountUserState
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RewardUserOnceInstruction<
   TProgramAddress,
-  TAccountFarmAdmin,
-  TAccountFarmState,
-  TAccountUserState
+  ResolvedInstructionAccountMeta<
+    TAccountFarmAdmin,
+    InstructionAccountInputAddress<TAccountFarmAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserState,
+    InstructionAccountInputAddress<TAccountUserState>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    farmAdmin: { value: input.farmAdmin ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    userState: { value: input.userState ?? null, isWritable: true },
+    farmAdmin: {
+      value: input.farmAdmin ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -159,7 +195,6 @@ export function getRewardUserOnceInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("farmAdmin", accounts.farmAdmin),
@@ -172,9 +207,18 @@ export function getRewardUserOnceInstruction<
     programAddress,
   } as RewardUserOnceInstruction<
     TProgramAddress,
-    TAccountFarmAdmin,
-    TAccountFarmState,
-    TAccountUserState
+    ResolvedInstructionAccountMeta<
+      TAccountFarmAdmin,
+      InstructionAccountInputAddress<TAccountFarmAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >
   >);
 }
 

@@ -27,13 +27,16 @@ import {
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -96,42 +99,65 @@ export function getUpdateFarmAdminInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateFarmAdminInput<
-  TAccountPendingFarmAdmin extends string = string,
-  TAccountFarmState extends string = string,
+  TAccountPendingFarmAdmin extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pendingFarmAdmin: TransactionSigner<TAccountPendingFarmAdmin>;
-  farmState: Address<TAccountFarmState>;
+  pendingFarmAdmin: TAccountPendingFarmAdmin;
+  farmState: TAccountFarmState;
 };
 
 export function getUpdateFarmAdminInstruction<
-  TAccountPendingFarmAdmin extends string,
-  TAccountFarmState extends string,
+  TAccountPendingFarmAdmin extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: UpdateFarmAdminInput<TAccountPendingFarmAdmin, TAccountFarmState>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateFarmAdminInstruction<
   TProgramAddress,
-  TAccountPendingFarmAdmin,
-  TAccountFarmState
+  ResolvedInstructionAccountMeta<
+    TAccountPendingFarmAdmin,
+    InstructionAccountInputAddress<TAccountPendingFarmAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     pendingFarmAdmin: {
       value: input.pendingFarmAdmin ?? null,
+      isSigner: true,
       isWritable: true,
     },
-    farmState: { value: input.farmState ?? null, isWritable: true },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pendingFarmAdmin", accounts.pendingFarmAdmin),
@@ -141,8 +167,14 @@ export function getUpdateFarmAdminInstruction<
     programAddress,
   } as UpdateFarmAdminInstruction<
     TProgramAddress,
-    TAccountPendingFarmAdmin,
-    TAccountFarmState
+    ResolvedInstructionAccountMeta<
+      TAccountPendingFarmAdmin,
+      InstructionAccountInputAddress<TAccountPendingFarmAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >
   >);
 }
 

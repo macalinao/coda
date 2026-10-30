@@ -20,6 +20,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -39,7 +40,7 @@ export type UpdateMetadataAccountArgsV2 = {
 
 export type UpdateMetadataAccountArgsV2Args = {
   data: OptionOrNullable<DataV2Args>;
-  updateAuthority: OptionOrNullable<Address>;
+  updateAuthority: OptionOrNullable<Address | HasAddress>;
   primarySaleHappened: OptionOrNullable<boolean>;
   isMutable: OptionOrNullable<boolean>;
 };

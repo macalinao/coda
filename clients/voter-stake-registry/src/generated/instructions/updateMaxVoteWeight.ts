@@ -30,7 +30,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -95,37 +98,61 @@ export function getUpdateMaxVoteWeightInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateMaxVoteWeightInput<
-  TAccountRegistrar extends string = string,
-  TAccountMaxVoteWeightRecord extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMaxVoteWeightRecord extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  maxVoteWeightRecord: Address<TAccountMaxVoteWeightRecord>;
+  registrar: TAccountRegistrar;
+  maxVoteWeightRecord: TAccountMaxVoteWeightRecord;
 };
 
 export function getUpdateMaxVoteWeightInstruction<
-  TAccountRegistrar extends string,
-  TAccountMaxVoteWeightRecord extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountMaxVoteWeightRecord extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: UpdateMaxVoteWeightInput<
     TAccountRegistrar,
     TAccountMaxVoteWeightRecord
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateMaxVoteWeightInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountMaxVoteWeightRecord
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMaxVoteWeightRecord,
+    InstructionAccountInputAddress<TAccountMaxVoteWeightRecord>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     maxVoteWeightRecord: {
       value: input.maxVoteWeightRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -134,7 +161,6 @@ export function getUpdateMaxVoteWeightInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -144,8 +170,14 @@ export function getUpdateMaxVoteWeightInstruction<
     programAddress,
   } as UpdateMaxVoteWeightInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountMaxVoteWeightRecord
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMaxVoteWeightRecord,
+      InstructionAccountInputAddress<TAccountMaxVoteWeightRecord>
+    >
   >);
 }
 

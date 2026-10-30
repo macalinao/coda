@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtWithdrawIneligibleReward = {
@@ -27,8 +28,8 @@ export type EvtWithdrawIneligibleReward = {
 };
 
 export type EvtWithdrawIneligibleRewardArgs = {
-  pool: Address;
-  rewardMint: Address;
+  pool: Address | HasAddress;
+  rewardMint: Address | HasAddress;
   amount: number | bigint;
 };
 

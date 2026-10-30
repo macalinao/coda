@@ -41,13 +41,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -179,27 +182,31 @@ export function getCreateDepositEntryInstructionDataCodec(): Codec<
 }
 
 export type CreateDepositEntryInput<
-  TAccountRegistrar extends string = string,
-  TAccountVoter extends string = string,
-  TAccountVault extends string = string,
-  TAccountVoterAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountDepositMint extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountAssociatedTokenProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountDepositMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  voter: Address<TAccountVoter>;
-  vault: Address<TAccountVault>;
-  voterAuthority: TransactionSigner<TAccountVoterAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
-  depositMint: Address<TAccountDepositMint>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-  rent?: Address<TAccountRent>;
+  registrar: TAccountRegistrar;
+  voter: TAccountVoter;
+  vault: TAccountVault;
+  voterAuthority: TAccountVoterAuthority;
+  payer: TAccountPayer;
+  depositMint: TAccountDepositMint;
+  systemProgram?: TAccountSystemProgram;
+  tokenProgram?: TAccountTokenProgram;
+  associatedTokenProgram?: TAccountAssociatedTokenProgram;
+  rent?: TAccountRent;
   depositEntryIndex: CreateDepositEntryInstructionDataArgs["depositEntryIndex"];
   kind: CreateDepositEntryInstructionDataArgs["kind"];
   startTs: CreateDepositEntryInstructionDataArgs["startTs"];
@@ -208,16 +215,16 @@ export type CreateDepositEntryInput<
 };
 
 export function getCreateDepositEntryInstruction<
-  TAccountRegistrar extends string,
-  TAccountVoter extends string,
-  TAccountVault extends string,
-  TAccountVoterAuthority extends string,
-  TAccountPayer extends string,
-  TAccountDepositMint extends string,
-  TAccountSystemProgram extends string,
-  TAccountTokenProgram extends string,
-  TAccountAssociatedTokenProgram extends string,
-  TAccountRent extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountDepositMint extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: CreateDepositEntryInput<
@@ -232,39 +239,102 @@ export function getCreateDepositEntryInstruction<
     TAccountAssociatedTokenProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateDepositEntryInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountVoter,
-  TAccountVault,
-  TAccountVoterAuthority,
-  TAccountPayer,
-  TAccountDepositMint,
-  TAccountSystemProgram,
-  TAccountTokenProgram,
-  TAccountAssociatedTokenProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVault,
+    InstructionAccountInputAddress<TAccountVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterAuthority,
+    InstructionAccountInputAddress<TAccountVoterAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDepositMint,
+    InstructionAccountInputAddress<TAccountDepositMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAssociatedTokenProgram,
+    InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: true },
-    vault: { value: input.vault ?? null, isWritable: true },
-    voterAuthority: { value: input.voterAuthority ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    depositMint: { value: input.depositMint ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    associatedTokenProgram: {
-      value: input.associatedTokenProgram ?? null,
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    rent: { value: input.rent ?? null, isWritable: false },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: true },
+    vault: { value: input.vault ?? null, isSigner: false, isWritable: true },
+    voterAuthority: {
+      value: input.voterAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    depositMint: {
+      value: input.depositMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    associatedTokenProgram: {
+      value: input.associatedTokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -292,7 +362,6 @@ export function getCreateDepositEntryInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -312,16 +381,46 @@ export function getCreateDepositEntryInstruction<
     programAddress,
   } as CreateDepositEntryInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVault,
-    TAccountVoterAuthority,
-    TAccountPayer,
-    TAccountDepositMint,
-    TAccountSystemProgram,
-    TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVault,
+      InstructionAccountInputAddress<TAccountVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterAuthority,
+      InstructionAccountInputAddress<TAccountVoterAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDepositMint,
+      InstructionAccountInputAddress<TAccountDepositMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssociatedTokenProgram,
+      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

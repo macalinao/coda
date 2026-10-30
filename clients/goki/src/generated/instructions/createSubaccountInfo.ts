@@ -29,18 +29,22 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -95,8 +99,8 @@ export type CreateSubaccountInfoInstructionData = {
 
 export type CreateSubaccountInfoInstructionDataArgs = {
   bump: number;
-  subaccount: Address;
-  smartWallet: Address;
+  subaccount: Address | HasAddress;
+  smartWallet: Address | HasAddress;
   index: number | bigint;
   subaccountType: SubaccountTypeArgs;
 };
@@ -140,13 +144,15 @@ export function getCreateSubaccountInfoInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CreateSubaccountInfoInput<
-  TAccountSubaccountInfo extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountSubaccountInfo extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  subaccountInfo: Address<TAccountSubaccountInfo>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  subaccountInfo: TAccountSubaccountInfo;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: CreateSubaccountInfoInstructionDataArgs["bump"];
   subaccount: CreateSubaccountInfoInstructionDataArgs["subaccount"];
   smartWallet: CreateSubaccountInfoInstructionDataArgs["smartWallet"];
@@ -155,9 +161,9 @@ export type CreateSubaccountInfoInput<
 };
 
 export function getCreateSubaccountInfoInstruction<
-  TAccountSubaccountInfo extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountSubaccountInfo extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SMART_WALLET_PROGRAM_ADDRESS,
 >(
   input: CreateSubaccountInfoInput<
@@ -165,21 +171,51 @@ export function getCreateSubaccountInfoInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateSubaccountInfoInstruction<
   TProgramAddress,
-  TAccountSubaccountInfo,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountSubaccountInfo,
+    InstructionAccountInputAddress<TAccountSubaccountInfo>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    subaccountInfo: { value: input.subaccountInfo ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    subaccountInfo: {
+      value: input.subaccountInfo ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -195,7 +231,6 @@ export function getCreateSubaccountInfoInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("subaccountInfo", accounts.subaccountInfo),
@@ -208,9 +243,18 @@ export function getCreateSubaccountInfoInstruction<
     programAddress,
   } as CreateSubaccountInfoInstruction<
     TProgramAddress,
-    TAccountSubaccountInfo,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountSubaccountInfo,
+      InstructionAccountInputAddress<TAccountSubaccountInfo>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

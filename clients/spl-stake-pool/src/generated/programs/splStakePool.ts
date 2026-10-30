@@ -23,6 +23,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -673,107 +674,134 @@ export type SplStakePoolPluginAccounts = {
 export type SplStakePoolPluginInstructions = {
   initialize: (
     input: InitializeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeInstructionAsync> &
     SelfPlanAndSendFunctions;
   addValidatorToPool: (
     input: AddValidatorToPoolAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddValidatorToPoolInstructionAsync> &
     SelfPlanAndSendFunctions;
   removeValidatorFromPool: (
     input: RemoveValidatorFromPoolAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveValidatorFromPoolInstructionAsync> &
     SelfPlanAndSendFunctions;
   decreaseValidatorStake: (
     input: DecreaseValidatorStakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDecreaseValidatorStakeInstructionAsync> &
     SelfPlanAndSendFunctions;
   increaseValidatorStake: (
     input: IncreaseValidatorStakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getIncreaseValidatorStakeInstructionAsync> &
     SelfPlanAndSendFunctions;
   setPreferredValidator: (
     input: SetPreferredValidatorInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetPreferredValidatorInstruction> &
     SelfPlanAndSendFunctions;
   updateValidatorListBalance: (
     input: UpdateValidatorListBalanceAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateValidatorListBalanceInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateStakePoolBalance: (
     input: UpdateStakePoolBalanceAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateStakePoolBalanceInstructionAsync> &
     SelfPlanAndSendFunctions;
   cleanupRemovedValidatorEntries: (
     input: CleanupRemovedValidatorEntriesInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCleanupRemovedValidatorEntriesInstruction> &
     SelfPlanAndSendFunctions;
   depositStake: (
     input: DepositStakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositStakeInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawStake: (
     input: WithdrawStakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawStakeInstructionAsync> &
     SelfPlanAndSendFunctions;
   setManager: (
     input: SetManagerInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetManagerInstruction> & SelfPlanAndSendFunctions;
   setFee: (
     input: SetFeeInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetFeeInstruction> & SelfPlanAndSendFunctions;
   setStaker: (
     input: SetStakerInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetStakerInstruction> & SelfPlanAndSendFunctions;
   depositSol: (
     input: MakeOptional<DepositSolAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositSolInstructionAsync> &
     SelfPlanAndSendFunctions;
   setFundingAuthority: (
     input: SetFundingAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetFundingAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   withdrawSol: (
     input: WithdrawSolAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawSolInstructionAsync> &
     SelfPlanAndSendFunctions;
   createTokenMetadata: (
     input: MakeOptional<CreateTokenMetadataAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTokenMetadataInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateTokenMetadata: (
     input: UpdateTokenMetadataAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateTokenMetadataInstructionAsync> &
     SelfPlanAndSendFunctions;
   increaseAdditionalValidatorStake: (
     input: IncreaseAdditionalValidatorStakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getIncreaseAdditionalValidatorStakeInstructionAsync> &
     SelfPlanAndSendFunctions;
   decreaseAdditionalValidatorStake: (
     input: DecreaseAdditionalValidatorStakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDecreaseAdditionalValidatorStakeInstructionAsync> &
     SelfPlanAndSendFunctions;
   decreaseValidatorStakeWithReserve: (
     input: DecreaseValidatorStakeWithReserveAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDecreaseValidatorStakeWithReserveInstructionAsync> &
     SelfPlanAndSendFunctions;
   redelegate: (
     input: RedelegateAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRedelegateInstructionAsync> &
     SelfPlanAndSendFunctions;
   depositStakeWithSlippage: (
     input: DepositStakeWithSlippageAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositStakeWithSlippageInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawStakeWithSlippage: (
     input: WithdrawStakeWithSlippageAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawStakeWithSlippageInstructionAsync> &
     SelfPlanAndSendFunctions;
   depositSolWithSlippage: (
     input: MakeOptional<DepositSolWithSlippageAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositSolWithSlippageInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawSolWithSlippage: (
     input: WithdrawSolWithSlippageAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawSolWithSlippageInstructionAsync> &
     SelfPlanAndSendFunctions;
 };
@@ -792,7 +820,9 @@ export type SplStakePoolPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function splStakePoolProgram() {
+export function splStakePoolProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends SplStakePoolPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { splStakePool: SplStakePoolPlugin }> => {
@@ -803,150 +833,253 @@ export function splStakePoolProgram() {
           validatorList: addSelfFetchFunctions(client, getValidatorListCodec()),
         },
         instructions: {
-          initialize: (input) =>
+          initialize: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeInstructionAsync(input),
-            ),
-          addValidatorToPool: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAddValidatorToPoolInstructionAsync(input),
-            ),
-          removeValidatorFromPool: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveValidatorFromPoolInstructionAsync(input),
-            ),
-          decreaseValidatorStake: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDecreaseValidatorStakeInstructionAsync(input),
-            ),
-          increaseValidatorStake: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getIncreaseValidatorStakeInstructionAsync(input),
-            ),
-          setPreferredValidator: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetPreferredValidatorInstruction(input),
-            ),
-          updateValidatorListBalance: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateValidatorListBalanceInstructionAsync(input),
-            ),
-          updateStakePoolBalance: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateStakePoolBalanceInstructionAsync(input),
-            ),
-          cleanupRemovedValidatorEntries: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCleanupRemovedValidatorEntriesInstruction(input),
-            ),
-          depositStake: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDepositStakeInstructionAsync(input),
-            ),
-          withdrawStake: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getWithdrawStakeInstructionAsync(input),
-            ),
-          setManager: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetManagerInstruction(input),
-            ),
-          setFee: (input) =>
-            addSelfPlanAndSendFunctions(client, getSetFeeInstruction(input)),
-          setStaker: (input) =>
-            addSelfPlanAndSendFunctions(client, getSetStakerInstruction(input)),
-          depositSol: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDepositSolInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getInitializeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setFundingAuthority: (input) =>
+          addValidatorToPool: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetFundingAuthorityInstruction(input),
-            ),
-          withdrawSol: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getWithdrawSolInstructionAsync(input),
-            ),
-          createTokenMetadata: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateTokenMetadataInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getAddValidatorToPoolInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          updateTokenMetadata: (input) =>
+          removeValidatorFromPool: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateTokenMetadataInstructionAsync(input),
-            ),
-          increaseAdditionalValidatorStake: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getIncreaseAdditionalValidatorStakeInstructionAsync(input),
-            ),
-          decreaseAdditionalValidatorStake: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDecreaseAdditionalValidatorStakeInstructionAsync(input),
-            ),
-          decreaseValidatorStakeWithReserve: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDecreaseValidatorStakeWithReserveInstructionAsync(input),
-            ),
-          redelegate: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRedelegateInstructionAsync(input),
-            ),
-          depositStakeWithSlippage: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDepositStakeWithSlippageInstructionAsync(input),
-            ),
-          withdrawStakeWithSlippage: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getWithdrawStakeWithSlippageInstructionAsync(input),
-            ),
-          depositSolWithSlippage: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDepositSolWithSlippageInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getRemoveValidatorFromPoolInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          withdrawSolWithSlippage: (input) =>
+          decreaseValidatorStake: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawSolWithSlippageInstructionAsync(input),
+              getDecreaseValidatorStakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          increaseValidatorStake: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIncreaseValidatorStakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setPreferredValidator: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetPreferredValidatorInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          updateValidatorListBalance: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateValidatorListBalanceInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          updateStakePoolBalance: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateStakePoolBalanceInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          cleanupRemovedValidatorEntries: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCleanupRemovedValidatorEntriesInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositStake: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositStakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawStake: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawStakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setManager: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetManagerInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setFee: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetFeeInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setStaker: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetStakerInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositSol: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositSolInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setFundingAuthority: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetFundingAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawSol: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawSolInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          createTokenMetadata: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTokenMetadataInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateTokenMetadata: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateTokenMetadataInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          increaseAdditionalValidatorStake: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getIncreaseAdditionalValidatorStakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          decreaseAdditionalValidatorStake: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecreaseAdditionalValidatorStakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          decreaseValidatorStakeWithReserve: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecreaseValidatorStakeWithReserveInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          redelegate: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedelegateInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositStakeWithSlippage: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositStakeWithSlippageInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawStakeWithSlippage: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawStakeWithSlippageInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          depositSolWithSlippage: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositSolWithSlippageInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          withdrawSolWithSlippage: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawSolWithSlippageInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          withdrawAuthority: findWithdrawAuthorityPda,
-          stake: findStakePda,
-          transientStake: findTransientStakePda,
-          ephemeralStake: findEphemeralStakePda,
+          withdrawAuthority: (seeds, pdaConfig) =>
+            findWithdrawAuthorityPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          stake: (seeds, pdaConfig) =>
+            findStakePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          transientStake: (seeds, pdaConfig) =>
+            findTransientStakePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          ephemeralStake: (seeds, pdaConfig) =>
+            findEphemeralStakePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifySplStakePoolAccount,
         identifyInstruction: identifySplStakePoolInstruction,

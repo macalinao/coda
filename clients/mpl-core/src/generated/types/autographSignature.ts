@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** A single signature entry recorded by the `Autograph` plugin. */
@@ -32,7 +33,12 @@ export type AutographSignature = {
   message: string;
 };
 
-export type AutographSignatureArgs = AutographSignature;
+export type AutographSignatureArgs = {
+  /** The address that signed. */
+  address: Address | HasAddress;
+  /** An optional message left alongside the signature. */
+  message: string;
+};
 
 export function getAutographSignatureEncoder(): Encoder<AutographSignatureArgs> {
   return getStructEncoder([

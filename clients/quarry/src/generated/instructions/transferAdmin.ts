@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -102,19 +105,19 @@ export function getTransferAdminInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type TransferAdminInput<
-  TAccountMintWrapper extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountNextAdmin extends string = string,
+  TAccountMintWrapper extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNextAdmin extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  mintWrapper: Address<TAccountMintWrapper>;
-  admin: TransactionSigner<TAccountAdmin>;
-  nextAdmin: Address<TAccountNextAdmin>;
+  mintWrapper: TAccountMintWrapper;
+  admin: TAccountAdmin;
+  nextAdmin: TAccountNextAdmin;
 };
 
 export function getTransferAdminInstruction<
-  TAccountMintWrapper extends string,
-  TAccountAdmin extends string,
-  TAccountNextAdmin extends string,
+  TAccountMintWrapper extends InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput,
+  TAccountNextAdmin extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
 >(
   input: TransferAdminInput<
@@ -122,29 +125,57 @@ export function getTransferAdminInstruction<
     TAccountAdmin,
     TAccountNextAdmin
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): TransferAdminInstruction<
   TProgramAddress,
-  TAccountMintWrapper,
-  TAccountAdmin,
-  TAccountNextAdmin
+  ResolvedInstructionAccountMeta<
+    TAccountMintWrapper,
+    InstructionAccountInputAddress<TAccountMintWrapper>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAdmin,
+    InstructionAccountInputAddress<TAccountAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNextAdmin,
+    InstructionAccountInputAddress<TAccountNextAdmin>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    nextAdmin: { value: input.nextAdmin ?? null, isWritable: false },
+    mintWrapper: {
+      value: input.mintWrapper ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    admin: { value: input.admin ?? null, isSigner: true, isWritable: false },
+    nextAdmin: {
+      value: input.nextAdmin ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("mintWrapper", accounts.mintWrapper),
@@ -155,9 +186,18 @@ export function getTransferAdminInstruction<
     programAddress,
   } as TransferAdminInstruction<
     TProgramAddress,
-    TAccountMintWrapper,
-    TAccountAdmin,
-    TAccountNextAdmin
+    ResolvedInstructionAccountMeta<
+      TAccountMintWrapper,
+      InstructionAccountInputAddress<TAccountMintWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNextAdmin,
+      InstructionAccountInputAddress<TAccountNextAdmin>
+    >
   >);
 }
 

@@ -22,6 +22,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -30,7 +31,7 @@ export type ProgrammableConfig = { __kind: "V1"; ruleSet: Option<Address> };
 
 export type ProgrammableConfigArgs = {
   __kind: "V1";
-  ruleSet: OptionOrNullable<Address>;
+  ruleSet: OptionOrNullable<Address | HasAddress>;
 };
 
 export function getProgrammableConfigEncoder(): Encoder<ProgrammableConfigArgs> {

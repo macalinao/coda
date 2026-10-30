@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -502,47 +503,59 @@ export type SmartWalletPluginAccounts = {
 export type SmartWalletPluginInstructions = {
   createSmartWallet: (
     input: MakeOptional<CreateSmartWalletInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateSmartWalletInstruction> &
     SelfPlanAndSendFunctions;
   setOwners: (
     input: SetOwnersInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetOwnersInstruction> & SelfPlanAndSendFunctions;
   changeThreshold: (
     input: ChangeThresholdInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getChangeThresholdInstruction> &
     SelfPlanAndSendFunctions;
   createTransaction: (
     input: MakeOptional<CreateTransactionInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTransactionInstruction> &
     SelfPlanAndSendFunctions;
   createTransactionWithTimelock: (
     input: MakeOptional<CreateTransactionWithTimelockInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTransactionWithTimelockInstruction> &
     SelfPlanAndSendFunctions;
   approve: (
     input: ApproveInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getApproveInstruction> & SelfPlanAndSendFunctions;
   unapprove: (
     input: UnapproveInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnapproveInstruction> & SelfPlanAndSendFunctions;
   executeTransaction: (
     input: ExecuteTransactionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getExecuteTransactionInstruction> &
     SelfPlanAndSendFunctions;
   executeTransactionDerived: (
     input: ExecuteTransactionDerivedInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getExecuteTransactionDerivedInstruction> &
     SelfPlanAndSendFunctions;
   ownerInvokeInstruction: (
     input: OwnerInvokeInstructionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getOwnerInvokeInstructionInstruction> &
     SelfPlanAndSendFunctions;
   ownerInvokeInstructionV2: (
     input: OwnerInvokeInstructionV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getOwnerInvokeInstructionV2Instruction> &
     SelfPlanAndSendFunctions;
   createSubaccountInfo: (
     input: MakeOptional<CreateSubaccountInfoInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateSubaccountInfoInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -562,7 +575,9 @@ export type SmartWalletPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function smartWalletProgram() {
+export function smartWalletProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends SmartWalletPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { smartWallet: SmartWalletPlugin }> => {
@@ -577,76 +592,141 @@ export function smartWalletProgram() {
           ),
         },
         instructions: {
-          createSmartWallet: (input) =>
+          createSmartWallet: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateSmartWalletInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateSmartWalletInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setOwners: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetOwnersInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setOwners: (input) =>
-            addSelfPlanAndSendFunctions(client, getSetOwnersInstruction(input)),
-          changeThreshold: (input) =>
+          changeThreshold: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getChangeThresholdInstruction(input),
-            ),
-          createTransaction: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateTransactionInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getChangeThresholdInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createTransactionWithTimelock: (input) =>
+          createTransaction: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateTransactionWithTimelockInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateTransactionInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createTransactionWithTimelock: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTransactionWithTimelockInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          approve: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getApproveInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          approve: (input) =>
-            addSelfPlanAndSendFunctions(client, getApproveInstruction(input)),
-          unapprove: (input) =>
-            addSelfPlanAndSendFunctions(client, getUnapproveInstruction(input)),
-          executeTransaction: (input) =>
+          unapprove: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getExecuteTransactionInstruction(input),
-            ),
-          executeTransactionDerived: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getExecuteTransactionDerivedInstruction(input),
-            ),
-          ownerInvokeInstruction: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getOwnerInvokeInstructionInstruction(input),
-            ),
-          ownerInvokeInstructionV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getOwnerInvokeInstructionV2Instruction(input),
-            ),
-          createSubaccountInfo: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateSubaccountInfoInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUnapproveInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
+            ),
+          executeTransaction: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getExecuteTransactionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          executeTransactionDerived: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getExecuteTransactionDerivedInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          ownerInvokeInstruction: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getOwnerInvokeInstructionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          ownerInvokeInstructionV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getOwnerInvokeInstructionV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          createSubaccountInfo: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateSubaccountInfoInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
         },
         pdas: {
-          smartWallet: findSmartWalletPda,
-          transaction: findTransactionPda,
-          subaccountInfo: findSubaccountInfoPda,
-          walletDerived: findWalletDerivedPda,
-          ownerInvoker: findOwnerInvokerPda,
+          smartWallet: (seeds, pdaConfig) =>
+            findSmartWalletPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          transaction: (seeds, pdaConfig) =>
+            findTransactionPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          subaccountInfo: (seeds, pdaConfig) =>
+            findSubaccountInfoPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          walletDerived: (seeds, pdaConfig) =>
+            findWalletDerivedPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          ownerInvoker: (seeds, pdaConfig) =>
+            findOwnerInvokerPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifySmartWalletAccount,
         identifyInstruction: identifySmartWalletInstruction,

@@ -26,12 +26,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -57,9 +61,9 @@ export type LockerWhitelistEntry = {
 
 export type LockerWhitelistEntryArgs = {
   bump: number;
-  locker: Address;
-  programId: Address;
-  owner: Address;
+  locker: Address | HasAddress;
+  programId: Address | HasAddress;
+  owner: Address | HasAddress;
 };
 
 /** Gets the encoder for {@link LockerWhitelistEntryArgs} account data. */
@@ -121,8 +125,10 @@ export function decodeLockerWhitelistEntry<TAddress extends string = string>(
 export async function fetchLockerWhitelistEntry<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<LockerWhitelistEntry, TAddress>> {
   const maybeAccount = await fetchMaybeLockerWhitelistEntry(
@@ -137,17 +143,25 @@ export async function fetchLockerWhitelistEntry<
 export async function fetchMaybeLockerWhitelistEntry<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<LockerWhitelistEntry, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeLockerWhitelistEntry(maybeAccount);
 }
 
 export async function fetchAllLockerWhitelistEntry(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LockerWhitelistEntry>[]> {
   const maybeAccounts = await fetchAllMaybeLockerWhitelistEntry(
@@ -160,20 +174,28 @@ export async function fetchAllLockerWhitelistEntry(
 }
 
 export async function fetchAllMaybeLockerWhitelistEntry(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LockerWhitelistEntry>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeLockerWhitelistEntry(maybeAccount),
   );
 }
 
 export async function fetchLockerWhitelistEntryFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: WhitelistSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<LockerWhitelistEntry>> {
   const maybeAccount = await fetchMaybeLockerWhitelistEntryFromSeeds(
     rpc,
@@ -185,9 +207,11 @@ export async function fetchLockerWhitelistEntryFromSeeds(
 }
 
 export async function fetchMaybeLockerWhitelistEntryFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: WhitelistSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<LockerWhitelistEntry>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findWhitelistPda(seeds, { programAddress });

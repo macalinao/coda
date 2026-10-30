@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /**
@@ -32,7 +33,12 @@ export type Collection = {
   key: Address;
 };
 
-export type CollectionArgs = Collection;
+export type CollectionArgs = {
+  /** Whether the collection has been verified via `verifyCollection` / `setAndVerifyCollection`. */
+  verified: boolean;
+  /** Mint of the collection NFT. */
+  key: Address | HasAddress;
+};
 
 export function getCollectionEncoder(): FixedSizeEncoder<CollectionArgs> {
   return getStructEncoder([

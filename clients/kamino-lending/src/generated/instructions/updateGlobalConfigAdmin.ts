@@ -28,12 +28,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -99,43 +102,69 @@ export function getUpdateGlobalConfigAdminInstructionDataCodec(): FixedSizeCodec
 }
 
 export type UpdateGlobalConfigAdminInput<
-  TAccountPendingAdmin extends string = string,
-  TAccountGlobalConfig extends string = string,
+  TAccountPendingAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  pendingAdmin: TransactionSigner<TAccountPendingAdmin>;
-  globalConfig: Address<TAccountGlobalConfig>;
+  pendingAdmin: TAccountPendingAdmin;
+  globalConfig: TAccountGlobalConfig;
 };
 
 export function getUpdateGlobalConfigAdminInstruction<
-  TAccountPendingAdmin extends string,
-  TAccountGlobalConfig extends string,
+  TAccountPendingAdmin extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: UpdateGlobalConfigAdminInput<
     TAccountPendingAdmin,
     TAccountGlobalConfig
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateGlobalConfigAdminInstruction<
   TProgramAddress,
-  TAccountPendingAdmin,
-  TAccountGlobalConfig
+  ResolvedInstructionAccountMeta<
+    TAccountPendingAdmin,
+    InstructionAccountInputAddress<TAccountPendingAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pendingAdmin: { value: input.pendingAdmin ?? null, isWritable: false },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: true },
+    pendingAdmin: {
+      value: input.pendingAdmin ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pendingAdmin", accounts.pendingAdmin),
@@ -145,8 +174,14 @@ export function getUpdateGlobalConfigAdminInstruction<
     programAddress,
   } as UpdateGlobalConfigAdminInstruction<
     TProgramAddress,
-    TAccountPendingAdmin,
-    TAccountGlobalConfig
+    ResolvedInstructionAccountMeta<
+      TAccountPendingAdmin,
+      InstructionAccountInputAddress<TAccountPendingAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >
   >);
 }
 

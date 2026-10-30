@@ -11,21 +11,27 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type SubaccountInfoSeeds = {
-  subaccount: Address;
+  subaccount: Address | HasAddress;
 };
 
 /** Metadata describing a smart wallet subaccount */
 export async function findSubaccountInfoPda(
   seeds: SubaccountInfoSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH" as Address<"GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH">,
+    programAddress:
+      programAddressInput = "GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH" as Address<"GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

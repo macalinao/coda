@@ -32,13 +32,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -175,79 +178,91 @@ export function getCreateRealmInstructionDataCodec(): Codec<
 }
 
 export type CreateRealmInput<
-  TAccountRealmAccount extends string = string,
-  TAccountRealmAuthority extends string = string,
-  TAccountCommunityTokenMint extends string = string,
-  TAccountCommunityTokenHoldingAccount extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountCouncilTokenMint extends string = string,
-  TAccountCouncilTokenHoldingAccount extends string = string,
-  TAccountRealmConfig extends string = string,
-  TAccountCommunityVoterWeightAddin extends string = string,
-  TAccountMaxCommunityVoterWeightAddin extends string = string,
-  TAccountCouncilVoterWeightAddin extends string = string,
-  TAccountMaxCouncilVoterWeightAddin extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCommunityTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCommunityTokenHoldingAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCouncilTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCouncilTokenHoldingAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRealmConfig extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCommunityVoterWeightAddin extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMaxCommunityVoterWeightAddin extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCouncilVoterWeightAddin extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMaxCouncilVoterWeightAddin extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Governance Realm account */
-  realmAccount: Address<TAccountRealmAccount>;
+  realmAccount: TAccountRealmAccount;
   /** The authority of the Realm */
-  realmAuthority: Address<TAccountRealmAuthority>;
+  realmAuthority: TAccountRealmAuthority;
   /** The mint address of the token to be used as the community mint */
-  communityTokenMint: Address<TAccountCommunityTokenMint>;
+  communityTokenMint: TAccountCommunityTokenMint;
   /**
    * The account to hold the community tokens.
    *     PDA seeds=['governance', realm, community_mint]
    */
-  communityTokenHoldingAccount: Address<TAccountCommunityTokenHoldingAccount>;
+  communityTokenHoldingAccount: TAccountCommunityTokenHoldingAccount;
   /** the payer of this transaction */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** System Program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** SPL Token Program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** SysVar Rent */
-  rent?: Address<TAccountRent>;
+  rent?: TAccountRent;
   /** The mint address of the token to be used as the council mint */
-  councilTokenMint?: Address<TAccountCouncilTokenMint>;
+  councilTokenMint?: TAccountCouncilTokenMint;
   /**
    * The account to hold the council tokens.
    *     PDA seeds: ['governance',realm,council_mint]
    *
    */
-  councilTokenHoldingAccount?: Address<TAccountCouncilTokenHoldingAccount>;
+  councilTokenHoldingAccount?: TAccountCouncilTokenHoldingAccount;
   /** Realm Config account */
-  realmConfig: Address<TAccountRealmConfig>;
+  realmConfig: TAccountRealmConfig;
   /** Optional Community Voter Weight Addin Program Id */
-  communityVoterWeightAddin?: Address<TAccountCommunityVoterWeightAddin>;
+  communityVoterWeightAddin?: TAccountCommunityVoterWeightAddin;
   /** Optional Max Community Voter Weight Addin Program Id */
-  maxCommunityVoterWeightAddin?: Address<TAccountMaxCommunityVoterWeightAddin>;
+  maxCommunityVoterWeightAddin?: TAccountMaxCommunityVoterWeightAddin;
   /** Optional Council Voter Weight Addin Program Id */
-  councilVoterWeightAddin?: Address<TAccountCouncilVoterWeightAddin>;
+  councilVoterWeightAddin?: TAccountCouncilVoterWeightAddin;
   /** Optional Max Council Voter Weight Addin Program Id */
-  maxCouncilVoterWeightAddin?: Address<TAccountMaxCouncilVoterWeightAddin>;
+  maxCouncilVoterWeightAddin?: TAccountMaxCouncilVoterWeightAddin;
   name: CreateRealmInstructionDataArgs["name"];
   configArgs: CreateRealmInstructionDataArgs["configArgs"];
 };
 
 export function getCreateRealmInstruction<
-  TAccountRealmAccount extends string,
-  TAccountRealmAuthority extends string,
-  TAccountCommunityTokenMint extends string,
-  TAccountCommunityTokenHoldingAccount extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountTokenProgram extends string,
-  TAccountRent extends string,
-  TAccountCouncilTokenMint extends string,
-  TAccountCouncilTokenHoldingAccount extends string,
-  TAccountRealmConfig extends string,
-  TAccountCommunityVoterWeightAddin extends string,
-  TAccountMaxCommunityVoterWeightAddin extends string,
-  TAccountCouncilVoterWeightAddin extends string,
-  TAccountMaxCouncilVoterWeightAddin extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionAccountInput,
+  TAccountCommunityTokenMint extends InstructionAccountInput,
+  TAccountCommunityTokenHoldingAccount extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountCouncilTokenMint extends InstructionAccountInput,
+  TAccountCouncilTokenHoldingAccount extends InstructionAccountInput,
+  TAccountRealmConfig extends InstructionAccountInput,
+  TAccountCommunityVoterWeightAddin extends InstructionAccountInput,
+  TAccountMaxCommunityVoterWeightAddin extends InstructionAccountInput,
+  TAccountCouncilVoterWeightAddin extends InstructionAccountInput,
+  TAccountMaxCouncilVoterWeightAddin extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: CreateRealmInput<
@@ -267,68 +282,153 @@ export function getCreateRealmInstruction<
     TAccountCouncilVoterWeightAddin,
     TAccountMaxCouncilVoterWeightAddin
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateRealmInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountRealmAuthority,
-  TAccountCommunityTokenMint,
-  TAccountCommunityTokenHoldingAccount,
-  TAccountPayer,
-  TAccountSystemProgram,
-  TAccountTokenProgram,
-  TAccountRent,
-  TAccountCouncilTokenMint,
-  TAccountCouncilTokenHoldingAccount,
-  TAccountRealmConfig,
-  TAccountCommunityVoterWeightAddin,
-  TAccountMaxCommunityVoterWeightAddin,
-  TAccountCouncilVoterWeightAddin,
-  TAccountMaxCouncilVoterWeightAddin
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAuthority,
+    InstructionAccountInputAddress<TAccountRealmAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCommunityTokenMint,
+    InstructionAccountInputAddress<TAccountCommunityTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCommunityTokenHoldingAccount,
+    InstructionAccountInputAddress<TAccountCommunityTokenHoldingAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCouncilTokenMint,
+    InstructionAccountInputAddress<TAccountCouncilTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCouncilTokenHoldingAccount,
+    InstructionAccountInputAddress<TAccountCouncilTokenHoldingAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmConfig,
+    InstructionAccountInputAddress<TAccountRealmConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCommunityVoterWeightAddin,
+    InstructionAccountInputAddress<TAccountCommunityVoterWeightAddin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMaxCommunityVoterWeightAddin,
+    InstructionAccountInputAddress<TAccountMaxCommunityVoterWeightAddin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCouncilVoterWeightAddin,
+    InstructionAccountInputAddress<TAccountCouncilVoterWeightAddin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMaxCouncilVoterWeightAddin,
+    InstructionAccountInputAddress<TAccountMaxCouncilVoterWeightAddin>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: true },
-    realmAuthority: { value: input.realmAuthority ?? null, isWritable: false },
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    realmAuthority: {
+      value: input.realmAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     communityTokenMint: {
       value: input.communityTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     communityTokenHoldingAccount: {
       value: input.communityTokenHoldingAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
     councilTokenMint: {
       value: input.councilTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     councilTokenHoldingAccount: {
       value: input.councilTokenHoldingAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    realmConfig: { value: input.realmConfig ?? null, isWritable: true },
+    realmConfig: {
+      value: input.realmConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     communityVoterWeightAddin: {
       value: input.communityVoterWeightAddin ?? null,
+      isSigner: false,
       isWritable: false,
     },
     maxCommunityVoterWeightAddin: {
       value: input.maxCommunityVoterWeightAddin ?? null,
+      isSigner: false,
       isWritable: false,
     },
     councilVoterWeightAddin: {
       value: input.councilVoterWeightAddin ?? null,
+      isSigner: false,
       isWritable: false,
     },
     maxCouncilVoterWeightAddin: {
       value: input.maxCouncilVoterWeightAddin ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -354,7 +454,6 @@ export function getCreateRealmInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -397,21 +496,66 @@ export function getCreateRealmInstruction<
     programAddress,
   } as CreateRealmInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountRealmAuthority,
-    TAccountCommunityTokenMint,
-    TAccountCommunityTokenHoldingAccount,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountTokenProgram,
-    TAccountRent,
-    TAccountCouncilTokenMint,
-    TAccountCouncilTokenHoldingAccount,
-    TAccountRealmConfig,
-    TAccountCommunityVoterWeightAddin,
-    TAccountMaxCommunityVoterWeightAddin,
-    TAccountCouncilVoterWeightAddin,
-    TAccountMaxCouncilVoterWeightAddin
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAuthority,
+      InstructionAccountInputAddress<TAccountRealmAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCommunityTokenMint,
+      InstructionAccountInputAddress<TAccountCommunityTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCommunityTokenHoldingAccount,
+      InstructionAccountInputAddress<TAccountCommunityTokenHoldingAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCouncilTokenMint,
+      InstructionAccountInputAddress<TAccountCouncilTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCouncilTokenHoldingAccount,
+      InstructionAccountInputAddress<TAccountCouncilTokenHoldingAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmConfig,
+      InstructionAccountInputAddress<TAccountRealmConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCommunityVoterWeightAddin,
+      InstructionAccountInputAddress<TAccountCommunityVoterWeightAddin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMaxCommunityVoterWeightAddin,
+      InstructionAccountInputAddress<TAccountMaxCommunityVoterWeightAddin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCouncilVoterWeightAddin,
+      InstructionAccountInputAddress<TAccountCouncilVoterWeightAddin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMaxCouncilVoterWeightAddin,
+      InstructionAccountInputAddress<TAccountMaxCouncilVoterWeightAddin>
+    >
   >);
 }
 

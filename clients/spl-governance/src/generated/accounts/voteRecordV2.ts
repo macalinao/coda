@@ -28,12 +28,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -67,8 +71,8 @@ export type VoteRecordV2 = {
 };
 
 export type VoteRecordV2Args = {
-  proposal: Address;
-  governingTokenOwner: Address;
+  proposal: Address | HasAddress;
+  governingTokenOwner: Address | HasAddress;
   isRelinquished: boolean;
   voterWeight: number | bigint;
   vote: VoteArgs;
@@ -125,8 +129,10 @@ export function decodeVoteRecordV2<TAddress extends string = string>(
 }
 
 export async function fetchVoteRecordV2<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<VoteRecordV2, TAddress>> {
   const maybeAccount = await fetchMaybeVoteRecordV2(rpc, address, config);
@@ -135,17 +141,25 @@ export async function fetchVoteRecordV2<TAddress extends string = string>(
 }
 
 export async function fetchMaybeVoteRecordV2<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<VoteRecordV2, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeVoteRecordV2(maybeAccount);
 }
 
 export async function fetchAllVoteRecordV2(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<VoteRecordV2>[]> {
   const maybeAccounts = await fetchAllMaybeVoteRecordV2(rpc, addresses, config);
@@ -154,18 +168,26 @@ export async function fetchAllVoteRecordV2(
 }
 
 export async function fetchAllMaybeVoteRecordV2(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<VoteRecordV2>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeVoteRecordV2(maybeAccount));
 }
 
 export async function fetchVoteRecordV2FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: VoteRecordSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<VoteRecordV2>> {
   const maybeAccount = await fetchMaybeVoteRecordV2FromSeeds(
     rpc,
@@ -177,9 +199,11 @@ export async function fetchVoteRecordV2FromSeeds(
 }
 
 export async function fetchMaybeVoteRecordV2FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: VoteRecordSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<VoteRecordV2>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findVoteRecordPda(seeds, { programAddress });

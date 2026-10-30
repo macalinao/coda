@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -172,15 +175,17 @@ export function getIdlMissingTypesInstructionDataCodec(): Codec<
 }
 
 export type IdlMissingTypesInput<
-  TAccountSigner extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountReserve extends string = string,
+  TAccountSigner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  signer: TransactionSigner<TAccountSigner>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  reserve: Address<TAccountReserve>;
+  signer: TAccountSigner;
+  globalConfig: TAccountGlobalConfig;
+  lendingMarket: TAccountLendingMarket;
+  reserve: TAccountReserve;
   reserveFarmKind: IdlMissingTypesInstructionDataArgs["reserveFarmKind"];
   assetTier: IdlMissingTypesInstructionDataArgs["assetTier"];
   feeCalculation: IdlMissingTypesInstructionDataArgs["feeCalculation"];
@@ -191,10 +196,10 @@ export type IdlMissingTypesInput<
 };
 
 export function getIdlMissingTypesInstruction<
-  TAccountSigner extends string,
-  TAccountGlobalConfig extends string,
-  TAccountLendingMarket extends string,
-  TAccountReserve extends string,
+  TAccountSigner extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: IdlMissingTypesInput<
@@ -203,24 +208,60 @@ export function getIdlMissingTypesInstruction<
     TAccountLendingMarket,
     TAccountReserve
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): IdlMissingTypesInstruction<
   TProgramAddress,
-  TAccountSigner,
-  TAccountGlobalConfig,
-  TAccountLendingMarket,
-  TAccountReserve
+  ResolvedInstructionAccountMeta<
+    TAccountSigner,
+    InstructionAccountInputAddress<TAccountSigner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserve,
+    InstructionAccountInputAddress<TAccountReserve>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    signer: { value: input.signer ?? null, isWritable: false },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: true },
+    signer: { value: input.signer ?? null, isSigner: true, isWritable: false },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -230,7 +271,6 @@ export function getIdlMissingTypesInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("signer", accounts.signer),
@@ -244,10 +284,22 @@ export function getIdlMissingTypesInstruction<
     programAddress,
   } as IdlMissingTypesInstruction<
     TProgramAddress,
-    TAccountSigner,
-    TAccountGlobalConfig,
-    TAccountLendingMarket,
-    TAccountReserve
+    ResolvedInstructionAccountMeta<
+      TAccountSigner,
+      InstructionAccountInputAddress<TAccountSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >
   >);
 }
 

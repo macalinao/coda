@@ -32,13 +32,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findMergeMinerPda } from "../pdas/index.ts";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -121,31 +124,35 @@ export function getWithdrawTokensMMInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type WithdrawTokensMMAsyncInput<
-  TAccountOwner extends string = string,
-  TAccountPool extends string = string,
-  TAccountMm extends string = string,
-  TAccountWithdrawMint extends string = string,
-  TAccountMmTokenAccount extends string = string,
-  TAccountTokenDestination extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWithdrawMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMmTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenDestination extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  pool: Address<TAccountPool>;
-  mm?: Address<TAccountMm>;
-  withdrawMint: Address<TAccountWithdrawMint>;
-  mmTokenAccount?: Address<TAccountMmTokenAccount>;
-  tokenDestination: Address<TAccountTokenDestination>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  owner: TAccountOwner;
+  pool: TAccountPool;
+  mm?: TAccountMm;
+  withdrawMint: TAccountWithdrawMint;
+  mmTokenAccount?: TAccountMmTokenAccount;
+  tokenDestination: TAccountTokenDestination;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export async function getWithdrawTokensMMInstructionAsync<
-  TAccountOwner extends string,
-  TAccountPool extends string,
-  TAccountMm extends string,
-  TAccountWithdrawMint extends string,
-  TAccountMmTokenAccount extends string,
-  TAccountTokenDestination extends string,
-  TAccountTokenProgram extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput,
+  TAccountWithdrawMint extends InstructionAccountInput,
+  TAccountMmTokenAccount extends InstructionAccountInput,
+  TAccountTokenDestination extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
   input: WithdrawTokensMMAsyncInput<
@@ -157,35 +164,81 @@ export async function getWithdrawTokensMMInstructionAsync<
     TAccountTokenDestination,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   WithdrawTokensMMInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountPool,
-    TAccountMm,
-    TAccountWithdrawMint,
-    TAccountMmTokenAccount,
-    TAccountTokenDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMm,
+      InstructionAccountInputAddress<TAccountMm>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawMint,
+      InstructionAccountInputAddress<TAccountWithdrawMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMmTokenAccount,
+      InstructionAccountInputAddress<TAccountMmTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenDestination,
+      InstructionAccountInputAddress<TAccountTokenDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    pool: { value: input.pool ?? null, isWritable: false },
-    mm: { value: input.mm ?? null, isWritable: true },
-    withdrawMint: { value: input.withdrawMint ?? null, isWritable: false },
-    mmTokenAccount: { value: input.mmTokenAccount ?? null, isWritable: true },
-    tokenDestination: {
-      value: input.tokenDestination ?? null,
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    mm: { value: input.mm ?? null, isSigner: false, isWritable: true },
+    withdrawMint: {
+      value: input.withdrawMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    mmTokenAccount: {
+      value: input.mmTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenDestination: {
+      value: input.tokenDestination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -233,7 +286,6 @@ export async function getWithdrawTokensMMInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -248,42 +300,67 @@ export async function getWithdrawTokensMMInstructionAsync<
     programAddress,
   } as WithdrawTokensMMInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountPool,
-    TAccountMm,
-    TAccountWithdrawMint,
-    TAccountMmTokenAccount,
-    TAccountTokenDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMm,
+      InstructionAccountInputAddress<TAccountMm>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawMint,
+      InstructionAccountInputAddress<TAccountWithdrawMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMmTokenAccount,
+      InstructionAccountInputAddress<TAccountMmTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenDestination,
+      InstructionAccountInputAddress<TAccountTokenDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 
 export type WithdrawTokensMMInput<
-  TAccountOwner extends string = string,
-  TAccountPool extends string = string,
-  TAccountMm extends string = string,
-  TAccountWithdrawMint extends string = string,
-  TAccountMmTokenAccount extends string = string,
-  TAccountTokenDestination extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWithdrawMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMmTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenDestination extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  pool: Address<TAccountPool>;
-  mm: Address<TAccountMm>;
-  withdrawMint: Address<TAccountWithdrawMint>;
-  mmTokenAccount: Address<TAccountMmTokenAccount>;
-  tokenDestination: Address<TAccountTokenDestination>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  owner: TAccountOwner;
+  pool: TAccountPool;
+  mm: TAccountMm;
+  withdrawMint: TAccountWithdrawMint;
+  mmTokenAccount: TAccountMmTokenAccount;
+  tokenDestination: TAccountTokenDestination;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getWithdrawTokensMMInstruction<
-  TAccountOwner extends string,
-  TAccountPool extends string,
-  TAccountMm extends string,
-  TAccountWithdrawMint extends string,
-  TAccountMmTokenAccount extends string,
-  TAccountTokenDestination extends string,
-  TAccountTokenProgram extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput,
+  TAccountWithdrawMint extends InstructionAccountInput,
+  TAccountMmTokenAccount extends InstructionAccountInput,
+  TAccountTokenDestination extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
   input: WithdrawTokensMMInput<
@@ -295,33 +372,79 @@ export function getWithdrawTokensMMInstruction<
     TAccountTokenDestination,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): WithdrawTokensMMInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountPool,
-  TAccountMm,
-  TAccountWithdrawMint,
-  TAccountMmTokenAccount,
-  TAccountTokenDestination,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMm,
+    InstructionAccountInputAddress<TAccountMm>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWithdrawMint,
+    InstructionAccountInputAddress<TAccountWithdrawMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMmTokenAccount,
+    InstructionAccountInputAddress<TAccountMmTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenDestination,
+    InstructionAccountInputAddress<TAccountTokenDestination>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    pool: { value: input.pool ?? null, isWritable: false },
-    mm: { value: input.mm ?? null, isWritable: true },
-    withdrawMint: { value: input.withdrawMint ?? null, isWritable: false },
-    mmTokenAccount: { value: input.mmTokenAccount ?? null, isWritable: true },
-    tokenDestination: {
-      value: input.tokenDestination ?? null,
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    mm: { value: input.mm ?? null, isSigner: false, isWritable: true },
+    withdrawMint: {
+      value: input.withdrawMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    mmTokenAccount: {
+      value: input.mmTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenDestination: {
+      value: input.tokenDestination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -334,7 +457,6 @@ export function getWithdrawTokensMMInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -349,13 +471,34 @@ export function getWithdrawTokensMMInstruction<
     programAddress,
   } as WithdrawTokensMMInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountPool,
-    TAccountMm,
-    TAccountWithdrawMint,
-    TAccountMmTokenAccount,
-    TAccountTokenDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMm,
+      InstructionAccountInputAddress<TAccountMm>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawMint,
+      InstructionAccountInputAddress<TAccountWithdrawMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMmTokenAccount,
+      InstructionAccountInputAddress<TAccountMmTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenDestination,
+      InstructionAccountInputAddress<TAccountTokenDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

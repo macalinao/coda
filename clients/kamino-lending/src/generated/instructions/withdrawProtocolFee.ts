@@ -34,7 +34,10 @@ import {
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findLendingMarketAuthPda } from "../pdas/index.ts";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -132,35 +135,41 @@ export function getWithdrawProtocolFeeInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type WithdrawProtocolFeeAsyncInput<
-  TAccountGlobalConfig extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountReserve extends string = string,
-  TAccountReserveLiquidityMint extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountFeeVault extends string = string,
-  TAccountFeeCollectorAta extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFeeCollectorAta extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  globalConfig: Address<TAccountGlobalConfig>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  reserve: Address<TAccountReserve>;
-  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
-  feeVault: Address<TAccountFeeVault>;
-  feeCollectorAta: Address<TAccountFeeCollectorAta>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  globalConfig: TAccountGlobalConfig;
+  lendingMarket: TAccountLendingMarket;
+  reserve: TAccountReserve;
+  reserveLiquidityMint: TAccountReserveLiquidityMint;
+  lendingMarketAuthority?: TAccountLendingMarketAuthority;
+  feeVault: TAccountFeeVault;
+  feeCollectorAta: TAccountFeeCollectorAta;
+  tokenProgram?: TAccountTokenProgram;
   amount: WithdrawProtocolFeeInstructionDataArgs["amount"];
 };
 
 export async function getWithdrawProtocolFeeInstructionAsync<
-  TAccountGlobalConfig extends string,
-  TAccountLendingMarket extends string,
-  TAccountReserve extends string,
-  TAccountReserveLiquidityMint extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountFeeVault extends string,
-  TAccountFeeCollectorAta extends string,
-  TAccountTokenProgram extends string,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput,
+  TAccountFeeVault extends InstructionAccountInput,
+  TAccountFeeCollectorAta extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: WithdrawProtocolFeeAsyncInput<
@@ -173,40 +182,102 @@ export async function getWithdrawProtocolFeeInstructionAsync<
     TAccountFeeCollectorAta,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   WithdrawProtocolFeeInstruction<
     TProgramAddress,
-    TAccountGlobalConfig,
-    TAccountLendingMarket,
-    TAccountReserve,
-    TAccountReserveLiquidityMint,
-    TAccountLendingMarketAuthority,
-    TAccountFeeVault,
-    TAccountFeeCollectorAta,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquidityMint,
+      InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeVault,
+      InstructionAccountInputAddress<TAccountFeeVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeCollectorAta,
+      InstructionAccountInputAddress<TAccountFeeCollectorAta>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: false },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     reserveLiquidityMint: {
       value: input.reserveLiquidityMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     lendingMarketAuthority: {
       value: input.lendingMarketAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    feeVault: { value: input.feeVault ?? null, isWritable: true },
-    feeCollectorAta: { value: input.feeCollectorAta ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    feeVault: {
+      value: input.feeVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    feeCollectorAta: {
+      value: input.feeCollectorAta ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -233,7 +304,6 @@ export async function getWithdrawProtocolFeeInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("globalConfig", accounts.globalConfig),
@@ -251,47 +321,77 @@ export async function getWithdrawProtocolFeeInstructionAsync<
     programAddress,
   } as WithdrawProtocolFeeInstruction<
     TProgramAddress,
-    TAccountGlobalConfig,
-    TAccountLendingMarket,
-    TAccountReserve,
-    TAccountReserveLiquidityMint,
-    TAccountLendingMarketAuthority,
-    TAccountFeeVault,
-    TAccountFeeCollectorAta,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquidityMint,
+      InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeVault,
+      InstructionAccountInputAddress<TAccountFeeVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeCollectorAta,
+      InstructionAccountInputAddress<TAccountFeeCollectorAta>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 
 export type WithdrawProtocolFeeInput<
-  TAccountGlobalConfig extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountReserve extends string = string,
-  TAccountReserveLiquidityMint extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountFeeVault extends string = string,
-  TAccountFeeCollectorAta extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFeeCollectorAta extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  globalConfig: Address<TAccountGlobalConfig>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  reserve: Address<TAccountReserve>;
-  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
-  feeVault: Address<TAccountFeeVault>;
-  feeCollectorAta: Address<TAccountFeeCollectorAta>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  globalConfig: TAccountGlobalConfig;
+  lendingMarket: TAccountLendingMarket;
+  reserve: TAccountReserve;
+  reserveLiquidityMint: TAccountReserveLiquidityMint;
+  lendingMarketAuthority: TAccountLendingMarketAuthority;
+  feeVault: TAccountFeeVault;
+  feeCollectorAta: TAccountFeeCollectorAta;
+  tokenProgram?: TAccountTokenProgram;
   amount: WithdrawProtocolFeeInstructionDataArgs["amount"];
 };
 
 export function getWithdrawProtocolFeeInstruction<
-  TAccountGlobalConfig extends string,
-  TAccountLendingMarket extends string,
-  TAccountReserve extends string,
-  TAccountReserveLiquidityMint extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountFeeVault extends string,
-  TAccountFeeCollectorAta extends string,
-  TAccountTokenProgram extends string,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput,
+  TAccountFeeVault extends InstructionAccountInput,
+  TAccountFeeCollectorAta extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: WithdrawProtocolFeeInput<
@@ -304,38 +404,100 @@ export function getWithdrawProtocolFeeInstruction<
     TAccountFeeCollectorAta,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): WithdrawProtocolFeeInstruction<
   TProgramAddress,
-  TAccountGlobalConfig,
-  TAccountLendingMarket,
-  TAccountReserve,
-  TAccountReserveLiquidityMint,
-  TAccountLendingMarketAuthority,
-  TAccountFeeVault,
-  TAccountFeeCollectorAta,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserve,
+    InstructionAccountInputAddress<TAccountReserve>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveLiquidityMint,
+    InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarketAuthority,
+    InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeVault,
+    InstructionAccountInputAddress<TAccountFeeVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeCollectorAta,
+    InstructionAccountInputAddress<TAccountFeeCollectorAta>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: false },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     reserveLiquidityMint: {
       value: input.reserveLiquidityMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     lendingMarketAuthority: {
       value: input.lendingMarketAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    feeVault: { value: input.feeVault ?? null, isWritable: true },
-    feeCollectorAta: { value: input.feeCollectorAta ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    feeVault: {
+      value: input.feeVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    feeCollectorAta: {
+      value: input.feeCollectorAta ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -351,7 +513,6 @@ export function getWithdrawProtocolFeeInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("globalConfig", accounts.globalConfig),
@@ -369,14 +530,38 @@ export function getWithdrawProtocolFeeInstruction<
     programAddress,
   } as WithdrawProtocolFeeInstruction<
     TProgramAddress,
-    TAccountGlobalConfig,
-    TAccountLendingMarket,
-    TAccountReserve,
-    TAccountReserveLiquidityMint,
-    TAccountLendingMarketAuthority,
-    TAccountFeeVault,
-    TAccountFeeCollectorAta,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquidityMint,
+      InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeVault,
+      InstructionAccountInputAddress<TAccountFeeVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeCollectorAta,
+      InstructionAccountInputAddress<TAccountFeeCollectorAta>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

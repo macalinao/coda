@@ -22,6 +22,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -958,113 +959,142 @@ export type MplCoreProgramPluginAccounts = {
 export type MplCoreProgramPluginInstructions = {
   createV1: (
     input: MakeOptional<CreateV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateV1Instruction> & SelfPlanAndSendFunctions;
   createCollectionV1: (
     input: MakeOptional<CreateCollectionV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateCollectionV1Instruction> &
     SelfPlanAndSendFunctions;
   addPluginV1: (
     input: MakeOptional<AddPluginV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddPluginV1Instruction> & SelfPlanAndSendFunctions;
   addCollectionPluginV1: (
     input: MakeOptional<AddCollectionPluginV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddCollectionPluginV1Instruction> &
     SelfPlanAndSendFunctions;
   removePluginV1: (
     input: MakeOptional<RemovePluginV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemovePluginV1Instruction> &
     SelfPlanAndSendFunctions;
   removeCollectionPluginV1: (
     input: MakeOptional<RemoveCollectionPluginV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveCollectionPluginV1Instruction> &
     SelfPlanAndSendFunctions;
   updatePluginV1: (
     input: MakeOptional<UpdatePluginV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdatePluginV1Instruction> &
     SelfPlanAndSendFunctions;
   updateCollectionPluginV1: (
     input: MakeOptional<UpdateCollectionPluginV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateCollectionPluginV1Instruction> &
     SelfPlanAndSendFunctions;
   approvePluginAuthorityV1: (
     input: MakeOptional<ApprovePluginAuthorityV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getApprovePluginAuthorityV1Instruction> &
     SelfPlanAndSendFunctions;
   approveCollectionPluginAuthorityV1: (
     input: MakeOptional<ApproveCollectionPluginAuthorityV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getApproveCollectionPluginAuthorityV1Instruction> &
     SelfPlanAndSendFunctions;
   revokePluginAuthorityV1: (
     input: MakeOptional<RevokePluginAuthorityV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRevokePluginAuthorityV1Instruction> &
     SelfPlanAndSendFunctions;
   revokeCollectionPluginAuthorityV1: (
     input: MakeOptional<RevokeCollectionPluginAuthorityV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRevokeCollectionPluginAuthorityV1Instruction> &
     SelfPlanAndSendFunctions;
   burnV1: (
     input: MakeOptional<BurnV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBurnV1Instruction> & SelfPlanAndSendFunctions;
   burnCollectionV1: (
     input: MakeOptional<BurnCollectionV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBurnCollectionV1Instruction> &
     SelfPlanAndSendFunctions;
   transferV1: (
     input: MakeOptional<TransferV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferV1Instruction> & SelfPlanAndSendFunctions;
   updateV1: (
     input: MakeOptional<UpdateV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateV1Instruction> & SelfPlanAndSendFunctions;
   updateCollectionV1: (
     input: MakeOptional<UpdateCollectionV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateCollectionV1Instruction> &
     SelfPlanAndSendFunctions;
   compressV1: (
     input: MakeOptional<CompressV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCompressV1Instruction> & SelfPlanAndSendFunctions;
   decompressV1: (
     input: MakeOptional<DecompressV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDecompressV1Instruction> & SelfPlanAndSendFunctions;
   collect: (
     input: CollectInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectInstruction> & SelfPlanAndSendFunctions;
   createV2: (
     input: MakeOptional<CreateV2Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateV2Instruction> & SelfPlanAndSendFunctions;
   createCollectionV2: (
     input: MakeOptional<CreateCollectionV2Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateCollectionV2Instruction> &
     SelfPlanAndSendFunctions;
   addExternalPluginAdapterV1: (
     input: MakeOptional<AddExternalPluginAdapterV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddExternalPluginAdapterV1Instruction> &
     SelfPlanAndSendFunctions;
   addCollectionExternalPluginAdapterV1: (
     input: MakeOptional<AddCollectionExternalPluginAdapterV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddCollectionExternalPluginAdapterV1Instruction> &
     SelfPlanAndSendFunctions;
   removeExternalPluginAdapterV1: (
     input: MakeOptional<RemoveExternalPluginAdapterV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveExternalPluginAdapterV1Instruction> &
     SelfPlanAndSendFunctions;
   removeCollectionExternalPluginAdapterV1: (
     input: MakeOptional<RemoveCollectionExternalPluginAdapterV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getRemoveCollectionExternalPluginAdapterV1Instruction
   > &
     SelfPlanAndSendFunctions;
   updateExternalPluginAdapterV1: (
     input: MakeOptional<UpdateExternalPluginAdapterV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateExternalPluginAdapterV1Instruction> &
     SelfPlanAndSendFunctions;
   updateCollectionExternalPluginAdapterV1: (
     input: MakeOptional<UpdateCollectionExternalPluginAdapterV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getUpdateCollectionExternalPluginAdapterV1Instruction
   > &
     SelfPlanAndSendFunctions;
   writeExternalPluginAdapterDataV1: (
     input: MakeOptional<WriteExternalPluginAdapterDataV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWriteExternalPluginAdapterDataV1Instruction> &
     SelfPlanAndSendFunctions;
   writeCollectionExternalPluginAdapterDataV1: (
@@ -1072,54 +1102,67 @@ export type MplCoreProgramPluginInstructions = {
       WriteCollectionExternalPluginAdapterDataV1Input,
       "payer"
     >,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getWriteCollectionExternalPluginAdapterDataV1Instruction
   > &
     SelfPlanAndSendFunctions;
   updateV2: (
     input: MakeOptional<UpdateV2Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateV2Instruction> & SelfPlanAndSendFunctions;
   executeV1: (
     input: MakeOptional<ExecuteV1AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getExecuteV1InstructionAsync> &
     SelfPlanAndSendFunctions;
   updateCollectionInfoV1: (
     input: UpdateCollectionInfoV1Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateCollectionInfoV1Instruction> &
     SelfPlanAndSendFunctions;
   addCollectionsToGroupV1: (
     input: MakeOptional<AddCollectionsToGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddCollectionsToGroupV1Instruction> &
     SelfPlanAndSendFunctions;
   removeCollectionsFromGroupV1: (
     input: MakeOptional<RemoveCollectionsFromGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveCollectionsFromGroupV1Instruction> &
     SelfPlanAndSendFunctions;
   addAssetsToGroupV1: (
     input: MakeOptional<AddAssetsToGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddAssetsToGroupV1Instruction> &
     SelfPlanAndSendFunctions;
   removeAssetsFromGroupV1: (
     input: MakeOptional<RemoveAssetsFromGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveAssetsFromGroupV1Instruction> &
     SelfPlanAndSendFunctions;
   addGroupsToGroupV1: (
     input: MakeOptional<AddGroupsToGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddGroupsToGroupV1Instruction> &
     SelfPlanAndSendFunctions;
   removeGroupsFromGroupV1: (
     input: MakeOptional<RemoveGroupsFromGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveGroupsFromGroupV1Instruction> &
     SelfPlanAndSendFunctions;
   createGroupV1: (
     input: MakeOptional<CreateGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateGroupV1Instruction> &
     SelfPlanAndSendFunctions;
   closeGroupV1: (
     input: MakeOptional<CloseGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseGroupV1Instruction> & SelfPlanAndSendFunctions;
   updateGroupV1: (
     input: MakeOptional<UpdateGroupV1Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateGroupV1Instruction> &
     SelfPlanAndSendFunctions;
 };
@@ -1135,7 +1178,9 @@ export type MplCoreProgramPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function mplCoreProgramProgram() {
+export function mplCoreProgramProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends MplCoreProgramPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { mplCoreProgram: MplCoreProgramPlugin }> => {
@@ -1156,335 +1201,473 @@ export function mplCoreProgramProgram() {
           hashedAssetV1: addSelfFetchFunctions(client, getHashedAssetV1Codec()),
         },
         instructions: {
-          createV1: (input) =>
+          createV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createCollectionV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateCollectionV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          addPluginV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddPluginV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          addCollectionPluginV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddCollectionPluginV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          removePluginV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemovePluginV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          removeCollectionPluginV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveCollectionPluginV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updatePluginV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdatePluginV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateCollectionPluginV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateCollectionPluginV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          approvePluginAuthorityV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getApprovePluginAuthorityV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          approveCollectionPluginAuthorityV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getApproveCollectionPluginAuthorityV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          revokePluginAuthorityV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokePluginAuthorityV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          revokeCollectionPluginAuthorityV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeCollectionPluginAuthorityV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          burnV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBurnV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          burnCollectionV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBurnCollectionV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          transferV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateCollectionV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateCollectionV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          compressV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCompressV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          decompressV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDecompressV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          collect: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCollectInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createCollectionV1: (input) =>
+          createV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateCollectionV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateV2Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createCollectionV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateCollectionV2Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          addExternalPluginAdapterV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddExternalPluginAdapterV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          addCollectionExternalPluginAdapterV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddCollectionExternalPluginAdapterV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          removeExternalPluginAdapterV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveExternalPluginAdapterV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          removeCollectionExternalPluginAdapterV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveCollectionExternalPluginAdapterV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateExternalPluginAdapterV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateExternalPluginAdapterV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateCollectionExternalPluginAdapterV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateCollectionExternalPluginAdapterV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          writeExternalPluginAdapterDataV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWriteExternalPluginAdapterDataV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          writeCollectionExternalPluginAdapterDataV1: (
+            input,
+            instructionConfig,
+          ) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWriteCollectionExternalPluginAdapterDataV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateV2Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          executeV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getExecuteV1InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateCollectionInfoV1: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateCollectionInfoV1Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          addPluginV1: (input) =>
+          addCollectionsToGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getAddPluginV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getAddCollectionsToGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          addCollectionPluginV1: (input) =>
+          removeCollectionsFromGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getAddCollectionPluginV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getRemoveCollectionsFromGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          removePluginV1: (input) =>
+          addAssetsToGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRemovePluginV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getAddAssetsToGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          removeCollectionPluginV1: (input) =>
+          removeAssetsFromGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRemoveCollectionPluginV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getRemoveAssetsFromGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          updatePluginV1: (input) =>
+          addGroupsToGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdatePluginV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getAddGroupsToGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          updateCollectionPluginV1: (input) =>
+          removeGroupsFromGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateCollectionPluginV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getRemoveGroupsFromGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          approvePluginAuthorityV1: (input) =>
+          createGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getApprovePluginAuthorityV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getCreateGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          approveCollectionPluginAuthorityV1: (input) =>
+          closeGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getApproveCollectionPluginAuthorityV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getCloseGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          revokePluginAuthorityV1: (input) =>
+          updateGroupV1: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRevokePluginAuthorityV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          revokeCollectionPluginAuthorityV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRevokeCollectionPluginAuthorityV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          burnV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getBurnV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          burnCollectionV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getBurnCollectionV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          transferV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getTransferV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateCollectionV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateCollectionV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          compressV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCompressV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          decompressV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDecompressV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          collect: (input) =>
-            addSelfPlanAndSendFunctions(client, getCollectInstruction(input)),
-          createV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateV2Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          createCollectionV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateCollectionV2Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          addExternalPluginAdapterV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAddExternalPluginAdapterV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          addCollectionExternalPluginAdapterV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAddCollectionExternalPluginAdapterV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          removeExternalPluginAdapterV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveExternalPluginAdapterV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          removeCollectionExternalPluginAdapterV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveCollectionExternalPluginAdapterV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateExternalPluginAdapterV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateExternalPluginAdapterV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateCollectionExternalPluginAdapterV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateCollectionExternalPluginAdapterV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          writeExternalPluginAdapterDataV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getWriteExternalPluginAdapterDataV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          writeCollectionExternalPluginAdapterDataV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getWriteCollectionExternalPluginAdapterDataV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateV2Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          executeV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getExecuteV1InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateCollectionInfoV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateCollectionInfoV1Instruction(input),
-            ),
-          addCollectionsToGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAddCollectionsToGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          removeCollectionsFromGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveCollectionsFromGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          addAssetsToGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAddAssetsToGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          removeAssetsFromGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveAssetsFromGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          addGroupsToGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAddGroupsToGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          removeGroupsFromGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveGroupsFromGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          createGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          closeGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCloseGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          updateGroupV1: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateGroupV1Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getUpdateGroupV1Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
         },
-        pdas: { assetSigner: findAssetSignerPda },
+        pdas: {
+          assetSigner: (seeds, pdaConfig) =>
+            findAssetSignerPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+        },
         identifyInstruction: identifyMplCoreProgramInstruction,
         parseInstruction: parseMplCoreProgramInstruction,
       } as MplCoreProgramPlugin,

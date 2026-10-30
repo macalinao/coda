@@ -20,11 +20,16 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type Creator = { address: Address; verified: boolean; share: number };
 
-export type CreatorArgs = Creator;
+export type CreatorArgs = {
+  address: Address | HasAddress;
+  verified: boolean;
+  share: number;
+};
 
 export function getCreatorEncoder(): FixedSizeEncoder<CreatorArgs> {
   return getStructEncoder([

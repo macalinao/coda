@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getLockerParamsDecoder,
@@ -31,7 +32,7 @@ export type LockerSetParamsEvent = {
 };
 
 export type LockerSetParamsEventArgs = {
-  locker: Address;
+  locker: Address | HasAddress;
   prevParams: LockerParamsArgs;
   params: LockerParamsArgs;
 };

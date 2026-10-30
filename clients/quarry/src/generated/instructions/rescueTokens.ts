@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -109,25 +112,28 @@ export function getRescueTokensInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RescueTokensInput<
-  TAccountMiner extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountMinerTokenAccount extends string = string,
-  TAccountDestinationTokenAccount extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountMiner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountMinerTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountDestinationTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  miner: Address<TAccountMiner>;
-  authority: TransactionSigner<TAccountAuthority>;
-  minerTokenAccount: Address<TAccountMinerTokenAccount>;
-  destinationTokenAccount: Address<TAccountDestinationTokenAccount>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  miner: TAccountMiner;
+  authority: TAccountAuthority;
+  minerTokenAccount: TAccountMinerTokenAccount;
+  destinationTokenAccount: TAccountDestinationTokenAccount;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getRescueTokensInstruction<
-  TAccountMiner extends string,
-  TAccountAuthority extends string,
-  TAccountMinerTokenAccount extends string,
-  TAccountDestinationTokenAccount extends string,
-  TAccountTokenProgram extends string,
+  TAccountMiner extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountMinerTokenAccount extends InstructionAccountInput,
+  TAccountDestinationTokenAccount extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: RescueTokensInput<
@@ -137,31 +143,69 @@ export function getRescueTokensInstruction<
     TAccountDestinationTokenAccount,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RescueTokensInstruction<
   TProgramAddress,
-  TAccountMiner,
-  TAccountAuthority,
-  TAccountMinerTokenAccount,
-  TAccountDestinationTokenAccount,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountMiner,
+    InstructionAccountInputAddress<TAccountMiner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMinerTokenAccount,
+    InstructionAccountInputAddress<TAccountMinerTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDestinationTokenAccount,
+    InstructionAccountInputAddress<TAccountDestinationTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    miner: { value: input.miner ?? null, isWritable: false },
-    authority: { value: input.authority ?? null, isWritable: false },
+    miner: { value: input.miner ?? null, isSigner: false, isWritable: false },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     minerTokenAccount: {
       value: input.minerTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     destinationTokenAccount: {
       value: input.destinationTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -174,7 +218,6 @@ export function getRescueTokensInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("miner", accounts.miner),
@@ -190,11 +233,26 @@ export function getRescueTokensInstruction<
     programAddress,
   } as RescueTokensInstruction<
     TProgramAddress,
-    TAccountMiner,
-    TAccountAuthority,
-    TAccountMinerTokenAccount,
-    TAccountDestinationTokenAccount,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountMiner,
+      InstructionAccountInputAddress<TAccountMiner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMinerTokenAccount,
+      InstructionAccountInputAddress<TAccountMinerTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestinationTokenAccount,
+      InstructionAccountInputAddress<TAccountDestinationTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

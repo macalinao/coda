@@ -34,12 +34,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -143,8 +147,8 @@ export type FarmState = {
 };
 
 export type FarmStateArgs = {
-  farmAdmin: Address;
-  globalConfig: Address;
+  farmAdmin: Address | HasAddress;
+  globalConfig: Address | HasAddress;
   token: FarmsTokenInfoArgs;
   rewardInfos: Array<RewardInfoArgs>;
   numRewardTokens: number | bigint;
@@ -155,14 +159,14 @@ export type FarmStateArgs = {
    * Set such as `farm_vault.amount = total_staked_amount + total_pending_amount`
    */
   totalStakedAmount: number | bigint;
-  farmVault: Address;
-  farmVaultsAuthority: Address;
+  farmVault: Address | HasAddress;
+  farmVaultsAuthority: Address | HasAddress;
   farmVaultsAuthorityBump: number | bigint;
   /**
    * Only used for delegate farms
    * Set to `default()` otherwise
    */
-  delegateAuthority: Address;
+  delegateAuthority: Address | HasAddress;
   /**
    * Raw representation of a `TimeUnit`
    * Seconds = 0, Slots = 1
@@ -183,7 +187,7 @@ export type FarmStateArgs = {
    * Withdraw authority for the farm, allowed to lock deposited funds and withdraw them
    * Set to `default()` if unused (only the depositors can withdraw their funds)
    */
-  withdrawAuthority: Address;
+  withdrawAuthority: Address | HasAddress;
   /**
    * Delay between a user deposit and the moment it is considered as staked
    * 0 if unused
@@ -203,20 +207,20 @@ export type FarmStateArgs = {
   /** Slashed amounts from early withdrawal */
   slashedAmountCurrent: number | bigint;
   slashedAmountCumulative: number | bigint;
-  slashedAmountSpillAddress: Address;
+  slashedAmountSpillAddress: Address | HasAddress;
   /** Locking stake */
   lockingMode: number | bigint;
   lockingStartTimestamp: number | bigint;
   lockingDuration: number | bigint;
   lockingEarlyWithdrawalPenaltyBps: number | bigint;
   depositCapAmount: number | bigint;
-  scopePrices: Address;
+  scopePrices: Address | HasAddress;
   scopeOraclePriceId: number | bigint;
   scopeOracleMaxAge: number | bigint;
-  pendingFarmAdmin: Address;
-  strategyId: Address;
-  delegatedRpsAdmin: Address;
-  vaultId: Address;
+  pendingFarmAdmin: Address | HasAddress;
+  strategyId: Address | HasAddress;
+  delegatedRpsAdmin: Address | HasAddress;
+  vaultId: Address | HasAddress;
   padding: Array<number | bigint>;
 };
 
@@ -332,8 +336,10 @@ export function decodeFarmState<TAddress extends string = string>(
 }
 
 export async function fetchFarmState<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<FarmState, TAddress>> {
   const maybeAccount = await fetchMaybeFarmState(rpc, address, config);
@@ -342,17 +348,25 @@ export async function fetchFarmState<TAddress extends string = string>(
 }
 
 export async function fetchMaybeFarmState<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<FarmState, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeFarmState(maybeAccount);
 }
 
 export async function fetchAllFarmState(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FarmState>[]> {
   const maybeAccounts = await fetchAllMaybeFarmState(rpc, addresses, config);
@@ -361,10 +375,16 @@ export async function fetchAllFarmState(
 }
 
 export async function fetchAllMaybeFarmState(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FarmState>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeFarmState(maybeAccount));
 }

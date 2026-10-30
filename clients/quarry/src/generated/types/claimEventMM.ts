@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ClaimEventMM = {
@@ -30,9 +31,9 @@ export type ClaimEventMM = {
 };
 
 export type ClaimEventMMArgs = {
-  pool: Address;
-  mm: Address;
-  mint: Address;
+  pool: Address | HasAddress;
+  mm: Address | HasAddress;
+  mint: Address | HasAddress;
   amount: number | bigint;
   initialBalance: number | bigint;
   endBalance: number | bigint;

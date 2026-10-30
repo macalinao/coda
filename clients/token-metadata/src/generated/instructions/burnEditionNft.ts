@@ -26,13 +26,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -123,50 +126,58 @@ export function getBurnEditionNftInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type BurnEditionNftInput<
-  TAccountMetadata extends string = string,
-  TAccountOwner extends string = string,
-  TAccountPrintEditionMint extends string = string,
-  TAccountMasterEditionMint extends string = string,
-  TAccountPrintEditionTokenAccount extends string = string,
-  TAccountMasterEditionTokenAccount extends string = string,
-  TAccountMasterEditionAccount extends string = string,
-  TAccountPrintEditionAccount extends string = string,
-  TAccountEditionMarkerAccount extends string = string,
-  TAccountSplTokenProgram extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPrintEditionMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMasterEditionMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPrintEditionTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMasterEditionTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMasterEditionAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPrintEditionAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEditionMarkerAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSplTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** NFT owner */
-  owner: TransactionSigner<TAccountOwner>;
+  owner: TAccountOwner;
   /** Mint of the print edition NFT */
-  printEditionMint: Address<TAccountPrintEditionMint>;
+  printEditionMint: TAccountPrintEditionMint;
   /** Mint of the original/master NFT */
-  masterEditionMint: Address<TAccountMasterEditionMint>;
+  masterEditionMint: TAccountMasterEditionMint;
   /** Token account the print edition NFT is in */
-  printEditionTokenAccount: Address<TAccountPrintEditionTokenAccount>;
+  printEditionTokenAccount: TAccountPrintEditionTokenAccount;
   /** Token account the Master Edition NFT is in */
-  masterEditionTokenAccount: Address<TAccountMasterEditionTokenAccount>;
+  masterEditionTokenAccount: TAccountMasterEditionTokenAccount;
   /** MasterEdition2 of the original NFT */
-  masterEditionAccount: Address<TAccountMasterEditionAccount>;
+  masterEditionAccount: TAccountMasterEditionAccount;
   /** Print Edition account of the NFT */
-  printEditionAccount: Address<TAccountPrintEditionAccount>;
+  printEditionAccount: TAccountPrintEditionAccount;
   /** Edition Marker PDA of the NFT */
-  editionMarkerAccount: Address<TAccountEditionMarkerAccount>;
+  editionMarkerAccount: TAccountEditionMarkerAccount;
   /** SPL Token Program */
-  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  splTokenProgram?: TAccountSplTokenProgram;
 };
 
 export function getBurnEditionNftInstruction<
-  TAccountMetadata extends string,
-  TAccountOwner extends string,
-  TAccountPrintEditionMint extends string,
-  TAccountMasterEditionMint extends string,
-  TAccountPrintEditionTokenAccount extends string,
-  TAccountMasterEditionTokenAccount extends string,
-  TAccountMasterEditionAccount extends string,
-  TAccountPrintEditionAccount extends string,
-  TAccountEditionMarkerAccount extends string,
-  TAccountSplTokenProgram extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountPrintEditionMint extends InstructionAccountInput,
+  TAccountMasterEditionMint extends InstructionAccountInput,
+  TAccountPrintEditionTokenAccount extends InstructionAccountInput,
+  TAccountMasterEditionTokenAccount extends InstructionAccountInput,
+  TAccountMasterEditionAccount extends InstructionAccountInput,
+  TAccountPrintEditionAccount extends InstructionAccountInput,
+  TAccountEditionMarkerAccount extends InstructionAccountInput,
+  TAccountSplTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: BurnEditionNftInput<
@@ -181,58 +192,112 @@ export function getBurnEditionNftInstruction<
     TAccountEditionMarkerAccount,
     TAccountSplTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): BurnEditionNftInstruction<
   TProgramAddress,
-  TAccountMetadata,
-  TAccountOwner,
-  TAccountPrintEditionMint,
-  TAccountMasterEditionMint,
-  TAccountPrintEditionTokenAccount,
-  TAccountMasterEditionTokenAccount,
-  TAccountMasterEditionAccount,
-  TAccountPrintEditionAccount,
-  TAccountEditionMarkerAccount,
-  TAccountSplTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPrintEditionMint,
+    InstructionAccountInputAddress<TAccountPrintEditionMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMasterEditionMint,
+    InstructionAccountInputAddress<TAccountMasterEditionMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPrintEditionTokenAccount,
+    InstructionAccountInputAddress<TAccountPrintEditionTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMasterEditionTokenAccount,
+    InstructionAccountInputAddress<TAccountMasterEditionTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMasterEditionAccount,
+    InstructionAccountInputAddress<TAccountMasterEditionAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPrintEditionAccount,
+    InstructionAccountInputAddress<TAccountPrintEditionAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEditionMarkerAccount,
+    InstructionAccountInputAddress<TAccountEditionMarkerAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSplTokenProgram,
+    InstructionAccountInputAddress<TAccountSplTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: true },
     printEditionMint: {
       value: input.printEditionMint ?? null,
+      isSigner: false,
       isWritable: true,
     },
     masterEditionMint: {
       value: input.masterEditionMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     printEditionTokenAccount: {
       value: input.printEditionTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     masterEditionTokenAccount: {
       value: input.masterEditionTokenAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     masterEditionAccount: {
       value: input.masterEditionAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     printEditionAccount: {
       value: input.printEditionAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     editionMarkerAccount: {
       value: input.editionMarkerAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     splTokenProgram: {
       value: input.splTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -247,7 +312,6 @@ export function getBurnEditionNftInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -271,16 +335,46 @@ export function getBurnEditionNftInstruction<
     programAddress,
   } as BurnEditionNftInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountOwner,
-    TAccountPrintEditionMint,
-    TAccountMasterEditionMint,
-    TAccountPrintEditionTokenAccount,
-    TAccountMasterEditionTokenAccount,
-    TAccountMasterEditionAccount,
-    TAccountPrintEditionAccount,
-    TAccountEditionMarkerAccount,
-    TAccountSplTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrintEditionMint,
+      InstructionAccountInputAddress<TAccountPrintEditionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEditionMint,
+      InstructionAccountInputAddress<TAccountMasterEditionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrintEditionTokenAccount,
+      InstructionAccountInputAddress<TAccountPrintEditionTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEditionTokenAccount,
+      InstructionAccountInputAddress<TAccountMasterEditionTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEditionAccount,
+      InstructionAccountInputAddress<TAccountMasterEditionAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrintEditionAccount,
+      InstructionAccountInputAddress<TAccountPrintEditionAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEditionMarkerAccount,
+      InstructionAccountInputAddress<TAccountEditionMarkerAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSplTokenProgram,
+      InstructionAccountInputAddress<TAccountSplTokenProgram>
+    >
   >);
 }
 

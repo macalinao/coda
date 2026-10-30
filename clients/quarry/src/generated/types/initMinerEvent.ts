@@ -16,11 +16,16 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type InitMinerEvent = { pool: Address; mm: Address; miner: Address };
 
-export type InitMinerEventArgs = InitMinerEvent;
+export type InitMinerEventArgs = {
+  pool: Address | HasAddress;
+  mm: Address | HasAddress;
+  miner: Address | HasAddress;
+};
 
 export function getInitMinerEventEncoder(): FixedSizeEncoder<InitMinerEventArgs> {
   return getStructEncoder([

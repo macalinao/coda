@@ -13,24 +13,30 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type OptionOrNullable,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type WhitelistSeeds = {
-  locker: Address;
-  programId: Address;
-  owner: OptionOrNullable<Address>;
+  locker: Address | HasAddress;
+  programId: Address | HasAddress;
+  owner: OptionOrNullable<Address | HasAddress>;
 };
 
 /** Whitelist entry for a program that can interact with the locker */
 export async function findWhitelistPda(
   seeds: WhitelistSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">,
+    programAddress:
+      programAddressInput = "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

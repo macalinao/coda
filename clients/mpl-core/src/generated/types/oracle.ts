@@ -18,6 +18,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -50,7 +51,7 @@ export type Oracle = {
 
 export type OracleArgs = {
   /** The address of the oracle account, or the base address used to derive it. */
-  baseAddress: Address;
+  baseAddress: Address | HasAddress;
   /**
    * How to derive the actual oracle account from `baseAddress`
    * (e.g. a PDA keyed by the asset), if not `baseAddress` itself.

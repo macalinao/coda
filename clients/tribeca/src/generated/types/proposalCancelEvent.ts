@@ -16,11 +16,15 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ProposalCancelEvent = { governor: Address; proposal: Address };
 
-export type ProposalCancelEventArgs = ProposalCancelEvent;
+export type ProposalCancelEventArgs = {
+  governor: Address | HasAddress;
+  proposal: Address | HasAddress;
+};
 
 export function getProposalCancelEventEncoder(): FixedSizeEncoder<ProposalCancelEventArgs> {
   return getStructEncoder([

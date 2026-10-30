@@ -28,12 +28,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -95,40 +98,65 @@ export function getAcceptAdminInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type AcceptAdminInput<
-  TAccountMintWrapper extends string = string,
-  TAccountPendingAdmin extends string = string,
+  TAccountMintWrapper extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPendingAdmin extends InstructionSignerInput = InstructionSignerInput,
 > = {
-  mintWrapper: Address<TAccountMintWrapper>;
-  pendingAdmin: TransactionSigner<TAccountPendingAdmin>;
+  mintWrapper: TAccountMintWrapper;
+  pendingAdmin: TAccountPendingAdmin;
 };
 
 export function getAcceptAdminInstruction<
-  TAccountMintWrapper extends string,
-  TAccountPendingAdmin extends string,
+  TAccountMintWrapper extends InstructionAccountInput,
+  TAccountPendingAdmin extends InstructionSignerInput,
   TProgramAddress extends Address = typeof QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS,
 >(
   input: AcceptAdminInput<TAccountMintWrapper, TAccountPendingAdmin>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): AcceptAdminInstruction<
   TProgramAddress,
-  TAccountMintWrapper,
-  TAccountPendingAdmin
+  ResolvedInstructionAccountMeta<
+    TAccountMintWrapper,
+    InstructionAccountInputAddress<TAccountMintWrapper>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPendingAdmin,
+    InstructionAccountInputAddress<TAccountPendingAdmin>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MINT_WRAPPER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: true },
-    pendingAdmin: { value: input.pendingAdmin ?? null, isWritable: false },
+    mintWrapper: {
+      value: input.mintWrapper ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    pendingAdmin: {
+      value: input.pendingAdmin ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("mintWrapper", accounts.mintWrapper),
@@ -138,8 +166,14 @@ export function getAcceptAdminInstruction<
     programAddress,
   } as AcceptAdminInstruction<
     TProgramAddress,
-    TAccountMintWrapper,
-    TAccountPendingAdmin
+    ResolvedInstructionAccountMeta<
+      TAccountMintWrapper,
+      InstructionAccountInputAddress<TAccountMintWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPendingAdmin,
+      InstructionAccountInputAddress<TAccountPendingAdmin>
+    >
   >);
 }
 

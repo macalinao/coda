@@ -33,13 +33,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -133,27 +136,28 @@ export function getCreateTransactionInstructionDataCodec(): Codec<
 }
 
 export type CreateTransactionInput<
-  TAccountSmartWallet extends string = string,
-  TAccountTransaction extends string = string,
-  TAccountProposer extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountSmartWallet extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTransaction extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProposer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  smartWallet: Address<TAccountSmartWallet>;
-  transaction: Address<TAccountTransaction>;
-  proposer: TransactionSigner<TAccountProposer>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  smartWallet: TAccountSmartWallet;
+  transaction: TAccountTransaction;
+  proposer: TAccountProposer;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: CreateTransactionInstructionDataArgs["bump"];
   instructions: CreateTransactionInstructionDataArgs["instructions"];
 };
 
 export function getCreateTransactionInstruction<
-  TAccountSmartWallet extends string,
-  TAccountTransaction extends string,
-  TAccountProposer extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountSmartWallet extends InstructionAccountInput,
+  TAccountTransaction extends InstructionAccountInput,
+  TAccountProposer extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SMART_WALLET_PROGRAM_ADDRESS,
 >(
   input: CreateTransactionInput<
@@ -163,25 +167,69 @@ export function getCreateTransactionInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateTransactionInstruction<
   TProgramAddress,
-  TAccountSmartWallet,
-  TAccountTransaction,
-  TAccountProposer,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTransaction,
+    InstructionAccountInputAddress<TAccountTransaction>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposer,
+    InstructionAccountInputAddress<TAccountProposer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    smartWallet: { value: input.smartWallet ?? null, isWritable: true },
-    transaction: { value: input.transaction ?? null, isWritable: true },
-    proposer: { value: input.proposer ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    transaction: {
+      value: input.transaction ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    proposer: {
+      value: input.proposer ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -197,7 +245,6 @@ export function getCreateTransactionInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("smartWallet", accounts.smartWallet),
@@ -212,11 +259,26 @@ export function getCreateTransactionInstruction<
     programAddress,
   } as CreateTransactionInstruction<
     TProgramAddress,
-    TAccountSmartWallet,
-    TAccountTransaction,
-    TAccountProposer,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTransaction,
+      InstructionAccountInputAddress<TAccountTransaction>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposer,
+      InstructionAccountInputAddress<TAccountProposer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

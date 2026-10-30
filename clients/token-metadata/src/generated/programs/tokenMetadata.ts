@@ -22,6 +22,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -1327,14 +1328,17 @@ export type TokenMetadataPluginAccounts = {
 export type TokenMetadataPluginInstructions = {
   createMetadataAccount: (
     input: MakeOptional<CreateMetadataAccountAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMetadataAccountInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateMetadataAccount: (
     input: UpdateMetadataAccountInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateMetadataAccountInstruction> &
     SelfPlanAndSendFunctions;
   deprecatedCreateMasterEdition: (
     input: MakeOptional<DeprecatedCreateMasterEditionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeprecatedCreateMasterEditionInstructionAsync> &
     SelfPlanAndSendFunctions;
   deprecatedMintNewEditionFromMasterEditionViaPrintingToken: (
@@ -1342,45 +1346,55 @@ export type TokenMetadataPluginInstructions = {
       DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAsyncInput,
       "payer"
     >,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionAsync
   > &
     SelfPlanAndSendFunctions;
   updatePrimarySaleHappenedViaToken: (
     input: UpdatePrimarySaleHappenedViaTokenInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdatePrimarySaleHappenedViaTokenInstruction> &
     SelfPlanAndSendFunctions;
   deprecatedSetReservationList: (
     input: DeprecatedSetReservationListInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeprecatedSetReservationListInstruction> &
     SelfPlanAndSendFunctions;
   deprecatedCreateReservationList: (
     input: MakeOptional<DeprecatedCreateReservationListInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeprecatedCreateReservationListInstruction> &
     SelfPlanAndSendFunctions;
   signMetadata: (
     input: SignMetadataInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSignMetadataInstruction> & SelfPlanAndSendFunctions;
   deprecatedMintPrintingTokensViaToken: (
     input: DeprecatedMintPrintingTokensViaTokenInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeprecatedMintPrintingTokensViaTokenInstruction> &
     SelfPlanAndSendFunctions;
   deprecatedMintPrintingTokens: (
     input: DeprecatedMintPrintingTokensInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeprecatedMintPrintingTokensInstruction> &
     SelfPlanAndSendFunctions;
   createMasterEdition: (
     input: MakeOptional<CreateMasterEditionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMasterEditionInstructionAsync> &
     SelfPlanAndSendFunctions;
   mintNewEditionFromMasterEditionViaToken: (
     input: MakeOptional<MintNewEditionFromMasterEditionViaTokenInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getMintNewEditionFromMasterEditionViaTokenInstruction
   > &
     SelfPlanAndSendFunctions;
   convertMasterEditionV1ToV2: (
     input: ConvertMasterEditionV1ToV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getConvertMasterEditionV1ToV2Instruction> &
     SelfPlanAndSendFunctions;
   mintNewEditionFromMasterEditionViaVaultProxy: (
@@ -1388,167 +1402,212 @@ export type TokenMetadataPluginInstructions = {
       MintNewEditionFromMasterEditionViaVaultProxyInput,
       "payer"
     >,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<
     typeof getMintNewEditionFromMasterEditionViaVaultProxyInstruction
   > &
     SelfPlanAndSendFunctions;
   puffMetadata: (
     input: PuffMetadataInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getPuffMetadataInstruction> & SelfPlanAndSendFunctions;
   updateMetadataAccountV2: (
     input: UpdateMetadataAccountV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateMetadataAccountV2Instruction> &
     SelfPlanAndSendFunctions;
   createMetadataAccountV2: (
     input: MakeOptional<CreateMetadataAccountV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMetadataAccountV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   createMasterEditionV3: (
     input: MakeOptional<CreateMasterEditionV3AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMasterEditionV3InstructionAsync> &
     SelfPlanAndSendFunctions;
   verifyCollection: (
     input: MakeOptional<VerifyCollectionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   utilize: (
     input: UtilizeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUtilizeInstructionAsync> & SelfPlanAndSendFunctions;
   approveUseAuthority: (
     input: MakeOptional<ApproveUseAuthorityAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getApproveUseAuthorityInstructionAsync> &
     SelfPlanAndSendFunctions;
   revokeUseAuthority: (
     input: RevokeUseAuthorityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRevokeUseAuthorityInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifyCollection: (
     input: UnverifyCollectionAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnverifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   approveCollectionAuthority: (
     input: MakeOptional<ApproveCollectionAuthorityAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getApproveCollectionAuthorityInstructionAsync> &
     SelfPlanAndSendFunctions;
   revokeCollectionAuthority: (
     input: RevokeCollectionAuthorityAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRevokeCollectionAuthorityInstructionAsync> &
     SelfPlanAndSendFunctions;
   setAndVerifyCollection: (
     input: MakeOptional<SetAndVerifyCollectionAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetAndVerifyCollectionInstructionAsync> &
     SelfPlanAndSendFunctions;
   freezeDelegatedAccount: (
     input: FreezeDelegatedAccountInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFreezeDelegatedAccountInstruction> &
     SelfPlanAndSendFunctions;
   thawDelegatedAccount: (
     input: ThawDelegatedAccountInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getThawDelegatedAccountInstruction> &
     SelfPlanAndSendFunctions;
   removeCreatorVerification: (
     input: RemoveCreatorVerificationInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveCreatorVerificationInstruction> &
     SelfPlanAndSendFunctions;
   burnNft: (
     input: BurnNftAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBurnNftInstructionAsync> & SelfPlanAndSendFunctions;
   verifySizedCollectionItem: (
     input: MakeOptional<VerifySizedCollectionItemAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getVerifySizedCollectionItemInstructionAsync> &
     SelfPlanAndSendFunctions;
   unverifySizedCollectionItem: (
     input: MakeOptional<UnverifySizedCollectionItemAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnverifySizedCollectionItemInstructionAsync> &
     SelfPlanAndSendFunctions;
   setAndVerifySizedCollectionItem: (
     input: MakeOptional<SetAndVerifySizedCollectionItemAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetAndVerifySizedCollectionItemInstructionAsync> &
     SelfPlanAndSendFunctions;
   createMetadataAccountV3: (
     input: MakeOptional<CreateMetadataAccountV3AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMetadataAccountV3InstructionAsync> &
     SelfPlanAndSendFunctions;
   setCollectionSize: (
     input: SetCollectionSizeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetCollectionSizeInstructionAsync> &
     SelfPlanAndSendFunctions;
   setTokenStandard: (
     input: SetTokenStandardAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetTokenStandardInstructionAsync> &
     SelfPlanAndSendFunctions;
   bubblegumSetCollectionSize: (
     input: BubblegumSetCollectionSizeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBubblegumSetCollectionSizeInstructionAsync> &
     SelfPlanAndSendFunctions;
   burnEditionNft: (
     input: BurnEditionNftInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBurnEditionNftInstruction> &
     SelfPlanAndSendFunctions;
   createEscrowAccount: (
     input: MakeOptional<CreateEscrowAccountAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateEscrowAccountInstructionAsync> &
     SelfPlanAndSendFunctions;
   closeEscrowAccount: (
     input: MakeOptional<CloseEscrowAccountAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseEscrowAccountInstructionAsync> &
     SelfPlanAndSendFunctions;
   transferOutOfEscrow: (
     input: MakeOptional<TransferOutOfEscrowInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferOutOfEscrowInstruction> &
     SelfPlanAndSendFunctions;
   burn: (
     input: BurnAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getBurnInstructionAsync> & SelfPlanAndSendFunctions;
   create: (
     input: MakeOptional<CreateAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateInstructionAsync> & SelfPlanAndSendFunctions;
   mint: (
     input: MakeOptional<MintAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getMintInstructionAsync> & SelfPlanAndSendFunctions;
   delegate: (
     input: MakeOptional<DelegateAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateInstructionAsync> &
     SelfPlanAndSendFunctions;
   revoke: (
     input: MakeOptional<RevokeAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRevokeInstructionAsync> & SelfPlanAndSendFunctions;
   lock: (
     input: MakeOptional<LockAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLockInstructionAsync> & SelfPlanAndSendFunctions;
   unlock: (
     input: MakeOptional<UnlockAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnlockInstructionAsync> & SelfPlanAndSendFunctions;
   migrate: (
     input: MakeOptional<MigrateAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getMigrateInstructionAsync> & SelfPlanAndSendFunctions;
   transfer: (
     input: MakeOptional<TransferAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferInstructionAsync> &
     SelfPlanAndSendFunctions;
   update: (
     input: MakeOptional<UpdateAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateInstructionAsync> & SelfPlanAndSendFunctions;
   use: (
     input: MakeOptional<UseAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUseInstructionAsync> & SelfPlanAndSendFunctions;
   verify: (
     input: VerifyInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getVerifyInstruction> & SelfPlanAndSendFunctions;
   unverify: (
     input: UnverifyInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnverifyInstruction> & SelfPlanAndSendFunctions;
   collect: (
     input: CollectInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectInstruction> & SelfPlanAndSendFunctions;
   print: (
     input: MakeOptional<PrintInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getPrintInstruction> & SelfPlanAndSendFunctions;
   resize: (
     input: MakeOptional<ResizeAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getResizeInstructionAsync> & SelfPlanAndSendFunctions;
   closeAccounts: (
     input: CloseAccountsAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseAccountsInstructionAsync> &
     SelfPlanAndSendFunctions;
 };
@@ -1566,7 +1625,9 @@ export type TokenMetadataPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function tokenMetadataProgram() {
+export function tokenMetadataProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends TokenMetadataPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { tokenMetadata: TokenMetadataPlugin }> => {
@@ -1619,384 +1680,589 @@ export function tokenMetadataProgram() {
           ),
         },
         instructions: {
-          createMetadataAccount: (input) =>
+          createMetadataAccount: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateMetadataAccountInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateMetadataAccountInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          updateMetadataAccount: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateMetadataAccountInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          updateMetadataAccount: (input) =>
+          deprecatedCreateMasterEdition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateMetadataAccountInstruction(input),
+              getDeprecatedCreateMasterEditionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          deprecatedCreateMasterEdition: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDeprecatedCreateMasterEditionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          deprecatedMintNewEditionFromMasterEditionViaPrintingToken: (input) =>
+          deprecatedMintNewEditionFromMasterEditionViaPrintingToken: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
               getDeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInstructionAsync(
                 { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
               ),
             ),
-          updatePrimarySaleHappenedViaToken: (input) =>
+          updatePrimarySaleHappenedViaToken: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdatePrimarySaleHappenedViaTokenInstruction(input),
-            ),
-          deprecatedSetReservationList: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDeprecatedSetReservationListInstruction(input),
-            ),
-          deprecatedCreateReservationList: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDeprecatedCreateReservationListInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUpdatePrimarySaleHappenedViaTokenInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          signMetadata: (input) =>
+          deprecatedSetReservationList: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSignMetadataInstruction(input),
-            ),
-          deprecatedMintPrintingTokensViaToken: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDeprecatedMintPrintingTokensViaTokenInstruction(input),
-            ),
-          deprecatedMintPrintingTokens: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDeprecatedMintPrintingTokensInstruction(input),
-            ),
-          createMasterEdition: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateMasterEditionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getDeprecatedSetReservationListInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          mintNewEditionFromMasterEditionViaToken: (input) =>
+          deprecatedCreateReservationList: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintNewEditionFromMasterEditionViaTokenInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getDeprecatedCreateReservationListInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          signMetadata: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSignMetadataInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          convertMasterEditionV1ToV2: (input) =>
+          deprecatedMintPrintingTokensViaToken: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getConvertMasterEditionV1ToV2Instruction(input),
-            ),
-          mintNewEditionFromMasterEditionViaVaultProxy: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getMintNewEditionFromMasterEditionViaVaultProxyInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getDeprecatedMintPrintingTokensViaTokenInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          puffMetadata: (input) =>
+          deprecatedMintPrintingTokens: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getPuffMetadataInstruction(input),
-            ),
-          updateMetadataAccountV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateMetadataAccountV2Instruction(input),
-            ),
-          createMetadataAccountV2: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateMetadataAccountV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getDeprecatedMintPrintingTokensInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createMasterEditionV3: (input) =>
+          createMasterEdition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateMasterEditionV3InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateMasterEditionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          mintNewEditionFromMasterEditionViaToken: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintNewEditionFromMasterEditionViaTokenInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          convertMasterEditionV1ToV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getConvertMasterEditionV1ToV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          verifyCollection: (input) =>
+          mintNewEditionFromMasterEditionViaVaultProxy: (
+            input,
+            instructionConfig,
+          ) =>
             addSelfPlanAndSendFunctions(
               client,
-              getVerifyCollectionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getMintNewEditionFromMasterEditionViaVaultProxyInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          puffMetadata: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getPuffMetadataInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          utilize: (input) =>
+          updateMetadataAccountV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUtilizeInstructionAsync(input),
-            ),
-          approveUseAuthority: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getApproveUseAuthorityInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUpdateMetadataAccountV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          revokeUseAuthority: (input) =>
+          createMetadataAccountV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRevokeUseAuthorityInstructionAsync(input),
+              getCreateMetadataAccountV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          unverifyCollection: (input) =>
+          createMasterEditionV3: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifyCollectionInstructionAsync(input),
+              getCreateMasterEditionV3InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          approveCollectionAuthority: (input) =>
+          verifyCollection: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getApproveCollectionAuthorityInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getVerifyCollectionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          utilize: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUtilizeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          revokeCollectionAuthority: (input) =>
+          approveUseAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRevokeCollectionAuthorityInstructionAsync(input),
+              getApproveUseAuthorityInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setAndVerifyCollection: (input) =>
+          revokeUseAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetAndVerifyCollectionInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getRevokeUseAuthorityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          freezeDelegatedAccount: (input) =>
+          unverifyCollection: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getFreezeDelegatedAccountInstruction(input),
-            ),
-          thawDelegatedAccount: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getThawDelegatedAccountInstruction(input),
-            ),
-          removeCreatorVerification: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRemoveCreatorVerificationInstruction(input),
-            ),
-          burnNft: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getBurnNftInstructionAsync(input),
-            ),
-          verifySizedCollectionItem: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getVerifySizedCollectionItemInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUnverifyCollectionInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          unverifySizedCollectionItem: (input) =>
+          approveCollectionAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnverifySizedCollectionItemInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getApproveCollectionAuthorityInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          revokeCollectionAuthority: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeCollectionAuthorityInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setAndVerifySizedCollectionItem: (input) =>
+          setAndVerifyCollection: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetAndVerifySizedCollectionItemInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetAndVerifyCollectionInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          freezeDelegatedAccount: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFreezeDelegatedAccountInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createMetadataAccountV3: (input) =>
+          thawDelegatedAccount: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateMetadataAccountV3InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getThawDelegatedAccountInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setCollectionSize: (input) =>
+          removeCreatorVerification: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetCollectionSizeInstructionAsync(input),
-            ),
-          setTokenStandard: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetTokenStandardInstructionAsync(input),
-            ),
-          bubblegumSetCollectionSize: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getBubblegumSetCollectionSizeInstructionAsync(input),
-            ),
-          burnEditionNft: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getBurnEditionNftInstruction(input),
-            ),
-          createEscrowAccount: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateEscrowAccountInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getRemoveCreatorVerificationInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          closeEscrowAccount: (input) =>
+          burnNft: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseEscrowAccountInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getBurnNftInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          transferOutOfEscrow: (input) =>
+          verifySizedCollectionItem: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTransferOutOfEscrowInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getVerifySizedCollectionItemInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          unverifySizedCollectionItem: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUnverifySizedCollectionItemInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setAndVerifySizedCollectionItem: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetAndVerifySizedCollectionItemInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createMetadataAccountV3: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMetadataAccountV3InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setCollectionSize: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetCollectionSizeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          burn: (input) =>
-            addSelfPlanAndSendFunctions(client, getBurnInstructionAsync(input)),
-          create: (input) =>
+          setTokenStandard: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetTokenStandardInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          mint: (input) =>
+          bubblegumSetCollectionSize: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMintInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getBubblegumSetCollectionSizeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          delegate: (input) =>
+          burnEditionNft: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getBurnEditionNftInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          revoke: (input) =>
+          createEscrowAccount: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRevokeInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateEscrowAccountInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          closeEscrowAccount: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCloseEscrowAccountInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          transferOutOfEscrow: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferOutOfEscrowInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          burn: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getBurnInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          lock: (input) =>
+          create: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getLockInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          mint: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMintInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          delegate: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          revoke: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          lock: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          unlock: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUnlockInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          migrate: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getMigrateInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          transfer: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          update: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          use: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUseInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          verify: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getVerifyInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          unlock: (input) =>
+          unverify: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnlockInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUnverifyInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          migrate: (input) =>
+          collect: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getMigrateInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCollectInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          transfer: (input) =>
+          print: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTransferInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getPrintInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          update: (input) =>
+          resize: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getResizeInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          use: (input) =>
+          closeAccounts: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUseInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCloseAccountsInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
-            ),
-          verify: (input) =>
-            addSelfPlanAndSendFunctions(client, getVerifyInstruction(input)),
-          unverify: (input) =>
-            addSelfPlanAndSendFunctions(client, getUnverifyInstruction(input)),
-          collect: (input) =>
-            addSelfPlanAndSendFunctions(client, getCollectInstruction(input)),
-          print: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getPrintInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          resize: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getResizeInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
-            ),
-          closeAccounts: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCloseAccountsInstructionAsync(input),
             ),
         },
         pdas: {
-          metadata: findMetadataPda,
-          masterEdition: findMasterEditionPda,
-          tokenRecord: findTokenRecordPda,
+          metadata: (seeds, pdaConfig) =>
+            findMetadataPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          masterEdition: (seeds, pdaConfig) =>
+            findMasterEditionPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          tokenRecord: (seeds, pdaConfig) =>
+            findTokenRecordPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyInstruction: identifyTokenMetadataInstruction,
         parseInstruction: parseTokenMetadataInstruction,

@@ -27,13 +27,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -126,25 +129,27 @@ export function getValidateInstructionDataCodec(): Codec<
 }
 
 export type ValidateInput<
-  TAccountRuleSetPda extends string = string,
-  TAccountMint extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountPayer extends string = string,
-  TAccountRuleAuthority extends string = string,
-  TAccountRuleSetStatePda extends string = string,
+  TAccountRuleSetPda extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRuleAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRuleSetStatePda extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** The PDA account where the RuleSet is stored */
-  ruleSetPda: Address<TAccountRuleSetPda>;
+  ruleSetPda: TAccountRuleSetPda;
   /** Mint of token asset */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Payer for RuleSet state PDA account */
-  payer?: TransactionSigner<TAccountPayer>;
+  payer?: TAccountPayer;
   /** Signing authority for any Rule state updates */
-  ruleAuthority?: TransactionSigner<TAccountRuleAuthority>;
+  ruleAuthority?: TAccountRuleAuthority;
   /** The PDA account where any RuleSet state is stored */
-  ruleSetStatePda?: Address<TAccountRuleSetStatePda>;
+  ruleSetStatePda?: TAccountRuleSetStatePda;
   validateArgs: ValidateInstructionDataArgs["validateArgs"];
 };
 
@@ -158,12 +163,12 @@ export type ValidateInput<
  * rule-set state PDA.
  */
 export function getValidateInstruction<
-  TAccountRuleSetPda extends string,
-  TAccountMint extends string,
-  TAccountSystemProgram extends string,
-  TAccountPayer extends string,
-  TAccountRuleAuthority extends string,
-  TAccountRuleSetStatePda extends string,
+  TAccountRuleSetPda extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountRuleAuthority extends InstructionSignerInput,
+  TAccountRuleSetStatePda extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
 >(
   input: ValidateInput<
@@ -174,28 +179,74 @@ export function getValidateInstruction<
     TAccountRuleAuthority,
     TAccountRuleSetStatePda
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ValidateInstruction<
   TProgramAddress,
-  TAccountRuleSetPda,
-  TAccountMint,
-  TAccountSystemProgram,
-  TAccountPayer,
-  TAccountRuleAuthority,
-  TAccountRuleSetStatePda
+  ResolvedInstructionAccountMeta<
+    TAccountRuleSetPda,
+    InstructionAccountInputAddress<TAccountRuleSetPda>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMint,
+    InstructionAccountInputAddress<TAccountMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRuleAuthority,
+    InstructionAccountInputAddress<TAccountRuleAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRuleSetStatePda,
+    InstructionAccountInputAddress<TAccountRuleSetStatePda>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    ruleSetPda: { value: input.ruleSetPda ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    ruleAuthority: { value: input.ruleAuthority ?? null, isWritable: false },
-    ruleSetStatePda: { value: input.ruleSetStatePda ?? null, isWritable: true },
+    ruleSetPda: {
+      value: input.ruleSetPda ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    ruleAuthority: {
+      value: input.ruleAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    ruleSetStatePda: {
+      value: input.ruleSetStatePda ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -211,7 +262,6 @@ export function getValidateInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("ruleSetPda", accounts.ruleSetPda),
@@ -227,12 +277,30 @@ export function getValidateInstruction<
     programAddress,
   } as ValidateInstruction<
     TProgramAddress,
-    TAccountRuleSetPda,
-    TAccountMint,
-    TAccountSystemProgram,
-    TAccountPayer,
-    TAccountRuleAuthority,
-    TAccountRuleSetStatePda
+    ResolvedInstructionAccountMeta<
+      TAccountRuleSetPda,
+      InstructionAccountInputAddress<TAccountRuleSetPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRuleAuthority,
+      InstructionAccountInputAddress<TAccountRuleAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRuleSetStatePda,
+      InstructionAccountInputAddress<TAccountRuleSetStatePda>
+    >
   >);
 }
 

@@ -33,6 +33,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
@@ -41,12 +42,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -99,7 +103,7 @@ export type ConfigureVotingMintInstructionDataArgs = {
   baselineVoteWeightScaledFactor: number | bigint;
   maxExtraLockupVoteWeightScaledFactor: number | bigint;
   lockupSaturationSecs: number | bigint;
-  grantAuthority: OptionOrNullable<Address>;
+  grantAuthority: OptionOrNullable<Address | HasAddress>;
 };
 
 export function getConfigureVotingMintInstructionDataEncoder(): Encoder<ConfigureVotingMintInstructionDataArgs> {
@@ -143,13 +147,14 @@ export function getConfigureVotingMintInstructionDataCodec(): Codec<
 }
 
 export type ConfigureVotingMintInput<
-  TAccountRegistrar extends string = string,
-  TAccountRealmAuthority extends string = string,
-  TAccountMint extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  realmAuthority: TransactionSigner<TAccountRealmAuthority>;
-  mint: Address<TAccountMint>;
+  registrar: TAccountRegistrar;
+  realmAuthority: TAccountRealmAuthority;
+  mint: TAccountMint;
   idx: ConfigureVotingMintInstructionDataArgs["idx"];
   digitShift: ConfigureVotingMintInstructionDataArgs["digitShift"];
   baselineVoteWeightScaledFactor: ConfigureVotingMintInstructionDataArgs["baselineVoteWeightScaledFactor"];
@@ -159,9 +164,9 @@ export type ConfigureVotingMintInput<
 };
 
 export function getConfigureVotingMintInstruction<
-  TAccountRegistrar extends string,
-  TAccountRealmAuthority extends string,
-  TAccountMint extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput,
+  TAccountMint extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: ConfigureVotingMintInput<
@@ -169,22 +174,51 @@ export function getConfigureVotingMintInstruction<
     TAccountRealmAuthority,
     TAccountMint
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ConfigureVotingMintInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountRealmAuthority,
-  TAccountMint
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAuthority,
+    InstructionAccountInputAddress<TAccountRealmAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMint,
+    InstructionAccountInputAddress<TAccountMint>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: true },
-    realmAuthority: { value: input.realmAuthority ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    realmAuthority: {
+      value: input.realmAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -194,7 +228,6 @@ export function getConfigureVotingMintInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -207,9 +240,18 @@ export function getConfigureVotingMintInstruction<
     programAddress,
   } as ConfigureVotingMintInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountRealmAuthority,
-    TAccountMint
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAuthority,
+      InstructionAccountInputAddress<TAccountRealmAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >
   >);
 }
 

@@ -12,12 +12,13 @@ import {
   getU64Encoder,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type AssetIdSeeds = {
   /** The address of the merkle tree account */
-  merkleTree: Address;
+  merkleTree: Address | HasAddress;
   /** The nonce (leaf index) of the leaf */
   nonce: number | bigint;
 };
@@ -25,11 +26,16 @@ export type AssetIdSeeds = {
 /** Deterministic asset id for a compressed NFT leaf */
 export async function findAssetIdPda(
   seeds: AssetIdSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">,
+    programAddress:
+      programAddressInput = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

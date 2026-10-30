@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type PythConfiguration = {
@@ -23,7 +24,10 @@ export type PythConfiguration = {
   price: Address;
 };
 
-export type PythConfigurationArgs = PythConfiguration;
+export type PythConfigurationArgs = {
+  /** Pubkey of the base price feed (disabled if `null` or `default`) */
+  price: Address | HasAddress;
+};
 
 export function getPythConfigurationEncoder(): FixedSizeEncoder<PythConfigurationArgs> {
   return getStructEncoder([["price", getAddressEncoder()]]);

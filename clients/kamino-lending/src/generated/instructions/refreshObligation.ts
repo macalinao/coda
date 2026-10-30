@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -93,40 +96,66 @@ export function getRefreshObligationInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RefreshObligationInput<
-  TAccountLendingMarket extends string = string,
-  TAccountObligation extends string = string,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountObligation extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  lendingMarket: Address<TAccountLendingMarket>;
-  obligation: Address<TAccountObligation>;
+  lendingMarket: TAccountLendingMarket;
+  obligation: TAccountObligation;
 };
 
 export function getRefreshObligationInstruction<
-  TAccountLendingMarket extends string,
-  TAccountObligation extends string,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountObligation extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: RefreshObligationInput<TAccountLendingMarket, TAccountObligation>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RefreshObligationInstruction<
   TProgramAddress,
-  TAccountLendingMarket,
-  TAccountObligation
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountObligation,
+    InstructionAccountInputAddress<TAccountObligation>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: true },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    obligation: {
+      value: input.obligation ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("lendingMarket", accounts.lendingMarket),
@@ -136,8 +165,14 @@ export function getRefreshObligationInstruction<
     programAddress,
   } as RefreshObligationInstruction<
     TProgramAddress,
-    TAccountLendingMarket,
-    TAccountObligation
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >
   >);
 }
 

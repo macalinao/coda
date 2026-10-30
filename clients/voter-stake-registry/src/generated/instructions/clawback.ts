@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -120,29 +123,31 @@ export function getClawbackInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ClawbackInput<
-  TAccountRegistrar extends string = string,
-  TAccountRealmAuthority extends string = string,
-  TAccountVoter extends string = string,
-  TAccountVault extends string = string,
-  TAccountDestination extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  realmAuthority: TransactionSigner<TAccountRealmAuthority>;
-  voter: Address<TAccountVoter>;
-  vault: Address<TAccountVault>;
-  destination: Address<TAccountDestination>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  registrar: TAccountRegistrar;
+  realmAuthority: TAccountRealmAuthority;
+  voter: TAccountVoter;
+  vault: TAccountVault;
+  destination: TAccountDestination;
+  tokenProgram?: TAccountTokenProgram;
   depositEntryIndex: ClawbackInstructionDataArgs["depositEntryIndex"];
 };
 
 export function getClawbackInstruction<
-  TAccountRegistrar extends string,
-  TAccountRealmAuthority extends string,
-  TAccountVoter extends string,
-  TAccountVault extends string,
-  TAccountDestination extends string,
-  TAccountTokenProgram extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput,
+  TAccountDestination extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: ClawbackInput<
@@ -153,28 +158,74 @@ export function getClawbackInstruction<
     TAccountDestination,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ClawbackInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountRealmAuthority,
-  TAccountVoter,
-  TAccountVault,
-  TAccountDestination,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAuthority,
+    InstructionAccountInputAddress<TAccountRealmAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVault,
+    InstructionAccountInputAddress<TAccountVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDestination,
+    InstructionAccountInputAddress<TAccountDestination>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    realmAuthority: { value: input.realmAuthority ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: true },
-    vault: { value: input.vault ?? null, isWritable: true },
-    destination: { value: input.destination ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    realmAuthority: {
+      value: input.realmAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: true },
+    vault: { value: input.vault ?? null, isSigner: false, isWritable: true },
+    destination: {
+      value: input.destination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -190,7 +241,6 @@ export function getClawbackInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -206,12 +256,30 @@ export function getClawbackInstruction<
     programAddress,
   } as ClawbackInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountRealmAuthority,
-    TAccountVoter,
-    TAccountVault,
-    TAccountDestination,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAuthority,
+      InstructionAccountInputAddress<TAccountRealmAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVault,
+      InstructionAccountInputAddress<TAccountVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestination,
+      InstructionAccountInputAddress<TAccountDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type UnstakeReplicaEvent = {
@@ -29,10 +30,10 @@ export type UnstakeReplicaEvent = {
 };
 
 export type UnstakeReplicaEventArgs = {
-  pool: Address;
-  mm: Address;
-  miner: Address;
-  owner: Address;
+  pool: Address | HasAddress;
+  mm: Address | HasAddress;
+  miner: Address | HasAddress;
+  owner: Address | HasAddress;
   amount: number | bigint;
 };
 

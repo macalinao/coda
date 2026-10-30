@@ -18,11 +18,15 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtSetPoolStatus = { pool: Address; status: number };
 
-export type EvtSetPoolStatusArgs = EvtSetPoolStatus;
+export type EvtSetPoolStatusArgs = {
+  pool: Address | HasAddress;
+  status: number;
+};
 
 export function getEvtSetPoolStatusEncoder(): FixedSizeEncoder<EvtSetPoolStatusArgs> {
   return getStructEncoder([

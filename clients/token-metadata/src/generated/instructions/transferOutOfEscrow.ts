@@ -27,13 +27,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -163,63 +166,70 @@ export function getTransferOutOfEscrowInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type TransferOutOfEscrowInput<
-  TAccountEscrow extends string = string,
-  TAccountMetadata extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAttributeMint extends string = string,
-  TAccountAttributeSrc extends string = string,
-  TAccountAttributeDst extends string = string,
-  TAccountEscrowMint extends string = string,
-  TAccountEscrowAccount extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountAtaProgram extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSysvarInstructions extends string = string,
-  TAccountAuthority extends string = string,
+  TAccountEscrow extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAttributeMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAttributeSrc extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAttributeDst extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEscrowMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrowAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAtaProgram extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSysvarInstructions extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
 > = {
   /** Escrow account */
-  escrow: Address<TAccountEscrow>;
+  escrow: TAccountEscrow;
   /** Metadata account */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Wallet paying for the transaction and new account */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** Mint account for the new attribute */
-  attributeMint: Address<TAccountAttributeMint>;
+  attributeMint: TAccountAttributeMint;
   /** Token account source for the new attribute */
-  attributeSrc: Address<TAccountAttributeSrc>;
+  attributeSrc: TAccountAttributeSrc;
   /** Token account, owned by TM, destination for the new attribute */
-  attributeDst: Address<TAccountAttributeDst>;
+  attributeDst: TAccountAttributeDst;
   /** Mint account that the escrow is attached */
-  escrowMint: Address<TAccountEscrowMint>;
+  escrowMint: TAccountEscrowMint;
   /** Token account that holds the token the escrow is attached to */
-  escrowAccount: Address<TAccountEscrowAccount>;
+  escrowAccount: TAccountEscrowAccount;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Associated Token program */
-  ataProgram?: Address<TAccountAtaProgram>;
+  ataProgram?: TAccountAtaProgram;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** Instructions sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions?: TAccountSysvarInstructions;
   /** Authority/creator of the escrow account */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   transferOutOfEscrowArgs: TransferOutOfEscrowInstructionDataArgs["transferOutOfEscrowArgs"];
 };
 
 export function getTransferOutOfEscrowInstruction<
-  TAccountEscrow extends string,
-  TAccountMetadata extends string,
-  TAccountPayer extends string,
-  TAccountAttributeMint extends string,
-  TAccountAttributeSrc extends string,
-  TAccountAttributeDst extends string,
-  TAccountEscrowMint extends string,
-  TAccountEscrowAccount extends string,
-  TAccountSystemProgram extends string,
-  TAccountAtaProgram extends string,
-  TAccountTokenProgram extends string,
-  TAccountSysvarInstructions extends string,
-  TAccountAuthority extends string,
+  TAccountEscrow extends InstructionAccountInput,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAttributeMint extends InstructionAccountInput,
+  TAccountAttributeSrc extends InstructionAccountInput,
+  TAccountAttributeDst extends InstructionAccountInput,
+  TAccountEscrowMint extends InstructionAccountInput,
+  TAccountEscrowAccount extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountAtaProgram extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSysvarInstructions extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: TransferOutOfEscrowInput<
@@ -237,45 +247,137 @@ export function getTransferOutOfEscrowInstruction<
     TAccountSysvarInstructions,
     TAccountAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): TransferOutOfEscrowInstruction<
   TProgramAddress,
-  TAccountEscrow,
-  TAccountMetadata,
-  TAccountPayer,
-  TAccountAttributeMint,
-  TAccountAttributeSrc,
-  TAccountAttributeDst,
-  TAccountEscrowMint,
-  TAccountEscrowAccount,
-  TAccountSystemProgram,
-  TAccountAtaProgram,
-  TAccountTokenProgram,
-  TAccountSysvarInstructions,
-  TAccountAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountEscrow,
+    InstructionAccountInputAddress<TAccountEscrow>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAttributeMint,
+    InstructionAccountInputAddress<TAccountAttributeMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAttributeSrc,
+    InstructionAccountInputAddress<TAccountAttributeSrc>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAttributeDst,
+    InstructionAccountInputAddress<TAccountAttributeDst>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowMint,
+    InstructionAccountInputAddress<TAccountEscrowMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowAccount,
+    InstructionAccountInputAddress<TAccountEscrowAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAtaProgram,
+    InstructionAccountInputAddress<TAccountAtaProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSysvarInstructions,
+    InstructionAccountInputAddress<TAccountSysvarInstructions>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
 
   // Original accounts.
   const originalAccounts = {
-    escrow: { value: input.escrow ?? null, isWritable: false },
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    attributeMint: { value: input.attributeMint ?? null, isWritable: false },
-    attributeSrc: { value: input.attributeSrc ?? null, isWritable: true },
-    attributeDst: { value: input.attributeDst ?? null, isWritable: true },
-    escrowMint: { value: input.escrowMint ?? null, isWritable: false },
-    escrowAccount: { value: input.escrowAccount ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    ataProgram: { value: input.ataProgram ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    sysvarInstructions: {
-      value: input.sysvarInstructions ?? null,
+    escrow: { value: input.escrow ?? null, isSigner: false, isWritable: false },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    attributeMint: {
+      value: input.attributeMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    authority: { value: input.authority ?? null, isWritable: false },
+    attributeSrc: {
+      value: input.attributeSrc ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    attributeDst: {
+      value: input.attributeDst ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    escrowMint: {
+      value: input.escrowMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    escrowAccount: {
+      value: input.escrowAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    ataProgram: {
+      value: input.ataProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    sysvarInstructions: {
+      value: input.sysvarInstructions ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -303,7 +405,6 @@ export function getTransferOutOfEscrowInstruction<
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
       getAccountMeta("escrow", accounts.escrow),
@@ -326,19 +427,58 @@ export function getTransferOutOfEscrowInstruction<
     programAddress,
   } as TransferOutOfEscrowInstruction<
     TProgramAddress,
-    TAccountEscrow,
-    TAccountMetadata,
-    TAccountPayer,
-    TAccountAttributeMint,
-    TAccountAttributeSrc,
-    TAccountAttributeDst,
-    TAccountEscrowMint,
-    TAccountEscrowAccount,
-    TAccountSystemProgram,
-    TAccountAtaProgram,
-    TAccountTokenProgram,
-    TAccountSysvarInstructions,
-    TAccountAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountEscrow,
+      InstructionAccountInputAddress<TAccountEscrow>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAttributeMint,
+      InstructionAccountInputAddress<TAccountAttributeMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAttributeSrc,
+      InstructionAccountInputAddress<TAccountAttributeSrc>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAttributeDst,
+      InstructionAccountInputAddress<TAccountAttributeDst>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowMint,
+      InstructionAccountInputAddress<TAccountEscrowMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowAccount,
+      InstructionAccountInputAddress<TAccountEscrowAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAtaProgram,
+      InstructionAccountInputAddress<TAccountAtaProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSysvarInstructions,
+      InstructionAccountInputAddress<TAccountSysvarInstructions>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >
   >);
 }
 

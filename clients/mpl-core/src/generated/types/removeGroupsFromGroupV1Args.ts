@@ -18,6 +18,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Arguments for `removeGroupsFromGroupV1`. */
@@ -26,7 +27,10 @@ export type RemoveGroupsFromGroupV1Args = {
   groups: Array<Address>;
 };
 
-export type RemoveGroupsFromGroupV1ArgsArgs = RemoveGroupsFromGroupV1Args;
+export type RemoveGroupsFromGroupV1ArgsArgs = {
+  /** The addresses of the child groups to remove from the parent. */
+  groups: Array<Address | HasAddress>;
+};
 
 export function getRemoveGroupsFromGroupV1ArgsEncoder(): Encoder<RemoveGroupsFromGroupV1ArgsArgs> {
   return getStructEncoder([["groups", getArrayEncoder(getAddressEncoder())]]);

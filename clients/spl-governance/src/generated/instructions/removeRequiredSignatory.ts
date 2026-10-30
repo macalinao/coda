@@ -25,13 +25,16 @@ import {
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -95,20 +98,23 @@ export function getRemoveRequiredSignatoryInstructionDataCodec(): FixedSizeCodec
 }
 
 export type RemoveRequiredSignatoryInput<
-  TAccountGovernanceAccount extends string = string,
-  TAccountRequiredSignatoryAccount extends string = string,
-  TAccountBeneficiaryAccount extends string = string,
+  TAccountGovernanceAccount extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountRequiredSignatoryAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountBeneficiaryAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  governanceAccount: TransactionSigner<TAccountGovernanceAccount>;
-  requiredSignatoryAccount: Address<TAccountRequiredSignatoryAccount>;
+  governanceAccount: TAccountGovernanceAccount;
+  requiredSignatoryAccount: TAccountRequiredSignatoryAccount;
   /** Beneficiary Account which would receive lamports from the disposed RequiredSignatory Account */
-  beneficiaryAccount: Address<TAccountBeneficiaryAccount>;
+  beneficiaryAccount: TAccountBeneficiaryAccount;
 };
 
 export function getRemoveRequiredSignatoryInstruction<
-  TAccountGovernanceAccount extends string,
-  TAccountRequiredSignatoryAccount extends string,
-  TAccountBeneficiaryAccount extends string,
+  TAccountGovernanceAccount extends InstructionSignerInput,
+  TAccountRequiredSignatoryAccount extends InstructionAccountInput,
+  TAccountBeneficiaryAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: RemoveRequiredSignatoryInput<
@@ -116,29 +122,53 @@ export function getRemoveRequiredSignatoryInstruction<
     TAccountRequiredSignatoryAccount,
     TAccountBeneficiaryAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RemoveRequiredSignatoryInstruction<
   TProgramAddress,
-  TAccountGovernanceAccount,
-  TAccountRequiredSignatoryAccount,
-  TAccountBeneficiaryAccount
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAccount,
+    InstructionAccountInputAddress<TAccountGovernanceAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRequiredSignatoryAccount,
+    InstructionAccountInputAddress<TAccountRequiredSignatoryAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBeneficiaryAccount,
+    InstructionAccountInputAddress<TAccountBeneficiaryAccount>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     governanceAccount: {
       value: input.governanceAccount ?? null,
+      isSigner: true,
       isWritable: true,
     },
     requiredSignatoryAccount: {
       value: input.requiredSignatoryAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     beneficiaryAccount: {
       value: input.beneficiaryAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
   };
@@ -147,7 +177,6 @@ export function getRemoveRequiredSignatoryInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("governanceAccount", accounts.governanceAccount),
@@ -161,9 +190,18 @@ export function getRemoveRequiredSignatoryInstruction<
     programAddress,
   } as RemoveRequiredSignatoryInstruction<
     TProgramAddress,
-    TAccountGovernanceAccount,
-    TAccountRequiredSignatoryAccount,
-    TAccountBeneficiaryAccount
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAccount,
+      InstructionAccountInputAddress<TAccountGovernanceAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRequiredSignatoryAccount,
+      InstructionAccountInputAddress<TAccountRequiredSignatoryAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBeneficiaryAccount,
+      InstructionAccountInputAddress<TAccountBeneficiaryAccount>
+    >
   >);
 }
 

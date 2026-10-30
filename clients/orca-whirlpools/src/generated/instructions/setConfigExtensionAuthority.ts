@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -111,22 +114,26 @@ export function getSetConfigExtensionAuthorityInstructionDataCodec(): FixedSizeC
 }
 
 export type SetConfigExtensionAuthorityInput<
-  TAccountWhirlpoolsConfig extends string = string,
-  TAccountWhirlpoolsConfigExtension extends string = string,
-  TAccountConfigExtensionAuthority extends string = string,
-  TAccountNewConfigExtensionAuthority extends string = string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWhirlpoolsConfigExtension extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountConfigExtensionAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountNewConfigExtensionAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
-  whirlpoolsConfigExtension: Address<TAccountWhirlpoolsConfigExtension>;
-  configExtensionAuthority: TransactionSigner<TAccountConfigExtensionAuthority>;
-  newConfigExtensionAuthority: Address<TAccountNewConfigExtensionAuthority>;
+  whirlpoolsConfig: TAccountWhirlpoolsConfig;
+  whirlpoolsConfigExtension: TAccountWhirlpoolsConfigExtension;
+  configExtensionAuthority: TAccountConfigExtensionAuthority;
+  newConfigExtensionAuthority: TAccountNewConfigExtensionAuthority;
 };
 
 export function getSetConfigExtensionAuthorityInstruction<
-  TAccountWhirlpoolsConfig extends string,
-  TAccountWhirlpoolsConfigExtension extends string,
-  TAccountConfigExtensionAuthority extends string,
-  TAccountNewConfigExtensionAuthority extends string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput,
+  TAccountWhirlpoolsConfigExtension extends InstructionAccountInput,
+  TAccountConfigExtensionAuthority extends InstructionSignerInput,
+  TAccountNewConfigExtensionAuthority extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: SetConfigExtensionAuthorityInput<
@@ -135,33 +142,62 @@ export function getSetConfigExtensionAuthorityInstruction<
     TAccountConfigExtensionAuthority,
     TAccountNewConfigExtensionAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetConfigExtensionAuthorityInstruction<
   TProgramAddress,
-  TAccountWhirlpoolsConfig,
-  TAccountWhirlpoolsConfigExtension,
-  TAccountConfigExtensionAuthority,
-  TAccountNewConfigExtensionAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolsConfig,
+    InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolsConfigExtension,
+    InstructionAccountInputAddress<TAccountWhirlpoolsConfigExtension>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountConfigExtensionAuthority,
+    InstructionAccountInputAddress<TAccountConfigExtensionAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewConfigExtensionAuthority,
+    InstructionAccountInputAddress<TAccountNewConfigExtensionAuthority>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     whirlpoolsConfig: {
       value: input.whirlpoolsConfig ?? null,
+      isSigner: false,
       isWritable: false,
     },
     whirlpoolsConfigExtension: {
       value: input.whirlpoolsConfigExtension ?? null,
+      isSigner: false,
       isWritable: true,
     },
     configExtensionAuthority: {
       value: input.configExtensionAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
     newConfigExtensionAuthority: {
       value: input.newConfigExtensionAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -170,7 +206,6 @@ export function getSetConfigExtensionAuthorityInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
@@ -191,10 +226,22 @@ export function getSetConfigExtensionAuthorityInstruction<
     programAddress,
   } as SetConfigExtensionAuthorityInstruction<
     TProgramAddress,
-    TAccountWhirlpoolsConfig,
-    TAccountWhirlpoolsConfigExtension,
-    TAccountConfigExtensionAuthority,
-    TAccountNewConfigExtensionAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolsConfig,
+      InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolsConfigExtension,
+      InstructionAccountInputAddress<TAccountWhirlpoolsConfigExtension>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountConfigExtensionAuthority,
+      InstructionAccountInputAddress<TAccountConfigExtensionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewConfigExtensionAuthority,
+      InstructionAccountInputAddress<TAccountNewConfigExtensionAuthority>
+    >
   >);
 }
 

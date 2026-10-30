@@ -31,13 +31,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -134,35 +137,39 @@ export function getApproveProgramLockPrivilegeInstructionDataCodec(): FixedSizeC
 }
 
 export type ApproveProgramLockPrivilegeInput<
-  TAccountLocker extends string = string,
-  TAccountWhitelistEntry extends string = string,
-  TAccountGovernor extends string = string,
-  TAccountSmartWallet extends string = string,
-  TAccountExecutableId extends string = string,
-  TAccountWhitelistedOwner extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountLocker extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWhitelistEntry extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSmartWallet extends InstructionSignerInput = InstructionSignerInput,
+  TAccountExecutableId extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWhitelistedOwner extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  locker: Address<TAccountLocker>;
-  whitelistEntry: Address<TAccountWhitelistEntry>;
-  governor: Address<TAccountGovernor>;
-  smartWallet: TransactionSigner<TAccountSmartWallet>;
-  executableId: Address<TAccountExecutableId>;
-  whitelistedOwner: Address<TAccountWhitelistedOwner>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  locker: TAccountLocker;
+  whitelistEntry: TAccountWhitelistEntry;
+  governor: TAccountGovernor;
+  smartWallet: TAccountSmartWallet;
+  executableId: TAccountExecutableId;
+  whitelistedOwner: TAccountWhitelistedOwner;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: ApproveProgramLockPrivilegeInstructionDataArgs["bump"];
 };
 
 export function getApproveProgramLockPrivilegeInstruction<
-  TAccountLocker extends string,
-  TAccountWhitelistEntry extends string,
-  TAccountGovernor extends string,
-  TAccountSmartWallet extends string,
-  TAccountExecutableId extends string,
-  TAccountWhitelistedOwner extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountLocker extends InstructionAccountInput,
+  TAccountWhitelistEntry extends InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountSmartWallet extends InstructionSignerInput,
+  TAccountExecutableId extends InstructionAccountInput,
+  TAccountWhitelistedOwner extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: ApproveProgramLockPrivilegeInput<
@@ -175,34 +182,92 @@ export function getApproveProgramLockPrivilegeInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ApproveProgramLockPrivilegeInstruction<
   TProgramAddress,
-  TAccountLocker,
-  TAccountWhitelistEntry,
-  TAccountGovernor,
-  TAccountSmartWallet,
-  TAccountExecutableId,
-  TAccountWhitelistedOwner,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountLocker,
+    InstructionAccountInputAddress<TAccountLocker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhitelistEntry,
+    InstructionAccountInputAddress<TAccountWhitelistEntry>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountExecutableId,
+    InstructionAccountInputAddress<TAccountExecutableId>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhitelistedOwner,
+    InstructionAccountInputAddress<TAccountWhitelistedOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    locker: { value: input.locker ?? null, isWritable: false },
-    whitelistEntry: { value: input.whitelistEntry ?? null, isWritable: true },
-    governor: { value: input.governor ?? null, isWritable: false },
-    smartWallet: { value: input.smartWallet ?? null, isWritable: false },
-    executableId: { value: input.executableId ?? null, isWritable: false },
-    whitelistedOwner: {
-      value: input.whitelistedOwner ?? null,
+    locker: { value: input.locker ?? null, isSigner: false, isWritable: false },
+    whitelistEntry: {
+      value: input.whitelistEntry ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    executableId: {
+      value: input.executableId ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    whitelistedOwner: {
+      value: input.whitelistedOwner ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -218,7 +283,6 @@ export function getApproveProgramLockPrivilegeInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("locker", accounts.locker),
@@ -236,14 +300,38 @@ export function getApproveProgramLockPrivilegeInstruction<
     programAddress,
   } as ApproveProgramLockPrivilegeInstruction<
     TProgramAddress,
-    TAccountLocker,
-    TAccountWhitelistEntry,
-    TAccountGovernor,
-    TAccountSmartWallet,
-    TAccountExecutableId,
-    TAccountWhitelistedOwner,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountLocker,
+      InstructionAccountInputAddress<TAccountLocker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhitelistEntry,
+      InstructionAccountInputAddress<TAccountWhitelistEntry>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountExecutableId,
+      InstructionAccountInputAddress<TAccountExecutableId>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhitelistedOwner,
+      InstructionAccountInputAddress<TAccountWhitelistedOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

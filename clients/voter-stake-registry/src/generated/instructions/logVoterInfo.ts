@@ -32,7 +32,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -106,31 +109,57 @@ export function getLogVoterInfoInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type LogVoterInfoInput<
-  TAccountRegistrar extends string = string,
-  TAccountVoter extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  voter: Address<TAccountVoter>;
+  registrar: TAccountRegistrar;
+  voter: TAccountVoter;
   depositEntryBegin: LogVoterInfoInstructionDataArgs["depositEntryBegin"];
   depositEntryCount: LogVoterInfoInstructionDataArgs["depositEntryCount"];
 };
 
 export function getLogVoterInfoInstruction<
-  TAccountRegistrar extends string,
-  TAccountVoter extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: LogVoterInfoInput<TAccountRegistrar, TAccountVoter>,
-  config?: { programAddress?: TProgramAddress },
-): LogVoterInfoInstruction<TProgramAddress, TAccountRegistrar, TAccountVoter> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): LogVoterInfoInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >
+> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -140,7 +169,6 @@ export function getLogVoterInfoInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -152,8 +180,14 @@ export function getLogVoterInfoInstruction<
     programAddress,
   } as LogVoterInfoInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >
   >);
 }
 

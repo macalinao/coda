@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type TransactionExecuteEvent = {
@@ -28,9 +29,9 @@ export type TransactionExecuteEvent = {
 };
 
 export type TransactionExecuteEventArgs = {
-  smartWallet: Address;
-  transaction: Address;
-  executor: Address;
+  smartWallet: Address | HasAddress;
+  transaction: Address | HasAddress;
+  executor: Address | HasAddress;
   timestamp: number | bigint;
 };
 

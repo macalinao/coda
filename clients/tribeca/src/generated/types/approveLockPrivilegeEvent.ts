@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ApproveLockPrivilegeEvent = {
@@ -28,9 +29,9 @@ export type ApproveLockPrivilegeEvent = {
 };
 
 export type ApproveLockPrivilegeEventArgs = {
-  locker: Address;
-  programId: Address;
-  owner: Address;
+  locker: Address | HasAddress;
+  programId: Address | HasAddress;
+  owner: Address | HasAddress;
   timestamp: number | bigint;
 };
 

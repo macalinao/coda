@@ -34,13 +34,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -131,29 +134,33 @@ export function getInitReferrerStateAndShortUrlInstructionDataCodec(): Codec<
 }
 
 export type InitReferrerStateAndShortUrlInput<
-  TAccountReferrer extends string = string,
-  TAccountReferrerState extends string = string,
-  TAccountReferrerShortUrl extends string = string,
-  TAccountReferrerUserMetadata extends string = string,
-  TAccountRent extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountReferrer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountReferrerState extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReferrerShortUrl extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReferrerUserMetadata extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  referrer: TransactionSigner<TAccountReferrer>;
-  referrerState: Address<TAccountReferrerState>;
-  referrerShortUrl: Address<TAccountReferrerShortUrl>;
-  referrerUserMetadata: Address<TAccountReferrerUserMetadata>;
-  rent?: Address<TAccountRent>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  referrer: TAccountReferrer;
+  referrerState: TAccountReferrerState;
+  referrerShortUrl: TAccountReferrerShortUrl;
+  referrerUserMetadata: TAccountReferrerUserMetadata;
+  rent?: TAccountRent;
+  systemProgram?: TAccountSystemProgram;
   shortUrl: InitReferrerStateAndShortUrlInstructionDataArgs["shortUrl"];
 };
 
 export function getInitReferrerStateAndShortUrlInstruction<
-  TAccountReferrer extends string,
-  TAccountReferrerState extends string,
-  TAccountReferrerShortUrl extends string,
-  TAccountReferrerUserMetadata extends string,
-  TAccountRent extends string,
-  TAccountSystemProgram extends string,
+  TAccountReferrer extends InstructionSignerInput,
+  TAccountReferrerState extends InstructionAccountInput,
+  TAccountReferrerShortUrl extends InstructionAccountInput,
+  TAccountReferrerUserMetadata extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: InitReferrerStateAndShortUrlInput<
@@ -164,34 +171,78 @@ export function getInitReferrerStateAndShortUrlInstruction<
     TAccountRent,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitReferrerStateAndShortUrlInstruction<
   TProgramAddress,
-  TAccountReferrer,
-  TAccountReferrerState,
-  TAccountReferrerShortUrl,
-  TAccountReferrerUserMetadata,
-  TAccountRent,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountReferrer,
+    InstructionAccountInputAddress<TAccountReferrer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferrerState,
+    InstructionAccountInputAddress<TAccountReferrerState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferrerShortUrl,
+    InstructionAccountInputAddress<TAccountReferrerShortUrl>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferrerUserMetadata,
+    InstructionAccountInputAddress<TAccountReferrerUserMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    referrer: { value: input.referrer ?? null, isWritable: true },
-    referrerState: { value: input.referrerState ?? null, isWritable: true },
+    referrer: {
+      value: input.referrer ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    referrerState: {
+      value: input.referrerState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     referrerShortUrl: {
       value: input.referrerShortUrl ?? null,
+      isSigner: false,
       isWritable: true,
     },
     referrerUserMetadata: {
       value: input.referrerUserMetadata ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    rent: { value: input.rent ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -211,7 +262,6 @@ export function getInitReferrerStateAndShortUrlInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("referrer", accounts.referrer),
@@ -227,12 +277,30 @@ export function getInitReferrerStateAndShortUrlInstruction<
     programAddress,
   } as InitReferrerStateAndShortUrlInstruction<
     TProgramAddress,
-    TAccountReferrer,
-    TAccountReferrerState,
-    TAccountReferrerShortUrl,
-    TAccountReferrerUserMetadata,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountReferrer,
+      InstructionAccountInputAddress<TAccountReferrer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferrerState,
+      InstructionAccountInputAddress<TAccountReferrerState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferrerShortUrl,
+      InstructionAccountInputAddress<TAccountReferrerShortUrl>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferrerUserMetadata,
+      InstructionAccountInputAddress<TAccountReferrerUserMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

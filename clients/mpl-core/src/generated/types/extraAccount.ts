@@ -26,6 +26,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -79,13 +80,13 @@ export type ExtraAccountArgs =
   | {
       __kind: "CustomPda";
       seeds: Array<SeedArgs>;
-      customProgramId: OptionOrNullable<Address>;
+      customProgramId: OptionOrNullable<Address | HasAddress>;
       isSigner: boolean;
       isWritable: boolean;
     }
   | {
       __kind: "Address";
-      address: Address;
+      address: Address | HasAddress;
       isSigner: boolean;
       isWritable: boolean;
     };

@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -77,7 +78,7 @@ export type LinkedLifecycleHookInitInfo = {
 
 export type LinkedLifecycleHookInitInfoArgs = {
   /** The program to invoke via CPI at the configured lifecycle events. */
-  hookedProgram: Address;
+  hookedProgram: Address | HasAddress;
   /**
    * The authority to manage this adapter; defaults to the
    * adapter type's standard authority if omitted.

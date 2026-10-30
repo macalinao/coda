@@ -30,13 +30,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -116,23 +119,24 @@ export function getInitializeTickArrayInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitializeTickArrayInput<
-  TAccountWhirlpool extends string = string,
-  TAccountFunder extends string = string,
-  TAccountTickArray extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFunder extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTickArray extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  whirlpool: Address<TAccountWhirlpool>;
-  funder: TransactionSigner<TAccountFunder>;
-  tickArray: Address<TAccountTickArray>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  whirlpool: TAccountWhirlpool;
+  funder: TAccountFunder;
+  tickArray: TAccountTickArray;
+  systemProgram?: TAccountSystemProgram;
   startTickIndex: InitializeTickArrayInstructionDataArgs["startTickIndex"];
 };
 
 export function getInitializeTickArrayInstruction<
-  TAccountWhirlpool extends string,
-  TAccountFunder extends string,
-  TAccountTickArray extends string,
-  TAccountSystemProgram extends string,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountFunder extends InstructionSignerInput,
+  TAccountTickArray extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: InitializeTickArrayInput<
@@ -141,23 +145,60 @@ export function getInitializeTickArrayInstruction<
     TAccountTickArray,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitializeTickArrayInstruction<
   TProgramAddress,
-  TAccountWhirlpool,
-  TAccountFunder,
-  TAccountTickArray,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFunder,
+    InstructionAccountInputAddress<TAccountFunder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArray,
+    InstructionAccountInputAddress<TAccountTickArray>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    whirlpool: { value: input.whirlpool ?? null, isWritable: false },
-    funder: { value: input.funder ?? null, isWritable: true },
-    tickArray: { value: input.tickArray ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    funder: { value: input.funder ?? null, isSigner: true, isWritable: true },
+    tickArray: {
+      value: input.tickArray ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -173,7 +214,6 @@ export function getInitializeTickArrayInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpool", accounts.whirlpool),
@@ -187,10 +227,22 @@ export function getInitializeTickArrayInstruction<
     programAddress,
   } as InitializeTickArrayInstruction<
     TProgramAddress,
-    TAccountWhirlpool,
-    TAccountFunder,
-    TAccountTickArray,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFunder,
+      InstructionAccountInputAddress<TAccountFunder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArray,
+      InstructionAccountInputAddress<TAccountTickArray>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getRemoveLiquidityParametersDecoder,
@@ -36,9 +37,9 @@ export type EvtRemoveLiquidity = {
 };
 
 export type EvtRemoveLiquidityArgs = {
-  pool: Address;
-  position: Address;
-  owner: Address;
+  pool: Address | HasAddress;
+  position: Address | HasAddress;
+  owner: Address | HasAddress;
   params: RemoveLiquidityParametersArgs;
   tokenAAmount: number | bigint;
   tokenBAmount: number | bigint;

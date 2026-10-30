@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtLockPosition = {
@@ -37,10 +38,10 @@ export type EvtLockPosition = {
 };
 
 export type EvtLockPositionArgs = {
-  pool: Address;
-  position: Address;
-  owner: Address;
-  vesting: Address;
+  pool: Address | HasAddress;
+  position: Address | HasAddress;
+  owner: Address | HasAddress;
+  vesting: Address | HasAddress;
   cliffPoint: number | bigint;
   periodFrequency: number | bigint;
   cliffUnlockLiquidity: number | bigint;

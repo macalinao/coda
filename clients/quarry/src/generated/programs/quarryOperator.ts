@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -432,45 +433,56 @@ export type QuarryOperatorPluginAccounts = {
 export type QuarryOperatorPluginInstructions = {
   createOperator: (
     input: MakeOptional<CreateOperatorAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateOperatorInstructionAsync> &
     SelfPlanAndSendFunctions;
   createOperatorV2: (
     input: MakeOptional<CreateOperatorV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateOperatorV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   setAdmin: (
     input: SetAdminInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetAdminInstruction> & SelfPlanAndSendFunctions;
   setRateSetter: (
     input: SetRateSetterInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRateSetterInstruction> &
     SelfPlanAndSendFunctions;
   setQuarryCreator: (
     input: SetQuarryCreatorInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetQuarryCreatorInstruction> &
     SelfPlanAndSendFunctions;
   setShareAllocator: (
     input: SetShareAllocatorInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetShareAllocatorInstruction> &
     SelfPlanAndSendFunctions;
   delegateSetAnnualRewards: (
     input: DelegateSetAnnualRewardsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateSetAnnualRewardsInstruction> &
     SelfPlanAndSendFunctions;
   delegateCreateQuarry: (
     input: MakeOptional<DelegateCreateQuarryAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateCreateQuarryInstructionAsync> &
     SelfPlanAndSendFunctions;
   delegateCreateQuarryV2: (
     input: MakeOptional<DelegateCreateQuarryV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateCreateQuarryV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   delegateSetRewardsShare: (
     input: DelegateSetRewardsShareInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateSetRewardsShareInstruction> &
     SelfPlanAndSendFunctions;
   delegateSetFamine: (
     input: DelegateSetFamineInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDelegateSetFamineInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -484,7 +496,9 @@ export type QuarryOperatorPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function quarryOperatorProgram() {
+export function quarryOperatorProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends QuarryOperatorPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { quarryOperator: QuarryOperatorPlugin }> => {
@@ -494,72 +508,114 @@ export function quarryOperatorProgram() {
           operator: addSelfFetchFunctions(client, getOperatorCodec()),
         },
         instructions: {
-          createOperator: (input) =>
+          createOperator: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateOperatorInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateOperatorInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createOperatorV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateOperatorV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setAdmin: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetAdminInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createOperatorV2: (input) =>
+          setRateSetter: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateOperatorV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetRateSetterInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setAdmin: (input) =>
-            addSelfPlanAndSendFunctions(client, getSetAdminInstruction(input)),
-          setRateSetter: (input) =>
+          setQuarryCreator: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetRateSetterInstruction(input),
-            ),
-          setQuarryCreator: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetQuarryCreatorInstruction(input),
-            ),
-          setShareAllocator: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetShareAllocatorInstruction(input),
-            ),
-          delegateSetAnnualRewards: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDelegateSetAnnualRewardsInstruction(input),
-            ),
-          delegateCreateQuarry: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getDelegateCreateQuarryInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetQuarryCreatorInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          delegateCreateQuarryV2: (input) =>
+          setShareAllocator: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateCreateQuarryV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetShareAllocatorInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          delegateSetRewardsShare: (input) =>
+          delegateSetAnnualRewards: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateSetRewardsShareInstruction(input),
+              getDelegateSetAnnualRewardsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          delegateSetFamine: (input) =>
+          delegateCreateQuarry: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDelegateSetFamineInstruction(input),
+              getDelegateCreateQuarryInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          delegateCreateQuarryV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateCreateQuarryV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          delegateSetRewardsShare: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateSetRewardsShareInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          delegateSetFamine: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDelegateSetFamineInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
-        pdas: { operator: findOperatorPda },
+        pdas: {
+          operator: (seeds, pdaConfig) =>
+            findOperatorPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+        },
         identifyAccount: identifyQuarryOperatorAccount,
         identifyInstruction: identifyQuarryOperatorInstruction,
         parseInstruction: parseQuarryOperatorInstruction,

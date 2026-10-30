@@ -22,6 +22,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getAuthorityDecoder,
@@ -39,7 +40,7 @@ export type LinkedDataKey =
   | { __kind: "LinkedAppData"; fields: readonly [Authority] };
 
 export type LinkedDataKeyArgs =
-  | { __kind: "LinkedLifecycleHook"; fields: readonly [Address] }
+  | { __kind: "LinkedLifecycleHook"; fields: readonly [Address | HasAddress] }
   | { __kind: "LinkedAppData"; fields: readonly [AuthorityArgs] };
 
 export function getLinkedDataKeyEncoder(): Encoder<LinkedDataKeyArgs> {

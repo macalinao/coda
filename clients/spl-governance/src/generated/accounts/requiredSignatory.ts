@@ -22,12 +22,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -60,8 +64,8 @@ export type RequiredSignatory = {
 
 export type RequiredSignatoryArgs = {
   accountVersion: number;
-  governance: Address;
-  signatory: Address;
+  governance: Address | HasAddress;
+  signatory: Address | HasAddress;
 };
 
 /** Gets the encoder for {@link RequiredSignatoryArgs} account data. */
@@ -116,8 +120,10 @@ export function decodeRequiredSignatory<TAddress extends string = string>(
 }
 
 export async function fetchRequiredSignatory<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<RequiredSignatory, TAddress>> {
   const maybeAccount = await fetchMaybeRequiredSignatory(rpc, address, config);
@@ -128,17 +134,25 @@ export async function fetchRequiredSignatory<TAddress extends string = string>(
 export async function fetchMaybeRequiredSignatory<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<RequiredSignatory, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeRequiredSignatory(maybeAccount);
 }
 
 export async function fetchAllRequiredSignatory(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<RequiredSignatory>[]> {
   const maybeAccounts = await fetchAllMaybeRequiredSignatory(
@@ -151,20 +165,28 @@ export async function fetchAllRequiredSignatory(
 }
 
 export async function fetchAllMaybeRequiredSignatory(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<RequiredSignatory>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeRequiredSignatory(maybeAccount),
   );
 }
 
 export async function fetchRequiredSignatoryFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RequiredSignatorySeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<RequiredSignatory>> {
   const maybeAccount = await fetchMaybeRequiredSignatoryFromSeeds(
     rpc,
@@ -176,9 +198,11 @@ export async function fetchRequiredSignatoryFromSeeds(
 }
 
 export async function fetchMaybeRequiredSignatoryFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RequiredSignatorySeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<RequiredSignatory>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findRequiredSignatoryPda(seeds, { programAddress });

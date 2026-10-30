@@ -27,14 +27,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.ts";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -127,42 +130,46 @@ export function getApproveCollectionAuthorityInstructionDataCodec(): FixedSizeCo
 }
 
 export type ApproveCollectionAuthorityAsyncInput<
-  TAccountCollectionAuthorityRecord extends string = string,
-  TAccountNewCollectionAuthority extends string = string,
-  TAccountUpdateAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountMetadata extends string = string,
-  TAccountMint extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountNewCollectionAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUpdateAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Collection Authority Record PDA */
-  collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
+  collectionAuthorityRecord: TAccountCollectionAuthorityRecord;
   /** A Collection Authority */
-  newCollectionAuthority: Address<TAccountNewCollectionAuthority>;
+  newCollectionAuthority: TAccountNewCollectionAuthority;
   /** Update Authority of Collection NFT */
-  updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  updateAuthority: TAccountUpdateAuthority;
   /** Payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** Collection Metadata account */
-  metadata?: Address<TAccountMetadata>;
+  metadata?: TAccountMetadata;
   /** Mint of Collection Metadata */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Rent info */
-  rent?: Address<TAccountRent>;
+  rent?: TAccountRent;
 };
 
 export async function getApproveCollectionAuthorityInstructionAsync<
-  TAccountCollectionAuthorityRecord extends string,
-  TAccountNewCollectionAuthority extends string,
-  TAccountUpdateAuthority extends string,
-  TAccountPayer extends string,
-  TAccountMetadata extends string,
-  TAccountMint extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput,
+  TAccountNewCollectionAuthority extends InstructionAccountInput,
+  TAccountUpdateAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: ApproveCollectionAuthorityAsyncInput<
@@ -175,40 +182,90 @@ export async function getApproveCollectionAuthorityInstructionAsync<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   ApproveCollectionAuthorityInstruction<
     TProgramAddress,
-    TAccountCollectionAuthorityRecord,
-    TAccountNewCollectionAuthority,
-    TAccountUpdateAuthority,
-    TAccountPayer,
-    TAccountMetadata,
-    TAccountMint,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthorityRecord,
+      InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewCollectionAuthority,
+      InstructionAccountInputAddress<TAccountNewCollectionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUpdateAuthority,
+      InstructionAccountInputAddress<TAccountUpdateAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
 
   // Original accounts.
   const originalAccounts = {
     collectionAuthorityRecord: {
       value: input.collectionAuthorityRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
     newCollectionAuthority: {
       value: input.newCollectionAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    metadata: { value: input.metadata ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    updateAuthority: {
+      value: input.updateAuthority ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -233,7 +290,6 @@ export async function getApproveCollectionAuthorityInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
       getAccountMeta(
@@ -252,54 +308,82 @@ export async function getApproveCollectionAuthorityInstructionAsync<
     programAddress,
   } as ApproveCollectionAuthorityInstruction<
     TProgramAddress,
-    TAccountCollectionAuthorityRecord,
-    TAccountNewCollectionAuthority,
-    TAccountUpdateAuthority,
-    TAccountPayer,
-    TAccountMetadata,
-    TAccountMint,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthorityRecord,
+      InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewCollectionAuthority,
+      InstructionAccountInputAddress<TAccountNewCollectionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUpdateAuthority,
+      InstructionAccountInputAddress<TAccountUpdateAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 
 export type ApproveCollectionAuthorityInput<
-  TAccountCollectionAuthorityRecord extends string = string,
-  TAccountNewCollectionAuthority extends string = string,
-  TAccountUpdateAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountMetadata extends string = string,
-  TAccountMint extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountNewCollectionAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUpdateAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Collection Authority Record PDA */
-  collectionAuthorityRecord: Address<TAccountCollectionAuthorityRecord>;
+  collectionAuthorityRecord: TAccountCollectionAuthorityRecord;
   /** A Collection Authority */
-  newCollectionAuthority: Address<TAccountNewCollectionAuthority>;
+  newCollectionAuthority: TAccountNewCollectionAuthority;
   /** Update Authority of Collection NFT */
-  updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  updateAuthority: TAccountUpdateAuthority;
   /** Payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** Collection Metadata account */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Mint of Collection Metadata */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Rent info */
-  rent?: Address<TAccountRent>;
+  rent?: TAccountRent;
 };
 
 export function getApproveCollectionAuthorityInstruction<
-  TAccountCollectionAuthorityRecord extends string,
-  TAccountNewCollectionAuthority extends string,
-  TAccountUpdateAuthority extends string,
-  TAccountPayer extends string,
-  TAccountMetadata extends string,
-  TAccountMint extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput,
+  TAccountNewCollectionAuthority extends InstructionAccountInput,
+  TAccountUpdateAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: ApproveCollectionAuthorityInput<
@@ -312,38 +396,88 @@ export function getApproveCollectionAuthorityInstruction<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ApproveCollectionAuthorityInstruction<
   TProgramAddress,
-  TAccountCollectionAuthorityRecord,
-  TAccountNewCollectionAuthority,
-  TAccountUpdateAuthority,
-  TAccountPayer,
-  TAccountMetadata,
-  TAccountMint,
-  TAccountSystemProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountCollectionAuthorityRecord,
+    InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewCollectionAuthority,
+    InstructionAccountInputAddress<TAccountNewCollectionAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUpdateAuthority,
+    InstructionAccountInputAddress<TAccountUpdateAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMint,
+    InstructionAccountInputAddress<TAccountMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
 
   // Original accounts.
   const originalAccounts = {
     collectionAuthorityRecord: {
       value: input.collectionAuthorityRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
     newCollectionAuthority: {
       value: input.newCollectionAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    metadata: { value: input.metadata ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    updateAuthority: {
+      value: input.updateAuthority ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -356,7 +490,6 @@ export function getApproveCollectionAuthorityInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
       getAccountMeta(
@@ -375,14 +508,38 @@ export function getApproveCollectionAuthorityInstruction<
     programAddress,
   } as ApproveCollectionAuthorityInstruction<
     TProgramAddress,
-    TAccountCollectionAuthorityRecord,
-    TAccountNewCollectionAuthority,
-    TAccountUpdateAuthority,
-    TAccountPayer,
-    TAccountMetadata,
-    TAccountMint,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthorityRecord,
+      InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewCollectionAuthority,
+      InstructionAccountInputAddress<TAccountNewCollectionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUpdateAuthority,
+      InstructionAccountInputAddress<TAccountUpdateAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

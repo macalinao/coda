@@ -28,12 +28,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -100,46 +103,70 @@ export function getUpdateLendingMarketOwnerInstructionDataCodec(): FixedSizeCode
 }
 
 export type UpdateLendingMarketOwnerInput<
-  TAccountLendingMarketOwnerCached extends string = string,
-  TAccountLendingMarket extends string = string,
+  TAccountLendingMarketOwnerCached extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  lendingMarketOwnerCached: TransactionSigner<TAccountLendingMarketOwnerCached>;
-  lendingMarket: Address<TAccountLendingMarket>;
+  lendingMarketOwnerCached: TAccountLendingMarketOwnerCached;
+  lendingMarket: TAccountLendingMarket;
 };
 
 export function getUpdateLendingMarketOwnerInstruction<
-  TAccountLendingMarketOwnerCached extends string,
-  TAccountLendingMarket extends string,
+  TAccountLendingMarketOwnerCached extends InstructionSignerInput,
+  TAccountLendingMarket extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: UpdateLendingMarketOwnerInput<
     TAccountLendingMarketOwnerCached,
     TAccountLendingMarket
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateLendingMarketOwnerInstruction<
   TProgramAddress,
-  TAccountLendingMarketOwnerCached,
-  TAccountLendingMarket
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarketOwnerCached,
+    InstructionAccountInputAddress<TAccountLendingMarketOwnerCached>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     lendingMarketOwnerCached: {
       value: input.lendingMarketOwnerCached ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: true },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta(
@@ -152,8 +179,14 @@ export function getUpdateLendingMarketOwnerInstruction<
     programAddress,
   } as UpdateLendingMarketOwnerInstruction<
     TProgramAddress,
-    TAccountLendingMarketOwnerCached,
-    TAccountLendingMarket
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketOwnerCached,
+      InstructionAccountInputAddress<TAccountLendingMarketOwnerCached>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >
   >);
 }
 

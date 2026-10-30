@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getPodStakeStatusDecoder,
@@ -93,7 +94,7 @@ export type ValidatorStakeInfoArgs = {
   /** Status of the validator stake account */
   status: PodStakeStatusArgs;
   /** Validator vote account address */
-  voteAccountAddress: Address;
+  voteAccountAddress: Address | HasAddress;
 };
 
 export function getValidatorStakeInfoEncoder(): FixedSizeEncoder<ValidatorStakeInfoArgs> {

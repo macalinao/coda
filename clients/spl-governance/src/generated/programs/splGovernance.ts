@@ -23,6 +23,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -1064,121 +1065,152 @@ export type SplGovernancePluginAccounts = {
 export type SplGovernancePluginInstructions = {
   createRealm: (
     input: MakeOptional<CreateRealmInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateRealmInstruction> & SelfPlanAndSendFunctions;
   depositGoverningTokens: (
     input: MakeOptional<DepositGoverningTokensInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositGoverningTokensInstruction> &
     SelfPlanAndSendFunctions;
   withdrawGoverningTokens: (
     input: WithdrawGoverningTokensInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawGoverningTokensInstruction> &
     SelfPlanAndSendFunctions;
   setGovernanceDelegate: (
     input: SetGovernanceDelegateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetGovernanceDelegateInstruction> &
     SelfPlanAndSendFunctions;
   createGovernance: (
     input: MakeOptional<CreateGovernanceInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateGovernanceInstruction> &
     SelfPlanAndSendFunctions;
   createProgramGovernance: (
     input: MakeOptional<CreateProgramGovernanceInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateProgramGovernanceInstruction> &
     SelfPlanAndSendFunctions;
   createProposal: (
     input: MakeOptional<CreateProposalInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateProposalInstruction> &
     SelfPlanAndSendFunctions;
   addSignatory: (
     input: MakeOptional<AddSignatoryInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddSignatoryInstruction> & SelfPlanAndSendFunctions;
   legacy1: (
     input: Legacy1Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLegacy1Instruction> & SelfPlanAndSendFunctions;
   insertTransaction: (
     input: MakeOptional<InsertTransactionInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInsertTransactionInstruction> &
     SelfPlanAndSendFunctions;
   removeTransaction: (
     input: RemoveTransactionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveTransactionInstruction> &
     SelfPlanAndSendFunctions;
   cancelProposal: (
     input: CancelProposalInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCancelProposalInstruction> &
     SelfPlanAndSendFunctions;
   signOffProposal: (
     input: SignOffProposalInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSignOffProposalInstruction> &
     SelfPlanAndSendFunctions;
   castVote: (
     input: MakeOptional<CastVoteInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCastVoteInstruction> & SelfPlanAndSendFunctions;
   finalizeVote: (
     input: FinalizeVoteInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFinalizeVoteInstruction> & SelfPlanAndSendFunctions;
   relinquishVote: (
     input: RelinquishVoteInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRelinquishVoteInstruction> &
     SelfPlanAndSendFunctions;
   executeTransaction: (
     input: ExecuteTransactionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getExecuteTransactionInstruction> &
     SelfPlanAndSendFunctions;
   createMintGovernance: (
     input: MakeOptional<CreateMintGovernanceInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMintGovernanceInstruction> &
     SelfPlanAndSendFunctions;
   createTokenGovernance: (
     input: MakeOptional<CreateTokenGovernanceInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTokenGovernanceInstruction> &
     SelfPlanAndSendFunctions;
   setGovernanceConfig: (
     input: SetGovernanceConfigInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetGovernanceConfigInstruction> &
     SelfPlanAndSendFunctions;
   flagTransactionError: (
     input: FlagTransactionErrorInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFlagTransactionErrorInstruction> &
     SelfPlanAndSendFunctions;
   setRealmAuthority: (
     input: SetRealmAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRealmAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   setRealmConfig: (
     input: SetRealmConfigInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRealmConfigInstruction> &
     SelfPlanAndSendFunctions;
   createTokenOwnerRecord: (
     input: MakeOptional<CreateTokenOwnerRecordAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateTokenOwnerRecordInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateProgramMetadata: (
     input: MakeOptional<UpdateProgramMetadataInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateProgramMetadataInstruction> &
     SelfPlanAndSendFunctions;
   createNativeTreasury: (
     input: MakeOptional<CreateNativeTreasuryInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateNativeTreasuryInstruction> &
     SelfPlanAndSendFunctions;
   revokeGoverningTokens: (
     input: RevokeGoverningTokensInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRevokeGoverningTokensInstruction> &
     SelfPlanAndSendFunctions;
   refundProposalDeposit: (
     input: RefundProposalDepositInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefundProposalDepositInstruction> &
     SelfPlanAndSendFunctions;
   completeProposal: (
     input: CompleteProposalInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCompleteProposalInstruction> &
     SelfPlanAndSendFunctions;
   addRequiredSignatory: (
     input: MakeOptional<AddRequiredSignatoryInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddRequiredSignatoryInstruction> &
     SelfPlanAndSendFunctions;
   removeRequiredSignatory: (
     input: RemoveRequiredSignatoryInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRemoveRequiredSignatoryInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -1207,7 +1239,9 @@ export type SplGovernancePluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function splGovernanceProgram() {
+export function splGovernanceProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends SplGovernancePluginRequirements>(
     client: T,
   ): ExtendedClient<T, { splGovernance: SplGovernancePlugin }> => {
@@ -1268,216 +1302,368 @@ export function splGovernanceProgram() {
           voteRecordV2: addSelfFetchFunctions(client, getVoteRecordV2Codec()),
         },
         instructions: {
-          createRealm: (input) =>
+          createRealm: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateRealmInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateRealmInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          depositGoverningTokens: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositGoverningTokensInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          withdrawGoverningTokens: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawGoverningTokensInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          depositGoverningTokens: (input) =>
+          setGovernanceDelegate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDepositGoverningTokensInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetGovernanceDelegateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          withdrawGoverningTokens: (input) =>
+          createGovernance: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawGoverningTokensInstruction(input),
+              getCreateGovernanceInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setGovernanceDelegate: (input) =>
+          createProgramGovernance: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetGovernanceDelegateInstruction(input),
+              getCreateProgramGovernanceInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          createGovernance: (input) =>
+          createProposal: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateGovernanceInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateProposalInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          addSignatory: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddSignatoryInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          legacy1: (_input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLegacy1Instruction({
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createProgramGovernance: (input) =>
+          insertTransaction: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateProgramGovernanceInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getInsertTransactionInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          removeTransaction: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveTransactionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createProposal: (input) =>
+          cancelProposal: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateProposalInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCancelProposalInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          addSignatory: (input) =>
+          signOffProposal: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getAddSignatoryInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSignOffProposalInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          legacy1: (input) =>
-            addSelfPlanAndSendFunctions(client, getLegacy1Instruction(input)),
-          insertTransaction: (input) =>
+          castVote: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInsertTransactionInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCastVoteInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          finalizeVote: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFinalizeVoteInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          removeTransaction: (input) =>
+          relinquishVote: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRemoveTransactionInstruction(input),
-            ),
-          cancelProposal: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCancelProposalInstruction(input),
-            ),
-          signOffProposal: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSignOffProposalInstruction(input),
-            ),
-          castVote: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCastVoteInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getRelinquishVoteInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          finalizeVote: (input) =>
+          executeTransaction: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getFinalizeVoteInstruction(input),
-            ),
-          relinquishVote: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRelinquishVoteInstruction(input),
-            ),
-          executeTransaction: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getExecuteTransactionInstruction(input),
-            ),
-          createMintGovernance: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateMintGovernanceInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getExecuteTransactionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createTokenGovernance: (input) =>
+          createMintGovernance: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateTokenGovernanceInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateMintGovernanceInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createTokenGovernance: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateTokenGovernanceInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setGovernanceConfig: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetGovernanceConfigInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setGovernanceConfig: (input) =>
+          flagTransactionError: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetGovernanceConfigInstruction(input),
-            ),
-          flagTransactionError: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getFlagTransactionErrorInstruction(input),
-            ),
-          setRealmAuthority: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetRealmAuthorityInstruction(input),
-            ),
-          setRealmConfig: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetRealmConfigInstruction(input),
-            ),
-          createTokenOwnerRecord: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateTokenOwnerRecordInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getFlagTransactionErrorInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          updateProgramMetadata: (input) =>
+          setRealmAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateProgramMetadataInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetRealmAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createNativeTreasury: (input) =>
+          setRealmConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateNativeTreasuryInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetRealmConfigInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          revokeGoverningTokens: (input) =>
+          createTokenOwnerRecord: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRevokeGoverningTokensInstruction(input),
+              getCreateTokenOwnerRecordInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          refundProposalDeposit: (input) =>
+          updateProgramMetadata: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRefundProposalDepositInstruction(input),
+              getUpdateProgramMetadataInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          completeProposal: (input) =>
+          createNativeTreasury: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCompleteProposalInstruction(input),
+              getCreateNativeTreasuryInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          addRequiredSignatory: (input) =>
+          revokeGoverningTokens: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getAddRequiredSignatoryInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getRevokeGoverningTokensInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          removeRequiredSignatory: (input) =>
+          refundProposalDeposit: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRemoveRequiredSignatoryInstruction(input),
+              getRefundProposalDepositInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          completeProposal: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCompleteProposalInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          addRequiredSignatory: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getAddRequiredSignatoryInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          removeRequiredSignatory: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRemoveRequiredSignatoryInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          realm: findRealmPda,
-          communityTokenHolding: findCommunityTokenHoldingPda,
-          councilTokenHolding: findCouncilTokenHoldingPda,
-          realmConfig: findRealmConfigPda,
-          tokenOwnerRecord: findTokenOwnerRecordPda,
-          governingTokenHolding: findGoverningTokenHoldingPda,
-          governance: findGovernancePda,
-          nativeTreasury: findNativeTreasuryPda,
-          proposal: findProposalPda,
-          proposalDeposit: findProposalDepositPda,
-          signatoryRecord: findSignatoryRecordPda,
-          proposalTransaction: findProposalTransactionPda,
-          voteRecord: findVoteRecordPda,
-          requiredSignatory: findRequiredSignatoryPda,
+          realm: (seeds, pdaConfig) =>
+            findRealmPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          communityTokenHolding: (seeds, pdaConfig) =>
+            findCommunityTokenHoldingPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          councilTokenHolding: (seeds, pdaConfig) =>
+            findCouncilTokenHoldingPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          realmConfig: (seeds, pdaConfig) =>
+            findRealmConfigPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          tokenOwnerRecord: (seeds, pdaConfig) =>
+            findTokenOwnerRecordPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          governingTokenHolding: (seeds, pdaConfig) =>
+            findGoverningTokenHoldingPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          governance: (seeds, pdaConfig) =>
+            findGovernancePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          nativeTreasury: (seeds, pdaConfig) =>
+            findNativeTreasuryPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          proposal: (seeds, pdaConfig) =>
+            findProposalPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          proposalDeposit: (seeds, pdaConfig) =>
+            findProposalDepositPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          signatoryRecord: (seeds, pdaConfig) =>
+            findSignatoryRecordPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          proposalTransaction: (seeds, pdaConfig) =>
+            findProposalTransactionPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          voteRecord: (seeds, pdaConfig) =>
+            findVoteRecordPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          requiredSignatory: (seeds, pdaConfig) =>
+            findRequiredSignatoryPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifySplGovernanceAccount,
         identifyInstruction: identifySplGovernanceInstruction,

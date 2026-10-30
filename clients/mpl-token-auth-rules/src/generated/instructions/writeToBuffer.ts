@@ -26,14 +26,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findRuleSetBufferPda } from "../pdas/index.ts";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -114,16 +117,17 @@ export function getWriteToBufferInstructionDataCodec(): Codec<
 }
 
 export type WriteToBufferAsyncInput<
-  TAccountPayer extends string = string,
-  TAccountBufferPda extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountBufferPda extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Payer and creator of the RuleSet */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The PDA account where the RuleSet buffer is stored */
-  bufferPda?: Address<TAccountBufferPda>;
+  bufferPda?: TAccountBufferPda;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   writeToBufferArgs: WriteToBufferInstructionDataArgs["writeToBufferArgs"];
 };
 
@@ -135,9 +139,9 @@ export type WriteToBufferAsyncInput<
  * call that reads from the buffer.
  */
 export async function getWriteToBufferInstructionAsync<
-  TAccountPayer extends string,
-  TAccountBufferPda extends string,
-  TAccountSystemProgram extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountBufferPda extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
 >(
   input: WriteToBufferAsyncInput<
@@ -145,24 +149,53 @@ export async function getWriteToBufferInstructionAsync<
     TAccountBufferPda,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   WriteToBufferInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountBufferPda,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBufferPda,
+      InstructionAccountInputAddress<TAccountBufferPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    bufferPda: { value: input.bufferPda ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    bufferPda: {
+      value: input.bufferPda ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -189,7 +222,6 @@ export async function getWriteToBufferInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -202,23 +234,33 @@ export async function getWriteToBufferInstructionAsync<
     programAddress,
   } as WriteToBufferInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountBufferPda,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBufferPda,
+      InstructionAccountInputAddress<TAccountBufferPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type WriteToBufferInput<
-  TAccountPayer extends string = string,
-  TAccountBufferPda extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountBufferPda extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Payer and creator of the RuleSet */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The PDA account where the RuleSet buffer is stored */
-  bufferPda: Address<TAccountBufferPda>;
+  bufferPda: TAccountBufferPda;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   writeToBufferArgs: WriteToBufferInstructionDataArgs["writeToBufferArgs"];
 };
 
@@ -230,9 +272,9 @@ export type WriteToBufferInput<
  * call that reads from the buffer.
  */
 export function getWriteToBufferInstruction<
-  TAccountPayer extends string,
-  TAccountBufferPda extends string,
-  TAccountSystemProgram extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountBufferPda extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
 >(
   input: WriteToBufferInput<
@@ -240,22 +282,51 @@ export function getWriteToBufferInstruction<
     TAccountBufferPda,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): WriteToBufferInstruction<
   TProgramAddress,
-  TAccountPayer,
-  TAccountBufferPda,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBufferPda,
+    InstructionAccountInputAddress<TAccountBufferPda>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    bufferPda: { value: input.bufferPda ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    bufferPda: {
+      value: input.bufferPda ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -271,7 +342,6 @@ export function getWriteToBufferInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -284,9 +354,18 @@ export function getWriteToBufferInstruction<
     programAddress,
   } as WriteToBufferInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountBufferPda,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBufferPda,
+      InstructionAccountInputAddress<TAccountBufferPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

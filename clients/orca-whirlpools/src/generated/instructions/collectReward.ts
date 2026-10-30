@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -126,32 +129,36 @@ export function getCollectRewardInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CollectRewardInput<
-  TAccountWhirlpool extends string = string,
-  TAccountPositionAuthority extends string = string,
-  TAccountPosition extends string = string,
-  TAccountPositionTokenAccount extends string = string,
-  TAccountRewardOwnerAccount extends string = string,
-  TAccountRewardVault extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRewardOwnerAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  whirlpool: Address<TAccountWhirlpool>;
-  positionAuthority: TransactionSigner<TAccountPositionAuthority>;
-  position: Address<TAccountPosition>;
-  positionTokenAccount: Address<TAccountPositionTokenAccount>;
-  rewardOwnerAccount: Address<TAccountRewardOwnerAccount>;
-  rewardVault: Address<TAccountRewardVault>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  whirlpool: TAccountWhirlpool;
+  positionAuthority: TAccountPositionAuthority;
+  position: TAccountPosition;
+  positionTokenAccount: TAccountPositionTokenAccount;
+  rewardOwnerAccount: TAccountRewardOwnerAccount;
+  rewardVault: TAccountRewardVault;
+  tokenProgram?: TAccountTokenProgram;
   rewardIndex: CollectRewardInstructionDataArgs["rewardIndex"];
 };
 
 export function getCollectRewardInstruction<
-  TAccountWhirlpool extends string,
-  TAccountPositionAuthority extends string,
-  TAccountPosition extends string,
-  TAccountPositionTokenAccount extends string,
-  TAccountRewardOwnerAccount extends string,
-  TAccountRewardVault extends string,
-  TAccountTokenProgram extends string,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountPositionAuthority extends InstructionSignerInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput,
+  TAccountRewardOwnerAccount extends InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: CollectRewardInput<
@@ -163,38 +170,91 @@ export function getCollectRewardInstruction<
     TAccountRewardVault,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CollectRewardInstruction<
   TProgramAddress,
-  TAccountWhirlpool,
-  TAccountPositionAuthority,
-  TAccountPosition,
-  TAccountPositionTokenAccount,
-  TAccountRewardOwnerAccount,
-  TAccountRewardVault,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionAuthority,
+    InstructionAccountInputAddress<TAccountPositionAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionTokenAccount,
+    InstructionAccountInputAddress<TAccountPositionTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardOwnerAccount,
+    InstructionAccountInputAddress<TAccountRewardOwnerAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardVault,
+    InstructionAccountInputAddress<TAccountRewardVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    whirlpool: { value: input.whirlpool ?? null, isWritable: false },
-    positionAuthority: {
-      value: input.positionAuthority ?? null,
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    position: { value: input.position ?? null, isWritable: true },
+    positionAuthority: {
+      value: input.positionAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     positionTokenAccount: {
       value: input.positionTokenAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     rewardOwnerAccount: {
       value: input.rewardOwnerAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    rewardVault: { value: input.rewardVault ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    rewardVault: {
+      value: input.rewardVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -210,7 +270,6 @@ export function getCollectRewardInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpool", accounts.whirlpool),
@@ -227,13 +286,34 @@ export function getCollectRewardInstruction<
     programAddress,
   } as CollectRewardInstruction<
     TProgramAddress,
-    TAccountWhirlpool,
-    TAccountPositionAuthority,
-    TAccountPosition,
-    TAccountPositionTokenAccount,
-    TAccountRewardOwnerAccount,
-    TAccountRewardVault,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionAuthority,
+      InstructionAccountInputAddress<TAccountPositionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionTokenAccount,
+      InstructionAccountInputAddress<TAccountPositionTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardOwnerAccount,
+      InstructionAccountInputAddress<TAccountRewardOwnerAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

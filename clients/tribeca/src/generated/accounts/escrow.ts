@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -63,14 +67,14 @@ export type Escrow = {
 };
 
 export type EscrowArgs = {
-  locker: Address;
-  owner: Address;
+  locker: Address | HasAddress;
+  owner: Address | HasAddress;
   bump: number;
-  tokens: Address;
+  tokens: Address | HasAddress;
   amount: number | bigint;
   escrowStartedAt: number | bigint;
   escrowEndsAt: number | bigint;
-  voteDelegate: Address;
+  voteDelegate: Address | HasAddress;
 };
 
 /** Gets the encoder for {@link EscrowArgs} account data. */
@@ -127,8 +131,10 @@ export function decodeEscrow<TAddress extends string = string>(
 }
 
 export async function fetchEscrow<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Escrow, TAddress>> {
   const maybeAccount = await fetchMaybeEscrow(rpc, address, config);
@@ -137,17 +143,25 @@ export async function fetchEscrow<TAddress extends string = string>(
 }
 
 export async function fetchMaybeEscrow<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Escrow, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeEscrow(maybeAccount);
 }
 
 export async function fetchAllEscrow(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Escrow>[]> {
   const maybeAccounts = await fetchAllMaybeEscrow(rpc, addresses, config);
@@ -156,18 +170,26 @@ export async function fetchAllEscrow(
 }
 
 export async function fetchAllMaybeEscrow(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Escrow>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeEscrow(maybeAccount));
 }
 
 export async function fetchEscrowFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: EscrowSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Escrow>> {
   const maybeAccount = await fetchMaybeEscrowFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -175,9 +197,11 @@ export async function fetchEscrowFromSeeds(
 }
 
 export async function fetchMaybeEscrowFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: EscrowSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Escrow>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findEscrowPda(seeds, { programAddress });

@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -92,39 +95,64 @@ export function getRefreshFarmInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RefreshFarmInput<
-  TAccountFarmState extends string = string,
-  TAccountScopePrices extends string = string,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  farmState: Address<TAccountFarmState>;
-  scopePrices?: Address<TAccountScopePrices>;
+  farmState: TAccountFarmState;
+  scopePrices?: TAccountScopePrices;
 };
 
 export function getRefreshFarmInstruction<
-  TAccountFarmState extends string,
-  TAccountScopePrices extends string,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: RefreshFarmInput<TAccountFarmState, TAccountScopePrices>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RefreshFarmInstruction<
   TProgramAddress,
-  TAccountFarmState,
-  TAccountScopePrices
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountScopePrices,
+    InstructionAccountInputAddress<TAccountScopePrices>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("farmState", accounts.farmState),
@@ -134,8 +162,14 @@ export function getRefreshFarmInstruction<
     programAddress,
   } as RefreshFarmInstruction<
     TProgramAddress,
-    TAccountFarmState,
-    TAccountScopePrices
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >
   >);
 }
 

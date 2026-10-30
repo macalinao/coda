@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type SwitchboardConfiguration = {
@@ -24,7 +25,11 @@ export type SwitchboardConfiguration = {
   twapAggregator: Address;
 };
 
-export type SwitchboardConfigurationArgs = SwitchboardConfiguration;
+export type SwitchboardConfigurationArgs = {
+  /** Pubkey of the base price feed (disabled if `null` or `default`) */
+  priceAggregator: Address | HasAddress;
+  twapAggregator: Address | HasAddress;
+};
 
 export function getSwitchboardConfigurationEncoder(): FixedSizeEncoder<SwitchboardConfigurationArgs> {
   return getStructEncoder([

@@ -23,6 +23,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -1607,190 +1608,239 @@ export type WhirlpoolPluginAccounts = {
 export type WhirlpoolPluginInstructions = {
   initializeConfig: (
     input: InitializeConfigInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeConfigInstruction> &
     SelfPlanAndSendFunctions;
   initializePool: (
     input: InitializePoolInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializePoolInstruction> &
     SelfPlanAndSendFunctions;
   initializeTickArray: (
     input: InitializeTickArrayInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeTickArrayInstruction> &
     SelfPlanAndSendFunctions;
   initializeFeeTier: (
     input: InitializeFeeTierInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeFeeTierInstruction> &
     SelfPlanAndSendFunctions;
   initializeReward: (
     input: InitializeRewardInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeRewardInstruction> &
     SelfPlanAndSendFunctions;
   setRewardEmissions: (
     input: SetRewardEmissionsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRewardEmissionsInstruction> &
     SelfPlanAndSendFunctions;
   openPosition: (
     input: OpenPositionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getOpenPositionInstruction> & SelfPlanAndSendFunctions;
   openPositionWithMetadata: (
     input: OpenPositionWithMetadataInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getOpenPositionWithMetadataInstruction> &
     SelfPlanAndSendFunctions;
   increaseLiquidity: (
     input: IncreaseLiquidityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getIncreaseLiquidityInstruction> &
     SelfPlanAndSendFunctions;
   decreaseLiquidity: (
     input: DecreaseLiquidityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDecreaseLiquidityInstruction> &
     SelfPlanAndSendFunctions;
   updateFeesAndRewards: (
     input: UpdateFeesAndRewardsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateFeesAndRewardsInstruction> &
     SelfPlanAndSendFunctions;
   collectFees: (
     input: CollectFeesInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectFeesInstruction> & SelfPlanAndSendFunctions;
   collectReward: (
     input: CollectRewardInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectRewardInstruction> &
     SelfPlanAndSendFunctions;
   collectProtocolFees: (
     input: CollectProtocolFeesInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectProtocolFeesInstruction> &
     SelfPlanAndSendFunctions;
   swap: (
     input: SwapInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSwapInstruction> & SelfPlanAndSendFunctions;
   closePosition: (
     input: ClosePositionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClosePositionInstruction> &
     SelfPlanAndSendFunctions;
   setDefaultFeeRate: (
     input: SetDefaultFeeRateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetDefaultFeeRateInstruction> &
     SelfPlanAndSendFunctions;
   setDefaultProtocolFeeRate: (
     input: SetDefaultProtocolFeeRateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetDefaultProtocolFeeRateInstruction> &
     SelfPlanAndSendFunctions;
   setFeeRate: (
     input: SetFeeRateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetFeeRateInstruction> & SelfPlanAndSendFunctions;
   setProtocolFeeRate: (
     input: SetProtocolFeeRateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetProtocolFeeRateInstruction> &
     SelfPlanAndSendFunctions;
   setFeeAuthority: (
     input: SetFeeAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetFeeAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   setCollectProtocolFeesAuthority: (
     input: SetCollectProtocolFeesAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetCollectProtocolFeesAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   setRewardAuthority: (
     input: SetRewardAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRewardAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   setRewardAuthorityBySuperAuthority: (
     input: SetRewardAuthorityBySuperAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRewardAuthorityBySuperAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   setRewardEmissionsSuperAuthority: (
     input: SetRewardEmissionsSuperAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRewardEmissionsSuperAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   twoHopSwap: (
     input: TwoHopSwapInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTwoHopSwapInstruction> & SelfPlanAndSendFunctions;
   initializePositionBundle: (
     input: InitializePositionBundleInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializePositionBundleInstruction> &
     SelfPlanAndSendFunctions;
   initializePositionBundleWithMetadata: (
     input: InitializePositionBundleWithMetadataInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializePositionBundleWithMetadataInstruction> &
     SelfPlanAndSendFunctions;
   deletePositionBundle: (
     input: DeletePositionBundleInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeletePositionBundleInstruction> &
     SelfPlanAndSendFunctions;
   openBundledPosition: (
     input: OpenBundledPositionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getOpenBundledPositionInstruction> &
     SelfPlanAndSendFunctions;
   closeBundledPosition: (
     input: CloseBundledPositionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseBundledPositionInstruction> &
     SelfPlanAndSendFunctions;
   openPositionWithTokenExtensions: (
     input: OpenPositionWithTokenExtensionsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getOpenPositionWithTokenExtensionsInstruction> &
     SelfPlanAndSendFunctions;
   closePositionWithTokenExtensions: (
     input: ClosePositionWithTokenExtensionsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClosePositionWithTokenExtensionsInstruction> &
     SelfPlanAndSendFunctions;
   lockPosition: (
     input: LockPositionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLockPositionInstruction> & SelfPlanAndSendFunctions;
   collectFeesV2: (
     input: CollectFeesV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectFeesV2Instruction> &
     SelfPlanAndSendFunctions;
   collectProtocolFeesV2: (
     input: CollectProtocolFeesV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectProtocolFeesV2Instruction> &
     SelfPlanAndSendFunctions;
   collectRewardV2: (
     input: CollectRewardV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCollectRewardV2Instruction> &
     SelfPlanAndSendFunctions;
   decreaseLiquidityV2: (
     input: DecreaseLiquidityV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDecreaseLiquidityV2Instruction> &
     SelfPlanAndSendFunctions;
   increaseLiquidityV2: (
     input: IncreaseLiquidityV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getIncreaseLiquidityV2Instruction> &
     SelfPlanAndSendFunctions;
   initializePoolV2: (
     input: InitializePoolV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializePoolV2Instruction> &
     SelfPlanAndSendFunctions;
   initializeRewardV2: (
     input: InitializeRewardV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeRewardV2Instruction> &
     SelfPlanAndSendFunctions;
   setRewardEmissionsV2: (
     input: SetRewardEmissionsV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRewardEmissionsV2Instruction> &
     SelfPlanAndSendFunctions;
   swapV2: (
     input: SwapV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSwapV2Instruction> & SelfPlanAndSendFunctions;
   twoHopSwapV2: (
     input: TwoHopSwapV2Input,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTwoHopSwapV2Instruction> & SelfPlanAndSendFunctions;
   initializeConfigExtension: (
     input: InitializeConfigExtensionInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeConfigExtensionInstruction> &
     SelfPlanAndSendFunctions;
   setConfigExtensionAuthority: (
     input: SetConfigExtensionAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetConfigExtensionAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   setTokenBadgeAuthority: (
     input: SetTokenBadgeAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetTokenBadgeAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   initializeTokenBadge: (
     input: InitializeTokenBadgeInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeTokenBadgeInstruction> &
     SelfPlanAndSendFunctions;
   deleteTokenBadge: (
     input: DeleteTokenBadgeInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDeleteTokenBadgeInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -1801,7 +1851,9 @@ export type WhirlpoolPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function whirlpoolProgram() {
+export function whirlpoolProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends WhirlpoolPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { whirlpool: WhirlpoolPlugin }> => {
@@ -1828,244 +1880,397 @@ export function whirlpoolProgram() {
           whirlpool: addSelfFetchFunctions(client, getWhirlpoolCodec()),
         },
         instructions: {
-          initializeConfig: (input) =>
+          initializeConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeConfigInstruction(input),
+              getInitializeConfigInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializePool: (input) =>
+          initializePool: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializePoolInstruction(input),
+              getInitializePoolInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeTickArray: (input) =>
+          initializeTickArray: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeTickArrayInstruction(input),
+              getInitializeTickArrayInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeFeeTier: (input) =>
+          initializeFeeTier: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeFeeTierInstruction(input),
+              getInitializeFeeTierInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeReward: (input) =>
+          initializeReward: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeRewardInstruction(input),
+              getInitializeRewardInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setRewardEmissions: (input) =>
+          setRewardEmissions: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetRewardEmissionsInstruction(input),
+              getSetRewardEmissionsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          openPosition: (input) =>
+          openPosition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getOpenPositionInstruction(input),
+              getOpenPositionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          openPositionWithMetadata: (input) =>
+          openPositionWithMetadata: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getOpenPositionWithMetadataInstruction(input),
+              getOpenPositionWithMetadataInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          increaseLiquidity: (input) =>
+          increaseLiquidity: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getIncreaseLiquidityInstruction(input),
+              getIncreaseLiquidityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          decreaseLiquidity: (input) =>
+          decreaseLiquidity: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDecreaseLiquidityInstruction(input),
+              getDecreaseLiquidityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateFeesAndRewards: (input) =>
+          updateFeesAndRewards: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateFeesAndRewardsInstruction(input),
+              getUpdateFeesAndRewardsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          collectFees: (input) =>
+          collectFees: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCollectFeesInstruction(input),
+              getCollectFeesInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          collectReward: (input) =>
+          collectReward: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCollectRewardInstruction(input),
+              getCollectRewardInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          collectProtocolFees: (input) =>
+          collectProtocolFees: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCollectProtocolFeesInstruction(input),
+              getCollectProtocolFeesInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          swap: (input) =>
-            addSelfPlanAndSendFunctions(client, getSwapInstruction(input)),
-          closePosition: (input) =>
+          swap: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getClosePositionInstruction(input),
+              getSwapInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setDefaultFeeRate: (input) =>
+          closePosition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetDefaultFeeRateInstruction(input),
+              getClosePositionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setDefaultProtocolFeeRate: (input) =>
+          setDefaultFeeRate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetDefaultProtocolFeeRateInstruction(input),
+              getSetDefaultFeeRateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setFeeRate: (input) =>
+          setDefaultProtocolFeeRate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetFeeRateInstruction(input),
+              getSetDefaultProtocolFeeRateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setProtocolFeeRate: (input) =>
+          setFeeRate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetProtocolFeeRateInstruction(input),
+              getSetFeeRateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setFeeAuthority: (input) =>
+          setProtocolFeeRate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetFeeAuthorityInstruction(input),
+              getSetProtocolFeeRateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setCollectProtocolFeesAuthority: (input) =>
+          setFeeAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetCollectProtocolFeesAuthorityInstruction(input),
+              getSetFeeAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setRewardAuthority: (input) =>
+          setCollectProtocolFeesAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetRewardAuthorityInstruction(input),
+              getSetCollectProtocolFeesAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setRewardAuthorityBySuperAuthority: (input) =>
+          setRewardAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetRewardAuthorityBySuperAuthorityInstruction(input),
+              getSetRewardAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setRewardEmissionsSuperAuthority: (input) =>
+          setRewardAuthorityBySuperAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetRewardEmissionsSuperAuthorityInstruction(input),
+              getSetRewardAuthorityBySuperAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          twoHopSwap: (input) =>
+          setRewardEmissionsSuperAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTwoHopSwapInstruction(input),
+              getSetRewardEmissionsSuperAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializePositionBundle: (input) =>
+          twoHopSwap: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializePositionBundleInstruction(input),
+              getTwoHopSwapInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializePositionBundleWithMetadata: (input) =>
+          initializePositionBundle: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializePositionBundleWithMetadataInstruction(input),
+              getInitializePositionBundleInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          deletePositionBundle: (input) =>
+          initializePositionBundleWithMetadata: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDeletePositionBundleInstruction(input),
+              getInitializePositionBundleWithMetadataInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          openBundledPosition: (input) =>
+          deletePositionBundle: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getOpenBundledPositionInstruction(input),
+              getDeletePositionBundleInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          closeBundledPosition: (input) =>
+          openBundledPosition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseBundledPositionInstruction(input),
+              getOpenBundledPositionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          openPositionWithTokenExtensions: (input) =>
+          closeBundledPosition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getOpenPositionWithTokenExtensionsInstruction(input),
+              getCloseBundledPositionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          closePositionWithTokenExtensions: (input) =>
+          openPositionWithTokenExtensions: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getClosePositionWithTokenExtensionsInstruction(input),
+              getOpenPositionWithTokenExtensionsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          lockPosition: (input) =>
+          closePositionWithTokenExtensions: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getLockPositionInstruction(input),
+              getClosePositionWithTokenExtensionsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          collectFeesV2: (input) =>
+          lockPosition: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCollectFeesV2Instruction(input),
+              getLockPositionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          collectProtocolFeesV2: (input) =>
+          collectFeesV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCollectProtocolFeesV2Instruction(input),
+              getCollectFeesV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          collectRewardV2: (input) =>
+          collectProtocolFeesV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCollectRewardV2Instruction(input),
+              getCollectProtocolFeesV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          decreaseLiquidityV2: (input) =>
+          collectRewardV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDecreaseLiquidityV2Instruction(input),
+              getCollectRewardV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          increaseLiquidityV2: (input) =>
+          decreaseLiquidityV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getIncreaseLiquidityV2Instruction(input),
+              getDecreaseLiquidityV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializePoolV2: (input) =>
+          increaseLiquidityV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializePoolV2Instruction(input),
+              getIncreaseLiquidityV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeRewardV2: (input) =>
+          initializePoolV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeRewardV2Instruction(input),
+              getInitializePoolV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setRewardEmissionsV2: (input) =>
+          initializeRewardV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetRewardEmissionsV2Instruction(input),
+              getInitializeRewardV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          swapV2: (input) =>
-            addSelfPlanAndSendFunctions(client, getSwapV2Instruction(input)),
-          twoHopSwapV2: (input) =>
+          setRewardEmissionsV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTwoHopSwapV2Instruction(input),
+              getSetRewardEmissionsV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeConfigExtension: (input) =>
+          swapV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeConfigExtensionInstruction(input),
+              getSwapV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setConfigExtensionAuthority: (input) =>
+          twoHopSwapV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetConfigExtensionAuthorityInstruction(input),
+              getTwoHopSwapV2Instruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setTokenBadgeAuthority: (input) =>
+          initializeConfigExtension: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetTokenBadgeAuthorityInstruction(input),
+              getInitializeConfigExtensionInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeTokenBadge: (input) =>
+          setConfigExtensionAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeTokenBadgeInstruction(input),
+              getSetConfigExtensionAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          deleteTokenBadge: (input) =>
+          setTokenBadgeAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDeleteTokenBadgeInstruction(input),
+              getSetTokenBadgeAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          initializeTokenBadge: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitializeTokenBadgeInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          deleteTokenBadge: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDeleteTokenBadgeInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         identifyAccount: identifyWhirlpoolAccount,

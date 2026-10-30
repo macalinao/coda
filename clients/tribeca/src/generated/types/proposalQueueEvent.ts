@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ProposalQueueEvent = {
@@ -24,7 +25,11 @@ export type ProposalQueueEvent = {
   transaction: Address;
 };
 
-export type ProposalQueueEventArgs = ProposalQueueEvent;
+export type ProposalQueueEventArgs = {
+  governor: Address | HasAddress;
+  proposal: Address | HasAddress;
+  transaction: Address | HasAddress;
+};
 
 export function getProposalQueueEventEncoder(): FixedSizeEncoder<ProposalQueueEventArgs> {
   return getStructEncoder([

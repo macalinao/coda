@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -117,31 +120,34 @@ export function getExitInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ExitInput<
-  TAccountLocker extends string = string,
-  TAccountEscrow extends string = string,
-  TAccountEscrowOwner extends string = string,
-  TAccountEscrowTokens extends string = string,
-  TAccountDestinationTokens extends string = string,
-  TAccountPayer extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountLocker extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountEscrowTokens extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountDestinationTokens extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  locker: Address<TAccountLocker>;
-  escrow: Address<TAccountEscrow>;
-  escrowOwner: TransactionSigner<TAccountEscrowOwner>;
-  escrowTokens: Address<TAccountEscrowTokens>;
-  destinationTokens: Address<TAccountDestinationTokens>;
-  payer: TransactionSigner<TAccountPayer>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  locker: TAccountLocker;
+  escrow: TAccountEscrow;
+  escrowOwner: TAccountEscrowOwner;
+  escrowTokens: TAccountEscrowTokens;
+  destinationTokens: TAccountDestinationTokens;
+  payer: TAccountPayer;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getExitInstruction<
-  TAccountLocker extends string,
-  TAccountEscrow extends string,
-  TAccountEscrowOwner extends string,
-  TAccountEscrowTokens extends string,
-  TAccountDestinationTokens extends string,
-  TAccountPayer extends string,
-  TAccountTokenProgram extends string,
+  TAccountLocker extends InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput,
+  TAccountEscrowTokens extends InstructionAccountInput,
+  TAccountDestinationTokens extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: ExitInput<
@@ -153,32 +159,79 @@ export function getExitInstruction<
     TAccountPayer,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ExitInstruction<
   TProgramAddress,
-  TAccountLocker,
-  TAccountEscrow,
-  TAccountEscrowOwner,
-  TAccountEscrowTokens,
-  TAccountDestinationTokens,
-  TAccountPayer,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountLocker,
+    InstructionAccountInputAddress<TAccountLocker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrow,
+    InstructionAccountInputAddress<TAccountEscrow>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowOwner,
+    InstructionAccountInputAddress<TAccountEscrowOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowTokens,
+    InstructionAccountInputAddress<TAccountEscrowTokens>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDestinationTokens,
+    InstructionAccountInputAddress<TAccountDestinationTokens>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    locker: { value: input.locker ?? null, isWritable: true },
-    escrow: { value: input.escrow ?? null, isWritable: true },
-    escrowOwner: { value: input.escrowOwner ?? null, isWritable: false },
-    escrowTokens: { value: input.escrowTokens ?? null, isWritable: true },
-    destinationTokens: {
-      value: input.destinationTokens ?? null,
+    locker: { value: input.locker ?? null, isSigner: false, isWritable: true },
+    escrow: { value: input.escrow ?? null, isSigner: false, isWritable: true },
+    escrowOwner: {
+      value: input.escrowOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    escrowTokens: {
+      value: input.escrowTokens ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    destinationTokens: {
+      value: input.destinationTokens ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -191,7 +244,6 @@ export function getExitInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("locker", accounts.locker),
@@ -206,13 +258,34 @@ export function getExitInstruction<
     programAddress,
   } as ExitInstruction<
     TProgramAddress,
-    TAccountLocker,
-    TAccountEscrow,
-    TAccountEscrowOwner,
-    TAccountEscrowTokens,
-    TAccountDestinationTokens,
-    TAccountPayer,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountLocker,
+      InstructionAccountInputAddress<TAccountLocker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrow,
+      InstructionAccountInputAddress<TAccountEscrow>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowOwner,
+      InstructionAccountInputAddress<TAccountEscrowOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowTokens,
+      InstructionAccountInputAddress<TAccountEscrowTokens>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestinationTokens,
+      InstructionAccountInputAddress<TAccountDestinationTokens>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

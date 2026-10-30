@@ -18,6 +18,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Internal plugin recording the groups an asset or collection belongs to. */
@@ -26,7 +27,10 @@ export type Groups = {
   groups: Array<Address>;
 };
 
-export type GroupsArgs = Groups;
+export type GroupsArgs = {
+  /** The addresses of the groups this asset or collection belongs to. */
+  groups: Array<Address | HasAddress>;
+};
 
 export function getGroupsEncoder(): Encoder<GroupsArgs> {
   return getStructEncoder([["groups", getArrayEncoder(getAddressEncoder())]]);

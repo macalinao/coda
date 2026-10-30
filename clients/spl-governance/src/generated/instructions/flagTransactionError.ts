@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -100,25 +103,29 @@ export function getFlagTransactionErrorInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type FlagTransactionErrorInput<
-  TAccountProposalAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountGovernanceAuthority extends string = string,
-  TAccountProposalTransactionAccount extends string = string,
+  TAccountProposalAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountProposalTransactionAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  proposalAccount: Address<TAccountProposalAccount>;
+  proposalAccount: TAccountProposalAccount;
   /** TokenOwnerRecord account of the Proposal owner */
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
   /** Governance Authority (Token Owner or Governance Delegate) */
-  governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
+  governanceAuthority: TAccountGovernanceAuthority;
   /** ProposalTransaction account to flag */
-  proposalTransactionAccount: Address<TAccountProposalTransactionAccount>;
+  proposalTransactionAccount: TAccountProposalTransactionAccount;
 };
 
 export function getFlagTransactionErrorInstruction<
-  TAccountProposalAccount extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountGovernanceAuthority extends string,
-  TAccountProposalTransactionAccount extends string,
+  TAccountProposalAccount extends InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput,
+  TAccountProposalTransactionAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: FlagTransactionErrorInput<
@@ -127,31 +134,62 @@ export function getFlagTransactionErrorInstruction<
     TAccountGovernanceAuthority,
     TAccountProposalTransactionAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): FlagTransactionErrorInstruction<
   TProgramAddress,
-  TAccountProposalAccount,
-  TAccountTokenOwnerRecord,
-  TAccountGovernanceAuthority,
-  TAccountProposalTransactionAccount
+  ResolvedInstructionAccountMeta<
+    TAccountProposalAccount,
+    InstructionAccountInputAddress<TAccountProposalAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAuthority,
+    InstructionAccountInputAddress<TAccountGovernanceAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalTransactionAccount,
+    InstructionAccountInputAddress<TAccountProposalTransactionAccount>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    proposalAccount: { value: input.proposalAccount ?? null, isWritable: true },
+    proposalAccount: {
+      value: input.proposalAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
     governanceAuthority: {
       value: input.governanceAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
     proposalTransactionAccount: {
       value: input.proposalTransactionAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
   };
@@ -160,7 +198,6 @@ export function getFlagTransactionErrorInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("proposalAccount", accounts.proposalAccount),
@@ -175,10 +212,22 @@ export function getFlagTransactionErrorInstruction<
     programAddress,
   } as FlagTransactionErrorInstruction<
     TProgramAddress,
-    TAccountProposalAccount,
-    TAccountTokenOwnerRecord,
-    TAccountGovernanceAuthority,
-    TAccountProposalTransactionAccount
+    ResolvedInstructionAccountMeta<
+      TAccountProposalAccount,
+      InstructionAccountInputAddress<TAccountProposalAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAuthority,
+      InstructionAccountInputAddress<TAccountGovernanceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalTransactionAccount,
+      InstructionAccountInputAddress<TAccountProposalTransactionAccount>
+    >
   >);
 }
 
